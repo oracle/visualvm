@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2013, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.MonitoredData;
 import com.sun.tools.visualvm.application.jvm.MonitoredDataListener;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.jvm.HeapHistogram;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.heapdump.HeapDumpSupport;
 import com.sun.tools.visualvm.host.Host;
@@ -429,6 +430,22 @@ public class JVMImpl extends Jvm implements JvmstatListener {
         os.write(threadDump.getBytes("UTF-8")); // NOI18N
         os.close();
         return dumpFile;
+    }
+
+    public HeapHistogram takeHeapHistogram() {
+        AttachModel attach = getAttach();
+        HeapHistogram histogram = null;
+        
+        if (attach != null) {
+            histogram = attach.takeHeapHistogram();
+        }
+        if (histogram == null) {
+            JmxModel jmx = getJmxModel();
+            if (jmx != null) {
+                histogram = jmx.takeHeapHistogram();
+            }
+        }
+        return histogram;
     }
     
     public boolean isCpuMonitoringSupported() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2013, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.tools.jmx;
 
+import com.sun.tools.visualvm.application.jvm.HeapHistogram;
 import com.sun.tools.visualvm.core.datasupport.AsyncPropertyChangeSupport;
 import com.sun.tools.visualvm.core.model.Model;
 import java.beans.PropertyChangeListener;
@@ -210,6 +211,13 @@ public abstract class JmxModel extends Model {
      */
     public abstract String takeThreadDump(long[] threadIds);
 
+    /**
+     * Takes heap histogram of target Application.
+     * @since VisualVM 1.3.7
+     * @return Returns {@link HeapHistogram} of the heap from target Application.
+     */
+    public abstract HeapHistogram takeHeapHistogram();
+ 
     /**
      * print VM option.
      * Note that VM option is the one which starts with

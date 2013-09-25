@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.jmx.impl;
 
 import com.sun.management.HotSpotDiagnosticMXBean;
 import com.sun.management.VMOption;
+import com.sun.tools.visualvm.application.jvm.HeapHistogram;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModel.ConnectionState;
 import com.sun.tools.visualvm.tools.jmx.JvmMXBeans;
@@ -43,11 +44,16 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
 import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
+import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.management.ReflectionException;
 import org.openide.ErrorManager;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -57,6 +63,11 @@ public class JmxSupport {
     private final static Logger LOGGER = Logger.getLogger(JmxSupport.class.getName());
     private static final String HOTSPOT_DIAGNOSTIC_MXBEAN_NAME =
             "com.sun.management:type=HotSpotDiagnostic";    // NOI18N
+    private static final String DIAGNOSTIC_COMMAND_MXBEAN_NAME =
+            "com.sun.management:type=DiagnosticCommand";    // NOI18N
+    private static final String ALL_OBJECTS_OPTION = "-all";    // NOI18N
+    private static final String HISTOGRAM_COMMAND = "gcClassHistogram";       // NOI18N
+
     private JvmMXBeans mxbeans;
     private JmxModel jmxModel;
     // HotspotDiagnostic
@@ -330,6 +341,37 @@ public class JmxSupport {
             if (option != null) {
                 return option.getValue();
             }
+        }
+        return null;
+    }
+
+    HeapHistogram takeHeapHistogram() {
+        if (jmxModel.getConnectionState() == ConnectionState.CONNECTED) {
+            MBeanServerConnection conn = jmxModel.getMBeanServerConnection();
+            try {
+                ObjectName diagCommName = new ObjectName(DIAGNOSTIC_COMMAND_MXBEAN_NAME);
+
+                if (conn.isRegistered(diagCommName)) {
+                    Object histo = conn.invoke(diagCommName,
+                                HISTOGRAM_COMMAND,
+                                new Object[] {new String[] {ALL_OBJECTS_OPTION}},
+                                new String[] {String[].class.getName()}
+                    );
+                    if (histo instanceof String) {
+                        return new HeapHistogramImpl((String)histo);
+                    }
+                }
+            } catch (MalformedObjectNameException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (IOException ex) {
+                LOGGER.log(Level.INFO,"takeHeapHistogram", ex); // NOI18N
+            } catch (InstanceNotFoundException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (MBeanException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (ReflectionException ex) {
+                Exceptions.printStackTrace(ex);
+            } 
         }
         return null;
     }

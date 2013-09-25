@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2013, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,11 +26,11 @@
 package com.sun.tools.visualvm.sampler.memory;
 
 import com.sun.tools.visualvm.application.jvm.HeapHistogram;
+import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.sampler.AbstractSamplerSupport;
 import com.sun.tools.visualvm.sampler.AbstractSamplerSupport.Refresher;
-import com.sun.tools.visualvm.tools.attach.AttachModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
@@ -54,7 +54,7 @@ import org.openide.util.NbBundle;
  */
 public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     
-    private final AttachModel attachModel;
+    private final Jvm jvm;
     private final MemoryMXBean memoryBean;
     private final ThreadsMemory threadsMemory;
     private final HeapDumper heapDumper;
@@ -76,9 +76,9 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     
     private DataViewComponent.DetailsView[] detailsViews;
     
-    public MemorySamplerSupport(AttachModel attachModel, ThreadsMemory mem, MemoryMXBean memoryBean, 
+    public MemorySamplerSupport(Jvm jvm, ThreadsMemory mem, MemoryMXBean memoryBean, 
                                 SnapshotDumper snapshotDumper, HeapDumper heapDumper) {
-        this.attachModel = attachModel;
+        this.jvm = jvm;
         threadsMemory = mem;
         this.memoryBean = memoryBean;
         this.heapDumper = heapDumper;
@@ -254,7 +254,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
                 public void run() {
                     try {
                         if (!timer.isRunning()) return;
-                        doRefreshImplImpl(attachModel.takeHeapHistogram(), views);
+                        doRefreshImplImpl(jvm.takeHeapHistogram(), views);
                     } catch (Exception e) {
                         terminate();
                     }

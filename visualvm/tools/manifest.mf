@@ -3,5 +3,5 @@ AutoUpdate-Show-In-Client: false
 AutoUpdate-Essential-Module: true
 OpenIDE-Module: com.sun.tools.visualvm.tools/0
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/tools/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.3
+OpenIDE-Module-Specification-Version: 1.4
 

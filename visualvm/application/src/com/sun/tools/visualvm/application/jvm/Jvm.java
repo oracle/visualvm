@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2013, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -312,6 +312,16 @@ public abstract class Jvm extends Model {
      */
     public abstract File takeThreadDump() throws IOException;
     
+    /**
+     * Takes heap histogram of target Application.
+     * @since VisualVM 1.3.7
+     * @return Returns {@link HeapHistogram} of the heap from target Application.
+     */
+    public HeapHistogram takeHeapHistogram() {
+        // default implementation for backward compatibility
+        return null;        
+    }
+     
     /**
      * provides access to current values of monitored data in instance of {@link MonitoredData}. 
      * The methods may return <CODE>null</CODE> if the {@link MonitoredData} are not available

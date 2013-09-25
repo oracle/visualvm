@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2013, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  * This code is free software; you can redistribute it and/or modify it
@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.sampler.cpu.ThreadsCPU;
 import com.sun.tools.visualvm.sampler.memory.MemorySettingsSupport;
 import com.sun.tools.visualvm.sampler.cpu.CPUSettingsSupport;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
@@ -584,40 +585,41 @@ final class SamplerImpl {
                     });
                     return;
                 }
-                if (!application.isLocalApplication()) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            memoryStatus = NbBundle.getMessage(SamplerImpl.class,
-                                    "MSG_Unavailable_remote"); // NOI18N
-                            refreshSummary();
-                        }
-                    });
-                    return;
-                }
-                if (!JvmFactory.getJVMFor(application).isAttachable()) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            memoryStatus = NbBundle.getMessage(SamplerImpl.class,
-                                    "MSG_Unavailable_connect_jdk"); // NOI18N
-                            refreshSummary();
-                        }
-                    });
-                    return;
-                }
-                final AttachModel attachModel = AttachModelFactory.getAttachFor(application);
-                if (attachModel == null) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            memoryStatus = NbBundle.getMessage(SamplerImpl.class,
-                                    "MSG_Unavailable_connect_log"); // NOI18N
-                            refreshSummary();
-                        }
-                    });
-                    LOGGER.log(Level.WARNING, "AttachModelFactory.getAttachFor(application) returns null for " + application); // NOI18N
-                    return;
-                }
+                final Jvm jvm = JvmFactory.getJVMFor(application);
                 try {
-                    if (attachModel.takeHeapHistogram() == null) {
+                    if (jvm.takeHeapHistogram() == null) {
+                        if (!application.isLocalApplication()) {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    memoryStatus = NbBundle.getMessage(SamplerImpl.class,
+                                            "MSG_Unavailable_remote"); // NOI18N
+                                    refreshSummary();
+                                }
+                            });
+                            return;
+                        }
+                        if (!JvmFactory.getJVMFor(application).isAttachable()) {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    memoryStatus = NbBundle.getMessage(SamplerImpl.class,
+                                            "MSG_Unavailable_connect_jdk"); // NOI18N
+                                    refreshSummary();
+                                }
+                            });
+                            return;
+                        }
+                        final AttachModel attachModel = AttachModelFactory.getAttachFor(application);
+                        if (attachModel == null) {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    memoryStatus = NbBundle.getMessage(SamplerImpl.class,
+                                            "MSG_Unavailable_connect_log"); // NOI18N
+                                    refreshSummary();
+                                }
+                            });
+                            LOGGER.log(Level.WARNING, "AttachModelFactory.getAttachFor(application) returns null for " + application); // NOI18N
+                            return;
+                        }
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 memoryStatus = NbBundle.getMessage(SamplerImpl.class,
@@ -717,7 +719,7 @@ final class SamplerImpl {
                             else hds.takeRemoteHeapDump(application, null, openView);
                         }
                     };
-                memorySampler = new MemorySamplerSupport(attachModel, threadsMemory, memoryBean, snapshotDumper, heapDumper) {
+                memorySampler = new MemorySamplerSupport(jvm, threadsMemory, memoryBean, snapshotDumper, heapDumper) {
                     protected Timer getTimer() { return SamplerImpl.this.getTimer(); }
                 };
                 SwingUtilities.invokeLater(new Runnable() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2013, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -30,6 +30,7 @@ import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.jvm.HeapHistogram;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
@@ -313,6 +314,10 @@ class JmxModelImpl extends JmxModel {
     public String takeThreadDump(long[] threadIds) {
         return getJmxSupport().takeThreadDump(threadIds);
     }    
+
+    public HeapHistogram takeHeapHistogram() {
+        return getJmxSupport().takeHeapHistogram();
+    }
 
     public String getFlagValue(String name) {
         return getJmxSupport().getFlagValue(name);
