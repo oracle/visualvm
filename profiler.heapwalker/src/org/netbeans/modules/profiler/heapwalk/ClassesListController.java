@@ -449,6 +449,7 @@ public class ClassesListController extends AbstractController {
                             showDiffProgress();
                             Heap currentHeap = hfw.getHeapFragment();
                             Heap diffHeap = HeapFactory.createHeap(result.getFile());
+                            CompareSnapshotsHelper.checkObjectSizes(currentHeap, diffHeap);
                             compareRetained = result.compareRetained();
                             diffClasses = createDiffClasses(diffHeap, currentHeap);
                         } catch (Exception e) {
