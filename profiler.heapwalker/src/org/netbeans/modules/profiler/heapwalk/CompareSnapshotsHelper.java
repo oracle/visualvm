@@ -65,6 +65,9 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.DialogDisplayer;
@@ -92,7 +95,9 @@ import org.openide.windows.WindowManager;
     "CompareSnapshotsHelper_SnapshotsListAccessDescr=List of comparable heap dumps in current project",
     "CompareSnapshotsHelper_CompareRetainedRadio=Compare &retained sizes",
     "CompareSnapshotsHelper_CompareRetainedRadioAccessDescr=Compute and compare retained sizes by class",
-    "CompareSnapshotsHelper_CompareRetainedHint=Comparing retained sizes can take a significant amount of time!"
+    "CompareSnapshotsHelper_CompareRetainedHint=Comparing retained sizes can take a significant amount of time!",
+    "CompareSnapshotsHelper_CaptionWarning=Warning",
+    "CompareSnapshotsHelper_DifferentObjectSize=<html><b>Object sizes are different.</b><br><br>Size of the same objects differ for each heap dump and their comparison is invalid.<br>The heap dumps have likely been taken on different architectures (32bit vs. 64bit).</html>"
 })
 class CompareSnapshotsHelper {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -524,6 +529,16 @@ class CompareSnapshotsHelper {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    static void checkObjectSizes(Heap heap1, Heap heap2) {
+        JavaClass objcls1 = heap1.getJavaClassByName("java.lang.Object"); // NOI18N
+        JavaClass objcls2 = heap2.getJavaClassByName("java.lang.Object"); // NOI18N
+        
+        if (objcls1.getInstanceSize() != objcls2.getInstanceSize())
+            ProfilerDialogs.displayWarningDNSA(Bundle.CompareSnapshotsHelper_DifferentObjectSize(),
+                                               Bundle.CompareSnapshotsHelper_CaptionWarning(), null,
+                                               "CompareSnapshotsHelper.checkObjectSizes", false); // NOI18N
+    }
 
     static Result selectSnapshot(HeapFragmentWalker heapWalker, boolean compareRetained) {
         CompareSnapshotsHelper helper = new CompareSnapshotsHelper(heapWalker, compareRetained);
