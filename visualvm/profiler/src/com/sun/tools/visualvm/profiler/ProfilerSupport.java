@@ -368,7 +368,11 @@ public final class ProfilerSupport {
                 } else if (updateNumber >= 6) return false;
             // JDK 7.0 is OK from Build 26
             } else if (javaRTVersion.startsWith(JAVA_RT_17_PREFIX)) {
-                if (buildNumber >= 26) return false;
+                if (updateNumber == 0) {
+                    if (buildNumber >= 26) return false;
+                } else {
+                    return false;
+                }
             } else if (javaRTVersion.startsWith(JAVA_RT_18_PREFIX)) {
                 return false;
             }
@@ -376,10 +380,18 @@ public final class ProfilerSupport {
         } else if(vmName.startsWith(OPENJDK_VM_NAME_PREFIX)) {
             // OpenJDK 6 is OK from Build 11
             if (javaRTVersion.startsWith(JAVA_RT_16_PREFIX)) {
-                if (buildNumber >= 11) return false;
+                if (updateNumber == 0) {
+                    if (buildNumber >= 11) return false;
+                } else {
+                    return false;
+                }
             // OpenJDK 7 is assumed to be OK from Build 26 (not tested)
             } else if (javaRTVersion.startsWith(JAVA_RT_17_PREFIX)) {
-                if (buildNumber >= 26) return false;
+                if (updateNumber == 0) {
+                    if (buildNumber >= 26) return false;
+                } else {
+                    return false;
+                }
             }
             // OpenJDK 8 should be OK
             else if (javaRTVersion.startsWith(JAVA_RT_18_PREFIX)) {
