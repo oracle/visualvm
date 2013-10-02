@@ -143,7 +143,7 @@ public final class Utils {
     
     /**
      * Returns Set of independent DataSources. Independent means that no DataSource
-     * is (super)owner of any other DataSource - this means that (sub)childs are removed.
+     * is (super)owner of any other DataSource - this means that (sub)children are removed.
      * 
      * @param <X> any DataSource.
      * @param dataSources DataSources to be filtered.
@@ -278,11 +278,11 @@ public final class Utils {
     }
     
     /**
-     * Copies source file to the destination file, returns true if the file was successfuly copied.
+     * Copies source file to the destination file, returns true if the file was successfully copied.
      * 
      * @param file source file.
      * @param copy destination file.
-     * @return true if the file was successfuly copied, false otherwise.
+     * @return true if the file was successfully copied, false otherwise.
      */
     public static boolean copyFile(File file, File copy) {
         if (file == null || copy == null) throw new NullPointerException("File cannot be null");    // NOI18N
