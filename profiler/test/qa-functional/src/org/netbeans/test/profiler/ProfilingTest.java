@@ -42,10 +42,10 @@
 package org.netbeans.test.profiler;
 
 import java.util.logging.Level;
+import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.netbeans.jellytools.JellyTestCase;
 import org.netbeans.junit.NbModuleSuite;
-import org.netbeans.junit.NbTestSuite;
 import org.netbeans.test.profiler.utils.J2SEProfiledProject;
 import org.openide.util.Exceptions;
 
@@ -73,21 +73,18 @@ public class ProfilingTest extends JellyTestCase {
             super(name);
 	}
 
-	public static NbTestSuite suite() {
-            NbModuleSuite.Configuration conf = NbModuleSuite.createConfiguration(
-            ProfilingTest.class);
-            
-            conf.clusters("profiler|nb").enableModules(".*").honorAutoloadEager(true)
-            .failOnException(Level.SEVERE)
-            .failOnMessage(Level.SEVERE);
-        
-            conf.addTest("testJavaSEProjectMonitoring").addTest("testJavaSEProjectCPU").addTest("testJavaSEProjectMemory");
-
-            NbTestSuite suite = new NbTestSuite();
-            suite.addTest(NbModuleSuite.create(conf));
-        
-            return suite;
-
+	public static Test suite() {
+            NbModuleSuite.Configuration conf = NbModuleSuite
+                    .createConfiguration(ProfilingTest.class)
+                    .clusters(".*")
+                    .enableModules(".*")
+                    .honorAutoloadEager(true)
+                    .failOnException(Level.SEVERE)
+                    .failOnMessage(Level.SEVERE);
+            conf.addTest("testJavaSEProjectMonitoring"
+                    ,"testJavaSEProjectCPU"
+                    ,"testJavaSEProjectMemory");
+            return conf.suite();
 //		return (NbTestSuite) createModuleTest(ProfilingTest.class,
 //				tests);
 	}
