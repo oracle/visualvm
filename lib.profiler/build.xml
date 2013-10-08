@@ -101,15 +101,4 @@ made subject to such option by the copyright holder.
         <fixcrlf eol="crlf" srcdir="${cluster}/lib/deployed" includes="**/*.map"/>
     </target>
 
-    <target name="netbeans-extra">
-       <ant dir="release/remote-pack-defs" target="profiler-server-all" inheritall="false">
-           <property name="cluster" location="${cluster}"/>
-           <property name="dest.dir" location="${build.dir}"/>
-       </ant>
-    </target>
-
-    <target name="clean" depends="projectized-common.clean">
-       <delete dir="remote-packs/build"/>
-    </target>
-
 </project>
