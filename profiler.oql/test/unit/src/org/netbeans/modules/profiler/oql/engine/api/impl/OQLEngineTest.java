@@ -164,7 +164,7 @@ public class OQLEngineTest {
     @Test
     public void testHeapForEachClass() throws Exception {
         System.out.println("heap.forEachClass");
-        String query = "select heap.forEachClass(function(xxx) { println(xxx.name); })";
+        String query = "select heap.forEachClass(function(xxx) { print(xxx.name); print(\"\\n\");})";
 
         instance.executeQuery(query, null);
     }
@@ -172,7 +172,7 @@ public class OQLEngineTest {
     @Test
     public void testHeapForEachObject() throws Exception {
         System.out.println("heap.forEachObject");
-        String query = "select heap.forEachObject(function(xxx) { println(xxx.id); }, \"java.io.File\")";
+        String query = "select heap.forEachObject(function(xxx) { print(xxx.id); print(\"\\n\");}, \"java.io.File\")";
 
         instance.executeQuery(query, null);
     }
@@ -332,7 +332,7 @@ public class OQLEngineTest {
     public void testforEachReferrer() throws Exception {
         System.out.println("forEachReferrer");
 
-        String query = "select forEachReferrer(function(xxx) { println(\"referrer: \" + xxx.id);}, heap.findObject(1684166976))";
+        String query = "select forEachReferrer(function(xxx) { print(\"referrer: \" + xxx.id); print(\"\\n\");}, heap.findObject(1684166976))";
 
         instance.executeQuery(query, null);
     }
@@ -341,7 +341,7 @@ public class OQLEngineTest {
     public void testforEachReferee() throws Exception {
         System.out.println("forEachReferee");
 
-        String query = "select forEachReferee(function(xxx) { println(\"referee: \" + xxx.id);}, heap.findObject(1684166976))";
+        String query = "select forEachReferee(function(xxx) { print(\"referee: \" + xxx.id); print(\"\\n\");}, heap.findObject(1684166976))";
 
         instance.executeQuery(query, null);
     }
