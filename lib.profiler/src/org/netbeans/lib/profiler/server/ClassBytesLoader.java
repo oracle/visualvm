@@ -127,11 +127,10 @@ public class ClassBytesLoader {
         getClassFileBytes("sun.misc.Launcher"); // NOI18N
         new java.io.FilePermission("*", "read"); // NOI18N
 
-        java.util.HashMap h = new java.util.HashMap();
-        h.keySet().iterator();
+        new java.util.HashMap().keySet().iterator();
  
         // compressed remote profiling
-        java.util.zip.Deflater d = new java.util.zip.Deflater();
+        new java.util.zip.Deflater();
     }
 
     private static byte[] readFile(final URL classUrl)
