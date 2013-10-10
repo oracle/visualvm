@@ -337,8 +337,8 @@ class ClassLoaderManager implements CommonConstants {
 
     static void initialize(ProfilerServer inProfilerServer) {
         try {
-            Class classLoaderClass = Class.forName("java.lang.ClassLoader"); // NOI18N
-            Class[] stringArg = new Class[] { Class.forName("java.lang.String") }; // NOI18N
+            Class classLoaderClass = ClassLoader.class;
+            Class[] stringArg = new Class[] { String.class };
             findLoadedClassMethod = classLoaderClass.getDeclaredMethod("findLoadedClass", stringArg); // NOI18N
             findLoadedClassMethod.setAccessible(true); // REQUIRED to suppress
             findBootstrapClassMethod = classLoaderClass.getDeclaredMethod("findBootstrapClass", stringArg); // NOI18N
