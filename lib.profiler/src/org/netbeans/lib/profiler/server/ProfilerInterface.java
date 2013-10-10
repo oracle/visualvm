@@ -54,6 +54,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
+import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
 
@@ -168,12 +169,9 @@ public class ProfilerInterface implements CommonConstants {
             // or Code Fragment profiling is used
             // see http://profiler.netbeans.org/issues/show_bug.cgi?id=59660
             // and http://profiler.netbeans.org/issues/show_bug.cgi?id=61968
+            new LinkedHashMap().keySet().iterator();
             try {
-                Class.forName("java.util.LinkedHashMap"); // NOI18N
-                Class.forName("java.util.LinkedHashMap$LinkedHashIterator"); // NOI18N
-                Class.forName("java.util.LinkedHashMap$KeyIterator"); // NOI18N
-                                                                      // for take heap dump
-
+                // for take heap dump
                 Class.forName("java.lang.reflect.InvocationTargetException"); // NOI18N
                 Class.forName("java.lang.InterruptedException");    // NOI18N
                 Class.forName("java.lang.ClassFormatError"); // NOI18N class caching
