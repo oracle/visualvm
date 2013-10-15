@@ -81,7 +81,9 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.locks.LockCCTNode;
@@ -163,6 +165,7 @@ public class LockContentionPanel extends ResultsPanel {
     
     private LockRuntimeCCTNode root;
     private Listener cctListener;
+    private long countsInMicrosec;
     
     
     public LockContentionPanel() {        
@@ -369,14 +372,14 @@ public class LockContentionPanel extends ResultsPanel {
                 LockCCTNode top = tempTop.getChild(i);
                 result.append(quote).append(top.getNodeName()).append(quote).append(separator);
                 result.append(top.getTimeInPerCent()).append(separator);
-                result.append(top.getTime()).append(separator);
+                result.append(getTimeInMillis(top)).append(separator);
                 result.append(top.getWaits()).append(newLine);
                 if (top.getNChildren()>0) {
                     for (int j = 0; j < top.getNChildren(); j++) {
                         LockCCTNode leaf = top.getChild(j);
                         result.append(quote).append(indent).append(leaf.getNodeName()).append(quote).append(separator);
                         result.append(leaf.getTimeInPerCent()).append(separator);
-                        result.append(leaf.getTime()).append(separator);
+                        result.append(getTimeInMillis(leaf)).append(separator);
                         result.append(leaf.getWaits()).append(newLine);
                     }
                 }
@@ -418,7 +421,7 @@ public class LockContentionPanel extends ResultsPanel {
                 result.append(indent).append("<").append(first).append(">").append(newLine); // NOI18N
                 result.append(indent).append(indent).append("<name>").append(quote).append(top.getNodeName()).append(quote).append("</name>").append(newLine); // NOI18N
                 result.append(indent).append(indent).append("<time_relative>").append(top.getTimeInPerCent()).append("</time_relative>").append(newLine); // NOI18N
-                result.append(indent).append(indent).append("<time>").append(top.getTime()).append("</time>").append(newLine); // NOI18N
+                result.append(indent).append(indent).append("<time>").append(getTimeInMillis(top)).append("</time>").append(newLine); // NOI18N
                 result.append(indent).append(indent).append("<waits>").append(top.getWaits()).append("</waits>").append(newLine); // NOI18N
                 if (top.getNChildren()>0) {
                     for (int j = 0; j < top.getNChildren(); j++) {
@@ -426,7 +429,7 @@ public class LockContentionPanel extends ResultsPanel {
                         result.append(indent).append(indent).append("<").append(second).append(">").append(newLine); // NOI18N
                         result.append(indent).append(indent).append(indent).append("<name>").append(quote).append(leaf.getNodeName()).append(quote).append("</name>").append(newLine); // NOI18N
                         result.append(indent).append(indent).append(indent).append("<time_relative>").append(leaf.getTimeInPerCent()).append("</time_relative>").append(newLine); // NOI18N
-                        result.append(indent).append(indent).append(indent).append("<time>").append(leaf.getTime()).append("</time>").append(newLine); // NOI18N
+                        result.append(indent).append(indent).append(indent).append("<time>").append(getTimeInMillis(leaf)).append("</time>").append(newLine); // NOI18N
                         result.append(indent).append(indent).append(indent).append("<waits>").append(leaf.getWaits()).append("</waits>").append(newLine); // NOI18N
                         result.append(indent).append(indent).append("</").append(second).append(">").append(newLine); // NOI18N
                     }
@@ -469,14 +472,14 @@ public class LockContentionPanel extends ResultsPanel {
                 LockCCTNode top = tempTop.getChild(i);
                 result.append("<tr><td><pre>").append(top.getNodeName()).append("</pre></td>"); // NOI18N
                 result.append("<td>").append(top.getTimeInPerCent()).append("%</td>"); // NOI18N
-                result.append("<td>").append(top.getTime()).append("</td>"); // NOI18N
+                result.append("<td>").append(getTimeInMillis(top)).append("</td>"); // NOI18N
                 result.append("<td>").append(top.getWaits()).append("</td></tr>").append(newLine); // NOI18N
                 if (top.getNChildren()>0) {
                     for (int j = 0; j < top.getNChildren(); j++) {
                         LockCCTNode leaf = top.getChild(j);
                         result.append("<tr><td><pre>").append(indent).append(leaf.getNodeName()).append("</pre></td>"); // NOI18N                        
                         result.append("<td>").append(leaf.getTimeInPerCent()).append("</td>"); // NOI18N
-                        result.append("<td>").append(leaf.getTime()).append("</td>"); // NOI18N
+                        result.append("<td>").append(getTimeInMillis(leaf)).append("</td>"); // NOI18N
                         result.append("<td>").append(leaf.getWaits()).append("</td></tr>"); // NOI18N
                     }
                 }
@@ -567,6 +570,9 @@ public class LockContentionPanel extends ResultsPanel {
     }
 
     public void profilingSessionStarted() {
+        ProfilingSessionStatus session = TargetAppRunner.getDefault().getProfilingSessionStatus();
+        countsInMicrosec = session.timerCountsInSecond[0] / 1000000L;
+
         if (cctListener == null) {
             cctListener = new Listener();
             LockCCTProvider cctProvider = Lookup.getDefault().lookup(LockCCTProvider.class);
@@ -606,6 +612,10 @@ public class LockContentionPanel extends ResultsPanel {
         enableLockContentionButton.removeActionListener(listener);
     }
     
+    private String getTimeInMillis(LockCCTNode node) {
+        long microSec = node.getTime() / countsInMicrosec;
+        return StringUtils.mcsTimeToString(microSec);
+    }
     
     private void initColumnsData() {
         columnCount = 4;
@@ -777,7 +787,7 @@ public class LockContentionPanel extends ResultsPanel {
                 case 1:
                     return node.getTimeInPerCent();
                 case 2:
-                    return StringUtils.mcsTimeToString(node.getTime()) + " ms (" // NOI18N
+                    return getTimeInMillis(node) + " ms (" // NOI18N
                     + percentFormat.format(node.getTimeInPerCent() / 100) + ")"; // NOI18N
                 case 3:
                     return node.getWaits();
