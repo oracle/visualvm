@@ -24,6 +24,8 @@
  */
 package com.sun.tools.visualvm.sampler.cpu;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
@@ -44,25 +46,29 @@ final class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
 
     // @GuardedBy containerGuard
     private FlatProfileContainer container;
-    private Stack parentStack;
+    private Stack<TotalTime> parentStack;
+    private Set methodsOnStack;
     private int[] invDiff;
     private int[] invPM;
     private int[] nCalleeInvocations;
     private long[] timePM0;
     private long[] timePM1;
+    private long[] totalTimePM0;
+    private long[] totalTimePM1;
     private int nMethods;
-    private boolean collectingTwoTimeStamps;
+    private InstrumentationFilter instrFilter;
+    private boolean twoTimestamps;
     private MethodInfoMapper methodInfoMapper;
-    private InstrumentationFilter filter;
-    
+
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     CCTFlattener(boolean twoStamps, MethodInfoMapper mapper, InstrumentationFilter f) {
         parentStack = new Stack();
+        methodsOnStack = new HashSet();
         nMethods = mapper.getMaxMethodId();
         methodInfoMapper = mapper;
-        collectingTwoTimeStamps = twoStamps;
-        filter = f;
+        twoTimestamps = twoStamps;
+        instrFilter = f;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -99,7 +105,7 @@ final class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
                 wholeGraphTime0 += time;
             }
 
-            if (collectingTwoTimeStamps) {
+            if (twoTimestamps) {
                 // convert to microseconds
                 time = timePM1[i] / 1000.0;
                 timePM1[i] = (long) time;
@@ -114,69 +120,120 @@ final class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
         }
 
         synchronized (containerGuard) {
-            container = new FlatProfilerContainer(methodInfoMapper, collectingTwoTimeStamps, timePM0, timePM1, invPM, new char[0], wholeGraphTime0,
-                                                     wholeGraphTime1, invPM.length);
+            container = new FlatProfilerContainer(methodInfoMapper, twoTimestamps, timePM0, timePM1, totalTimePM0, totalTimePM1,
+                    invPM, new char[0], wholeGraphTime0, wholeGraphTime1, invPM.length);
         }
 
         timePM0 = timePM1 = null;
         invPM = invDiff = nCalleeInvocations = null;
         parentStack.clear();
-//        currentFilter = null;
+        methodsOnStack.clear();
+        instrFilter = null;
     }
 
     public void onStart() {
         timePM0 = new long[nMethods];
-        timePM1 = new long[collectingTwoTimeStamps ? nMethods : 0];
+        timePM1 = new long[twoTimestamps ? nMethods : 0];
+        totalTimePM0 = new long[nMethods];
+        totalTimePM1 = new long[twoTimestamps ? nMethods : 0];
         invPM = new int[nMethods];
         invDiff = new int[nMethods];
         nCalleeInvocations = new int[nMethods];
         parentStack.clear();
+        methodsOnStack.clear();
 
-//        currentFilter = (CCTResultsFilter)Lookup.getDefault().lookup(CCTResultsFilter.class);
-        
         synchronized (containerGuard) {
             container = null;
         }
     }
 
     public void onNode(MethodCPUCCTNode node) {
-        MethodCPUCCTNode currentParent = parentStack.isEmpty() ? null : (MethodCPUCCTNode) parentStack.peek();
-        boolean filteredOut = node.getFilteredStatus() == TimedCPUCCTNode.FILTERED_YES; // filtered out by rootmethod/markermethod rules
+        final int nodeMethodId = node.getMethodId();
+        final int nodeFilerStatus = node.getFilteredStatus();
+        final MethodCPUCCTNode currentParent = parentStack.isEmpty() ? null : (MethodCPUCCTNode) parentStack.peek().parent;
+        boolean filteredOut = (nodeFilerStatus == TimedCPUCCTNode.FILTERED_YES); // filtered out by rootmethod/markermethod rules
 
         if (!filteredOut) {
-            String jvmClassName = methodInfoMapper.getInstrMethodClass(node.getMethodId()).replace('.', '/'); // NOI18N
-            filteredOut = !filter.passesFilter(jvmClassName);
+            String jvmClassName = methodInfoMapper.getInstrMethodClass(nodeMethodId).replace('.', '/'); // NOI18N
+            filteredOut = !instrFilter.passesFilter(jvmClassName);
         }
+
+        final int parentMethodId = currentParent != null ? currentParent.getMethodId() : -1;
+
         if (filteredOut) {
             if ((currentParent != null) && !currentParent.isRoot()) {
-                invDiff[currentParent.getMethodId()] += node.getNCalls();
+                invDiff[parentMethodId] += node.getNCalls();
 
-                timePM0[currentParent.getMethodId()] += node.getNetTime0();
+                timePM0[parentMethodId] += node.getNetTime0();
 
-                if (collectingTwoTimeStamps) {
-                    timePM1[currentParent.getMethodId()] += node.getNetTime1();
+                if (twoTimestamps) {
+                    timePM1[parentMethodId] += node.getNetTime1();
                 }
             }
         } else {
-            timePM0[node.getMethodId()] += node.getNetTime0();
+            timePM0[nodeMethodId] += node.getNetTime0();
 
-            if (collectingTwoTimeStamps) {
-                timePM1[node.getMethodId()] += node.getNetTime1();
+            if (twoTimestamps) {
+                timePM1[nodeMethodId] += node.getNetTime1();
             }
 
-            invPM[node.getMethodId()] += node.getNCalls();
+            invPM[nodeMethodId] += node.getNCalls();
 
             if ((currentParent != null) && !currentParent.isRoot()) {
-                nCalleeInvocations[currentParent.getMethodId()] += node.getNCalls();
+                nCalleeInvocations[parentMethodId] += node.getNCalls();
             }
-
-            currentParent = node;
         }
-
-        parentStack.push(currentParent);
+        final MethodCPUCCTNode nextParent = filteredOut ? currentParent : node;
+        final TotalTime timeNode = new TotalTime(nextParent,methodsOnStack.contains(nodeMethodId));
+        timeNode.totalTimePM0+=node.getNetTime0();
+        if (twoTimestamps) timeNode.totalTimePM1+=node.getNetTime1();
+        if (!timeNode.recursive) {
+            methodsOnStack.add(nodeMethodId);
+        }
+        parentStack.push(timeNode);
     }
 
     public void onBackout(MethodCPUCCTNode node) {
-        parentStack.pop();
+        TotalTime current = parentStack.pop();
+        if (!current.recursive) {
+            int nodeMethodId = node.getMethodId();
+            methodsOnStack.remove(nodeMethodId);
+            // convert to microseconds
+            double time = current.totalTimePM0 / 1000.0;
+            if (time>0) {
+                totalTimePM0[nodeMethodId]+=time;
+            }
+            if (twoTimestamps) {
+                time = current.totalTimePM1 / 1000.0;
+                if (time>0) {
+                    totalTimePM1[nodeMethodId]+=time;
+                }
+            }
+        }
+        // add self data to parent
+        if (!parentStack.isEmpty()) {
+            TotalTime parent = parentStack.peek();
+            parent.add(current);
+            parent.outCalls+=node.getNCalls();
+        }
+    }
+
+    private static class TotalTime {
+        private final MethodCPUCCTNode parent;
+        private final boolean recursive;
+        private int outCalls;
+        private long totalTimePM0;
+        private long totalTimePM1;
+
+        TotalTime(MethodCPUCCTNode n, boolean r) {
+            parent = n;
+            recursive = r;
+        }
+
+        private void add(TotalTime current) {
+            outCalls += current.outCalls;
+            totalTimePM0 += current.totalTimePM0;
+            totalTimePM1 += current.totalTimePM1;
+        }
     }
 }

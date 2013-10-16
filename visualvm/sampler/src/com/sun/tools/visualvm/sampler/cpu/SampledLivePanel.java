@@ -74,7 +74,6 @@ final class SampledLivePanel extends LiveFlatProfileCollectorPanel {
         super.obtainResults();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                resTableModel.setRealColumnVisibility(4, false);
                 resTable.createDefaultColumnsFromModel();
                 resTableModel.setTable(resTable);
                 setColumnsData();

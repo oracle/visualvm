@@ -57,7 +57,7 @@ import org.openide.util.NbBundle;
 class NetworkOptionsPanel extends JPanel {
 
     private final NetworkOptionsPanelController controller;
-    
+    private boolean passwordChanged;
 
     NetworkOptionsPanel(NetworkOptionsPanelController controller) {
         this.controller = controller;
@@ -70,64 +70,65 @@ class NetworkOptionsPanel extends JPanel {
         NetworkOptionsModel model = controller.getModel();
 
         switch (model.getProxyType()) {
-            case NetworkOptionsModel.DIRECT_CONNECTION:
+            case ProxySettings.DIRECT_CONNECTION:
                 noProxyRadio.setSelected(true);
                 break;
-            case NetworkOptionsModel.AUTO_DETECT_PROXY:
+            case ProxySettings.AUTO_DETECT_PROXY:
                 systemProxyRadio.setSelected(true);
                 break;
-            case NetworkOptionsModel.MANUAL_SET_PROXY:
+            case ProxySettings.MANUAL_SET_PROXY:
                 manualProxyRadio.setSelected(true);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown proxy configuration"); // NOI18N
         }
 
-        httpProxyField.setText(model.getHttpHost());
-        httpProxySpinnerModel.setValue(Integer.parseInt(model.getHttpPort()));
+        httpProxyField.setText(model.getHttpProxyHost());
+        httpProxySpinnerModel.setValue(Integer.parseInt(model.getHttpProxyPort()));
 
         sameSettingsCheckBox.setSelected(model.useProxyAllProtocols());
 
-        httpsProxyField.setText(model.getHttpsHost());
-        httpsProxySpinnerModel.setValue(Integer.parseInt(model.getHttpsPort()));
+        httpsProxyField.setText(model.getHttpsProxyHost());
+        httpsProxySpinnerModel.setValue(Integer.parseInt(model.getHttpsProxyPort()));
         socksProxyField.setText(model.getSocksHost());
         socksProxySpinnerModel.setValue(Integer.parseInt(model.getSocksPort()));
 
         noProxyField.setText(model.getNonProxyHosts());
 
-        authenticationCheckBox.setSelected(model.useAuthentication());
-        usernameField.setText(model.getAuthenticationUsername());
-        passwordField.setText(new String(model.getAuthenticationPassword()));
+        authenticationCheckBox.setSelected(model.useProxyAuthentication());
+        usernameField.setText(model.getProxyAuthenticationUsername());
+        passwordField.setText(new String(model.getProxyAuthenticationPassword()));
     }
 
     void applyChanges() {
         NetworkOptionsModel model = controller.getModel();
 
         if (noProxyRadio.isSelected()) {
-            model.setProxyType(NetworkOptionsModel.DIRECT_CONNECTION);
+            model.setProxyType(ProxySettings.DIRECT_CONNECTION);
         } else if (systemProxyRadio.isSelected()) {
-            model.setProxyType(NetworkOptionsModel.AUTO_DETECT_PROXY);
+            model.setProxyType(ProxySettings.AUTO_DETECT_PROXY);
         } else if (manualProxyRadio.isSelected()) {
-            model.setProxyType(NetworkOptionsModel.MANUAL_SET_PROXY);
+            model.setProxyType(ProxySettings.MANUAL_SET_PROXY);
         } else {
             throw new IllegalArgumentException("Unknown proxy configuration"); // NOI18N
         }
 
-        model.setHttpHost(httpProxyField.getText().trim());
-        model.setHttpPort(httpProxySpinnerModel.getValue().toString());
+        model.setHttpProxyHost(httpProxyField.getText().trim());
+        model.setHttpProxyPort(httpProxySpinnerModel.getValue().toString());
         
         model.setUseProxyAllProtocols(sameSettingsCheckBox.isSelected());
 
-        model.setHttpsHost(httpsProxyField.getText().trim());
-        model.setHttpsPort(httpsProxySpinnerModel.getValue().toString());
+        model.setHttpProxyHost(httpsProxyField.getText().trim());
+        model.setHttpsProxyPort(httpsProxySpinnerModel.getValue().toString());
         model.setSocksHost(socksProxyField.getText().trim());
         model.setSocksPort(socksProxySpinnerModel.getValue().toString());
 
         model.setNonProxyHosts(noProxyField.getText().trim());
 
-        model.setUseAuthentication(authenticationCheckBox.isSelected());
+        model.setUseProxyAuthentication(authenticationCheckBox.isSelected());
         model.setAuthenticationUsername(usernameField.getText());
         model.setAuthenticationPassword(passwordField.getPassword());
+        passwordChanged = false;
     }
 
     void cancel() {
@@ -142,27 +143,27 @@ class NetworkOptionsPanel extends JPanel {
         int proxyType = model.getProxyType();
 
         if (noProxyRadio.isSelected() &&
-            proxyType != NetworkOptionsModel.DIRECT_CONNECTION) return true;
+            proxyType != ProxySettings.DIRECT_CONNECTION) return true;
         if (systemProxyRadio.isSelected() &&
-            proxyType != NetworkOptionsModel.AUTO_DETECT_PROXY) return true;
+            proxyType != ProxySettings.AUTO_DETECT_PROXY) return true;
         if (manualProxyRadio.isSelected() &&
-            proxyType != NetworkOptionsModel.MANUAL_SET_PROXY) return true;
+            proxyType != ProxySettings.MANUAL_SET_PROXY) return true;
 
-        if (!httpProxyField.getText().equals(model.getHttpHost())) return true;
-        if (!httpProxySpinnerModel.getValue().equals(model.getHttpPort())) return true;
+        if (!httpProxyField.getText().equals(model.getHttpProxyHost())) return true;
+        if (!httpProxySpinnerModel.getValue().toString().equals(model.getHttpProxyPort())) return true;
 
         if (sameSettingsCheckBox.isSelected() && !model.useProxyAllProtocols()) return true;
 
-        if (!httpsProxyField.getText().equals(model.getHttpsHost())) return true;
-        if (!httpsProxySpinnerModel.getValue().equals(model.getHttpsPort())) return true;
+        if (!httpsProxyField.getText().equals(model.getHttpsProxyHost())) return true;
+        if (!httpsProxySpinnerModel.getValue().toString().equals(model.getHttpsProxyPort())) return true;
         if (!socksProxyField.getText().equals(model.getSocksHost())) return true;
-        if (!socksProxySpinnerModel.getValue().equals(model.getSocksPort())) return true;
+        if (!socksProxySpinnerModel.getValue().toString().equals(model.getSocksPort())) return true;
 
         if (!noProxyField.getText().equals(model.getNonProxyHosts())) return true;
 
-        if (authenticationCheckBox.isSelected() && !model.useAuthentication()) return true;
-        if (!usernameField.getText().equals(model.getAuthenticationUsername())) return true;
-        if (!new String(passwordField.getPassword()).equals(new String(model.getAuthenticationPassword()))) return true;
+        if (authenticationCheckBox.isSelected() && !model.useProxyAuthentication()) return true;
+        if (!usernameField.getText().equals(model.getProxyAuthenticationUsername())) return true;
+        if (passwordChanged) return true;
 
         return false;
     }
@@ -502,6 +503,17 @@ class NetworkOptionsPanel extends JPanel {
                 updateManualSettings();
             }
         });
+        passwordField.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) {
+                passwordChanged = true;
+            }
+            public void removeUpdate(DocumentEvent e) {
+                passwordChanged = true;
+            }
+            public void changedUpdate(DocumentEvent e) {
+                passwordChanged = true;
+            }
+        });
     }
 
     private void updateManualSettings() {
@@ -545,7 +557,10 @@ class NetworkOptionsPanel extends JPanel {
         }
     }
 
-
+    void updateTestConnectionStatus(NetworkOptionsModel.TestingStatus testingStatus, Object object) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
     private JRadioButton noProxyRadio;
     private JRadioButton systemProxyRadio;
     private JRadioButton manualProxyRadio;

@@ -25,264 +25,326 @@
 
 package com.sun.tools.visualvm.modules.appui.options;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
+import java.net.Proxy;
+import java.net.URL;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
-import org.netbeans.api.keyring.Keyring;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
-import org.openide.util.Utilities;
+import org.openide.util.RequestProcessor;
 
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
 class NetworkOptionsModel {
 
-    static final String PROXY_HTTP_HOST = "proxyHttpHost"; // NOI18N
-    static final String PROXY_HTTP_PORT = "proxyHttpPort"; // NOI18N
-    static final String PROXY_HTTPS_HOST = "proxyHttpsHost"; // NOI18N
-    static final String PROXY_HTTPS_PORT = "proxyHttpsPort"; // NOI18N
-    static final String PROXY_SOCKS_HOST = "proxySocksHost"; // NOI18N
-    static final String PROXY_SOCKS_PORT = "proxySocksPort"; // NOI18N
-    static final String NOT_PROXY_HOSTS = "proxyNonProxyHosts"; // NOI18N
-    static final String PROXY_TYPE = "proxyType"; // NOI18N
-    static final String USE_PROXY_AUTHENTICATION = "useProxyAuthentication"; // NOI18N
-    static final String PROXY_AUTHENTICATION_USERNAME = "proxyAuthenticationUsername"; // NOI18N
-    static final String PROXY_AUTHENTICATION_PASSWORD = "proxyAuthenticationPassword"; // NOI18N
-    static final String USE_PROXY_ALL_PROTOCOLS = "useProxyAllProtocols"; // NOI18N
-    static final String DIRECT = "DIRECT"; // NOI18N
+    enum TestingStatus {
 
-    private static String presetNonProxyHosts;
-    private final Preferences PREFERENCES = NbPreferences.root().node ("org/netbeans/core"); // NOI18N
-
-    static final int DIRECT_CONNECTION = 0;
-    static final int AUTO_DETECT_PROXY = 1;
-    static final int MANUAL_SET_PROXY = 2;
-
-
-    String getHttpHost() {
-        return normalizeProxyHost(PREFERENCES.get(PROXY_HTTP_HOST, "")); // NOI18N
+        OK,
+        FAILED,
+        WAITING,
+        NOT_TESTED
     }
 
-    void setHttpHost(String proxyHost) {
-        if (!proxyHost.equals(getHttpHost()))
-            PREFERENCES.put(PROXY_HTTP_HOST, proxyHost);
+    private static final Logger LOGGER = Logger.getLogger(NetworkOptionsModel.class.getName());
+
+    private static final String NON_PROXY_HOSTS_DELIMITER = "|"; //NOI18N
+
+    private static final RequestProcessor rp = new RequestProcessor(NetworkOptionsModel.class);
+
+    private static Preferences getProxyPreferences() {
+        return NbPreferences.root().node("org/netbeans/core");  // NOI18N
     }
 
-    String getHttpPort() {
-        return PREFERENCES.get(PROXY_HTTP_PORT, "0"); // NOI18N
+    boolean getUsageStatistics() {
+        String key = System.getProperty("nb.show.statistics.ui");   // NOI18N
+        if (key != null) {
+            return getProxyPreferences().getBoolean(key, Boolean.FALSE);
+        } else {
+            return false;
+        }
     }
 
-    void setHttpPort(String proxyPort) {
-        if (!proxyPort.equals(getHttpPort()))
-            PREFERENCES.put(PROXY_HTTP_PORT, validatePort(proxyPort) ? proxyPort : ""); // NOI18N
-    }
-
-    String getHttpsHost() {
-        if (useProxyAllProtocols()) return getHttpHost();
-        else return PREFERENCES.get(PROXY_HTTPS_HOST, ""); // NOI18N
-    }
-
-    void setHttpsHost(String proxyHost) {
-        if (!proxyHost.equals(getHttpsHost()))
-            PREFERENCES.put(PROXY_HTTPS_HOST, proxyHost);
-    }
-
-    String getHttpsPort() {
-        if (useProxyAllProtocols()) return getHttpPort();
-        else return PREFERENCES.get(PROXY_HTTPS_PORT, "0"); // NOI18N
-    }
-
-    void setHttpsPort(String proxyPort) {
-        if (!proxyPort.equals(getHttpsPort()))
-            PREFERENCES.put(PROXY_HTTPS_PORT, validatePort(proxyPort) ? proxyPort : ""); // NOI18N
-    }
-
-    String getSocksHost() {
-        if (useProxyAllProtocols()) return getHttpHost();
-        else return PREFERENCES.get(PROXY_SOCKS_HOST, ""); // NOI18N
-    }
-
-    void setSocksHost(String proxyHost) {
-        if (!proxyHost.equals(getSocksHost()))
-            PREFERENCES.put(PROXY_SOCKS_HOST, proxyHost);
-    }
-
-    String getSocksPort() {
-        if (useProxyAllProtocols()) return getHttpPort();
-        else return PREFERENCES.get(PROXY_SOCKS_PORT, "0"); // NOI18N
-    }
-
-    void setSocksPort(String proxyPort) {
-        if (!proxyPort.equals(getSocksPort()))
-            PREFERENCES.put(PROXY_SOCKS_PORT, validatePort(proxyPort) ? proxyPort : ""); // NOI18N
-    }
-
-    String getNonProxyHosts() {
-        return code2view(PREFERENCES.get(NOT_PROXY_HOSTS, getDefaultUserNonProxyHosts()));
-    }
-
-    void setNonProxyHosts(String nonProxy) {
-        if (!nonProxy.equals(getNonProxyHosts()))
-            PREFERENCES.put(NOT_PROXY_HOSTS, view2code(nonProxy));
+    void setUsageStatistics(boolean use) {
+        String key = System.getProperty("nb.show.statistics.ui");   //NOI18N
+        if ((key != null) && (use != getUsageStatistics())) {
+            getProxyPreferences().putBoolean(key, use);
+        }
     }
 
     int getProxyType() {
-        return PREFERENCES.getInt(PROXY_TYPE, AUTO_DETECT_PROXY);
+        return getProxyPreferences().getInt(ProxySettings.PROXY_TYPE, ProxySettings.AUTO_DETECT_PROXY);
     }
 
     void setProxyType(int proxyType) {
-        if (proxyType != getProxyType()) PREFERENCES.putInt(PROXY_TYPE, proxyType);
+        if (proxyType != getProxyType()) {
+            if (ProxySettings.AUTO_DETECT_PROXY == proxyType) {
+                getProxyPreferences().putInt(ProxySettings.PROXY_TYPE, usePAC() ? ProxySettings.AUTO_DETECT_PAC : ProxySettings.AUTO_DETECT_PROXY);
+            } else {
+                getProxyPreferences().putInt(ProxySettings.PROXY_TYPE, proxyType);
+            }
+        }
     }
 
-    boolean useAuthentication() {
-        return PREFERENCES.getBoolean(USE_PROXY_AUTHENTICATION, false);
+    String getHttpProxyHost() {
+        return ProxySettings.getHttpHost();
     }
 
-    void setUseAuthentication(boolean use) {
-        if (use != useAuthentication())
-            PREFERENCES.putBoolean(USE_PROXY_AUTHENTICATION, use);
+    void setHttpProxyHost(String proxyHost) {
+        if (!proxyHost.equals(getHttpProxyHost())) {
+            getProxyPreferences().put(ProxySettings.PROXY_HTTP_HOST, proxyHost);
+        }
+    }
+
+    String getHttpProxyPort() {
+        return ProxySettings.getHttpPort();
+    }
+
+    void setHttpProxyPort(String proxyPort) {
+        if (!proxyPort.equals(getHttpProxyPort())) {
+            getProxyPreferences().put(ProxySettings.PROXY_HTTP_PORT, validatePort(proxyPort) ? proxyPort : "");
+        }
+    }
+
+    String getHttpsProxyHost() {
+        return ProxySettings.getHttpsHost();
+    }
+
+    void setHttpsProxyHost(String proxyHost) {
+        if (!proxyHost.equals(getHttpsProxyHost())) {
+            getProxyPreferences().put(ProxySettings.PROXY_HTTPS_HOST, proxyHost);
+        }
+    }
+
+    String getHttpsProxyPort() {
+        return ProxySettings.getHttpsPort();
+    }
+
+    void setHttpsProxyPort(String proxyPort) {
+        if (!proxyPort.equals(getHttpsProxyPort())) {
+            getProxyPreferences().put(ProxySettings.PROXY_HTTPS_PORT, validatePort(proxyPort) ? proxyPort : "");
+        }
+    }
+
+    String getSocksHost() {
+        return ProxySettings.getSocksHost();
+    }
+
+    void setSocksHost(String socksHost) {
+        if (!socksHost.equals(getSocksHost())) {
+            getProxyPreferences().put(ProxySettings.PROXY_SOCKS_HOST, socksHost);
+        }
+    }
+
+    String getSocksPort() {
+        return ProxySettings.getSocksPort();
+    }
+
+    void setSocksPort(String socksPort) {
+        if (!socksPort.equals(getSocksPort())) {
+            getProxyPreferences().put(ProxySettings.PROXY_SOCKS_PORT, validatePort(socksPort) ? socksPort : "");
+        }
+    }
+
+    String getOriginalHttpsHost() {
+        return getProxyPreferences().get(ProxySettings.PROXY_HTTPS_HOST, "");
+    }
+
+    String getOriginalHttpsPort() {
+        return getProxyPreferences().get(ProxySettings.PROXY_HTTPS_PORT, "");
+    }
+
+    String getOriginalSocksHost() {
+        return getProxyPreferences().get(ProxySettings.PROXY_SOCKS_HOST, "");
+    }
+
+    String getOriginalSocksPort() {
+        return getProxyPreferences().get(ProxySettings.PROXY_SOCKS_PORT, "");
+    }
+
+    String getNonProxyHosts() {
+        return code2view(ProxySettings.getNonProxyHosts());
+    }
+
+    void setNonProxyHosts(String nonProxy) {
+        if (!nonProxy.equals(getNonProxyHosts())) {
+            getProxyPreferences().put(ProxySettings.NOT_PROXY_HOSTS, view2code(nonProxy));
+        }
+    }
+
+    boolean useProxyAuthentication() {
+        return ProxySettings.useAuthentication();
+    }
+
+    void setUseProxyAuthentication(boolean use) {
+        if (use != useProxyAuthentication()) {
+            getProxyPreferences().putBoolean(ProxySettings.USE_PROXY_AUTHENTICATION, use);
+        }
     }
 
     boolean useProxyAllProtocols() {
-        return PREFERENCES.getBoolean(USE_PROXY_ALL_PROTOCOLS, true);
+        return ProxySettings.useProxyAllProtocols();
     }
 
     void setUseProxyAllProtocols(boolean use) {
-        if (use != useProxyAllProtocols())
-            PREFERENCES.putBoolean(USE_PROXY_ALL_PROTOCOLS, use);
+        if (use != useProxyAllProtocols()) {
+            getProxyPreferences().putBoolean(ProxySettings.USE_PROXY_ALL_PROTOCOLS, use);
+        }
     }
 
-    String getAuthenticationUsername() {
-        return PREFERENCES.get(PROXY_AUTHENTICATION_USERNAME, ""); // NOI18N
+    String getProxyAuthenticationUsername() {
+        return ProxySettings.getAuthenticationUsername();
     }
 
     void setAuthenticationUsername(String username) {
-        PREFERENCES.put(PROXY_AUTHENTICATION_USERNAME, username);
+        getProxyPreferences().put(ProxySettings.PROXY_AUTHENTICATION_USERNAME, username);
     }
 
-    char[] getAuthenticationPassword() {
-        String old = PREFERENCES.get(PROXY_AUTHENTICATION_PASSWORD, null);
-        if (old != null) {
-            PREFERENCES.remove(PROXY_AUTHENTICATION_PASSWORD);
-            setAuthenticationPassword(old.toCharArray());
-        }
-        char[] pwd = Keyring.read(PROXY_AUTHENTICATION_PASSWORD);
-        return pwd != null ? pwd : new char[0];
+    char[] getProxyAuthenticationPassword() {
+        return ProxySettings.getAuthenticationPassword();
     }
 
-    void setAuthenticationPassword(char [] password) {
-        Keyring.save(PROXY_AUTHENTICATION_PASSWORD, password,
-                NbBundle.getMessage(NetworkOptionsModel.class, "NetworkOptionsPanel_Password_Description"));  // NOI18N
+    void setAuthenticationPassword(char[] password) {
+        ProxySettings.setAuthenticationPassword(password);
     }
 
-//    void addPreferenceChangeListener(PreferenceChangeListener l) {
-//        PREFERENCES.addPreferenceChangeListener(l);
-//    }
-//
-//    void removePreferenceChangeListener(PreferenceChangeListener l) {
-//        PREFERENCES.removePreferenceChangeListener(l);
-//    }
-
-    private static String getSystemNonProxyHosts() {
-        String systemProxy = System.getProperty ("netbeans.system_http_non_proxy_hosts"); // NOI18N
-        return systemProxy == null ? "" : systemProxy; // NOI18N
+    static boolean usePAC() {
+        String pacUrl = getProxyPreferences().get(ProxySettings.SYSTEM_PAC, ""); // NOI18N
+        return pacUrl != null && pacUrl.length() > 0;
     }
 
-    private static String getPresetNonProxyHosts() {
-        if (presetNonProxyHosts == null)
-            presetNonProxyHosts = System.getProperty ("http.nonProxyHosts", ""); // NOI18N
-        return presetNonProxyHosts;
+    static void testConnection(final NetworkOptionsPanel panel, final int proxyType,
+            final String proxyHost, final String proxyPortString, final String nonProxyHosts) {
+        rp.post(new Runnable() {
+
+            @Override
+            public void run() {
+                testProxy(panel, proxyType, proxyHost, proxyPortString, nonProxyHosts);
+            }
+        });
     }
 
-    private static String getDefaultUserNonProxyHosts() {
-        return getModifiedNonProxyHosts(getSystemNonProxyHosts());
-    }
+    // private helper methods ..................................................
+    private static void testProxy(NetworkOptionsPanel panel, int proxyType,
+            String proxyHost, String proxyPortString, String nonProxyHosts) {
+        panel.updateTestConnectionStatus(TestingStatus.WAITING, null);
 
-    private static String getModifiedNonProxyHosts(String systemPreset) {
-        String fromSystem = systemPreset.replaceAll(";", "|").replaceAll(",", "|"); //NOI18N
-        String fromUser = getPresetNonProxyHosts() == null ? "" : getPresetNonProxyHosts().replaceAll(";", "|").replaceAll(",", "|"); //NOI18N
-        if (Utilities.isWindows()) fromSystem = addReguralToNonProxyHosts(fromSystem);
-        String nonProxy = fromUser + (fromUser.length() == 0 ? "" : "|") + fromSystem + (fromSystem.length() == 0 ? "" : "|") + "localhost|127.0.0.1"; // NOI18N
-        String localhost = ""; // NOI18N
+        TestingStatus status = TestingStatus.FAILED;
+        String message = null;
+        String testingUrlHost;
+        URL testingUrl;
+        Proxy testingProxy;
+
         try {
-            localhost = InetAddress.getLocalHost().getHostName();
-            if (!"localhost".equals(localhost)) { // NOI18N
-                nonProxy = nonProxy + "|" + localhost; // NOI18N
-            } else {
-                // Avoid this error when hostname == localhost:
-                // Error in http.nonProxyHosts system property:  sun.misc.REException: localhost is a duplicate
-            }
+            testingUrl = new URL(ProxySettings.HTTP_CONNECTION_TEST_URL);
+            testingUrlHost = testingUrl.getHost();
+        } catch (MalformedURLException ex) {
+            LOGGER.log(Level.SEVERE, "Cannot create url from string.", ex); // NOI18N
+            panel.updateTestConnectionStatus(status, message);
+            return;
         }
-        catch (UnknownHostException e) {
-            // OK. Sometimes a hostname is assigned by DNS, but a computer
-            // is later pulled off the network. It may then produce a bogus
-            // name for itself which can't actually be resolved. Normally
-            // "localhost" is aliased to 127.0.0.1 anyway.
+
+        switch (proxyType) {
+            case ProxySettings.DIRECT_CONNECTION:
+                testingProxy = Proxy.NO_PROXY;
+                break;
+            case ProxySettings.AUTO_DETECT_PROXY:
+            case ProxySettings.AUTO_DETECT_PAC:
+                nonProxyHosts = ProxySettings.getSystemNonProxyHosts();
+                if (isNonProxy(testingUrlHost, nonProxyHosts)) {
+                    testingProxy = Proxy.NO_PROXY;
+                } else {
+                    String host = ProxySettings.getTestSystemHttpHost();
+                    int port = 0;
+                    try {
+                        port = Integer.valueOf(ProxySettings.getTestSystemHttpPort());
+                    } catch (NumberFormatException ex) {
+                        LOGGER.log(Level.INFO, "Cannot parse port number", ex); //NOI18N
+                    }
+                    testingProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
+                }
+                break;
+            case ProxySettings.MANUAL_SET_PROXY:
+                nonProxyHosts = view2code(nonProxyHosts);
+                if (isNonProxy(testingUrl.getHost(), nonProxyHosts)) {
+                    testingProxy = Proxy.NO_PROXY;
+                } else {
+                    try {
+                        int proxyPort = Integer.valueOf(proxyPortString);
+                        testingProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
+                    } catch (NumberFormatException ex) {
+                        // shouldn't fall into this code
+                        LOGGER.log(Level.INFO, "Cannot parse port number", ex); // NOI18N
+                        status = TestingStatus.FAILED;
+                        message = NbBundle.getMessage(NetworkOptionsModel.class, "NetworkOptionsModel_PortError");  // NOI18N
+                        panel.updateTestConnectionStatus(status, message);
+                        return;
+                    }
+                }
+                break;
+            case ProxySettings.MANUAL_SET_PAC:
+            // Never should get here, user cannot set up PAC manualy from IDE
+            default:
+                testingProxy = Proxy.NO_PROXY;
         }
-        /* per Milan's agreement it's removed. See issue #89868
+
         try {
-            String localhost2 = InetAddress.getLocalHost().getCanonicalHostName();
-            if (!"localhost".equals(localhost2) && !localhost2.equals(localhost)) { // NOI18N
-                nonProxy = nonProxy + "|" + localhost2; // NOI18N
-            } else {
-                // Avoid this error when hostname == localhost:
-                // Error in http.nonProxyHosts system property:  sun.misc.REException: localhost is a duplicate
+            status = testHttpConnection(testingUrl, testingProxy) ? TestingStatus.OK : TestingStatus.FAILED;
+        } catch (IOException ex) {
+            LOGGER.log(Level.INFO, "Cannot connect via http protocol.", ex); //NOI18N
+            message = ex.getLocalizedMessage();
+        }
+
+        panel.updateTestConnectionStatus(status, message);
+    }
+
+    private static boolean testHttpConnection(URL url, Proxy proxy) throws IOException {
+        boolean result = false;
+
+        HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection(proxy);
+        // Timeout shorten to 5s
+        httpConnection.setConnectTimeout(5000);
+        httpConnection.connect();
+
+        if (httpConnection.getResponseCode() == HttpURLConnection.HTTP_OK
+                || httpConnection.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
+            result = true;
+        }
+
+        httpConnection.disconnect();
+
+        return result;
+    }
+
+    // Simplified to use only with supposed netbeans.org host
+    private static boolean isNonProxy(String host, String nonProxyHosts) {
+        boolean isNonProxy = false;
+
+        if (host != null && nonProxyHosts != null) {
+            StringTokenizer st = new StringTokenizer(nonProxyHosts, NON_PROXY_HOSTS_DELIMITER, false);
+            while (st.hasMoreTokens()) {
+                if (st.nextToken().equals(host)) {
+                    isNonProxy = true;
+                    break;
+                }
             }
         }
-        catch (UnknownHostException e) {
-            // OK. Sometimes a hostname is assigned by DNS, but a computer
-            // is later pulled off the network. It may then produce a bogus
-            // name for itself which can't actually be resolved. Normally
-            // "localhost" is aliased to 127.0.0.1 anyway.
-        }
-         */
-        return compactNonProxyHosts(nonProxy);
+
+        return isNonProxy;
     }
 
-
-    // avoid duplicate hosts
-    private static String compactNonProxyHosts(String nonProxyHost) {
-        StringTokenizer st = new StringTokenizer(nonProxyHost, "|"); //NOI18N
-        Set<String> s = new HashSet<String>();
-        StringBuilder compactedProxyHosts = new StringBuilder();
-        while (st.hasMoreTokens()) {
-            String t = st.nextToken();
-            if (s.add(t.toLowerCase(Locale.US))) {
-                if (compactedProxyHosts.length() > 0) compactedProxyHosts.append('|');
-                compactedProxyHosts.append(t);
-            }
+    private static boolean validatePort(String port) {
+        if (port.trim().length() == 0) {
+            return true;
         }
-        return compactedProxyHosts.toString();
-    }
-
-    private static String addReguralToNonProxyHosts(String nonProxyHost) {
-        StringTokenizer st = new StringTokenizer(nonProxyHost, "|"); // NOI18N
-        StringBuilder reguralProxyHosts = new StringBuilder();
-        while (st.hasMoreTokens()) {
-            String t = st.nextToken();
-            if (t.indexOf ('*') == -1) t = t + '*'; //NOI18N
-            if (reguralProxyHosts.length() > 0) reguralProxyHosts.append('|'); // NOI18N
-            reguralProxyHosts.append(t);
-        }
-        return reguralProxyHosts.toString();
-    }
-
-    private static String normalizeProxyHost(String proxyHost) {
-        if (proxyHost.toLowerCase(Locale.US).startsWith("http://")) { // NOI18N
-            return proxyHost.substring(7, proxyHost.length());
-        } else {
-            return proxyHost;
-        }
-    }
-
-    private static boolean validatePort (String port) {
-        if (port.trim().length() == 0) return true;
 
         boolean ok = false;
         try {

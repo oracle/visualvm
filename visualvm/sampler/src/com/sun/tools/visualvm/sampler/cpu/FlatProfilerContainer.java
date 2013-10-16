@@ -50,14 +50,17 @@ final class FlatProfilerContainer extends FlatProfileContainer {
      *
      * @param timeInMcs0         Array of Absolute timer values for each method - always used
      * @param timeInMcs1         Array of CPU timer values for each method - optional, may be null
+     * @param totalTimeInMcs0   Array of Absolute timer (total time) values for each method - always used
+     * @param totalTimeInMcs1   Array of CPU timer (total time) values for each method - optional, may be null
      * @param nInvocations       Array of number of invocations for each method
      * @param wholeGraphNetTime0 Total absolute time
      * @param wholeGraphNetTime1 Total CPU time - not used if CPU timer is not used
      * @param nMethods           Total number of profiled methods - length of the provided arrays
      */
-    FlatProfilerContainer(MethodInfoMapper mapper,boolean twoStamps,long[] timeInMcs0, long[] timeInMcs1, int[] nInvocations,
+    FlatProfilerContainer(MethodInfoMapper mapper,boolean twoStamps,long[] timeInMcs0, long[] timeInMcs1, 
+                                    long[] totalTimeInMcs0, long[] totalTimeInMcs1,int[] nInvocations,
                                     char[] marks, double wholeGraphNetTime0, double wholeGraphNetTime1, int nMethods) {
-        super(timeInMcs0, timeInMcs1, nInvocations, marks, nMethods);
+        super(timeInMcs0, timeInMcs1, totalTimeInMcs0, totalTimeInMcs1, nInvocations, marks, nMethods);
         this.wholeGraphNetTime0 = wholeGraphNetTime0;
         this.wholeGraphNetTime1 = wholeGraphNetTime1;
 

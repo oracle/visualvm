@@ -364,6 +364,7 @@ final class ApplicationProfilerView extends DataSourceView {
         public void threadsMonitoringChanged() { refreshStatus(); }
         public void instrumentationChanged(int oldInstrType, int currentInstrType) { refreshStatus(); }
         public void serverStateChanged(int serverState, int serverProgress) {}
+        public void lockContentionMonitoringChanged() {}
         
 
         private synchronized void refreshStatus() {
