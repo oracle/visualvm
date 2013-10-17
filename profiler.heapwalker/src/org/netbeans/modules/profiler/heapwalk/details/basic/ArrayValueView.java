@@ -113,10 +113,6 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
         super(instance, heap);
         this.className = className;
     }
-    
-    private ArrayValueView getArrayValueView() {
-        return this;
-    }
 
     protected void computeView(Instance instance, Heap heap) {
         
@@ -183,7 +179,7 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
                 
                 JButton save = htmlButton(Bundle.ArrayValueView_Save(), !preview.isEmpty(), new Runnable() {
                     public void run() {
-                        new BasicExportAction(getArrayValueView()).actionPerformed(null);
+                        new BasicExportAction(ArrayValueView.this).actionPerformed(null);
                     }
                 });
                 c = new GridBagConstraints();
