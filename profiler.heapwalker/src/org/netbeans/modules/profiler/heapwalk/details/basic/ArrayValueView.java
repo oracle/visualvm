@@ -42,7 +42,6 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details.basic;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Cursor;
