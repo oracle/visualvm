@@ -68,6 +68,7 @@ import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import static org.netbeans.modules.profiler.heapwalk.details.basic.ArrayValueView.Type.*;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
@@ -91,6 +92,7 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
     private static final int MAX_ARRAY_ITEMS = 1000;
     private static final int MAX_CHARARRAY_ITEMS = 500000;
     private static final String TRUNCATED = Bundle.ArrayValueView_Truncated();
+    enum Type {STRING, STRING_BUILDER, PRIMITIVE_ARRAY};
     
     private final String className;
     
@@ -105,7 +107,7 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
     private boolean truncated;
     private boolean chararray;
     private String instanceIdentifier;
-    private int type;
+    private Type type;
     
     protected ArrayValueView(String className, Instance instance, Heap heap) {
         super(instance, heap);
@@ -124,14 +126,14 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
             count = DetailsUtils.getIntFieldValue(instance, "count", -1);           // NOI18N
             values = DetailsUtils.getPrimitiveArrayFieldValues(instance, "value");  // NOI18N
             caption = Bundle.ArrayValueView_Value();
-            type = 1;
+            type = STRING;
         } else if (StringDetailsProvider.BUILDERS_MASK.equals(className)) {         // AbstractStringBuilder+
             separator = "";                                                         // NOI18N
             offset = 0;
             count = DetailsUtils.getIntFieldValue(instance, "count", -1);           // NOI18N
             values = DetailsUtils.getPrimitiveArrayFieldValues(instance, "value");  // NOI18N
             caption = Bundle.ArrayValueView_Value();
-            type = 2;
+            type = STRING_BUILDER;
         } else if (instance instanceof PrimitiveArrayInstance) {                    // Primitive array
             chararray = "char[]".equals(instance.getJavaClass().getName());         // NOI18N
             separator = chararray ? "" : ", ";                                      // NOI18N
@@ -139,7 +141,7 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
             values = DetailsUtils.getPrimitiveArrayValues(instance);
             count = values == null ? 0 : values.size();
             caption = Bundle.ArrayValueView_Items();
-            type = 3;
+            type = PRIMITIVE_ARRAY;
         }
         instanceIdentifier=instance.getJavaClass().getName()+"#"+instance.getInstanceNumber(); // NOI18N
         final String preview = getString(true);
@@ -336,12 +338,19 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
 
     @Override
     public boolean hasRawData() {
-        return type==3;
+        return type.equals(PRIMITIVE_ARRAY);
     }
 
     @Override
     public boolean hasText() {
-        return type<3 || chararray;
+        switch (type) {
+            case STRING:
+            case STRING_BUILDER:
+                return true;
+            case PRIMITIVE_ARRAY:
+                return chararray;
+        }
+        throw new IllegalArgumentException(type.toString());
     }
 
     @Override
