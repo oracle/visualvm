@@ -106,6 +106,7 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
     private int count;
     private boolean truncated;
     private boolean chararray;
+    private boolean bytearray;
     private String instanceIdentifier;
     private Type type;
     
@@ -132,6 +133,7 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
             type = STRING_BUILDER;
         } else if (instance instanceof PrimitiveArrayInstance) {                    // Primitive array
             chararray = "char[]".equals(instance.getJavaClass().getName());         // NOI18N
+            bytearray = "byte[]".equals(instance.getJavaClass().getName());         // NOI18N
             separator = chararray ? "" : ", ";                                      // NOI18N
             offset = 0;
             values = DetailsUtils.getPrimitiveArrayValues(instance);
@@ -311,17 +313,24 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
             int valuesCount = count < 0 ? values.size() - offset :
                               Math.min(count, values.size() - offset);
             int lastValue = offset + valuesCount - 1;
-            if (exportedFileType == BasicExportAction.MODE_CSV) {
-                for (int i = offset; i <= lastValue; i++) {
-                    eDD.dumpData(values.get(i));
-                    eDD.dumpData(comma);
+            for (int i = offset; i <= lastValue; i++) {
+                String value = values.get(i);
+                
+                switch (exportedFileType) {
+                    case BasicExportAction.MODE_CSV:
+                        eDD.dumpData(value);
+                        eDD.dumpData(comma);
+                        break;
+                    case BasicExportAction.MODE_TXT:
+                        eDD.dumpData(value);
+                        break;
+                    case BasicExportAction.MODE_BIN:
+                        byte b = Byte.valueOf(value);
+                        eDD.dumpByte(b);
+                        break;
+                    default:
+                        throw new IllegalArgumentException(); //Illegal export type
                 }
-            } else if (exportedFileType==BasicExportAction.MODE_TXT) {
-                for (int i = offset; i <= lastValue; i++) {
-                    eDD.dumpData(values.get(i));
-                }
-            } else {
-                throw new IllegalArgumentException(); //Illegal export type
             }
         }
         eDD.close();
@@ -338,6 +347,11 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
     }
 
     @Override
+    public boolean hasBinaryData() {
+        return bytearray;
+    }
+
+    @Override
     public boolean hasText() {
         switch (type) {
             case STRING:
@@ -351,7 +365,7 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
 
     @Override
     public boolean isExportable() {
-        return hasText() || hasRawData();
+        return hasText() || hasBinaryData() || hasRawData();
     }
     
 }
