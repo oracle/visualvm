@@ -121,6 +121,7 @@
         <folder name="View">
             <file name="Separator1.instance_hidden"/>
             <file name="Separator2.instance_hidden"/>
+            <file name="ShowEditorOnlyAction.shadow_hidden"/>
             <file name="org-netbeans-core-actions-HTMLViewAction.instance_hidden"/>
             <file name="org-netbeans-core-actions-LogAction.instance_hidden"/>
             <file name="org-netbeans-core-multiview-EditorsAction.instance_hidden"/>
