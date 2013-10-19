@@ -57,7 +57,7 @@ import java.io.IOException;
  * using the getCaughtException() method.
  *
  * @author Misha Dmitriev
- * @author cyhelsky
+ * @author Petr Cyhelsky
  */
 public class ExportDataDumper {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
@@ -84,6 +84,21 @@ public class ExportDataDumper {
 
     public int getNumExceptions() {
         return numExceptions;
+    }
+    
+    public void dumpByte(byte b) {
+        if (caughtEx != null) {
+            return;
+        }
+
+        try {
+            bos.write(b);
+        } catch (IOException ex) {
+            caughtEx = ex;
+            System.out.println(b);
+            numExceptions++;
+            System.err.println(ex.getMessage());
+        }
     }
 
     public void dumpData(CharSequence s) {
