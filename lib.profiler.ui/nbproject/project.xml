@@ -130,6 +130,7 @@ made subject to such option by the copyright holder.
                 <package>org.netbeans.lib.profiler.ui.locks</package>
                 <package>org.netbeans.lib.profiler.ui.memory</package>
                 <package>org.netbeans.lib.profiler.ui.monitor</package>
+                <package>org.netbeans.lib.profiler.ui.swing</package>
                 <package>org.netbeans.lib.profiler.ui.threads</package>
             </friend-packages>
         </data>
