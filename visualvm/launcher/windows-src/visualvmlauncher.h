@@ -28,6 +28,7 @@
 
 #include <string>
 #include <windows.h>
+#include <cstddef>
 #include "cmdargs.h"
 
 class VisualVMLauncher {
@@ -85,6 +86,8 @@ private:
     bool getOption(char *&str, const char *opt);
     void addCluster(const char *cl);
     void addExtraClusters();
+    std::string getDefaultUserDirRoot();
+    std::string getDefaultCacheDirRoot();
 
 protected:
     std::string baseDir;

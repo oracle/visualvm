@@ -29,7 +29,7 @@
 #define FVER 0,0,0,0
 #define BUILD_ID "0"
 #define INTERNAL_NAME "visualvm"
-#define COPYRIGHT "\xA9 2007, 2012 Oracle and/or its affiliates. All rights reserved."
+#define COPYRIGHT "\xA9 2007, 2013, Oracle and/or its affiliates. All rights reserved."
 #define FNAME "visualvm.exe"
 #define NAME "VisualVM Dev. build"
 

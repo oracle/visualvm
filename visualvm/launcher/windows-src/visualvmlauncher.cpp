@@ -109,10 +109,6 @@ int VisualVMLauncher::start(int argc, char *argv[]) {
     CmdArgs newArgs(argc + 20);
     addSpecificOptions(newArgs);
 
-    if (!jdkHome.empty()) {
-        newArgs.add(ARG_NAME_JDKHOME);
-        newArgs.add(jdkHome.c_str());
-    }
     if (!clusters.empty()) {
         newArgs.add(ARG_NAME_CLUSTERS);
         newArgs.add(clusters.c_str());
@@ -134,6 +130,10 @@ int VisualVMLauncher::start(int argc, char *argv[]) {
     }
     for (int i = 0; i < argc; i++) {
         newArgs.add(argv[i]);
+    }
+    if (!jdkHome.empty()) {
+        newArgs.add(ARG_NAME_JDKHOME);
+        newArgs.add(jdkHome.c_str());
     }
     if (parentProcID) {
         newArgs.add(ARG_NAME_LA_PPID);
@@ -369,15 +369,9 @@ bool VisualVMLauncher::findUserDir(const char *str) {
         }
         userDir = userHome + (str + strlen(HOME_TOKEN));
     } else if (strncmp(str, DEFAULT_USERDIR_ROOT_TOKEN, strlen(DEFAULT_USERDIR_ROOT_TOKEN)) == 0) {
-        TCHAR defUserDirRootChar[MAX_PATH];
-        if (FAILED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, defUserDirRootChar))) {
-            return false;
-        }
-        defUserDirRoot = ((string) defUserDirRootChar) + VISUALVM_DIRECTORY;
-        defUserDirRoot.erase(defUserDirRoot.rfind('\\'));
-        logMsg("Default Userdir Root: %s", defUserDirRoot.c_str());
-        userDir = defUserDirRoot + (str + strlen(DEFAULT_USERDIR_ROOT_TOKEN));
+        userDir = getDefaultUserDirRoot() + (str + strlen(DEFAULT_USERDIR_ROOT_TOKEN));
     } else {
+        getDefaultUserDirRoot();
         userDir = str;
     }
     return true;
@@ -402,6 +396,26 @@ bool VisualVMLauncher::findCacheDir(const char *str) {
         }
         cacheDir = userHome + (str + strlen(HOME_TOKEN));
     } else if (strncmp(str, DEFAULT_CACHEDIR_ROOT_TOKEN, strlen(DEFAULT_CACHEDIR_ROOT_TOKEN)) == 0) {
+        cacheDir = getDefaultCacheDirRoot() + (str + strlen(DEFAULT_CACHEDIR_ROOT_TOKEN));
+    } else {
+        getDefaultCacheDirRoot();
+        cacheDir = str;
+    }
+    return true;
+}
+
+string VisualVMLauncher::getDefaultUserDirRoot() {
+    TCHAR defUserDirRootChar[MAX_PATH];
+    if (FAILED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, defUserDirRootChar))) {
+        return false;
+    }
+    defUserDirRoot = ((string) defUserDirRootChar) + VISUALVM_DIRECTORY;
+    defUserDirRoot.erase(defUserDirRoot.rfind('\\'));
+    logMsg("Default Userdir Root: %s", defUserDirRoot.c_str());
+    return defUserDirRoot;
+}
+
+string VisualVMLauncher::getDefaultCacheDirRoot() {
         TCHAR defCacheDirRootChar[MAX_PATH];
         if (FAILED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, defCacheDirRootChar))) {
             return false;
@@ -409,12 +423,8 @@ bool VisualVMLauncher::findCacheDir(const char *str) {
         defCacheDirRoot = ((string) defCacheDirRootChar) + VISUALVM_CACHES_DIRECTORY;
         defCacheDirRoot.erase(defCacheDirRoot.rfind('\\'));
         logMsg("Default Cachedir Root: %s", defCacheDirRoot.c_str());
-        cacheDir = defCacheDirRoot + (str + strlen(DEFAULT_CACHEDIR_ROOT_TOKEN));
-    } else {
-        cacheDir = str;
+    return defCacheDirRoot;
     }
-    return true;
-}
 
 bool VisualVMLauncher::getOption(char *&str, const char *opt) {
     if (strncmp(str, opt, strlen(opt)) == 0) {
