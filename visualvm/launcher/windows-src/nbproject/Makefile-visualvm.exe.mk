@@ -61,7 +61,7 @@ LDLIBSOPTIONS=visualvm.res
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk visualvm.exe
 
 visualvm.exe: ${OBJECTFILES}
-	${LINK.cc} -o visualvm.exe ${OBJECTFILES} ${LDLIBSOPTIONS} -mwindows
+	${LINK.cc} -o visualvm.exe ${OBJECTFILES} ${LDLIBSOPTIONS} -mwindows -Wl,--nxcompat -Wl,--dynamicbase
 
 ${OBJECTDIR}/o.n.bootstrap/utilsfuncs.o: o.n.bootstrap/utilsfuncs.cpp 
 	${MKDIR} -p ${OBJECTDIR}/o.n.bootstrap

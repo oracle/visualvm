@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="84">
+<configurationDescriptor version="89">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -12,9 +12,9 @@
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
                    projectFiles="true">
+      <itemPath>version.rc</itemPath>
       <itemPath>visualvm.exe.manifest</itemPath>
       <itemPath>visualvm.rc</itemPath>
-      <itemPath>version.rc</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
@@ -35,6 +35,8 @@
       <toolsSet>
         <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>Cygwin|Cygwin</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
         <ccTool>
@@ -52,14 +54,36 @@
           <linkerLibItems>
             <linkerOptionItem>visualvm.res</linkerOptionItem>
           </linkerLibItems>
-          <commandLine>-mwindows</commandLine>
+          <commandLine>-mwindows -Wl,--nxcompat -Wl,--dynamicbase</commandLine>
         </linkerTool>
       </compileType>
+      <item path="cmdargs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="o.n.bootstrap/utilsfuncs.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="o.n.bootstrap/utilsfuncs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="version.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="version.rc" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="visualvm.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="visualvm.exe.manifest" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="visualvm.rc" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="visualvmlauncher.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="visualvmlauncher.h" ex="false" tool="3" flavor2="0">
+      </item>
     </conf>
     <conf name="visualvm64.exe" type="1">
       <toolsSet>
         <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>Cygwin64|Cygwin</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
         <ccTool>
@@ -80,6 +104,26 @@
           <commandLine>-mwindows</commandLine>
         </linkerTool>
       </compileType>
+      <item path="cmdargs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="o.n.bootstrap/utilsfuncs.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="o.n.bootstrap/utilsfuncs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="version.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="version.rc" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="visualvm.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="visualvm.exe.manifest" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="visualvm.rc" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="visualvmlauncher.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="visualvmlauncher.h" ex="false" tool="3" flavor2="0">
+      </item>
     </conf>
   </confs>
 </configurationDescriptor>
