@@ -85,6 +85,8 @@ public class StackTraceSnapshotBuilder {
         new MethodInfo("sun.net.dns.ResolverConfigurationImpl","notifyAddrChange0() : int"), // NOI18N
         new MethodInfo("java.lang.ProcessImpl","waitFor[native]"), // NOI18N
         new MethodInfo("java.lang.ProcessImpl","waitFor() : int"), // NOI18N
+        new MethodInfo("sun.nio.ch.EPollArrayWrapper","epollWait[native]"), // NOI18N
+        new MethodInfo("sun.nio.ch.EPollArrayWrapper","epollWait(long, int, long, int) : int"), // NOI18N
     });
 
     private InstrumentationFilter filter;
