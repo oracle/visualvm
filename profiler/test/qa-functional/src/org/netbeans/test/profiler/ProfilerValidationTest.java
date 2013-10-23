@@ -76,6 +76,7 @@ import org.netbeans.jemmy.operators.JCheckBoxOperator;
 import org.netbeans.jemmy.operators.JComboBoxOperator;
 import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JTabbedPaneOperator;
+import org.netbeans.jemmy.operators.JTableOperator;
 import org.netbeans.jemmy.operators.JTreeOperator;
 import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.lib.profiler.common.Profiler;
@@ -186,26 +187,24 @@ public class ProfilerValidationTest extends JellyTestCase {
 
     /**
      * Test profiler calibration - run profiler calibration Profile|Advanced
-     * Commands|Run Profiler Calibration - wait for calibration results and
+     * Commands|Manage Calibration Data - select default platform -
+     * start calibration - wait for calibration results and
      * confirm information dialog
      */
     public void testProfilerCalibration() {
         String ProfileMenu = Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE, "Menu/Profile");
         String AdvansedCmds = Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE, "Menu/Profile/Advanced");
-        String CalibrationAction = Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE, "LBL_RunCalibrationAction");
+        String manageCalibrationLabel = "Manage Calibration Data";
 
-        new ActionNoBlock(ProfileMenu + "|" + AdvansedCmds + "|" + CalibrationAction, null).perform();
-        new NbDialogOperator(Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE,
-                "JavaPlatformSelector_SelectPlatformCalibrateDialogCaption")).ok();
-        // increase timeout for calibration
-        JemmyProperties.setCurrentTimeout("DialogWaiter.WaitDialogTimeout", 120000); // NOI18N
-        NbDialogOperator infoDlg = new NbDialogOperator(Bundle.getStringTrimmed("org.openide.Bundle",
-                "NTF_InformationTitle")); // "Information"
-        String lbl = Bundle.getStringTrimmed(PROFILER_LIB_BUNDLE,
-                "TargetAppRunner_CalibrationSummaryShortMsg");
-        /* The calibration was successful.\nClick Show Details to see calibration results.\n\nWarning\: If your computer uses dynamic CPU frequency switching,\nplease disable it and rerun calibration as changing the CPU frequency\nduring profiling would produce inaccurate results. */
-        JLabelOperator calibrationResultLabel = new JLabelOperator(infoDlg, lbl.substring(0, lbl.indexOf('\n'))); // The calibration was successful.
-        infoDlg.ok();
+        new ActionNoBlock(ProfileMenu + "|" + AdvansedCmds + "|" + manageCalibrationLabel, null).perform();
+        NbDialogOperator manageOper = new NbDialogOperator(manageCalibrationLabel);
+        JTableOperator platformsOper = new JTableOperator(manageOper);
+        platformsOper.selectCell(0, 0);
+        JButtonOperator calibrateButton = new JButtonOperator(manageOper, "Calibrate");
+        calibrateButton.pushNoBlock();
+        NbDialogOperator infoOper = new NbDialogOperator("Information");
+        infoOper.ok();
+        manageOper.closeByButton();
     }
 
     /**
