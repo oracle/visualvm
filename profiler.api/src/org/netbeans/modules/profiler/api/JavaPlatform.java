@@ -209,6 +209,11 @@ public final class JavaPlatform {
     public String getVersion() {
         return getSystemProperties().get("java.version");
     }
+    
+    @Override
+    public String toString() {
+        return getDisplayName();
+    }
 
     @Override
     public boolean equals(Object obj) {
