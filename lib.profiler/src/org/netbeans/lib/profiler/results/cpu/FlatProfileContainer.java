@@ -359,18 +359,18 @@ public abstract class FlatProfileContainer {
                     super.swap(a, b);
                     FlatProfileContainer.this.swap(a, b);
 
-                    swap(timeInMcs0,a,b);
-                    swap(totalTimeInMcs0,a,b);
+                    FlatProfileContainer.swap(timeInMcs0,a,b);
+                    FlatProfileContainer.swap(totalTimeInMcs0,a,b);
 
                     if (collectingTwoTimeStamps) {
-                        swap(timeInMcs1,a,b);
-                        swap(totalTimeInMcs1,a,b);
+                        FlatProfileContainer.swap(timeInMcs1,a,b);
+                        FlatProfileContainer.swap(totalTimeInMcs1,a,b);
                     }
 
-                    swap(methodIds,a,b);
+                    FlatProfileContainer.swap(methodIds,a,b);
 
                     if (percent != null) {
-                        swap(percent,a,b);
+                        FlatProfileContainer.swap(percent,a,b);
                     }
                 }
             }).sort(sortOrder);
@@ -392,19 +392,19 @@ public abstract class FlatProfileContainer {
                     super.swap(a, b);
                     FlatProfileContainer.this.swap(a, b);
 
-                    swap(timeInMcs0,a,b);
-                    swap(totalTimeInMcs0,a,b);
+                    FlatProfileContainer.swap(timeInMcs0,a,b);
+                    FlatProfileContainer.swap(totalTimeInMcs0,a,b);
 
                     if (collectingTwoTimeStamps) {
-                        swap(timeInMcs1,a,b);
-                        swap(totalTimeInMcs1,a,b);
+                        FlatProfileContainer.swap(timeInMcs1,a,b);
+                        FlatProfileContainer.swap(totalTimeInMcs1,a,b);
                     }
 
-                    swap(methodIds,a,b);
-                    swap(nInvocations,a,b);
+                    FlatProfileContainer.swap(methodIds,a,b);
+                    FlatProfileContainer.swap(nInvocations,a,b);
 
                     if (percent != null) {
-                        swap(percent,a,b);
+                        FlatProfileContainer.swap(percent,a,b);
                     }
                 }
             }).sort(sortOrder);
@@ -438,18 +438,18 @@ public abstract class FlatProfileContainer {
                     super.swap(a, b);
                     FlatProfileContainer.this.swap(a, b);
 
-                    swap(totalTimeInMcs0,a,b);
+                    FlatProfileContainer.swap(totalTimeInMcs0,a,b);
                     
                     if (collectingTwoTimeStamps) {
-                        swap(tpmBF,a,b);
-                        swap(totalTimeInMcs1,a,b);
+                        FlatProfileContainer.swap(tpmBF,a,b);
+                        FlatProfileContainer.swap(totalTimeInMcs1,a,b);
                     }
 
-                    swap(methodIds,a,b);
-                    swap(nInvocations,a,b);
+                    FlatProfileContainer.swap(methodIds,a,b);
+                    FlatProfileContainer.swap(nInvocations,a,b);
 
                     if (percent != null) {
-                        swap(percent,a,b);
+                        FlatProfileContainer.swap(percent,a,b);
                     }
                 }
             }).sort(sortOrder);
@@ -467,14 +467,14 @@ public abstract class FlatProfileContainer {
                         super.swap(a, b);
                         FlatProfileContainer.this.swap(a, b);
 
-                        swap(totalTimeInMcs0,a,b);
+                        FlatProfileContainer.swap(totalTimeInMcs0,a,b);
                         
                         if (collectingTwoTimeStamps) {
-                            swap(tpmBF,a,b);
-                            swap(totalTimeInMcs1,a,b);
+                            FlatProfileContainer.swap(tpmBF,a,b);
+                            FlatProfileContainer.swap(totalTimeInMcs1,a,b);
                         }
 
-                        swap(methodIds,a,b);
+                        FlatProfileContainer.swap(methodIds,a,b);
                     }
                 }).sort(sortOrder);
         }
@@ -508,18 +508,18 @@ public abstract class FlatProfileContainer {
                     super.swap(a, b);
                     FlatProfileContainer.this.swap(a, b);
 
-                    swap(timeInMcs0,a,b);
+                    FlatProfileContainer.swap(timeInMcs0,a,b);
                     
                     if (collectingTwoTimeStamps) {
-                        swap(tpmBF,a,b);
-                        swap(timeInMcs1,a,b);
+                        FlatProfileContainer.swap(tpmBF,a,b);
+                        FlatProfileContainer.swap(timeInMcs1,a,b);
                     }
 
-                    swap(methodIds,a,b);
-                    swap(nInvocations,a,b);
+                    FlatProfileContainer.swap(methodIds,a,b);
+                    FlatProfileContainer.swap(nInvocations,a,b);
 
                     if (percent != null) {
-                        swap(percent,a,b);
+                        FlatProfileContainer.swap(percent,a,b);
                     }
                 }
             }).sort(sortOrder);
@@ -537,14 +537,14 @@ public abstract class FlatProfileContainer {
                         super.swap(a, b);
                         FlatProfileContainer.this.swap(a, b);
 
-                        swap(timeInMcs0,a,b);
+                        FlatProfileContainer.swap(timeInMcs0,a,b);
 
                         if (collectingTwoTimeStamps) {
-                            swap(tpmBF,a,b);
-                            swap(timeInMcs1,a,b);
+                            FlatProfileContainer.swap(tpmBF,a,b);
+                            FlatProfileContainer.swap(timeInMcs1,a,b);
                         }
 
-                        swap(methodIds,a,b);
+                        FlatProfileContainer.swap(methodIds,a,b);
                     }
                 }).sort(sortOrder);
         }
