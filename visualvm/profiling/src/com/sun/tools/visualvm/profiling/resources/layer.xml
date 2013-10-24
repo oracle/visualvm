@@ -27,14 +27,6 @@
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
 <filesystem>
     
-    <folder name="Actions">
-        <folder name="Other">
-            <file name="com-sun-tools-visualvm-profiling-snapshot-diff-CompareSnapshotsAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiling.snapshot.diff.CompareSnapshotsAction.instance"/>
-            </file>
-        </folder>
-    </folder>
-    
     <folder name="OptionsDialog">
         <file name="ProfilerOptions.instance">
             <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiling.presets.ProfilingOptionsCategory.instance"/>
@@ -43,10 +35,16 @@
     </folder>
     
     <folder name="VisualVM">
+        <folder name="Actions">
+            <file name="com-sun-tools-visualvm-profiling-snapshot-diff-CompareSnapshotsAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiling.snapshot.diff.CompareSnapshotsAction.instance"/>
+            </file>
+        </folder>
+
         <folder name="ExplorerPopupSelection">
             
             <file name="com-sun-tools-visualvm-profiling-snapshot-diff-CompareSnapshotsAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiling-snapshot-diff-CompareSnapshotsAction.instance"/>
+                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-profiling-snapshot-diff-CompareSnapshotsAction.instance"/>
                 <attr name="position" intvalue="20"/>
                 <attr name="default" boolvalue="true"/>
             </file>

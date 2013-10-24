@@ -32,9 +32,6 @@
             <file name="com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.application.snapshot.AddApplicationSnapshotAction.alwaysEnabled"/>
             </file>
-            <file name="com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.application.snapshot.ApplicationSnapshotAction.instance"/>
-            </file>
         </folder>
     </folder>
     
@@ -48,7 +45,7 @@
         
         <folder name="Applications">
             <file name="com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.instance"/>
+                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.instance"/>
                 <attr name="position" intvalue="2500"/>
             </file>
         </folder>
@@ -71,6 +68,12 @@
     </folder>
     
     <folder name="VisualVM">
+        <folder name="Actions">
+            <file name="com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.application.snapshot.ApplicationSnapshotAction.instance"/>
+            </file>
+        </folder>
+
         <folder name="ExplorerPopupSelection">
             
             <file name="com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-selectionAware.instance">
@@ -80,7 +83,7 @@
             </file>
             
             <file name="com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.instance"/>
+                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-application-snapshot-ApplicationSnapshotAction.instance"/>
                 <attr name="position" intvalue="1500"/>
             </file>
             
@@ -89,7 +92,7 @@
         <folder name="ExplorerPopupNoSelection">
             
             <file name="com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance"/>
+                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="400"/>
             </file>
             

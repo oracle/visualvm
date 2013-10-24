@@ -27,17 +27,6 @@
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
 <filesystem>
     
-    <folder name="Actions">
-        <folder name="Other">
-            <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfileApplicationAction.instance"/>
-            </file>
-            <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance">
-                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfilerSnapshotAction.instance"/>
-            </file>
-        </folder>
-    </folder>
-    
     <folder name="Menu">
         <folder name="Applications">
             <file name="Applications-Separator-1500.instance">
@@ -45,21 +34,30 @@
                 <attr name="position" intvalue="1500"/>
             </file>
             <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance"/>
+                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance"/>
                 <attr name="position" intvalue="1520"/>
             </file>
             <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance"/>
+                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance"/>
                 <attr name="position" intvalue="2400"/>
             </file>
         </folder>
     </folder>
 
     <folder name="VisualVM">
+        <folder name="Actions">
+            <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfileApplicationAction.instance"/>
+            </file>
+            <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.profiler.ProfilerSnapshotAction.instance"/>
+            </file>
+        </folder>
+
         <folder name="ExplorerPopupSelection">
             
             <file name="com-sun-tools-visualvm-profiler-ProfileApplicationAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance"/>
+                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-profiler-ProfileApplicationAction.instance"/>
                 <attr name="position" intvalue="1015"/>
             </file>
             <file name="ProfileApplicationAction-Separator-1020.instance">
@@ -68,7 +66,7 @@
             </file>
             
             <file name="com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance"/>
+                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-profiler-ProfilerSnapshotAction.instance"/>
                 <attr name="position" intvalue="1400"/>
             </file>
             

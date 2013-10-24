@@ -27,19 +27,17 @@
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
 <filesystem>
 
-    <folder name="Actions">
-        <folder name="Other">
+    <folder name="VisualVM">
+        <folder name="Actions">
             <file name="com-sun-tools-visualvm-jvmstat-application-AddJstatdConnectionAction.instance">
                 <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.jvmstat.application.AddJstatdConnectionAction.instance"/>
             </file>
         </folder>
-    </folder>
-    
-    <folder name="VisualVM">
+
         <folder name="ExplorerPopupSelection">
 
             <file name="com-sun-tools-visualvm-jvmstat-application-AddJstatdConnectionAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-jvmstat-application-AddJstatdConnectionAction.instance"/>
+                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-jvmstat-application-AddJstatdConnectionAction.instance"/>
                 <attr name="position" intvalue="150"/>
             </file>
             
