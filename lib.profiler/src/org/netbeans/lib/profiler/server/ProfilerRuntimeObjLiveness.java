@@ -259,31 +259,32 @@ public class ProfilerRuntimeObjLiveness extends ProfilerRuntimeMemory {
         ti.inProfilingRuntimeMethod++;
 
         // See comment marked with (***) in ProfilerRuntimeCPUFullInstr
-        classId = (char) ((int) classId);
+        int classInt = classId&0xff;
+        classInt |= classId&0xff00;
 
         int objCount = 0;
 
         synchronized (allocatedInstancesCount) {
-            objCount = ++allocatedInstancesCount[classId];
+            objCount = ++allocatedInstancesCount[classInt];
         }
 
-        if (allocatedInstThreshold[classId] <= 0) {
+        if (allocatedInstThreshold[classInt] <= 0) {
             //System.out.print("+++ Alloc object "); //System.out.print((int) classId); System.out.print(" "); System.out.println(object);
             char epoch = (char) GC.getCurrentGCEpoch();
 
             // Generate a 64-bit object id. Make sure the function is the same at the tool side!
-            long objectId = (((long) classId) << 48) | (((long) epoch) << 32) | ((long) objCount);
+            long objectId = (((long) classInt) << 48) | (((long) epoch) << 32) | ((long) objCount);
             ProfilerRuntimeObjLivenessWeakRef wr = new ProfilerRuntimeObjLivenessWeakRef(object, rq, objectId);
             objSet.put(wr);
 
-            long objSize = getCachedObjectSize(classId, object);
+            long objSize = getCachedObjectSize(classInt, object);
 
             getAndSendCurrentStackTrace(classId, epoch, objCount, objSize);
 
-            allocatedInstThreshold[classId] = nextRandomizedInterval();
+            allocatedInstThreshold[classInt] = nextRandomizedInterval();
         }
 
-        allocatedInstThreshold[classId]--;
+        allocatedInstThreshold[classInt]--;
         ti.inProfilingRuntimeMethod--;
     }
 
