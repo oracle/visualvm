@@ -232,13 +232,13 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
         }
     }
 
-    protected static long getCachedObjectSize(char classId, Object object) {
-        long objSize = objectSize[classId];
+    protected static long getCachedObjectSize(int classInt, Object object) {
+        long objSize = objectSize[classInt];
 
         if (objSize <= 1) { // An array (variable size, value 1) or cached size unset (value 0)
 
             if (object == null) { // Should not happen, this is a debugging/critical error statement
-                System.err.println("*** JFluid critical error: received null object for classId = " + (int) classId
+                System.err.println("*** JFluid critical error: received null object for classId = " + classInt
                                    + " in getCachedObjectSize"); // NOI18N
                 Thread.dumpStack();
                 System.err.println("*** End JFluid critical error message ---------------------------"); // NOI18N
@@ -248,9 +248,9 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
                 objSize = Classes.getObjectSize(object);
 
                 if (object.getClass().isArray() || (objSize > 0xFFFF)) {
-                    objectSize[classId] = 1; // Size will be determined separately every time
+                    objectSize[classInt] = 1; // Size will be determined separately every time
                 } else {
-                    objectSize[classId] = (char) objSize; // Size will be used for all objects of this class
+                    objectSize[classInt] = (char) objSize; // Size will be used for all objects of this class
                 }
             } else {
                 objSize = Classes.getObjectSize(object);
