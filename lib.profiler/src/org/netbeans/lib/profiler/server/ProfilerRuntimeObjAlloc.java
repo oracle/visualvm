@@ -105,19 +105,20 @@ public class ProfilerRuntimeObjAlloc extends ProfilerRuntimeMemory {
         ti.inProfilingRuntimeMethod++;
 
         // See comment marked with (***) in ProfilerRuntimeCPUFullInstr
-        classId = (char) ((int) classId);
+        int classInt = classId&0xff;
+        classInt |= classId&0xff00;
 
         synchronized (allocatedInstancesCount) {
-            allocatedInstancesCount[classId]++;
+            allocatedInstancesCount[classInt]++;
         }
 
-        if (allocatedInstThreshold[classId] <= 0) {
-            long objSize = getCachedObjectSize(classId, object);
+        if (allocatedInstThreshold[classInt] <= 0) {
+            long objSize = getCachedObjectSize(classInt, object);
             getAndSendCurrentStackTrace(classId, objSize);
-            allocatedInstThreshold[classId] = nextRandomizedInterval();
+            allocatedInstThreshold[classInt] = nextRandomizedInterval();
         }
 
-        allocatedInstThreshold[classId]--;
+        allocatedInstThreshold[classInt]--;
         ti.inProfilingRuntimeMethod--;
     }
 
