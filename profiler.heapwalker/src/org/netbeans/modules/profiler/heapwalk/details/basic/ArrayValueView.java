@@ -42,7 +42,6 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details.basic;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -69,6 +68,7 @@ import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import static org.netbeans.modules.profiler.heapwalk.details.basic.ArrayValueView.Type.*;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
@@ -92,6 +92,7 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
     private static final int MAX_ARRAY_ITEMS = 1000;
     private static final int MAX_CHARARRAY_ITEMS = 500000;
     private static final String TRUNCATED = Bundle.ArrayValueView_Truncated();
+    enum Type {STRING, STRING_BUILDER, PRIMITIVE_ARRAY};
     
     private final String className;
     
@@ -105,16 +106,13 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
     private int count;
     private boolean truncated;
     private boolean chararray;
+    private boolean bytearray;
     private String instanceIdentifier;
-    private int type;
+    private Type type;
     
     protected ArrayValueView(String className, Instance instance, Heap heap) {
         super(instance, heap);
         this.className = className;
-    }
-    
-    private ArrayValueView getArrayValueView() {
-        return this;
     }
 
     protected void computeView(Instance instance, Heap heap) {
@@ -125,22 +123,23 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
             count = DetailsUtils.getIntFieldValue(instance, "count", -1);           // NOI18N
             values = DetailsUtils.getPrimitiveArrayFieldValues(instance, "value");  // NOI18N
             caption = Bundle.ArrayValueView_Value();
-            type = 1;
+            type = STRING;
         } else if (StringDetailsProvider.BUILDERS_MASK.equals(className)) {         // AbstractStringBuilder+
             separator = "";                                                         // NOI18N
             offset = 0;
             count = DetailsUtils.getIntFieldValue(instance, "count", -1);           // NOI18N
             values = DetailsUtils.getPrimitiveArrayFieldValues(instance, "value");  // NOI18N
             caption = Bundle.ArrayValueView_Value();
-            type = 2;
+            type = STRING_BUILDER;
         } else if (instance instanceof PrimitiveArrayInstance) {                    // Primitive array
             chararray = "char[]".equals(instance.getJavaClass().getName());         // NOI18N
+            bytearray = "byte[]".equals(instance.getJavaClass().getName());         // NOI18N
             separator = chararray ? "" : ", ";                                      // NOI18N
             offset = 0;
             values = DetailsUtils.getPrimitiveArrayValues(instance);
             count = values == null ? 0 : values.size();
             caption = Bundle.ArrayValueView_Items();
-            type = 3;
+            type = PRIMITIVE_ARRAY;
         }
         instanceIdentifier=instance.getJavaClass().getName()+"#"+instance.getInstanceNumber(); // NOI18N
         final String preview = getString(true);
@@ -182,7 +181,7 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
                 
                 JButton save = htmlButton(Bundle.ArrayValueView_Save(), !preview.isEmpty(), new Runnable() {
                     public void run() {
-                        new BasicExportAction(getArrayValueView()).actionPerformed(null);
+                        new BasicExportAction(ArrayValueView.this).actionPerformed(null);
                     }
                 });
                 c = new GridBagConstraints();
@@ -314,17 +313,24 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
             int valuesCount = count < 0 ? values.size() - offset :
                               Math.min(count, values.size() - offset);
             int lastValue = offset + valuesCount - 1;
-            if (exportedFileType == BasicExportAction.MODE_CSV) {
-                for (int i = offset; i <= lastValue; i++) {
-                    eDD.dumpData(values.get(i));
-                    eDD.dumpData(comma);
+            for (int i = offset; i <= lastValue; i++) {
+                String value = values.get(i);
+                
+                switch (exportedFileType) {
+                    case BasicExportAction.MODE_CSV:
+                        eDD.dumpData(value);
+                        eDD.dumpData(comma);
+                        break;
+                    case BasicExportAction.MODE_TXT:
+                        eDD.dumpData(value);
+                        break;
+                    case BasicExportAction.MODE_BIN:
+                        byte b = Byte.valueOf(value);
+                        eDD.dumpByte(b);
+                        break;
+                    default:
+                        throw new IllegalArgumentException(); //Illegal export type
                 }
-            } else if (exportedFileType==BasicExportAction.MODE_TXT) {
-                for (int i = offset; i <= lastValue; i++) {
-                    eDD.dumpData(values.get(i));
-                }
-            } else {
-                throw new IllegalArgumentException(); //Illegal export type
             }
         }
         eDD.close();
@@ -337,17 +343,29 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
 
     @Override
     public boolean hasRawData() {
-        return type==3;
+        return type.equals(PRIMITIVE_ARRAY);
+    }
+
+    @Override
+    public boolean hasBinaryData() {
+        return bytearray;
     }
 
     @Override
     public boolean hasText() {
-        return type<3 || chararray;
+        switch (type) {
+            case STRING:
+            case STRING_BUILDER:
+                return true;
+            case PRIMITIVE_ARRAY:
+                return chararray;
+        }
+        throw new IllegalArgumentException(type.toString());
     }
 
     @Override
     public boolean isExportable() {
-        return hasText() || hasRawData();
+        return hasText() || hasBinaryData() || hasRawData();
     }
     
 }

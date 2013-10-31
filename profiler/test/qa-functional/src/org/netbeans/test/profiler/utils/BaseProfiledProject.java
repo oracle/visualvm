@@ -85,6 +85,11 @@ public class BaseProfiledProject {
 	 * String constant for stopping the profiling session
 	 */
 	public static String STOP = "Stop Profiling Session";
+        /**
+	 * String constant for taking snapshot
+	 */
+	public static String TAKE_SNAPSHOT = "Take Snapshot of Collected Results";                
+        
 	//members------------------------
 	/**
 	 * Name of the project. Should be given/created in the constructor of the
@@ -459,15 +464,19 @@ public class BaseProfiledProject {
 	 * menu item "Profile|Stop profiling session".
 	 */
 	protected void waitProfilingStart() {
-		System.out.println("Waiting for enabling menuitem 'stop profiling session' ");
-		Action stopAction = new Action(PROFILE_MENU + "|" + STOP, null);
-		MainWindowOperator.getDefault().toFront();
-		while (!stopAction.isEnabled()) {
-			sleep(1000);
-			print("waiting for menu...");
-			MainWindowOperator.getDefault().toFront();
-		}
-		print("stopping the session is enabled");
+            System.out.println("Waiting for enabling menuitem 'stop profiling session' ");
+            Action snapshotAction = new Action(PROFILE_MENU + "|" + TAKE_SNAPSHOT, null);		
+            MainWindowOperator.getDefault().toFront();
+            for (int i = 0; i < 10; i++) {
+                MainWindowOperator.getDefault().toFront();
+                if (snapshotAction.isEnabled()) {
+                    break;
+                } else {
+                    sleep(1000);
+                    print("waiting for menu...");                    
+                }
+            }
+            print("Take snapshot action is enabled");
 	}
 	/**
 	 * Convenience function for printing a string.

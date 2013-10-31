@@ -200,7 +200,7 @@ public class CalibrationDataFileIO {
         return false;
     }
 
-    private static String getCalibrationDataFileName(String targetJDKVerString)
+    public static String getCalibrationDataFileName(String targetJDKVerString)
                                               throws IOException {
         String fileName = "machinedata" + "." + targetJDKVerString; // NOI18N
 
