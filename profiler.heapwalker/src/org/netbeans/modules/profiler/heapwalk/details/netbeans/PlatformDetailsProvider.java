@@ -63,7 +63,7 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
     private static final String STANDARD_MODULE_DATA = "org.netbeans.StandardModuleData"; // NOI18N
     private static final String SPECIFICATION_VERSION = "org.openide.modules.SpecificationVersion"; // NOI18N
     private static final String ABSTRACT_NODE = "org.openide.nodes.AbstractNode+"; // NOI18N
-    private static final String FILE_ENTRY = "org.openide.loaders.FileEntry+"; // NOI18N
+    private static final String MULTI_FILE_ENTRY = "org.openide.loaders.MultiDataObject$Entry+"; // NOI18N
     private static final String DATA_OBJECT = "org.openide.loaders.DataObject+"; // NOI18N
     private static final String JAR_FILESYSTEM = "org.openide.filesystems.JarFileSystem+"; // NOI18N
     private static final String FILE_OBJ = "org.netbeans.modules.masterfs.filebasedfs.fileobjects.FileObj+"; // NOI18N
@@ -91,7 +91,7 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
     
     public PlatformDetailsProvider() {
         super(STANDARD_MODULE,STANDARD_MODULE_DATA,SPECIFICATION_VERSION,
-              ABSTRACT_NODE,FILE_ENTRY,DATA_OBJECT,JAR_FILESYSTEM,
+              ABSTRACT_NODE,MULTI_FILE_ENTRY,DATA_OBJECT,JAR_FILESYSTEM,
               FILE_OBJ,FOLDER_OBJ, FILE_NAME,FOLDER_NAME,ABSTRACT_FOLDER,
               BFS_BASE,
               FIXED_0_7,FIXED_8_15,FIXED_16_23,FIXED_1_10,FIXED_11_20,
@@ -142,7 +142,7 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
             return name;
         } else if (JAR_FILESYSTEM.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "foRoot", heap); // NOI18N
-        } else if (FILE_ENTRY.equals(className)) {
+        } else if (MULTI_FILE_ENTRY.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "file", heap); // NOI18N
         } else if (DATA_OBJECT.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "primary", heap); // NOI18N
