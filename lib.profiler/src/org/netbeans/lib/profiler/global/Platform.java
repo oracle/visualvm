@@ -239,7 +239,11 @@ public class Platform implements CommonConstants {
                 } else if (isHpux()) {
                     procArch = "pa_risc2.0"; // NOI18N
                 } else if (isLinuxArm()) {
-                    procArch = "arm"; // NOI18N
+                    if (isLinuxArmVfpHflt()) {
+                        procArch = "arm-vfp-hflt"; // NOI18N
+                    } else {
+                        procArch = "arm"; // NOI18N
+                    }
                 }
             }
 
@@ -519,6 +523,15 @@ public class Platform implements CommonConstants {
         String procArch = System.getProperty("os.arch"); // NOI18N
         
         return isLinux() && procArch.startsWith("arm"); // NOI18N
+    }
+
+    /**
+     * Test whether we are running on Linux on ARM processor with Hard float ABI
+     */
+    public static boolean isLinuxArmVfpHflt() {
+        String procArch = System.getProperty("sun.arch.abi"); // NOI18N
+        
+        return isLinux() && isLinuxArm() && "gnueabihf".equals(procArch); // NOI18N
     }
     
     /**
