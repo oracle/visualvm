@@ -218,6 +218,7 @@ public class ProfilerRuntime implements CommonConstants {
 
     public static void setLockContentionMonitoringEnabled(boolean b) {
         lockContentionMonitoringEnabled = b;
+        knownMonitors = b ? new HashSet() : null;
         if (DEBUG) {
             System.out.println("ProfilerRuntime.DEBUG: setLockContentionMonitoringEnabled "+b);
         }
@@ -722,13 +723,12 @@ public class ProfilerRuntime implements CommonConstants {
         }
         int hash = System.identityHashCode(id);
         Integer hashInt = new Integer(hash);
-        if (knownMonitors == null) {
-            knownMonitors = new HashSet();
-        }
-        if (!knownMonitors.contains(hashInt)) {
-            knownMonitors.add(hashInt);
+        if (knownMonitors.add(hashInt)) {
             int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
 
+            if (DEBUG) {
+                System.out.println("ProfilerRuntime.DEBUG: New Monitor "+Integer.toHexString(hash));
+            }
             if (curPos > ThreadInfo.evBufPosThreshold) {
                 copyLocalBuffer(ti);
                 curPos = ti.evBufPos;
