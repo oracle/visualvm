@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  *
@@ -75,6 +76,9 @@ class ThreadInfo {
         assert openMonitor != null;
         assert mi.equals(openMonitor.monitor);
         long wait = timeStamp - openMonitor.timeStamp;
+        if (LockGraphBuilder.LOG.isLoggable(Level.FINEST)) {
+            LockGraphBuilder.LOG.log(Level.FINEST, "Monitor exit mId = {0}, time diff = {1}", new Object[]{Integer.toHexString(mi.hashCode()), wait});
+        }
         addMonitor(mi, wait);
         openMonitor = null;
         mi.closeThread(this, timeStamp);
@@ -92,7 +96,7 @@ class ThreadInfo {
     void timeAdjust(long timeDiff) {
         if (openMonitor != null) {
             openMonitor.timeAdjust(timeDiff);
-            openMonitor.monitor.timeAdjust(timeDiff);
+            openMonitor.monitor.timeAdjust(this, timeDiff);
         }
     }
 
