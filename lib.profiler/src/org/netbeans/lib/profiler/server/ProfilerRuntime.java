@@ -671,6 +671,7 @@ public class ProfilerRuntime implements CommonConstants {
     }
 
     static long writeWaitTimeEvent(byte eventType, ThreadInfo ti, Object id) {
+        if (eventBuffer == null) return -1;
         int hash = writeNewMonitorEvent(ti,id);
         
         // if (printEvents) System.out.println("*** Writing event " + eventType + ", metodId = " + (int)methodId);
