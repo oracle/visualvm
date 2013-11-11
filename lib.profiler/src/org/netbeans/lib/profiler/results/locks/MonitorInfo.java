@@ -54,7 +54,7 @@ class MonitorInfo {
 
     final private int monitorId;
     private String className;
-    private OpenThread openThread;
+    private Map<ThreadInfo, OpenThread> openThreads;
     private Map<ThreadInfo, ThreadDetail> threads;
 
     MonitorInfo(int id) {
@@ -90,16 +90,15 @@ class MonitorInfo {
     }
 
     void openThread(ThreadInfo ti, long timeStamp0) {
-        assert openThread == null;
-        openThread = new OpenThread(ti, timeStamp0);
+        assert openThreads.get(ti) == null;
+        openThreads.put(ti, new OpenThread(ti, timeStamp0));
     }
 
     void closeThread(ThreadInfo ti, long timeStamp0) {
+        OpenThread openThread = openThreads.remove(ti);
         assert openThread != null;
-        assert openThread.threadInfo.equals(ti);
         long wait = timeStamp0 - openThread.timeStamp;
         addThread(ti, wait);
-        openThread = null;
     }
 
     private void addThread(ThreadInfo ti, long wait) {
@@ -111,7 +110,8 @@ class MonitorInfo {
         }
     }
 
-    void timeAdjust(long timeDiff) {
+    void timeAdjust(ThreadInfo ti, long timeDiff) {
+        OpenThread openThread = openThreads.get(ti);
         assert openThread != null;
         openThread.timeAdjust(timeDiff);
     }
