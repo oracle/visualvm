@@ -60,6 +60,7 @@ class MonitorInfo {
     MonitorInfo(int id) {
         monitorId = id;
         threads = new HashMap();
+        openThreads = new HashMap();
         className = "*unknown*"; // NOI18N
     }
     
