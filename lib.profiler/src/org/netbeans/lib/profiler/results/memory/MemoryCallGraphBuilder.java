@@ -468,7 +468,7 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
     }
 
     @Override
-    public void monitorEntry(int threadId, long timeStamp0, long timeStamp1, int monitorId) {
+    public void monitorEntry(int threadId, long timeStamp0, long timeStamp1, int monitorId, int ownerThreadId) {
         // ignore
     }
 

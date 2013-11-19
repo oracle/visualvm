@@ -2,7 +2,7 @@
 
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright 1997-2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright 1997-2013 Oracle and/or its affiliates. All rights reserved.
 #
 # Oracle and Java are registered trademarks of Oracle and/or its affiliates.
 # Other names may be trademarks of their respective owners.
@@ -42,30 +42,18 @@
 # Version 2 license, then the option applies only if the new code is
 # made subject to such option by the copyright holder.
 
-BuildForJDK()
-{
-        JAVA_HOME=$1
-        JDK_ID=$2
-        ARCH_DIR=$3
-        ARCH_TOOLS=$4
-        ARCH_FLAGS=$5
-	echo $JAVA_HOME $JDK_ID $ARCH_DIR $ARCH_TOOLS $ARCH_FLAGS
-	$ARCH_TOOLS/bin/gcc -I$JAVA_HOME/include -I$JAVA_HOME/include/linux -DLINUX -pthread -fPIC -shared -O3 $ARCH_FLAGS -Wall \
-	-o ../../release/lib/deployed/$JDK_ID/$ARCH_DIR/libprofilerinterface.so \
-	../src-jdk15/class_file_cache.c \
-	../src-jdk15/attach.c \
-	../src-jdk15/Classes.c \
-	../src-jdk15/HeapDump.c \
-	../src-jdk15/Timers.c \
-	../src-jdk15/GC.c \
-	../src-jdk15/Threads.c \
-	../src-jdk15/Stacks.c \
-	../src-jdk15/common_functions.c
+# This script expects JAVA_HOME to point to the correct JDK 6.0+ installation
+# In case you need to customize it, please uncomment and modify the following lines
 
-	rm -f *.o
-}
+# JAVA_HOME=/opt/java/jdk1.6.0_02
+# export JAVA_HOME
 
-BuildForJDK "$JAVA_HOME_16" "jdk16" "linux-arm" "$ARM_SFLT_TOOLS" "-msoft-float -march=armv5t"
-BuildForJDK "$JAVA_HOME_16" "jdk16" "linux-arm-vfp-hflt" "$ARM_VFP_HFLT_TOOLS" "-marm -mfloat-abi=hard -mfpu=vfp"
+# Determine the location of the profile script as an absolute directory
+ORIG_DIR=`pwd`
+PROG_NAME=`type $0 | awk '{print $3}'`
+INSTALL_DIR=`dirname $PROG_NAME`
+cd $INSTALL_DIR
+INSTALL_DIR=`pwd`
+cd $ORIG_DIR
 
-
+$JAVA_HOME/bin/java -agentpath:$INSTALL_DIR/../lib/deployed/jdk16/linux-arm-vfp-hflt/libprofilerinterface.so=$INSTALL_DIR/../lib/,5140 $@
