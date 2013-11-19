@@ -270,6 +270,50 @@ public class IntegrationUtils {
         }
         return null;
     }
+    
+    public static String getPlatformByOSAndArch(int platform, int dataModel, String arch, String JVMTarget) {
+        switch (dataModel) {
+            case Platform.ARCH_32:
+                if (platform == Platform.OS_LINUX) {
+                    if (arch.startsWith("arm")) {   //NOI18N
+                        if (JVMTarget.contains("hflt")) {
+                            return PLATFORM_LINUX_ARM_VFP_HFLT_OS;
+                        } 
+                        return PLATFORM_LINUX_ARM_OS;
+                    } else {
+                        return PLATFORM_LINUX_OS;
+                    }
+                } else if ((Platform.OS_WINDOWS_MASK & platform) != 0) {
+                    return PLATFORM_WINDOWS_OS;
+                } else if (platform == Platform.OS_SOLARIS) {
+                    if (arch.startsWith("x86")) {   //NOI18N
+                        return PLATFORM_SOLARIS_INTEL_OS;
+                    } else {
+                        return PLATFORM_SOLARIS_SPARC_OS;
+                    }
+                } else {
+                    throw new UnsupportedOperationException(); //Mac32, Unknown
+                }
+            case Platform.ARCH_64:
+                if (platform == Platform.OS_LINUX) {
+                    return PLATFORM_LINUX_AMD64_OS;
+                } else if ((Platform.OS_WINDOWS_MASK & platform) != 0) {
+                    return PLATFORM_WINDOWS_AMD64_OS;
+                } else if (platform == Platform.OS_MAC) {
+                    return PLATFORM_MAC_OS;
+                } else if (platform == Platform.OS_SOLARIS) {
+                    if (arch.startsWith("x86")) {   //NOI18N
+                        return PLATFORM_SOLARIS_AMD64_OS;
+                    } else {
+                        return PLATFORM_SOLARIS_SPARC64_OS;
+                    }
+                } else {
+                    throw new UnsupportedOperationException();
+                }
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
 
     // Returns friendly java platform name
     public static String getJavaPlatformName(String javaPlatform) {
@@ -308,10 +352,14 @@ public class IntegrationUtils {
     // Returns the path to agent native libraries according to current / selected OS
     public static String getLibsDir(String targetPlatform, boolean isRemote) {
         if (isRemote) {
-            return HTML_REMOTE_STRING + getDirectorySeparator(targetPlatform) + "lib"; //NOI18N
+            return getRemoteLibsDir(HTML_REMOTE_STRING, targetPlatform);
         }
 
         return Profiler.getDefault().getLibsDir();
+    }
+    
+    private static String getRemoteLibsDir(String prefix, String targetPlatform) {
+        return prefix + getDirectorySeparator(targetPlatform) + "lib"; //NOI18N;
     }
 
     public static String getLineBreak(String targetPlatform) {
@@ -389,6 +437,12 @@ public class IntegrationUtils {
         return getLibsDir(targetPlatform, isRemote) + getDirectorySeparator(targetPlatform) + "deployed" //NOI18N
                + getDirectorySeparator(targetPlatform) + getJavaPlatformNativeLibrariesDirectoryName(targetJVM)
                + getDirectorySeparator(targetPlatform) + getOSPlatformNativeLibrariesDirectoryName(targetPlatform, isRemote);
+    }
+    
+    private static String getRemoteNativeLibrariesPath(String prefix, String targetPlatform, String targetJVM) {
+        return getRemoteLibsDir(prefix, targetPlatform) + getDirectorySeparator(targetPlatform) + "deployed" //NOI18N
+                + getDirectorySeparator(targetPlatform) + getJavaPlatformNativeLibrariesDirectoryName(targetJVM)
+                + getDirectorySeparator(targetPlatform) + getOSPlatformNativeLibrariesDirectoryName(targetPlatform, true);
     }
 
     // Returns name of the environment variable for system path to Profiler native libraries appropriate for current / selected OS
@@ -485,6 +539,19 @@ public class IntegrationUtils {
     }
 
     // Returns extra command line arguments without additional quotes required when attaching on startup
+    public static String getRemoteProfilerAgentCommandLineArgsWithoutQuotes(
+            String prefix, String targetPlatform, String targetJVM, int portNumber) {
+        final StringBuilder args = new StringBuilder();
+        if ((targetJVM.equals(PLATFORM_JAVA_60) || targetJVM.equals(PLATFORM_JAVA_70) || targetJVM.equals(PLATFORM_JAVA_80)) &&
+                isLinuxPlatform(targetPlatform)) {
+            args.append(" -XX:+UseLinuxPosixThreadCPUClocks "); // NOI18N
+        }
+        args.append("-agentpath:").append(getRemoteNativeLibrariesPath(prefix, targetPlatform, targetJVM)). // NOI18N
+                append(getDirectorySeparator(targetPlatform)).append(getProfilerAgentLibraryFile(targetPlatform)).append("="). //NOI18N
+                append(getRemoteLibsDir(prefix,targetPlatform)).append(",").append(portNumber); //NOI18N
+        return args.toString();
+    }
+    
     public static String getProfilerAgentCommandLineArgsWithoutQuotes(String targetPlatform, String targetJVM, boolean isRemote,
                                                                       int portNumber) {
         StringBuilder args = new StringBuilder();
@@ -578,6 +645,15 @@ public class IntegrationUtils {
 
     public static boolean isWindowsPlatform(String targetPlatform) {
         return targetPlatform.equals(PLATFORM_WINDOWS_OS) || targetPlatform.equals(PLATFORM_WINDOWS_AMD64_OS) || targetPlatform.equals(PLATFORM_WINDOWS_CVM);
+    }
+    
+    public static boolean isSolarisPlatform(String targetPlatform) {
+        return targetPlatform.equals(PLATFORM_SOLARIS_AMD64_OS) || targetPlatform.equals(PLATFORM_SOLARIS_INTEL_OS) 
+                || targetPlatform.equals(PLATFORM_SOLARIS_SPARC64_OS) || targetPlatform.equals(PLATFORM_SOLARIS_SPARC_OS);
+    }
+    
+    public static boolean isMacPlatform(String targetPlatform) {
+        return targetPlatform.equals(PLATFORM_MAC_OS); 
     }
 
     public static boolean isLinuxPlatform(String targetPlatform) {
