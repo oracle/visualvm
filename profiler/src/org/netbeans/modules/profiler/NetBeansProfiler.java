@@ -934,7 +934,7 @@ public abstract class NetBeansProfiler extends Profiler {
             
             sessionSettings.applySettings(sSettings);
             profilingSettings.applySettings(sSettings); // can override the session settings
-            sSettings.setRemoteHost(""); // NOI18N // clear remote profiling host
+            //sSettings.setRemoteHost(""); // NOI18N // clear remote profiling host
 
             //getThreadsManager().setSupportsSleepingStateMonitoring(
             // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
@@ -949,7 +949,7 @@ public abstract class NetBeansProfiler extends Profiler {
                     @Override
                     public void run() {
                         // should propagate the result of the following operation somehow; current workflow doesn't allow it
-                        if (tryInitiateSession(cancel)) {
+                        if (tryInitiateSession(sessionSettings, cancel)) {
                             connectToApp();
                         }
                     }
@@ -979,10 +979,9 @@ public abstract class NetBeansProfiler extends Profiler {
                 }
             });
         }
-        if (!CalibrationDataFileIO.validateCalibrationInput(sessionSettings.getJavaVersionString(),
-                                                                sessionSettings.getJavaExecutable())) {
-            ProfilerDialogs.displayError(
-                Bundle.NetBeansProfiler_MustCalibrateFirstMsg(), null, Bundle.NetBeansProfiler_MustCalibrateFirstShortMsg());
+        if (sessionSettings.getRemoteHost().isEmpty() && !CalibrationDataFileIO.validateCalibrationInput(
+                sessionSettings.getJavaVersionString(),sessionSettings.getJavaExecutable())) {
+            ProfilerDialogs.displayError(Bundle.NetBeansProfiler_MustCalibrateFirstMsg(), null, Bundle.NetBeansProfiler_MustCalibrateFirstShortMsg());
             changeStateTo(PROFILING_INACTIVE);
 
             return false; // failed, cannot proceed
@@ -996,10 +995,9 @@ public abstract class NetBeansProfiler extends Profiler {
         return true;
     }
     
-    private boolean tryInitiateSession(AtomicBoolean cancel) {
-        if (!targetAppRunner.initiateSession(0, false, cancel) || !targetAppRunner.connectToStartedVMAndStartTA()) {
+    private boolean tryInitiateSession(SessionSettings sessionSettings, AtomicBoolean cancel) {
+        if (!targetAppRunner.initiateSession(sessionSettings.getRemoteHost().isEmpty() ? 0 : 1, false, cancel) || !targetAppRunner.connectToStartedVMAndStartTA()) {
             changeStateTo(PROFILING_INACTIVE);
-
             return false; // failed, cannot proceed
         }
         return true;

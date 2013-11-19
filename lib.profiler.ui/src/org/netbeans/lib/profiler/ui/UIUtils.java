@@ -49,6 +49,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.PixelGrabber;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -141,13 +143,25 @@ public final class UIUtils {
         return UIManager.getLookAndFeel().getID().equals("Aqua"); //NOI18N
     }
 
+    private static Map<Integer, Color> DARKER_CACHE;
     public static Color getDarker(Color c) {
-        if (c.equals(Color.WHITE)) {
-            return new Color(244, 244, 244);
+        if (DARKER_CACHE == null) DARKER_CACHE = new HashMap();
+        
+        int rgb = c.getRGB();
+        Color d = DARKER_CACHE.get(rgb);
+        
+        if (d == null) {
+            if (c.equals(Color.WHITE)) {
+                d = new Color(244, 244, 244);
+            } else {
+                d = getSafeColor((int)(c.getRed() * ALTERNATE_ROW_DARKER_FACTOR),
+                                 (int)(c.getGreen() * ALTERNATE_ROW_DARKER_FACTOR),
+                                 (int)(c.getBlue() * ALTERNATE_ROW_DARKER_FACTOR));
+            }
+            DARKER_CACHE.put(rgb, d);
         }
-
-        return getSafeColor((int) (c.getRed() * ALTERNATE_ROW_DARKER_FACTOR), (int) (c.getGreen() * ALTERNATE_ROW_DARKER_FACTOR),
-                            (int) (c.getBlue() * ALTERNATE_ROW_DARKER_FACTOR));
+        
+        return d;
     }
 
     public static Color getDarkerLine(Color c, float alternateRowDarkerFactor) {

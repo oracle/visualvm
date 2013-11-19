@@ -189,6 +189,13 @@ public final class JavaPlatform {
     public Map<String,String> getSystemProperties() {
         return provider.getSystemProperties();
     }
+    
+    /** Gets the java platform properties.
+     * @return the java platform system properties
+     */
+    public Map<String,String> getProperties() {
+        return provider.getProperties();
+    }
 
     /** Gets the java platform architecture.
      * @return the java platform architecture - 32 or 64

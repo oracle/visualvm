@@ -179,7 +179,7 @@ public class MemoryDataFrameProcessor extends AbstractLockDataFrameProcessor {
                     String className = getString(buffer);
 
                     if (LOGGER.isLoggable(Level.FINEST)) {
-                        LOGGER.log(Level.FINEST, "Creating new monitor , mId={0} , className={1}", new Object[] {hash, className}); // NOI18N
+                        LOGGER.log(Level.FINEST, "Creating new monitor , monitorId={0} , className={1}", new Object[] {Integer.toHexString(hash), className}); // NOI18N
                     }
 
                     fireNewMonitor(hash, className);
@@ -192,15 +192,16 @@ public class MemoryDataFrameProcessor extends AbstractLockDataFrameProcessor {
                     int hash = buffer.getInt();
                     
                     if (eventType == CommonConstants.METHOD_ENTRY_MONITOR) {
+                        int ownerThreadId = buffer.getInt();
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Monitor entry , tId={0} , monitorId={1}", new Object[]{currentThreadId,hash}); // NOI18N
+                            LOGGER.log(Level.FINEST, "Monitor entry , tId={0} , monitorId={1} , ownerId={2}", new Object[]{currentThreadId,Integer.toHexString(hash),ownerThreadId}); // NOI18N
                         }
 
-                        fireMonitorEntry(currentThreadId, timeStamp0, timeStamp1, hash);
+                        fireMonitorEntry(currentThreadId, timeStamp0, timeStamp1, hash, ownerThreadId);
                     }
                     if (eventType == CommonConstants.METHOD_EXIT_MONITOR) {
                         if (LOGGER.isLoggable(Level.FINEST)) {
-                            LOGGER.log(Level.FINEST, "Monitor exit , tId={0} , monitorId={1}", new Object[]{currentThreadId,hash}); // NOI18N
+                            LOGGER.log(Level.FINEST, "Monitor exit , tId={0} , monitorId={1}", new Object[]{currentThreadId,Integer.toHexString(hash)}); // NOI18N
                         }
 
                         fireMonitorExit(currentThreadId, timeStamp0, timeStamp1, hash);
