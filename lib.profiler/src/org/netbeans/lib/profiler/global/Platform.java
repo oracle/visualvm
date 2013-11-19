@@ -540,19 +540,13 @@ public class Platform implements CommonConstants {
     public static int getSystemArchitecture() {
         if (sysArch == 0) {
             String architecture = System.getProperty("sun.arch.data.model"); // NOI18N
-
-            if (architecture == null) {
-                sysArch = ARCH_32;
-            } else if ("32".equals(architecture)) { // NOI18N
-                sysArch = ARCH_32; // defined 32bit environment
-            } else if ("64".equals(architecture)) { // NOI18N
-                sysArch = ARCH_64; // defined 64bit environment
-            } else {
-                sysArch = ARCH_32; // unknown environment, 32bit by default
-            }
+            sysArch = getSystemArchitecture(architecture);
         }
-
         return sysArch;
+    }
+    
+    public static int getSystemArchitecture(String arch) {
+        return "64".equals(arch) ? ARCH_64 : ARCH_32;
     }
 
     /**

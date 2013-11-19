@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,6 +24,11 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Contributor(s):
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -34,48 +39,16 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- *
- * Contributor(s):
- *
- * Portions Copyrighted 2011 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.spi;
 
-import java.util.Map;
+package org.netbeans.lib.profiler.ui.swing.renderer;
 
 /**
  *
- * @author Tomas Hurka
+ * @author Jiri Sedlacek
  */
-public abstract class JavaPlatformProvider {
-
-    /**
-     * @return  a descriptive, human-readable name of the platform
-     */
-    public abstract String getDisplayName();
-
-    /** Gets the java platform system properties.
-     * @return the java platform system properties
-     */
-    public abstract Map<String,String> getSystemProperties();
+public interface Translatable {
     
-    /** Gets the java platform properties.
-     * @return the java platform properties
-     */
-    public abstract Map<String,String> getProperties();
-
-
-    /** Gets a path to java executable for specified platform. The platform passed cannot be null.
-     * Errors when obtaining the java executable will be reported to the user and null will be returned.
-     *
-     * @param platform A JavaPlatform for which we need the java executable path
-     * @return A path to java executable or null if not found
-     */
-    public abstract String getPlatformJavaFile();
-
-    /**
-     * @return  a unique name of the platform
-     */
-    public abstract String getPlatformId();
+    public void translate(int dx, int dy);
     
 }

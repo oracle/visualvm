@@ -67,6 +67,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.BorderFactory;
 import javax.swing.CellRendererPane;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
@@ -108,14 +110,27 @@ class ProfilerTableHover {
     }
     
     
-    private void showPopup(int row, int column, Painter p) {
+    private void showPopup(int row, int column) {
         mouse.deinstall();
+        
+        Painter p = new Painter(row, column);
         
         Point l = table.getLocationOnScreen();
         Rectangle r = table.getCellRect(row, column, true);
         popupRect = new Rectangle(l.x + r.x, l.y + r.y, r.width, r.height);
         PopupFactory popupFactory = PopupFactory.getSharedInstance();
-        popup = popupFactory.getPopup(table, p, popupRect.x - 1, popupRect.y - 1);
+        int o = table.getColumnOffset(table.convertColumnIndexToModel(column));
+        Component c = getRenderer(row, column);
+        if (leadingAlign(c)) {
+            popup = popupFactory.getPopup(table, p, popupRect.x - 1 - o, popupRect.y - 1);
+        } else {
+            int w = c.getPreferredSize().width;
+            int _column = table.convertColumnIndexToModel(column);
+            int f = !table.isScrollableColumn(_column) ? w :
+                    table.getColumnPreferredWidth(_column);
+            int x = w + 2;
+            popup = popupFactory.getPopup(table, p, popupRect.x - 1 - o + f - x, popupRect.y - 1);
+        }
         popup.show();
         
         paranoid = new Paranoid(p);
@@ -150,10 +165,7 @@ class ProfilerTableHover {
         if (row < 0 || row >= table.getRowCount()) return;
         if (column < 0 || column >= table.getColumnCount()) return;
 
-        Painter p = new Painter(row, column);
-        Rectangle r = table.getCellRect(row, column, true);
-
-        if (p.getWidth() > r.width) showPopup(row, column, p);
+        if (shouldDisplayHover(row, column)) showPopup(row, column);
     }
     
     
@@ -335,9 +347,11 @@ class ProfilerTableHover {
             
             value = table.getValueAt(row, column);
             renderer = table.getCellRenderer(row, column);
-            Dimension size = table.getRenderer(renderer, row, column).getPreferredSize();
-            size.width += 2;
-            size.height += 4;
+            
+            Dimension rSize = table.getRenderer(renderer, row, column).getPreferredSize();
+            Dimension cSize = table.getCellRect(row, column, true).getSize();
+            Dimension size = new Dimension(rSize.width, Math.max(rSize.height, cSize.height));
+            
             setSize(size);
             setPreferredSize(size);
             setBorder(BorderFactory.createLineBorder(table.getGridColor()));
@@ -345,8 +359,9 @@ class ProfilerTableHover {
         
         protected void paintComponent(Graphics g) {
             Component x = table.getRenderer(renderer, row, column);
-            x.setBounds(getBounds());
-            getPainter().paintComponent(g, x, null, 1, 0, getWidth(), getHeight(), false);
+            Rectangle b = getBounds();
+            x.setBounds(b);
+            getPainter().paintComponent(g, x, null, 1, 0, b.width, b.height, false);
         }
         
         int getRow() {
@@ -364,6 +379,39 @@ class ProfilerTableHover {
             return true;
         }
         
+    }
+    
+    private boolean shouldDisplayHover(int row, int column) {
+        Component component = getRenderer(row, column);
+        
+        if (component instanceof JComponent)
+            if (((JComponent)component).getClientProperty(ProfilerTable.PROP_NO_HOVER) != null)
+                return false;
+        
+        Dimension size = component.getPreferredSize();
+        Rectangle rect = table.getCellRect(row, column, true);
+        int offset = table.getColumnOffset(table.convertColumnIndexToModel(column));
+        
+        // might also check height
+        if (leadingAlign(component)) {
+            return offset > 0 || size.width > rect.width;
+        } else {
+            if (size.width > rect.width) return true;
+            
+            int _column = table.convertColumnIndexToModel(column);
+            if (!table.isScrollableColumn(_column)) return false;
+            int pref = table.getColumnPreferredWidth(_column);
+            return offset < pref - rect.width;
+        }
+    }
+    
+    private Component getRenderer(int row, int column) {
+        TableCellRenderer renderer = table.getCellRenderer(row, column);
+        return table.getRenderer(renderer, row, column);
+    }
+    
+    private boolean leadingAlign(Component c) {
+        return c instanceof JLabel ? ((JLabel)c).getHorizontalAlignment() == JLabel.LEADING : true;
     }
     
     private static CellRendererPane PAINTER;
