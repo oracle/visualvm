@@ -100,6 +100,7 @@ void initializeJVMTI(JavaVM *jvm) {
     capas.can_generate_monitor_events = 1;
     capas.can_get_current_thread_cpu_time = 1;
     capas.can_generate_vm_object_alloc_events = 1;
+    capas.can_get_monitor_info = 1;
     err = (*_jvmti)->AddCapabilities(_jvmti, &capas);
     if (err != JVMTI_ERROR_NONE) {
         fprintf(stderr, "Profiler Agent Error: Failed to obtain JVMTI capabilities, error code: %d\n", err);
