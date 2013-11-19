@@ -65,7 +65,7 @@ import org.openide.windows.WindowManager;
 
 /**
  *
- * @author cyhelsky
+ * @author Petr Cyhelsky
  */
 
 
@@ -78,17 +78,18 @@ import org.openide.windows.WindowManager;
     "BasicExportAction_OverwriteFileMsg=<html><b>File {0} already exists.</b><br><br>Do you want to replace it?</html>",
     "BasicExportAction_ExportDialogCSVFilter=CSV File (*.csv)",
     "BasicExportAction_ExportDialogTXTFilter=Text File (*.txt)",
+    "BasicExportAction_ExportDialogBINFilter=Binary File (*.bin)",
     "BasicExportAction_ExportingViewMsg=Exporting...",
     "BasicExportAction_NoViewMsg=No view to export.",
     "BasicExportAction_OomeExportingMsg=<html><b>Not enough memory to save the file.</b><br><br>To avoid this error increase the -Xmx<br>value in the etc/netbeans.conf file in NetBeans IDE installation.</html>",
     "BasicExportAction_IOException_Exporting_Msg=<html>IOException occurred during export, see IDE log for details</html>",
     "BasicExportAction_CannotWriteFileMsg=Failed to export File. Reason: {0}."})
-public final class BasicExportAction extends AbstractAction {
+final class BasicExportAction extends AbstractAction {
     private static final Logger LOGGER = Logger.getLogger(BasicExportAction.class.getName());
 
 //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
 
-    public static interface ExportProvider {
+    static interface ExportProvider {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void exportData(int exportedFileType, ExportDataDumper eDD);
@@ -98,6 +99,8 @@ public final class BasicExportAction extends AbstractAction {
         public boolean isExportable();
 
         public boolean hasRawData();
+        
+        public boolean hasBinaryData();
 
         public boolean hasText();
 
@@ -137,8 +140,10 @@ public final class BasicExportAction extends AbstractAction {
     private static final Icon ICON = Icons.getIcon(GeneralIcons.EXPORT);
     private static final String FILE_EXTENSION_CSV = "csv"; // NOI18N
     private static final String FILE_EXTENSION_TXT = "txt"; // NOI18N
-    public static final int MODE_CSV = 1;
-    public static final int MODE_TXT = 2;
+    private static final String FILE_EXTENSION_BIN = "bin"; // NOI18N
+    static final int MODE_CSV = 1;
+    static final int MODE_TXT = 2;
+    static final int MODE_BIN = 3;
     private static File exportDir;
 
 
@@ -166,6 +171,9 @@ public final class BasicExportAction extends AbstractAction {
         }
         if (exportProvider.hasText()) {
             fileChooser.addChoosableFileFilter(new FileFilterImpl(FILE_EXTENSION_TXT));
+        }
+        if (exportProvider.hasBinaryData()) {
+            fileChooser.addChoosableFileFilter(new FileFilterImpl(FILE_EXTENSION_BIN));
         }
     }
 
@@ -222,6 +230,9 @@ public final class BasicExportAction extends AbstractAction {
         } else if (selectedFileFilter.getDescription().equals(Bundle.BasicExportAction_ExportDialogTXTFilter())) {
             targetExt=FILE_EXTENSION_TXT;
             exportedFileType=MODE_TXT;
+        } else if (selectedFileFilter.getDescription().equals(Bundle.BasicExportAction_ExportDialogBINFilter())) {
+            targetExt=FILE_EXTENSION_BIN;
+            exportedFileType=MODE_BIN;
         }
 
         if (file.isDirectory()) { // save to selected directory under default name
@@ -309,6 +320,8 @@ public final class BasicExportAction extends AbstractAction {
                 return Bundle.BasicExportAction_ExportDialogCSVFilter();
             } else if (FILE_EXTENSION_TXT.equals(extension)) {
                 return Bundle.BasicExportAction_ExportDialogTXTFilter();
+            } else if (FILE_EXTENSION_BIN.equals(extension)) {
+                return Bundle.BasicExportAction_ExportDialogBINFilter();
             } else {
                 return null;
             }
