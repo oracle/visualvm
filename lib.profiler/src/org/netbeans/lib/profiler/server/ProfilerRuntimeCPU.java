@@ -230,14 +230,14 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
     }
 
     // ---------------------------------- Handling wait/sleep/monitor times ----------------------------
-    protected static long monitorEntryCPU(ThreadInfo ti, Object monitor) {
+    protected static long monitorEntryCPU(ThreadInfo ti, Object monitor, ThreadInfo ownerTi) {
         if (recursiveInstrumentationDisabled || !waitTrackingEnabled) {
             return -1; // See the comment at the recursiveInstrumentationDisabled variable declaration
         }
 
         if (ti.isInitialized() && ti.inCallGraph) {
             //System.out.println("++++++monitorEntry, depth = " + ti.stackDepth);
-            return writeWaitTimeEvent(METHOD_ENTRY_MONITOR, ti, monitor);
+            return writeWaitTimeEvent(METHOD_ENTRY_MONITOR, ti, monitor, ownerTi);
         }
         return -1;
     }

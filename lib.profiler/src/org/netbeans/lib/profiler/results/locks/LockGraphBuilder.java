@@ -41,6 +41,7 @@
  */
 package org.netbeans.lib.profiler.results.locks;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,20 +63,28 @@ public class LockGraphBuilder extends BaseCallGraphBuilder implements LockProfil
     static final Logger LOG = Logger.getLogger(LockGraphBuilder.class.getName());
     final private ThreadInfos threadInfos = new ThreadInfos();
     private Map<Integer, MonitorInfo> monitorInfos = new HashMap();
-    private TransactionalSupport transaction = new TransactionalSupport();
+    private final TransactionalSupport transaction = new TransactionalSupport();
 
     @Override
     protected RuntimeCCTNode getAppRootNode() {
-        Map<ThreadInfo, List<ThreadInfo.Monitor>> threadsCopy = new HashMap(threadInfos.threadInfos.length);
-        Map<MonitorInfo, List<MonitorInfo.ThreadDetail>> monitorsCopy = new HashMap(monitorInfos.size());
+        Map<ThreadInfo, List<List<ThreadInfo.MonitorDetail>>> threadsCopy = new HashMap(threadInfos.threadInfos.length);
+        Map<MonitorInfo, List<List<MonitorInfo.ThreadDetail>>> monitorsCopy = new HashMap(monitorInfos.size());
 
         for (ThreadInfo ti : threadInfos.threadInfos) {
             if (ti != null) {
-                threadsCopy.put(ti, ti.cloneMonitorDetails());
+                List<List<ThreadInfo.MonitorDetail>> monitors = new ArrayList(2);
+                
+                monitors.add(ti.cloneWaitMonitorDetails());
+                monitors.add(ti.cloneOwnerMonitorDetails());
+                threadsCopy.put(ti, monitors);
             }
         }
         for (MonitorInfo mi : monitorInfos.values()) {
-            monitorsCopy.put(mi, mi.cloneThreadDetails());
+            List<List<MonitorInfo.ThreadDetail>> threads = new ArrayList(2);
+            
+            threads.add(mi.cloneWaitThreadDetails());
+            threads.add(mi.cloneOwnerThreadDetails());
+            monitorsCopy.put(mi, threads);
         }
         return new LockRuntimeCCTNode(threadsCopy, monitorsCopy);
     }
@@ -116,17 +125,20 @@ public class LockGraphBuilder extends BaseCallGraphBuilder implements LockProfil
     }
 
     @Override
-    public void monitorEntry(int threadId, long timeStamp0, long timeStamp1, int monitorId) {
+    public void monitorEntry(int threadId, long timeStamp0, long timeStamp1, int monitorId, int ownerThreadId) {
         ThreadInfo ti = getThreadInfo(threadId);
 
         if (ti == null) {
             return;
         }
         if (LOG.isLoggable(Level.FINEST)) {
-            LOG.log(Level.FINEST, "Monitor entry thread id = {0}, id = {1}", new Object[]{threadId, Integer.toHexString(monitorId)});
+            LOG.log(Level.FINEST, "Monitor entry thread id = {0}, mId = {1}, owner id = {2}", new Object[]{threadId, Integer.toHexString(monitorId), ownerThreadId});
         }
         MonitorInfo m = getMonitorInfo(monitorId);
-        ti.openMonitor(m, timeStamp0);
+        ThreadInfo ownerTi = getThreadInfo(ownerThreadId);
+        assert ownerTi != null;
+        ti.openMonitor(ownerTi, m, timeStamp0);
+        m.openThread(ti, ownerTi, timeStamp0);
     }
 
     @Override
@@ -137,10 +149,11 @@ public class LockGraphBuilder extends BaseCallGraphBuilder implements LockProfil
             return;
         }
         if (LOG.isLoggable(Level.FINEST)) {
-            LOG.log(Level.FINEST, "Monitor exit thread id = {0}, id = {1}", new Object[]{threadId, Integer.toHexString(monitorId)});
+            LOG.log(Level.FINEST, "Monitor exit thread id = {0}, mId = {1}", new Object[]{threadId, Integer.toHexString(monitorId)});
         }
         MonitorInfo m = getMonitorInfo(monitorId);
         ti.closeMonitor(m, timeStamp0);
+        m.closeThread(ti, timeStamp0);
         batchNotEmpty = true;
     }
 
@@ -161,7 +174,7 @@ public class LockGraphBuilder extends BaseCallGraphBuilder implements LockProfil
             return;
         }
         if (LOG.isLoggable(Level.FINEST)) {
-            LOG.log(Level.FINEST, "New monitor creation, mId = {0}, className = {1}", new Object[]{hash, className});
+            LOG.log(Level.FINEST, "New monitor creation, mId = {0}, className = {1}", new Object[]{Integer.toHexString(hash), className});
         }
         registerNewMonitor(hash,className);
     }
@@ -262,11 +275,11 @@ public class LockGraphBuilder extends BaseCallGraphBuilder implements LockProfil
     }
 
     private ThreadInfo getThreadInfo(int threadId) {
-        if (!isReady() || (threadInfos.threadInfos == null)) {
+        if (!isReady()) {
             return null;
         }
 
-        return threadInfos.threadInfos[threadId];
+        return threadInfos.getThreadInfo(threadId);
     }
 
     private MonitorInfo getMonitorInfo(int monitorId) {
