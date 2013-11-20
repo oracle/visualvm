@@ -442,7 +442,8 @@ public class ProfilerTable extends JTable {
                     chooseColumns((Component)e.getSource(), null);
                 }
             };
-            HeaderComponent corner = new HeaderComponent(chooser) {
+            HeaderComponent corner = !hideable ? new HeaderComponent(chooser) :
+                                                 new HeaderComponent(chooser) {
                 private Icon icon = Icons.getIcon(GeneralIcons.SORT_DESCENDING);
                 protected void paintComponent(Graphics g) {
                     super.paintComponent(g);
