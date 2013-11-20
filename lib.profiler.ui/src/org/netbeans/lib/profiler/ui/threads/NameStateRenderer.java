@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -43,56 +43,44 @@
 
 package org.netbeans.lib.profiler.ui.threads;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Graphics;
-import org.netbeans.lib.profiler.results.threads.ThreadData;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.Icon;
-
+import javax.swing.JTable;
+import javax.swing.table.TableCellRenderer;
+import org.netbeans.lib.profiler.results.threads.ThreadData;
+import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 
 /**
+ *
  * @author Jiri Sedlacek
  */
-public class ThreadStateIcon implements Icon {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    public static final int ICON_NONE = -100;
-
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    protected Color threadStateColor;
-    protected int height;
-    protected int width;
-
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    public ThreadStateIcon(int threadState, int width, int height) {
-        this.threadStateColor = getThreadStateColor(threadState);
-        this.width = width;
-        this.height = height;
+public class NameStateRenderer extends LabelRenderer implements TableCellRenderer {
+    
+    public NameStateRenderer() {
+        setOpaque(true);
+        setMargin(3, 4, 3, 4);
     }
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public int getIconHeight() {
-        return height;
+    
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        ThreadData data = (ThreadData)value;
+        setText(data.getName());
+        setIcon(getIcon(data.getLastState()));
+        return this;
     }
-
-    public int getIconWidth() {
-        return width;
-    }
-
-    public void paintIcon(Component c, Graphics g, int x, int y) {
-        if (threadStateColor != null) {
-            g.setColor(threadStateColor);
-            g.fillRect(x + 1, y + 1, width - 1, height - 1);
+    
+    private static final int THREAD_ICON_SIZE = 9;    
+    private static final Map<Byte, Icon> STATE_ICONS_CACHE = new HashMap();
+    private static Icon getIcon(byte state) {
+        Icon icon = STATE_ICONS_CACHE.get(state);
+        
+        if (icon == null) {
+            icon = new ThreadStateIcon(state, THREAD_ICON_SIZE, THREAD_ICON_SIZE);
+            STATE_ICONS_CACHE.put(state, icon);
         }
-        g.setColor(Color.BLACK);
-        g.drawRect(x, y, width - 1, height - 1);
+        
+        return icon;
     }
-
-    protected Color getThreadStateColor(int threadState) {
-        if (threadState == ICON_NONE) return null;
-        return ThreadData.getThreadStateColor(threadState);
-    }
+    
 }

@@ -47,6 +47,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -60,6 +61,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.JTableHeader;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
@@ -68,27 +70,31 @@ import javax.swing.table.JTableHeader;
 public class ProfilerTableContainer extends JPanel {
     
     private static final String PROP_COLUMN = "column"; // NOI18N
-    
+
+    private ProfilerTable table;
+    private JScrollPane tableScroll;
     private JPanel scrollersPanel;
 
     public ProfilerTableContainer(final ProfilerTable table, boolean decorated,
                                   ColumnChangeAdapter adapter) {
         super(new BorderLayout());
         
-        JScrollPane sp = new JScrollPane(table) {
+        this.table = table;
+        
+        tableScroll = new JScrollPane(table) {
             protected JViewport createViewport() {
                 if (getViewport() == null) return customViewport(table);
                 else return super.createViewport();
             }
         };
-        sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        configureVerticalScrollBar(sp.getVerticalScrollBar());
+        tableScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        tableScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        configureVerticalScrollBar(tableScroll.getVerticalScrollBar());
         if (!decorated) {
-            sp.setBorder(BorderFactory.createEmptyBorder());
-            sp.setViewportBorder(BorderFactory.createEmptyBorder());
+            tableScroll.setBorder(BorderFactory.createEmptyBorder());
+            tableScroll.setViewportBorder(BorderFactory.createEmptyBorder());
         }
-        add(sp, BorderLayout.CENTER);
+        add(tableScroll, BorderLayout.CENTER);
         
         final ProfilerColumnModel cModel = table._getColumnModel();
         
@@ -176,6 +182,15 @@ public class ProfilerTableContainer extends JPanel {
         }
         
         if (adapter != null) cModel.addColumnChangeListener(adapter);
+    }
+    
+    public boolean tableNeedsScrolling() {
+        return tableScroll.getVerticalScrollBar().isEnabled();
+    }
+    
+    public BufferedImage createTableScreenshot(boolean onlyVisibleArea) {
+        return onlyVisibleArea ? UIUtils.createScreenshot(tableScroll) :
+                                 UIUtils.createScreenshot(table);
     }
     
     private int getColumn(JScrollBar scroller) {

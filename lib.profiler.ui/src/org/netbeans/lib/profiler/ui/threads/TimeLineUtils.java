@@ -65,10 +65,10 @@ public class TimeLineUtils {
     private static final String SECONDS_LEGEND_ABBR = messages.getString("TimeLineUtils_SecondsLegendAbbr"); // NOI18N
     private static final String MILLISECONDS_LEGEND_ABBR = messages.getString("TimeLineUtils_MillisecondsLegendAbbr"); // NOI18N
                                                                                                                        // -----
-    public static final int MIN_TIMEMARK_STEP = 150; // The minimal distance between two time marks
+    public static final int MIN_TIMEMARK_STEP = 120; // The minimal distance between two time marks
     public static final Color BASE_TIMELINE_COLOR = new Color(0, 0, 0);
     public static final Color MAIN_TIMELINE_COLOR = new Color(150, 150, 150);
-    public static final Color TICK_TIMELINE_COLOR = new Color(230, 230, 230);
+    public static final Color TICK_TIMELINE_COLOR = new Color(200, 200, 200);
     private static final int TIME_FORMAT_UNKNOWN = -1;
     private static final int TIME_FORMAT_MILLIS = 10;
     private static final int TIME_FORMAT_SECONDS = 20;

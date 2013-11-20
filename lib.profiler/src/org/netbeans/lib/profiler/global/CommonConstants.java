@@ -242,10 +242,10 @@ public interface CommonConstants {
     // Thread state color constants.
 
     /** Thread status is unknown. */
-    public static final java.awt.Color THREAD_STATUS_UNKNOWN_COLOR = java.awt.Color.LIGHT_GRAY;
+    public static final java.awt.Color THREAD_STATUS_UNKNOWN_COLOR = null;
 
     /** Thread is waiting to die. Also used for "doesn't exist yet" and "dead" */
-    public static final java.awt.Color THREAD_STATUS_ZOMBIE_COLOR = java.awt.Color.BLACK;
+    public static final java.awt.Color THREAD_STATUS_ZOMBIE_COLOR = null;
 
     /** Thread is runnable. Note that we unfortunately don't know whether it's actually running or
      * pre-empted by another thread...*/
