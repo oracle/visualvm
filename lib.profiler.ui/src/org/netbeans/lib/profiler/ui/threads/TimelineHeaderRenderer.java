@@ -79,7 +79,7 @@ public class TimelineHeaderRenderer extends BaseRenderer implements TableCellRen
     
     
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-        boolean timelineColumn = column == table.convertColumnIndexToView(col);
+        boolean timelineColumn = column == table.convertColumnIndexToModel(col);
         setVisible(timelineColumn);
         
         Component c = impl.getTableCellRendererComponent(table, timelineColumn ?
