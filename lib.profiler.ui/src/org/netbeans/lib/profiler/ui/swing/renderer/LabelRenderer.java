@@ -103,7 +103,6 @@ public class LabelRenderer extends JLabel implements Translatable {
         if (preferredSize == null) preferredSize = new Dimension(DIRTY, DIRTY);
         
         if (preferredSize.width == DIRTY) {
-            iconWidth = icon == null ? 0 : icon.getIconWidth();
             textWidth = text == null || text.isEmpty() ? 0 : fontMetrics.stringWidth(text);
             preferredSize.width = iconWidth + textWidth;
             preferredSize.width += margin.left + margin.right;
@@ -111,7 +110,6 @@ public class LabelRenderer extends JLabel implements Translatable {
         }
 
         if (preferredSize.height == DIRTY) {
-            iconHeight = icon == null ? 0 : icon.getIconHeight();
             fontAscent = fontMetrics.getAscent();
             preferredSize.height = fontAscent + fontMetrics.getDescent();
             preferredSize.height += margin.top + margin.bottom;
@@ -138,7 +136,12 @@ public class LabelRenderer extends JLabel implements Translatable {
         
         g.setFont(getFont());
         
-        xx += margin.left;
+        if (getHorizontalAlignment() == LEADING) {
+            xx += margin.left;
+        } else {
+            xx += size.width - margin.right - textWidth;
+            if (iconWidth > 0 ) xx += - iconWidth - iconTextGap;
+        }
         
         if (iconWidth > 0) {
             int yy = (h - iconHeight) / 2;
@@ -304,7 +307,9 @@ public class LabelRenderer extends JLabel implements Translatable {
 
     public void setIcon(Icon icon) {
         this.icon = icon;
-        resetPreferredSize(true, false);
+        iconWidth = icon == null ? 0 : icon.getIconWidth();
+        iconHeight = icon == null ? 0 : icon.getIconHeight();
+        resetPreferredSize(true, false); // Icon likely won't change height
     }
 
     public Icon getIcon() {

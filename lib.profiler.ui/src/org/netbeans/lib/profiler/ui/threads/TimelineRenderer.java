@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -46,53 +46,79 @@ package org.netbeans.lib.profiler.ui.threads;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
+import javax.swing.JTable;
+import javax.swing.table.TableCellRenderer;
 import org.netbeans.lib.profiler.results.threads.ThreadData;
-import javax.swing.Icon;
-
+import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
+import org.netbeans.lib.profiler.ui.swing.renderer.BaseRenderer;
 
 /**
+ *
  * @author Jiri Sedlacek
  */
-public class ThreadStateIcon implements Icon {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    public static final int ICON_NONE = -100;
-
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    protected Color threadStateColor;
-    protected int height;
-    protected int width;
-
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    public ThreadStateIcon(int threadState, int width, int height) {
-        this.threadStateColor = getThreadStateColor(threadState);
-        this.width = width;
-        this.height = height;
+public class TimelineRenderer extends BaseRenderer implements TableCellRenderer {
+    
+    private static final int BAR_MARGIN = 3;
+    private static final int BAR_MARGIN_X2 = BAR_MARGIN * 2;
+    
+    private final ViewManager view;
+    private ViewManager.RowView rowView;
+    
+    
+    public TimelineRenderer(ViewManager view) {
+        this.view = view;
+        
+        setOpaque(true);
+        
+        putClientProperty(ProfilerTable.PROP_NO_HOVER, this);
     }
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public int getIconHeight() {
-        return height;
+    
+    public Component getTableCellRendererComponent(JTable table, Object value,
+                          boolean isSelected, boolean hasFocus, int row, int column) {
+        rowView = (ViewManager.RowView)value;
+        return this;
     }
-
-    public int getIconWidth() {
-        return width;
-    }
-
-    public void paintIcon(Component c, Graphics g, int x, int y) {
-        if (threadStateColor != null) {
-            g.setColor(threadStateColor);
-            g.fillRect(x + 1, y + 1, width - 1, height - 1);
+    
+    public void paint(Graphics g) {
+        int w = size.width;
+        int h = size.height;
+        
+        g.setColor(getBackground());
+        g.fillRect(dx, dy, w, h);
+        
+        int i = rowView.getLastIndex();
+        if (i != -1) {
+            int xx = Math.min(rowView.getMaxPosition(), w);
+            while (i >= 0 && xx >= 0) xx = paintState(g, i--, dx, dy, xx, h);
         }
-        g.setColor(Color.BLACK);
-        g.drawRect(x, y, width - 1, height - 1);
+        
+        long time = view.getFirstTimeMark(false);
+        long step = view.getTimeMarksStep();
+        
+        g.setColor(TimeLineUtils.TICK_TIMELINE_COLOR);
+        
+        int x = view.getTimePosition(time, false);
+        int oldX = x;
+        while (x < w) {
+            g.drawLine(x + dx, dy, x + dx, h - 1 + dy);
+            time += step;
+            x = view.getTimePosition(time, false);
+            // Workaround to prevent endless loop until fixed
+            if (x <= oldX) break;
+            else oldX = x;
+        }
     }
-
-    protected Color getThreadStateColor(int threadState) {
-        if (threadState == ICON_NONE) return null;
-        return ThreadData.getThreadStateColor(threadState);
+    
+    private int paintState(Graphics g, int i, int _x, int _y, int xx, int h) {
+        int x = Math.max(0, rowView.getPosition(rowView.getTime(i)));
+        
+        Color c = ThreadData.getThreadStateColor(rowView.getState(i));
+        if (c != null) {
+            g.setColor(c);
+            g.fillRect(x + _x, BAR_MARGIN + _y, xx - x + 1, h - BAR_MARGIN_X2);
+        }
+        
+        return x - 1;
     }
+    
 }
