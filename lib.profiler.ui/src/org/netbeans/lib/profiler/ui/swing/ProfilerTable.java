@@ -131,8 +131,8 @@ public class ProfilerTable extends JTable {
         setRowSelectionAllowed(true);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         setGridColor(UIConstants.TABLE_VERTICAL_GRID_COLOR);
-//        setSelectionBackground(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
-//        setSelectionForeground(UIConstants.TABLE_SELECTION_FOREGROUND_COLOR);
+        setSelectionBackground(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
+        setSelectionForeground(UIConstants.TABLE_SELECTION_FOREGROUND_COLOR);
         setShowHorizontalLines(UIConstants.SHOW_TABLE_HORIZONTAL_GRID);
         setShowVerticalLines(UIConstants.SHOW_TABLE_VERTICAL_GRID);
         setRowMargin(UIConstants.TABLE_ROW_MARGIN);
