@@ -66,6 +66,7 @@ import java.util.Properties;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
@@ -89,6 +90,8 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 /**
  *
@@ -312,8 +315,23 @@ public class ProfilerTable extends JTable {
         _getColumnModel().setDefaultColumnWidth(width);
     }
     
+    public void setDefaultColumnWidth(int column, int width) {
+        _getColumnModel().setDefaultColumnWidth(column, width);
+    }
+    
     public void setColumnToolTips(String[] toolTips) {
         _getColumnModel().setColumnToolTips(toolTips);
+    }
+    
+    public void setColumnVisibility(int column, boolean visible) {
+        ProfilerColumnModel cModel = _getColumnModel();
+        TableColumn col = cModel.getColumn(convertColumnIndexToView(column));
+        cModel.setColumnVisibility(col, visible, this);
+    }
+    
+    public boolean isColumnVisible(int column) {
+        int _column = convertColumnIndexToView(column);
+        return _getColumnModel().isColumnVisible(_column);
     }
     
     public void setColumnOffset(int column, int offset) {
@@ -321,7 +339,6 @@ public class ProfilerTable extends JTable {
             column = convertColumnIndexToView(column);
             Rectangle rect = getCellRect(0, column, true);
             repaint(rect.x, 0, rect.width, getHeight());
-//            paintImmediately(rect.x, 0, rect.width, getHeight());
         }
     }
     
@@ -338,7 +355,6 @@ public class ProfilerTable extends JTable {
     }
     
     private void updateColumnsPreferredWidth() {
-//        System.err.println(">>> Update...");
         Rectangle visible = getVisibleRect();
         if (visible.isEmpty()) return;
         
@@ -421,12 +437,20 @@ public class ProfilerTable extends JTable {
         JScrollPane scrollPane = getEnclosingScrollPane();
         if (scrollPane != null) {
             boolean hideable = hideableColums && !UIUtils.isAquaLookAndFeel();
-            ActionListener chooser = !hideable ? null : new ActionListener() {
+            final ActionListener chooser = !hideable ? null : new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     chooseColumns((Component)e.getSource(), null);
                 }
             };
-            HeaderComponent corner = new HeaderComponent(chooser);
+            HeaderComponent corner = new HeaderComponent(chooser) {
+                private Icon icon = Icons.getIcon(GeneralIcons.SORT_DESCENDING);
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    int x = (getWidth() - icon.getIconWidth()) / 2 - 1;
+                    int y = (getHeight() - icon.getIconHeight()) / 2;
+                    icon.paintIcon(this, g, x, y);
+                }
+            };
             scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, corner);
             
             if (scrollableColumns != null && !scrollableColumns.isEmpty())

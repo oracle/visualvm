@@ -43,25 +43,22 @@
 
 package org.netbeans.modules.profiler;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Image;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.ui.threads.ThreadsDetailsPanel;
-import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.common.event.ProfilingStateAdapter;
 import org.netbeans.lib.profiler.ui.ResultsView;
-import org.netbeans.lib.profiler.ui.threads.ThreadsTablePanel;
+import org.netbeans.lib.profiler.ui.threads.ThreadsPanel2;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
@@ -84,7 +81,7 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
     "ThreadsWindow_ThreadsDetailsTabDescr=List of application threads with detailed status data",
     "ThreadsWindow_ThreadsAccessDescr=Profiler threads timeline and details"
 })
-public final class ThreadsWindow extends ProfilerTopComponent implements ActionListener, ChangeListener,
+public final class ThreadsWindow extends ProfilerTopComponent implements ActionListener, /*ChangeListener,*/
                                                                  SaveViewAction.ViewProvider {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     private static final String HELP_CTX_KEY = "ThreadsWindow.HelpCtx"; // NOI18N
@@ -94,12 +91,13 @@ public final class ThreadsWindow extends ProfilerTopComponent implements ActionL
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private final JPanel threadsTimelinePanelContainer;
+//    private final JPanel threadsTimelinePanelContainer;
     private final ResultsView threadsView;
-    private final ThreadsPanel threadsPanel;
-    private final ThreadsTablePanel threadsTablePanel;
-    private JPanel threadsDetailsPanelContainer;
-    private ThreadsDetailsPanel threadsDetailsPanel;
+    private final ThreadsPanel2 threadsPanel;
+//    private final ThreadsPanel threadsPanel;
+//    private final ThreadsTablePanel threadsTablePanel;
+//    private JPanel threadsDetailsPanelContainer;
+//    private ThreadsDetailsPanel threadsDetailsPanel;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -112,58 +110,60 @@ public final class ThreadsWindow extends ProfilerTopComponent implements ActionL
         threadsView = new ResultsView();
         add(threadsView, BorderLayout.CENTER);
 
-        final boolean tvmSupportsSleepingState = Platform.supportsThreadSleepingStateMonitoring(Profiler.getDefault()
-                                                                                                        .getTargetAppRunner()
-                                                                                                        .getProfilerEngineSettings()
-                                                                                                        .getTargetJDKVersionString()); // TODO [project] - this is wrong - the JVM can change and the supportSleeping state as well
+//        final boolean tvmSupportsSleepingState = Platform.
+//                supportsThreadSleepingStateMonitoring(Profiler.getDefault().
+//                getTargetAppRunner().getProfilerEngineSettings().getTargetJDKVersionString()); // TODO [project] - this is wrong - the JVM can change and the supportSleeping state as well
 
-        threadsPanel = new ThreadsPanel(Profiler.getDefault().getThreadsManager(),
-                                        new ThreadsPanel.ThreadsDetailsCallback() {
-                /**
-                 * Displays a panel with details about specified threads
-                 * @param indexes array of int indexes for threads to display
-                 */
-                public void showDetails(final int[] indexes) {
-                    threadsDetailsPanel.showDetails(indexes);
-                    threadsView.selectView(threadsDetailsPanelContainer);
-                }
-            }, tvmSupportsSleepingState); // TODO [project] - this is wrong - the JVM can change and the supportSleeping state as well
-        threadsTimelinePanelContainer = new JPanel() {
-                public void requestFocus() {
-                    threadsPanel.requestFocus();
-                }
-            };
-        threadsTimelinePanelContainer.setLayout(new BorderLayout());
-        threadsTimelinePanelContainer.add(threadsPanel, BorderLayout.CENTER);
+        threadsPanel = new ThreadsPanel2(Profiler.getDefault().getThreadsManager(), new SaveViewAction(this));
+        
+//        threadsPanel = new ThreadsPanel(Profiler.getDefault().getThreadsManager(),
+//                                        new ThreadsPanel.ThreadsDetailsCallback() {
+//                /**
+//                 * Displays a panel with details about specified threads
+//                 * @param indexes array of int indexes for threads to display
+//                 */
+//                public void showDetails(final int[] indexes) {
+//                    threadsDetailsPanel.showDetails(indexes);
+//                    threadsView.selectView(threadsDetailsPanelContainer);
+//                }
+//            }, tvmSupportsSleepingState); // TODO [project] - this is wrong - the JVM can change and the supportSleeping state as well
+        
+//        threadsTimelinePanelContainer = new JPanel() {
+//                public void requestFocus() {
+//                    threadsPanel.requestFocus();
+//                }
+//            };
+//        threadsTimelinePanelContainer.setLayout(new BorderLayout());
+//        threadsTimelinePanelContainer.add(threadsPanel, BorderLayout.CENTER);
 
         threadsPanel.addThreadsMonitoringActionListener(this);
-        threadsPanel.addSaveViewAction(new SaveViewAction(this));
+//        threadsPanel.addSaveViewAction(new SaveViewAction(this));
         
-        threadsTablePanel = new ThreadsTablePanel(Profiler.getDefault().getThreadsManager(),
-                new ThreadsTablePanel.ThreadsDetailsCallback() {
-                public void showDetails(final int[] indexes) {
-                    threadsDetailsPanel.showDetails(indexes);
-                    threadsView.selectView(threadsDetailsPanelContainer);
-                }
-            }, tvmSupportsSleepingState);
-        threadsTablePanel.addSaveViewAction(new SaveViewAction(this));
-
-        threadsDetailsPanel = new ThreadsDetailsPanel(Profiler.getDefault().getThreadsManager(), tvmSupportsSleepingState);
-        threadsDetailsPanelContainer = new JPanel() {
-                public void requestFocus() {
-                    threadsDetailsPanel.requestFocus();
-                }
-            };
-        threadsDetailsPanelContainer.setLayout(new BorderLayout());
-        threadsDetailsPanelContainer.add(threadsDetailsPanel, BorderLayout.CENTER);
-        threadsDetailsPanel.addSaveViewAction(new SaveViewAction(this));
+//        threadsTablePanel = new ThreadsTablePanel(Profiler.getDefault().getThreadsManager(),
+//                new ThreadsTablePanel.ThreadsDetailsCallback() {
+//                public void showDetails(final int[] indexes) {
+//                    threadsDetailsPanel.showDetails(indexes);
+//                    threadsView.selectView(threadsDetailsPanelContainer);
+//                }
+//            }, tvmSupportsSleepingState);
+//        threadsTablePanel.addSaveViewAction(new SaveViewAction(this));
+//
+//        threadsDetailsPanel = new ThreadsDetailsPanel(Profiler.getDefault().getThreadsManager(), tvmSupportsSleepingState);
+//        threadsDetailsPanelContainer = new JPanel() {
+//                public void requestFocus() {
+//                    threadsDetailsPanel.requestFocus();
+//                }
+//            };
+//        threadsDetailsPanelContainer.setLayout(new BorderLayout());
+//        threadsDetailsPanelContainer.add(threadsDetailsPanel, BorderLayout.CENTER);
+//        threadsDetailsPanel.addSaveViewAction(new SaveViewAction(this));
 
         threadsView.addView(Bundle.ThreadsWindow_ThreadsTimelineTabName(), null,
-                Bundle.ThreadsWindow_ThreadsTimelineTabDescr(), threadsTimelinePanelContainer, threadsPanel.getToolbar());
-        threadsView.addView(Bundle.ThreadsWindow_ThreadsTableTabName(), null,
-                Bundle.ThreadsWindow_ThreadsTableTabDescr(), threadsTablePanel, threadsTablePanel.getToolbar());
-        threadsView.addView(Bundle.ThreadsWindow_ThreadsDetailsTabName(), null,
-                Bundle.ThreadsWindow_ThreadsDetailsTabDescr(), threadsDetailsPanelContainer, threadsDetailsPanel.getToolbar());
+                Bundle.ThreadsWindow_ThreadsTimelineTabDescr(), threadsPanel, threadsPanel.getToolbar());
+//        threadsView.addView(Bundle.ThreadsWindow_ThreadsTableTabName(), null,
+//                Bundle.ThreadsWindow_ThreadsTableTabDescr(), threadsTablePanel, threadsTablePanel.getToolbar());
+//        threadsView.addView(Bundle.ThreadsWindow_ThreadsDetailsTabName(), null,
+//                Bundle.ThreadsWindow_ThreadsDetailsTabDescr(), threadsDetailsPanelContainer, threadsDetailsPanel.getToolbar());
 
         profilingStateChanged(Profiler.getDefault().getProfilingState());
         updateThreadsView();
@@ -171,7 +171,7 @@ public final class ThreadsWindow extends ProfilerTopComponent implements ActionL
         setFocusable(true);
         setRequestFocusEnabled(true);
 
-        threadsView.addChangeListener(this);
+//        threadsView.addChangeListener(this);
         Profiler.getDefault().addProfilingStateListener(new ProfilingStateAdapter(){
             @Override
             public void profilingStateChanged(final ProfilingStateEvent e) {
@@ -220,29 +220,11 @@ public final class ThreadsWindow extends ProfilerTopComponent implements ActionL
     }
 
     public BufferedImage getViewImage(boolean onlyVisibleArea) {
-        Component selectedView = threadsView.getSelectedView();
-        if (selectedView == threadsTimelinePanelContainer) {
-            return threadsPanel.getCurrentViewScreenshot(onlyVisibleArea);
-        } else if (selectedView == threadsTablePanel) {
-            return threadsTablePanel.getCurrentViewScreenshot(onlyVisibleArea);
-        } else if (selectedView == threadsDetailsPanelContainer) {
-            return threadsDetailsPanel.getCurrentViewScreenshot(onlyVisibleArea);
-        }
-
-        return null;
+        return threadsPanel.getCurrentViewScreenshot(onlyVisibleArea);
     }
 
     public String getViewName() {
-        Component selectedView = threadsView.getSelectedView();
-        if (selectedView == threadsTimelinePanelContainer) {
-            return "threads-timeline"; // NOI18N
-        } else if (selectedView == threadsTablePanel) {
-            return "threads-table"; // NOI18N
-        } else if (selectedView == threadsDetailsPanelContainer) {
-            return "threads-details"; // NOI18N
-        }
-
-        return null;
+        return "threads"; // NOI18N
     }
     
     protected Component defaultFocusOwner() {
@@ -250,59 +232,41 @@ public final class ThreadsWindow extends ProfilerTopComponent implements ActionL
     }
 
     public boolean fitsVisibleArea() {
-        Component selectedView = threadsView.getSelectedView();
-        if (selectedView == threadsTimelinePanelContainer) {
-            return threadsPanel.fitsVisibleArea();
-        } else if (selectedView == threadsTablePanel) {
-            return threadsTablePanel.fitsVisibleArea();
-        } else if (selectedView == threadsDetailsPanelContainer) {
-            return threadsDetailsPanel.fitsVisibleArea();
-        }
-
-        return true;
+        return threadsPanel.fitsVisibleArea();
     }
 
     // --- Export Current View action support ------------------------------------
     public boolean hasView() {
-        Component selectedView = threadsView.getSelectedView();
-        if (selectedView == threadsTimelinePanelContainer) {
-            return threadsPanel.hasView();
-        } else if (selectedView == threadsTablePanel) {
-            return threadsTablePanel.hasView();
-        } else if (selectedView == threadsDetailsPanelContainer) {
-            return threadsDetailsPanel.hasView();
-        }
-
-        return false;
+        return threadsPanel.hasView();
     }
     
     public void showThreads() {
-        threadsView.selectView(threadsTimelinePanelContainer);
+//        threadsView.selectView(threadsTimelinePanelContainer);
         open();
         requestActive();
     }
 
-    public void stateChanged(ChangeEvent e) {
-        SwingUtilities.invokeLater(new Runnable() { // must be invoked lazily to override default focus of first component
-                public void run() {
-                    Component selectedView = threadsView.getSelectedView();
-                    if (selectedView != null) {
-                        selectedView.requestFocus(); // move focus to results table when tab is switched
-                    }
-                }
-            });
-    }
+//    public void stateChanged(ChangeEvent e) {
+//        SwingUtilities.invokeLater(new Runnable() { // must be invoked lazily to override default focus of first component
+//                public void run() {
+//                    Component selectedView = threadsView.getSelectedView();
+//                    if (selectedView != null) {
+//                        selectedView.requestFocus(); // move focus to results table when tab is switched
+//                    }
+//                }
+//            });
+//    }
 
     private void updateThreadsView() {
         if (Profiler.getDefault().getThreadsMonitoringEnabled()) {
             threadsPanel.threadsMonitoringEnabled();
-            threadsView.setViewEnabled(threadsTablePanel, true);
-            threadsView.setViewEnabled(threadsDetailsPanelContainer, true);
+//            threadsView.setViewEnabled(threadsTablePanel, true);
+//            threadsView.setViewEnabled(threadsDetailsPanelContainer, true);
         } else {
             threadsPanel.threadsMonitoringDisabled();
-            threadsView.selectView(threadsTimelinePanelContainer);
-            threadsView.setViewEnabled(threadsTablePanel, false);
-            threadsView.setViewEnabled(threadsDetailsPanelContainer, false);
+//            threadsView.selectView(threadsTimelinePanelContainer);
+//            threadsView.setViewEnabled(threadsTablePanel, false);
+//            threadsView.setViewEnabled(threadsDetailsPanelContainer, false);
         }
     }
 

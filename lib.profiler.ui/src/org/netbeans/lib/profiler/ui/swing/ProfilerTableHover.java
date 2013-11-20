@@ -350,7 +350,7 @@ class ProfilerTableHover {
             
             Dimension rSize = table.getRenderer(renderer, row, column).getPreferredSize();
             Dimension cSize = table.getCellRect(row, column, true).getSize();
-            Dimension size = new Dimension(rSize.width, Math.max(rSize.height, cSize.height));
+            Dimension size = new Dimension(rSize.width + 2, cSize.height + 2);
             
             setSize(size);
             setPreferredSize(size);
