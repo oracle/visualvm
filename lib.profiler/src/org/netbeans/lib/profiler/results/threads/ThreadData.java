@@ -60,8 +60,9 @@ public class ThreadData {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private final Object dataLock = new Object();
-    private String className;
-    private String name;
+    private final String name;
+    private final String className;
+    private long[] times = new long[6];
     private byte[] threadStates; // Array of states corresponding to above timestamps
                                  // @GuardedBy dataLock
 
@@ -134,7 +135,43 @@ public class ThreadData {
     }
 
     public String getName() {
-        return name;
+        synchronized (dataLock) {
+            return name;
+        }
+    }
+    
+    public long getRunningTime() {
+        synchronized (dataLock) {
+            return times[CommonConstants.THREAD_STATUS_RUNNING];
+        }
+    }
+    
+    public long getSleepingTime() {
+        synchronized (dataLock) {
+            return times[CommonConstants.THREAD_STATUS_SLEEPING];
+        }
+    }
+    
+    public long getWaitTime() {
+        synchronized (dataLock) {
+            return times[CommonConstants.THREAD_STATUS_WAIT];
+        }
+    }
+    
+    public long getParkTime() {
+        synchronized (dataLock) {
+            return times[CommonConstants.THREAD_STATUS_PARK];
+        }
+    }
+    
+    public long getMonitorTime() {
+        synchronized (dataLock) {
+            return times[CommonConstants.THREAD_STATUS_MONITOR];
+        }
+    }
+    
+    public long getTotalTime() {
+        return getLastTimeStamp() - getFirstTimeStamp();
     }
 
     public byte getStateAt(int idx) {
@@ -191,6 +228,13 @@ public class ThreadData {
 
             timeStamps[curSize] = timeStamp;
             threadStates[curSize] = threadState;
+            
+            if (curSize > 0 && threadState > CommonConstants.THREAD_STATUS_ZOMBIE) {
+                long duration = timeStamp - timeStamps[curSize - 1];
+                times[threadState] += duration;
+                times[0] += duration;
+            }
+            
             curSize++;
         }
     }
@@ -201,6 +245,7 @@ public class ThreadData {
             timeStamps = new long[capacity];
             threadStates = new byte[capacity];
             curSize = 0;
+            times = new long[6];
         }
     }
 
@@ -208,5 +253,9 @@ public class ThreadData {
         synchronized (dataLock) {
             return curSize;
         }
+    }
+    
+    public String toString() {
+        return getName();
     }
 }
