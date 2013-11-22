@@ -112,7 +112,7 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
             zoomChanged(this.zoom, zoom);
             if (!isFit()) {
                 double tt = (offset + width / 2) / oldZoom;
-                newOffset = (int)(tt * zoom - width / 2);
+                newOffset = Math.max((int)(tt * zoom - width / 2), 0);
             }
             updateActions();
         }
