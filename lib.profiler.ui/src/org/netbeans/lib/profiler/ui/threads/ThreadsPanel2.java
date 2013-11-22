@@ -65,6 +65,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.DataManagerListener;
@@ -105,11 +106,6 @@ public class ThreadsPanel2 extends JPanel {
             public void zoomChanged(double oldZoom, double newZoom) {
                 super.zoomChanged(oldZoom, newZoom);
                 repaintTimeline();
-            }
-            private void repaintTimeline() {
-                int _column = threadsTable.convertColumnIndexToView(1);
-                JTableHeader header = threadsTable.getTableHeader();
-                header.repaint(header.getHeaderRect(_column));
             }
         };
         
@@ -335,9 +331,7 @@ public class ThreadsPanel2 extends JPanel {
                     public void run() {
                         if (firstChange) {
                             firstChange = false;
-                            int _column = threadsTable.convertColumnIndexToView(1);
-                            JTableHeader header = threadsTable.getTableHeader();
-                            header.repaint(header.getHeaderRect(_column));
+                            repaintTimeline();
                         }
                         threadsTableModel.fireTableDataChanged();
                     }
@@ -355,6 +349,17 @@ public class ThreadsPanel2 extends JPanel {
         });
         
         updateFilter();
+    }
+    
+    private void repaintTimeline() {
+        JTableHeader header = threadsTable.getTableHeader();
+        TableColumn draggedColumn = header.getDraggedColumn();
+        if (draggedColumn != null && draggedColumn.getModelIndex() == 1) {
+            header.repaint();
+        } else {
+            int _column = threadsTable.convertColumnIndexToView(1);
+            header.repaint(header.getHeaderRect(_column));
+        }
     }
     
     private void updateFilter() {
