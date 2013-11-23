@@ -130,11 +130,13 @@ public class ProfilerTableContainer extends JPanel {
                         putClientProperty(PROP_COLUMN, column);
                     }
                     public void setValue(int value) {
+                        value = checkedValue(value);
                         super.setValue(value);
                         updateColumnOffset(value);
                     }
                     public void setValues(int value, int extent, int min, int max) {
                         if (adjusting) return;
+                        value = checkedValue(value);
                         setEnabled(extent < max);
                         if (isTrackingEnd()) value = max - extent;
                         super.setValues(value, extent, min, max);
@@ -150,6 +152,11 @@ public class ProfilerTableContainer extends JPanel {
                     }
                     private boolean isTrackingEnd() {
                         return isEnabled() && getValue() + getVisibleAmount() >= getMaximum();
+                    }
+                    private int checkedValue(int value) {
+                        value = Math.max(0, value);
+                        value = Math.min(getMaximum() - getVisibleAmount(), value);
+                        return value;
                     }
                 };
                 scrollersPanel.add(scroller);
