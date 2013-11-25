@@ -358,7 +358,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         batchNotEmpty = true;
     }
 
-    public void monitorEntry(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId) {
+    public void monitorEntry(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId, int ownerThreadId) {
         waitEntry(threadId, timeStamp0, timeStamp1);
         batchNotEmpty = true;
     }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2012-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -382,6 +382,7 @@ public class AttachDialog extends AttachWizard {
                 IntegrationUtils.PLATFORM_LINUX_OS,
                 IntegrationUtils.PLATFORM_LINUX_AMD64_OS,
                 IntegrationUtils.PLATFORM_LINUX_ARM_OS,
+                IntegrationUtils.PLATFORM_LINUX_ARM_VFP_HFLT_OS,
                 IntegrationUtils.PLATFORM_LINUX_CVM,
                 IntegrationUtils.PLATFORM_SOLARIS_SPARC_OS,
                 IntegrationUtils.PLATFORM_SOLARIS_SPARC64_OS,

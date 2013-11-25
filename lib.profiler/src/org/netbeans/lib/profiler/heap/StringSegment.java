@@ -45,7 +45,6 @@ package org.netbeans.lib.profiler.heap;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -61,7 +60,7 @@ class StringSegment extends TagBounds {
     private final int lengthOffset;
     private final int stringIDOffset;
     private final int timeOffset;
-    private Map stringIDMap;
+    private LongHashMap stringIDMap;
     private HprofHeap hprofHeap;
     private Map stringCache = Collections.synchronizedMap(new StringCache());
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -83,13 +82,13 @@ class StringSegment extends TagBounds {
         Long stringIDObj = new Long(stringID);
         String string = (String) stringCache.get(stringIDObj);
         if (string == null) {
-            string = createStringByID(stringIDObj);
+            string = createStringByID(stringID);
             stringCache.put(stringIDObj,string);
         }
         return string;
     }
     
-    private String createStringByID(Long stringID) {
+    private String createStringByID(long stringID) {
         return getString(getStringOffsetByID(stringID));
     }
     
@@ -115,28 +114,28 @@ class StringSegment extends TagBounds {
         return s;
     }
 
-    private synchronized long getStringOffsetByID(Long stringID) {
-        Long startLong;
+    private synchronized long getStringOffsetByID(long stringID) {
+        long startLong;
 
         if (stringIDMap == null) {
-            stringIDMap = new HashMap(8000);
+            stringIDMap = new LongHashMap(32768);
 
             long[] offset = new long[] { startOffset };
 
             while (offset[0] < endOffset) {
                 long start = offset[0];
                 long sID = readStringTag(offset);
-                stringIDMap.put(new Long(sID), new Long(start));
+                stringIDMap.put(sID, start);
             }
         }
 
-        startLong = (Long) stringIDMap.get(stringID);
+        startLong = stringIDMap.get(stringID);
 
-        if (startLong == null) {
+        if (startLong == 0) {
             return -1;
         }
 
-        return startLong.longValue();
+        return startLong;
     }
 
     private HprofByteBuffer getDumpBuffer() {
