@@ -84,6 +84,7 @@ static jobject  _ctable_lock = NULL;
 static jboolean  waitTrackingEnabled = FALSE;
 static jboolean  sleepTrackingEnabled = FALSE;
 static jboolean  parkTrackingEnabled = FALSE;
+static jboolean  lockContentionMonitoringEnabled = FALSE;
 
 static jboolean  trackingMethodsInitialized = FALSE;
 
@@ -310,6 +311,22 @@ void get_saved_class_file_bytes(JNIEnv *env, char *name, jobject loader, jint *c
 void try_removing_bytes_for_unloaded_classes(JNIEnv *env) {
 }
 
+jthread getOwner(jvmtiEnv *jvmti_env, jobject object) {
+    jvmtiMonitorUsage usage;
+    jvmtiError res;
+    
+    res = (*jvmti_env)->GetObjectMonitorUsage(jvmti_env, object, &usage);
+    assert(res == JVMTI_ERROR_NONE);
+    (*jvmti_env)->Deallocate(jvmti_env, (void*)usage.waiters);
+    (*jvmti_env)->Deallocate(jvmti_env, (void*)usage.notify_waiters);
+    if (usage.owner == NULL) {
+        jint hash;
+        res = (*jvmti_env)->GetObjectHashCode(jvmti_env, object, &hash);
+        assert(res == JVMTI_ERROR_NONE);        
+        fprintf(stderr, "Profiler Agent Warning: NULL owner for lock %x.\n", (unsigned int)hash);
+    }
+    return usage.owner;
+}
 
 /** Class file load hook that the JVM calls whenever a class file is loaded and about to be parsed */
 void JNICALL class_file_load_hook(
@@ -399,7 +416,7 @@ void initializeMethods (JNIEnv *env) {
             error = TRUE;
         }
     
-        monitorEntryID = (*env)->GetStaticMethodID(env, profilerRuntimeID, "monitorEntry", "(Ljava/lang/Thread;Ljava/lang/Object;)V");
+        monitorEntryID = (*env)->GetStaticMethodID(env, profilerRuntimeID, "monitorEntry", "(Ljava/lang/Thread;Ljava/lang/Object;Ljava/lang/Thread;)V");
         if (monitorEntryID == NULL) {
             fprintf(stderr, "Profiler Agent Warning: Native bind failed to lookup monitorEntry method!!! \n");
             (*env)->ExceptionDescribe (env);
@@ -626,7 +643,11 @@ void JNICALL monitor_contended_enter_hook(
     }
   
     if (waitTrackingEnabled) {
-        (*jni_env)->CallStaticVoidMethod (jni_env, profilerRuntimeID, monitorEntryID, thread, object);
+        jthread owner = NULL;
+        if (lockContentionMonitoringEnabled) {
+            owner = getOwner(jvmti_env, object);
+        }
+        (*jni_env)->CallStaticVoidMethod (jni_env, profilerRuntimeID, monitorEntryID, thread, object, owner);
         (*jni_env)->ExceptionDescribe (jni_env);
     }
 }
@@ -680,6 +701,18 @@ JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_
         return TRUE;
     }
     return FALSE;
+}
+
+/*
+ * Class:     org_netbeans_lib_profiler_server_system_Classes
+ * Method:    setLockContentionMonitoringEnabled
+ * Signature: (Z)Z
+ */
+JNIEXPORT jboolean JNICALL Java_org_netbeans_lib_profiler_server_system_Classes_setLockContentionMonitoringEnabled
+  (JNIEnv *env, jclass clazz, jboolean value) {
+
+    lockContentionMonitoringEnabled = value;
+    return TRUE;
 }
 
 /*
