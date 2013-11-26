@@ -160,7 +160,7 @@ public class ProfilerRuntimeCPUCodeRegion extends ProfilerRuntime {
     }
 
     // ---------------------------------- Handling wait/sleep/monitor times ----------------------------
-    protected static long monitorEntryRegion(Thread t, Object monitor) {
+    protected static long monitorEntryRegion(Thread t, Object monitor, ThreadInfo ownerTi) {
         if (codeRegionInstrumentationDisabled) {
             return -1;
         }

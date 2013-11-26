@@ -2,7 +2,7 @@
 
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright 1997-2012 Oracle and/or its affiliates. All rights reserved.
+# Copyright 1997-2013 Oracle and/or its affiliates. All rights reserved.
 #
 # Oracle and Java are registered trademarks of Oracle and/or its affiliates.
 # Other names may be trademarks of their respective owners.
@@ -42,7 +42,7 @@
 # Version 2 license, then the option applies only if the new code is
 # made subject to such option by the copyright holder.
 
-# This script expects JAVA_HOME to point to the correct JDK 5.0 installation
+# This script expects JAVA_HOME to point to the correct JDK 6.0+ installation
 # In case you need to customize it, please uncomment and modify the following lines
 
 # JAVA_HOME=/opt/java/jdk1.6.0_02

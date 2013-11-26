@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  *
@@ -53,7 +54,8 @@ import java.util.Map;
 class ThreadInfo {
 
     private final int threadId;
-    private final Map<MonitorInfo, Monitor> monitors;
+    private final Map<MonitorInfo, MonitorDetail> waitMonitors;
+    private final Map<MonitorInfo, MonitorDetail> ownerMonitors;
     private OpenMonitor openMonitor;
     private final String threadName;
     private final String threadClassName;
@@ -62,44 +64,55 @@ class ThreadInfo {
         threadId = id;
         threadName = name;
         threadClassName = className;
-        monitors = new HashMap();
+        waitMonitors = new HashMap();
+        ownerMonitors = new HashMap();
     }
 
-    void openMonitor(MonitorInfo mi, long timeStamp) {
+    void openMonitor(ThreadInfo owner, MonitorInfo mi, long timeStamp) {
         assert openMonitor == null;
-        openMonitor = new OpenMonitor(mi, timeStamp);
-        mi.openThread(this, timeStamp);
+        openMonitor = new OpenMonitor(mi, owner, timeStamp);
     }
 
     void closeMonitor(MonitorInfo mi, long timeStamp) {
         assert openMonitor != null;
         assert mi.equals(openMonitor.monitor);
         long wait = timeStamp - openMonitor.timeStamp;
-        addMonitor(mi, wait);
+        if (LockGraphBuilder.LOG.isLoggable(Level.FINEST)) {
+            LockGraphBuilder.LOG.log(Level.FINEST, "Monitor exit mId = {0}, time diff = {1}", new Object[]{Integer.toHexString(mi.hashCode()), wait});
+        }
+        addMonitor(waitMonitors, mi, openMonitor.owner, wait);
+        addMonitor(openMonitor.owner.ownerMonitors, mi, this, wait);
         openMonitor = null;
-        mi.closeThread(this, timeStamp);
     }
 
-    private void addMonitor(MonitorInfo mi, long wait) {
-        Monitor m = monitors.get(mi);
+    private static void addMonitor(Map<MonitorInfo,MonitorDetail> monitors, MonitorInfo mi, ThreadInfo ti, long wait) {
+        MonitorDetail m = monitors.get(mi);
         if (m == null) {
-            monitors.put(mi, new Monitor(mi, wait));
-        } else {
-            m.addWait(wait);
+            m = new MonitorDetail(mi);
+            monitors.put(mi, m);
         }
+        m.addWait(ti, wait);
     }
 
     void timeAdjust(long timeDiff) {
         if (openMonitor != null) {
             openMonitor.timeAdjust(timeDiff);
-            openMonitor.monitor.timeAdjust(timeDiff);
+            openMonitor.monitor.timeAdjust(this, timeDiff);
         }
     }
 
-    List<Monitor> cloneMonitorDetails() {
+    List<MonitorDetail> cloneWaitMonitorDetails() {
+        return cloneMonitorDetails(waitMonitors);
+    }
+
+    List<MonitorDetail> cloneOwnerMonitorDetails() {
+        return cloneMonitorDetails(ownerMonitors);
+    }
+
+    private static List<MonitorDetail> cloneMonitorDetails(Map<MonitorInfo,MonitorDetail> monitors) {
         List details = new ArrayList(monitors.size());
-        for (Monitor m : monitors.values()) {
-            details.add(new Monitor(m));
+        for (MonitorDetail m : monitors.values()) {
+            details.add(new MonitorDetail(m));
         }
         return details;
     }
@@ -128,10 +141,14 @@ class ThreadInfo {
     private static class OpenMonitor {
 
         final MonitorInfo monitor;
+        final ThreadInfo owner;
         long timeStamp;
 
-        OpenMonitor(MonitorInfo mi, long ts0) {
+        OpenMonitor(MonitorInfo mi, ThreadInfo ti, long ts0) {
+            assert mi != null;
+            assert ti != null;
             monitor = mi;
+            owner = ti;
             timeStamp = ts0;
         }
 
@@ -140,27 +157,48 @@ class ThreadInfo {
         }
     }
 
-    static class Monitor {
+    static class MonitorDetail {
 
         final MonitorInfo monitor;
+        final Map<ThreadInfo, MonitorInfo.ThreadDetail> threads;
         long count;
         long waitTime;
 
-        private Monitor(MonitorInfo mi, long wait) {
+        private MonitorDetail(MonitorInfo mi) {
             monitor = mi;
-            waitTime = wait;
-            count = 1;
+            threads = new HashMap();
         }
 
-        Monitor(Monitor m) {
+        MonitorDetail(MonitorDetail m) {
             monitor = m.monitor;
             count = m.count;
             waitTime = m.waitTime;
+            threads = new HashMap();
+            for (MonitorInfo.ThreadDetail td : m.threads.values()) {
+                threads.put(td.threadInfo, td);
+            }
         }
 
-        private void addWait(long wait) {
+        List<MonitorInfo.ThreadDetail> cloneThreadDetails() {
+            return MonitorInfo.cloneThreadDetails(threads);
+        }
+
+        private void addWait(ThreadInfo ti, long wait) {
             waitTime += wait;
             count++;
+            if (ti != null) {
+                addThread(ti, wait);
+            }
+        }
+        
+        private void addThread(ThreadInfo ti, long wait) {
+            MonitorInfo.ThreadDetail td = threads.get(ti);
+            
+            if (td == null) {
+                td = new MonitorInfo.ThreadDetail(ti);
+                threads.put(ti, td);
+            }
+            td.addWait(null, wait);
         }
     }
 }

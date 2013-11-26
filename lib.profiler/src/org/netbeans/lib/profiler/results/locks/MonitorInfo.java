@@ -54,12 +54,15 @@ class MonitorInfo {
 
     final private int monitorId;
     private String className;
-    private OpenThread openThread;
-    private Map<ThreadInfo, ThreadDetail> threads;
+    private Map<ThreadInfo, OpenThread> openThreads;
+    private Map<ThreadInfo, ThreadDetail> waitThreads;
+    private Map<ThreadInfo, ThreadDetail> ownerThreads;
 
     MonitorInfo(int id) {
         monitorId = id;
-        threads = new HashMap();
+        waitThreads = new HashMap();
+        ownerThreads = new HashMap();
+        openThreads = new HashMap();
         className = "*unknown*"; // NOI18N
     }
     
@@ -89,34 +92,43 @@ class MonitorInfo {
         return monitorId;
     }
 
-    void openThread(ThreadInfo ti, long timeStamp0) {
-        assert openThread == null;
-        openThread = new OpenThread(ti, timeStamp0);
+    void openThread(ThreadInfo ti, ThreadInfo owner, long timeStamp0) {
+        assert openThreads.get(ti) == null;
+        openThreads.put(ti, new OpenThread(ti, owner, timeStamp0));
     }
 
     void closeThread(ThreadInfo ti, long timeStamp0) {
+        OpenThread openThread = openThreads.remove(ti);
         assert openThread != null;
-        assert openThread.threadInfo.equals(ti);
         long wait = timeStamp0 - openThread.timeStamp;
-        addThread(ti, wait);
-        openThread = null;
+        addThread(waitThreads, ti, openThread.owner, wait);
+        addThread(ownerThreads, openThread.owner, ti, wait);
     }
 
-    private void addThread(ThreadInfo ti, long wait) {
-        ThreadDetail td = threads.get(ti);
+    private static void addThread(Map<ThreadInfo,ThreadDetail> threads, ThreadInfo master, ThreadInfo detail, long wait) {
+        ThreadDetail td = threads.get(master);
         if (td == null) {
-            threads.put(ti, new ThreadDetail(ti, wait));
-        } else {
-            td.addWait(wait);
+            td = new ThreadDetail(master);
+            threads.put(master, td);
         }
+        td.addWait(detail, wait);
     }
 
-    void timeAdjust(long timeDiff) {
+    void timeAdjust(ThreadInfo ti, long timeDiff) {
+        OpenThread openThread = openThreads.get(ti);
         assert openThread != null;
         openThread.timeAdjust(timeDiff);
     }
 
-    List<ThreadDetail> cloneThreadDetails() {
+    List<ThreadDetail> cloneWaitThreadDetails() {
+        return cloneThreadDetails(waitThreads);
+    }
+
+    List<ThreadDetail> cloneOwnerThreadDetails() {
+        return cloneThreadDetails(ownerThreads);
+    }
+
+    static List<ThreadDetail> cloneThreadDetails(Map<ThreadInfo,ThreadDetail> threads) {
         List details = new ArrayList(threads.size());
         for (ThreadDetail d : threads.values()) {
             details.add(new ThreadDetail(d));
@@ -132,10 +144,12 @@ class MonitorInfo {
     private static class OpenThread {
 
         private final ThreadInfo threadInfo;
+        private final ThreadInfo owner;
         private long timeStamp;
 
-        OpenThread(ThreadInfo ti, long ts) {
+        OpenThread(ThreadInfo ti, ThreadInfo ownerTi, long ts) {
             threadInfo = ti;
+            owner = ownerTi;
             timeStamp = ts;
         }
 
@@ -147,24 +161,45 @@ class MonitorInfo {
     static class ThreadDetail {
 
         final ThreadInfo threadInfo;
+        private Map<ThreadInfo, ThreadDetail> threads;
         long count;
         long waitTime;
 
-        private ThreadDetail(ThreadInfo ti, long wait) {
+        ThreadDetail(ThreadInfo ti) {
             threadInfo = ti;
-            waitTime = wait;
-            count = 1;
+            threads = new HashMap();
         }
 
         ThreadDetail(ThreadDetail d) {
             threadInfo = d.threadInfo;
             count = d.count;
             waitTime = d.waitTime;
+            threads = new HashMap();
+            for (ThreadDetail td : d.threads.values()) {
+                threads.put(td.threadInfo, new ThreadDetail(td));
+            }
         }
 
-        private void addWait(long wait) {
+        List<ThreadDetail> cloneThreadDetails() {
+            return MonitorInfo.cloneThreadDetails(threads);
+        }
+
+        void addWait(ThreadInfo ti, long wait) {
             waitTime += wait;
             count++;
+            if (ti != null) {
+                addThread(ti, wait);
+            }
+        }
+        
+        private void addThread(ThreadInfo ti, long wait) {
+            ThreadDetail td = threads.get(ti);
+            
+            if (td == null) {
+                td = new ThreadDetail(ti);
+                threads.put(ti, td);
+            }
+            td.addWait(null, wait);
         }
     }
 }

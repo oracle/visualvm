@@ -76,6 +76,7 @@ public final class SessionSettings {
     public static final String PROP_JAVA_VERSION = "profiler.session.java.version"; //NOI18N
     public static final String PROP_ARCHITECTURE = "profiler.session.java.architecture"; //NOI18N
     public static final String PROP_PORT_NO = "profiler.session.port.no"; //NOI18N
+    public static final String PROP_REMOTE_HOST = "profiler.session.remote.host"; //NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -88,6 +89,7 @@ public final class SessionSettings {
     private String workingDir = System.getProperty("user.dir"); //NOI18N // Only used for Profile, not for Attach
     private int architecture = Platform.ARCH_32;
     private int portNo = 5140;
+    private String remoteHost = ""; //NOI18N
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -176,6 +178,14 @@ public final class SessionSettings {
     public int getPortNo() {
         return portNo;
     }
+    
+    public String getRemoteHost() {
+        return remoteHost;
+    }
+    
+    public void setRemoteHost(String remoteHost) {
+        this.remoteHost = remoteHost;
+    }
 
     public void setSystemArchitecture(int value) {
         architecture = value;
@@ -207,6 +217,7 @@ public final class SessionSettings {
         settings.setTargetJDKVersionString(javaVersionString);
         settings.setSystemArchitecture(architecture);
         settings.setPortNo(portNo);
+        settings.setRemoteHost(remoteHost);
     }
 
     public String debug() {
@@ -226,6 +237,8 @@ public final class SessionSettings {
         sb.append("javaVersionString =").append(javaVersionString); //NOI18N
         sb.append('\n'); //NOI18N
         sb.append("architecture =").append(architecture);
+        sb.append('\n');
+        sb.append("remoteHost =").append(remoteHost); //NOI18N
         sb.append('\n');
         sb.append("portNo =").append(portNo); //NOI18N
         sb.append('\n');
@@ -251,6 +264,7 @@ public final class SessionSettings {
             throw new IllegalArgumentException(INCORRECT_ARCH_MSG, e);
         }
 
+        setRemoteHost(getProperty(props, PROP_REMOTE_HOST, ""));
         String port = getProperty(props, PROP_PORT_NO, "5140"); //NOI18N
 
         try {
@@ -270,6 +284,7 @@ public final class SessionSettings {
         props.put(PROP_JAVA_EXECUTABLE, javaExecutable);
         props.put(PROP_JAVA_VERSION, javaVersionString);
         props.put(PROP_ARCHITECTURE, Integer.toString(architecture));
+        props.put(PROP_REMOTE_HOST, remoteHost);
         props.put(PROP_PORT_NO, Integer.toString(portNo));
     }
 

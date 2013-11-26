@@ -44,8 +44,11 @@ package org.netbeans.lib.profiler.ui.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -58,34 +61,161 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.JTableHeader;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 public class ProfilerTableContainer extends JPanel {
+    
+    private static final String PROP_COLUMN = "column"; // NOI18N
 
-    public ProfilerTableContainer(final JTable table, boolean decorated) {
+    private ProfilerTable table;
+    private JScrollPane tableScroll;
+    private JPanel scrollersPanel;
+
+    public ProfilerTableContainer(final ProfilerTable table, boolean decorated,
+                                  ColumnChangeAdapter adapter) {
         super(new BorderLayout());
         
-        JScrollPane sp = new JScrollPane(table) {
-            protected JViewport createViewport() { return customViewport(table); }
+        this.table = table;
+        
+        tableScroll = new JScrollPane(table) {
+            protected JViewport createViewport() {
+                if (getViewport() == null) return customViewport(table);
+                else return super.createViewport();
+            }
         };
-        sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        configureScrollBar(sp.getVerticalScrollBar());
+        tableScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        tableScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        configureVerticalScrollBar(tableScroll.getVerticalScrollBar());
         if (!decorated) {
-            sp.setBorder(BorderFactory.createEmptyBorder());
-            sp.setViewportBorder(BorderFactory.createEmptyBorder());
+            tableScroll.setBorder(BorderFactory.createEmptyBorder());
+            tableScroll.setViewportBorder(BorderFactory.createEmptyBorder());
         }
-        add(sp, BorderLayout.CENTER);
+        add(tableScroll, BorderLayout.CENTER);
+        
+        final ProfilerColumnModel cModel = table._getColumnModel();
+        
+        Set<Integer> scrollableColumns = table.getScrollableColumns();
+        if (scrollableColumns != null && !scrollableColumns.isEmpty()) {
+            scrollersPanel = new JPanel(null) {
+                public void doLayout() {
+                    int height = getHeight();
+                    if (height > 0) for (Component component : getComponents()) {
+                        JScrollBar scroller = (JScrollBar)component;
+                        int column = table.convertColumnIndexToView(getColumn(scroller));
+                        Rectangle rect = table.getTableHeader().getHeaderRect(column);
+                        scroller.setBounds(rect.x, 0, rect.width, height);
+                        scroller.doLayout();
+                    }
+                }
+                public Dimension getPreferredSize() {
+                    Dimension d = super.getPreferredSize();
+                    d.height = 0;
+                    for (Component component : getComponents()) {
+                        JScrollBar scroller = (JScrollBar)component;
+                        if (cModel.isColumnVisible(getColumn(scroller)))
+                            d.height = Math.max(d.height, scroller.getPreferredSize().height);
+                    }
+                    return d;
+                }
+            };
+
+            for (final Integer column : scrollableColumns) {
+                final JScrollBar scroller = new JScrollBar(JScrollBar.HORIZONTAL) {
+                    private boolean adjusting = false;
+                    {
+                        putClientProperty(PROP_COLUMN, column);
+                    }
+                    public void setValue(int value) {
+                        value = checkedValue(value);
+                        super.setValue(value);
+                        updateColumnOffset(value);
+                    }
+                    public void setValues(int value, int extent, int min, int max) {
+                        if (adjusting) return;
+                        value = checkedValue(value);
+                        setEnabled(extent < max);
+                        if (isTrackingEnd()) value = max - extent;
+                        super.setValues(value, extent, min, max);
+                        updateColumnOffset(value);
+                    }
+                    public void setValueIsAdjusting(boolean b) {
+                        adjusting = b;
+                        super.setValueIsAdjusting(b);
+                        if (!adjusting) updateHorizontalScrollBars(table, column, false);
+                    }
+                    private void updateColumnOffset(int value) {
+                        table.setColumnOffset(column, value);
+                    }
+                    private boolean isTrackingEnd() {
+                        return isEnabled() && getValue() + getVisibleAmount() >= getMaximum();
+                    }
+                    private int checkedValue(int value) {
+                        value = Math.max(0, value);
+                        value = Math.min(getMaximum() - getVisibleAmount(), value);
+                        return value;
+                    }
+                };
+                scrollersPanel.add(scroller);
+            }
+            
+            cModel.addColumnChangeListener(new ColumnChangeAdapter() {
+                public void columnWidthChanged(int column, int oldWidth, int newWidth) {
+                    if (table.isScrollableColumn(column))
+                        updateHorizontalScrollBars(table, column, true);
+                }
+                public void columnPreferredWidthChanged(int column, int oldWidth, int newWidth) {
+                    if (table.isScrollableColumn(column))
+                        updateHorizontalScrollBars(table, column, false);
+                }
+            });
+
+            cModel.addColumnModelListener(new TableColumnModelListener() {
+                public void columnAdded(TableColumnModelEvent e) {}
+                public void columnRemoved(TableColumnModelEvent e) {}
+                public void columnMoved(TableColumnModelEvent e) { process(e); }
+                public void columnMarginChanged(ChangeEvent e) {}
+                public void columnSelectionChanged(ListSelectionEvent e) {}
+                private void process(TableColumnModelEvent e) {
+                    if (e.getFromIndex() != e.getToIndex())
+                        updateHorizontalScrollBars(table, -1, true);
+                }
+            });
+
+            add(scrollersPanel, BorderLayout.SOUTH);
+        }
+        
+        if (adapter != null) cModel.addColumnChangeListener(adapter);
+    }
+    
+    public boolean tableNeedsScrolling() {
+        return tableScroll.getVerticalScrollBar().isEnabled();
+    }
+    
+    public BufferedImage createTableScreenshot(boolean onlyVisibleArea) {
+        return onlyVisibleArea ? UIUtils.createScreenshot(tableScroll) :
+                                 UIUtils.createScreenshot(table);
+    }
+    
+    private int getColumn(JScrollBar scroller) {
+        return (Integer)scroller.getClientProperty(PROP_COLUMN);
+    }
+    
+    private JScrollBar getScroller(int column) {
+        for (Component component : scrollersPanel.getComponents()) {
+            JScrollBar scroller = (JScrollBar)component;
+            if (getColumn(scroller) == column) return scroller;
+        }
+        return null;
     }
     
     private JViewport customViewport(final JTable table) {
         return new JViewport() {
             {
                 setBackground(table.getBackground());
-                
             }
             public void paint(Graphics g) {
                 super.paint(g);
@@ -121,13 +251,46 @@ public class ProfilerTableContainer extends JPanel {
         };
     }
     
-    private void configureScrollBar(final JScrollBar scrollBar) {
+    private void configureVerticalScrollBar(final JScrollBar scrollBar) {
         scrollBar.getModel().addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 scrollBar.setEnabled(ProfilerTableContainer.this.isEnabled() &&
                           scrollBar.getVisibleAmount() < scrollBar.getMaximum());
             }
         });
+    }
+    
+    private void updateHorizontalScrollBars(ProfilerTable table, int column, boolean layout) {
+        if (column != -1) {
+            JScrollBar scroll = getScroller(column);
+            int offset = table.getColumnOffset(column);
+            int columnPref = table.getColumnPreferredWidth(column);
+            int _column = table.convertColumnIndexToView(column);
+            int columnAct = table.getTableHeader().getHeaderRect(_column).width;
+            if (columnPref > columnAct) {
+                int value = Math.min(offset, columnPref - columnAct);
+                scroll.setValues(value, columnAct, 0, columnPref);
+            } else {
+                scroll.setValues(0, 0, 0, 0);
+            }
+        }
+        
+        if (layout) {
+            doLayout();
+            scrollersPanel.doLayout();
+            repaint();
+        }
+    }
+    
+    
+    public static class ColumnChangeAdapter implements ProfilerColumnModel.Listener {
+        
+        public void columnOffsetChanged(int column, int oldOffset, int newOffset) {}
+        
+        public void columnWidthChanged(int column, int oldWidth, int newWidth) {}
+        
+        public void columnPreferredWidthChanged(int column, int oldWidth, int newWidth) {}
+        
     }
     
 }

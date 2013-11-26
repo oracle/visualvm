@@ -42,13 +42,17 @@
  */
 package org.netbeans.lib.profiler.ui.swing;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
 
@@ -57,6 +61,8 @@ import javax.swing.table.TableColumn;
  * @author Jiri Sedlacek
  */
 class ProfilerColumnModel extends DefaultTableColumnModel {
+    
+    private static final String PROP_COLUMN_WIDTH = "width"; // NOI18N
     
     // --- Package-private constructor -----------------------------------------
     
@@ -80,6 +86,44 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
         return fitWidthColumn != -1;
     }
     
+    // --- Column offset & width -----------------------------------------------
+    
+    private Map<Integer, Integer> columnOffsets;
+    private Map<Integer, Integer> columnPreferredWidths;
+    
+    boolean setColumnOffset(int column, int offset) {
+        if (columnOffsets == null) columnOffsets = new HashMap();
+        Integer previousOffset = columnOffsets.put(column, offset);
+        int _previousOffset = previousOffset == null ? 0 : previousOffset.intValue();
+        boolean change = _previousOffset != offset;
+        if (change) fireColumnOffsetChanged(column, _previousOffset, offset);
+        return change;
+    }
+    
+    int getColumnOffset(int column) {
+        if (columnOffsets == null) return 0;
+        Integer offset = columnOffsets.get(column);
+        return offset == null ? 0 : offset.intValue();
+    }
+    
+    void clearColumnsPrefferedWidth() {
+        if (columnPreferredWidths != null) columnPreferredWidths.clear();
+    }
+    
+    boolean setColumnPreferredWidth(int column, int width) {
+        if (columnPreferredWidths == null) columnPreferredWidths = new HashMap();
+        Integer previousWidth = columnPreferredWidths.put(column, width);
+        int _previousWidth = previousWidth == null ? 0 : previousWidth.intValue();
+        boolean change = _previousWidth != width;
+        if (change) fireColumnPreferredWidthChanged(column, _previousWidth, width);
+        return change;
+    }
+    
+    int getColumnPreferredWidth(int column) {
+        if (columnPreferredWidths == null) return 0;
+        Integer width = columnPreferredWidths.get(column);
+        return width == null ? 0 : width.intValue();
+    }
     
     // --- Column visibility ---------------------------------------------------
     
@@ -131,10 +175,10 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
     
     void showColumn(TableColumn column, ProfilerTable table) {
         column.setMaxWidth(Integer.MAX_VALUE);
-        column.setMinWidth(minColumnWidth);
         Integer width = hiddenColumnWidths.remove(column.getModelIndex());
         column.setWidth(width != null ? width.intValue() :
                         getDefaultColumnWidth(column.getModelIndex()));
+        column.setMinWidth(minColumnWidth);
         
         int toResizeIndex = getFitWidthColumn();
         if (column.getModelIndex() == toResizeIndex) {
@@ -160,12 +204,14 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
             getSelectionModel().setSelectionInterval(newSelected, newSelected);
         }
                 
-        ProfilerRowSorter sorter = table._getRowSorter();
-        int sortColumn = sorter.getSortColumn();
-        if (sortColumn == column.getModelIndex()) {
-            int newSortColumn = table.convertColumnIndexToView(sortColumn);
-            newSortColumn = getPreviousVisibleColumn(newSortColumn);
-            sorter.setSortColumn(getColumn(newSortColumn).getModelIndex());
+        if (table.isSortable()) {
+            ProfilerRowSorter sorter = table._getRowSorter();
+            int sortColumn = sorter.getSortColumn();
+            if (sortColumn == column.getModelIndex()) {
+                int newSortColumn = table.convertColumnIndexToView(sortColumn);
+                newSortColumn = getPreviousVisibleColumn(newSortColumn);
+                sorter.setSortColumn(getColumn(newSortColumn).getModelIndex());
+            }
         }
     }
     
@@ -223,6 +269,64 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
         return column < 0 || column >= toolTips.length ? null : toolTips[column];
     }
     
+    // --- Listener ------------------------------------------------------------
+    
+    private Set<Listener> columnListeners;
+    
+    public void addColumn(TableColumn column) {
+        super.addColumn(column);
+        
+        final int index = column.getModelIndex();
+        column.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (PROP_COLUMN_WIDTH.equals(evt.getPropertyName())) {
+                    int oldWidth = ((Integer)evt.getOldValue()).intValue();
+                    int newWidth = ((Integer)evt.getNewValue()).intValue();
+                    fireColumnWidthChanged(index, oldWidth, newWidth);
+                }
+            }
+        });
+    }
+    
+    void addColumnChangeListener(Listener listener) {
+        if (columnListeners == null) columnListeners = new HashSet();
+        columnListeners.add(listener);
+    }
+    
+    void removeColumnChangeListener(Listener listener) {
+        if (columnListeners == null) return;
+        columnListeners.remove(listener);
+        if (columnListeners.isEmpty()) columnListeners = null;
+    }
+    
+    private void fireColumnOffsetChanged(int column, int oldOffset, int newOffset) {
+        if (columnListeners == null) return;
+        for (Listener listener : columnListeners)
+            listener.columnOffsetChanged(column, oldOffset, newOffset);
+    }
+    
+    private void fireColumnWidthChanged(int column, int oldWidth, int newWidth) {
+        if (columnListeners == null) return;
+        for (Listener listener : columnListeners)
+            listener.columnWidthChanged(column, oldWidth, newWidth);
+    }
+    
+    private void fireColumnPreferredWidthChanged(int column, int oldWidth, int newWidth) {
+        if (columnListeners == null) return;
+        for (Listener listener : columnListeners)
+            listener.columnPreferredWidthChanged(column, oldWidth, newWidth);
+    }
+    
+    static interface Listener {
+        
+        public void columnOffsetChanged(int column, int oldOffset, int newOffset);
+        
+        public void columnWidthChanged(int column, int oldWidth, int newWidth);
+        
+        public void columnPreferredWidthChanged(int column, int oldWidth, int newWidth);
+        
+    }
+    
     // --- Persistence ---------------------------------------------------------
     
     private static final String COLUMN_INDEX_KEY = "ProfilerColumnModel.ColumnIndex"; // NOI18N
@@ -245,9 +349,7 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
                     if (width == 0) hideColumn(column, table);
                     else column.setWidth(width);
                 }
-            } catch (NumberFormatException e) {
-                continue;
-            }
+            } catch (NumberFormatException e) {}
         }
         Collections.sort(tableColumns, new Comparator<TableColumn>() {
             public int compare(TableColumn c1, TableColumn c2) {

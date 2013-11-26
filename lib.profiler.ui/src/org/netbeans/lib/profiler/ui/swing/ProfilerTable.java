@@ -42,13 +42,17 @@
  */
 package org.netbeans.lib.profiler.ui.swing;
 
-import java.awt.Color;
+import org.netbeans.lib.profiler.ui.swing.renderer.Translatable;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -56,10 +60,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
@@ -71,6 +78,10 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.event.RowSorterEvent;
+import javax.swing.event.RowSorterListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -79,6 +90,8 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 /**
  *
@@ -86,8 +99,10 @@ import org.netbeans.lib.profiler.ui.UIUtils;
  */
 public class ProfilerTable extends JTable {
     
-    public ProfilerTable(TableModel model, boolean hideableColums, boolean sortable,
-                         boolean keepUnfocusedSelection) {
+    public static final String PROP_NO_HOVER = "ProfilerTableHover_NoHover"; // NOI18N
+    
+    public ProfilerTable(TableModel model, boolean sortable, boolean hideableColums,
+                         int[] scrollableColumns, boolean keepUnfocusedSelection) {
         super(model);
         
         this.hideableColums = hideableColums;
@@ -95,6 +110,9 @@ public class ProfilerTable extends JTable {
         
         setupModels(sortable);
         setupAppearance();
+        
+        if (scrollableColumns != null && scrollableColumns.length > 0)
+            initScrollableColumns(scrollableColumns);
     }
     
     
@@ -113,8 +131,8 @@ public class ProfilerTable extends JTable {
         setRowSelectionAllowed(true);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         setGridColor(UIConstants.TABLE_VERTICAL_GRID_COLOR);
-//        setSelectionBackground(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
-//        setSelectionForeground(UIConstants.TABLE_SELECTION_FOREGROUND_COLOR);
+        setSelectionBackground(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
+        setSelectionForeground(UIConstants.TABLE_SELECTION_FOREGROUND_COLOR);
         setShowHorizontalLines(UIConstants.SHOW_TABLE_HORIZONTAL_GRID);
         setShowVerticalLines(UIConstants.SHOW_TABLE_VERTICAL_GRID);
         setRowMargin(UIConstants.TABLE_ROW_MARGIN);
@@ -164,36 +182,82 @@ public class ProfilerTable extends JTable {
             c.setBackground(UIManager.getColor("TextField.inactiveBackground")); // NOI18N
         } else {
             c.setForeground(getForeground());
-            Color background = getBackground();
-            if ((row & 0x1) == 0) {
-//                c.setForeground((unselectedForeground != null) ? unselectedForeground : table.getForeground());
-                c.setBackground(UIUtils.getDarker(background));
+            c.setBackground((row & 0x1) == 0 ? getBackground() :
+                            UIUtils.getDarker(getBackground()));
+        }
+        
+        int col = convertColumnIndexToModel(column);
+        
+        // TODO: will be removed once custom renderers are implemented
+        if (col > 0 && c instanceof JLabel) 
+            ((JLabel)c).setHorizontalAlignment(JLabel.TRAILING);
+//        else
+//            ((JLabel)c).setHorizontalAlignment(JLabel.LEADING);
+        
+        if (!isCustomRendering && isScrollableColumn(col)) {
+            int prefWidth = getColumnPreferredWidth(col);
+            return getScrollableRenderer(c, col, prefWidth);
+        } else {
+            return c;
+        }
+    }
+    
+    private ScrollableRenderer _renderer;
+    private ScrollableRenderer getScrollableRenderer(Component renderer, int column, int width) {
+        if (_renderer == null) _renderer = new ScrollableRenderer();
+        _renderer.setRenderer(renderer, getColumnOffset(column), width);
+        return _renderer;
+    }
+    
+    private class ScrollableRenderer extends Component {
+        
+        private Component impl;
+        private Translatable implT;
+        
+        private int offset;
+        private int prefWidth;
+        
+        void setRenderer(Component c, int o, int w) {
+            impl = c;
+            offset = o;
+            prefWidth = w;
+            
+            implT = c instanceof Translatable ? (Translatable)c : null;
+        }
+        
+        public void setBounds(int x, int y, int w, int h) {
+            impl.setSize(Math.max(w, prefWidth), h);
+        }
+        
+        public Dimension getPreferredSize() {
+            return impl.getPreferredSize();
+        }
+        
+        public void paint(Graphics g) {
+            if (implT != null) {
+                implT.translate(-offset, 0);
+                impl.paint(g);
             } else {
-//                c.setForeground((unselectedForeground != null) ? unselectedForeground : table.getForeground());
-                c.setBackground(background);
+                g.translate(-offset, 0);
+                impl.paint(g);
+                g.translate(offset, 0);
             }
         }
         
-        // TODO: will be removed once custom renderers are implemented
-        if (getColumnModel().getColumn(column).getModelIndex() > 0 && c instanceof JLabel) {
-            ((JLabel)c).setHorizontalAlignment(JLabel.TRAILING);
-        }
-        
-        return c;
     }
     
     Component getRenderer(TableCellRenderer renderer, int row, int column) {
-        isRendering = true;
+        isCustomRendering = true;
         try {
             return prepareRenderer(renderer, row, column);
         } finally {
-            isRendering = false;
+            isCustomRendering = false;
         }
     }
     
-    private boolean isRendering;
+    private boolean isCustomRendering;
     public boolean isFocusOwner() {
-        return !isRendering && super.isFocusOwner();
+        return !isCustomRendering && super.isFocusOwner();
     }
     
     public boolean isCellEditable(int row, int column) {
@@ -232,6 +296,9 @@ public class ProfilerTable extends JTable {
     
     // --- Column model --------------------------------------------------------
     
+    private boolean columnWidthsValid;
+    private Set<Integer> scrollableColumns;
+    
     ProfilerColumnModel _getColumnModel() {
         return (ProfilerColumnModel)getColumnModel();
     }
@@ -240,13 +307,125 @@ public class ProfilerTable extends JTable {
         return new ProfilerColumnModel();
     }
     
+    public void setFitWidthColumn(int column) {
+        _getColumnModel().setFitWidthColumn(column);
+    }
+    
     public void setDefaultColumnWidth(int width) {
         _getColumnModel().setDefaultColumnWidth(width);
+    }
+    
+    public void setDefaultColumnWidth(int column, int width) {
+        _getColumnModel().setDefaultColumnWidth(column, width);
     }
     
     public void setColumnToolTips(String[] toolTips) {
         _getColumnModel().setColumnToolTips(toolTips);
     }
+    
+    public void setColumnVisibility(int column, boolean visible) {
+        ProfilerColumnModel cModel = _getColumnModel();
+        TableColumn col = cModel.getColumn(convertColumnIndexToView(column));
+        cModel.setColumnVisibility(col, visible, this);
+    }
+    
+    public boolean isColumnVisible(int column) {
+        int _column = convertColumnIndexToView(column);
+        return _getColumnModel().isColumnVisible(_column);
+    }
+    
+    public void setColumnOffset(int column, int offset) {
+        if (_getColumnModel().setColumnOffset(column, offset)) {
+            column = convertColumnIndexToView(column);
+            Rectangle rect = getCellRect(0, column, true);
+            repaint(rect.x, 0, rect.width, getHeight());
+        }
+    }
+    
+    public Set<Integer> getScrollableColumns() {
+        return scrollableColumns;
+    }
+    
+    public boolean isScrollableColumn(int column) {
+        return scrollableColumns != null && scrollableColumns.contains(column);
+    }
+    
+    public int getColumnOffset(int column) {
+        return _getColumnModel().getColumnOffset(column);
+    }
+    
+    private void updateColumnsPreferredWidth() {
+        Rectangle visible = getVisibleRect();
+        if (visible.isEmpty()) return;
+        
+        Point visibleP = visible.getLocation();
+        int first = rowAtPoint(visible.getLocation());
+        visibleP.translate(0, visible.height - 1);
+        int last = rowAtPoint(visibleP);
+        
+        ProfilerColumnModel cModel = _getColumnModel();
+        
+        for (int column : scrollableColumns) {
+            int _column = convertColumnIndexToView(column);
+            int width = computeColumnPreferredWidth(column, _column, first, last);
+            cModel.setColumnPreferredWidth(column, width);
+        }
+        
+        columnWidthsValid = true;
+    }
+    
+    public void updateColumnPreferredWidth(int column) {
+        Rectangle visible = getVisibleRect();
+        if (visible.isEmpty()) return;
+        
+        Point visibleP = visible.getLocation();
+        int first = rowAtPoint(visible.getLocation());
+        visibleP.translate(0, visible.height - 1);
+        int last = rowAtPoint(visibleP);
+        
+        int _column = convertColumnIndexToView(column);
+        
+        int width = computeColumnPreferredWidth(column, _column, first, last);
+        _getColumnModel().setColumnPreferredWidth(column, width);
+    }
+    
+    protected int computeColumnPreferredWidth(int modelIndex, int viewIndex, int firstRow, int lastRow) {
+        int width = 0;
+        for (int row = firstRow; row <= lastRow; row++) {
+            TableCellRenderer renderer = getCellRenderer(row, viewIndex);
+            Component component = getRenderer(renderer, row, viewIndex);
+            width = Math.max(component.getPreferredSize().width, width);
+        }
+        return width;
+    }
+    
+    public int getColumnPreferredWidth(int column) {
+        if (!columnWidthsValid) updateColumnsPreferredWidth();
+        return _getColumnModel().getColumnPreferredWidth(column);
+    }
+    
+    private void initScrollableColumns(int[] columns) {
+        scrollableColumns = new HashSet(columns.length);
+        for (final int column : columns) scrollableColumns.add(column);
+        
+        columnWidthsValid = false;
+        
+        if (isSortable()) {
+            getRowSorter().addRowSorterListener(new RowSorterListener() {
+                public void sorterChanged(RowSorterEvent e) {
+                    if (RowSorterEvent.Type.SORTED.equals(e.getType()))
+                        updateColumnsPreferredWidth();
+                }
+            });
+        } else {
+            getModel().addTableModelListener(new TableModelListener() {
+                public void tableChanged(TableModelEvent e) {
+                    updateColumnsPreferredWidth();
+                }
+            }); 
+        }
+    }
+    
     
     // --- Columns hiding & layout ---------------------------------------------
     
@@ -258,13 +437,29 @@ public class ProfilerTable extends JTable {
         JScrollPane scrollPane = getEnclosingScrollPane();
         if (scrollPane != null) {
             boolean hideable = hideableColums && !UIUtils.isAquaLookAndFeel();
-            ActionListener chooser = !hideable ? null : new ActionListener() {
+            final ActionListener chooser = !hideable ? null : new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     chooseColumns((Component)e.getSource(), null);
                 }
             };
-            HeaderComponent corner = new HeaderComponent(chooser);
+            HeaderComponent corner = !hideable ? new HeaderComponent(chooser) :
+                                                 new HeaderComponent(chooser) {
+                private Icon icon = Icons.getIcon(GeneralIcons.SORT_DESCENDING);
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    int x = (getWidth() - icon.getIconWidth()) / 2 - 1;
+                    int y = (getHeight() - icon.getIconHeight()) / 2;
+                    icon.paintIcon(this, g, x, y);
+                }
+            };
             scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, corner);
+            
+            if (scrollableColumns != null && !scrollableColumns.isEmpty())
+                scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+                    public void adjustmentValueChanged(AdjustmentEvent e) {
+                        if (!e.getValueIsAdjusting()) updateColumnsPreferredWidth();
+                    }
+                });
         }
     }
     
@@ -347,6 +542,13 @@ public class ProfilerTable extends JTable {
         s.setDefaultSortOrder(0, SortOrder.ASCENDING);
         s.setSortColumn(0);
         return s;
+    }
+    
+    public void disableColumnSorting(int column) {
+        ProfilerRowSorter sorter = _getRowSorter();
+        if (sorter == null) return;
+        int _column = convertColumnIndexToView(column);
+        sorter.setSortable(_column, false);
     }
     
     public void setSortColumn(int column) {
