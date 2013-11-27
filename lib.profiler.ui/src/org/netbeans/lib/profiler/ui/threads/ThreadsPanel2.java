@@ -56,7 +56,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
@@ -71,10 +70,11 @@ import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.threads.ThreadData;
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
+import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
-import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
 
 /**
  *
@@ -90,6 +90,8 @@ public class ThreadsPanel2 extends JPanel {
     private ProfilerTableContainer threadsTableContainer;
     private JComboBox threadStateFilter;
     private JPanel legendPanel;
+    
+    private ThreadTimeRelRenderer timeRelRenderer; 
     
     
     public ThreadsPanel2(ThreadsDataManager dataManager, Action saveView) {
@@ -216,24 +218,22 @@ public class ThreadsPanel2 extends JPanel {
         threadsTable.setDefaultColumnWidth(0, nameStateRenderer.getPreferredSize().width);
         threadsTable.setDefaultRenderer(ThreadData.class, nameStateRenderer);
         threadsTable.setDefaultRenderer(ViewManager.RowView.class, new TimelineRenderer(viewManager));
-        final LabelRenderer labelRenderer = new LabelRenderer();
-        labelRenderer.setText("123456789 ms"); // NOI18N
-        labelRenderer.setHorizontalAlignment(SwingConstants.TRAILING);
-        threadsTable.setDefaultColumnWidth(labelRenderer.getPreferredSize().width);
-        threadsTable.setDefaultRenderer(Long.class, new TableCellRenderer() {
-            {
-                labelRenderer.setOpaque(true);
-                labelRenderer.setMargin(3, 3, 3, 3);
-            }
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                labelRenderer.setText(value.toString() + " ms");
-                return labelRenderer;
-            }
-        });
         
         final JTableHeader header = threadsTable.getTableHeader();
         TableCellRenderer headerRenderer = header.getDefaultRenderer();
         header.setDefaultRenderer(new TimelineHeaderRenderer(headerRenderer, 1, viewManager));
+        
+        Number refTime = new Long(123456789);
+        
+        timeRelRenderer = new ThreadTimeRelRenderer(dataManager);
+        timeRelRenderer.setValue(refTime, -1);
+        threadsTable.setDefaultColumnWidth(timeRelRenderer.getPreferredSize().width);
+        threadsTable.setDefaultRenderer(Long.class, timeRelRenderer);
+        
+        NumberRenderer numberRenderer = new NumberRenderer(Formatters.millisecondsFormat());
+        numberRenderer.setValue(refTime, -1);
+        threadsTable.setDefaultColumnWidth(7, numberRenderer.getPreferredSize().width);
+        threadsTable.setColumnRenderer(7, numberRenderer);
         
         threadsTable.setColumnVisibility(3, false);
         threadsTable.setColumnVisibility(4, false);
@@ -329,6 +329,7 @@ public class ThreadsPanel2 extends JPanel {
             public void dataChanged() {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
+                        timeRelRenderer.setBasis(dataManager.getEndTime() - dataManager.getStartTime());
                         if (firstChange) {
                             firstChange = false;
                             repaintTimeline();
@@ -342,6 +343,7 @@ public class ThreadsPanel2 extends JPanel {
                     public void run() {
                         viewManager.reset();
                         firstChange = true;
+                        timeRelRenderer.setBasis(0);
                         threadsTableModel.fireTableDataChanged();
                     }
                 });

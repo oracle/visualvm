@@ -42,7 +42,7 @@
  */
 package org.netbeans.lib.profiler.ui.swing;
 
-import org.netbeans.lib.profiler.ui.swing.renderer.Translatable;
+import org.netbeans.lib.profiler.ui.swing.renderer.Movable;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -68,7 +68,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -90,6 +89,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 
@@ -168,6 +168,25 @@ public class ProfilerTable extends JTable {
         repaint();
     }
     
+    public void setDefaultRenderer(Class<?> columnClass, ProfilerRenderer renderer) {
+        super.setDefaultRenderer(columnClass, createCellRenderer(renderer));
+    }
+    
+    public void setColumnRenderer(int column, ProfilerRenderer renderer) {
+        int _column = convertColumnIndexToModel(column);
+        TableColumn tColumn = getColumnModel().getColumn(_column);
+        tColumn.setCellRenderer(createCellRenderer(renderer));
+    }
+    
+    public static TableCellRenderer createCellRenderer(final ProfilerRenderer renderer) {
+        return new TableCellRenderer() {
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                renderer.setValue(value, table.convertRowIndexToModel(row));
+                return renderer.getComponent();
+            }
+        };
+    }
+    
     public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
         Component c = super.prepareRenderer(renderer, row, column);
         
@@ -186,14 +205,9 @@ public class ProfilerTable extends JTable {
                             UIUtils.getDarker(getBackground()));
         }
         
-        int col = convertColumnIndexToModel(column);
+        c.move(0, 0);
         
-        // TODO: will be removed once custom renderers are implemented
-        if (col > 0 && c instanceof JLabel) 
-            ((JLabel)c).setHorizontalAlignment(JLabel.TRAILING);
-//        else
-//            ((JLabel)c).setHorizontalAlignment(JLabel.LEADING);
-        
+        int col = convertColumnIndexToModel(column);        
         if (!isCustomRendering && isScrollableColumn(col)) {
             int prefWidth = getColumnPreferredWidth(col);
             return getScrollableRenderer(c, col, prefWidth);
@@ -212,7 +226,7 @@ public class ProfilerTable extends JTable {
     private class ScrollableRenderer extends Component {
         
         private Component impl;
-        private Translatable implT;
+        private Movable implM;
         
         private int offset;
         private int prefWidth;
@@ -222,10 +236,11 @@ public class ProfilerTable extends JTable {
             offset = o;
             prefWidth = w;
             
-            implT = c instanceof Translatable ? (Translatable)c : null;
+            implM = c instanceof Movable ? (Movable)c : null;
         }
         
         public void setBounds(int x, int y, int w, int h) {
+            super.setBounds(x, y, w, h);
             impl.setSize(Math.max(w, prefWidth), h);
         }
         
@@ -234,8 +249,8 @@ public class ProfilerTable extends JTable {
         }
         
         public void paint(Graphics g) {
-            if (implT != null) {
-                implT.translate(-offset, 0);
+            if (implM != null) {
+                implM.move(-offset, 0);
                 impl.paint(g);
             } else {
                 g.translate(-offset, 0);
