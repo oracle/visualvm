@@ -52,6 +52,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.plaf.LabelUI;
 import javax.swing.plaf.basic.BasicLabelUI;
@@ -63,19 +64,38 @@ import javax.swing.plaf.basic.BasicLabelUI;
  *
  * @author Jiri Sedlacek
  */
-public class LabelRenderer extends JLabel implements Translatable {
+public class LabelRenderer extends JLabel implements ProfilerRenderer {
     
     // --- Constructor ---------------------------------------------------------
-
+    
     public LabelRenderer() {
+        this(false);
+    }
+
+    public LabelRenderer(boolean plain) {
+        setEnabled(true);
         setHorizontalAlignment(LEADING);
         setVerticalAlignment(TOP);
         setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
-        setOpaque(false);
-        setEnabled(true);
+        if (plain) {
+            setOpaque(false);
+        } else {
+            setOpaque(true);
+            setMargin(3, 3, 3, 3);
+        }
 
         iconTextGap = super.getIconTextGap();
+    }
+    
+    // --- Renderer ------------------------------------------------------------
+    
+    public void setValue(Object value, int row) {
+        setText(value.toString());
+    }
+    
+    public JComponent getComponent() {
+        return this;
     }
     
     // --- Appearance ----------------------------------------------------------
@@ -125,13 +145,13 @@ public class LabelRenderer extends JLabel implements Translatable {
     }
 
     public void paint(Graphics g) {
-        int xx = dx;
+        int xx = location.x;
         int h = size.height;
         int hh = getPreferredSizeImpl().height; // lazily computes dirty metrics
         
         if (background != null && isOpaque()) {
             g.setColor(background);
-            g.fillRect(xx, dy, size.width, h);
+            g.fillRect(xx, location.y, size.width, h);
         }
         
         g.setFont(getFont());
@@ -145,13 +165,13 @@ public class LabelRenderer extends JLabel implements Translatable {
         
         if (iconWidth > 0) {
             int yy = (h - iconHeight) / 2;
-            icon.paintIcon(this, g, xx, dy + yy);
+            icon.paintIcon(this, g, xx, location.y + yy);
             xx += iconWidth + iconTextGap;
         }
         
         if (textWidth > 0) {
-            int yy = (h - hh) / 2 + margin.top;
-            UI.paintEnabledText(this, g, text, xx, dy + yy + fontAscent);
+            int yy = (h - hh - fontSizeDiff) / 2 + margin.top;
+            UI.paintEnabledText(this, g, text, xx, location.y + yy + fontAscent);
         }
     }
 
@@ -201,10 +221,7 @@ public class LabelRenderer extends JLabel implements Translatable {
     protected final Point location = new Point();
     protected final Dimension size = new Dimension();
     
-    protected int dx;
-    protected int dy;
-    
-    public void setLocation(int x, int y) {
+    public void move(int x, int y) {
         location.x = x;
         location.y = y;
     }
@@ -243,23 +260,11 @@ public class LabelRenderer extends JLabel implements Translatable {
     }
     
     public void reshape(int x, int y, int w, int h) {
-        location.x = x;
-        location.y = y;
+        // ignore x, y: used only for move(x, y)
+//        location.x = x;
+//        location.y = y;
         size.width = w;
         size.height = h;
-    }
-    
-    public void translate(int dx, int dy) {
-        this.dx = dx;
-        this.dy = dy;
-    }
-    
-    public int getDx() {
-        return dx;
-    }
-    
-    public int getDy() {
-        return dy;
     }
 
     // --- Margins -------------------------------------------------------------
@@ -290,6 +295,7 @@ public class LabelRenderer extends JLabel implements Translatable {
     // --- Other peformance tweaks ---------------------------------------------
     
     private FontMetrics fontMetrics;
+    private int fontSizeDiff;
     private String text;
     private Icon icon;
     private Color foreground;
@@ -352,6 +358,13 @@ public class LabelRenderer extends JLabel implements Translatable {
         super.setFont(font);
         fontMetrics = super.getFontMetrics(font);
         resetPreferredSize(true, true);
+    }
+    
+    // Use to keep the baseline for various font-sized instances
+    public void changeFontSize(int diff) {
+        fontSizeDiff = diff;
+        Font font = getFont();
+        setFont(font.deriveFont(font.getSize2D() + diff));
     }
 
     public int getIconTextGap() {

@@ -41,42 +41,62 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.threads;
+package org.netbeans.lib.profiler.ui;
 
-import java.util.HashMap;
-import java.util.Map;
-import javax.swing.Icon;
-import org.netbeans.lib.profiler.results.threads.ThreadData;
-import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
+import java.text.Format;
+import java.text.MessageFormat;
+import java.text.NumberFormat;
+import java.util.ResourceBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class NameStateRenderer extends LabelRenderer {
+public final class Formatters {
     
-    public NameStateRenderer() {
-        setOpaque(true);
-        setMargin(3, 4, 3, 4);
-    }
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.Bundle"); // NOI18N
     
-    public void setValue(Object value, int row) {
-        ThreadData data = (ThreadData)value;
-        setText(data.getName());
-        setIcon(getIcon(data.getLastState()));
-    }
-    
-    private static final int THREAD_ICON_SIZE = 9;    
-    private static final Map<Byte, Icon> STATE_ICONS_CACHE = new HashMap();
-    private static Icon getIcon(byte state) {
-        Icon icon = STATE_ICONS_CACHE.get(state);
-        
-        if (icon == null) {
-            icon = new ThreadStateIcon(state, THREAD_ICON_SIZE, THREAD_ICON_SIZE);
-            STATE_ICONS_CACHE.put(state, icon);
+    private static NumberFormat NUMBER_FORMAT;
+    /**
+     * Returns Format instance for formatting numbers according to current Locale.
+     * 
+     * @return Format instance for formatting numbers according to current Locale
+     */
+    public static Format numberFormat() {
+        if (NUMBER_FORMAT == null) {
+            NUMBER_FORMAT = NumberFormat.getNumberInstance();
+            NUMBER_FORMAT.setGroupingUsed(true);
         }
-        
-        return icon;
+        return NUMBER_FORMAT;
+    }
+    
+    private static NumberFormat PERCENT_FORMAT;
+    /**
+     * Returns Format instance for formatting percents according to current Locale.
+     * 
+     * @return Format instance for formatting percents according to current Locale
+     */
+    public static Format percentFormat() {
+        if (PERCENT_FORMAT == null) {
+            PERCENT_FORMAT = NumberFormat.getPercentInstance();
+            PERCENT_FORMAT.setMaximumFractionDigits(1);
+            PERCENT_FORMAT.setMinimumFractionDigits(0);
+        }
+        return PERCENT_FORMAT;
+    }
+    
+    private static Format MILLISECONDS_FORMAT;
+    /**
+     * Returns Format instance to post-process a formatted milliseconds value.
+     * By default adds a " ms" suffix to a formatted long value.
+     * 
+     * @return Format instance to post-process a formatted milliseconds value
+     */
+    public static Format millisecondsFormat() {
+        if (MILLISECONDS_FORMAT == null) {
+            MILLISECONDS_FORMAT = new MessageFormat(BUNDLE.getString("Formatters.MillisecondsFormat")); // NOI18N
+        }
+        return MILLISECONDS_FORMAT;
     }
     
 }

@@ -317,6 +317,10 @@ public final class RunCalibrationAction extends AbstractAction {
         private static Date DATE;
         private static DateFormat FORMAT_TIME;
         private static DateFormat FORMAT_DATE;
+        
+        CalibrationDateCellRenderer() {
+            setHorizontalAlignment(TRAILING);
+        }
 
         protected void setValue(Object value) {
             if (value == null) {

@@ -41,42 +41,49 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.threads;
+package org.netbeans.lib.profiler.ui.swing.renderer;
 
-import java.util.HashMap;
-import java.util.Map;
-import javax.swing.Icon;
-import org.netbeans.lib.profiler.results.threads.ThreadData;
-import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
+import java.text.Format;
+import org.netbeans.lib.profiler.ui.Formatters;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class NameStateRenderer extends LabelRenderer {
+public class NumberPercentRenderer extends BaseDetailsRenderer {
     
-    public NameStateRenderer() {
-        setOpaque(true);
-        setMargin(3, 4, 3, 4);
+    private static final String NUL = Formatters.percentFormat().format(0);
+    private static final String NAN = NUL.replace("0", "-"); // NOI18N
+    
+    private long basis;
+    
+    public NumberPercentRenderer() {
+        this(null);
+    }
+    
+    public NumberPercentRenderer(Format customFormat) {
+        super(new NumberRenderer(customFormat), getPercentString(999.9f, 100), 0);
+    }
+    
+    public void setBasis(long basis) {
+        this.basis = basis;
     }
     
     public void setValue(Object value, int row) {
-        ThreadData data = (ThreadData)value;
-        setText(data.getName());
-        setIcon(getIcon(data.getLastState()));
+        setValues(value, getPercentString((Number)value, basis), row);
     }
     
-    private static final int THREAD_ICON_SIZE = 9;    
-    private static final Map<Byte, Icon> STATE_ICONS_CACHE = new HashMap();
-    private static Icon getIcon(byte state) {
-        Icon icon = STATE_ICONS_CACHE.get(state);
+    private static String getPercentString(Number value, long basis) {
+        String string = "("; // NOI18N
         
-        if (icon == null) {
-            icon = new ThreadStateIcon(state, THREAD_ICON_SIZE, THREAD_ICON_SIZE);
-            STATE_ICONS_CACHE.put(state, icon);
+        if (basis == 0) {
+            string += NAN;
+        } else {
+            string += value.longValue() == 0 ? NUL : Formatters.percentFormat().
+                                               format(value.doubleValue() / basis);
         }
         
-        return icon;
+        return string + ")"; // NOI18N
     }
     
 }
