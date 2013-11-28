@@ -125,14 +125,14 @@ public class TimelineHeaderRenderer extends BaseRenderer implements TableCellRen
         
         Dimension d = painter.getPreferredSize();
         painter.setSize(d);
-        painter.translate(x - d.width / 2, (h - d.height) / 2 + Y_LAF_OFFSET);
+        painter.move(x - d.width / 2, (h - d.height) / 2 + Y_LAF_OFFSET);
         painter.paint(g);
     }
     
     private static LabelRenderer painter;
     private static int Y_LAF_OFFSET;
     private static void initStaticUI(Component c, JTableHeader header) {
-        painter = new LabelRenderer();
+        painter = new LabelRenderer(true);
         
         Color color = c.getForeground();
         if (color == null) color = header.getForeground();
