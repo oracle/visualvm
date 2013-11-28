@@ -72,10 +72,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 
 /**
  *
@@ -115,21 +117,20 @@ class ProfilerTableHover {
         
         Painter p = new Painter(row, column);
         
+        int _column = table.convertColumnIndexToModel(column);
         Point l = table.getLocationOnScreen();
         Rectangle r = table.getCellRect(row, column, true);
         popupRect = new Rectangle(l.x + r.x, l.y + r.y, r.width, r.height);
         PopupFactory popupFactory = PopupFactory.getSharedInstance();
-        int o = table.getColumnOffset(table.convertColumnIndexToModel(column));
+        int o = table.getColumnOffset(_column);
         Component c = getRenderer(row, column);
         if (leadingAlign(c)) {
             popup = popupFactory.getPopup(table, p, popupRect.x - 1 - o, popupRect.y - 1);
         } else {
-            int w = c.getPreferredSize().width;
-            int _column = table.convertColumnIndexToModel(column);
-            int f = !table.isScrollableColumn(_column) ? w :
-                    table.getColumnPreferredWidth(_column);
-            int x = w + 2;
-            popup = popupFactory.getPopup(table, p, popupRect.x - 1 - o + f - x, popupRect.y - 1);
+            int w = p.getPreferredSize().width;
+            int f = !table.isScrollableColumn(_column) ? popupRect.width - w :
+                    table.getColumnPreferredWidth(_column) - w + 1;
+            popup = popupFactory.getPopup(table, p, popupRect.x + f - o, popupRect.y - 1);
         }
         popup.show();
         
@@ -342,6 +343,8 @@ class ProfilerTableHover {
         Painter(int row, int column) {
             super(null);
             
+            setBorder(BorderFactory.createLineBorder(table.getGridColor()));
+            
             this.row = row;
             this.column = column;
             
@@ -354,14 +357,14 @@ class ProfilerTableHover {
             
             setSize(size);
             setPreferredSize(size);
-            setBorder(BorderFactory.createLineBorder(table.getGridColor()));
         }
         
         protected void paintComponent(Graphics g) {
             Component x = table.getRenderer(renderer, row, column);
             Rectangle b = getBounds();
-            x.setBounds(b);
-            getPainter().paintComponent(g, x, null, 1, 0, b.width, b.height, false);
+            x.setSize(b.width, b.height);
+            x.move(b.x, b.y);
+            getPainter().paintComponent(g, x, null, 1, 1, b.width - 2, b.height - 2, false);
         }
         
         int getRow() {
@@ -411,7 +414,18 @@ class ProfilerTableHover {
     }
     
     private boolean leadingAlign(Component c) {
-        return c instanceof JLabel ? ((JLabel)c).getHorizontalAlignment() == JLabel.LEADING : true;
+        int alignment;
+        
+        if (c instanceof ProfilerRenderer) {
+            alignment = ((ProfilerRenderer)c).getHorizontalAlignment();
+        } else if (c instanceof JLabel) {
+            alignment = ((JLabel)c).getHorizontalAlignment();
+        } else {
+            alignment = SwingConstants.LEADING;
+        }
+        
+        return alignment == SwingConstants.LEADING ||
+               alignment == SwingConstants.LEFT;
     }
     
     private static CellRendererPane PAINTER;
