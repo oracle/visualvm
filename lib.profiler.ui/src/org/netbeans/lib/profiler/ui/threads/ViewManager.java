@@ -397,8 +397,11 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
         
         
         private void offsetChanged(int oldOffset, int newOffset) {
+            int maxIndex = getMaxIndex();
+            if (maxIndex == -1) return;
+            
             if (isTrackingEnd()) {
-                i = getMaxIndex();
+                i = maxIndex;
             } else {
                 if (newOffset > oldOffset) {
                     i = i == -1 ? findLastIndex() : findLastIndexRight();
@@ -408,9 +411,12 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
             }
         }
         
-        private void widthChanged(int oldWidth, int newWidth) {            
+        private void widthChanged(int oldWidth, int newWidth) {
+            int maxIndex = getMaxIndex();
+            if (maxIndex == -1) return;
+            
             if (isTrackingEnd() || isFit()) {
-                i = getMaxIndex();
+                i = maxIndex;
             } else {
                 if (newWidth > oldWidth) {
                     i = i == -1 ? findLastIndex() : findLastIndexRight();
@@ -421,17 +427,23 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
         }
         
         private void preferredWidthChanged(int oldWidth, int newWidth) {
+            int maxIndex = getMaxIndex();
+            if (maxIndex == -1) return;
+            
             int currPos = getMaxPosition() - offset;
             if (currPos >= 0 && currPos < width) { // TODO: verify
-                i = getMaxIndex();
+                i = maxIndex;
             } else {
                 // offsetChanged when tracking end or no change
             }
         }
         
         private void zoomChanged(double oldZoom, double newZoom) {
+            int maxIndex = getMaxIndex();
+            if (maxIndex == -1) return;
+            
             if (isTrackingEnd() || isFit()) {
-                i = getMaxIndex();
+                i = maxIndex;
             } else {
                 i = findLastIndex();
             }

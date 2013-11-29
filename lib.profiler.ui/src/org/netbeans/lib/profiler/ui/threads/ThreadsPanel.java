@@ -446,7 +446,7 @@ public class ThreadsPanel extends JPanel {
                 filter = new RowFilter() {
                     public boolean include(RowFilter.Entry entry) {
                         ThreadData data = (ThreadData)entry.getValue(0);
-                        return data.getLastState() != CommonConstants.THREAD_STATUS_ZOMBIE;
+                        return isAliveState(data.getLastState());
                     }
                 };
                 break;
@@ -454,7 +454,7 @@ public class ThreadsPanel extends JPanel {
                 filter = new RowFilter() {
                     public boolean include(RowFilter.Entry entry) {
                         ThreadData data = (ThreadData)entry.getValue(0);
-                        return data.getLastState() == CommonConstants.THREAD_STATUS_ZOMBIE;
+                        return !isAliveState(data.getLastState());
                     }
                 };
                 break;
@@ -463,6 +463,14 @@ public class ThreadsPanel extends JPanel {
         sorter.setRowFilter(filter);
     }
     
+    private boolean isAliveState(byte state) {
+        if (state == CommonConstants.THREAD_STATUS_RUNNING) return true;
+        if (state == CommonConstants.THREAD_STATUS_SLEEPING) return true;
+        if (state == CommonConstants.THREAD_STATUS_MONITOR) return true;
+        if (state == CommonConstants.THREAD_STATUS_WAIT) return true;
+        if (state == CommonConstants.THREAD_STATUS_PARK) return true;
+        return false;
+    }
     
     public Component getToolbar() {
         return threadsToolbar.getComponent();
