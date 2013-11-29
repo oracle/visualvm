@@ -67,6 +67,7 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
         return ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.threads.Bundle"); // NOI18N
     }
     
+    private static final int MIN_TIMEMARK_STEP = 120; // The minimal distance between two time marks
     public static final String PROP_NEW_OFFSET = "newOffset"; // NOI18N
     
     // Zoom value maximum
@@ -220,7 +221,7 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
     private long timeMarksStep;
     private String format;
     private void updateTimeMarks(boolean updateStep) {
-        if (updateStep) timeMarksStep = TimeAxisUtils.getTimeUnits(zoom, TimeLineUtils.MIN_TIMEMARK_STEP);
+        if (updateStep) timeMarksStep = TimeAxisUtils.getTimeUnits(zoom, MIN_TIMEMARK_STEP);
         
         long first = data.getStartTime();
         long _first = first + (long)(offset / zoom);
