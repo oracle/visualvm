@@ -116,7 +116,9 @@ public class ThreadsPanel extends JPanel {
     private JLabel enableThreadsMonitoringLabel1;
     private JLabel enableThreadsMonitoringLabel2;
     
-    private ThreadTimeRelRenderer timeRelRenderer; 
+    private ThreadTimeRelRenderer timeRelRenderer;
+    
+    private long lastTimestamp;
     
     
     public ThreadsPanel(ThreadsDataManager dataManager, Action saveView) {
@@ -188,17 +190,17 @@ public class ThreadsPanel extends JPanel {
                 } else if (columnIndex == 1) {
                     return viewManager.getRowView(rowIndex);
                 } else if (columnIndex == 2) {
-                    return getData(rowIndex).getRunningTime();
+                    return getData(rowIndex).getRunningTime(lastTimestamp);
                 } else if (columnIndex == 3) {
-                    return getData(rowIndex).getSleepingTime();
+                    return getData(rowIndex).getSleepingTime(lastTimestamp);
                 } else if (columnIndex == 4) {
-                    return getData(rowIndex).getWaitTime();
+                    return getData(rowIndex).getWaitTime(lastTimestamp);
                 } else if (columnIndex == 5) {
-                    return getData(rowIndex).getParkTime();
+                    return getData(rowIndex).getParkTime(lastTimestamp);
                 } else if (columnIndex == 6) {
-                    return getData(rowIndex).getMonitorTime();
+                    return getData(rowIndex).getMonitorTime(lastTimestamp);
                 } else if (columnIndex == 7) {
-                    return getData(rowIndex).getTotalTime();
+                    return getData(rowIndex).getTotalTime(lastTimestamp);
                 }
                 
                 return null;
@@ -404,7 +406,7 @@ public class ThreadsPanel extends JPanel {
             public void dataChanged() {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        timeRelRenderer.setBasis(dataManager.getEndTime() - dataManager.getStartTime());
+                        lastTimestamp = dataManager.getEndTime();
                         if (firstChange) {
                             firstChange = false;
                             repaintTimeline();
@@ -446,7 +448,7 @@ public class ThreadsPanel extends JPanel {
                 filter = new RowFilter() {
                     public boolean include(RowFilter.Entry entry) {
                         ThreadData data = (ThreadData)entry.getValue(0);
-                        return isAliveState(data.getLastState());
+                        return ThreadData.isAliveState(data.getLastState());
                     }
                 };
                 break;
@@ -454,22 +456,13 @@ public class ThreadsPanel extends JPanel {
                 filter = new RowFilter() {
                     public boolean include(RowFilter.Entry entry) {
                         ThreadData data = (ThreadData)entry.getValue(0);
-                        return !isAliveState(data.getLastState());
+                        return !ThreadData.isAliveState(data.getLastState());
                     }
                 };
                 break;
         }
         TableRowSorter sorter = (TableRowSorter)threadsTable.getRowSorter();
         sorter.setRowFilter(filter);
-    }
-    
-    private boolean isAliveState(byte state) {
-        if (state == CommonConstants.THREAD_STATUS_RUNNING) return true;
-        if (state == CommonConstants.THREAD_STATUS_SLEEPING) return true;
-        if (state == CommonConstants.THREAD_STATUS_MONITOR) return true;
-        if (state == CommonConstants.THREAD_STATUS_WAIT) return true;
-        if (state == CommonConstants.THREAD_STATUS_PARK) return true;
-        return false;
     }
     
     public Component getToolbar() {
