@@ -46,6 +46,7 @@ package org.netbeans.lib.profiler.ui.threads;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JToggleButton;
@@ -61,6 +62,9 @@ import org.netbeans.modules.profiler.api.icons.Icons;
  * @author Jiri Sedlacek
  */
 public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
+    
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(
+            "org.netbeans.lib.profiler.ui.threads.Bundle"); // NOI18N
     
     public static final String PROP_NEW_OFFSET = "newOffset"; // NOI18N
     
@@ -125,6 +129,9 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
     
     public Action zoomInAction() {
         if (zoomInAction == null) zoomInAction = new AbstractAction(null, Icons.getIcon(GeneralIcons.ZOOM_IN)) {
+            {
+                putValue(Action.SHORT_DESCRIPTION, BUNDLE.getString("ACT_ZoomIn")); // NOI18N
+            }
             public void actionPerformed(ActionEvent e) {
                 int newOffset = zoomIn();
                 Integer _newOffset = newOffset == offset ? null : newOffset;
@@ -136,6 +143,9 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
     
     public Action zoomOutAction() {
         if (zoomOutAction == null) zoomOutAction = new AbstractAction(null, Icons.getIcon(GeneralIcons.ZOOM_OUT)) {
+            {
+                putValue(Action.SHORT_DESCRIPTION, BUNDLE.getString("ACT_ZoomOut")); // NOI18N
+            }
             public void actionPerformed(ActionEvent e) {
                 int newOffset = zoomOut();
                 Integer _newOffset = newOffset == offset ? null : newOffset;
@@ -147,6 +157,9 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
     
     public Action fitAction() {
         if (fitAction == null) fitAction = new AbstractAction(null, Icons.getIcon(GeneralIcons.SCALE_TO_FIT)) {
+            {
+                putValue(Action.SHORT_DESCRIPTION, BUNDLE.getString("ACT_ScaleToFit")); // NOI18N
+            }
             public void actionPerformed(ActionEvent e) {
                 Object source = e.getSource();
                 if (source instanceof JToggleButton) {
@@ -427,7 +440,7 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
         }
         
         public String toString() {
-            return "Timeline";
+            return BUNDLE.getString("LBL_Timeline"); // NOI18N
         }
         
     }
