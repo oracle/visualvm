@@ -44,9 +44,12 @@
 package org.netbeans.lib.profiler.ui.threads;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -61,6 +64,8 @@ import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
@@ -71,16 +76,23 @@ import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.threads.ThreadData;
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import org.netbeans.lib.profiler.ui.Formatters;
+import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.components.FlatToolBar;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 public class ThreadsPanel2 extends JPanel {
+    
+    private static final String LAYOUT_ENABLED = "ENABLED"; // NOI18N
+    private static final String LAYOUT_DISABLED = "DISABLED"; // NOI18N
     
     private final ThreadsDataManager dataManager;
     private final ViewManager viewManager;
@@ -90,6 +102,14 @@ public class ThreadsPanel2 extends JPanel {
     private ProfilerTableContainer threadsTableContainer;
     private JComboBox threadStateFilter;
     private JPanel legendPanel;
+    
+    private Component fitAct;
+    
+    private JPanel contentPanel;
+    private JPanel notificationPanel;
+    private JButton enableThreadsMonitoringButton;
+    private JLabel enableThreadsMonitoringLabel1;
+    private JLabel enableThreadsMonitoringLabel2;
     
     private ThreadTimeRelRenderer timeRelRenderer; 
     
@@ -281,6 +301,9 @@ public class ThreadsPanel2 extends JPanel {
                 }
                 threadsTableModel.fireTableDataChanged();
             }
+            public boolean isEnabled() {
+                return threadsTable.isShowing() && super.isEnabled();
+            }
         });
         
         final Action zoomOutAction = viewManager.zoomOutAction();
@@ -294,19 +317,27 @@ public class ThreadsPanel2 extends JPanel {
                 }
                 threadsTableModel.fireTableDataChanged();
             }
+            public boolean isEnabled() {
+                return threadsTable.isShowing() && super.isEnabled();
+            }
         });
         
-        threadsToolbar.add(new JToggleButton(viewManager.fitAction()) {
+        fitAct = threadsToolbar.add(new JToggleButton(viewManager.fitAction()) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 threadsTableModel.fireTableDataChanged();
             }
         });
+        fitAct.setEnabled(false);
         
         threadsToolbar.addSeparator();
         
         threadsToolbar.addSpace(3);
-        threadsToolbar.add(new JLabel("View:"));
+        threadsToolbar.add(new JLabel("View:") {
+            public boolean isEnabled() {
+                return threadsTable.isShowing() && super.isEnabled();
+            }
+        });
         threadsToolbar.addSpace(5);
         
         threadStateFilter = new JComboBox(new String[] { "All threads", "Live threads", "Finished threads" }) {
@@ -317,12 +348,48 @@ public class ThreadsPanel2 extends JPanel {
                 super.fireActionEvent();
                 updateFilter();
             }
+            public boolean isEnabled() {
+                return threadsTable.isShowing() && super.isEnabled();
+            }
         };
         threadsToolbar.add(threadStateFilter);
         
-        setLayout(new BorderLayout());
-        add(threadsTableContainer, BorderLayout.CENTER);
-        add(legendPanel, BorderLayout.SOUTH);
+        contentPanel = new JPanel(new BorderLayout());
+        contentPanel.add(threadsTableContainer, BorderLayout.CENTER);
+        contentPanel.add(legendPanel, BorderLayout.SOUTH);
+        
+        Border myRolloverBorder = new CompoundBorder(new FlatToolBar.FlatRolloverButtonBorder(Color.GRAY, Color.LIGHT_GRAY),
+                                                     new FlatToolBar.FlatMarginBorder());
+
+        enableThreadsMonitoringLabel1 = new JLabel("Threads monitoring is currently disabled. Press the button to enable it\\:");
+        enableThreadsMonitoringLabel1.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 3));
+        enableThreadsMonitoringLabel1.setForeground(Color.DARK_GRAY);
+
+        enableThreadsMonitoringButton = new JButton(Icons.getIcon(ProfilerIcons.VIEW_THREADS_32));
+        enableThreadsMonitoringButton.setToolTipText("Press to enable threads monitoring for this profiling session.");
+        enableThreadsMonitoringButton.setContentAreaFilled(false);
+        enableThreadsMonitoringButton.setMargin(new Insets(3, 3, 3, 3));
+        enableThreadsMonitoringButton.setVerticalTextPosition(SwingConstants.BOTTOM);
+        enableThreadsMonitoringButton.setHorizontalTextPosition(SwingConstants.CENTER);
+        enableThreadsMonitoringButton.setRolloverEnabled(true);
+        enableThreadsMonitoringButton.setBorder(myRolloverBorder);
+        enableThreadsMonitoringButton.getAccessibleContext().setAccessibleName("Press to enable threads monitoring for this profiling session.");
+
+        enableThreadsMonitoringLabel2 = new JLabel("No profiling session currently in progress.");
+        enableThreadsMonitoringLabel2.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 0));
+        enableThreadsMonitoringLabel2.setForeground(Color.DARK_GRAY);
+        enableThreadsMonitoringLabel2.setVisible(false);
+
+        notificationPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 15));
+        notificationPanel.setBackground(threadsTable.getBackground());
+        UIUtils.decorateProfilerPanel(notificationPanel);
+        notificationPanel.add(enableThreadsMonitoringLabel1);
+        notificationPanel.add(enableThreadsMonitoringButton);
+        notificationPanel.add(enableThreadsMonitoringLabel2);
+        
+        setLayout(new CardLayout());
+        add(notificationPanel, LAYOUT_DISABLED);
+        add(contentPanel, LAYOUT_ENABLED);
         
         dataManager.addDataListener(new DataManagerListener() {
             private boolean firstChange = true;
@@ -406,35 +473,33 @@ public class ThreadsPanel2 extends JPanel {
     }
     
     public void threadsMonitoringDisabled() {
-//        threadsMonitoringEnabled = false;
-//        ((CardLayout) (contentPanel.getLayout())).show(contentPanel, ENABLE_THREADS_PROFILING);
-//        updateZoomButtonsEnabledState();
-//        threadsSelectionCombo.setEnabled(false);
+        ((CardLayout)getLayout()).show(this, LAYOUT_DISABLED);
+        fitAct.setEnabled(false);
+        threadsToolbar.getComponent().repaint();
     }
 
     public void threadsMonitoringEnabled() {
-//        threadsMonitoringEnabled = true;
-//        ((CardLayout) (contentPanel.getLayout())).show(contentPanel, THREADS_TABLE);
-//        updateZoomButtonsEnabledState();
-//        threadsSelectionCombo.setEnabled(true);
+        ((CardLayout)getLayout()).show(this, LAYOUT_ENABLED);
+        fitAct.setEnabled(true);
+        threadsToolbar.getComponent().repaint();
     }
     
     public void profilingSessionStarted() {
-//        enableThreadsMonitoringButton.setEnabled(true);
-//        enableThreadsMonitoringLabel1.setVisible(true);
-//        enableThreadsMonitoringButton.setVisible(true);
-//        enableThreadsMonitoringLabel3.setVisible(false);
+        enableThreadsMonitoringButton.setEnabled(true);
+        enableThreadsMonitoringButton.setVisible(true);
+        enableThreadsMonitoringLabel1.setVisible(true);
+        enableThreadsMonitoringLabel2.setVisible(false);
     }
     
     public void profilingSessionFinished() {
-//        enableThreadsMonitoringButton.setEnabled(false);
-//        enableThreadsMonitoringLabel1.setVisible(false);
-//        enableThreadsMonitoringButton.setVisible(false);
-//        enableThreadsMonitoringLabel3.setVisible(true);
+        enableThreadsMonitoringButton.setEnabled(false);
+        enableThreadsMonitoringButton.setVisible(false);
+        enableThreadsMonitoringLabel1.setVisible(false);
+        enableThreadsMonitoringLabel2.setVisible(true);
     }
     
     public void addThreadsMonitoringActionListener(ActionListener listener) {
-//        enableThreadsMonitoringButton.addActionListener(listener);
+        enableThreadsMonitoringButton.addActionListener(listener);
     }
     
 }
