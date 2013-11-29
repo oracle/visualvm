@@ -53,6 +53,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.util.ResourceBundle;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -90,6 +91,10 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  * @author Jiri Sedlacek
  */
 public class ThreadsPanel2 extends JPanel {
+    
+    private static ResourceBundle BUNDLE() {
+        return ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.threads.Bundle"); // NOI18N
+    }
     
     private static final String LAYOUT_ENABLED = "ENABLED"; // NOI18N
     private static final String LAYOUT_DISABLED = "DISABLED"; // NOI18N
@@ -140,21 +145,21 @@ public class ThreadsPanel2 extends JPanel {
         final AbstractTableModel threadsTableModel = new AbstractTableModel() {
             public String getColumnName(int columnIndex) {
                 if (columnIndex == 0) {
-                    return "Name";
+                    return BUNDLE().getString("COL_Name"); // NOI18N
                 } else if (columnIndex == 1) {
-                    return "Timeline";
+                    return BUNDLE().getString("COL_Timeline"); // NOI18N
                 } else if (columnIndex == 2) {
-                    return "Running";
+                    return CommonConstants.THREAD_STATUS_RUNNING_STRING;
                 } else if (columnIndex == 3) {
-                    return "Sleeping";
+                    return CommonConstants.THREAD_STATUS_SLEEPING_STRING;
                 } else if (columnIndex == 4) {
-                    return "Wait";
+                    return CommonConstants.THREAD_STATUS_WAIT_STRING;
                 } else if (columnIndex == 5) {
-                    return "Park";
+                    return CommonConstants.THREAD_STATUS_PARK_STRING;
                 } else if (columnIndex == 6) {
-                    return "Monitor";
+                    return CommonConstants.THREAD_STATUS_MONITOR_STRING;
                 } else if (columnIndex == 7) {
-                    return "Total";
+                    return BUNDLE().getString("COL_Total"); // NOI18N
                 }
                 return null;
             }
@@ -222,14 +227,14 @@ public class ThreadsPanel2 extends JPanel {
                 }
             }
         };
-        threadsTable.setColumnToolTips(new String[] { "Thread name",
-                                                      "Thread states timeline",
-                                                      "Time spent in Running state",
-                                                      "Time spent in Sleeping state",
-                                                      "Time spent in Wait state",
-                                                      "Time spent in Park state",
-                                                      "Time spent in Monitor state",
-                                                      "Total thread time" });
+        threadsTable.setColumnToolTips(new String[] { BUNDLE().getString("DESC_Name"), // NOI18N
+                                                      BUNDLE().getString("DESC_Timeline"), // NOI18N
+                                                      BUNDLE().getString("DESC_Running"), // NOI18N
+                                                      BUNDLE().getString("DESC_Sleeping"), // NOI18N
+                                                      BUNDLE().getString("DESC_Wait"), // NOI18N
+                                                      BUNDLE().getString("DESC_Park"), // NOI18N
+                                                      BUNDLE().getString("DESC_Monitor"), // NOI18N
+                                                      BUNDLE().getString("DESC_Total") }); // NOI18N
         threadsTable.setDefaultSortOrder(1, SortOrder.ASCENDING);
         threadsTable.setSortColumn(1);
         threadsTable.setFitWidthColumn(1);
@@ -333,14 +338,17 @@ public class ThreadsPanel2 extends JPanel {
         threadsToolbar.addSeparator();
         
         threadsToolbar.addSpace(3);
-        threadsToolbar.add(new JLabel("View:") {
+        threadsToolbar.add(new JLabel(BUNDLE().getString("LBL_View")) { // NOI18N
             public boolean isEnabled() {
                 return threadsTable.isShowing() && super.isEnabled();
             }
         });
         threadsToolbar.addSpace(5);
         
-        threadStateFilter = new JComboBox(new String[] { "All threads", "Live threads", "Finished threads" }) {
+        threadStateFilter = new JComboBox(new String[] { BUNDLE().getString("OPT_AllThreads"), // NOI18N
+                                                         BUNDLE().getString("OPT_LiveThreads"), // NOI18N
+                                                         BUNDLE().getString("OPT_FinishedThreads") // NOI18N
+                                                       }) {
             public Dimension getMaximumSize() {
                 return super.getPreferredSize();
             }
@@ -361,21 +369,21 @@ public class ThreadsPanel2 extends JPanel {
         Border myRolloverBorder = new CompoundBorder(new FlatToolBar.FlatRolloverButtonBorder(Color.GRAY, Color.LIGHT_GRAY),
                                                      new FlatToolBar.FlatMarginBorder());
 
-        enableThreadsMonitoringLabel1 = new JLabel("Threads monitoring is currently disabled. Press the button to enable it\\:");
+        enableThreadsMonitoringLabel1 = new JLabel(BUNDLE().getString("MSG_ThreadsDisabled")); // NOI18N
         enableThreadsMonitoringLabel1.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 3));
         enableThreadsMonitoringLabel1.setForeground(Color.DARK_GRAY);
 
         enableThreadsMonitoringButton = new JButton(Icons.getIcon(ProfilerIcons.VIEW_THREADS_32));
-        enableThreadsMonitoringButton.setToolTipText("Press to enable threads monitoring for this profiling session.");
+        enableThreadsMonitoringButton.setToolTipText(BUNDLE().getString("DESC_ThreadsDisabled")); // NOI18N
         enableThreadsMonitoringButton.setContentAreaFilled(false);
         enableThreadsMonitoringButton.setMargin(new Insets(3, 3, 3, 3));
         enableThreadsMonitoringButton.setVerticalTextPosition(SwingConstants.BOTTOM);
         enableThreadsMonitoringButton.setHorizontalTextPosition(SwingConstants.CENTER);
         enableThreadsMonitoringButton.setRolloverEnabled(true);
         enableThreadsMonitoringButton.setBorder(myRolloverBorder);
-        enableThreadsMonitoringButton.getAccessibleContext().setAccessibleName("Press to enable threads monitoring for this profiling session.");
+        enableThreadsMonitoringButton.getAccessibleContext().setAccessibleName(BUNDLE().getString("DESC_ThreadsDisabled")); // NOI18N
 
-        enableThreadsMonitoringLabel2 = new JLabel("No profiling session currently in progress.");
+        enableThreadsMonitoringLabel2 = new JLabel(BUNDLE().getString("MSG_NoProfiling")); // NOI18N
         enableThreadsMonitoringLabel2.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 0));
         enableThreadsMonitoringLabel2.setForeground(Color.DARK_GRAY);
         enableThreadsMonitoringLabel2.setVisible(false);
