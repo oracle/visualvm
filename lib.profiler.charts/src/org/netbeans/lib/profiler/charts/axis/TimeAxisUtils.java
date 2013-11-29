@@ -177,16 +177,18 @@ public class TimeAxisUtils {
                                          new Object[] { time, date});
     }
 
-    public static String formatTime(TimeMark mark) {
-        String formatString = mark.getFormat();
-
+    public static String formatTime(Long value, String formatString) {
         Format format = FORMATS.get(formatString);
         if (format == null) {
             format = new SimpleDateFormat(formatString);
             FORMATS.put(formatString, format);
         }
 
-        return format.format(mark.getValue());
+        return format.format(value);
+    }
+    
+    public static String formatTime(TimeMark mark) {
+        return formatTime(mark.getValue(), mark.getFormat());
     }
 
 

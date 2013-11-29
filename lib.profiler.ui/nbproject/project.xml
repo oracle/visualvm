@@ -55,7 +55,7 @@ made subject to such option by the copyright holder.
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.33</specification-version>
+                        <specification-version>1.50</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -64,7 +64,7 @@ made subject to such option by the copyright holder.
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.1</specification-version>
+                        <specification-version>1.22</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -131,6 +131,7 @@ made subject to such option by the copyright holder.
                 <package>org.netbeans.lib.profiler.ui.memory</package>
                 <package>org.netbeans.lib.profiler.ui.monitor</package>
                 <package>org.netbeans.lib.profiler.ui.swing</package>
+                <package>org.netbeans.lib.profiler.ui.swing.renderer</package>
                 <package>org.netbeans.lib.profiler.ui.threads</package>
             </friend-packages>
         </data>
