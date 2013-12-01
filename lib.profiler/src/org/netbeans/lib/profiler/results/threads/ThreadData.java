@@ -140,38 +140,54 @@ public class ThreadData {
         }
     }
     
-    public long getRunningTime() {
+    public long getRunningTime(long lastTimestamp) {
         synchronized (dataLock) {
-            return times[CommonConstants.THREAD_STATUS_RUNNING];
+            long time = times[CommonConstants.THREAD_STATUS_RUNNING];
+            if (getLastState() == CommonConstants.THREAD_STATUS_RUNNING)
+                time += (lastTimestamp - getLastTimeStamp());
+            return time;
         }
     }
     
-    public long getSleepingTime() {
+    public long getSleepingTime(long lastTimestamp) {
         synchronized (dataLock) {
-            return times[CommonConstants.THREAD_STATUS_SLEEPING];
+            long time = times[CommonConstants.THREAD_STATUS_SLEEPING];
+            if (getLastState() == CommonConstants.THREAD_STATUS_SLEEPING)
+                time += (lastTimestamp - getLastTimeStamp());
+            return time;
         }
     }
     
-    public long getWaitTime() {
+    public long getWaitTime(long lastTimestamp) {
         synchronized (dataLock) {
-            return times[CommonConstants.THREAD_STATUS_WAIT];
+            long time = times[CommonConstants.THREAD_STATUS_WAIT];
+            if (getLastState() == CommonConstants.THREAD_STATUS_WAIT)
+                time += (lastTimestamp - getLastTimeStamp());
+            return time;
         }
     }
     
-    public long getParkTime() {
+    public long getParkTime(long lastTimestamp) {
         synchronized (dataLock) {
-            return times[CommonConstants.THREAD_STATUS_PARK];
+            long time = times[CommonConstants.THREAD_STATUS_PARK];
+            if (getLastState() == CommonConstants.THREAD_STATUS_PARK)
+                time += (lastTimestamp - getLastTimeStamp());
+            return time;
         }
     }
     
-    public long getMonitorTime() {
+    public long getMonitorTime(long lastTimestamp) {
         synchronized (dataLock) {
-            return times[CommonConstants.THREAD_STATUS_MONITOR];
+            long time = times[CommonConstants.THREAD_STATUS_MONITOR];
+            if (getLastState() == CommonConstants.THREAD_STATUS_MONITOR)
+                time += (lastTimestamp - getLastTimeStamp());
+            return time;
         }
     }
     
-    public long getTotalTime() {
-        return getLastTimeStamp() - getFirstTimeStamp();
+    public long getTotalTime(long lastTimestamp) {
+        return isAliveState(getLastState()) ? lastTimestamp - getFirstTimeStamp() :
+                                              getLastTimeStamp() - getFirstTimeStamp();
     }
 
     public byte getStateAt(int idx) {
@@ -199,6 +215,15 @@ public class ThreadData {
             default:
                 return CommonConstants.THREAD_STATUS_UNKNOWN_COLOR;
         }
+    }
+    
+    public static boolean isAliveState(int threadState) {
+        if (threadState == CommonConstants.THREAD_STATUS_RUNNING) return true;
+        if (threadState == CommonConstants.THREAD_STATUS_SLEEPING) return true;
+        if (threadState == CommonConstants.THREAD_STATUS_MONITOR) return true;
+        if (threadState == CommonConstants.THREAD_STATUS_WAIT) return true;
+        if (threadState == CommonConstants.THREAD_STATUS_PARK) return true;
+        return false;
     }
 
     public Color getThreadStateColorAt(int idx) {
@@ -229,9 +254,9 @@ public class ThreadData {
             timeStamps[curSize] = timeStamp;
             threadStates[curSize] = threadState;
             
-            if (curSize > 0 && threadState > CommonConstants.THREAD_STATUS_ZOMBIE) {
+            if (curSize > 0) {
                 long duration = timeStamp - timeStamps[curSize - 1];
-                times[threadState] += duration;
+                times[threadStates[curSize - 1]] += duration;
                 times[0] += duration;
             }
             
