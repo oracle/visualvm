@@ -61,7 +61,7 @@ class NetworkOptionsModel {
     private static final RequestProcessor rp = new RequestProcessor(NetworkOptionsModel.class);
 
     private static Preferences getProxyPreferences() {
-        return NbPreferences.root().node("org/netbeans/core");  // NOI18N
+        return ProxySettings.getPreferences();
     }
 
     boolean getUsageStatistics() {

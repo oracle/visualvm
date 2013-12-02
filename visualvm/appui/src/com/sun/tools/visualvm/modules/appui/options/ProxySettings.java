@@ -89,8 +89,8 @@ public class ProxySettings {
     
     private static final Logger LOGGER = Logger.getLogger(ProxySettings.class.getName());
     
-    private static Preferences getPreferences() {
-        return NbPreferences.forModule (ProxySettings.class);
+    static Preferences getPreferences() {
+        return NbPreferences.root().node("org/netbeans/core");
     }
     
     
