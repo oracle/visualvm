@@ -91,6 +91,7 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                     long timeStamp0 = 0;
                     long timeStamp1 = 0;
                     int hash = -1;
+                    int ownerThreadId = -1;
                     
                     if ((eventType != CommonConstants.ADJUST_TIME // those events do not carry methodId
                         ) && (eventType != CommonConstants.METHOD_ENTRY_WAIT) 
@@ -123,6 +124,9 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                         }
                         if (hasMonitorInfo && (eventType == CommonConstants.METHOD_ENTRY_MONITOR || eventType == CommonConstants.METHOD_EXIT_MONITOR)) {
                             hash = buffer.getInt();
+                            if (eventType == CommonConstants.METHOD_ENTRY_MONITOR) {
+                                ownerThreadId = buffer.getInt();
+                            }
                         }
                     }
 
@@ -234,16 +238,16 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                         }
                         case CommonConstants.METHOD_ENTRY_MONITOR: {
                             if (LOGGER.isLoggable(Level.FINEST)) {
-                                LOGGER.log(Level.FINEST, "Monitor entry , tId={0} , monitorId={1}", new Object[]{currentThreadId,hash}); // NOI18N
+                                LOGGER.log(Level.FINEST, "Monitor entry , tId={0} , monitorId={1}, ownerId={2}", new Object[]{currentThreadId,Integer.toHexString(hash),ownerThreadId}); // NOI18N
                             }
 
-                            fireMonitorEntry(currentThreadId, timeStamp0, timeStamp1, hash);
+                            fireMonitorEntry(currentThreadId, timeStamp0, timeStamp1, hash, ownerThreadId);
 
                             break;
                         }
                         case CommonConstants.METHOD_EXIT_MONITOR: {
                             if (LOGGER.isLoggable(Level.FINEST)) {
-                                LOGGER.log(Level.FINEST, "Monitor exit , tId={0} , monitorId={1}", new Object[]{currentThreadId,hash}); // NOI18N
+                                LOGGER.log(Level.FINEST, "Monitor exit , tId={0} , monitorId={1}", new Object[]{currentThreadId,Integer.toHexString(hash)}); // NOI18N
                             }
 
                             fireMonitorExit(currentThreadId, timeStamp0, timeStamp1, hash);
@@ -369,7 +373,7 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                             String className = getString(buffer);
 
                             if (LOGGER.isLoggable(Level.FINEST)) {
-                                LOGGER.log(Level.FINEST, "Creating new monitor , mId={0} , className={1}", new Object[] {hash, className}); // NOI18N
+                                LOGGER.log(Level.FINEST, "Creating new monitor , monitorId={0} , className={1}", new Object[] {Integer.toHexString(hash), className}); // NOI18N
                             }
                             hasMonitorInfo = true;
                             fireNewMonitor(hash, className);
