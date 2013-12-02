@@ -98,6 +98,8 @@ class NetworkOptionsPanel extends JPanel {
         authenticationCheckBox.setSelected(model.useProxyAuthentication());
         usernameField.setText(model.getProxyAuthenticationUsername());
         passwordField.setText(new String(model.getProxyAuthenticationPassword()));
+        
+        updateManualSettings(); // #581
     }
 
     void applyChanges() {
