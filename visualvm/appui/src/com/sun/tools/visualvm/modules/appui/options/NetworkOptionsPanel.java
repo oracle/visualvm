@@ -120,7 +120,7 @@ class NetworkOptionsPanel extends JPanel {
         
         model.setUseProxyAllProtocols(sameSettingsCheckBox.isSelected());
 
-        model.setHttpProxyHost(httpsProxyField.getText().trim());
+        model.setHttpsProxyHost(httpsProxyField.getText().trim());
         model.setHttpsProxyPort(httpsProxySpinnerModel.getValue().toString());
         model.setSocksHost(socksProxyField.getText().trim());
         model.setSocksPort(socksProxySpinnerModel.getValue().toString());
