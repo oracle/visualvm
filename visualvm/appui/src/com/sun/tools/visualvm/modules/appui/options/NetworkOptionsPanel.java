@@ -154,7 +154,7 @@ class NetworkOptionsPanel extends JPanel {
         if (!httpProxyField.getText().equals(model.getHttpProxyHost())) return true;
         if (!httpProxySpinnerModel.getValue().toString().equals(model.getHttpProxyPort())) return true;
 
-        if (sameSettingsCheckBox.isSelected() && !model.useProxyAllProtocols()) return true;
+        if (sameSettingsCheckBox.isSelected() != model.useProxyAllProtocols()) return true;
 
         if (!httpsProxyField.getText().equals(model.getHttpsProxyHost())) return true;
         if (!httpsProxySpinnerModel.getValue().toString().equals(model.getHttpsProxyPort())) return true;
@@ -163,7 +163,7 @@ class NetworkOptionsPanel extends JPanel {
 
         if (!noProxyField.getText().equals(model.getNonProxyHosts())) return true;
 
-        if (authenticationCheckBox.isSelected() && !model.useProxyAuthentication()) return true;
+        if (authenticationCheckBox.isSelected() != model.useProxyAuthentication()) return true;
         if (!usernameField.getText().equals(model.getProxyAuthenticationUsername())) return true;
         if (passwordChanged) return true;
 
