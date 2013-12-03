@@ -55,6 +55,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -98,7 +99,7 @@ public class ProfilerTableContainer extends JPanel {
         
         final ProfilerColumnModel cModel = table._getColumnModel();
         
-        Set<Integer> scrollableColumns = table.getScrollableColumns();
+        final Set<Integer> scrollableColumns = table.getScrollableColumns();
         if (scrollableColumns != null && !scrollableColumns.isEmpty()) {
             scrollersPanel = new JPanel(null) {
                 public void doLayout() {
@@ -138,7 +139,7 @@ public class ProfilerTableContainer extends JPanel {
                         if (adjusting) return;
                         value = checkedValue(value);
                         setEnabled(extent < max);
-                        if (isTrackingEnd()) value = max - extent;
+                        if (trackEnd()) value = max - extent;
                         super.setValues(value, extent, min, max);
                         updateColumnOffset(value);
                     }
@@ -147,11 +148,26 @@ public class ProfilerTableContainer extends JPanel {
                         super.setValueIsAdjusting(b);
                         if (!adjusting) updateHorizontalScrollBars(table, column, false);
                     }
+                    public int getUnitIncrement() {
+                        return 20;
+                    }
+                    public int getUnitIncrement(int direction) {
+                        return getUnitIncrement();
+                    }
+                    public int getBlockIncrement() {
+                        return (int)(getVisibleAmount() * 0.9f);
+                    }
+                    public int getBlockIncrement(int direction) {
+                        return getBlockIncrement();
+                    }
                     private void updateColumnOffset(int value) {
                         table.setColumnOffset(column, value);
                     }
-                    private boolean isTrackingEnd() {
-                        return isEnabled() && getValue() + getVisibleAmount() >= getMaximum();
+                    private boolean trackEnd() {
+                        if (!isEnabled()) return false;
+                        int visible = getVisibleAmount();
+                        if (visible > 0) return getValue() + visible >= getMaximum();
+                        return !table.isLeadingAlign(column);
                     }
                     private int checkedValue(int value) {
                         value = Math.max(0, value);
@@ -172,16 +188,33 @@ public class ProfilerTableContainer extends JPanel {
                         updateHorizontalScrollBars(table, column, false);
                 }
             });
-
+            
             cModel.addColumnModelListener(new TableColumnModelListener() {
                 public void columnAdded(TableColumnModelEvent e) {}
                 public void columnRemoved(TableColumnModelEvent e) {}
-                public void columnMoved(TableColumnModelEvent e) { process(e); }
-                public void columnMarginChanged(ChangeEvent e) {}
+                public void columnMoved(TableColumnModelEvent e) { moved(e); }
+                public void columnMarginChanged(ChangeEvent e) { margin(e); }
                 public void columnSelectionChanged(ListSelectionEvent e) {}
-                private void process(TableColumnModelEvent e) {
+                private void moved(TableColumnModelEvent e) {
                     if (e.getFromIndex() != e.getToIndex())
                         updateHorizontalScrollBars(table, -1, true);
+                }
+                private void margin(ChangeEvent e) {
+                    // Invoke later to let the columnWidthChanged perform first
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            for (Integer column : scrollableColumns) {
+                            int _column = table.convertColumnIndexToView(column);
+                                Rectangle rect = table.getTableHeader().getHeaderRect(_column);
+                                Rectangle scroll = getScroller(column).getBounds();
+                                // Column position changed without changing size
+                                if (rect.x != scroll.x || rect.width != scroll.width) {
+                                    updateHorizontalScrollBars(table, -1, true);
+                                    break;
+                                }
+                            }
+                        }
+                    });
                 }
             });
 

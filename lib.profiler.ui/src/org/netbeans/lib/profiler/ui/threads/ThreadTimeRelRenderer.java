@@ -61,7 +61,7 @@ public class ThreadTimeRelRenderer extends NumberPercentRenderer {
     }
     
     public void setValue(Object value, int row) {
-        if (row > -1) setBasis(manager.getThreadData(row).getTotalTime());
+        if (row > -1) setBasis(manager.getThreadData(row).getTotalTime(manager.getEndTime()));
         super.setValue(value, row);
     }
     
