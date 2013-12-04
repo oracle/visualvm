@@ -52,10 +52,10 @@ public abstract class AbstractLockDataFrameProcessor extends AbstractDataFramePr
     
     protected volatile int currentThreadId = -1;
 
-    protected void fireMonitorEntry(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId) {
+    protected void fireMonitorEntry(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId, final int ownerThreadId) {
         foreachListener(new ListenerFunctor() {
             public void execute(ProfilingResultListener listener) {
-                ((LockProfilingResultListener) listener).monitorEntry(threadId, timeStamp0, timeStamp1, monitorId);
+                ((LockProfilingResultListener) listener).monitorEntry(threadId, timeStamp0, timeStamp1, monitorId, ownerThreadId);
             }
         });
     }
