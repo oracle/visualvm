@@ -31,12 +31,11 @@ import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -61,7 +60,6 @@ import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import org.openide.windows.WindowManager;
 
 /**
  *
@@ -115,6 +113,38 @@ class ExplorerComponent extends JPanel {
                 super.updateUI();
                 setCellRenderer(new ExplorerNodeRenderer());
             }
+            public void addNotify() {
+                if (UISupport.isAquaLookAndFeel()) setWindow();
+                super.addNotify();
+            }
+            public void removeNotify() {
+                if (UISupport.isAquaLookAndFeel()) resetWindow();
+                super.removeNotify();
+            }
+            private Window window;
+            private WindowFocusListener focusListener;
+            private void setWindow() {
+                window = SwingUtilities.getWindowAncestor(this);
+                if (window != null) {
+                    if (focusListener == null) focusListener = new WindowFocusListener() {
+                        public void windowGainedFocus(WindowEvent e) { repaint(); }
+                        public void windowLostFocus(WindowEvent e)   { repaint(); }
+                    };
+                    window.addWindowFocusListener(focusListener);
+                }
+            }
+            private void resetWindow() {
+                if (window != null && focusListener != null) {
+                    window.removeWindowFocusListener(focusListener);
+                    window = null;
+                }
+            }
+            public Color getBackground() {
+                if (!UISupport.isAquaLookAndFeel()) return super.getBackground();
+                return KeyboardFocusManager.getCurrentKeyboardFocusManager().
+                        getFocusedWindow() == window ? MAC_TREE_BG_FOCUSED :
+                                                       MAC_TREE_BG_NOTFOCUSED;
+            }
         };
         explorerTree.setRootVisible(false);
         explorerTree.setShowsRootHandles(true);
@@ -123,37 +153,6 @@ class ExplorerComponent extends JPanel {
         explorerTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         explorerTree.addKeyListener(new ExplorerTreeKeyAdapter());
         explorerTree.addMouseListener(new ExplorerTreeMouseAdapter());
-
-        // Aqua LaF customizations
-        if (UISupport.isAquaLookAndFeel()) {
-            final Window mainWindow = WindowManager.getDefault().getMainWindow();
-            final Window[] ownerWindow = new Window[1];
-            final WindowFocusListener focusListener = new WindowFocusListener() {
-                public void windowGainedFocus(WindowEvent e) { update(true, e); }
-                public void windowLostFocus(WindowEvent e)   { update(false, e); }
-                private void update(boolean hasFocus, WindowEvent e) {
-                    Window oppositeWindow = e.getOppositeWindow();
-                    boolean focus = hasFocus || oppositeWindow == mainWindow ||
-                                    oppositeWindow == ownerWindow[0];
-                    if (focus) explorerTree.setBackground(MAC_TREE_BG_FOCUSED);
-                    else explorerTree.setBackground(MAC_TREE_BG_NOTFOCUSED);
-                }
-            };
-            mainWindow.addWindowFocusListener(focusListener);
-            explorerTree.addHierarchyListener(new HierarchyListener() {
-                public void hierarchyChanged(HierarchyEvent e) {
-                    if ((e.getChangeFlags() & HierarchyEvent.PARENT_CHANGED) != 0) {
-                        Window newOwnerWindow = SwingUtilities.getWindowAncestor(explorerTree);
-                        if (ownerWindow[0] == newOwnerWindow) return;
-                        if (ownerWindow[0] != null && ownerWindow[0] != mainWindow)
-                            ownerWindow[0].removeWindowFocusListener(focusListener);
-                        ownerWindow[0] = newOwnerWindow;
-                        if (ownerWindow[0] != null && ownerWindow[0] != mainWindow)
-                            ownerWindow[0].addWindowFocusListener(focusListener);
-                    }
-                }
-            });
-        }
         
         // explorerTreeScrollPane
         JScrollPane explorerTreeScrollPane = new JScrollPane(explorerTree, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
