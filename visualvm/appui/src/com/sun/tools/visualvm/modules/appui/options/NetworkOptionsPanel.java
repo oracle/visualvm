@@ -74,6 +74,7 @@ class NetworkOptionsPanel extends JPanel {
                 noProxyRadio.setSelected(true);
                 break;
             case ProxySettings.AUTO_DETECT_PROXY:
+            case ProxySettings.AUTO_DETECT_PAC:
                 systemProxyRadio.setSelected(true);
                 break;
             case ProxySettings.MANUAL_SET_PROXY:
