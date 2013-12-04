@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.modules.appui;
 
 import org.openide.modules.ModuleInstall;
 import com.sun.tools.visualvm.modules.appui.proxysettings.ProxySettingsHack;
+import org.openide.util.NbPreferences;
 
 /**
  *
@@ -36,6 +37,10 @@ import com.sun.tools.visualvm.modules.appui.proxysettings.ProxySettingsHack;
 public class Install extends ModuleInstall {
 
     public void restored() {
+        // #582, do not make undocked TopComponents semi-transparent
+        NbPreferences.root().node("org/netbeans/core/windows"). // NOI18N
+                putBoolean("transparency.floating", false); // NOI18N
+        
         // Initialize opening warning dialog on Proxy Settings
         ProxySettingsHack.hackProxySettings();
     }
