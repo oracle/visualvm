@@ -41,42 +41,21 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.threads;
+package org.netbeans.lib.profiler.ui.swing.renderer;
 
-import java.util.HashMap;
-import java.util.Map;
-import javax.swing.Icon;
-import org.netbeans.lib.profiler.results.threads.ThreadData;
-import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
+import javax.swing.JComponent;
 
 /**
+ * Interface to be implemented by each custom renderer.
  *
  * @author Jiri Sedlacek
  */
-public class NameStateRenderer extends LabelRenderer {
+public interface ProfilerRenderer extends Movable {
     
-    public NameStateRenderer() {
-        setOpaque(true);
-        setMargin(3, 4, 3, 4);
-    }
+    public void setValue(Object value, int row);
     
-    public void setValue(Object value, int row) {
-        ThreadData data = (ThreadData)value;
-        setText(data.getName());
-        setIcon(getIcon(data.getLastState()));
-    }
+    public int getHorizontalAlignment();
     
-    private static final int THREAD_ICON_SIZE = 9;    
-    private static final Map<Byte, Icon> STATE_ICONS_CACHE = new HashMap();
-    private static Icon getIcon(byte state) {
-        Icon icon = STATE_ICONS_CACHE.get(state);
-        
-        if (icon == null) {
-            icon = new ThreadStateIcon(state, THREAD_ICON_SIZE, THREAD_ICON_SIZE);
-            STATE_ICONS_CACHE.put(state, icon);
-        }
-        
-        return icon;
-    }
+    public JComponent getComponent();
     
 }

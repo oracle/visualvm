@@ -41,14 +41,28 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.swing.renderer;
+package org.netbeans.lib.profiler.ui.threads;
+
+import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
+import org.netbeans.lib.profiler.ui.Formatters;
+import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public interface Translatable {
+public class ThreadTimeRelRenderer extends NumberPercentRenderer {
     
-    public void translate(int dx, int dy);
+    private final ThreadsDataManager manager;
+    
+    public ThreadTimeRelRenderer(ThreadsDataManager manager) {
+        super(Formatters.millisecondsFormat());
+        this.manager = manager;
+    }
+    
+    public void setValue(Object value, int row) {
+        if (row > -1) setBasis(manager.getThreadData(row).getTotalTime());
+        super.setValue(value, row);
+    }
     
 }

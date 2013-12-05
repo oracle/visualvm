@@ -45,6 +45,7 @@ package org.netbeans.lib.profiler.ui.swing.renderer;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -56,12 +57,30 @@ import javax.swing.JComponent;
  *
  * @author Jiri Sedlacek
  */
-public class BaseRenderer extends JComponent implements Translatable {
+public class BaseRenderer extends JComponent implements ProfilerRenderer {
     
     // --- Constructor ---------------------------------------------------------
     
     public BaseRenderer() {
         setOpaque(false);
+    }
+    
+    // --- Renderer ------------------------------------------------------------
+    
+    private int alignment;
+    
+    public void setValue(Object value, int row) {}
+    
+    public void setHorizontalAlignment(int alignment) {
+        this.alignment = alignment;
+    }
+    
+    public int getHorizontalAlignment() {
+        return alignment;
+    }
+    
+    public JComponent getComponent() {
+        return this;
     }
     
     // --- Tools ---------------------------------------------------------------
@@ -110,10 +129,7 @@ public class BaseRenderer extends JComponent implements Translatable {
     protected final Point location = new Point();
     protected final Dimension size = new Dimension();
     
-    protected int dx;
-    protected int dy;
-    
-    public void setLocation(int x, int y) {
+    public void move(int x, int y) {
         location.x = x;
         location.y = y;
     }
@@ -152,23 +168,11 @@ public class BaseRenderer extends JComponent implements Translatable {
     }
     
     public void reshape(int x, int y, int w, int h) {
-        location.x = x;
-        location.y = y;
+        // ignore x, y: used only for move(x, y)
+//        location.x = x;
+//        location.y = y;
         size.width = w;
         size.height = h;
-    }
-    
-    public void translate(int dx, int dy) {
-        this.dx = dx;
-        this.dy = dy;
-    }
-    
-    public int getDx() {
-        return dx;
-    }
-    
-    public int getDy() {
-        return dy;
     }
     
     // --- Margins / Borders ---------------------------------------------------
@@ -223,6 +227,13 @@ public class BaseRenderer extends JComponent implements Translatable {
     }
     
     // --- Painting / Layout ---------------------------------------------------
+    
+    public void paint(Graphics g) {
+        if (isOpaque()) {
+            g.setColor(background);
+            g.fillRect(location.x, location.y, size.width, size.height);
+        }
+    }
     
     public void validate() {}
 

@@ -41,42 +41,38 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.ui.threads;
+package org.netbeans.lib.profiler.ui.swing.renderer;
 
-import java.util.HashMap;
-import java.util.Map;
-import javax.swing.Icon;
-import org.netbeans.lib.profiler.results.threads.ThreadData;
-import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
+import java.text.Format;
+import javax.swing.SwingConstants;
+import org.netbeans.lib.profiler.ui.Formatters;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class NameStateRenderer extends LabelRenderer {
+public class NumberRenderer extends LabelRenderer {
     
-    public NameStateRenderer() {
-        setOpaque(true);
-        setMargin(3, 4, 3, 4);
+    private final Format customFormat;
+    
+    public NumberRenderer() {
+        this(null);
+    }
+    
+    public NumberRenderer(Format customFormat) {
+        this.customFormat = customFormat;
+        
+        setHorizontalAlignment(SwingConstants.TRAILING);
     }
     
     public void setValue(Object value, int row) {
-        ThreadData data = (ThreadData)value;
-        setText(data.getName());
-        setIcon(getIcon(data.getLastState()));
+        Number valueN = (Number)value;
+        super.setValue(getValueString(valueN.longValue(), customFormat), row);
     }
     
-    private static final int THREAD_ICON_SIZE = 9;    
-    private static final Map<Byte, Icon> STATE_ICONS_CACHE = new HashMap();
-    private static Icon getIcon(byte state) {
-        Icon icon = STATE_ICONS_CACHE.get(state);
-        
-        if (icon == null) {
-            icon = new ThreadStateIcon(state, THREAD_ICON_SIZE, THREAD_ICON_SIZE);
-            STATE_ICONS_CACHE.put(state, icon);
-        }
-        
-        return icon;
+    protected String getValueString(long value, Format format) {
+        String string = Formatters.numberFormat().format(value);
+        return format == null ? string : format.format(new Object[] { string });
     }
     
 }

@@ -65,7 +65,7 @@ public class JpsProxy {
  
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    /** Returns the array of records for all running VMs capable of dynaimic attach (JDK 1.6 and newer)*/
+    /** Returns the array of records for all running VMs capable of dynamic attach (JDK 1.6 and newer)*/
     public static RunningVM[] getRunningVMs() {
         String hostname = null;
         List vret = new ArrayList();

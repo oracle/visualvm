@@ -44,10 +44,7 @@
 package org.netbeans.lib.profiler.ui.threads;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics;
-import javax.swing.JTable;
-import javax.swing.table.TableCellRenderer;
 import org.netbeans.lib.profiler.results.threads.ThreadData;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.renderer.BaseRenderer;
@@ -56,7 +53,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.BaseRenderer;
  *
  * @author Jiri Sedlacek
  */
-public class TimelineRenderer extends BaseRenderer implements TableCellRenderer {
+public class TimelineRenderer extends BaseRenderer {
     
     private static final int BAR_MARGIN = 3;
     private static final int BAR_MARGIN_X2 = BAR_MARGIN * 2;
@@ -73,24 +70,15 @@ public class TimelineRenderer extends BaseRenderer implements TableCellRenderer 
         putClientProperty(ProfilerTable.PROP_NO_HOVER, this);
     }
     
-    public Component getTableCellRendererComponent(JTable table, Object value,
-                          boolean isSelected, boolean hasFocus, int row, int column) {
+    public void setValue(Object value, int row) {
         rowView = (ViewManager.RowView)value;
-        return this;
     }
     
     public void paint(Graphics g) {
+        super.paint(g);
+        
         int w = size.width;
         int h = size.height;
-        
-        g.setColor(getBackground());
-        g.fillRect(dx, dy, w, h);
-        
-        int i = rowView.getLastIndex();
-        if (i != -1) {
-            int xx = Math.min(rowView.getMaxPosition(), w);
-            while (i >= 0 && xx >= 0) xx = paintState(g, i--, dx, dy, xx, h);
-        }
         
         long time = view.getFirstTimeMark(false);
         long step = view.getTimeMarksStep();
@@ -100,22 +88,28 @@ public class TimelineRenderer extends BaseRenderer implements TableCellRenderer 
         int x = view.getTimePosition(time, false);
         int oldX = x;
         while (x < w) {
-            g.drawLine(x + dx, dy, x + dx, h - 1 + dy);
+            g.drawLine(x + location.x, location.y, x + location.x, h - 1 + location.y);
             time += step;
             x = view.getTimePosition(time, false);
             // Workaround to prevent endless loop until fixed
             if (x <= oldX) break;
             else oldX = x;
         }
+        
+        int i = rowView.getLastIndex();
+        if (i != -1) {
+            int xx = Math.min(rowView.getMaxPosition(), w);
+            while (i >= 0 && xx >= 0) xx = paintState(g, i--, xx, h);
+        }
     }
     
-    private int paintState(Graphics g, int i, int _x, int _y, int xx, int h) {
+    private int paintState(Graphics g, int i, int xx, int h) {
         int x = Math.max(0, rowView.getPosition(rowView.getTime(i)));
         
         Color c = ThreadData.getThreadStateColor(rowView.getState(i));
         if (c != null) {
             g.setColor(c);
-            g.fillRect(x + _x, BAR_MARGIN + _y, xx - x + 1, h - BAR_MARGIN_X2);
+            g.fillRect(x + location.x, BAR_MARGIN + location.y, xx - x + 1, h - BAR_MARGIN_X2);
         }
         
         return x - 1;
