@@ -68,6 +68,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -75,6 +76,7 @@ import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.RowSorterEvent;
@@ -439,6 +441,28 @@ public class ProfilerTable extends JTable {
                 }
             }); 
         }
+    }
+    
+    boolean isLeadingAlign(int column) {
+        if (getRowCount() == 0) return true;
+        int _column = convertColumnIndexToView(column);
+        TableCellRenderer r = getCellRenderer(0, _column);
+        return isLeadingAlign(getRenderer(r, 0, _column));
+    }
+    
+    static boolean isLeadingAlign(Component component) {
+        int alignment;
+        
+        if (component instanceof ProfilerRenderer) {
+            alignment = ((ProfilerRenderer)component).getHorizontalAlignment();
+        } else if (component instanceof JLabel) {
+            alignment = ((JLabel)component).getHorizontalAlignment();
+        } else {
+            alignment = SwingConstants.LEADING;
+        }
+        
+        return alignment == SwingConstants.LEADING ||
+               alignment == SwingConstants.LEFT;
     }
     
     
