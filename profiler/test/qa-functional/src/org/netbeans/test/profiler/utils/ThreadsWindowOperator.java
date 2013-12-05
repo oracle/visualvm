@@ -42,17 +42,14 @@
 
 package org.netbeans.test.profiler.utils;
 
-import java.awt.Container;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.table.TableModel;
 import org.netbeans.jellytools.MainWindowOperator;
 import org.netbeans.jellytools.TopComponentOperator;
-import org.netbeans.jemmy.ComponentChooser;
-import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.operators.ContainerOperator;
 import org.netbeans.jemmy.operators.JTableOperator;
-import org.netbeans.lib.profiler.ui.components.JExtendedTable;
-import org.netbeans.lib.profiler.ui.threads.ThreadsTablePanel;
+import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.netbeans.modules.profiler.ThreadsWindow;
 import org.openide.util.NbBundle;
 
@@ -109,8 +106,8 @@ public class ThreadsWindowOperator extends TopComponentOperator {
 	}
 
 	public String getThreads(){
-		JTableOperator jto = new JTableOperator(new ContainerOperator(getThreadsTablePanel()));
-		JExtendedTable jet = (JExtendedTable) jto.getSource();
+		JTableOperator jto = new JTableOperator(new ContainerOperator(getThreadsPanel()));
+		JTable jet = (JTable) jto.getSource();
 		TableModel jetm = jet.getModel();
 		int count = jetm.getRowCount();
 		String result = "There is "+count +" threads";
@@ -125,16 +122,13 @@ public class ThreadsWindowOperator extends TopComponentOperator {
 	 * Get the threads panel of the threads window.
 	 * @return
 	 */
-	protected ThreadsTablePanel getThreadsTablePanel(){
+	protected ThreadsPanel getThreadsPanel(){
 		System.out.println("getting thread table panel");
 		MainWindowOperator.getDefault().toFront();                
-		JTabbedPane jtp = (JTabbedPane) findSubComponent(
-				new ClassChooser("ResultsView$1"));
-		jtp.setSelectedIndex(1);
-		ThreadsTablePanel threadsTablePanel = (ThreadsTablePanel) findSubComponent(
-				new ClassChooser("ThreadsTablePanel"));
+		ThreadsPanel threadsTablePanel = (ThreadsPanel) findSubComponent(
+				new ClassChooser("ThreadsPanel"));
 		if(threadsTablePanel==null){
-			System.out.println("Warning: no ThreadsTablePanel found, test will probably crash");
+			System.out.println("Warning: no ThreadsPanel found, test will probably crash");
 		}
 		return threadsTablePanel;
 	}

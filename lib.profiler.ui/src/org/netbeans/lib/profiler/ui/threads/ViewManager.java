@@ -46,6 +46,7 @@ package org.netbeans.lib.profiler.ui.threads;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JToggleButton;
@@ -62,6 +63,11 @@ import org.netbeans.modules.profiler.api.icons.Icons;
  */
 public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
     
+    private static ResourceBundle BUNDLE() {
+        return ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.threads.Bundle"); // NOI18N
+    }
+    
+    private static final int MIN_TIMEMARK_STEP = 120; // The minimal distance between two time marks
     public static final String PROP_NEW_OFFSET = "newOffset"; // NOI18N
     
     // Zoom value maximum
@@ -125,6 +131,9 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
     
     public Action zoomInAction() {
         if (zoomInAction == null) zoomInAction = new AbstractAction(null, Icons.getIcon(GeneralIcons.ZOOM_IN)) {
+            {
+                putValue(Action.SHORT_DESCRIPTION, BUNDLE().getString("ACT_ZoomIn")); // NOI18N
+            }
             public void actionPerformed(ActionEvent e) {
                 int newOffset = zoomIn();
                 Integer _newOffset = newOffset == offset ? null : newOffset;
@@ -136,6 +145,9 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
     
     public Action zoomOutAction() {
         if (zoomOutAction == null) zoomOutAction = new AbstractAction(null, Icons.getIcon(GeneralIcons.ZOOM_OUT)) {
+            {
+                putValue(Action.SHORT_DESCRIPTION, BUNDLE().getString("ACT_ZoomOut")); // NOI18N
+            }
             public void actionPerformed(ActionEvent e) {
                 int newOffset = zoomOut();
                 Integer _newOffset = newOffset == offset ? null : newOffset;
@@ -147,6 +159,9 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
     
     public Action fitAction() {
         if (fitAction == null) fitAction = new AbstractAction(null, Icons.getIcon(GeneralIcons.SCALE_TO_FIT)) {
+            {
+                putValue(Action.SHORT_DESCRIPTION, BUNDLE().getString("ACT_ScaleToFit")); // NOI18N
+            }
             public void actionPerformed(ActionEvent e) {
                 Object source = e.getSource();
                 if (source instanceof JToggleButton) {
@@ -206,7 +221,7 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
     private long timeMarksStep;
     private String format;
     private void updateTimeMarks(boolean updateStep) {
-        if (updateStep) timeMarksStep = TimeAxisUtils.getTimeUnits(zoom, TimeLineUtils.MIN_TIMEMARK_STEP);
+        if (updateStep) timeMarksStep = TimeAxisUtils.getTimeUnits(zoom, MIN_TIMEMARK_STEP);
         
         long first = data.getStartTime();
         long _first = first + (long)(offset / zoom);
@@ -382,8 +397,11 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
         
         
         private void offsetChanged(int oldOffset, int newOffset) {
+            int maxIndex = getMaxIndex();
+            if (maxIndex == -1) return;
+            
             if (isTrackingEnd()) {
-                i = getMaxIndex();
+                i = maxIndex;
             } else {
                 if (newOffset > oldOffset) {
                     i = i == -1 ? findLastIndex() : findLastIndexRight();
@@ -393,9 +411,12 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
             }
         }
         
-        private void widthChanged(int oldWidth, int newWidth) {            
+        private void widthChanged(int oldWidth, int newWidth) {
+            int maxIndex = getMaxIndex();
+            if (maxIndex == -1) return;
+            
             if (isTrackingEnd() || isFit()) {
-                i = getMaxIndex();
+                i = maxIndex;
             } else {
                 if (newWidth > oldWidth) {
                     i = i == -1 ? findLastIndex() : findLastIndexRight();
@@ -406,17 +427,23 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
         }
         
         private void preferredWidthChanged(int oldWidth, int newWidth) {
+            int maxIndex = getMaxIndex();
+            if (maxIndex == -1) return;
+            
             int currPos = getMaxPosition() - offset;
             if (currPos >= 0 && currPos < width) { // TODO: verify
-                i = getMaxIndex();
+                i = maxIndex;
             } else {
                 // offsetChanged when tracking end or no change
             }
         }
         
         private void zoomChanged(double oldZoom, double newZoom) {
+            int maxIndex = getMaxIndex();
+            if (maxIndex == -1) return;
+            
             if (isTrackingEnd() || isFit()) {
-                i = getMaxIndex();
+                i = maxIndex;
             } else {
                 i = findLastIndex();
             }
@@ -427,7 +454,7 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
         }
         
         public String toString() {
-            return "Timeline";
+            return BUNDLE().getString("COL_Timeline"); // NOI18N
         }
         
     }
