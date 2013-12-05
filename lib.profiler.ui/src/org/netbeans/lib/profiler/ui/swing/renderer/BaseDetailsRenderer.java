@@ -49,6 +49,7 @@ import java.awt.Graphics;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
@@ -80,7 +81,7 @@ public class BaseDetailsRenderer extends BaseRenderer {
         detailsRenderer.setMargin(3, 0, 3, 3);
         
         detailsRenderer.changeFontSize(-1);
-        detailsRenderer.setForeground(Color.GRAY);
+        detailsRenderer.setForeground(UIUtils.getDisabledLineColor());
         detailsRenderer.setText(refDetailsString);
         detailsRendererWidth = detailsRenderer.getPreferredSize().width;
         
