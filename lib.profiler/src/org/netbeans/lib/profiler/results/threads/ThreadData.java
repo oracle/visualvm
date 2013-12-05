@@ -60,8 +60,9 @@ public class ThreadData {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private final Object dataLock = new Object();
-    private String className;
-    private String name;
+    private final String name;
+    private final String className;
+    private long[] times = new long[6];
     private byte[] threadStates; // Array of states corresponding to above timestamps
                                  // @GuardedBy dataLock
 
@@ -134,7 +135,59 @@ public class ThreadData {
     }
 
     public String getName() {
-        return name;
+        synchronized (dataLock) {
+            return name;
+        }
+    }
+    
+    public long getRunningTime(long lastTimestamp) {
+        synchronized (dataLock) {
+            long time = times[CommonConstants.THREAD_STATUS_RUNNING];
+            if (getLastState() == CommonConstants.THREAD_STATUS_RUNNING)
+                time += (lastTimestamp - getLastTimeStamp());
+            return time;
+        }
+    }
+    
+    public long getSleepingTime(long lastTimestamp) {
+        synchronized (dataLock) {
+            long time = times[CommonConstants.THREAD_STATUS_SLEEPING];
+            if (getLastState() == CommonConstants.THREAD_STATUS_SLEEPING)
+                time += (lastTimestamp - getLastTimeStamp());
+            return time;
+        }
+    }
+    
+    public long getWaitTime(long lastTimestamp) {
+        synchronized (dataLock) {
+            long time = times[CommonConstants.THREAD_STATUS_WAIT];
+            if (getLastState() == CommonConstants.THREAD_STATUS_WAIT)
+                time += (lastTimestamp - getLastTimeStamp());
+            return time;
+        }
+    }
+    
+    public long getParkTime(long lastTimestamp) {
+        synchronized (dataLock) {
+            long time = times[CommonConstants.THREAD_STATUS_PARK];
+            if (getLastState() == CommonConstants.THREAD_STATUS_PARK)
+                time += (lastTimestamp - getLastTimeStamp());
+            return time;
+        }
+    }
+    
+    public long getMonitorTime(long lastTimestamp) {
+        synchronized (dataLock) {
+            long time = times[CommonConstants.THREAD_STATUS_MONITOR];
+            if (getLastState() == CommonConstants.THREAD_STATUS_MONITOR)
+                time += (lastTimestamp - getLastTimeStamp());
+            return time;
+        }
+    }
+    
+    public long getTotalTime(long lastTimestamp) {
+        return isAliveState(getLastState()) ? lastTimestamp - getFirstTimeStamp() :
+                                              getLastTimeStamp() - getFirstTimeStamp();
     }
 
     public byte getStateAt(int idx) {
@@ -162,6 +215,15 @@ public class ThreadData {
             default:
                 return CommonConstants.THREAD_STATUS_UNKNOWN_COLOR;
         }
+    }
+    
+    public static boolean isAliveState(int threadState) {
+        if (threadState == CommonConstants.THREAD_STATUS_RUNNING) return true;
+        if (threadState == CommonConstants.THREAD_STATUS_SLEEPING) return true;
+        if (threadState == CommonConstants.THREAD_STATUS_MONITOR) return true;
+        if (threadState == CommonConstants.THREAD_STATUS_WAIT) return true;
+        if (threadState == CommonConstants.THREAD_STATUS_PARK) return true;
+        return false;
     }
 
     public Color getThreadStateColorAt(int idx) {
@@ -191,6 +253,13 @@ public class ThreadData {
 
             timeStamps[curSize] = timeStamp;
             threadStates[curSize] = threadState;
+            
+            if (curSize > 0) {
+                long duration = timeStamp - timeStamps[curSize - 1];
+                times[threadStates[curSize - 1]] += duration;
+                times[0] += duration;
+            }
+            
             curSize++;
         }
     }
@@ -201,6 +270,7 @@ public class ThreadData {
             timeStamps = new long[capacity];
             threadStates = new byte[capacity];
             curSize = 0;
+            times = new long[6];
         }
     }
 
@@ -208,5 +278,9 @@ public class ThreadData {
         synchronized (dataLock) {
             return curSize;
         }
+    }
+    
+    public String toString() {
+        return getName();
     }
 }

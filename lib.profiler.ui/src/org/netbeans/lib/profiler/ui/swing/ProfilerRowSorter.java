@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -71,8 +72,8 @@ class ProfilerRowSorter extends TableRowSorter {
     // --- Public API implementation -------------------------------------------
     
     public void setSortKeys(List newKeys) {
-        SortKey oldKey = getSortKey();
-        SortKey newKey = (SortKey)newKeys.get(0);
+        RowSorter.SortKey oldKey = getSortKey();
+        RowSorter.SortKey newKey = (RowSorter.SortKey)newKeys.get(0);
         
         if (oldKey == null || oldKey.getColumn() != newKey.getColumn()) {
             // Use defined initial SortOrder for a newly sorted column
@@ -87,25 +88,25 @@ class ProfilerRowSorter extends TableRowSorter {
     }
     
     void setSortColumn(int column, SortOrder order) {
-        setSortKey(new SortKey(column, order));
+        setSortKey(new RowSorter.SortKey(column, order));
     }
     
-    void setSortKey(SortKey key) {
+    void setSortKey(RowSorter.SortKey key) {
         super.setSortKeys(Arrays.asList(key));
     }
     
     int getSortColumn() {
-        SortKey key = getSortKey();
+        RowSorter.SortKey key = getSortKey();
         return key == null ? -1 : key.getColumn();
     }
     
     SortOrder getSortOrder() {
-        SortKey key = getSortKey();
+        RowSorter.SortKey key = getSortKey();
         return key == null ? SortOrder.UNSORTED : key.getSortOrder();
     }
     
-    SortKey getSortKey() {
-        List<? extends SortKey> keys = getSortKeys();
+    RowSorter.SortKey getSortKey() {
+        List<? extends RowSorter.SortKey> keys = getSortKeys();
         return keys.isEmpty() ? null : keys.get(0);
     }
     
@@ -148,7 +149,7 @@ class ProfilerRowSorter extends TableRowSorter {
     }
     
     void saveToStorage(Properties properties, ProfilerTable table) {
-        SortKey key = getSortKey();
+        RowSorter.SortKey key = getSortKey();
         if (key == null) {
             properties.remove(SORT_COLUMN_KEY);
             properties.remove(SORT_ORDER_KEY);

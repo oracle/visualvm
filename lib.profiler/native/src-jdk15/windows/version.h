@@ -42,11 +42,11 @@
 
 #define COMPANY "Oracle Corporation"
 #define COMPONENT "NetBeans Profiler"
-#define VER "7.0.0.0"
-#define FVER 7,0,0,0
-#define BUILD_ID "22102010"
+#define VER "8.0.0.0"
+#define FVER 8,0,0,0
+#define BUILD_ID "22102013"
 #define INTERNAL_NAME "profilerinterface"
-#define COPYRIGHT "\xA9 2007, 2010 Oracle and/or its affiliates. All rights reserved."
+#define COPYRIGHT "\xA9 2007, 2013, Oracle and/or its affiliates. All rights reserved."
 #define FNAME "profilerinterface.dll"
-#define NAME "NetBeans Profiler 7.0"
+#define NAME "NetBeans Profiler 8.0"
 
