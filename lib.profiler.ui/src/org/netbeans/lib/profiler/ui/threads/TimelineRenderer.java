@@ -55,6 +55,8 @@ import org.netbeans.lib.profiler.ui.swing.renderer.BaseRenderer;
  */
 public class TimelineRenderer extends BaseRenderer {
     
+    private static final Color TICK_COLOR = new Color(200, 200, 200);
+    
     private static final int BAR_MARGIN = 3;
     private static final int BAR_MARGIN_X2 = BAR_MARGIN * 2;
     
@@ -83,7 +85,7 @@ public class TimelineRenderer extends BaseRenderer {
         long time = view.getFirstTimeMark(false);
         long step = view.getTimeMarksStep();
         
-        g.setColor(TimeLineUtils.TICK_TIMELINE_COLOR);
+        g.setColor(TICK_COLOR);
         
         int x = view.getTimePosition(time, false);
         int oldX = x;
