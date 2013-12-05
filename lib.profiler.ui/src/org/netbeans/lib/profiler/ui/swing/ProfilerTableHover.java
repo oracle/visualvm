@@ -124,7 +124,7 @@ class ProfilerTableHover {
         PopupFactory popupFactory = PopupFactory.getSharedInstance();
         int o = table.getColumnOffset(_column);
         Component c = getRenderer(row, column);
-        if (leadingAlign(c)) {
+        if (ProfilerTable.isLeadingAlign(c)) {
             popup = popupFactory.getPopup(table, p, popupRect.x - 1 - o, popupRect.y - 1);
         } else {
             int w = p.getPreferredSize().width;
@@ -396,7 +396,7 @@ class ProfilerTableHover {
         int offset = table.getColumnOffset(table.convertColumnIndexToModel(column));
         
         // might also check height
-        if (leadingAlign(component)) {
+        if (ProfilerTable.isLeadingAlign(component)) {
             return offset > 0 || size.width > rect.width;
         } else {
             if (size.width > rect.width) return true;
@@ -411,21 +411,6 @@ class ProfilerTableHover {
     private Component getRenderer(int row, int column) {
         TableCellRenderer renderer = table.getCellRenderer(row, column);
         return table.getRenderer(renderer, row, column);
-    }
-    
-    private boolean leadingAlign(Component c) {
-        int alignment;
-        
-        if (c instanceof ProfilerRenderer) {
-            alignment = ((ProfilerRenderer)c).getHorizontalAlignment();
-        } else if (c instanceof JLabel) {
-            alignment = ((JLabel)c).getHorizontalAlignment();
-        } else {
-            alignment = SwingConstants.LEADING;
-        }
-        
-        return alignment == SwingConstants.LEADING ||
-               alignment == SwingConstants.LEFT;
     }
     
     private static CellRendererPane PAINTER;
