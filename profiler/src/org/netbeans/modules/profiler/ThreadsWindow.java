@@ -48,7 +48,6 @@ import java.awt.Component;
 import java.awt.Image;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
-import org.netbeans.lib.profiler.global.Platform;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
@@ -58,7 +57,7 @@ import java.awt.image.BufferedImage;
 import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.common.event.ProfilingStateAdapter;
 import org.netbeans.lib.profiler.ui.ResultsView;
-import org.netbeans.lib.profiler.ui.threads.ThreadsPanel2;
+import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
@@ -91,13 +90,8 @@ public final class ThreadsWindow extends ProfilerTopComponent implements ActionL
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-//    private final JPanel threadsTimelinePanelContainer;
     private final ResultsView threadsView;
-    private final ThreadsPanel2 threadsPanel;
-//    private final ThreadsPanel threadsPanel;
-//    private final ThreadsTablePanel threadsTablePanel;
-//    private JPanel threadsDetailsPanelContainer;
-//    private ThreadsDetailsPanel threadsDetailsPanel;
+    private final ThreadsPanel threadsPanel;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -110,60 +104,11 @@ public final class ThreadsWindow extends ProfilerTopComponent implements ActionL
         threadsView = new ResultsView();
         add(threadsView, BorderLayout.CENTER);
 
-//        final boolean tvmSupportsSleepingState = Platform.
-//                supportsThreadSleepingStateMonitoring(Profiler.getDefault().
-//                getTargetAppRunner().getProfilerEngineSettings().getTargetJDKVersionString()); // TODO [project] - this is wrong - the JVM can change and the supportSleeping state as well
-
-        threadsPanel = new ThreadsPanel2(Profiler.getDefault().getThreadsManager(), new SaveViewAction(this));
-        
-//        threadsPanel = new ThreadsPanel(Profiler.getDefault().getThreadsManager(),
-//                                        new ThreadsPanel.ThreadsDetailsCallback() {
-//                /**
-//                 * Displays a panel with details about specified threads
-//                 * @param indexes array of int indexes for threads to display
-//                 */
-//                public void showDetails(final int[] indexes) {
-//                    threadsDetailsPanel.showDetails(indexes);
-//                    threadsView.selectView(threadsDetailsPanelContainer);
-//                }
-//            }, tvmSupportsSleepingState); // TODO [project] - this is wrong - the JVM can change and the supportSleeping state as well
-        
-//        threadsTimelinePanelContainer = new JPanel() {
-//                public void requestFocus() {
-//                    threadsPanel.requestFocus();
-//                }
-//            };
-//        threadsTimelinePanelContainer.setLayout(new BorderLayout());
-//        threadsTimelinePanelContainer.add(threadsPanel, BorderLayout.CENTER);
-
+        threadsPanel = new ThreadsPanel(Profiler.getDefault().getThreadsManager(), new SaveViewAction(this));
         threadsPanel.addThreadsMonitoringActionListener(this);
-//        threadsPanel.addSaveViewAction(new SaveViewAction(this));
-        
-//        threadsTablePanel = new ThreadsTablePanel(Profiler.getDefault().getThreadsManager(),
-//                new ThreadsTablePanel.ThreadsDetailsCallback() {
-//                public void showDetails(final int[] indexes) {
-//                    threadsDetailsPanel.showDetails(indexes);
-//                    threadsView.selectView(threadsDetailsPanelContainer);
-//                }
-//            }, tvmSupportsSleepingState);
-//        threadsTablePanel.addSaveViewAction(new SaveViewAction(this));
-//
-//        threadsDetailsPanel = new ThreadsDetailsPanel(Profiler.getDefault().getThreadsManager(), tvmSupportsSleepingState);
-//        threadsDetailsPanelContainer = new JPanel() {
-//                public void requestFocus() {
-//                    threadsDetailsPanel.requestFocus();
-//                }
-//            };
-//        threadsDetailsPanelContainer.setLayout(new BorderLayout());
-//        threadsDetailsPanelContainer.add(threadsDetailsPanel, BorderLayout.CENTER);
-//        threadsDetailsPanel.addSaveViewAction(new SaveViewAction(this));
 
         threadsView.addView(Bundle.ThreadsWindow_ThreadsTimelineTabName(), null,
                 Bundle.ThreadsWindow_ThreadsTimelineTabDescr(), threadsPanel, threadsPanel.getToolbar());
-//        threadsView.addView(Bundle.ThreadsWindow_ThreadsTableTabName(), null,
-//                Bundle.ThreadsWindow_ThreadsTableTabDescr(), threadsTablePanel, threadsTablePanel.getToolbar());
-//        threadsView.addView(Bundle.ThreadsWindow_ThreadsDetailsTabName(), null,
-//                Bundle.ThreadsWindow_ThreadsDetailsTabDescr(), threadsDetailsPanelContainer, threadsDetailsPanel.getToolbar());
 
         profilingStateChanged(Profiler.getDefault().getProfilingState());
         updateThreadsView();
@@ -171,7 +116,6 @@ public final class ThreadsWindow extends ProfilerTopComponent implements ActionL
         setFocusable(true);
         setRequestFocusEnabled(true);
 
-//        threadsView.addChangeListener(this);
         Profiler.getDefault().addProfilingStateListener(new ProfilingStateAdapter(){
             @Override
             public void profilingStateChanged(final ProfilingStateEvent e) {
@@ -241,32 +185,15 @@ public final class ThreadsWindow extends ProfilerTopComponent implements ActionL
     }
     
     public void showThreads() {
-//        threadsView.selectView(threadsTimelinePanelContainer);
         open();
         requestActive();
     }
 
-//    public void stateChanged(ChangeEvent e) {
-//        SwingUtilities.invokeLater(new Runnable() { // must be invoked lazily to override default focus of first component
-//                public void run() {
-//                    Component selectedView = threadsView.getSelectedView();
-//                    if (selectedView != null) {
-//                        selectedView.requestFocus(); // move focus to results table when tab is switched
-//                    }
-//                }
-//            });
-//    }
-
     private void updateThreadsView() {
         if (Profiler.getDefault().getThreadsMonitoringEnabled()) {
             threadsPanel.threadsMonitoringEnabled();
-//            threadsView.setViewEnabled(threadsTablePanel, true);
-//            threadsView.setViewEnabled(threadsDetailsPanelContainer, true);
         } else {
             threadsPanel.threadsMonitoringDisabled();
-//            threadsView.selectView(threadsTimelinePanelContainer);
-//            threadsView.setViewEnabled(threadsTablePanel, false);
-//            threadsView.setViewEnabled(threadsDetailsPanelContainer, false);
         }
     }
 
