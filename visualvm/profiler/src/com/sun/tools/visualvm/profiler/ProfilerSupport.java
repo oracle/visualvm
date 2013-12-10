@@ -36,25 +36,15 @@ import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.host.Host;
-import com.sun.tools.visualvm.modules.startup.dialogs.StartupDialog;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.SessionSettings;
-import org.netbeans.lib.profiler.global.CalibrationDataFileIO;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerControlPanel2;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
@@ -69,7 +59,7 @@ import org.openide.util.RequestProcessor;
  */
 public final class ProfilerSupport {
     
-    private static final Logger LOGGER = Logger.getLogger(ProfilerSupport.class.getName());
+//    private static final Logger LOGGER = Logger.getLogger(ProfilerSupport.class.getName());
     
     private static final boolean FORCE_PROFILING_SUPPORTED =
             Boolean.getBoolean("com.sun.tools.visualvm.profiler.SupportAllVMs");   // NOI18N
@@ -89,7 +79,7 @@ public final class ProfilerSupport {
     private boolean isInitialized;
     
     private Application profiledApplication;
-    private ApplicationProfilerViewProvider profilerViewProvider;
+    private final ApplicationProfilerViewProvider profilerViewProvider;
 
 
     public static synchronized ProfilerSupport getInstance() {
@@ -163,7 +153,7 @@ public final class ProfilerSupport {
         return new String[][] { names, codes, { current } };
     }
     
-    private static String getJavaName(String code) {
+    static String getJavaName(String code) {
         if (Platform.JDK_15_STRING.equals(code))
             return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 5); // NOI18N
         if (Platform.JDK_16_STRING.equals(code))
@@ -175,7 +165,7 @@ public final class ProfilerSupport {
         throw new IllegalArgumentException("Unknown java code " + code); // NOI18N
     }
     
-    private static String getArchName(int arch) {
+    static String getArchName(int arch) {
         if (32 == arch) return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_arch_name", 32); // NOI18N
         if (64 == arch) return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_arch_name", 64); // NOI18N
         throw new IllegalArgumentException("Unsupported architecture " + arch); // NOI18N
@@ -202,7 +192,7 @@ public final class ProfilerSupport {
                                       final MemorySettingsSupport memorySettings,
                                       final boolean isCPUProfiling) {
         
-        if (!checkCalibration(java, architecture)) return;
+        if (!CalibrationSupport.checkCalibration(java, architecture, null, null)) return;
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -268,22 +258,6 @@ public final class ProfilerSupport {
         if ("NO_OPTION".equals(dnsa)) ProfilerIDESettings.getInstance().setDoNotShowAgain(dnsaKey, null); // NOI18N        }
     }
     
-    // TODO: use also for CPU/Memory Profiler, initial calibration on startup should be removed
-    private static boolean checkCalibration(String java, int architecture) {
-        ProfilingSessionStatus status = NetBeansProfiler.getDefaultNB().
-                getTargetAppRunner().getProfilingSessionStatus();
-        status.targetJDKVersionString = java;
-        int result = CalibrationDataFileIO.readSavedCalibrationData(status);
-        if (result == 0) return true;
-        
-        File javaBinary = JavaPlatformSelector.selectJavaBinary(
-                    getJavaName(java), getArchName(architecture), java, Integer.toString(architecture));
-        if (javaBinary == null) return false;
-        if (!checkCalibration(javaBinary.getAbsolutePath(), java, architecture, null, null, false)) return false;
-        
-        return checkCalibration(java, architecture);
-    }
-    
     private static ProfilingSettings createProfilingSettings(CPUSettingsSupport cpuSettings,
             MemorySettingsSupport memorySettings, boolean isCPUProfiling) {
         
@@ -295,7 +269,7 @@ public final class ProfilerSupport {
         ss.setJavaVersionString(java);
         ss.setSystemArchitecture(architecture);
         ss.setPortNo(port);
-        ss.setJavaExecutable(getCurrentJDKExecutable()); // Workaround for calibration check, not used for profiling
+        ss.setJavaExecutable(JavaInfo.getCurrentJDKExecutable()); // Workaround for calibration check, not used for profiling
         return ss;
     }
     
@@ -452,114 +426,12 @@ public final class ProfilerSupport {
     }
     
     
-    // TODO: move to JVM?
-    private static String getCurrentJDKExecutable() {
-        return getJDKExecutable(System.getProperty("java.home")); // NOI18N
-    }
-    
-    private static String getJDKExecutable(String jdkHome) {
-        if (jdkHome == null || jdkHome.trim().length() == 0) return null;
-        String jreSuffix = File.separator + "jre"; // NOI18N
-        if (jdkHome.endsWith(jreSuffix)) jdkHome = jdkHome.substring(0, jdkHome.length() - jreSuffix.length());
-        String jdkExe = jdkHome + File.separator + "bin" + File.separator + "java" + (Platform.isWindows() ? ".exe" : ""); // NOI18N
-        return jdkExe;
-    }
-    
-    private static boolean checkCurrentJDKCalibration() {
-        return checkCalibration(getCurrentJDKExecutable(), Platform.getJDKVersionString(),
-                Platform.getSystemArchitecture(), null, null, true);
-    }
-    
-    static boolean checkJDKCalibration(Application application, Runnable preCalibrator, Runnable postCalibrator) {
-        Jvm jvm = JvmFactory.getJVMFor(application);
-        Properties properties = jvm.getSystemProperties();
-        if (properties == null) return false;
-        
-        return checkCalibration(getJDKExecutable(properties.getProperty("java.home")), // NOI18N
-                Platform.getJDKVersionString(properties.getProperty("java.version")), // NOI18N
-                Platform.getSystemArchitecture(), preCalibrator, postCalibrator, true);
-    }
-
-    private static boolean checkCalibration(String jvmExecutable, String jdkString, int architecture,
-                                     Runnable preCalibrator, Runnable postCalibrator, boolean dialog) {
-        if (jvmExecutable == null) return false;
-        
-        // Get ProfilerEngineSettings instance
-        TargetAppRunner runner = NetBeansProfiler.getDefaultNB().getTargetAppRunner();
-        if (runner == null) return false;
-        ProfilerEngineSettings pes = runner.getProfilerEngineSettings();
-
-        // Save current state
-        int savedPort = pes.getPortNo();
-        InstrumentationFilter savedInstrFilter = pes.getInstrumentationFilter();
-        String savedJVMExeFile = pes.getTargetJVMExeFile();
-        String savedJDKVersionString = pes.getTargetJDKVersionString();
-        int savedArch = pes.getSystemArchitecture();
-        String savedCP = pes.getMainClassPath();
-
-        boolean result = true;
-
-        // Setup ProfilerEngineSettings
-        pes.setTargetJVMExeFile(jvmExecutable);
-        pes.setTargetJDKVersionString(jdkString);
-        pes.setSystemArchitecture(architecture);
-        pes.setPortNo(ProfilerIDESettings.getInstance().getCalibrationPortNo());
-        pes.setInstrumentationFilter(new InstrumentationFilter());
-        pes.setMainClassPath(""); // NOI18N
-
-        // Perform calibration if necessary
-        if (!NetBeansProfiler.getDefaultNB().getTargetAppRunner().readSavedCalibrationData()) {
-            if (preCalibrator != null) preCalibrator.run();
-            result = calibrateJVM(dialog);
-            if (postCalibrator != null) postCalibrator.run();
-        }
-
-        // Restore original ProfilerEngineSettings
-        pes.setPortNo(savedPort);
-        pes.setInstrumentationFilter(savedInstrFilter);
-        pes.setTargetJDKVersionString(savedJDKVersionString);
-        pes.setSystemArchitecture(savedArch);
-        pes.setTargetJVMExeFile(savedJVMExeFile);
-        pes.setMainClassPath(savedCP);
-
-        return result;
-    }
-
-    private static boolean calibrateJVM(boolean dialog) {
-        // TODO: this should be performed after all modules are loaded & initialized to not bias the calibration!!!
-        
-        // Display blocking notification
-        if (dialog) {
-            JDialog d = StartupDialog.create(NbBundle.getMessage(ProfilerSupport.class, "CAPTION_Calibration"), // NOI18N
-                                             NbBundle.getMessage(ProfilerSupport.class, "MSG_Calibration"), // NOI18N
-                                             JOptionPane.INFORMATION_MESSAGE);
-            d.setVisible(true);
-        }
-
-        // Perform calibration
-        boolean result = false;
-        try {
-            result = NetBeansProfiler.getDefaultNB().runConfiguredCalibration();
-        } catch (Exception e) {
-            LOGGER.log(Level.FINE, "Failed to calibrate profiler", e); // NOI18N
-        }
-
-        return result;
-    }
-    
-    
     private ProfilerSupport() {
-        isInitialized = Profiler.getDefault() != null && checkCurrentJDKCalibration();
-        
-        if (isInitialized) {
+        profilerViewProvider = new ApplicationProfilerViewProvider();
+        profilerViewProvider.initialize();
 
-            profilerViewProvider = new ApplicationProfilerViewProvider();
-            profilerViewProvider.initialize();
-
-            ProfilerIDESettings.getInstance().setAutoOpenSnapshot(false);
-            ProfilerIDESettings.getInstance().setAutoSaveSnapshot(true);
-        
-        }
+        ProfilerIDESettings.getInstance().setAutoOpenSnapshot(false);
+        ProfilerIDESettings.getInstance().setAutoSaveSnapshot(true);
     }
 
 }

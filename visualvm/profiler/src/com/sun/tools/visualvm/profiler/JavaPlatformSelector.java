@@ -66,7 +66,7 @@ class JavaPlatformSelector extends JPanel {
 
   // NOTE: to be called outside of EDT
   // TODO: fix updating UI outside of EDT
-  static File selectJavaBinary(String javaName, String archName, String java, String arch) {
+  static String selectJavaBinary(String javaName, String archName, String java, String arch) {
     JavaPlatformSelector hc = getDefault();
     hc.setupSelectJavaPlatform(javaName, archName);
     
@@ -78,17 +78,23 @@ class JavaPlatformSelector extends JPanel {
     d.setVisible(true);
     
     if (dd.getValue() == hc.okButton) {
-        File javaBinary = hc.getJavaBinary();
-        String[] props = JavaInfo.getSystemProperties(javaBinary, "java.version", "sun.arch.data.model"); // NOI18N
-        if (props == null || props.length < 2 ||
-            !java.equals(Platform.getJDKVersionString(props[0])) ||
-            !arch.equals(props[1])) {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(
-                    NbBundle.getMessage(JavaPlatformSelector.class,
-                    "MSG_Incorrect_java_binary", javaName, archName), // NOI18N
-                    NotifyDescriptor.WARNING_MESSAGE);
-            DialogDisplayer.getDefault().notify(nd);
-            javaBinary = null;
+        String javaBinary = hc.getJavaBinary();
+        File javaBinaryF = new File(javaBinary);
+        if (arch == null) {
+            String[] props = JavaInfo.getSystemProperties(javaBinaryF, "java.version"); // NOI18N
+            if (props == null || props.length < 1 ||
+                !java.equals(Platform.getJDKVersionString(props[0]))) {
+                notifyWrongBinary(javaName, archName);
+                javaBinary = null;
+            }
+        } else {
+            String[] props = JavaInfo.getSystemProperties(javaBinaryF, "java.version", "sun.arch.data.model"); // NOI18N
+            if (props == null || props.length < 2 ||
+                !java.equals(Platform.getJDKVersionString(props[0])) ||
+                !arch.equals(props[1])) {
+                notifyWrongBinary(javaName, archName);
+                javaBinary = null;
+            }
         }
         return javaBinary == null ? selectJavaBinary(javaName, archName, java, arch) : javaBinary;
     } else {
@@ -96,8 +102,17 @@ class JavaPlatformSelector extends JPanel {
     }
   }
   
-  private File getJavaBinary() {
-    return new File(javaPlatformFileField.getText().trim());
+  private static void notifyWrongBinary(String javaName, String archName) {
+      String msg = archName != null ? NbBundle.getMessage(JavaPlatformSelector.class,
+                                      "MSG_Incorrect_java_binary_arch", javaName, archName) : // NOI18N
+                                      NbBundle.getMessage(JavaPlatformSelector.class,
+                                      "MSG_Incorrect_java_binary_noarch", javaName); // NOI18N
+      NotifyDescriptor nd = new NotifyDescriptor.Message(msg, NotifyDescriptor.WARNING_MESSAGE);
+      DialogDisplayer.getDefault().notify(nd);
+  }
+  
+  private String getJavaBinary() {
+    return javaPlatformFileField.getText().trim();
   }
   
   private static JavaPlatformSelector defaultInstance;
@@ -113,8 +128,10 @@ class JavaPlatformSelector extends JPanel {
   }
   
   private void setupSelectJavaPlatform(String javaName, String archName) {
-      hintArea.setText(NbBundle.getMessage(JavaPlatformSelector.class,
-              "MSG_Calibration_required", javaName, archName)); // NOI18N
+      if (archName != null) hintArea.setText(NbBundle.getMessage(JavaPlatformSelector.class,
+                                     "MSG_Calibration_required_arch", javaName, archName)); // NOI18N
+      else hintArea.setText(NbBundle.getMessage(JavaPlatformSelector.class,
+                                     "MSG_Calibration_required_noarch", javaName)); // NOI18N
       SwingUtilities.invokeLater(new Runnable() {
           public void run() {
               javaPlatformFileField.selectAll();
@@ -126,7 +143,7 @@ class JavaPlatformSelector extends JPanel {
   private void update() {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        File snapshotFile = getJavaBinary();
+        File snapshotFile = new File(getJavaBinary());
         okButton.setEnabled(snapshotFile.isFile());
       }
     });
@@ -136,7 +153,7 @@ class JavaPlatformSelector extends JPanel {
     JFileChooser chooser = new JFileChooser();
     chooser.setDialogTitle(NbBundle.getMessage(
             JavaPlatformSelector.class, "CAP_Select_java_binary")); // NOI18N
-    chooser.setSelectedFile(getJavaBinary());
+    chooser.setSelectedFile(new File(getJavaBinary()));
     if (Platform.isWindows()) {
       chooser.setAcceptAllFileFilterUsed(false);
       chooser.setFileFilter(new FileFilter() {

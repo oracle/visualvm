@@ -26,7 +26,6 @@
 package com.sun.tools.visualvm.profiling.presets;
 
 import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
-import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.options.UISupport;
 import com.sun.tools.visualvm.profiling.presets.ProfilerPresets.PresetsModel;
 import java.awt.BorderLayout;
@@ -39,12 +38,9 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
-import java.io.File;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
@@ -62,13 +58,10 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
-import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.openide.LifecycleManager;
 import org.openide.awt.Mnemonics;
 import org.openide.util.ImageUtilities;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -76,8 +69,8 @@ import org.openide.util.RequestProcessor;
  */
 final class ProfilingOptionsPanel extends JPanel {
 
-    final private static Logger LOGGER =
-            Logger.getLogger("com.sun.tools.visualvm.profiling.options"); // NOI18N
+//    final private static Logger LOGGER =
+//            Logger.getLogger("com.sun.tools.visualvm.profiling.options"); // NOI18N
     private final ProfilingOptionsPanelController controller;
 
     private final SamplerCPUSettings samplerCpuSettings;
@@ -86,7 +79,7 @@ final class ProfilingOptionsPanel extends JPanel {
     private final ProfilerMemorySettings profilerMemorySettings;
 
     private PresetsModel listModel;
-    private ListDataListener listModelListener;
+    private final ListDataListener listModelListener;
 
     private boolean internalChange;
 
@@ -469,69 +462,26 @@ final class ProfilingOptionsPanel extends JPanel {
 
 
         // --- Misellaneous ----------------------------------------------------
-        SectionSeparator miscellaneousSection = UISupport.createSectionSeparator(
-                NbBundle.getMessage(ProfilingOptionsPanel.class, "CAPTION_Misc")); // NOI18N
-        c = new GridBagConstraints();
-        c.gridy = 50;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(15, 0, 5, 0);
-        add(miscellaneousSection, c);
-
-        JPanel resetCalibrationPanel = new JPanel(new BorderLayout());
-
-        JLabel resetCalibrationLabel = new JLabel();
-        Mnemonics.setLocalizedText(resetCalibrationLabel, NbBundle.getMessage(
-                                   ProfilingOptionsPanel.class, "LBL_ResetData")); // NOI18N
-        resetCalibrationPanel.add(resetCalibrationLabel, BorderLayout.CENTER);
-
-        resetCalibrationButton = new JButton() {
-            protected void fireActionPerformed(ActionEvent e) {
-                resetCalibrationButtonAction();
-            }
-        };
-        Mnemonics.setLocalizedText(resetCalibrationButton, NbBundle.getMessage(
-                                   ProfilingOptionsPanel.class, "BTN_Reset")); // NOI18N
-        resetCalibrationPanel.add(resetCalibrationButton, BorderLayout.EAST);
-
-        c = new GridBagConstraints();
-        c.gridy = 52;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(2, 15, 3, 0);
-        add(resetCalibrationPanel, c);
-
-    }
-    
-    private void resetCalibrationButtonAction() {
-        resetCalibrationButton.setEnabled(false);
-        RequestProcessor.getDefault().post(new Runnable() {
-            public void run() {
-                try {
-                    File calibrationDirectory = new File(Platform.getProfilerUserDir());
-                    if (calibrationDirectory.isDirectory()) {
-                        boolean deleted = false;
-                        File[] calibrationFiles = calibrationDirectory.listFiles();
-                        for (File calibrationFile : calibrationFiles) {
-                            if (calibrationFile.isFile() && calibrationFile.getName().startsWith("machinedata.")) { // NOI18N
-                                Utils.delete(calibrationFile, false);
-                                deleted = true;
-                            }
-                        }
-                        if (deleted && ProfilerDialogs.displayConfirmation(NbBundle.getMessage(
-                            ProfilingOptionsPanel.class, "MSG_DeletedRestart"), NbBundle.getMessage( // NOI18N
-                            ProfilingOptionsPanel.class, "CAPTION_DeletedRestart"))) { // NOI18N
-                            LifecycleManager.getDefault().markForRestart();
-                            LifecycleManager.getDefault().exit();
-                        }
-                    }
-                } catch (Exception e) {
-                    LOGGER.log(Level.FINE, "Error resetting calibration data", e);  // NOI18N
-                }
-            }
-        });
+        int gridy = 50;
+        for (ProfilingOptionsSectionProvider provider : Lookup.getDefault().lookupAll(
+                                                        ProfilingOptionsSectionProvider.class)) {
+            SectionSeparator section = UISupport.createSectionSeparator(provider.getSectionName());
+            c = new GridBagConstraints();
+            c.gridy = gridy++;
+            c.gridwidth = GridBagConstraints.REMAINDER;
+            c.anchor = GridBagConstraints.NORTHWEST;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.insets = new Insets(15, 0, 5, 0);
+            add(section, c);
+            
+            c = new GridBagConstraints();
+            c.gridy = gridy++;
+            c.gridwidth = GridBagConstraints.REMAINDER;
+            c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.insets = new Insets(2, 15, 3, 0);
+            add(provider.getSection(), c);
+        }
     }
 
     void load() {
@@ -560,8 +510,6 @@ final class ProfilingOptionsPanel extends JPanel {
             }  
             list.setSelectedIndex(indexToSelect);
         }
-
-        resetCalibrationButton.setEnabled(true);
 
         updateComponents();
 
@@ -601,6 +549,5 @@ final class ProfilingOptionsPanel extends JPanel {
     private JButton downButton;
     private JTextField nameField;
     private JTextField targetField;
-    private JButton resetCalibrationButton;
     
 }

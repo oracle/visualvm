@@ -34,6 +34,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.netbeans.lib.profiler.global.Platform;
 
 /**
  * NOTE: Must be built with Source Level 1.5 to work for getting info from Java 5!
@@ -45,6 +46,18 @@ final class JavaInfo {
     public static void main(String[] args) {
         for (String arg : args) System.out.println(System.getProperty(arg));
     }
+    
+    static String getCurrentJDKExecutable() {
+        return getJDKExecutable(System.getProperty("java.home")); // NOI18N
+    }
+    
+    static String getJDKExecutable(String jdkHome) {
+        if (jdkHome == null || jdkHome.trim().length() == 0) return null;
+        String jreSuffix = File.separator + "jre"; // NOI18N
+        if (jdkHome.endsWith(jreSuffix)) jdkHome = jdkHome.substring(0, jdkHome.length() - jreSuffix.length());
+        String jdkExe = jdkHome + File.separator + "bin" + File.separator + "java" + (Platform.isWindows() ? ".exe" : ""); // NOI18N
+        return jdkExe;
+    }    
     
     static String[] getSystemProperties(File java, String... keys) {
         if (keys.length == 0) return new String[0];

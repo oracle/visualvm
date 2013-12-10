@@ -322,6 +322,7 @@ final class ApplicationProfilerView extends DataSourceView {
         private void startProfiling(Application application, ProfilingSettings pSettings) {
           Runnable calibrationStartUpdater = new Runnable() {
               public void run() {
+                  ProfilerDialogs.displayInfo(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_calibration")); // NOI18N
                   SwingUtilities.invokeLater(new Runnable() {
                       public void run() {
                           statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_calibration_progress")); // NOI18N
@@ -329,12 +330,7 @@ final class ApplicationProfilerView extends DataSourceView {
                   });
               }
           };
-          Runnable calibrationEndUpdater = new Runnable() {
-              public void run() {
-                  // Not used
-              }
-          };
-          if (ProfilerSupport.getInstance().checkJDKCalibration(application, calibrationStartUpdater, calibrationEndUpdater)) {
+          if (CalibrationSupport.checkCalibration(application, calibrationStartUpdater, null)) {
               NetBeansProfiler.getDefaultNB().attachToApp(pSettings, attachSettings);
           } else {
               SwingUtilities.invokeLater(new Runnable() {
