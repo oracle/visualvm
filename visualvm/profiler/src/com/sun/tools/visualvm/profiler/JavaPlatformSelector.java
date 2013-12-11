@@ -68,7 +68,7 @@ class JavaPlatformSelector extends JPanel {
   // TODO: fix updating UI outside of EDT
   static String selectJavaBinary(String javaName, String archName, String java, String arch) {
     JavaPlatformSelector hc = getDefault();
-    hc.setupSelectJavaPlatform(javaName, archName);
+    hc.setupSelectJavaPlatform(javaName, archName, java, arch);
     
     final DialogDescriptor dd = new DialogDescriptor(hc, NbBundle.getMessage(
             JavaPlatformSelector.class, "CAP_Calibrate_java"), true, new Object[] { // NOI18N
@@ -96,7 +96,12 @@ class JavaPlatformSelector extends JPanel {
                 javaBinary = null;
             }
         }
-        return javaBinary == null ? selectJavaBinary(javaName, archName, java, arch) : javaBinary;
+        // Wrong java binary, select again until cancelled
+        if (javaBinary == null) return selectJavaBinary(javaName, archName, java, arch);
+        // Correct binary, remember it
+        if (javaBinaryF.isFile()) JavaPlatformCache.setBinary(java, arch, javaBinary);
+        // Return the correct binary
+        return javaBinary;
     } else {
         return null;
     }
@@ -127,11 +132,20 @@ class JavaPlatformSelector extends JPanel {
     return defaultInstance;
   }
   
-  private void setupSelectJavaPlatform(String javaName, String archName) {
+  private void setupSelectJavaPlatform(String javaName, String archName, String java, String arch) {
       if (archName != null) hintArea.setText(NbBundle.getMessage(JavaPlatformSelector.class,
                                      "MSG_Calibration_required_arch", javaName, archName)); // NOI18N
       else hintArea.setText(NbBundle.getMessage(JavaPlatformSelector.class,
                                      "MSG_Calibration_required_noarch", javaName)); // NOI18N
+      
+      String binary = JavaPlatformCache.getBinary(java, arch);
+      if (binary == null || !new File(binary).isFile()) {
+          javaPlatformFileField.setText(""); // NOI18N
+          if (binary != null) JavaPlatformCache.clearBinary(java, arch);
+      } else {
+          javaPlatformFileField.setText(binary);
+      }
+      
       SwingUtilities.invokeLater(new Runnable() {
           public void run() {
               javaPlatformFileField.selectAll();
