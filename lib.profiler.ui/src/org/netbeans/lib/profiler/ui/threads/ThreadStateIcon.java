@@ -43,15 +43,17 @@
 
 package org.netbeans.lib.profiler.ui.threads;
 
-import org.netbeans.lib.profiler.global.CommonConstants;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
 import org.netbeans.lib.profiler.results.threads.ThreadData;
-import java.awt.*;
+import javax.swing.Icon;
 
 
 /**
  * @author Jiri Sedlacek
  */
-public class ThreadStateIcon implements javax.swing.Icon {
+public class ThreadStateIcon implements Icon {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     public static final int ICON_NONE = -100;
@@ -80,24 +82,17 @@ public class ThreadStateIcon implements javax.swing.Icon {
         return width;
     }
 
-    public void paintIcon(java.awt.Component c, java.awt.Graphics g, int x, int y) {
+    public void paintIcon(Component c, Graphics g, int x, int y) {
         if (threadStateColor != null) {
-            if (!threadStateColor.equals(CommonConstants.THREAD_STATUS_ZOMBIE_COLOR)) {
-                g.setColor(threadStateColor);
-                g.fillRect(x, y, width, height);
-            }
-
-            ;
-            g.setColor(Color.BLACK);
-            g.drawRect(x, y, width - 1, height - 1);
+            g.setColor(threadStateColor);
+            g.fillRect(x + 1, y + 1, width - 1, height - 1);
         }
+        g.setColor(Color.BLACK);
+        g.drawRect(x, y, width - 1, height - 1);
     }
 
     protected Color getThreadStateColor(int threadState) {
-        if (threadState == ICON_NONE) {
-            return null;
-        }
-
+        if (threadState == ICON_NONE) return null;
         return ThreadData.getThreadStateColor(threadState);
     }
 }
