@@ -49,7 +49,7 @@ import org.netbeans.lib.profiler.results.ProfilingResultListener;
  */
 public interface LockProfilingResultListener extends ProfilingResultListener {
 
-    void monitorEntry(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId);
+    void monitorEntry(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId, int ownerThreadId);
 
     void monitorExit(final int threadId, final long timeStamp0, final long timeStamp1, final int monitorId);
 
