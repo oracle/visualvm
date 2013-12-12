@@ -137,7 +137,7 @@ public final class RunCalibrationAction extends AbstractAction {
     }
     
     private void displayUI(final TableModel model) {
-        final ProfilerTable table = new ProfilerTable(model, false, true, null, true);
+        final ProfilerTable table = new ProfilerTable(model, false, true, null);
         table.getColumnModel().getColumn(1).setCellRenderer(new CalibrationDateCellRenderer());
         table.setDefaultColumnWidth(getColumnWidth());
         table.setSortColumn(0);
@@ -239,9 +239,10 @@ public final class RunCalibrationAction extends AbstractAction {
             if (!original.contains(platform)) selected = platform;
         }
         
+        table.clearSelection();
         model.fireTableDataChanged();
         
-        if (selected != null) table.selectValue(selected, column);
+        if (selected != null) table.selectValue(selected, column, true);
         
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() { refreshTimes(model); }
