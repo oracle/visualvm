@@ -239,7 +239,11 @@ public class Platform implements CommonConstants {
                 } else if (isHpux()) {
                     procArch = "pa_risc2.0"; // NOI18N
                 } else if (isLinuxArm()) {
-                    procArch = "arm"; // NOI18N
+                    if (isLinuxArmVfpHflt()) {
+                        procArch = "arm-vfp-hflt"; // NOI18N
+                    } else {
+                        procArch = "arm"; // NOI18N
+                    }
                 }
             }
 
@@ -520,6 +524,15 @@ public class Platform implements CommonConstants {
         
         return isLinux() && procArch.startsWith("arm"); // NOI18N
     }
+
+    /**
+     * Test whether we are running on Linux on ARM processor with Hard float ABI
+     */
+    public static boolean isLinuxArmVfpHflt() {
+        String procArch = System.getProperty("sun.arch.abi"); // NOI18N
+        
+        return isLinux() && isLinuxArm() && "gnueabihf".equals(procArch); // NOI18N
+    }
     
     /**
      * Returns system architecture: 32/64bit
@@ -527,19 +540,13 @@ public class Platform implements CommonConstants {
     public static int getSystemArchitecture() {
         if (sysArch == 0) {
             String architecture = System.getProperty("sun.arch.data.model"); // NOI18N
-
-            if (architecture == null) {
-                sysArch = ARCH_32;
-            } else if ("32".equals(architecture)) { // NOI18N
-                sysArch = ARCH_32; // defined 32bit environment
-            } else if ("64".equals(architecture)) { // NOI18N
-                sysArch = ARCH_64; // defined 64bit environment
-            } else {
-                sysArch = ARCH_32; // unknown environment, 32bit by default
-            }
+            sysArch = getSystemArchitecture(architecture);
         }
-
         return sysArch;
+    }
+    
+    public static int getSystemArchitecture(String arch) {
+        return "64".equals(arch) ? ARCH_64 : ARCH_32;
     }
 
     /**

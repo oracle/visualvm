@@ -43,7 +43,7 @@ rem made subject to such option by the copyright holder.
 SET BUILD_SRC_15=..\src-jdk15
 SET BUILD_SRC=..\src
 SET BUILD_JDK=C:\PROGRA~1\java\jdk1.5.0_15
-SET BUILD_OUTPUT=dist
+SET BUILD_OUTPUT=%TEMP%\dist
 SET BUILD_DEPLOY=..\..\release\lib
 
 mkdir %BUILD_OUTPUT%\deployed\jdk15\windows-amd64

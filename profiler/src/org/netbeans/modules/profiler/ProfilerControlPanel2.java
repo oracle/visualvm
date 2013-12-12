@@ -1222,6 +1222,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
         
         private boolean isOpen(Snapshot s) {
             File f = FileUtil.toFile(s.getFile());
+            if (f == null) return false; // #236480
 
             if (s.isHeapDump()) {
                 Set<TopComponent> tcs = WindowManager.getDefault().getRegistry().getOpened();

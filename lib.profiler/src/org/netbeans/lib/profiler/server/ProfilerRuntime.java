@@ -48,6 +48,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
+import org.netbeans.lib.profiler.server.system.Classes;
 import org.netbeans.lib.profiler.server.system.Histogram;
 import org.netbeans.lib.profiler.server.system.Timers;
 
@@ -218,13 +219,15 @@ public class ProfilerRuntime implements CommonConstants {
 
     public static void setLockContentionMonitoringEnabled(boolean b) {
         lockContentionMonitoringEnabled = b;
+        knownMonitors = b ? new HashSet() : null;
+        Classes.setLockContentionMonitoringEnabled(b);
         if (DEBUG) {
             System.out.println("ProfilerRuntime.DEBUG: setLockContentionMonitoringEnabled "+b);
         }
     }
 
     // ------------- Handling wait/sleep/monitors entry/exit -------------------------------------------
-    public static void monitorEntry(Thread t, Object monitor) {
+    public static void monitorEntry(Thread t, Object monitor, Thread owner) {
         if (ThreadInfo.profilingSuspended() || ThreadInfo.isProfilerServerThread(t)
             || ThreadInfo.isProfilerServerMonitor(monitor)) {
             // nothing done for profiler own threads or if in instrumentation
@@ -238,22 +241,23 @@ public class ProfilerRuntime implements CommonConstants {
         ti.inProfilingRuntimeMethod++;
 
         ProfilingSessionStatus status = ProfilerServer.getProfilingSessionStatus();
+        ThreadInfo ownerTi = owner != null ? ThreadInfo.getThreadInfo(owner) : null;
 
         if (status != null) {
             switch (status.currentInstrType) {
                 case INSTR_RECURSIVE_FULL:
                 case INSTR_RECURSIVE_SAMPLED:
-                    timeStamp = ProfilerRuntimeCPU.monitorEntryCPU(ti, monitor);
+                    timeStamp = ProfilerRuntimeCPU.monitorEntryCPU(ti, monitor, ownerTi);
 
                     break;
                 case INSTR_CODE_REGION:
-                    timeStamp = ProfilerRuntimeCPUCodeRegion.monitorEntryRegion(t, monitor);
+                    timeStamp = ProfilerRuntimeCPUCodeRegion.monitorEntryRegion(t, monitor, ownerTi);
 
                     break;
             }
         }
         if (lockContentionMonitoringEnabled && timeStamp == -1) {
-            writeWaitTimeEvent(METHOD_ENTRY_MONITOR, ti, monitor);
+            writeWaitTimeEvent(METHOD_ENTRY_MONITOR, ti, monitor, ownerTi);
         }
 
         Monitors.recordThreadStateChange(ti.thread, THREAD_STATUS_MONITOR, timeStamp, monitor);
@@ -670,8 +674,16 @@ public class ProfilerRuntime implements CommonConstants {
     }
 
     static long writeWaitTimeEvent(byte eventType, ThreadInfo ti, Object id) {
+        return writeWaitTimeEvent(eventType, ti, id, null);
+    }
+    
+    static long writeWaitTimeEvent(byte eventType, ThreadInfo ti, Object id, ThreadInfo ownerTi) {
+        if (eventBuffer == null) return -1;
         int hash = writeNewMonitorEvent(ti,id);
         
+        if (ownerTi != null) {
+            initThreadInfo(ownerTi);
+        }
         // if (printEvents) System.out.println("*** Writing event " + eventType + ", metodId = " + (int)methodId);
         int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
 
@@ -692,7 +704,8 @@ public class ProfilerRuntime implements CommonConstants {
         if (DEBUG) {
             System.out.println("ProfilerRuntime.DEBUG: Writing waitTime event type = " + eventType + // NOI18N
                     ", timestamp: " + absTimeStamp + // NOI18N
-                    (id==null ? "" : ", id: "+Integer.toHexString(System.identityHashCode(id)))); // NOI18N
+                    (id==null ? "" : ", id: "+Integer.toHexString(hash)) + // NOI18N
+                    (ownerTi == null ? "" : ", ownerId: "+ownerTi.threadId)); // NOI18N
         }
 
         evBuf[curPos++] = (byte) ((absTimeStamp >> 48) & 0xFF);
@@ -706,7 +719,18 @@ public class ProfilerRuntime implements CommonConstants {
             evBuf[curPos++] = (byte) ((hash >> 24) & 0xFF);
             evBuf[curPos++] = (byte) ((hash >> 16) & 0xFF);
             evBuf[curPos++] = (byte) ((hash >> 8) & 0xFF);
-            evBuf[curPos++] = (byte) ((hash) & 0xFF);            
+            evBuf[curPos++] = (byte) ((hash) & 0xFF);
+            if (eventType == METHOD_ENTRY_MONITOR) {
+                int ownerId = -1;
+                
+                if (ownerTi != null) {
+                    ownerId = ownerTi.getThreadId();
+                }
+                evBuf[curPos++] = (byte) ((ownerId >> 24) & 0xFF);
+                evBuf[curPos++] = (byte) ((ownerId >> 16) & 0xFF);
+                evBuf[curPos++] = (byte) ((ownerId >> 8) & 0xFF);
+                evBuf[curPos++] = (byte) ((ownerId) & 0xFF);
+            }
         }
 
         ti.evBufPos = curPos;
@@ -715,20 +739,15 @@ public class ProfilerRuntime implements CommonConstants {
 
     private static int writeNewMonitorEvent(ThreadInfo ti, Object id) {
         if (id == null || !lockContentionMonitoringEnabled) return -1;
-        if (ti.evBuf == null) {
-            if (!ti.isInitialized()) ti.initialize();
-            ti.useEventBuffer();
-            writeThreadCreationEvent(ti);
-        }
+        initThreadInfo(ti);
         int hash = System.identityHashCode(id);
         Integer hashInt = new Integer(hash);
-        if (knownMonitors == null) {
-            knownMonitors = new HashSet();
-        }
-        if (!knownMonitors.contains(hashInt)) {
-            knownMonitors.add(hashInt);
+        if (knownMonitors.add(hashInt)) {
             int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
 
+            if (DEBUG) {
+                System.out.println("ProfilerRuntime.DEBUG: New Monitor "+Integer.toHexString(hash));
+            }
             if (curPos > ThreadInfo.evBufPosThreshold) {
                 copyLocalBuffer(ti);
                 curPos = ti.evBufPos;
@@ -750,6 +769,14 @@ public class ProfilerRuntime implements CommonConstants {
             ti.evBufPos = curPos;
         }
         return hash;
+    }
+
+    private static void initThreadInfo(ThreadInfo ti) {
+        if (ti.evBuf == null) {
+            if (!ti.isInitialized()) ti.initialize();
+            ti.useEventBuffer();
+            writeThreadCreationEvent(ti);
+        }
     }
 
     // -------------------------------- Thread-related stuff ------------------------------------------
