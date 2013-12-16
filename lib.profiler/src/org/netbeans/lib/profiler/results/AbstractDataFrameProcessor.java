@@ -94,7 +94,7 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
                         LOGGER.finest("Frame start, size="+buffer.length); // NOI18N
                     }
                     doProcessDataFrame(ByteBuffer.wrap(buffer));
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     LOGGER.log(Level.SEVERE, "Error while processing data frame", e); // NOI18N
                 } finally {
                     if (LOGGER.isLoggable(Level.FINEST)) {

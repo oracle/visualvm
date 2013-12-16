@@ -137,14 +137,14 @@ public final class RunCalibrationAction extends AbstractAction {
     }
     
     private void displayUI(final TableModel model) {
-        final ProfilerTable table = new ProfilerTable(model, false, true, true);
+        final ProfilerTable table = new ProfilerTable(model, false, true, null, true);
         table.getColumnModel().getColumn(1).setCellRenderer(new CalibrationDateCellRenderer());
         table.setDefaultColumnWidth(getColumnWidth());
         table.setSortColumn(0);
         table.setPreferredScrollableViewportSize(new Dimension(400, 10));
         table.setVisibleRows(6);
         
-        ProfilerTableContainer container = new ProfilerTableContainer(table, true);
+        ProfilerTableContainer container = new ProfilerTableContainer(table, true, null);
         container.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
         
         JLabel label = new JLabel();
@@ -317,6 +317,10 @@ public final class RunCalibrationAction extends AbstractAction {
         private static Date DATE;
         private static DateFormat FORMAT_TIME;
         private static DateFormat FORMAT_DATE;
+        
+        CalibrationDateCellRenderer() {
+            setHorizontalAlignment(TRAILING);
+        }
 
         protected void setValue(Object value) {
             if (value == null) {

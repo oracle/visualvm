@@ -87,6 +87,8 @@ public class StackTraceSnapshotBuilder {
         new MethodInfo("java.lang.ProcessImpl","waitFor() : int"), // NOI18N
         new MethodInfo("sun.nio.ch.EPollArrayWrapper","epollWait[native]"), // NOI18N
         new MethodInfo("sun.nio.ch.EPollArrayWrapper","epollWait(long, int, long, int) : int"), // NOI18N
+        new MethodInfo("java.net.DualStackPlainSocketImpl","accept0[native]"), // NOI18N
+        new MethodInfo("java.net.DualStackPlainSocketImpl","accept0(int, java.net.InetSocketAddress[]) : int"), // NOI18N
     });
 
     private InstrumentationFilter filter;

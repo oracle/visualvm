@@ -51,17 +51,17 @@ import org.netbeans.lib.profiler.results.RuntimeCCTNode;
  */
 public class LockRuntimeCCTNode implements RuntimeCCTNode {
 
-    private final Map<ThreadInfo, List<ThreadInfo.Monitor>> threads;
-    private final Map<MonitorInfo, List<MonitorInfo.ThreadDetail>> monitors;
+    private final Map<ThreadInfo, List<List<ThreadInfo.MonitorDetail>>> threads;
+    private final Map<MonitorInfo, List<List<MonitorInfo.ThreadDetail>>> monitors;
 
-    LockRuntimeCCTNode(Map<ThreadInfo, List<ThreadInfo.Monitor>> threadsCopy, Map<MonitorInfo, List<MonitorInfo.ThreadDetail>> monitorCopy) {
+    LockRuntimeCCTNode(Map<ThreadInfo, List<List<ThreadInfo.MonitorDetail>>> threadsCopy, Map<MonitorInfo, List<List<MonitorInfo.ThreadDetail>>> monitorCopy) {
         threads = threadsCopy;
         monitors = monitorCopy;
     }
 
     public LockCCTNode getThreads() {
         LockCCTNode top = new TopLockCCTNode();
-        for (Map.Entry<ThreadInfo, List<ThreadInfo.Monitor>> entry : threads.entrySet()) {
+        for (Map.Entry<ThreadInfo, List<List<ThreadInfo.MonitorDetail>>> entry : threads.entrySet()) {
             top.addChild(new ThreadLockCCTNode(top, entry.getKey(), entry.getValue()));
         }
         return top;
@@ -69,7 +69,7 @@ public class LockRuntimeCCTNode implements RuntimeCCTNode {
 
     public LockCCTNode getMonitors() {
         LockCCTNode top = new TopLockCCTNode();
-        for (Map.Entry<MonitorInfo, List<MonitorInfo.ThreadDetail>> entry : monitors.entrySet()) {
+        for (Map.Entry<MonitorInfo, List<List<MonitorInfo.ThreadDetail>>> entry : monitors.entrySet()) {
             top.addChild(new MonitorCCTNode(top, entry.getKey(), entry.getValue()));
         }
         return top;
