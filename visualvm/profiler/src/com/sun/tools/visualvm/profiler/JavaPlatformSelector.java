@@ -165,6 +165,7 @@ class JavaPlatformSelector extends JPanel {
 
   private void chooseSnapshot() {
     JFileChooser chooser = new JFileChooser();
+    chooser.putClientProperty("JFileChooser.packageIsTraversable", "always");   // NOI18N
     chooser.setDialogTitle(NbBundle.getMessage(
             JavaPlatformSelector.class, "CAP_Select_java_binary")); // NOI18N
     chooser.setSelectedFile(new File(getJavaBinary()));
