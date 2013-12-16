@@ -103,12 +103,11 @@ public class ProfilerTable extends JTable {
     
     public static final String PROP_NO_HOVER = "ProfilerTableHover_NoHover"; // NOI18N
     
-    public ProfilerTable(TableModel model, boolean sortable, boolean hideableColums,
-                         int[] scrollableColumns, boolean keepUnfocusedSelection) {
+    public ProfilerTable(TableModel model, boolean sortable,
+                         boolean hideableColums, int[] scrollableColumns) {
         super(model);
         
         this.hideableColums = hideableColums;
-        this.keepUnfocusedSelection = keepUnfocusedSelection;
         
         setupModels(sortable);
         setupAppearance();
@@ -128,8 +127,6 @@ public class ProfilerTable extends JTable {
     // --- UI tweaks -----------------------------------------------------------
     
     protected void setupAppearance() {
-        setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        
         setRowSelectionAllowed(true);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         setGridColor(UIConstants.TABLE_VERTICAL_GRID_COLOR);
@@ -195,7 +192,7 @@ public class ProfilerTable extends JTable {
         boolean isSelected = isCellSelected(row, column);
         
         if (isSelected && isEnabled()) {
-            boolean focusOwner = keepUnfocusedSelection || super.isFocusOwner();
+            boolean focusOwner = !shadeUnfocusedSelection || super.isFocusOwner();
             c.setForeground(focusOwner ? getSelectionForeground() : UIUtils.getUnfocusedSelectionForeground());
             c.setBackground(focusOwner ? getSelectionBackground() : UIUtils.getUnfocusedSelectionBackground());
         } else if (!isEnabled()) {
@@ -287,9 +284,21 @@ public class ProfilerTable extends JTable {
         setPreferredScrollableViewportSize(size);
     }
     
+    // --- Main column ---------------------------------------------------------
+    
+    private int mainColumn = 0;
+    
+    public final void setMainColumn(int column) {
+        mainColumn = column;
+    }
+    
+    public final int getMainColumn() {
+        return mainColumn;
+    }
+    
     // --- Selection -----------------------------------------------------------
     
-    private final boolean keepUnfocusedSelection;
+    private boolean shadeUnfocusedSelection = false;
     
     public void selectRow(int row, boolean scrollToVisible) {
         setRowSelectionInterval(row, row);
@@ -301,14 +310,35 @@ public class ProfilerTable extends JTable {
         if (scrollToVisible) scrollRectToVisible(getCellRect(getSelectedRow(), column, true));
     }
     
-    public void selectValue(Object value, int column) {
+    public void selectValue(Object value, int column, boolean scrollToVisible) {
         if (value == null) return;
         
+        int _column = convertColumnIndexToView(column);
         for (int row = 0; row < getRowCount(); row++)
-            if (value.equals(getValueAt(row, column))) {
-                selectRow(row, true);
+            if (value.equals(getValueAt(row, _column))) {
+                selectRow(row, scrollToVisible);
                 break;
             }
+    }
+    
+    public Object getSelectedValue(int column) {
+        int row = getSelectedRow();
+        if (row == -1) return null;
+        return getValueAt(row, convertColumnIndexToView(column));
+    }
+    
+    public void tableChanged(TableModelEvent e) {
+        Object selected = getSelectedValue(mainColumn);
+        super.tableChanged(e);
+        if (selected != null) selectValue(selected, mainColumn, false);
+    }
+    
+    public final void setShadeUnfocusedSelection(boolean shade) {
+        shadeUnfocusedSelection = shade;
+    }
+    
+    public final boolean shadesUnfocusedSelection() {
+        return shadeUnfocusedSelection;
     }
     
     // --- Column model --------------------------------------------------------
