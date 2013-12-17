@@ -100,35 +100,47 @@ public class HintsController extends AbstractController {
         summaryController.getHeapFragmentWalker().createNavigationHistoryPoint();
     }
     
-    public void showURL(URL url) {
-        String urls = url.toString();
-        HeapFragmentWalker heapFragmentWalker = summaryController.getHeapFragmentWalker();
-        
-        if (urls.startsWith(INSTANCE_URL_PREFIX)) {
-            urls = urls.substring(INSTANCE_URL_PREFIX.length());
-            
-            String[] id = urls.split("/"); // NOI18N
-            long instanceId = Long.parseLong(id[2]);
-            Instance i = heapFragmentWalker.getHeapFragment().getInstanceByID(instanceId);
-                            
-            if (i != null) {
-                heapFragmentWalker.getClassesController().showInstance(i);
-            } else {
-                ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveInstanceMsg(id[1], id[0]));
+    public void showURL(final URL url) {
+        BrowserUtils.performTask(new Runnable() {
+            public void run() {
+                String urls = url.toString();
+                final HeapFragmentWalker heapFragmentWalker = summaryController.getHeapFragmentWalker();
+
+                if (urls.startsWith(INSTANCE_URL_PREFIX)) {
+                    urls = urls.substring(INSTANCE_URL_PREFIX.length());
+
+                    final String[] id = urls.split("/"); // NOI18N
+                    long instanceId = Long.parseLong(id[2]);
+                    final Instance i = heapFragmentWalker.getHeapFragment().getInstanceByID(instanceId);
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (i != null) {
+                                heapFragmentWalker.getClassesController().showInstance(i);
+                            } else {
+                                ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveInstanceMsg(id[1], id[0]));
+                            }
+                        }
+                    });
+                } else if (urls.startsWith(CLASS_URL_PREFIX)) {
+                    urls = urls.substring(CLASS_URL_PREFIX.length());
+
+                    final String[] id = urls.split("/"); // NOI18N
+                    long jclsId = Long.parseLong(id[1]);
+                    final JavaClass c = heapFragmentWalker.getHeapFragment().getJavaClassByID(jclsId);
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (c != null) {
+                                heapFragmentWalker.getClassesController().showClass(c);
+                            } else {
+                                ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveClassMsg(id[0]));
+                            }
+                        }
+                    });
+                }
             }
-        } else if (urls.startsWith(CLASS_URL_PREFIX)) {
-            urls = urls.substring(CLASS_URL_PREFIX.length());
-            
-            String[] id = urls.split("/"); // NOI18N
-            long jclsId = Long.parseLong(id[1]);
-            JavaClass c = heapFragmentWalker.getHeapFragment().getJavaClassByID(jclsId);
-            
-            if (c != null) {
-                heapFragmentWalker.getClassesController().showClass(c);
-            } else {
-                ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveClassMsg(id[0]));
-            }
-        }
+        });
     }
 
     public void computeBiggestObjects(final int number) {
