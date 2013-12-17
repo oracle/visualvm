@@ -85,7 +85,7 @@ class ClassDumpInstance implements Instance {
     }
 
     public Instance getNearestGCRootPointer() {
-        return classDump.getHprof().nearestGCRoot.getNearestGCRootPointer(this);
+        return classDump.getHprof().getNearestGCRootPointer(this);
     }
 
     public int getReachableSize() {
