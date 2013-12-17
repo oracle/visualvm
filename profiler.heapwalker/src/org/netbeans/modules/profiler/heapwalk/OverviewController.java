@@ -64,6 +64,7 @@ import org.netbeans.lib.profiler.heap.ThreadObjectGCRoot;
 import org.netbeans.modules.profiler.heapwalk.ui.OverviewControllerUI;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.HeapSummary;
 import org.netbeans.lib.profiler.heap.JavaClass;
@@ -71,6 +72,7 @@ import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.NbBundle;
 
@@ -294,46 +296,67 @@ public class OverviewController extends AbstractController {
         // NOTE: the above HTML string should be terminated by newline to workaround HTML rendering bug in JDK 5, see Issue 120157
     }
     
-    public void showURL(String urls) {
-        if (urls.startsWith(OPEN_THREADS_URL)) {
-            urls = urls.substring(OPEN_THREADS_URL.length());
-            String parts[] = urls.split("\\|"); // NOI18N
-            String className = parts[0];
-            String method = parts[1];
-            int linenumber = Integer.parseInt(parts[2]);
-            GoToSource.openSource(heapFragmentWalker.getHeapDumpProject(), className, method, linenumber);
-        } else if (urls.startsWith(INSTANCE_URL_PREFIX)) {
-            urls = urls.substring(INSTANCE_URL_PREFIX.length());
+    public void showURL(final String _urls) {
+        BrowserUtils.performTask(new Runnable() {
+            public void run() {
+                String urls = _urls;
+                if (urls.startsWith(OPEN_THREADS_URL)) {
+                    urls = urls.substring(OPEN_THREADS_URL.length());
+                    String parts[] = urls.split("\\|"); // NOI18N
+                    String className = parts[0];
+                    String method = parts[1];
+                    int linenumber = Integer.parseInt(parts[2]);
+                    GoToSource.openSource(heapFragmentWalker.getHeapDumpProject(), className, method, linenumber);
+                } else if (urls.startsWith(INSTANCE_URL_PREFIX)) {
+                    urls = urls.substring(INSTANCE_URL_PREFIX.length());
 
-            String[] id = urls.split("/"); // NOI18N
-            long instanceId = Long.parseLong(id[2]);
-            Instance i = heapFragmentWalker.getHeapFragment().getInstanceByID(instanceId);
+                    final String[] id = urls.split("/"); // NOI18N
+                    long instanceId = Long.parseLong(id[2]);
+                    final Instance i = heapFragmentWalker.getHeapFragment().getInstanceByID(instanceId);
+                    
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (i != null) {
+                                heapFragmentWalker.getClassesController().showInstance(i);
+                            } else {
+                                ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveInstanceMsg(id[1], id[0]));
+                            }
+                        }
+                    });
+                } else if (urls.startsWith(CLASS_URL_PREFIX)) {
+                    urls = urls.substring(CLASS_URL_PREFIX.length());
+                    final String[] id = urls.split("/"); // NOI18N
+                    long jclsid = Long.parseLong(id[1]);
 
-            if (i != null) {
-                heapFragmentWalker.getClassesController().showInstance(i);
-            } else {
-                ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveInstanceMsg(id[1], id[0]));
+                    final JavaClass c = heapFragmentWalker.getHeapFragment().getJavaClassByID(jclsid);
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (c != null) {
+                                heapFragmentWalker.getClassesController().showClass(c);
+                            } else {
+                                ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveClassMsg(id[0]));
+                            }
+                        }
+                    });
+                } else if (urls.startsWith(THREAD_URL_PREFIX)) {
+                    urls = urls.substring(THREAD_URL_PREFIX.length());
+                    String[] id = urls.split("/"); // NOI18N
+                    long threadid = Long.parseLong(id[1]);
+                    final Instance i = heapFragmentWalker.getHeapFragment().getInstanceByID(threadid);
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (i != null) {
+                                showInThreads(i);
+                            } else {
+                                System.err.println(">>> OverviewController: unexpected null instance for showInThreads"); // NOI18N
+                            }
+                        }
+                    });
+                }
             }
-        } else if (urls.startsWith(CLASS_URL_PREFIX)) {
-            urls = urls.substring(CLASS_URL_PREFIX.length());
-            String[] id = urls.split("/"); // NOI18N
-            long jclsid = Long.parseLong(id[1]);
-
-            JavaClass c = heapFragmentWalker.getHeapFragment().getJavaClassByID(jclsid);
-
-            if (c != null) {
-                heapFragmentWalker.getClassesController().showClass(c);
-            } else {
-                ProfilerDialogs.displayError(Bundle.AnalysisController_CannotResolveClassMsg(id[0]));
-            }
-        }   else if (urls.startsWith(THREAD_URL_PREFIX)) {
-            urls = urls.substring(THREAD_URL_PREFIX.length());
-            String[] id = urls.split("/"); // NOI18N
-            long threadid = Long.parseLong(id[1]);
-            
-            showInThreads(heapFragmentWalker.getHeapFragment().getInstanceByID(threadid));
-        } 
- 
+        });
     }
             
     private long computeFinalizers(Heap heap) {

@@ -161,13 +161,14 @@ public final class DetailsUtils {
             int valuesCount = count < 0 ? values.size() - offset :
                               Math.min(count, values.size() - offset);            
             int separatorLength = separator == null ? 0 : separator.length();
-            int estimatedSize = Math.min(valuesCount * (2 + separatorLength), MAX_ARRAY_LENGTH + trailer.length());
+            int trailerLength = trailer == null ? 0 : trailer.length();
+            int estimatedSize = Math.min(valuesCount * (1 + separatorLength), MAX_ARRAY_LENGTH + trailerLength);
             StringBuilder value = new StringBuilder(estimatedSize);
             int lastValue = offset + valuesCount - 1;
             for (int i = offset; i <= lastValue; i++) {
                 value.append(values.get(i));
                 if (value.length() >= MAX_ARRAY_LENGTH) {
-                    if (trailer != null) value.append(trailer);
+                    if (trailerLength > 0) value.append(trailer);
                     break;
                 }
                 if (separator != null && i < lastValue) value.append(separator);

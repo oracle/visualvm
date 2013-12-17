@@ -51,6 +51,8 @@ import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -118,9 +120,9 @@ public final class LoadSnapshotAction extends AbstractAction {
                 public boolean accept(File f) {
                     if (f.isDirectory()) return true;
                     String fname = f.getName();
-                    if (fname.endsWith("." + ResultsManager.SNAPSHOT_EXTENSION)) return true;
-                    if (fname.endsWith("." + ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION)) return true;
-                    if (handleHeapdumps && fname.endsWith("." + ResultsManager.HEAPDUMP_EXTENSION)) return true;
+                    if (fname.endsWith("." + ResultsManager.SNAPSHOT_EXTENSION)) return true; // NOI18N
+                    if (fname.endsWith("." + ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION)) return true; // NOI18N
+                    if (handleHeapdumps && fname.endsWith("." + ResultsManager.HEAPDUMP_EXTENSION)) return true; // NOI18N
                     return false;
                 }
 
@@ -143,15 +145,15 @@ public final class LoadSnapshotAction extends AbstractAction {
                 File file = files[i];
                 String fname = file.getName();
 
-                if (fname.endsWith("." + ResultsManager.SNAPSHOT_EXTENSION) || fname.endsWith("." + ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION)) {
-                    snapshotsFOArr.add(FileUtil.toFileObject(FileUtil.normalizeFile(file))); // NOI18N
-                } else if (fname.endsWith("." + ResultsManager.HEAPDUMP_EXTENSION)) {
-                    heapdumpsFArr.add(file); // NOI18N
+                if (fname.endsWith("." + ResultsManager.SNAPSHOT_EXTENSION) || fname.endsWith("." + ResultsManager.STACKTRACES_SNAPSHOT_EXTENSION)) { // NOI18N
+                    snapshotsFOArr.add(FileUtil.toFileObject(FileUtil.normalizeFile(file)));
+                } else if (fname.endsWith("." + ResultsManager.HEAPDUMP_EXTENSION)) { // NOI18N
+                    heapdumpsFArr.add(file);
                 }
             }
 
             if (!snapshotsFOArr.isEmpty()) {
-                RequestProcessor.getDefault().post(new Runnable() {
+                processor().post(new Runnable() {
                     public void run() {
                         final LoadedSnapshot[] imported = ResultsManager.getDefault().loadSnapshots(
                                 snapshotsFOArr.toArray(new FileObject[snapshotsFOArr.size()]));
@@ -168,17 +170,26 @@ public final class LoadSnapshotAction extends AbstractAction {
             }
 
             if (!heapdumpsFArr.isEmpty()) {
-                RequestProcessor.getDefault().post(new Runnable() {
-                        public void run() {
-                            for (File heapDump : heapdumpsFArr) {
-                                ResultsManager.getDefault().openSnapshot(heapDump);
-                            }
+                processor().post(new Runnable() {
+                    public void run() {
+                        for (File heapDump : heapdumpsFArr) {
+                            ResultsManager.getDefault().openSnapshot(heapDump);
                         }
-                    });
-
+                    }
+                });
             }
 
             importDir = chooser.getCurrentDirectory();
         }
+    }
+    
+    private static Reference<RequestProcessor> PROCESSOR_REF;
+    private static synchronized RequestProcessor processor() {
+        RequestProcessor processor = PROCESSOR_REF == null ? null : PROCESSOR_REF.get();
+        if (processor == null) {
+            processor = new RequestProcessor("Profiler Snapshot Loader", 3); // NOI18N
+            PROCESSOR_REF = new WeakReference(processor);
+        }
+        return processor;
     }
 }
