@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.jmx.impl;
 import com.sun.tools.visualvm.core.ui.components.Spacer;
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -103,24 +104,47 @@ public final class CredentialsConfigurator extends JPanel {
     private void initComponents() {
         setLayout(new GridBagLayout());
         GridBagConstraints constraints;
-
-        // usernameLabel
-        usernameLabel = new JLabel(); // NOI18N
-        Mnemonics.setLocalizedText(usernameLabel, NbBundle.getMessage(CredentialsConfigurator.class, "LBL_Username")); // NOI18N
+        
+        // hintLabel1
+        hintLabel1 = new JLabel();
+        hintLabel1.setFont(hintLabel1.getFont().deriveFont(Font.BOLD));
+        Mnemonics.setLocalizedText(hintLabel1, NbBundle.getMessage(CredentialsConfigurator.class, "LBL_CredentialsMsg1")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(15, 10, 0, 10);
+        add(hintLabel1, constraints);
+        
+        // hintLabel2
+        hintLabel2 = new JLabel();
+        Mnemonics.setLocalizedText(hintLabel2, NbBundle.getMessage(CredentialsConfigurator.class, "LBL_CredentialsMsg2")); // NOI18N
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(0, 10, 5, 10);
+        add(hintLabel2, constraints);
+
+        // usernameLabel
+        usernameLabel = new JLabel();
+        Mnemonics.setLocalizedText(usernameLabel, NbBundle.getMessage(CredentialsConfigurator.class, "LBL_Username")); // NOI18N
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 2;
         constraints.gridwidth = 1;
         constraints.fill = GridBagConstraints.NONE;
         constraints.anchor = GridBagConstraints.EAST;
-        constraints.insets = new Insets(15, 10, 0, 0);
+        constraints.insets = new Insets(15, 20, 0, 0);
         add(usernameLabel, constraints);
 
         // usernameField
         usernameField = new JTextField();
         usernameLabel.setLabelFor(usernameField);
-        usernameField.setPreferredSize(
-                new Dimension(320, usernameField.getPreferredSize().height));
         usernameField.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 update();
@@ -134,7 +158,7 @@ public final class CredentialsConfigurator extends JPanel {
         });
         constraints = new GridBagConstraints();
         constraints.gridx = 1;
-        constraints.gridy = 0;
+        constraints.gridy = 2;
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.anchor = GridBagConstraints.WEST;
@@ -142,22 +166,20 @@ public final class CredentialsConfigurator extends JPanel {
         add(usernameField, constraints);
 
         // passwordLabel
-        passwordLabel = new JLabel(); // NOI18N
+        passwordLabel = new JLabel();
         Mnemonics.setLocalizedText(passwordLabel, NbBundle.getMessage(CredentialsConfigurator.class, "LBL_Password")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
-        constraints.gridy = 1;
+        constraints.gridy = 3;
         constraints.gridwidth = 1;
         constraints.fill = GridBagConstraints.NONE;
         constraints.anchor = GridBagConstraints.EAST;
-        constraints.insets = new Insets(15, 10, 0, 0);
+        constraints.insets = new Insets(8, 20, 0, 0);
         add(passwordLabel, constraints);
 
         // passwordField
         passwordField = new JPasswordField();
         passwordLabel.setLabelFor(passwordField);
-        passwordField.setPreferredSize(
-                new Dimension(200, passwordField.getPreferredSize().height));
         passwordField.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 update();
@@ -171,17 +193,17 @@ public final class CredentialsConfigurator extends JPanel {
         });
         constraints = new GridBagConstraints();
         constraints.gridx = 1;
-        constraints.gridy = 1;
+        constraints.gridy = 3;
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(15, 5, 0, 10);
+        constraints.insets = new Insets(8, 5, 0, 10);
         add(passwordField, constraints);
 
         // spacer
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
-        constraints.gridy = 3;
+        constraints.gridy = 4;
         constraints.weightx = 1;
         constraints.weighty = 1;
         constraints.gridwidth = GridBagConstraints.REMAINDER;
@@ -194,6 +216,8 @@ public final class CredentialsConfigurator extends JPanel {
         okButton = new JButton(NbBundle.getMessage(CredentialsConfigurator.class, "LBL_OK"));   // NOI18N
     }
 
+    private JLabel hintLabel1;
+    private JLabel hintLabel2;
     private JLabel usernameLabel;
     private JTextField usernameField;
     private JLabel passwordLabel;
