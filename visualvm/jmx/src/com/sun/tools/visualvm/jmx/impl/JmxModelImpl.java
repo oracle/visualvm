@@ -235,6 +235,8 @@ class JmxModelImpl extends JmxModel {
                     if (DialogDisplayer.getDefault().notify(dd) == NotifyDescriptor.YES_OPTION) {
                         proxyClient.setInsecure();
                         continue;
+                    } else {
+                        break;
                     }
                 }
                 if (supplyCredentials(application, proxyClient) == null) {
