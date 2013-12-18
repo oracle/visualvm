@@ -92,7 +92,7 @@
         <folder name="ExplorerPopupNoSelection">
             
             <file name="com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.shadow">
-                <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance"/>
+                <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-application-snapshot-AddApplicationSnapshotAction-alwaysEnabled.instance"/>
                 <attr name="position" intvalue="400"/>
             </file>
             
