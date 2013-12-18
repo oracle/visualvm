@@ -31,6 +31,7 @@ import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.HeapHistogram;
+import com.sun.tools.visualvm.application.type.ApplicationType;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
@@ -229,7 +230,10 @@ class JmxModelImpl extends JmxModel {
             } catch (SecurityException e) {
                 LOGGER.log(Level.INFO, "connect", e);   // NOI18N
                 if (proxyClient.hasSSLStubCheck()) {
-                    String msg = NbBundle.getMessage(JmxModelImpl.class, "MSG_Insecure_SSL", proxyClient.getUrl().toString());  // NOI18N
+                    String conn = application.getStorage().getCustomProperty(DataSourceDescriptor.PROPERTY_NAME);
+                    if (conn == null) conn = application.getStorage().getCustomProperty(ApplicationType.PROPERTY_SUGGESTED_NAME);
+                    if (conn == null) conn = proxyClient.getUrl().toString();
+                    String msg = NbBundle.getMessage(JmxModelImpl.class, "MSG_Insecure_SSL", conn);  // NOI18N
                     String title = NbBundle.getMessage(JmxModelImpl.class, "Title_Insecure_SSL");   // NOI18N
                     NotifyDescriptor dd = new NotifyDescriptor.Confirmation(msg, title, NotifyDescriptor.YES_NO_OPTION);
                     if (DialogDisplayer.getDefault().notify(dd) == NotifyDescriptor.YES_OPTION) {
