@@ -140,6 +140,7 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
         private final String displayName;
         private final EnvironmentProvider environmentProvider;
         private final boolean persistentConnection;
+        private final boolean allowsInsecureConnection;
 
 
         /**
@@ -153,6 +154,24 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
         public Setup(String connectionString, String displayName,
                      EnvironmentProvider environmentProvider,
                      boolean persistentConnection) {
+            this(connectionString, displayName, environmentProvider,
+                 persistentConnection, false);
+        }
+        
+        /**
+         * Creates new instance of Setup.
+         *
+         * @param connectionString connection string for the JMX connection
+         * @param displayName display name of the JMX connection or null
+         * @param environmentProvider EnvironmentProvider for the JMX connection
+         * @param persistentConnection true if the connection should be persisted for another VisualVM sessions, false otherwise
+         * @param allowsInsecureConnection true if SSL is not required for the connection, false otherwise
+         * 
+         * @since VisualVM 1.3.7
+         */
+        public Setup(String connectionString, String displayName,
+                     EnvironmentProvider environmentProvider,
+                     boolean persistentConnection, boolean allowsInsecureConnection) {
             if (connectionString == null)
                 throw new IllegalArgumentException("connectionString cannot be null"); // NOI18N
             if (environmentProvider == null)
@@ -162,6 +181,7 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
             this.displayName = displayName;
             this.environmentProvider = environmentProvider;
             this.persistentConnection = persistentConnection;
+            this.allowsInsecureConnection = allowsInsecureConnection;
         }
 
 
@@ -192,6 +212,15 @@ public abstract class JmxConnectionCustomizer extends PropertiesProvider<Applica
          * @return true if the JMX connection to be created should be restored for another VisualVM sessions, false otherwise
          */
         public boolean isConnectionPersistent() { return persistentConnection; }
+        
+        /**
+         * Returns true if SSL is not required for the connection.
+         *
+         * @return true if SSL is not required for the connection, false otherwise
+         * 
+         * @since VisualVM 1.3.7
+         */
+        public boolean allowsInsecureConnection() { return allowsInsecureConnection; }
         
     }
 

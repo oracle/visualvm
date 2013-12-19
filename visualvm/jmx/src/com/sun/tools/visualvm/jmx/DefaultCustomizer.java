@@ -95,9 +95,10 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
         EnvironmentProvider provider = new CredentialsProvider.Custom(
                 panel.getUsername(), panel.getPassword(), panel.getSaveCredentials());
         boolean persistent = true;
+        boolean allowInsecure = panel.allowsInsecureConnection();
 
         return new JmxConnectionCustomizer.Setup(connectionString, displayName,
-                                                 provider, persistent);
+                                                 provider, persistent, allowInsecure);
     }
 
 
@@ -231,6 +232,17 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
         public final boolean getSaveCredentials() {
             return !securityCheckbox.isSelected() ? false :
                 saveCheckbox.isSelected();
+        }
+        
+        /**
+         * Returns true if SSL is not required for the connection.
+         *
+         * @return true if SSL is not required for the connection, false otherwise
+         * 
+         * @since VisualVM 1.3.7
+         */
+        public final boolean allowsInsecureConnection() {
+            return noSSLCheckbox.isSelected();
         }
 
 
@@ -482,11 +494,29 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.anchor = GridBagConstraints.EAST;
             constraints.insets = new Insets(8, 30, 0, 0);
             add(saveCheckbox, constraints);
+            
+            // noSSLCheckbox
+            noSSLCheckbox = new JCheckBox();   // NOI18N
+            Mnemonics.setLocalizedText(noSSLCheckbox, NbBundle.getMessage(
+                    DefaultCustomizer.class, "LBL_Insecure_connection")); // NOI18N
+            noSSLCheckbox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    update();
+                };
+            });
+            constraints = new GridBagConstraints();
+            constraints.gridx = 0;
+            constraints.gridy = 7;
+            constraints.gridwidth = GridBagConstraints.REMAINDER;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.EAST;
+            constraints.insets = new Insets(15, 5, 0, 0);
+            add(noSSLCheckbox, constraints);
 
             // spacer
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
-            constraints.gridy = 7;
+            constraints.gridy = 8;
             constraints.weightx = 1;
             constraints.weighty = 1;
             constraints.gridwidth = GridBagConstraints.REMAINDER;
@@ -513,6 +543,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
         private JLabel passwordLabel;
         private JPasswordField passwordField;
         private JCheckBox saveCheckbox;
+        private JCheckBox noSSLCheckbox;
     }
 
 
@@ -547,6 +578,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             boolean isusername = username != null && !username.isEmpty();
             boolean ispassword = provider.hasPassword(storage);
             boolean ispersistent = provider.isPersistent(storage);
+            String noSSL = storage.getCustomProperty(JmxApplicationProvider.PROPERTY_RETRY_WITHOUT_SSL);
 
             connectionField.setText(connectionString);
             connectionField.setCaretPosition(0);
@@ -556,7 +588,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             passwordField.setText(ispassword ? "----------" : ""); // NOI18N
             passwordField.setCaretPosition(0);
             saveCheckbox.setSelected(ispersistent);
-
+            noSSLCheckbox.setSelected(noSSL != null && Boolean.parseBoolean(noSSL));
         }
 
         private void initComponents() {
@@ -685,13 +717,29 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.fill = GridBagConstraints.HORIZONTAL;
             constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(3, 20, 3, 0);
+            constraints.insets = new Insets(3, 20, 0, 0);
             add(saveCheckbox, constraints);
+            
+            // noSSLCheckbox
+            noSSLCheckbox = new JCheckBox();   // NOI18N
+            Mnemonics.setLocalizedText(noSSLCheckbox, NbBundle.getMessage(
+                    DefaultCustomizer.class, "LBL_Insecure_connection")); // NOI18N
+            noSSLCheckbox.setEnabled(false);
+            noSSLCheckbox.setOpaque(false);
+            noSSLCheckbox.setForeground(checkboxText);
+            constraints = new GridBagConstraints();
+            constraints.gridx = 0;
+            constraints.gridy = 7;
+            constraints.gridwidth = GridBagConstraints.REMAINDER;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.EAST;
+            constraints.insets = new Insets(15, 0, 3, 0);
+            add(noSSLCheckbox, constraints);
 
             // spacer
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
-            constraints.gridy = 7;
+            constraints.gridy = 8;
             constraints.weightx = 1;
             constraints.weighty = 1;
             constraints.gridwidth = GridBagConstraints.REMAINDER;
@@ -709,6 +757,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
         private JLabel passwordLabel;
         private JPasswordField passwordField;
         private JCheckBox saveCheckbox;
+        private JCheckBox noSSLCheckbox;
 
     }
 

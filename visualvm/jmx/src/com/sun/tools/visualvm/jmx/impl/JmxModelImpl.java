@@ -32,6 +32,7 @@ import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.HeapHistogram;
 import com.sun.tools.visualvm.application.type.ApplicationType;
+import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasupport.DataRemovedListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
@@ -45,6 +46,7 @@ import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
 import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
+import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -73,8 +75,12 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -230,17 +236,34 @@ class JmxModelImpl extends JmxModel {
             } catch (SecurityException e) {
                 LOGGER.log(Level.INFO, "connect", e);   // NOI18N
                 if (proxyClient.hasSSLStubCheck()) {
-                    String conn = application.getStorage().getCustomProperty(DataSourceDescriptor.PROPERTY_NAME);
-                    if (conn == null) conn = application.getStorage().getCustomProperty(ApplicationType.PROPERTY_SUGGESTED_NAME);
-                    if (conn == null) conn = proxyClient.getUrl().toString();
-                    String msg = NbBundle.getMessage(JmxModelImpl.class, "MSG_Insecure_SSL", conn);  // NOI18N
-                    String title = NbBundle.getMessage(JmxModelImpl.class, "Title_Insecure_SSL");   // NOI18N
-                    NotifyDescriptor dd = new NotifyDescriptor.Confirmation(msg, title, NotifyDescriptor.YES_NO_OPTION);
-                    if (DialogDisplayer.getDefault().notify(dd) == NotifyDescriptor.YES_OPTION) {
+                    Storage storage = application.getStorage();
+                    String noSSLProp = JmxApplicationProvider.PROPERTY_RETRY_WITHOUT_SSL;
+                    String noSSL = storage.getCustomProperty(noSSLProp);
+                    if (noSSL != null && Boolean.parseBoolean(noSSL)) { // NOI18N
                         proxyClient.setInsecure();
                         continue;
                     } else {
-                        break;
+                        String conn = storage.getCustomProperty(DataSourceDescriptor.PROPERTY_NAME);
+                        if (conn == null) conn = storage.getCustomProperty(ApplicationType.PROPERTY_SUGGESTED_NAME);
+                        if (conn == null) conn = proxyClient.getUrl().toString();
+                        String msg = NbBundle.getMessage(JmxModelImpl.class, "MSG_Insecure_SSL", conn);  // NOI18N
+                        String title = NbBundle.getMessage(JmxModelImpl.class, "Title_Insecure_SSL");   // NOI18N
+                        String retry = NbBundle.getMessage(JmxModelImpl.class, "Retry_Insecure_SSL");   // NOI18N
+                        JLabel l = new JLabel(msg);
+                        JCheckBox c = new JCheckBox();
+                        Mnemonics.setLocalizedText(c, retry);
+                        c.setSelected(noSSL == null);
+                        JPanel p = new JPanel(new BorderLayout(0, 20));
+                        p.add(l, BorderLayout.CENTER);
+                        p.add(c, BorderLayout.SOUTH);
+                        NotifyDescriptor dd = new NotifyDescriptor.Confirmation(p, title, NotifyDescriptor.YES_NO_OPTION);
+                        if (DialogDisplayer.getDefault().notify(dd) == NotifyDescriptor.YES_OPTION) {
+                            storage.setCustomProperty(noSSLProp, Boolean.toString(c.isSelected()));
+                            proxyClient.setInsecure();
+                            continue;
+                        } else {
+                            break;
+                        }
                     }
                 }
                 if (supplyCredentials(application, proxyClient) == null) {

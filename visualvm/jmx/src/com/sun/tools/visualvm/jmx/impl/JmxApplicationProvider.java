@@ -59,7 +59,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 import javax.management.remote.JMXServiceURL;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -78,17 +77,26 @@ import org.openide.windows.WindowManager;
  * @author Luis-Miguel Alventosa
  */
 public class JmxApplicationProvider {
-    private static final Logger LOGGER = Logger.getLogger(JmxApplicationProvider.class.getName());
+//    private static final Logger LOGGER = Logger.getLogger(JmxApplicationProvider.class.getName());
+    
+    // --- Snapshot format history ---------------------------------------------
+    //
+    // 1.0:     initial snapshot version
+    // 1.1:     added PROPERTY_ENV_PROVIDER_ID
+    // 1.2:     added PROPERTY_RETRY_WITHOUT_SSL
+    //
+    // -------------------------------------------------------------------------
     
     private static final String SNAPSHOT_VERSION = "snapshot_version";  // NOI18N
     private static final String SNAPSHOT_VERSION_DIVIDER = ".";         // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION_MAJOR = "1";   // NOI18N
-    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "1";   // NOI18N
+    private static final String CURRENT_SNAPSHOT_VERSION_MINOR = "2";   // NOI18N
     private static final String CURRENT_SNAPSHOT_VERSION =
                                                 CURRENT_SNAPSHOT_VERSION_MAJOR +
                                                 SNAPSHOT_VERSION_DIVIDER +
                                                 CURRENT_SNAPSHOT_VERSION_MINOR;
     
+    public static final String PROPERTY_RETRY_WITHOUT_SSL = "prop_retry_without_ssl"; // NOI18N
     private static final String PROPERTY_CONNECTION_STRING = "prop_conn_string";    // NOI18N
     private static final String PROPERTY_HOSTNAME = "prop_conn_hostname";   // NOI18N
     private static final String PROPERTY_ENV_PROVIDER_ID = "prop_env_provider_id"; // NOI18N
@@ -162,7 +170,9 @@ public class JmxApplicationProvider {
     }
 
     public JmxApplication createJmxApplication(String connectionString, String displayName,
-            String suggestedName, EnvironmentProvider provider, boolean persistent) throws JmxApplicationException {
+                                               String suggestedName, EnvironmentProvider provider,
+                                               boolean persistent, boolean allowsInsecure)
+                                               throws JmxApplicationException {
         // Initial check if the provided connectionName can be used for resolving the host/application
         final String normalizedConnectionName = normalizeConnectionName(connectionString);
         final JMXServiceURL serviceURL;
@@ -188,7 +198,8 @@ public class JmxApplicationProvider {
 
         try {
             return addJmxApplication(true, serviceURL, normalizedConnectionName,
-                    displayName, suggestedName, hostName, provider, storage);
+                                     displayName, suggestedName, hostName,
+                                     provider, storage, Boolean.toString(allowsInsecure));
         } catch (JMXException e) {
             if (storage != null) {
                 File appStorage = storage.getDirectory();
@@ -200,7 +211,7 @@ public class JmxApplicationProvider {
 
     private JmxApplication addJmxApplication(boolean newApp, JMXServiceURL serviceURL,
             String connectionName, String displayName, String suggestedName, String hostName,
-            EnvironmentProvider provider, Storage storage) throws JMXException {
+            EnvironmentProvider provider, Storage storage, String allowsInsecure) throws JMXException {
 
         // Resolve JMXServiceURL, finish if not resolved
         if (serviceURL == null) {
@@ -276,6 +287,9 @@ public class JmxApplicationProvider {
                                     application.getId(), DataSourceDescriptorFactory.
                                     getDescriptor(tempapp).getName() }));
         }
+        
+        // Setup whether the SSL connection is required or not
+        application.getStorage().setCustomProperty(PROPERTY_RETRY_WITHOUT_SSL, allowsInsecure);
 
         // Connect to the JMX agent
         JmxModel model = JmxModelFactory.getJmxModelFor(application);
@@ -404,7 +418,8 @@ public class JmxApplicationProvider {
                             PROPERTY_HOSTNAME,
                             DataSourceDescriptor.PROPERTY_NAME,
                             ApplicationType.PROPERTY_SUGGESTED_NAME,
-                            PROPERTY_ENV_PROVIDER_ID
+                            PROPERTY_ENV_PROVIDER_ID,
+                            PROPERTY_RETRY_WITHOUT_SSL
                         };
 
                         for (final Storage storage : storageSet) {
@@ -422,7 +437,7 @@ public class JmxApplicationProvider {
                                                                  JmxConnectionSupportImpl.
                                                                  getProvider(epid);
                                         addJmxApplication(false, null, values[0], values[2],
-                                                          values[3], values[1], ep, storage);
+                                                          values[3], values[1], ep, storage, values[5]);
                                     } catch (final JMXException e) {
                                         if (e.isConfig()) {
                                             DialogDisplayer.getDefault().notifyLater(

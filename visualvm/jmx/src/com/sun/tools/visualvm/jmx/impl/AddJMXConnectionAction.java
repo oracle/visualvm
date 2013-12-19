@@ -80,7 +80,8 @@ class AddJMXConnectionAction extends SingleDataSourceAction<Host> {
                     JmxApplication application = (JmxApplication)JmxApplicationsSupport.
                             getInstance().createJmxApplicationInteractive(
                             setup.getConnectionString(), setup.getDisplayName(),
-                            setup.getEnvironmentProvider(), setup.isConnectionPersistent());
+                            setup.getEnvironmentProvider(), setup.isConnectionPersistent(),
+                            setup.allowsInsecureConnection());
                     if (application == null) result.cancelled();
                     else result.accepted(application);
                 }

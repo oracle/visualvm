@@ -123,7 +123,7 @@ public final class JmxApplicationsSupport {
         EnvironmentProvider epr = new CredentialsProvider.Custom(username,
                 password.toCharArray(), saveCredentials);
         return createJmxApplicationImpl(connectionString, displayName, suggestedName,
-                epr, persistent);
+                                        epr, persistent, false);
     }
 
     /**
@@ -149,7 +149,7 @@ public final class JmxApplicationsSupport {
         String suggestedName = JmxApplicationProvider.getSuggestedName(displayName,
                 connectionString, username);
         return createJmxApplicationImpl(connectionString, displayName, suggestedName,
-                provider, persistent);
+                                        provider, persistent, false);
     }
 
     /**
@@ -216,7 +216,7 @@ public final class JmxApplicationsSupport {
             EnvironmentProvider epr = new CredentialsProvider.Custom(username,
                 password.toCharArray(), saveCredentials);
             return createJmxApplicationImpl(connectionString, displayName,
-                                            suggestedName, epr, persistent);
+                                            suggestedName, epr, persistent, false);
         } catch (JmxApplicationException e) {
             DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(e.
                     getMessage(), NotifyDescriptor.ERROR_MESSAGE));
@@ -231,7 +231,7 @@ public final class JmxApplicationsSupport {
         }
         return null;
     }
-
+    
     /**
      * Creates new Application defined by JMX connection and adds it to the
      * Applications tree. Displays progress during application creation and
@@ -253,6 +253,32 @@ public final class JmxApplicationsSupport {
                                             EnvironmentProvider provider,
                                             boolean persistent) {
 
+        return createJmxApplicationInteractive(connectionString, displayName,
+                                            provider, persistent, false);
+    }
+
+    /**
+     * Creates new Application defined by JMX connection and adds it to the
+     * Applications tree. Displays progress during application creation and
+     * opens an error dialog if creating the application failed.
+     *
+     * Note that even if the created application isn't persistent for another
+     * VisualVM sessions, the host created for this application will be restored.
+     *
+     * @param connectionString definition of the connection, for example hostname:port
+     * @param displayName display name for the application, may be null
+     * @param provider JMX EnvironmentProvider for the Application
+     * @param persistent controls whether the application definition will be persisted for another VisualVM sessions
+     * @param allowsInsecure true if SSL is not required for the connection, false otherwise
+     * @return created JMX application or null if creating the application failed
+     *
+     * @since VisualVM 1.3.7
+     */
+    public Application createJmxApplicationInteractive(String connectionString,
+                                            String displayName,
+                                            EnvironmentProvider provider,
+                                            boolean persistent, boolean allowsInsecure) {
+
         final ProgressHandle[] pHandle = new ProgressHandle[1];
         try {
             String username = getUsername(provider);
@@ -267,8 +293,8 @@ public final class JmxApplicationsSupport {
                         pHandle[0].start();
                     }
                 });
-            return createJmxApplicationImpl(connectionString, displayName,
-                                            suggestedName, provider, persistent);
+            return createJmxApplicationImpl(connectionString, displayName, suggestedName,
+                                            provider, persistent, allowsInsecure);
         } catch (JmxApplicationException e) {
             DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(e.
                     getMessage(), NotifyDescriptor.ERROR_MESSAGE));
@@ -287,11 +313,11 @@ public final class JmxApplicationsSupport {
     private Application createJmxApplicationImpl(String connectionString,
                                             String displayName, String suggestedName,
                                             EnvironmentProvider provider,
-                                            boolean persistent)
+                                            boolean persistent, boolean allowsInsecure)
                                             throws JmxApplicationException {
 
         return applicationProvider.createJmxApplication(connectionString,
-                displayName, suggestedName, provider, persistent);
+                displayName, suggestedName, provider, persistent, allowsInsecure);
     }
     
     private static String getUsername(EnvironmentProvider provider) {
