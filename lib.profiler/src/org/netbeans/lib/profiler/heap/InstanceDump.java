@@ -105,7 +105,7 @@ class InstanceDump extends HprofObject implements Instance {
     }
 
     public Instance getNearestGCRootPointer() {
-        return getHprof().nearestGCRoot.getNearestGCRootPointer(this);
+        return getHprof().getNearestGCRootPointer(this);
     }
 
     public int getReachableSize() {
