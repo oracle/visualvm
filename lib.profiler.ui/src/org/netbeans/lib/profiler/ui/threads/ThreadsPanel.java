@@ -216,7 +216,7 @@ public class ThreadsPanel extends JPanel {
         
         };
         
-        threadsTable = new ProfilerTable(threadsTableModel, true, true, new int[] { 1 }, true) {
+        threadsTable = new ProfilerTable(threadsTableModel, true, true, new int[] { 1 }) {
             protected int computeColumnPreferredWidth(int modelIndex, int viewIndex, int firstRow, int lastRow) {
                 if (modelIndex != 1) return super.computeColumnPreferredWidth(modelIndex, viewIndex, firstRow, lastRow);
                 
