@@ -177,6 +177,7 @@ public final class ResultsManager {
 
     static final String HEAPDUMP_PREFIX = "heapdump-";  // NOI18N // should differ from generated OOME heapdumps not to be detected as OOME
     private static final String SNAPSHOT_PREFIX = "snapshot-";  // NOI18N
+    private static final long MINIMAL_TIMESTAMP = 946684800000L; // Sat, 01 Jan 2000 00:00:00 GMT in milliseconds since 01 Jan 1970
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -229,7 +230,12 @@ public final class ResultsManager {
             String time = fileName.substring(SNAPSHOT_PREFIX.length(), fileName.length());
             try {
                 long timeStamp = Long.parseLong(time);
-                displayName = StringUtils.formatUserDate(new Date(timeStamp));
+                if (timeStamp > MINIMAL_TIMESTAMP) {
+                    displayName = StringUtils.formatUserDate(new Date(timeStamp));
+                } else {
+                    // file name is probably customized
+                    displayName = fileName;                    
+                }
             } catch (NumberFormatException e) {
                 // file name is probably customized
                 displayName = fileName;
@@ -259,7 +265,12 @@ public final class ResultsManager {
             String time = fileName.substring(HEAPDUMP_PREFIX.length(), fileName.length());
             try {
                 long timeStamp = Long.parseLong(time);
-                displayName = StringUtils.formatUserDate(new Date(timeStamp));
+                if (timeStamp > MINIMAL_TIMESTAMP) {
+                    displayName = StringUtils.formatUserDate(new Date(timeStamp));
+                } else {
+                    // file name is probably customized
+                    displayName = fileName;                    
+                }
             } catch (NumberFormatException e) {
                 // file name is probably customized
                 displayName = fileName;
