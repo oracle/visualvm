@@ -318,7 +318,6 @@ public final class HeapDumpAction extends ProfilingAwareAction {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // -----
-    public static final String TAKEN_HEAPDUMP_PREFIX = "heapdump-"; // NOI18N // should differ from generated OOME heapdumps not to be detected as OOME
     private static final String SELECTING_TARGET_CANCELLED = "&*$?CANCELLED?$*&"; // NOI18N
     private static final int[] ENABLED_STATES = new int[] { Profiler.PROFILING_RUNNING };
     private static JFileChooser snapshotDirectoryChooser;
@@ -368,7 +367,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
     private String getCurrentHeapDumpFilename(String targetFolder) {
         try {
-            String fileName = TAKEN_HEAPDUMP_PREFIX + System.currentTimeMillis();
+            String fileName = ResultsManager.getDefault().getDefaultHeapDumpFileName(System.currentTimeMillis());
             FileObject folder = (targetFolder == null)
                                 ? ProjectStorage.getSettingsFolder(NetBeansProfiler.getDefaultNB().getProfiledProject(), true)
                                 : FileUtil.toFileObject(FileUtil.normalizeFile(new File(targetFolder)));

@@ -324,6 +324,7 @@ public class ProfilerTable extends JTable {
     public Object getSelectedValue(int column) {
         int row = getSelectedRow();
         if (row == -1) return null;
+        if (row >= getModel().getRowCount()) return null; // #239936
         return getValueAt(row, convertColumnIndexToView(column));
     }
     
