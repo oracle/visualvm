@@ -1905,6 +1905,7 @@ public abstract class NetBeansProfiler extends Profiler {
                         ProfilingResultsDispatcher.getDefault().addListener(listener);
                         listener.startup(getTargetAppRunner().getProfilerClient());
                     }
+                    break;
                 }
                 default: {
                     listeners = Lookup.getDefault().lookupAll(LockProfilingResultListener.class);
