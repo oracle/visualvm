@@ -162,7 +162,7 @@ public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
                     break;
                 }
                 default: {
-                    LOGGER.log(Level.SEVERE, "*** Profiler Engine: internal error: got unknown event type in CallGraphBuilder: {0} at {1}", // NOI18N
+                    LOGGER.log(Level.SEVERE, "*** Profiler Engine: internal error: got unknown event type in CPUSamplingDataFrameProcessor: {0} at {1}", // NOI18N
                             new Object[]{(int) eventType, buffer.position()});
                     
                     break;
