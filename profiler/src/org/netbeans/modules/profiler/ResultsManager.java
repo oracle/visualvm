@@ -43,6 +43,15 @@
 
 package org.netbeans.modules.profiler;
 
+import java.awt.Cursor;
+import java.awt.Window;
+import java.io.*;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.ProfilerLogger;
@@ -56,6 +65,7 @@ import org.netbeans.lib.profiler.results.ProfilingResultsDispatcher;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
+import org.netbeans.lib.profiler.results.cpu.CPUResultsDiff;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
@@ -64,32 +74,22 @@ import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
-import org.openide.filesystems.FileLock;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
-import org.openide.util.NbBundle;
-import org.openide.util.lookup.ServiceProvider;
-import org.openide.util.lookup.ServiceProviders;
-import org.openide.windows.WindowManager;
-import java.awt.*;
-import java.io.*;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.*;
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsDiff;
-import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.cookies.OpenCookie;
+import org.openide.filesystems.FileLock;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
+import org.openide.windows.WindowManager;
 
 
 /** An manager for management/notifications about obtainer profiling results.
@@ -175,6 +175,10 @@ public final class ResultsManager {
     /* see  org.netbeans.modules.sampler.SampleOutputStream.FILE_EXT */ 
     public static final String STACKTRACES_SNAPSHOT_EXTENSION = "npss"; // NOI18N 
 
+    static final String HEAPDUMP_PREFIX = "heapdump-";  // NOI18N // should differ from generated OOME heapdumps not to be detected as OOME
+    private static final String SNAPSHOT_PREFIX = "snapshot-";  // NOI18N
+    private static final long MINIMAL_TIMESTAMP = 946684800000L; // Sat, 01 Jan 2000 00:00:00 GMT in milliseconds since 01 Jan 1970
+
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private ArrayList<LoadedSnapshot> loadedSnapshots = new ArrayList<LoadedSnapshot>();
@@ -205,7 +209,7 @@ public final class ResultsManager {
     }
 
     public String getDefaultSnapshotFileName(LoadedSnapshot ls) {
-        return "snapshot-" + ls.getSnapshot().getTimeTaken(); // NOI18N
+        return SNAPSHOT_PREFIX + ls.getSnapshot().getTimeTaken();
     }
     
     public String getSnapshotDisplayName(LoadedSnapshot ls) {
@@ -222,11 +226,16 @@ public final class ResultsManager {
         
     public String getSnapshotDisplayName(String fileName, int snapshotType) {
         String displayName;
-        if (fileName.startsWith("snapshot-")) { // NOI18N
-            String time = fileName.substring("snapshot-".length(), fileName.length()); // NOI18N
+        if (fileName.startsWith(SNAPSHOT_PREFIX)) {
+            String time = fileName.substring(SNAPSHOT_PREFIX.length(), fileName.length());
             try {
                 long timeStamp = Long.parseLong(time);
-                displayName = StringUtils.formatUserDate(new Date(timeStamp));
+                if (timeStamp > MINIMAL_TIMESTAMP) {
+                    displayName = StringUtils.formatUserDate(new Date(timeStamp));
+                } else {
+                    // file name is probably customized
+                    displayName = fileName;                    
+                }
             } catch (NumberFormatException e) {
                 // file name is probably customized
                 displayName = fileName;
@@ -246,13 +255,22 @@ public final class ResultsManager {
         }
     }
     
+    public String getDefaultHeapDumpFileName(long time) {
+        return HEAPDUMP_PREFIX + time;
+    }
+
     public String getHeapDumpDisplayName(String fileName) {
         String displayName;
-        if (fileName.startsWith("heapdump-")) { // NOI18N
-            String time = fileName.substring("heapdump-".length(), fileName.length()); // NOI18N
+        if (fileName.startsWith(HEAPDUMP_PREFIX)) {
+            String time = fileName.substring(HEAPDUMP_PREFIX.length(), fileName.length());
             try {
                 long timeStamp = Long.parseLong(time);
-                displayName = StringUtils.formatUserDate(new Date(timeStamp));
+                if (timeStamp > MINIMAL_TIMESTAMP) {
+                    displayName = StringUtils.formatUserDate(new Date(timeStamp));
+                } else {
+                    // file name is probably customized
+                    displayName = fileName;                    
+                }
             } catch (NumberFormatException e) {
                 // file name is probably customized
                 displayName = fileName;
