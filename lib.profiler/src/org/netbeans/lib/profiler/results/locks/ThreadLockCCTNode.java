@@ -120,8 +120,10 @@ class ThreadLockCCTNode extends LockCCTNode {
 
     private void summarize() {
         getChildren();
-        allTime = waitNode.getTime();
-        allCount = waitNode.getWaits();
+        if (waitNode != null) {
+            allTime = waitNode.getTime();
+            allCount = waitNode.getWaits();
+        }
     }
 
     @Override
