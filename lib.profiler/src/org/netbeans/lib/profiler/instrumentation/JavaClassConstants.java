@@ -475,7 +475,7 @@ public interface JavaClassConstants {
     3, // opc_invokespecial
     3, // opc_invokestatic
     5, // opc_invokeinterface
-    0, // opc_xxxunusedxxx
+    5, // opc_invokedynamic
     3, // opc_new
     2, // opc_newarray
     3, // opc_anewarray
