@@ -129,9 +129,11 @@ class ThreadLockCCTNode extends LockCCTNode {
     @Override
     void computeChildren() {
         super.computeChildren();
-        if (!waitMonitors.isEmpty() || !ownerMonitors.isEmpty()) {
+        if (!waitMonitors.isEmpty()) {
             waitNode = new MonitorsCCTNode(this, WAIT_MONITORS_LBL, WAIT_MONITORS_OWNER_LBL, waitMonitors);
             addChild(waitNode);
+        }
+        if (!ownerMonitors.isEmpty()) {
             addChild(new MonitorsCCTNode(this, OWNER_MONITORS_LBL, OWNER_MONITORS__WAIT_LBL, ownerMonitors));
         }
     }
