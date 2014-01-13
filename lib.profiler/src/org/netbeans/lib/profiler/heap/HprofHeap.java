@@ -109,7 +109,7 @@ class HprofHeap implements Heap {
 
     HprofByteBuffer dumpBuffer;
     LongMap idToOffsetMap;
-    NearestGCRoot nearestGCRoot;
+    private NearestGCRoot nearestGCRoot;
     private ComputedSummary computedSummary;
     private Map gcRoots;
     private DominatorTree domTree;
@@ -658,6 +658,10 @@ class HprofHeap implements Heap {
         retainedSizeByClassComputed = true;
     }
 
+    synchronized Instance getNearestGCRootPointer(Instance instance) {
+        return nearestGCRoot.getNearestGCRootPointer(instance);
+    }
+    
     int readDumpTag(long[] offset) {
         long position = offset[0];
         int dumpTag = dumpBuffer.get(position++);
