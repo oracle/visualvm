@@ -47,17 +47,17 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.client.ClientUtils.TargetAppOrVMTerminated;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
-import org.netbeans.lib.profiler.results.AbstractDataFrameProcessor;
 import org.netbeans.lib.profiler.results.ProfilingResultListener;
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder.SampledThreadInfo;
+import org.netbeans.lib.profiler.results.locks.AbstractLockDataFrameProcessor;
 import org.netbeans.lib.profiler.results.memory.JMethodIdTable;
 import org.netbeans.lib.profiler.results.memory.JMethodIdTable.JMethodIdTableEntry;
 import org.netbeans.lib.profiler.utils.formatting.DefaultMethodNameFormatter;
@@ -69,11 +69,9 @@ import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
  * the JFluid server agent and dispatch the resulting events to all interested parties
  * @author Tomas Hurka
  */
-public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
+public class CPUSamplingDataFrameProcessor extends AbstractLockDataFrameProcessor {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------    
-    private volatile int currentThreadId = -1;
     private String currentThreadName, currentThreadClassName;
-    private SampledThreadInfo currentThread;
     private long currentTimestamp;
     private Map<Integer,ThreadInfo> currentThreadsDump;
     private Map<Integer,ThreadInfo> lastThreadsDump;
@@ -110,6 +108,15 @@ public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
                     currentThreadId = threadId;
                     currentThreadName = threadName;
                     currentThreadClassName = threadClassName;
+                    fireNewThread(threadId, threadName, threadClassName);
+                    break;
+                }
+                case CommonConstants.SET_FOLLOWING_EVENTS_THREAD: {
+                    currentThreadId = buffer.getChar();
+                    if (LOGGER.isLoggable(Level.FINEST)) {
+                        LOGGER.log(Level.FINEST, "Change current thread , tId={0}", currentThreadId); // NOI18N
+                    }
+
                     break;
                 }
                 case CommonConstants.THREAD_INFO_IDENTICAL: {
@@ -159,6 +166,51 @@ public class CPUSamplingDataFrameProcessor extends AbstractDataFrameProcessor {
                     }
                     fireReset();
                     builder.reset();
+                    break;
+                }
+                case CommonConstants.NEW_MONITOR: {
+                    int hash = buffer.getInt();
+                    String className = getString(buffer);
+
+                    if (LOGGER.isLoggable(Level.FINEST)) {
+                        LOGGER.log(Level.FINEST, "Creating new monitor , monitorId={0} , className={1}", new Object[] {Integer.toHexString(hash), className}); // NOI18N
+                    }
+
+                    fireNewMonitor(hash, className);
+                    break;
+                }
+                case CommonConstants.METHOD_ENTRY_MONITOR:
+                case CommonConstants.METHOD_EXIT_MONITOR: {
+                    long timeStamp0 = getTimeStamp(buffer);
+                    long timeStamp1 = -1;
+                    int hash = buffer.getInt();
+                    
+                    if (eventType == CommonConstants.METHOD_ENTRY_MONITOR) {
+                        int ownerThreadId = buffer.getInt();
+                        if (LOGGER.isLoggable(Level.FINEST)) {
+                            LOGGER.log(Level.FINEST, "Monitor entry , tId={0} , monitorId={1} , ownerId={2}", new Object[]{currentThreadId,Integer.toHexString(hash),ownerThreadId}); // NOI18N
+                        }
+
+                        fireMonitorEntry(currentThreadId, timeStamp0, timeStamp1, hash, ownerThreadId);
+                    }
+                    if (eventType == CommonConstants.METHOD_EXIT_MONITOR) {
+                        if (LOGGER.isLoggable(Level.FINEST)) {
+                            LOGGER.log(Level.FINEST, "Monitor exit , tId={0} , monitorId={1}", new Object[]{currentThreadId,Integer.toHexString(hash)}); // NOI18N
+                        }
+
+                        fireMonitorExit(currentThreadId, timeStamp0, timeStamp1, hash);
+                    }
+                    break;
+                }
+                case CommonConstants.ADJUST_TIME: {
+                    long timeStamp0 = getTimeStamp(buffer);
+                    long timeStamp1 = getTimeStamp(buffer);
+                    if (LOGGER.isLoggable(Level.FINEST)) {
+                        LOGGER.log(Level.FINEST, "Adjust time , tId={0}", currentThreadId); // NOI18N
+                    }
+
+                    fireAdjustTime(currentThreadId, timeStamp0, timeStamp1);
+
                     break;
                 }
                 default: {
