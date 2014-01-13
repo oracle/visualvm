@@ -57,6 +57,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
+import java.util.logging.Level;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -69,6 +70,8 @@ import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.spi.JavaPlatformManagerProvider;
+import org.netbeans.modules.profiler.spi.JavaPlatformProvider;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -77,6 +80,7 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
 import org.openide.awt.Mnemonics;
 import org.openide.util.HelpCtx;
+import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
 
 
@@ -89,6 +93,7 @@ import org.openide.util.RequestProcessor;
 @NbBundle.Messages({
     "LBL_RunCalibrationAction=&Manage Calibration Data",
     "HINT_RunCalibrationAction=Manage Calibration Data",
+    "HINT_CalibrateDisabled=Calibration is done Automatically for remote platforms",
     "LBL_JavaPlatform=Java Platform",
     "LBL_LastCalibrated=Last Calibrated",
     "LBL_NotCalibrated=Not calibrated",
@@ -137,7 +142,7 @@ public final class RunCalibrationAction extends AbstractAction {
     }
     
     private void displayUI(final TableModel model) {
-        final ProfilerTable table = new ProfilerTable(model, false, true, null, true);
+        final ProfilerTable table = new ProfilerTable(model, false, true, null);
         table.getColumnModel().getColumn(1).setCellRenderer(new CalibrationDateCellRenderer());
         table.setDefaultColumnWidth(getColumnWidth());
         table.setSortColumn(0);
@@ -172,7 +177,15 @@ public final class RunCalibrationAction extends AbstractAction {
         });
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                calibrate.setEnabled(table.getSelectedRow() != -1);
+                if (table.getSelectedRow() != -1) {
+                    boolean remote = isRemotePlatform((JavaPlatform)table.getValueAt(table.getSelectedRow(), table.convertColumnIndexToView(0)));
+                    if (remote) {
+                        calibrate.setToolTipText(Bundle.HINT_CalibrateDisabled());
+                    } else {
+                        calibrate.setToolTipText(""); //NOI18N
+                    }
+                    calibrate.setEnabled(!remote);
+                }
             }
         });
         calibrate.setEnabled(false);
@@ -205,12 +218,20 @@ public final class RunCalibrationAction extends AbstractAction {
     private void refreshTimes(final TableModel model) {
         for (int i = 0; i < model.getRowCount(); i++) {
             JavaPlatform platform = (JavaPlatform)model.getValueAt(i, 0);
+            boolean remote = isRemotePlatform(platform);
             String version = platform.getPlatformJDKVersion();
             Long modified = null;
-            try {
-                File f = new File(CalibrationDataFileIO.getCalibrationDataFileName(version));
-                if (f.isFile()) modified = Long.valueOf(f.lastModified());
-            } catch (Exception e) {}
+            if (remote) {
+                try {
+                    File f = new File(CalibrationDataFileIO.getCalibrationDataFileName(version)+"."+platform.getProperties().get("platform.host")); //NOI18N
+                    if (f.isFile()) modified = Long.valueOf(f.lastModified());
+                } catch (Exception e) {}
+            } else {
+                try {
+                    File f = new File(CalibrationDataFileIO.getCalibrationDataFileName(version));
+                    if (f.isFile()) modified = Long.valueOf(f.lastModified());
+                } catch (Exception e) {}
+            }
             final int index = i;
             final Long _modified = modified;
             SwingUtilities.invokeLater(new Runnable() {
@@ -239,9 +260,10 @@ public final class RunCalibrationAction extends AbstractAction {
             if (!original.contains(platform)) selected = platform;
         }
         
+        table.clearSelection();
         model.fireTableDataChanged();
         
-        if (selected != null) table.selectValue(selected, column);
+        if (selected != null) table.selectValue(selected, column, true);
         
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() { refreshTimes(model); }
@@ -259,6 +281,22 @@ public final class RunCalibrationAction extends AbstractAction {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() { calibrate(platform, model); }
         });
+    }
+    
+    
+    private static boolean isRemotePlatform(final JavaPlatform platform) {
+        JavaPlatformManagerProvider impl = Lookup.getDefault().lookup(JavaPlatformManagerProvider.class);
+        if (impl == null) {
+            ProfilerUtils.getProfilerErrorManager().log(Level.WARNING.intValue(), "No instance of JavaPlatformManagerProvider found in Lookup");  //NOI18N
+            return false;
+        }
+        for (JavaPlatformProvider jpp : impl.getPlatforms()) {
+            if ( (platform.getPlatformId() != null) && (platform.getPlatformId().equals(jpp.getPlatformId())) && (platform.getProperties().containsKey("platform.host")) ) {//NOI18N
+                return true;
+                
+            }
+        }
+        return false;
     }
     
     private void calibrate(final JavaPlatform platform, final TableModel model) {

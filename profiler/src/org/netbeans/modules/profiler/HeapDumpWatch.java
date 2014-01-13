@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler;
 
-import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.openide.filesystems.FileChangeAdapter;
 import org.openide.filesystems.FileEvent;
 import org.openide.filesystems.FileObject;
@@ -52,8 +51,6 @@ import org.openide.util.NbBundle;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
@@ -164,7 +161,7 @@ public class HeapDumpWatch extends SessionListener.Adapter {
             return; // NOI18N
         }
 
-        if (heapDump.getName().startsWith(HeapDumpAction.TAKEN_HEAPDUMP_PREFIX)) {
+        if (heapDump.getName().startsWith(ResultsManager.HEAPDUMP_PREFIX)) {
             return; // custom heapdump
         }
 
