@@ -387,7 +387,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         }
 
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.log(Level.FINEST, "New monitor creation, mId = {0}, className = {1}", new Object[]{hash, className});
+            LOGGER.log(Level.FINEST, "New monitor creation, mId = {0}, className = {1}", new Object[]{Integer.toHexString(hash), className});
         }
     }
 
