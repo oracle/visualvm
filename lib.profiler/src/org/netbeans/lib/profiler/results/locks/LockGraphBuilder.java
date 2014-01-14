@@ -74,9 +74,11 @@ public class LockGraphBuilder extends BaseCallGraphBuilder implements LockProfil
             if (ti != null) {
                 List<List<ThreadInfo.MonitorDetail>> monitors = new ArrayList(2);
                 
-                monitors.add(ti.cloneWaitMonitorDetails());
-                monitors.add(ti.cloneOwnerMonitorDetails());
-                threadsCopy.put(ti, monitors);
+                if (!ti.isEmpty()) {
+                    monitors.add(ti.cloneWaitMonitorDetails());
+                    monitors.add(ti.cloneOwnerMonitorDetails());
+                    threadsCopy.put(ti, monitors);
+                }
             }
         }
         for (MonitorInfo mi : monitorInfos.values()) {

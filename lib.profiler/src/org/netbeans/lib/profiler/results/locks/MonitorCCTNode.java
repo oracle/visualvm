@@ -129,9 +129,11 @@ class MonitorCCTNode extends LockCCTNode {
     @Override
     void computeChildren() {
         super.computeChildren();
-        if (!waitThreads.isEmpty() || !ownerThreads.isEmpty()) {
+        if (!waitThreads.isEmpty()) {
             waitNode = new ThreadsCCTNode(this, WAIT_THREADS_LBL, WAIT_THREADS_OWNER_LBL, waitThreads);
             addChild(waitNode);
+        }
+        if (!ownerThreads.isEmpty()) {
             addChild(new ThreadsCCTNode(this, OWNER_THREADS_LBL, OWNER_THREADS_WAIT_LBL, ownerThreads));
         }
     }

@@ -100,6 +100,10 @@ class ThreadInfo {
             openMonitor.monitor.timeAdjust(this, timeDiff);
         }
     }
+    
+    boolean isEmpty() {
+        return waitMonitors.isEmpty() && ownerMonitors.isEmpty();
+    }
 
     List<MonitorDetail> cloneWaitMonitorDetails() {
         return cloneMonitorDetails(waitMonitors);
