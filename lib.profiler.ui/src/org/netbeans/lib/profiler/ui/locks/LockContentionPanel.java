@@ -58,6 +58,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -575,9 +576,11 @@ public class LockContentionPanel extends ResultsPanel {
 
         if (cctListener == null) {
             cctListener = new Listener();
-            LockCCTProvider cctProvider = Lookup.getDefault().lookup(LockCCTProvider.class);
-            assert cctProvider != null;
-            cctProvider.addListener(cctListener);
+            Collection<? extends LockCCTProvider> locksCCTProviders = Lookup.getDefault().lookupAll(LockCCTProvider.class);
+            assert !locksCCTProviders.isEmpty();
+            for (LockCCTProvider provider : locksCCTProviders) {
+                provider.addListener(cctListener);
+            }
         } else {
             treeTableModel.setRoot(LockCCTNode.EMPTY);
             treeTable.clearSelection();
