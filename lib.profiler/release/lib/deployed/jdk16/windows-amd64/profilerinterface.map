@@ -1,157 +1,215 @@
  profilerinterface
 
- Timestamp is 528a79e5 (Mon Nov 18 21:34:45 2013)
+ Timestamp is 52d67b9e (Wed Jan 15 13:14:22 2014)
 
- Preferred load address is 0000000010000000
+ Preferred load address is 0000000180000000
 
  Start         Length     Name                   Class
- 0001:00000000 000050a3H .text                   CODE
- 0002:00000000 000000a0H .idata$5                DATA
- 0002:000000a0 00000008H .CRT$XCA                DATA
- 0002:000000a8 00000008H .CRT$XCZ                DATA
- 0002:000000b0 00000008H .CRT$XIA                DATA
- 0002:000000b8 00000008H .CRT$XIZ                DATA
- 0002:000000c0 00000004H .rdata                  DATA
- 0002:000000c4 000008f8H .xdata                  DATA
- 0002:000009bc 00000028H .idata$2                DATA
- 0002:000009e4 00000014H .idata$3                DATA
- 0002:000009f8 000000a0H .idata$4                DATA
- 0002:00000a98 000000ecH .idata$6                DATA
- 0002:00000b90 00000e26H .edata                  DATA
- 0003:00000000 00001944H .data                   DATA
- 0003:00001950 000002f0H .bss                    DATA
- 0004:00000000 000005b8H .pdata                  DATA
+ 0001:00000000 00005344H .text                   CODE
+ 0002:00000000 00000130H .idata$5                DATA
+ 0002:00000130 00000008H .CRT$XCA                DATA
+ 0002:00000138 00000008H .CRT$XCZ                DATA
+ 0002:00000140 00000008H .CRT$XIA                DATA
+ 0002:00000148 00000008H .CRT$XIAA               DATA
+ 0002:00000150 00000008H .CRT$XIZ                DATA
+ 0002:00000158 00000010H .rdata                  DATA
+ 0002:00000168 00000008H .rtc$IAA                DATA
+ 0002:00000170 00000008H .rtc$IZZ                DATA
+ 0002:00000178 00000008H .rtc$TAA                DATA
+ 0002:00000180 00000008H .rtc$TZZ                DATA
+ 0002:00000188 00000754H .xdata                  DATA
+ 0002:000008dc 00000028H .idata$2                DATA
+ 0002:00000904 00000014H .idata$3                DATA
+ 0002:00000918 00000130H .idata$4                DATA
+ 0002:00000a48 0000023aH .idata$6                DATA
+ 0002:00000c90 00000e26H .edata                  DATA
+ 0003:00000000 00001f70H .data                   DATA
+ 0003:00001f70 00000308H .bss                    DATA
+ 0004:00000000 0000057cH .pdata                  DATA
  0005:00000000 00000058H .rsrc$01                DATA
  0005:00000060 00000398H .rsrc$02                DATA
 
-  Address         Publics by Value              Rva+Base             Lib:Object
+  Address         Publics by Value              Rva+Base               Lib:Object
 
- 0000:00000000       ___safe_se_handler_table   0000000000000000     <absolute>
  0000:00000000       ___safe_se_handler_count   0000000000000000     <absolute>
- 0001:00000000       Java_org_netbeans_lib_profiler_server_system_Classes_getAllLoadedClasses 0000000010001000 f   Classes.obj
- 0001:000001f0       Java_org_netbeans_lib_profiler_server_system_Classes_cacheLoadedClasses 00000000100011f0 f   Classes.obj
- 0001:000002b0       Java_org_netbeans_lib_profiler_server_system_Classes_getCachedClassFileBytes 00000000100012b0 f   Classes.obj
- 0001:00000420       register_class_prepare     0000000010001420 f   Classes.obj
- 0001:00000470       Java_org_netbeans_lib_profiler_server_system_Classes_enableClassLoadHook 0000000010001470 f   Classes.obj
- 0001:00000570       Java_org_netbeans_lib_profiler_server_system_Classes_disableClassLoadHook 0000000010001570 f   Classes.obj
- 0001:000005c0       Java_org_netbeans_lib_profiler_server_system_Classes_getObjectSize 00000000100015c0 f   Classes.obj
- 0001:000005f0       Java_org_netbeans_lib_profiler_server_system_Classes_doRedefineClasses 00000000100015f0 f   Classes.obj
- 0001:00000910       Java_org_netbeans_lib_profiler_server_system_Classes_notifyAboutClassLoaderUnloading 0000000010001910 f   Classes.obj
- 0001:00000920       Java_org_netbeans_lib_profiler_server_system_HeapDump_initialize15 0000000010001920 f   HeapDump.obj
- 0001:00000980       Java_org_netbeans_lib_profiler_server_system_HeapDump_takeHeapDump15Native 0000000010001980 f   HeapDump.obj
- 0001:00000a10       Java_org_netbeans_lib_profiler_server_system_Timers_getThreadCPUTimeInNanos 0000000010001a10 f   Timers.obj
- 0001:00000a80       Java_org_netbeans_lib_profiler_server_system_Timers_osSleep 0000000010001a80 f   Timers.obj
- 0001:00000a90       Java_org_netbeans_lib_profiler_server_system_Timers_enableMicrostateAccounting 0000000010001a90 f   Timers.obj
- 0001:00000aa0       register_gc_start          0000000010001aa0 f   GC.obj
- 0001:00000b30       register_gc_finish         0000000010001b30 f   GC.obj
- 0001:00000bc0       enable_gc_start_finish_hook 0000000010001bc0 f   GC.obj
- 0001:00000cb0       Java_org_netbeans_lib_profiler_server_system_GC_activateGCEpochCounter 0000000010001cb0 f   GC.obj
- 0001:00000e10       Java_org_netbeans_lib_profiler_server_system_GC_resetGCEpochCounter 0000000010001e10 f   GC.obj
- 0001:00000e20       Java_org_netbeans_lib_profiler_server_system_GC_getCurrentGCEpoch 0000000010001e20 f   GC.obj
- 0001:00000e30       Java_org_netbeans_lib_profiler_server_system_GC_objectsAdjacent 0000000010001e30 f   GC.obj
- 0001:00000e60       Java_org_netbeans_lib_profiler_server_system_GC_getGCRelativeTimeMetrics 0000000010001e60 f   GC.obj
- 0001:00000fb0       Java_org_netbeans_lib_profiler_server_system_GC_getGCStartFinishTimes 0000000010001fb0 f   GC.obj
- 0001:00001020       Java_org_netbeans_lib_profiler_server_system_GC_runGC 0000000010002020 f   GC.obj
- 0001:00001040       convert_JVMTI_thread_status_to_jfluid_status 0000000010002040 f   Threads.obj
- 0001:000011b0       Java_org_netbeans_lib_profiler_server_system_Threads_recordProfilerOwnThreads 00000000100021b0 f   Threads.obj
- 0001:000013f0       Java_org_netbeans_lib_profiler_server_system_Threads_recordAdditionalProfilerOwnThread 00000000100023f0 f   Threads.obj
- 0001:00001450       Java_org_netbeans_lib_profiler_server_system_Threads_getTotalNumberOfThreads 0000000010002450 f   Threads.obj
- 0001:000014c0       Java_org_netbeans_lib_profiler_server_system_Threads_suspendTargetAppThreads 00000000100024c0 f   Threads.obj
- 0001:00001670       Java_org_netbeans_lib_profiler_server_system_Threads_resumeTargetAppThreads 0000000010002670 f   Threads.obj
- 0001:00001820       Java_org_netbeans_lib_profiler_server_system_Threads_terminateTargetAppThreads 0000000010002820 f   Threads.obj
- 0001:000019d0       Java_org_netbeans_lib_profiler_server_system_Threads_targetAppThreadsExist 00000000100029d0 f   Threads.obj
- 0001:00001b70       Java_org_netbeans_lib_profiler_server_system_Threads_getAllThreads 0000000010002b70 f   Threads.obj
- 0001:00001d00       Java_org_netbeans_lib_profiler_server_system_Threads_getThreadsStatus 0000000010002d00 f   Threads.obj
- 0001:00001e10       Java_org_netbeans_lib_profiler_server_system_Threads_getJVMArguments 0000000010002e10 f   Threads.obj
- 0001:00001e30       Java_org_netbeans_lib_profiler_server_system_Threads_getJavaCommand 0000000010002e30 f   Threads.obj
- 0001:00001ef0       Java_org_netbeans_lib_profiler_server_system_Stacks_getCurrentJavaStackDepth 0000000010002ef0 f   Stacks.obj
- 0001:00001f20       Java_org_netbeans_lib_profiler_server_system_Stacks_clearNativeStackFrameBuffer 0000000010002f20 f   Stacks.obj
- 0001:00001f70       Java_org_netbeans_lib_profiler_server_system_Stacks_getCurrentStackFrameIds 0000000010002f70 f   Stacks.obj
- 0001:00002420       Java_org_netbeans_lib_profiler_server_system_Stacks_getMethodNamesForJMethodIds 0000000010003420 f   Stacks.obj
- 0001:00002800       Java_org_netbeans_lib_profiler_server_system_Stacks_getAllStackTraces 0000000010003800 f   Stacks.obj
- 0001:00002bc0       Java_org_netbeans_lib_profiler_server_system_Stacks_createNativeStackFrameBuffer 0000000010003bc0 f   Stacks.obj
- 0001:00002c20       get_nano_time              0000000010003c20 f   common_functions.obj
- 0001:00002c50       report_usage               0000000010003c50 f   common_functions.obj
- 0001:00002cb0       initializeJVMTI            0000000010003cb0 f   common_functions.obj
- 0001:00002ef0       JNI_OnLoad                 0000000010003ef0 f   common_functions.obj
- 0001:00002f50       Agent_OnLoad               0000000010003f50 f   common_functions.obj
- 0001:000030d0       set_system_loader          00000000100040d0 f   class_file_cache.obj
- 0001:00003200       loader_is_system_loader    0000000010004200 f   class_file_cache.obj
- 0001:00003270       cache_loaded_classes       0000000010004270 f   class_file_cache.obj
- 0001:000032d0       hash                       00000000100042d0 f   class_file_cache.obj
- 0001:00003340       grow_ctable                0000000010004340 f   class_file_cache.obj
- 0001:000035c0       get_saved_class_file_bytes 00000000100045c0 f   class_file_cache.obj
- 0001:000037a0       try_removing_bytes_for_unloaded_classes 00000000100047a0 f   class_file_cache.obj
- 0001:000037b0       getOwner                   00000000100047b0 f   class_file_cache.obj
- 0001:00003890       initializeMethods          0000000010004890 f   class_file_cache.obj
- 0001:00003c60       waitInterceptor            0000000010004c60 f   class_file_cache.obj
- 0001:00003d40       sleepInterceptor           0000000010004d40 f   class_file_cache.obj
- 0001:00003e20       parkInterceptor            0000000010004e20 f   class_file_cache.obj
- 0001:00003f10       monitor_contended_enter_hook 0000000010004f10 f   class_file_cache.obj
- 0001:00003fc0       monitor_contended_entered_hook 0000000010004fc0 f   class_file_cache.obj
- 0001:00004040       vm_object_alloc            0000000010005040 f   class_file_cache.obj
- 0001:000040c0       Java_org_netbeans_lib_profiler_server_system_Classes_setParkTrackingEnabled 00000000100050c0 f   class_file_cache.obj
- 0001:00004120       Java_org_netbeans_lib_profiler_server_system_Classes_setLockContentionMonitoringEnabled 0000000010005120 f   class_file_cache.obj
- 0001:00004130       Java_org_netbeans_lib_profiler_server_system_Classes_setWaitTrackingEnabled 0000000010005130 f   class_file_cache.obj
- 0001:000041a0       Java_org_netbeans_lib_profiler_server_system_Classes_setSleepTrackingEnabled 00000000100051a0 f   class_file_cache.obj
- 0001:00004200       Java_org_netbeans_lib_profiler_server_system_Classes_setVMObjectAllocEnabled 0000000010005200 f   class_file_cache.obj
- 0001:00004250       save_class_file_bytes      0000000010005250 f   class_file_cache.obj
- 0001:000044b0       class_file_load_hook       00000000100054b0 f   class_file_cache.obj
- 0001:00004630       native_method_bind_hook    0000000010005630 f   class_file_cache.obj
- 0001:000049e0       parse_options_and_extract_params 00000000100059e0 f   attach.obj
- 0001:00004bb0       setupAndCallProfilerRuntimeActivate 0000000010005bb0 f   attach.obj
- 0001:00004d80       vm_init_hook               0000000010005d80 f   attach.obj
- 0001:00004d8e       malloc                     0000000010005d8e f   MSVCRT:msvcrt.dll
- 0001:00004d94       memcpy                     0000000010005d94 f   MSVCRT:msvcrt.dll
- 0001:00004d9a       memmove                    0000000010005d9a f   MSVCRT:msvcrt.dll
- 0001:00004da0       memset                     0000000010005da0 f   MSVCRT:msvcrt.dll
- 0001:00004db0       _CRT_INIT                  0000000010005db0 f   MSVCRT:crtdll.obj
- 0001:00004e90       _DllMainCRTStartup         0000000010005e90 f   MSVCRT:crtdll.obj
- 0001:00005000       _initterm                  0000000010006000 f   MSVCRT:msvcrt.dll
- 0001:00005010       _malloc_crt                0000000010006010 f   MSVCRT:crtheap.obj
- 0001:00005080       DllMain                    0000000010006080 f   MSVCRT:dllmain.obj
- 0002:00000000       __imp_Sleep                0000000010007000     kernel32:KERNEL32.dll
- 0002:00000008       __imp_GetModuleHandleA     0000000010007008     kernel32:KERNEL32.dll
- 0002:00000010       __imp_GetProcAddress       0000000010007010     kernel32:KERNEL32.dll
- 0002:00000018       __imp_DisableThreadLibraryCalls 0000000010007018     kernel32:KERNEL32.dll
- 0002:00000020       \177KERNEL32_NULL_THUNK_DATA 0000000010007020     kernel32:KERNEL32.dll
- 0002:00000028       __imp__iob                 0000000010007028     MSVCRT:msvcrt.dll
- 0002:00000030       __imp_memcpy               0000000010007030     MSVCRT:msvcrt.dll
- 0002:00000038       __imp_memmove              0000000010007038     MSVCRT:msvcrt.dll
- 0002:00000040       __imp_strncpy              0000000010007040     MSVCRT:msvcrt.dll
- 0002:00000048       __imp_memset               0000000010007048     MSVCRT:msvcrt.dll
- 0002:00000050       __imp_strpbrk              0000000010007050     MSVCRT:msvcrt.dll
- 0002:00000058       __imp_fprintf              0000000010007058     MSVCRT:msvcrt.dll
- 0002:00000060       __imp_strtol               0000000010007060     MSVCRT:msvcrt.dll
- 0002:00000068       __imp__initterm            0000000010007068     MSVCRT:msvcrt.dll
- 0002:00000070       __imp_calloc               0000000010007070     MSVCRT:msvcrt.dll
- 0002:00000078       __imp__assert              0000000010007078     MSVCRT:msvcrt.dll
- 0002:00000080       __imp_malloc               0000000010007080     MSVCRT:msvcrt.dll
- 0002:00000088       __imp_atoi                 0000000010007088     MSVCRT:msvcrt.dll
- 0002:00000090       __imp_free                 0000000010007090     MSVCRT:msvcrt.dll
- 0002:00000098       \177msvcrt_NULL_THUNK_DATA 0000000010007098     MSVCRT:msvcrt.dll
- 0002:000000a0       __xc_a                     00000000100070a0     MSVCRT:cinitexe.obj
- 0002:000000a8       __xc_z                     00000000100070a8     MSVCRT:cinitexe.obj
- 0002:000000b0       __xi_a                     00000000100070b0     MSVCRT:cinitexe.obj
- 0002:000000b8       __xi_z                     00000000100070b8     MSVCRT:cinitexe.obj
- 0002:000000c0       __real@447a0000            00000000100070c0     GC.obj
- 0002:000009bc       __IMPORT_DESCRIPTOR_msvcrt 00000000100079bc     MSVCRT:msvcrt.dll
- 0002:000009d0       __IMPORT_DESCRIPTOR_KERNEL32 00000000100079d0     kernel32:KERNEL32.dll
- 0002:000009e4       __NULL_IMPORT_DESCRIPTOR   00000000100079e4     MSVCRT:msvcrt.dll
- 0003:00001940       _fltused                   000000001000a940     MSVCRT:dllsupp.obj
- 0003:00001c10       _jvmti                     000000001000ac10     <common>
- 0003:00001c18       _jvmti_callbacks           000000001000ac18     <common>
- 0003:00001c20       JVM_DumpHeap15             000000001000ac20     <common>
- 0003:00001c28       __onexitend                000000001000ac28     <common>
- 0003:00001c30       __onexitbegin              000000001000ac30     <common>
- 0003:00001c38       _pRawDllMain               000000001000ac38     <common>
+ 0000:00000000       ___safe_se_handler_table   0000000000000000     <absolute>
+ 0000:00000000       __ImageBase                0000000180000000     <linker-defined>
+ 0001:00000000       Java_org_netbeans_lib_profiler_server_system_Classes_getAllLoadedClasses 0000000180001000 f   Classes.obj
+ 0001:000001e0       Java_org_netbeans_lib_profiler_server_system_Classes_cacheLoadedClasses 00000001800011e0 f   Classes.obj
+ 0001:00000280       Java_org_netbeans_lib_profiler_server_system_Classes_getCachedClassFileBytes 0000000180001280 f   Classes.obj
+ 0001:000003d0       register_class_prepare     00000001800013d0 f   Classes.obj
+ 0001:00000420       Java_org_netbeans_lib_profiler_server_system_Classes_enableClassLoadHook 0000000180001420 f   Classes.obj
+ 0001:00000520       Java_org_netbeans_lib_profiler_server_system_Classes_disableClassLoadHook 0000000180001520 f   Classes.obj
+ 0001:00000570       Java_org_netbeans_lib_profiler_server_system_Classes_getObjectSize 0000000180001570 f   Classes.obj
+ 0001:000005a0       Java_org_netbeans_lib_profiler_server_system_Classes_doRedefineClasses 00000001800015a0 f   Classes.obj
+ 0001:00000880       Java_org_netbeans_lib_profiler_server_system_Classes_notifyAboutClassLoaderUnloading 0000000180001880 f   Classes.obj
+ 0001:00000890       Java_org_netbeans_lib_profiler_server_system_HeapDump_initialize15 0000000180001890 f   HeapDump.obj
+ 0001:00000900       Java_org_netbeans_lib_profiler_server_system_HeapDump_takeHeapDump15Native 0000000180001900 f   HeapDump.obj
+ 0001:00000980       Java_org_netbeans_lib_profiler_server_system_Timers_getThreadCPUTimeInNanos 0000000180001980 f   Timers.obj
+ 0001:000009f0       Java_org_netbeans_lib_profiler_server_system_Timers_osSleep 00000001800019f0 f   Timers.obj
+ 0001:00000a00       Java_org_netbeans_lib_profiler_server_system_Timers_enableMicrostateAccounting 0000000180001a00 f   Timers.obj
+ 0001:00000a10       register_gc_start          0000000180001a10 f   GC.obj
+ 0001:00000aa0       register_gc_finish         0000000180001aa0 f   GC.obj
+ 0001:00000b30       enable_gc_start_finish_hook 0000000180001b30 f   GC.obj
+ 0001:00000c20       Java_org_netbeans_lib_profiler_server_system_GC_activateGCEpochCounter 0000000180001c20 f   GC.obj
+ 0001:00000d80       Java_org_netbeans_lib_profiler_server_system_GC_resetGCEpochCounter 0000000180001d80 f   GC.obj
+ 0001:00000da0       Java_org_netbeans_lib_profiler_server_system_GC_getCurrentGCEpoch 0000000180001da0 f   GC.obj
+ 0001:00000db0       Java_org_netbeans_lib_profiler_server_system_GC_objectsAdjacent 0000000180001db0 f   GC.obj
+ 0001:00000de0       Java_org_netbeans_lib_profiler_server_system_GC_getGCRelativeTimeMetrics 0000000180001de0 f   GC.obj
+ 0001:00000f20       Java_org_netbeans_lib_profiler_server_system_GC_getGCStartFinishTimes 0000000180001f20 f   GC.obj
+ 0001:00000f90       Java_org_netbeans_lib_profiler_server_system_GC_runGC 0000000180001f90 f   GC.obj
+ 0001:00000fb0       convert_JVMTI_thread_status_to_jfluid_status 0000000180001fb0 f   Threads.obj
+ 0001:00001110       Java_org_netbeans_lib_profiler_server_system_Threads_recordProfilerOwnThreads 0000000180002110 f   Threads.obj
+ 0001:00001350       Java_org_netbeans_lib_profiler_server_system_Threads_recordAdditionalProfilerOwnThread 0000000180002350 f   Threads.obj
+ 0001:000013a0       Java_org_netbeans_lib_profiler_server_system_Threads_getTotalNumberOfThreads 00000001800023a0 f   Threads.obj
+ 0001:00001410       Java_org_netbeans_lib_profiler_server_system_Threads_suspendTargetAppThreads 0000000180002410 f   Threads.obj
+ 0001:000015b0       Java_org_netbeans_lib_profiler_server_system_Threads_resumeTargetAppThreads 00000001800025b0 f   Threads.obj
+ 0001:00001750       Java_org_netbeans_lib_profiler_server_system_Threads_terminateTargetAppThreads 0000000180002750 f   Threads.obj
+ 0001:000018e0       Java_org_netbeans_lib_profiler_server_system_Threads_targetAppThreadsExist 00000001800028e0 f   Threads.obj
+ 0001:00001a60       Java_org_netbeans_lib_profiler_server_system_Threads_getAllThreads 0000000180002a60 f   Threads.obj
+ 0001:00001bd0       Java_org_netbeans_lib_profiler_server_system_Threads_getThreadsStatus 0000000180002bd0 f   Threads.obj
+ 0001:00001d50       Java_org_netbeans_lib_profiler_server_system_Threads_getJVMArguments 0000000180002d50 f   Threads.obj
+ 0001:00001d70       Java_org_netbeans_lib_profiler_server_system_Threads_getJavaCommand 0000000180002d70 f   Threads.obj
+ 0001:00001e30       Java_org_netbeans_lib_profiler_server_system_Stacks_getCurrentJavaStackDepth 0000000180002e30 f   Stacks.obj
+ 0001:00001e60       Java_org_netbeans_lib_profiler_server_system_Stacks_clearNativeStackFrameBuffer 0000000180002e60 f   Stacks.obj
+ 0001:00001eb0       Java_org_netbeans_lib_profiler_server_system_Stacks_getCurrentStackFrameIds 0000000180002eb0 f   Stacks.obj
+ 0001:00002340       Java_org_netbeans_lib_profiler_server_system_Stacks_getMethodNamesForJMethodIds 0000000180003340 f   Stacks.obj
+ 0001:00002700       Java_org_netbeans_lib_profiler_server_system_Stacks_getAllStackTraces 0000000180003700 f   Stacks.obj
+ 0001:00002a90       Java_org_netbeans_lib_profiler_server_system_Stacks_createNativeStackFrameBuffer 0000000180003a90 f   Stacks.obj
+ 0001:00002af0       get_nano_time              0000000180003af0 f   common_functions.obj
+ 0001:00002b20       report_usage               0000000180003b20 f   common_functions.obj
+ 0001:00002b80       initializeJVMTI            0000000180003b80 f   common_functions.obj
+ 0001:00002dc0       JNI_OnLoad                 0000000180003dc0 f   common_functions.obj
+ 0001:00002e20       Agent_OnLoad               0000000180003e20 f   common_functions.obj
+ 0001:00002f80       set_system_loader          0000000180003f80 f   class_file_cache.obj
+ 0001:000030b0       loader_is_system_loader    00000001800040b0 f   class_file_cache.obj
+ 0001:00003120       cache_loaded_classes       0000000180004120 f   class_file_cache.obj
+ 0001:00003180       hash                       0000000180004180 f   class_file_cache.obj
+ 0001:00003200       grow_ctable                0000000180004200 f   class_file_cache.obj
+ 0001:00003440       get_saved_class_file_bytes 0000000180004440 f   class_file_cache.obj
+ 0001:00003600       try_removing_bytes_for_unloaded_classes 0000000180004600 f   class_file_cache.obj
+ 0001:00003610       getOwner                   0000000180004610 f   class_file_cache.obj
+ 0001:000036e0       initializeMethods          00000001800046e0 f   class_file_cache.obj
+ 0001:00003a90       waitInterceptor            0000000180004a90 f   class_file_cache.obj
+ 0001:00003b60       sleepInterceptor           0000000180004b60 f   class_file_cache.obj
+ 0001:00003c30       parkInterceptor            0000000180004c30 f   class_file_cache.obj
+ 0001:00003d20       monitor_contended_enter_hook 0000000180004d20 f   class_file_cache.obj
+ 0001:00003dc0       monitor_contended_entered_hook 0000000180004dc0 f   class_file_cache.obj
+ 0001:00003e40       vm_object_alloc            0000000180004e40 f   class_file_cache.obj
+ 0001:00003eb0       Java_org_netbeans_lib_profiler_server_system_Classes_setParkTrackingEnabled 0000000180004eb0 f   class_file_cache.obj
+ 0001:00003f10       Java_org_netbeans_lib_profiler_server_system_Classes_setLockContentionMonitoringEnabled 0000000180004f10 f   class_file_cache.obj
+ 0001:00003f20       Java_org_netbeans_lib_profiler_server_system_Classes_setWaitTrackingEnabled 0000000180004f20 f   class_file_cache.obj
+ 0001:00003f90       Java_org_netbeans_lib_profiler_server_system_Classes_setSleepTrackingEnabled 0000000180004f90 f   class_file_cache.obj
+ 0001:00003ff0       Java_org_netbeans_lib_profiler_server_system_Classes_setVMObjectAllocEnabled 0000000180004ff0 f   class_file_cache.obj
+ 0001:00004040       save_class_file_bytes      0000000180005040 f   class_file_cache.obj
+ 0001:00004290       class_file_load_hook       0000000180005290 f   class_file_cache.obj
+ 0001:00004400       native_method_bind_hook    0000000180005400 f   class_file_cache.obj
+ 0001:000047d0       parse_options_and_extract_params 00000001800057d0 f   attach.obj
+ 0001:00004990       setupAndCallProfilerRuntimeActivate 0000000180005990 f   attach.obj
+ 0001:00004b50       vm_init_hook               0000000180005b50 f   attach.obj
+ 0001:00004b5e       memcpy                     0000000180005b5e f   MSVCRT:MSVCR80.dll
+ 0001:00004b64       memset                     0000000180005b64 f   MSVCRT:MSVCR80.dll
+ 0001:00004be0       _CRT_INIT                  0000000180005be0 f   MSVCRT:crtdll.obj
+ 0001:00004f80       _DllMainCRTStartup         0000000180005f80 f   MSVCRT:crtdll.obj
+ 0001:00004fc0       __clean_type_info_names    0000000180005fc0 f   MSVCRT:tncleanup.obj
+ 0001:00004fd0       _onexit                    0000000180005fd0 f   MSVCRT:atonexit.obj
+ 0001:000050a0       atexit                     00000001800060a0 f   MSVCRT:atonexit.obj
+ 0001:000050c0       _RTC_Initialize            00000001800060c0 f   MSVCRT:initsect.obj
+ 0001:00005100       _RTC_Terminate             0000000180006100 f   MSVCRT:initsect.obj
+ 0001:00005140       _ValidateImageBase         0000000180006140 f   MSVCRT:pesect.obj
+ 0001:00005170       _FindPESection             0000000180006170 f   MSVCRT:pesect.obj
+ 0001:000051c0       _IsNonwritableInCurrentImage 00000001800061c0 f   MSVCRT:pesect.obj
+ 0001:00005222       _initterm                  0000000180006222 f   MSVCRT:MSVCR80.dll
+ 0001:00005228       _initterm_e                0000000180006228 f   MSVCRT:MSVCR80.dll
+ 0001:0000522e       _amsg_exit                 000000018000622e f   MSVCRT:MSVCR80.dll
+ 0001:00005234       __C_specific_handler       0000000180006234 f   MSVCRT:MSVCR80.dll
+ 0001:0000523a       __CppXcptFilter            000000018000623a f   MSVCRT:MSVCR80.dll
+ 0001:00005240       DllMain                    0000000180006240 f   MSVCRT:dllmain.obj
+ 0001:00005270       __security_init_cookie     0000000180006270 f   MSVCRT:gs_support.obj
+ 0001:0000532c       __clean_type_info_names_internal 000000018000632c f   MSVCRT:MSVCR80.dll
+ 0001:00005332       _unlock                    0000000180006332 f   MSVCRT:MSVCR80.dll
+ 0001:00005338       __dllonexit                0000000180006338 f   MSVCRT:MSVCR80.dll
+ 0001:0000533e       _lock                      000000018000633e f   MSVCRT:MSVCR80.dll
+ 0002:00000000       __imp_GetCurrentProcessId  0000000180007000     kernel32:KERNEL32.dll
+ 0002:00000008       __imp_GetCurrentThreadId   0000000180007008     kernel32:KERNEL32.dll
+ 0002:00000010       __imp_GetTickCount         0000000180007010     kernel32:KERNEL32.dll
+ 0002:00000018       __imp_QueryPerformanceCounter 0000000180007018     kernel32:KERNEL32.dll
+ 0002:00000020       __imp_DisableThreadLibraryCalls 0000000180007020     kernel32:KERNEL32.dll
+ 0002:00000028       __imp_Sleep                0000000180007028     kernel32:KERNEL32.dll
+ 0002:00000030       __imp_GetModuleHandleA     0000000180007030     kernel32:KERNEL32.dll
+ 0002:00000038       __imp_GetProcAddress       0000000180007038     kernel32:KERNEL32.dll
+ 0002:00000040       __imp_GetSystemTimeAsFileTime 0000000180007040     kernel32:KERNEL32.dll
+ 0002:00000048       \177KERNEL32_NULL_THUNK_DATA 0000000180007048     kernel32:KERNEL32.dll
+ 0002:00000050       __imp_strpbrk              0000000180007050     MSVCRT:MSVCR80.dll
+ 0002:00000058       __imp_atoi                 0000000180007058     MSVCRT:MSVCR80.dll
+ 0002:00000060       __imp_strtol               0000000180007060     MSVCRT:MSVCR80.dll
+ 0002:00000068       __imp__encode_pointer      0000000180007068     MSVCRT:MSVCR80.dll
+ 0002:00000070       __imp__malloc_crt          0000000180007070     MSVCRT:MSVCR80.dll
+ 0002:00000078       __imp__initterm            0000000180007078     MSVCRT:MSVCR80.dll
+ 0002:00000080       __imp__initterm_e          0000000180007080     MSVCRT:MSVCR80.dll
+ 0002:00000088       __imp__encoded_null        0000000180007088     MSVCRT:MSVCR80.dll
+ 0002:00000090       __imp_memset               0000000180007090     MSVCRT:MSVCR80.dll
+ 0002:00000098       __imp__amsg_exit           0000000180007098     MSVCRT:MSVCR80.dll
+ 0002:000000a0       __imp___C_specific_handler 00000001800070a0     MSVCRT:MSVCR80.dll
+ 0002:000000a8       __imp___CppXcptFilter      00000001800070a8     MSVCRT:MSVCR80.dll
+ 0002:000000b0       __imp___clean_type_info_names_internal 00000001800070b0     MSVCRT:MSVCR80.dll
+ 0002:000000b8       __imp__unlock              00000001800070b8     MSVCRT:MSVCR80.dll
+ 0002:000000c0       __imp___dllonexit          00000001800070c0     MSVCRT:MSVCR80.dll
+ 0002:000000c8       __imp__lock                00000001800070c8     MSVCRT:MSVCR80.dll
+ 0002:000000d0       __imp__onexit              00000001800070d0     MSVCRT:MSVCR80.dll
+ 0002:000000d8       __imp_strncpy              00000001800070d8     MSVCRT:MSVCR80.dll
+ 0002:000000e0       __imp_memmove              00000001800070e0     MSVCRT:MSVCR80.dll
+ 0002:000000e8       __imp_memcpy               00000001800070e8     MSVCRT:MSVCR80.dll
+ 0002:000000f0       __imp___iob_func           00000001800070f0     MSVCRT:MSVCR80.dll
+ 0002:000000f8       __imp_fprintf              00000001800070f8     MSVCRT:MSVCR80.dll
+ 0002:00000100       __imp_calloc               0000000180007100     MSVCRT:MSVCR80.dll
+ 0002:00000108       __imp__wassert             0000000180007108     MSVCRT:MSVCR80.dll
+ 0002:00000110       __imp_malloc               0000000180007110     MSVCRT:MSVCR80.dll
+ 0002:00000118       __imp__decode_pointer      0000000180007118     MSVCRT:MSVCR80.dll
+ 0002:00000120       __imp_free                 0000000180007120     MSVCRT:MSVCR80.dll
+ 0002:00000128       \177MSVCR80_NULL_THUNK_DATA 0000000180007128     MSVCRT:MSVCR80.dll
+ 0002:00000130       __xc_a                     0000000180007130     MSVCRT:cinitexe.obj
+ 0002:00000138       __xc_z                     0000000180007138     MSVCRT:cinitexe.obj
+ 0002:00000140       __xi_a                     0000000180007140     MSVCRT:cinitexe.obj
+ 0002:00000150       __xi_z                     0000000180007150     MSVCRT:cinitexe.obj
+ 0002:00000158       __real@447a0000            0000000180007158     GC.obj
+ 0002:00000160       _pRawDllMain               0000000180007160     MSVCRT:crtdll.obj
+ 0002:00000160       _pDefaultRawDllMain        0000000180007160     MSVCRT:crtdll.obj
+ 0002:00000168       __rtc_iaa                  0000000180007168     MSVCRT:initsect.obj
+ 0002:00000170       __rtc_izz                  0000000180007170     MSVCRT:initsect.obj
+ 0002:00000178       __rtc_taa                  0000000180007178     MSVCRT:initsect.obj
+ 0002:00000180       __rtc_tzz                  0000000180007180     MSVCRT:initsect.obj
+ 0002:000008dc       __IMPORT_DESCRIPTOR_MSVCR80 00000001800078dc     MSVCRT:MSVCR80.dll
+ 0002:000008f0       __IMPORT_DESCRIPTOR_KERNEL32 00000001800078f0     kernel32:KERNEL32.dll
+ 0002:00000904       __NULL_IMPORT_DESCRIPTOR   0000000180007904     MSVCRT:MSVCR80.dll
+ 0003:00001f50       _fltused                   000000018000af50     MSVCRT:dllsupp.obj
+ 0003:00001f54       __native_dllmain_reason    000000018000af54     MSVCRT:natstart.obj
+ 0003:00001f58       __native_vcclrit_reason    000000018000af58     MSVCRT:natstart.obj
+ 0003:00001f60       __security_cookie          000000018000af60     MSVCRT:gs_cookie.obj
+ 0003:00001f68       __security_cookie_complement 000000018000af68     MSVCRT:gs_cookie.obj
+ 0003:00002224       _forceCRTManifest          000000018000b224     MSVCRT:crtmanifest.obj
+ 0003:00002228       ?__type_info_root_node@@3U__type_info_node@@A 000000018000b228     MSVCRT:tncleanup.obj
+ 0003:00002238       _jvmti                     000000018000b238     <common>
+ 0003:00002240       _jvmti_callbacks           000000018000b240     <common>
+ 0003:00002248       JVM_DumpHeap15             000000018000b248     <common>
+ 0003:00002250       __native_startup_state     000000018000b250     <common>
+ 0003:00002258       __native_startup_lock      000000018000b258     <common>
+ 0003:00002260       __onexitend                000000018000b260     <common>
+ 0003:00002268       __onexitbegin              000000018000b268     <common>
+ 0003:00002270       __dyn_tls_init_callback    000000018000b270     <common>
 
- entry point at        0001:00004e90
+ entry point at        0001:00004f80
 
  Static symbols
 
- 0001:000010c0       isProfilerThread           00000000100020c0 f   Threads.obj
- 0001:00001e50       convert_jmethodID_to_jint  0000000010002e50 f   Stacks.obj
- 0001:00001ed0       convert_jint_to_jmethodID  0000000010002ed0 f   Stacks.obj
- 0001:000020d0       copy_into_data_array       00000000100030d0 f   Stacks.obj
- 0001:000021d0       copy_dummy_names_into_data_array 00000000100031d0 f   Stacks.obj
+ 0001:00001030       isProfilerThread           0000000180002030 f   Threads.obj
+ 0001:00001d90       convert_jmethodID_to_jint  0000000180002d90 f   Stacks.obj
+ 0001:00001e10       convert_jint_to_jmethodID  0000000180002e10 f   Stacks.obj
+ 0001:00002010       copy_into_data_array       0000000180003010 f   Stacks.obj
+ 0001:00002100       copy_dummy_names_into_data_array 0000000180003100 f   Stacks.obj
+ 0001:00004b70       pre_c_init                 0000000180005b70 f   MSVCRT:crtdll.obj
+ 0001:00004df0       __DllMainCRTStartup        0000000180005df0 f   MSVCRT:crtdll.obj
+ 0001:00004f30       __DllMainCRTStartup$filt$0 0000000180005f30 f   MSVCRT:crtdll.obj
+ 0001:00004f60       __DllMainCRTStartup$fin$1  0000000180005f60 f   MSVCRT:crtdll.obj
+ 0001:00005080       _onexit$fin$0              0000000180006080 f   MSVCRT:atonexit.obj
+ 0001:00005200       _IsNonwritableInCurrentImage$filt$0 0000000180006200 f   MSVCRT:pesect.obj
