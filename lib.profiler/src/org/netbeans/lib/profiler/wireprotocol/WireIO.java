@@ -50,7 +50,7 @@ import java.io.ObjectOutputStream;
 
 /**
  * Implementation of our custom serialization. We use our own, specialized, simplified and optimized flavor of
- * object serialization, to improve performance and avoid various things that standard serialization performes
+ * object serialization, to improve performance and avoid various things that standard serialization performs
  * behind the scenes, such as loading of many classes, generating some classes on-the-fly, and so on. These
  * actions can cause various undesirable side effects when used for such a sensitive thing as profiling.
  * However, this kind of serialization is not completely automatic, and some manual changes in this class are
