@@ -61,7 +61,7 @@ cl /I%BUILD_JDK%\include /I%BUILD_JDK%\include\win32 ^
 
 rc /fo version.res %BUILD_SRC_15%\windows\version.rc
 
-link /DLL /MAP:%BUILD_OUTPUT%\deployed\jdk16\windows\profilerinterface.map /OUT:%BUILD_OUTPUT%\deployed\jdk16\windows\profilerinterface.dll ^
+link /DLL /NXCOMPAT /DYNAMICBASE /SAFESEH /MAP:%BUILD_OUTPUT%\deployed\jdk16\windows\profilerinterface.map /OUT:%BUILD_OUTPUT%\deployed\jdk16\windows\profilerinterface.dll ^
 Classes.obj HeapDump.obj Timers.obj GC.obj Threads.obj Stacks.obj common_functions.obj class_file_cache.obj attach.obj version.res
 
 del vc60.pdb
