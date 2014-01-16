@@ -693,6 +693,21 @@ public abstract class NetBeansProfiler extends Profiler {
             return;
         }
 
+        if (getProfilingState() == PROFILING_RUNNING) {
+            final TargetAppRunner runner = getTargetAppRunner();
+            final ProfilerEngineSettings settings = runner.getProfilerEngineSettings();
+            
+            if (settings.isLockContentionMonitoringEnabled() != enabled && runner.targetJVMIsAlive()) {
+                settings.setLockContentionMonitoringEnabled(enabled);
+                try {
+                    runner.getProfilerClient().sendSetInstrumentationParamsCmd(true);
+                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                   settings.setLockContentionMonitoringEnabled(!enabled);
+                   ProfilerDialogs.displayError(ex.getMessage());
+                    return;
+                }
+            }
+        }
         lockContentionMonitoringEnabled = enabled;
         fireLockContentionMonitoringChange();
     }
