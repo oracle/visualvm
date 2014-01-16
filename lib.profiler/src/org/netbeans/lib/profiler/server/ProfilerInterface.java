@@ -585,9 +585,7 @@ public class ProfilerInterface implements CommonConstants {
         switch (instrType) {
             case INSTR_NONE:
             case INSTR_NONE_MEMORY_SAMPLING:
-                if (ProfilerRuntime.lockContentionMonitoringEnabled) {
-                    createEventBuffer();
-                }
+                createEventBuffer();
                 
                 break;
             case INSTR_RECURSIVE_FULL:
