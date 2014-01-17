@@ -43,52 +43,10 @@
 
 package org.netbeans.modules.profiler;
 
-import org.netbeans.modules.profiler.api.GestureSubmitter;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.ProfilingEventListener;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.classfile.ClassRepository;
-import org.netbeans.lib.profiler.client.AppStatusHandler;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.*;
-import org.netbeans.lib.profiler.common.filters.DefinedFilterSets;
-import org.netbeans.lib.profiler.common.filters.GlobalFilters;
-import org.netbeans.lib.profiler.global.CalibrationDataFileIO;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
-import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.instrumentation.BadLocationException;
-import org.netbeans.lib.profiler.instrumentation.InstrumentationException;
-import org.netbeans.lib.profiler.results.CCTProvider;
-import org.netbeans.lib.profiler.results.ProfilingResultsDispatcher;
-import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
-import org.netbeans.lib.profiler.results.cpu.CPUProfilingResultListener;
-import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter;
-import org.netbeans.lib.profiler.results.cpu.marking.MarkingEngine;
-import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
-import org.netbeans.lib.profiler.results.memory.MemoryProfilingResultsListener;
-import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
-import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
-import org.netbeans.lib.profiler.wireprotocol.Command;
-import org.netbeans.lib.profiler.wireprotocol.Response;
-import org.netbeans.lib.profiler.wireprotocol.WireIO;
-import org.openide.awt.StatusDisplayer;
-import org.openide.filesystems.FileLock;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
-import org.openide.util.Lookup;
-import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
-import org.openide.windows.WindowManager;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -124,20 +82,62 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.netbeans.lib.profiler.ProfilerClient;
+import org.netbeans.lib.profiler.ProfilerEngineSettings;
+import org.netbeans.lib.profiler.ProfilerLogger;
+import org.netbeans.lib.profiler.ProfilingEventListener;
+import org.netbeans.lib.profiler.TargetAppRunner;
+import org.netbeans.lib.profiler.classfile.ClassRepository;
+import org.netbeans.lib.profiler.client.AppStatusHandler;
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.client.ProfilingPointsProcessor;
+import org.netbeans.lib.profiler.common.*;
+import org.netbeans.lib.profiler.common.filters.DefinedFilterSets;
+import org.netbeans.lib.profiler.common.filters.GlobalFilters;
+import org.netbeans.lib.profiler.global.CalibrationDataFileIO;
+import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.global.InstrumentationFilter;
+import org.netbeans.lib.profiler.global.Platform;
+import org.netbeans.lib.profiler.instrumentation.BadLocationException;
+import org.netbeans.lib.profiler.instrumentation.InstrumentationException;
+import org.netbeans.lib.profiler.results.CCTProvider;
+import org.netbeans.lib.profiler.results.ProfilingResultsDispatcher;
+import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
+import org.netbeans.lib.profiler.results.cpu.CPUProfilingResultListener;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
+import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter;
 import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
+import org.netbeans.lib.profiler.results.cpu.marking.MarkingEngine;
 import org.netbeans.lib.profiler.results.locks.LockProfilingResultListener;
+import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
+import org.netbeans.lib.profiler.results.memory.MemoryProfilingResultsListener;
+import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
+import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import org.netbeans.lib.profiler.ui.SwingWorker;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
+import org.netbeans.lib.profiler.wireprotocol.Command;
+import org.netbeans.lib.profiler.wireprotocol.Response;
+import org.netbeans.lib.profiler.wireprotocol.WireIO;
+import org.netbeans.modules.profiler.api.GestureSubmitter;
 import org.netbeans.modules.profiler.api.GlobalStorage;
 import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.api.ProgressDisplayer;
 import org.netbeans.modules.profiler.spi.SessionListener;
 import org.netbeans.modules.profiler.ui.ProfilerProgressDisplayer;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.awt.Mnemonics;
+import org.openide.awt.StatusDisplayer;
+import org.openide.filesystems.FileLock;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
+import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
+import org.openide.windows.WindowManager;
 
 
 /**
@@ -693,6 +693,21 @@ public abstract class NetBeansProfiler extends Profiler {
             return;
         }
 
+        if (getProfilingState() == PROFILING_RUNNING) {
+            final TargetAppRunner runner = getTargetAppRunner();
+            final ProfilerEngineSettings settings = runner.getProfilerEngineSettings();
+            
+            if (settings.isLockContentionMonitoringEnabled() != enabled && runner.targetJVMIsAlive()) {
+                settings.setLockContentionMonitoringEnabled(enabled);
+                try {
+                    runner.getProfilerClient().sendSetInstrumentationParamsCmd(true);
+                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                   settings.setLockContentionMonitoringEnabled(!enabled);
+                   ProfilerDialogs.displayError(ex.getMessage());
+                    return;
+                }
+            }
+        }
         lockContentionMonitoringEnabled = enabled;
         fireLockContentionMonitoringChange();
     }
@@ -1905,6 +1920,7 @@ public abstract class NetBeansProfiler extends Profiler {
                         ProfilingResultsDispatcher.getDefault().addListener(listener);
                         listener.startup(getTargetAppRunner().getProfilerClient());
                     }
+                    break;
                 }
                 default: {
                     listeners = Lookup.getDefault().lookupAll(LockProfilingResultListener.class);

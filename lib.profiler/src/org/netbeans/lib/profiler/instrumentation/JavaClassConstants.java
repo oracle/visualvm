@@ -74,6 +74,12 @@ public interface JavaClassConstants {
     public static final int CONSTANT_Methodref = 10;
     public static final int CONSTANT_InterfaceMethodref = 11;
     public static final int CONSTANT_NameAndType = 12;
+    public static final int CONSTANT_unused13 = 13;
+    public static final int CONSTANT_unused14 = 14;
+    public static final int CONSTANT_MethodHandle = 15;
+    public static final int CONSTANT_MethodType = 16;
+    public static final int CONSTANT_unused17 = 17;  // unused
+    public static final int CONSTANT_InvokeDynamic = 18;
 
     /* Opcodes */
     static final int opc_try = -3;
@@ -469,7 +475,7 @@ public interface JavaClassConstants {
     3, // opc_invokespecial
     3, // opc_invokestatic
     5, // opc_invokeinterface
-    0, // opc_xxxunusedxxx
+    5, // opc_invokedynamic
     3, // opc_new
     2, // opc_newarray
     3, // opc_anewarray

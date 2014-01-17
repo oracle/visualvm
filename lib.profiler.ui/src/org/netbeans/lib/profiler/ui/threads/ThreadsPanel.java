@@ -216,7 +216,7 @@ public class ThreadsPanel extends JPanel {
         
         };
         
-        threadsTable = new ProfilerTable(threadsTableModel, true, true, new int[] { 1 }, true) {
+        threadsTable = new ProfilerTable(threadsTableModel, true, true, new int[] { 1 }) {
             protected int computeColumnPreferredWidth(int modelIndex, int viewIndex, int firstRow, int lastRow) {
                 if (modelIndex != 1) return super.computeColumnPreferredWidth(modelIndex, viewIndex, firstRow, lastRow);
                 
@@ -404,26 +404,18 @@ public class ThreadsPanel extends JPanel {
         dataManager.addDataListener(new DataManagerListener() {
             private boolean firstChange = true;
             public void dataChanged() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        lastTimestamp = dataManager.getEndTime();
-                        if (firstChange) {
-                            firstChange = false;
-                            repaintTimeline();
-                        }
-                        threadsTableModel.fireTableDataChanged();
-                    }
-                });
+                lastTimestamp = dataManager.getEndTime();
+                if (firstChange) {
+                    firstChange = false;
+                    repaintTimeline();
+                }
+                threadsTableModel.fireTableDataChanged();
             }
             public void dataReset() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        viewManager.reset();
-                        firstChange = true;
-                        timeRelRenderer.setBasis(0);
-                        threadsTableModel.fireTableDataChanged();
-                    }
-                });
+                viewManager.reset();
+                firstChange = true;
+                timeRelRenderer.setBasis(0);
+                threadsTableModel.fireTableDataChanged();
             }
         });
         
