@@ -223,7 +223,7 @@ public final class LockContentionWindow extends ProfilerTopComponent {
 
         @Override
         public void actionPerformed(final ActionEvent e) {
-//        Profiler.getDefault().setLockContentionEnabled(true);
+            Profiler.getDefault().setLockContentionMonitoringEnabled(true);
             locksPanel.lockContentionEnabled();
         }
     }
