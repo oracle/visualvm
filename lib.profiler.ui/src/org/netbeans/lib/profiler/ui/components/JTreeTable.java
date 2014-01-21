@@ -1013,11 +1013,23 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
 
     private void dispatchKeyboardEvent(KeyEvent e) {
         JTreeTable.this.tree.customProcessKeyEvent(e);
-
-        int selectedRow = getSelectedRow();
-
-        if (selectedRow > -1) {
-            scrollRectToVisible(getCellRect(selectedRow, 0, false));
+        
+        if (!isModifierKey(e)) {
+            int selectedRow = getSelectedRow();
+            if (selectedRow > -1)
+                scrollRectToVisible(getCellRect(selectedRow, 0, false));
+        }
+    }
+    
+    private static boolean isModifierKey(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_ALT:
+            case KeyEvent.VK_ALT_GRAPH:
+            case KeyEvent.VK_SHIFT:
+            case KeyEvent.VK_CONTROL:
+                return true;
+            default:
+                return false;
         }
     }
 
