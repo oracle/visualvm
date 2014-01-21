@@ -43,15 +43,14 @@
 
 package org.netbeans.lib.profiler.classfile;
 
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.instrumentation.BadLocationException;
-import org.netbeans.lib.profiler.utils.FileOrZipEntry;
-import org.netbeans.lib.profiler.utils.MiscUtils;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.*;
+import org.netbeans.lib.profiler.TargetAppRunner;
+import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.instrumentation.BadLocationException;
+import org.netbeans.lib.profiler.utils.MiscUtils;
 
 
 /**
@@ -330,8 +329,8 @@ public abstract class ClassRepository implements CommonConstants {
     }
 
     public static void addPlaceholder(PlaceholderClassInfo pci) {
-        BaseClassInfo singleExistingClazzOrPCI = null;
-        SameNameClassGroup classGroup = null;
+        BaseClassInfo singleExistingClazzOrPCI;
+        SameNameClassGroup classGroup;
         String className = pci.getName();
 
         Object entry = classes.get(className);
@@ -620,7 +619,7 @@ public abstract class ClassRepository implements CommonConstants {
     private static DynamicClassInfo lookupClass(String className, int classLoaderId, boolean reportIfNotFound)
                                          throws IOException, ClassFormatError {
         BaseClassInfo singleExistingClazzOrPCI = null;
-        BaseClassInfo clazzOrPCI = null;
+        BaseClassInfo clazzOrPCI;
         SameNameClassGroup classGroup = null;
         className = className.replace('.', '/').intern(); // NOI18N
 
