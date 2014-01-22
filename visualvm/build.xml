@@ -121,7 +121,7 @@
         <delete dir="build/javadoc"/>
 
         <javadoc destdir="build/javadoc" author="true" version="true" use="true" encoding="UTF-8" windowtitle="${app.title} API">
-
+            
             <!--group title="VisualVM-Application" packages="com.sun.tools.visualvm.application*"/-->
             <fileset dir="application/src" defaultexcludes="yes">
                 <include name="**/*.java"/>
@@ -209,7 +209,7 @@
                 <pathelement location="hostviews/build/classes/"/>
             </classpath>
 
-            <link href="http://download.oracle.com/javase/6/docs/api/"/>
+            <link href="http://docs.oracle.com/javase/7/docs/api/"/>
 
 
             <doctitle><![CDATA[<h1>${app.title} API Specification</h1><p align="left">This document is the API specification for ${app.title}. See the <a href="https://visualvm.java.net/api-quickstart.html">Getting Started Extending VisualVM</a> document for information about developing plugins for VisualVM.</p><br/>]]></doctitle>
