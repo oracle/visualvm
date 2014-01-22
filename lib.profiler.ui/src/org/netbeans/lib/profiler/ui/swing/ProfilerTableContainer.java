@@ -47,6 +47,9 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.util.Set;
 import javax.swing.BorderFactory;
@@ -175,7 +178,32 @@ public class ProfilerTableContainer extends JPanel {
                         return value;
                     }
                 };
+                scroller.addMouseWheelListener(new MouseWheelListener() {
+                    public void mouseWheelMoved(MouseWheelEvent e) {
+                        scroll(scroller, e);
+                    }
+                });
                 scrollersPanel.add(scroller);
+            }
+            
+            MouseWheelListener[] listeners = tableScroll.getMouseWheelListeners();
+            if (listeners != null && listeners.length == 1) {
+                final MouseWheelListener listener = listeners[0];
+                tableScroll.removeMouseWheelListener(listener);
+                tableScroll.addMouseWheelListener(new MouseWheelListener() {
+                    public void mouseWheelMoved(MouseWheelEvent e) {
+                        if (onlyShift(e)) {
+                            int c = table.columnAtPoint(e.getPoint());
+                            int _c = c == -1 ? -1 : table.convertColumnIndexToModel(c);
+                            if (_c != -1 && table.isScrollableColumn(_c)) {
+                                JScrollBar scroller = getScroller(_c);
+                                if (scroller != null) scroll(scroller, e);
+                                return;
+                            }
+                        }
+                        listener.mouseWheelMoved(e);
+                    }
+                });
             }
             
             cModel.addColumnChangeListener(new ColumnChangeAdapter() {
@@ -222,6 +250,22 @@ public class ProfilerTableContainer extends JPanel {
         }
         
         if (adapter != null) cModel.addColumnChangeListener(adapter);
+    }
+    
+    private static void scroll(JScrollBar scroller, MouseWheelEvent event) {
+        if (event.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+            int direction = event.getUnitsToScroll() < 0 ? -1 : 1;
+            int increment = scroller.getUnitIncrement(direction);
+            int oldValue = scroller.getValue();
+            int newValue = oldValue + increment * direction;
+            if (oldValue != newValue) scroller.setValue(newValue);
+            event.consume();
+        }
+    }
+    
+    private static boolean onlyShift(MouseEvent e) {
+        return e.isShiftDown() && !(e.isAltDown() || e.isAltGraphDown() ||
+                                    e.isControlDown() || e.isMetaDown());
     }
     
     public boolean tableNeedsScrolling() {
