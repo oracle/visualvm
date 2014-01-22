@@ -51,6 +51,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.openide.awt.Mnemonics;
@@ -355,8 +356,8 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.gridy = 2;
             constraints.gridwidth = 1;
             constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.EAST;
-            constraints.insets = new Insets(8, 4, 0, 0);
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.insets = new Insets(8, 0, 0, 0);
             add(displaynameCheckbox, constraints);
 
             // displaynameField
@@ -509,8 +510,8 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.gridy = 7;
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.fill = GridBagConstraints.HORIZONTAL;
-            constraints.anchor = GridBagConstraints.EAST;
-            constraints.insets = new Insets(15, 5, 0, 0);
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.insets = new Insets(15, 0, 0, 0);
             add(noSSLCheckbox, constraints);
 
             // spacer
@@ -526,7 +527,18 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             add(Spacer.create(), constraints);
 
             // UI tweaks
-            displaynameCheckbox.setBorder(connectionLabel.getBorder());
+            Border b = connectionLabel.getBorder();
+            int r = b == null ? 0 : b.getBorderInsets(connectionLabel).right;
+            
+            Border c = displaynameCheckbox.getBorder();
+            if (c != null) {
+                Insets i = c.getBorderInsets(displaynameCheckbox);
+                if (i == null) i = new Insets(0, 0, 0, 0);
+                Border bb = BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, r);
+                displaynameCheckbox.setBorder(bb);
+                securityCheckbox.setBorder(bb);
+                noSSLCheckbox.setBorder(bb);
+            }
         }
 
 
@@ -633,7 +645,6 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
                     DefaultCustomizer.class, "LBL_Use_security_credentials")); // NOI18N
             securityCheckbox.setEnabled(false);
             securityCheckbox.setOpaque(false);
-            securityCheckbox.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
             securityCheckbox.setForeground(checkboxText);
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
@@ -641,7 +652,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.fill = GridBagConstraints.NONE;
             constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(15, 0, 3, 0);
+            constraints.insets = new Insets(15, 0, 0, 0);
             add(securityCheckbox, constraints);
 
             // usernameLabel
@@ -654,7 +665,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.gridwidth = 1;
             constraints.fill = GridBagConstraints.NONE;
             constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(3, 20, 3, 0);
+            constraints.insets = new Insets(5, 20, 0, 0);
             add(usernameLabel, constraints);
 
             // usernameField
@@ -670,7 +681,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.fill = GridBagConstraints.HORIZONTAL;
             constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(3, 5, 3, 0);
+            constraints.insets = new Insets(5, 5, 0, 0);
             add(usernameField, constraints);
 
             // passwordLabel
@@ -683,7 +694,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.gridwidth = 1;
             constraints.fill = GridBagConstraints.NONE;
             constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(3, 20, 3, 0);
+            constraints.insets = new Insets(8, 20, 0, 0);
             add(passwordLabel, constraints);
 
             // passwordField
@@ -700,7 +711,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.fill = GridBagConstraints.HORIZONTAL;
             constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(3, 5, 3, 0);
+            constraints.insets = new Insets(8, 5, 0, 0);
             add(passwordField, constraints);
 
             // saveCheckbox
@@ -709,7 +720,6 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
                     DefaultCustomizer.class, "LBL_Save_security_credentials")); // NOI18N
             saveCheckbox.setEnabled(false);
             saveCheckbox.setOpaque(false);
-            saveCheckbox.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 3));
             saveCheckbox.setForeground(checkboxText);
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
@@ -717,7 +727,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.fill = GridBagConstraints.HORIZONTAL;
             constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = new Insets(3, 20, 0, 0);
+            constraints.insets = new Insets(8, 16, 0, 0);
             add(saveCheckbox, constraints);
             
             // noSSLCheckbox
@@ -732,7 +742,7 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.gridy = 7;
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.fill = GridBagConstraints.HORIZONTAL;
-            constraints.anchor = GridBagConstraints.EAST;
+            constraints.anchor = GridBagConstraints.WEST;
             constraints.insets = new Insets(15, 0, 3, 0);
             add(noSSLCheckbox, constraints);
 
@@ -747,6 +757,19 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
             constraints.anchor = GridBagConstraints.NORTHWEST;
             constraints.insets = new Insets(0, 0, 0, 0);
             add(Spacer.create(), constraints);
+            
+            // UI tweaks
+            Border b = connectionLabel.getBorder();
+            int r = b == null ? 0 : b.getBorderInsets(connectionLabel).right;
+            
+            Border c = securityCheckbox.getBorder();
+            if (c != null) {
+                Insets i = c.getBorderInsets(securityCheckbox);
+                if (i == null) i = new Insets(0, 0, 0, 0);
+                Border bb = BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, r);
+                securityCheckbox.setBorder(bb);
+                noSSLCheckbox.setBorder(bb);
+            }
         }
 
         private JLabel connectionLabel;
