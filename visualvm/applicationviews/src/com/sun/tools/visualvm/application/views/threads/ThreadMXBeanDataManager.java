@@ -175,9 +175,10 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
                     return CommonConstants.THREAD_STATUS_RUNNING;
                 case TIMED_WAITING:
                 case WAITING:
-                    return isSleeping(threadInfo.getStackTrace()[0]) ?
-                        CommonConstants.THREAD_STATUS_SLEEPING :
-                        CommonConstants.THREAD_STATUS_WAIT;
+                    StackTraceElement el = threadInfo.getStackTrace()[0];
+                    if (isSleeping(el)) return CommonConstants.THREAD_STATUS_SLEEPING;
+                    if (isParked(el)) return CommonConstants.THREAD_STATUS_PARK;
+                    return CommonConstants.THREAD_STATUS_WAIT;
                 case TERMINATED:
                 case NEW:
                     return CommonConstants.THREAD_STATUS_ZOMBIE;
@@ -188,6 +189,11 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
         boolean isSleeping(StackTraceElement element) {
             return Thread.class.getName().equals(element.getClassName()) &&
                     "sleep".equals(element.getMethodName());    // NOI18N
+        }
+
+        boolean isParked(StackTraceElement element) {
+            return "sun.misc.Unsafe".equals(element.getClassName()) &&    // NOI18N
+                    "park".equals(element.getMethodName());    // NOI18N
         }
     }
 }
