@@ -119,11 +119,12 @@ class HeaderComponent extends JComponent {
     }
     
     private void setupHeader(JTableHeader h) {
-        MouseEvent e = isSelected ?
+        h.setDraggedColumn(isSelected && isPressed ? getColumn() : null);
+        
+        MouseEvent e = isSelected && !isPressed ?
                 new MouseEvent(h, MouseEvent.MOUSE_ENTERED, 1, 0, 1, 1, 0, false) :
                 new MouseEvent(h, MouseEvent.MOUSE_EXITED, 1, 0, 0, 0, 0, false);
         h.dispatchEvent(e);
-        h.setDraggedColumn(isSelected && isPressed ? getColumn() : null);
     }
     
     

@@ -79,8 +79,12 @@ class ProfilerRowSorter extends TableRowSorter {
             // Use defined initial SortOrder for a newly sorted column
             setSortColumn(newKey.getColumn());
         } else {
-            super.setSortKeys(newKeys);
+            setSortKeysImpl(newKeys);
         }
+    }
+    
+    protected void setSortKeysImpl(List newKeys) {
+        super.setSortKeys(newKeys);
     }
     
     void setSortColumn(int column) {
@@ -92,7 +96,7 @@ class ProfilerRowSorter extends TableRowSorter {
     }
     
     void setSortKey(RowSorter.SortKey key) {
-        super.setSortKeys(Arrays.asList(key));
+        setSortKeysImpl(Arrays.asList(key));
     }
     
     int getSortColumn() {
