@@ -326,6 +326,11 @@ public class TreeTableModelAdapter extends AbstractTableModel {
             }
         }
     }
+    
+    private boolean firingChange;
+    public final boolean isFiringChange() {
+        return firingChange;
+    }
 
     /**
      * Invokes fireTableDataChanged after all the pending events have been
@@ -335,7 +340,12 @@ public class TreeTableModelAdapter extends AbstractTableModel {
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     TreePath[] selectedPaths = tree.getSelectionPaths();
-                    fireTableDataChanged();
+                    firingChange = true;
+                    try {
+                        fireTableDataChanged();
+                    } finally {
+                        firingChange = false;
+                    }
                     tree.setSelectionPaths(selectedPaths);
                 }
             });

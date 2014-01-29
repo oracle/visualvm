@@ -95,6 +95,7 @@ public class JTreeTable extends JTable implements CellTipAware, MouseListener, M
             //~ Methods ----------------------------------------------------------------------------------------------------------
 
             public void valueChanged(ListSelectionEvent e) {
+                if (treeTableModelAdapter.isFiringChange()) return;
                 updateSelectedPathsFromSelectedRows();
             }
         }
