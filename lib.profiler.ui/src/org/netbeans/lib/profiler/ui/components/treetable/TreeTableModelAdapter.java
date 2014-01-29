@@ -229,9 +229,13 @@ public class TreeTableModelAdapter extends AbstractTableModel {
         CCTNode n = (CCTNode)treeTableModel.getRoot();
         
         for (int i = 1; i < op.length; i++) {
+            // #241115
+            CCTNode[] children = n.getChildren();
+            if (children == null) return null;
+            
             CCTNode nn = null;
             
-            for (CCTNode c : n.getChildren())
+            for (CCTNode c : children)
                 if (c.equals(op[i])) {
                     nn = c;
                     break;
