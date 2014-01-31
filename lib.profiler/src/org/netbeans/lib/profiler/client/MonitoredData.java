@@ -262,12 +262,14 @@ public class MonitoredData {
     }
 
     private static void convertToTimeInMillis(final long[] hiResTimeStamp) {
-        ProfilingSessionStatus session = TargetAppRunner.getDefault().getProfilingSessionStatus();
-        long statupInCounts = session.startupTimeInCounts;
-        long startupMillis = session.startupTimeMillis;
+        if (hiResTimeStamp.length > 0) {
+            ProfilingSessionStatus session = TargetAppRunner.getDefault().getProfilingSessionStatus();
+            long statupInCounts = session.startupTimeInCounts;
+            long startupMillis = session.startupTimeMillis;
 
-        for (int i = 0; i < hiResTimeStamp.length; i++) {
-            hiResTimeStamp[i] = startupMillis + ((hiResTimeStamp[i] - statupInCounts) / (1000000000 / 1000L)); // 1 ms has 1000000000/1000 ns
+            for (int i = 0; i < hiResTimeStamp.length; i++) {
+                hiResTimeStamp[i] = startupMillis + ((hiResTimeStamp[i] - statupInCounts) / (1000000000 / 1000L)); // 1 ms has 1000000000/1000 ns
+            }
         }
     }
 
