@@ -430,6 +430,8 @@ public class ProfilerTable extends JTable {
     }
     
     private void updateColumnsPreferredWidth() {
+        if (getRowCount() == 0) return;
+        
         Rectangle visible = getVisibleRect();
         if (visible.isEmpty()) return;
         

@@ -1,7 +1,44 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common
+ * Development and Distribution License("CDDL") (collectively, the
+ * "License"). You may not use this file except in compliance with the
+ * License. You can obtain a copy of the License at
+ * http://www.netbeans.org/cddl-gplv2.html
+ * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+ * specific language governing permissions and limitations under the
+ * License.  When distributing the software, include this License Header
+ * Notice in each file and include the License file at
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Oracle in the GPL Version 2 section of the License file that
+ * accompanied this code. If applicable, add the following below the
+ * License Header, with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Contributor(s):
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
+ * If you wish your version of this file to be governed by only the CDDL
+ * or only the GPL Version 2, indicate your decision by adding
+ * "[Contributor] elects to include this software in this distribution
+ * under the [CDDL or GPL Version 2] license." If you do not indicate a
+ * single choice of license, a recipient has the option to distribute
+ * your version of this file under either the CDDL, the GPL Version 2 or
+ * to extend the choice of license to its licensees as provided above.
+ * However, if you add GPL Version 2 code and therefore, elected the GPL
+ * Version 2 license, then the option applies only if the new code is
+ * made subject to such option by the copyright holder.
  */
 
 package org.netbeans.lib.profiler.ui.swing;
@@ -30,6 +67,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
@@ -147,8 +185,8 @@ public class ProfilerTreeTable extends ProfilerTable {
     
     private static class ProfilerTreeTableSorter extends ProfilerRowSorter {
         
-        private TableModelImpl model;
-        private List<SortKey> sortKeys;
+        private final TableModelImpl model;
+        private List<RowSorter.SortKey> sortKeys;
         
         ProfilerTreeTableSorter(TableModel model) {
             super(model);
@@ -178,7 +216,7 @@ public class ProfilerTreeTable extends ProfilerTable {
 //            fireSortOrderChanged();
         }
         
-        public List<? extends SortKey> getSortKeys() {
+        public List<? extends RowSorter.SortKey> getSortKeys() {
             return sortKeys;
         }
         
@@ -229,6 +267,13 @@ public class ProfilerTreeTable extends ProfilerTable {
                     if (uiState != null) restoreUIState(tree, uiState);
                 }
             };
+            
+            model.addListener(new ProfilerTreeTableModel.Adapter() {
+                public void rootChanged(TreeNode oldRoot, TreeNode newRoot) {
+                    treeModel.setRoot(newRoot);
+                }
+            });
+                    
             tree = new ProfilerTreeTableTree(treeModel);
             tree.setShowsRootHandles(false);
             for (int i = 0; i < tree.getRowCount(); i++) tree.expandRow(i);
@@ -289,6 +334,8 @@ public class ProfilerTreeTable extends ProfilerTable {
         private Comparator comparator;
         private Map<Object, int[]> viewToModel;
         
+        private boolean isChanging;
+        
         
         TreeModelImpl(TreeNode root) {
             super(root);
@@ -301,6 +348,21 @@ public class ProfilerTreeTable extends ProfilerTable {
             reload();
         }
         
+        
+        public void setRoot(TreeNode root) {
+            viewToModel = null;
+            
+            isChanging = true;
+            try {
+                super.setRoot(root);
+            } finally {
+                isChanging = false;
+            }
+        }
+        
+        boolean isChanging() {
+            return isChanging;
+        }
         
         public Object getChild(Object parent, int index) {
             if (comparator == null) return super.getChild(parent, index);
@@ -351,7 +413,8 @@ public class ProfilerTreeTable extends ProfilerTable {
         try {
             tree.putClientProperty(UIUtils.PROP_EXPANSION_TRANSACTION, Boolean.TRUE);
             Enumeration<TreePath> paths = uiState.getExpandedPaths();
-            while (paths.hasMoreElements()) tree.expandPath(paths.nextElement());
+            if (paths != null) while (paths.hasMoreElements())
+                tree.expandPath(paths.nextElement());
         } finally {
             tree.putClientProperty(UIUtils.PROP_EXPANSION_TRANSACTION, null);
         }
@@ -456,7 +519,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         private boolean customRendering;
 
         
-        ProfilerTreeTableTree(TreeModel model) {
+        ProfilerTreeTableTree(TreeModelImpl model) {
             super(model);
             
             setOpaque(false);
@@ -464,6 +527,8 @@ public class ProfilerTreeTable extends ProfilerTable {
             getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
             
             setCellRenderer(createCellRenderer(new LabelRenderer()));
+            
+            setLargeModel(true);
         }
         
         public void setUI(TreeUI ui) {
@@ -540,6 +605,59 @@ public class ProfilerTreeTable extends ProfilerTable {
             for (int i = 0; i < column; i++) x += columns.getColumn(i).getWidth();
             return x == 0;
         }
+        
+        public void expandPath(TreePath path) {
+            if (isChangingModel()) path = getSimilarPath(path);
+            super.expandPath(path);
+        }
+        
+        public void setSelectionPath(TreePath path) {
+            if (isChangingModel()) path = getSimilarPath(path);
+            super.setSelectionPath(path);
+        }
+        
+        public void setSelectionPaths(TreePath[] paths) {
+            if (isChangingModel() && paths != null)
+                for (int i = 0; i < paths.length; i++)
+                    paths[i] = getSimilarPath(paths[i]);
+            super.setSelectionPaths(paths);
+        }
+        
+        private TreePath getSimilarPath(TreePath oldPath) {
+            if (oldPath == null || oldPath.getPathCount() < 1) return null;
+
+            TreeModel currentModel = getModel();
+            Object currentRoot = currentModel.getRoot();
+            if (!currentRoot.equals(oldPath.getPathComponent(0))) return null;
+
+            TreePath p = new TreePath(currentRoot);
+            Object[] op = oldPath.getPath();
+            Object n = currentRoot;
+
+            for (int i = 1; i < op.length; i++) {
+                Object nn = null;
+
+                for (int ii = 0; ii < currentModel.getChildCount(n); ii++) {
+                    Object c = currentModel.getChild(n, ii);
+                    if (c.equals(op[i])) {
+                        nn = c;
+                        break;
+                    }
+                }
+
+                if (nn == null) return null;
+
+                n = nn;
+                p = p.pathByAddingChild(n);
+            }
+
+            return p;
+        }
+        
+        private boolean isChangingModel() {
+            return ((TreeModelImpl)getModel()).isChanging();
+        }
+        
     }
     
     
