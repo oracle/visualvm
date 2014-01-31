@@ -72,19 +72,16 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
 import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
@@ -92,7 +89,6 @@ import org.netbeans.lib.profiler.results.locks.LockCCTNode;
 import org.netbeans.lib.profiler.results.locks.LockCCTProvider;
 import org.netbeans.lib.profiler.results.locks.LockRuntimeCCTNode;
 import org.netbeans.lib.profiler.ui.ResultsPanel;
-import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.FlatToolBar;
 //import org.netbeans.lib.profiler.ui.components.JTreeTable;
@@ -102,9 +98,6 @@ import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRender
 import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
 import org.netbeans.lib.profiler.ui.components.tree.EnhancedTreeCellRenderer;
-import org.netbeans.lib.profiler.ui.components.treetable.ExtendedTreeTableModel;
-import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
-import org.netbeans.lib.profiler.ui.components.treetable.TreeTableModel;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
@@ -217,8 +210,8 @@ public class LockContentionPanel extends ResultsPanel {
         treeTableModel = new LocksTreeTableModel();
         
         treeTable = new ProfilerTreeTable(treeTableModel, true, true, new int[] { 0 });
-//        treeTable.getTree().setRootVisible(false);
-//        treeTable.getTree().setShowsRootHandles(true);
+        treeTable.setRootVisible(false);
+        treeTable.setShowsRootHandles(true);
 //        treeTable.addMouseListener(new MouseListener());
 //        treeTable.addKeyListener(new KeyListener());
 //        treeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -559,7 +552,6 @@ public class LockContentionPanel extends ResultsPanel {
     }
 
     public void profilingSessionStarted() {
-        System.err.println(">>> profilingSessionStarted");
         ProfilingSessionStatus session = TargetAppRunner.getDefault().getProfilingSessionStatus();
         countsInMicrosec = session.timerCountsInSecond[0] / 1000000L;
 //        countsInMicrosec = 1;
@@ -747,7 +739,7 @@ public class LockContentionPanel extends ResultsPanel {
 
         public Class getColumnClass(int column) {
             if (column == 0) {
-                return TreeTableModel.class;
+                return JTree.class;
             } else {
                 return Object.class;
             }
@@ -761,17 +753,17 @@ public class LockContentionPanel extends ResultsPanel {
             return columnNames[columnIndex];
         }
 
-        public String getColumnToolTipText(int col) {
-            return columnToolTips[col];
-        }
+//        public String getColumnToolTipText(int col) {
+//            return columnToolTips[col];
+//        }
+//
+//        public boolean getInitialSorting(int column) {
+//            return column == 0;
+//        }
 
-        public boolean getInitialSorting(int column) {
-            return column == 0;
-        }
-
-        public boolean isLeaf(Object node) {
-            return ((LockCCTNode)node).getNChildren() == 0;
-        }
+//        public boolean isLeaf(Object node) {
+//            return ((LockCCTNode)node).getNChildren() == 0;
+//        }
 
         public Object getValueAt(TreeNode node, int columnIndex) {
             LockCCTNode lnode = (LockCCTNode)node;

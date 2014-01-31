@@ -133,6 +133,15 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
     
     
+    public void setShowsRootHandles(boolean newValue) {
+        if (tree != null) tree.setShowsRootHandles(newValue);
+    }
+    
+    public void setRootVisible(boolean rootVisible) {
+        if (tree != null) tree.setRootVisible(rootVisible);
+    }
+    
+    
     Component getRenderer(TableCellRenderer renderer, int row, int column, boolean sized) {
         Component comp = super.getRenderer(renderer, row, column, sized);
         
@@ -275,8 +284,6 @@ public class ProfilerTreeTable extends ProfilerTable {
             });
                     
             tree = new ProfilerTreeTableTree(treeModel);
-            tree.setShowsRootHandles(false);
-            for (int i = 0; i < tree.getRowCount(); i++) tree.expandRow(i);
         }
         
         
