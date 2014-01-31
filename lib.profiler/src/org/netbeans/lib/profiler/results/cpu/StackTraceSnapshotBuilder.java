@@ -89,6 +89,10 @@ public class StackTraceSnapshotBuilder {
         new MethodInfo("sun.nio.ch.EPollArrayWrapper","epollWait(long, int, long, int) : int"), // NOI18N
         new MethodInfo("java.net.DualStackPlainSocketImpl","accept0[native]"), // NOI18N
         new MethodInfo("java.net.DualStackPlainSocketImpl","accept0(int, java.net.InetSocketAddress[]) : int"), // NOI18N
+        new MethodInfo("java.lang.ProcessImpl","waitForInterruptibly[native]"), // NOI18N
+        new MethodInfo("java.lang.ProcessImpl","waitForInterruptibly(long) : void"), // NOI18N
+        new MethodInfo("sun.print.Win32PrintServiceLookup","notifyPrinterChange[native]"), // NOI18N
+        new MethodInfo("sun.print.Win32PrintServiceLookup","notifyPrinterChange(long) : int"), // NOI18N
     });
 
     private InstrumentationFilter filter;
