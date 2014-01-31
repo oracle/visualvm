@@ -207,7 +207,7 @@ public class ProfilerTable extends JTable {
         c.move(0, 0);
         
         int col = convertColumnIndexToModel(column);        
-        if (!isCustomRendering && isScrollableColumn(col)) {
+        if (!isCustomRendering() && isScrollableColumn(col)) {
             int prefWidth = getColumnPreferredWidth(col);
             return getScrollableRenderer(c, col, prefWidth);
         } else {
@@ -229,17 +229,22 @@ public class ProfilerTable extends JTable {
         
         private int offset;
         private int prefWidth;
+        private int marginOffset;
         
         void setRenderer(Component c, int o, int w) {
             impl = c;
             offset = o;
             prefWidth = w;
             
+            marginOffset = isLeadingAlign(impl) ? 0 : 
+                           getColumnModel().getColumnMargin();
+            
             implM = c instanceof Movable ? (Movable)c : null;
         }
         
         public void setBounds(int x, int y, int w, int h) {
             super.setBounds(x, y, w, h);
+            if (prefWidth > w) offset += marginOffset;
             impl.setSize(Math.max(w, prefWidth), h);
         }
         
@@ -254,24 +259,40 @@ public class ProfilerTable extends JTable {
             } else {
                 g.translate(-offset, 0);
                 impl.paint(g);
-                g.translate(offset, 0);
             }
         }
         
     }
     
-    Component getRenderer(TableCellRenderer renderer, int row, int column) {
+    Component getRenderer(TableCellRenderer renderer, int row, int column, boolean sized) {
         isCustomRendering = true;
         try {
-            return prepareRenderer(renderer, row, column);
+            Component comp = prepareRenderer(renderer, row, column);
+            comp.setSize(comp.getPreferredSize().width, getRowHeight());
+            if (sized) {
+                comp.setSize(comp.getPreferredSize().width, getRowHeight());
+                if (!isLeadingAlign(comp)) {
+                    TableColumnModel m = getColumnModel();
+                    int x = -comp.getWidth();
+                    int c = m.getColumn(column).getWidth();
+                    int _column = convertColumnIndexToModel(column);
+                    if (isScrollableColumn(_column)) {
+                        x += Math.max(c, getColumnPreferredWidth(_column));
+                    } else {
+                        x += c;
+                    }
+                    comp.move(x - m.getColumnMargin(), 0);
+                }
+            }
+            
+            return comp;
         } finally {
             isCustomRendering = false;
         }
     }
     
-    private boolean isCustomRendering;
     public boolean isFocusOwner() {
-        return !isCustomRendering && super.isFocusOwner();
+        return !isCustomRendering() && super.isFocusOwner();
     }
     
     public boolean isCellEditable(int row, int column) {
@@ -282,6 +303,12 @@ public class ProfilerTable extends JTable {
         Dimension size = super.getPreferredScrollableViewportSize();
         size.height = rows * getRowHeight();
         setPreferredScrollableViewportSize(size);
+    }
+    
+    private boolean isCustomRendering;
+    
+    final boolean isCustomRendering() {
+        return isCustomRendering;
     }
     
     // --- Main column ---------------------------------------------------------
@@ -441,7 +468,7 @@ public class ProfilerTable extends JTable {
         int width = 0;
         for (int row = firstRow; row <= lastRow; row++) {
             TableCellRenderer renderer = getCellRenderer(row, viewIndex);
-            Component component = getRenderer(renderer, row, viewIndex);
+            Component component = getRenderer(renderer, row, viewIndex, false);
             width = Math.max(component.getPreferredSize().width, width);
         }
         return width;
@@ -478,7 +505,7 @@ public class ProfilerTable extends JTable {
         if (getRowCount() == 0) return true;
         int _column = convertColumnIndexToView(column);
         TableCellRenderer r = getCellRenderer(0, _column);
-        return isLeadingAlign(getRenderer(r, 0, _column));
+        return isLeadingAlign(getRenderer(r, 0, _column, false));
     }
     
     static boolean isLeadingAlign(Component component) {
@@ -592,7 +619,7 @@ public class ProfilerTable extends JTable {
                     columnsWidth += column.getWidth();
                 }
             }
-            toResizeColumn.setWidth(getWidth() - columnsWidth);
+            if (toResizeColumn != null) toResizeColumn.setWidth(getWidth() - columnsWidth);
         }
     }
     

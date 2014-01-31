@@ -229,9 +229,13 @@ public class TreeTableModelAdapter extends AbstractTableModel {
         CCTNode n = (CCTNode)treeTableModel.getRoot();
         
         for (int i = 1; i < op.length; i++) {
+            // #241115
+            CCTNode[] children = n.getChildren();
+            if (children == null) return null;
+            
             CCTNode nn = null;
             
-            for (CCTNode c : n.getChildren())
+            for (CCTNode c : children)
                 if (c.equals(op[i])) {
                     nn = c;
                     break;
@@ -322,6 +326,11 @@ public class TreeTableModelAdapter extends AbstractTableModel {
             }
         }
     }
+    
+    private boolean firingChange;
+    public final boolean isFiringChange() {
+        return firingChange;
+    }
 
     /**
      * Invokes fireTableDataChanged after all the pending events have been
@@ -331,7 +340,12 @@ public class TreeTableModelAdapter extends AbstractTableModel {
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     TreePath[] selectedPaths = tree.getSelectionPaths();
-                    fireTableDataChanged();
+                    firingChange = true;
+                    try {
+                        fireTableDataChanged();
+                    } finally {
+                        firingChange = false;
+                    }
                     tree.setSelectionPaths(selectedPaths);
                 }
             });
