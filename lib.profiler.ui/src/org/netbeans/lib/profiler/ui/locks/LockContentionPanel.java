@@ -82,6 +82,7 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
@@ -94,17 +95,21 @@ import org.netbeans.lib.profiler.ui.ResultsPanel;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.FlatToolBar;
-import org.netbeans.lib.profiler.ui.components.JTreeTable;
+//import org.netbeans.lib.profiler.ui.components.JTreeTable;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.components.table.CustomBarCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
 import org.netbeans.lib.profiler.ui.components.tree.EnhancedTreeCellRenderer;
-import org.netbeans.lib.profiler.ui.components.treetable.AbstractTreeTableModel;
 import org.netbeans.lib.profiler.ui.components.treetable.ExtendedTreeTableModel;
 import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
 import org.netbeans.lib.profiler.ui.components.treetable.TreeTableModel;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
+//import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
+//import org.netbeans.lib.profiler.ui.components.treetable.TreeTableModel;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -137,10 +142,10 @@ public class LockContentionPanel extends ResultsPanel {
     
     private final ProfilerToolbar toolbar;
     
-    private final LocksTreeTableModel realTreeTableModel;
-    private final ExtendedTreeTableModel treeTableModel;
-    private final JTreeTable treeTable;
-    private final JTreeTablePanel treeTablePanel;
+//    private final LocksTreeTableModel realTreeTableModel;
+    private final LocksTreeTableModel treeTableModel;
+    private final ProfilerTreeTable treeTable;
+    private final ProfilerTableContainer treeTablePanel;
     private final JComboBox modeCombo;
     
     private final JPopupMenu tablePopup;
@@ -166,7 +171,7 @@ public class LockContentionPanel extends ResultsPanel {
     
     private LockRuntimeCCTNode root;
     private Listener cctListener;
-    private long countsInMicrosec;
+    private long countsInMicrosec = 1;
     
     
     public LockContentionPanel() {        
@@ -208,44 +213,23 @@ public class LockContentionPanel extends ResultsPanel {
         
         initColumnsData();
         
-        realTreeTableModel = new LocksTreeTableModel();
-        treeTableModel = new ExtendedTreeTableModel(realTreeTableModel);
+//        realTreeTableModel = new LocksTreeTableModel();
+        treeTableModel = new LocksTreeTableModel();
         
-        treeTable = new JTreeTable(treeTableModel) {
-                public void doLayout() {
-                    int columnsWidthsSum = 0;
-                    int realFirstColumn = -1;
-
-                    TableColumnModel colModel = getColumnModel();
-
-                    for (int i = 0; i < treeTableModel.getColumnCount(); i++) {
-                        if (treeTableModel.getRealColumn(i) == 0) {
-                            realFirstColumn = i;
-                        } else {
-                            columnsWidthsSum += colModel.getColumn(i).getPreferredWidth();
-                        }
-                    }
-
-                    if (realFirstColumn != -1) {
-                        colModel.getColumn(realFirstColumn).setPreferredWidth(getWidth() - columnsWidthsSum);
-                    }
-
-                    super.doLayout();
-                };
-            };
-        treeTable.getTree().setRootVisible(false);
-        treeTable.getTree().setShowsRootHandles(true);
+        treeTable = new ProfilerTreeTable(treeTableModel, true, true, new int[] { 0 });
+//        treeTable.getTree().setRootVisible(false);
+//        treeTable.getTree().setShowsRootHandles(true);
 //        treeTable.addMouseListener(new MouseListener());
 //        treeTable.addKeyListener(new KeyListener());
-        treeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        treeTable.setGridColor(UIConstants.TABLE_VERTICAL_GRID_COLOR);
-        treeTable.setSelectionBackground(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
-        treeTable.setSelectionForeground(UIConstants.TABLE_SELECTION_FOREGROUND_COLOR);
-        treeTable.setShowHorizontalLines(UIConstants.SHOW_TABLE_HORIZONTAL_GRID);
-        treeTable.setShowVerticalLines(UIConstants.SHOW_TABLE_VERTICAL_GRID);
-        treeTable.setRowMargin(UIConstants.TABLE_ROW_MARGIN);
-        treeTable.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
-        treeTable.getTree().setLargeModel(true);
+//        treeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//        treeTable.setGridColor(UIConstants.TABLE_VERTICAL_GRID_COLOR);
+//        treeTable.setSelectionBackground(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
+//        treeTable.setSelectionForeground(UIConstants.TABLE_SELECTION_FOREGROUND_COLOR);
+//        treeTable.setShowHorizontalLines(UIConstants.SHOW_TABLE_HORIZONTAL_GRID);
+//        treeTable.setShowVerticalLines(UIConstants.SHOW_TABLE_VERTICAL_GRID);
+//        treeTable.setRowMargin(UIConstants.TABLE_ROW_MARGIN);
+//        treeTable.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
+//        treeTable.getTree().setLargeModel(true);
 
         // Disable traversing table cells using TAB and Shift+TAB
         Set keys = new HashSet(treeTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
@@ -258,8 +242,8 @@ public class LockContentionPanel extends ResultsPanel {
         
         setColumnsData();
         
-        treeTablePanel = new JTreeTablePanel(treeTable);
-        treeTablePanel.clearBorders();
+        treeTablePanel = new ProfilerTableContainer(treeTable, false, null);
+//        treeTablePanel.clearBorders();
         
         notificationPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 15));
         notificationPanel.setBackground(treeTable.getBackground());
@@ -300,7 +284,7 @@ public class LockContentionPanel extends ResultsPanel {
         tablePopup = createTablePopup();
         
         cornerPopup = new JPopupMenu();
-        treeTablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createHeaderPopupCornerButton(cornerPopup));
+//        treeTablePanel.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createHeaderPopupCornerButton(cornerPopup));
         
         setDefaultSorting();
         prepareResults(); // Disables combo
@@ -492,7 +476,8 @@ public class LockContentionPanel extends ResultsPanel {
         }
     
     public boolean fitsVisibleArea() {
-        return !treeTablePanel.getScrollPane().getVerticalScrollBar().isEnabled();
+//        return !treeTablePanel.getScrollPane().getVerticalScrollBar().isEnabled();
+        return true;
     }
 
     public boolean hasView() {
@@ -502,7 +487,8 @@ public class LockContentionPanel extends ResultsPanel {
     public BufferedImage getCurrentViewScreenshot(boolean onlyVisibleArea) {
         if (!hasView()) return null;
         if (onlyVisibleArea) {
-            return UIUtils.createScreenshot(treeTablePanel.getScrollPane());
+//            return UIUtils.createScreenshot(treeTablePanel.getScrollPane());
+            return UIUtils.createScreenshot(treeTablePanel);
         } else {
             return UIUtils.createScreenshot(treeTable);
         }
@@ -520,25 +506,27 @@ public class LockContentionPanel extends ResultsPanel {
     }
     
     public void setSorting(int sColumn, boolean sOrder, boolean refreshUI) {
-        if (!refreshUI && sColumn == CommonConstants.SORTING_COLUMN_DEFAULT) {
-            setDefaultSorting();
-        } else {
-            sortingColumn = sColumn;
-            sortingOrder = sOrder;
-        }
-        if (refreshUI) {
-            treeTable.setSortingColumn(treeTableModel.getVirtualColumn(sColumn));
-            treeTable.setSortingOrder(sOrder);
-            treeTableModel.sortByColumn(sColumn, sOrder);
-        }
+//        if (!refreshUI && sColumn == CommonConstants.SORTING_COLUMN_DEFAULT) {
+//            setDefaultSorting();
+//        } else {
+//            sortingColumn = sColumn;
+//            sortingOrder = sOrder;
+//        }
+//        if (refreshUI) {
+//            treeTable.setSortingColumn(treeTableModel.getVirtualColumn(sColumn));
+//            treeTable.setSortingOrder(sOrder);
+//            treeTableModel.sortByColumn(sColumn, sOrder);
+//        }
     }
     
     public int getSortingColumn() {
-        return treeTableModel.getRealColumn(treeTable.getSortingColumn());
+//        return treeTableModel.getRealColumn(treeTable.getSortingColumn());
+        return 0;
     }
 
     public boolean getSortingOrder() {
-        return treeTable.getSortingOrder();
+//        return treeTable.getSortingOrder();
+        return false;
     }
     
     
@@ -556,8 +544,8 @@ public class LockContentionPanel extends ResultsPanel {
                     newRoot = root.getMonitors();
                 }
                 
-                newRoot.sortChildren(getSortBy(sortingColumn), sortingOrder);
-                treeTable.changeRoot(newRoot);
+//                newRoot.sortChildren(getSortBy(sortingColumn), sortingOrder);
+                treeTableModel.setRoot(newRoot);
             }
         });
     }
@@ -571,8 +559,10 @@ public class LockContentionPanel extends ResultsPanel {
     }
 
     public void profilingSessionStarted() {
+        System.err.println(">>> profilingSessionStarted");
         ProfilingSessionStatus session = TargetAppRunner.getDefault().getProfilingSessionStatus();
         countsInMicrosec = session.timerCountsInSecond[0] / 1000000L;
+//        countsInMicrosec = 1;
 
         if (cctListener == null) {
             cctListener = new Listener();
@@ -582,9 +572,10 @@ public class LockContentionPanel extends ResultsPanel {
                 provider.addListener(cctListener);
             }
         } else {
-            treeTableModel.setRoot(LockCCTNode.EMPTY);
             treeTable.clearSelection();
-            treeTable.updateTreeTable();
+            treeTableModel.setRoot(LockCCTNode.EMPTY);
+//            treeTable.clearSelection();
+//            treeTable.updateTreeTable();
         }
         
         enableLockContentionButton.setEnabled(true);
@@ -655,86 +646,86 @@ public class LockContentionPanel extends ResultsPanel {
     }
     
     private void setColumnsData() {
-        treeTable.setTreeCellRenderer(treeCellRenderer);
-        
-        TableColumnModel colModel = treeTable.getColumnModel();
-
-        for (int i = 0; i < treeTableModel.getColumnCount(); i++) {
-            int index = treeTableModel.getRealColumn(i);
-
-            if (index != 0) {
-                colModel.getColumn(i).setPreferredWidth(columnWidths[index - 1]);
-                colModel.getColumn(i).setCellRenderer(columnRenderers[index]);
-            }
-        }
+//        treeTable.setTreeCellRenderer(treeCellRenderer);
+//        
+//        TableColumnModel colModel = treeTable.getColumnModel();
+//
+//        for (int i = 0; i < treeTableModel.getColumnCount(); i++) {
+//            int index = treeTableModel.getRealColumn(i);
+//
+//            if (index != 0) {
+//                colModel.getColumn(i).setPreferredWidth(columnWidths[index - 1]);
+//                colModel.getColumn(i).setCellRenderer(columnRenderers[index]);
+//            }
+//        }
     }
     
     
     protected void initColumnSelectorItems() {
-        cornerPopup.removeAll();
-
-        JCheckBoxMenuItem menuItem;
-
-        for (int i = 0; i < realTreeTableModel.getColumnCount(); i++) {
-            menuItem = new JCheckBoxMenuItem(realTreeTableModel.getColumnName(i));
-            menuItem.setActionCommand(Integer.valueOf(i).toString());
-            addMenuItemListener(menuItem);
-
-            if (treeTable != null) {
-                menuItem.setState(treeTableModel.isRealColumnVisible(i));
-
-                if (i == 0) {
-                    menuItem.setEnabled(false);
-                }
-            } else {
-                menuItem.setState(true);
-            }
-
-            cornerPopup.add(menuItem);
-        }
-
-        cornerPopup.pack();
+//        cornerPopup.removeAll();
+//
+//        JCheckBoxMenuItem menuItem;
+//
+//        for (int i = 0; i < realTreeTableModel.getColumnCount(); i++) {
+//            menuItem = new JCheckBoxMenuItem(realTreeTableModel.getColumnName(i));
+//            menuItem.setActionCommand(Integer.valueOf(i).toString());
+//            addMenuItemListener(menuItem);
+//
+//            if (treeTable != null) {
+//                menuItem.setState(treeTableModel.isRealColumnVisible(i));
+//
+//                if (i == 0) {
+//                    menuItem.setEnabled(false);
+//                }
+//            } else {
+//                menuItem.setState(true);
+//            }
+//
+//            cornerPopup.add(menuItem);
+//        }
+//
+//        cornerPopup.pack();
     }
     
     private void addMenuItemListener(JCheckBoxMenuItem menuItem) {
-        menuItem.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    boolean sortResults = false;
-                    int column = Integer.parseInt(e.getActionCommand());
-                    sortingColumn = treeTable.getSortingColumn();
-
-                    int realSortingColumn = treeTableModel.getRealColumn(sortingColumn);
-                    boolean isColumnVisible = treeTableModel.isRealColumnVisible(column);
-
-                    // Current sorting column is going to be hidden
-                    if ((isColumnVisible) && (column == realSortingColumn)) {
-                        // Try to set next column as a sortingColumn. If currentSortingColumn is the last column, set previous
-                        // column as a sorting Column (one column is always visible).
-                        sortingColumn = ((sortingColumn + 1) == treeTableModel.getColumnCount()) ? (sortingColumn - 1)
-                                                                                                 : (sortingColumn + 1);
-                        realSortingColumn = treeTableModel.getRealColumn(sortingColumn);
-                        sortResults = true;
-                    }
-
-                    treeTableModel.setRealColumnVisibility(column, !isColumnVisible);
-                    treeTable.createDefaultColumnsFromModel();
-                    treeTable.updateTreeTableHeader();
-                    sortingColumn = treeTableModel.getVirtualColumn(realSortingColumn);
-
-                    if (sortResults) {
-                        sortingOrder = treeTableModel.getInitialSorting(sortingColumn);
-                        treeTableModel.sortByColumn(sortingColumn, sortingOrder);
-                        treeTable.updateTreeTable();
-                    }
-
-                    treeTable.setSortingColumn(sortingColumn);
-                    treeTable.setSortingOrder(sortingOrder);
-                    treeTable.getTableHeader().repaint();
-                    setColumnsData();
-
-                    // TODO [ui-persistence]
-                }
-            });
+//        menuItem.addActionListener(new java.awt.event.ActionListener() {
+//                public void actionPerformed(java.awt.event.ActionEvent e) {
+//                    boolean sortResults = false;
+//                    int column = Integer.parseInt(e.getActionCommand());
+//                    sortingColumn = treeTable.getSortingColumn();
+//
+//                    int realSortingColumn = treeTableModel.getRealColumn(sortingColumn);
+//                    boolean isColumnVisible = treeTableModel.isRealColumnVisible(column);
+//
+//                    // Current sorting column is going to be hidden
+//                    if ((isColumnVisible) && (column == realSortingColumn)) {
+//                        // Try to set next column as a sortingColumn. If currentSortingColumn is the last column, set previous
+//                        // column as a sorting Column (one column is always visible).
+//                        sortingColumn = ((sortingColumn + 1) == treeTableModel.getColumnCount()) ? (sortingColumn - 1)
+//                                                                                                 : (sortingColumn + 1);
+//                        realSortingColumn = treeTableModel.getRealColumn(sortingColumn);
+//                        sortResults = true;
+//                    }
+//
+//                    treeTableModel.setRealColumnVisibility(column, !isColumnVisible);
+//                    treeTable.createDefaultColumnsFromModel();
+//                    treeTable.updateTreeTableHeader();
+//                    sortingColumn = treeTableModel.getVirtualColumn(realSortingColumn);
+//
+//                    if (sortResults) {
+//                        sortingOrder = treeTableModel.getInitialSorting(sortingColumn);
+//                        treeTableModel.sortByColumn(sortingColumn, sortingOrder);
+//                        treeTable.updateTreeTable();
+//                    }
+//
+//                    treeTable.setSortingColumn(sortingColumn);
+//                    treeTable.setSortingOrder(sortingOrder);
+//                    treeTable.getTableHeader().repaint();
+//                    setColumnsData();
+//
+//                    // TODO [ui-persistence]
+//                }
+//            });
     }
     
     
@@ -743,13 +734,14 @@ public class LockContentionPanel extends ResultsPanel {
     }
     
     
-    private class LocksTreeTableModel extends AbstractTreeTableModel {
+    private class LocksTreeTableModel extends ProfilerTreeTableModel.Abstract {
         
         private LocksTreeTableModel() {
-            super(LockCCTNode.EMPTY, true, sortingColumn, sortingOrder);
+            super(LockCCTNode.EMPTY);
+//            super(LockCCTNode.EMPTY, true, sortingColumn, sortingOrder);
         }
 
-        public boolean isCellEditable(int rowIndex, int columnIndex) {
+        public boolean isCellEditable(TreeNode node, int columnIndex) {
             return false;
         }
 
@@ -781,32 +773,34 @@ public class LockContentionPanel extends ResultsPanel {
             return ((LockCCTNode)node).getNChildren() == 0;
         }
 
-        public Object getValueAt(Object object, int columnIndex) {
-            LockCCTNode node = (LockCCTNode)object;
+        public Object getValueAt(TreeNode node, int columnIndex) {
+            LockCCTNode lnode = (LockCCTNode)node;
 
             switch (columnIndex) {
                 case 0:
-                    return node;
+                    return lnode;
                 case 1:
-                    return node.getTimeInPerCent();
+                    return lnode.getTimeInPerCent();
                 case 2:
-                    return getTimeInMillis(node) + " ms (" // NOI18N
-                    + percentFormat.format(node.getTimeInPerCent() / 100) + ")"; // NOI18N
+                    return getTimeInMillis(lnode) + " ms (" // NOI18N
+                    + percentFormat.format(lnode.getTimeInPerCent() / 100) + ")"; // NOI18N
                 case 3:
-                    return node.getWaits();
+                    return lnode.getWaits();
                     
                 default:
                     return null;
             }
         }
+        
+        public void setValueAt(Object aValue, TreeNode node, int column) {}
 
-        public void sortByColumn(int column, boolean order) {
-            sortingColumn = column;
-            sortingOrder = order;
-
-            LockCCTNode _root = (LockCCTNode)root;
-            _root.sortChildren(getSortBy(column), order);
-        }
+//        public void sortByColumn(int column, boolean order) {
+//            sortingColumn = column;
+//            sortingOrder = order;
+//
+//            LockCCTNode _root = (LockCCTNode)root;
+//            _root.sortChildren(getSortBy(column), order);
+//        }
     }
     
     

@@ -46,7 +46,9 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.List;
+import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.results.CCTNode;
 
 /**
@@ -54,7 +56,7 @@ import org.netbeans.lib.profiler.results.CCTNode;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
-public abstract class LockCCTNode implements CCTNode {
+public abstract class LockCCTNode implements CCTNode, TreeNode {
     
     public static final int SORT_BY_NAME = 1;
     public static final int SORT_BY_TIME = 2;
@@ -80,6 +82,44 @@ public abstract class LockCCTNode implements CCTNode {
     LockCCTNode(LockCCTNode p) {
         parent = p;
     }
+    
+    
+    //---
+    public Enumeration<LockCCTNode> children() {
+        return new Enumeration<LockCCTNode>() {
+            private int index = 0;
+            
+            public boolean hasMoreElements() {
+                return children != null && index < children.size();
+            }
+
+            public LockCCTNode nextElement() {
+                return children.get(index++);
+            }
+        };
+    }
+    
+    public boolean isLeaf() {
+        return getChildCount() == 0;
+    }
+    
+    public boolean getAllowsChildren() {
+        return true;
+    }
+    
+    public int getIndex(TreeNode node) {
+        return getIndexOfChild(node);
+    }
+    
+    public int getChildCount() {
+        return getNChildren();
+    }
+    
+    public TreeNode getChildAt(int index) {
+        return getChild(index);
+    }
+    //---
+    
 
     @Override
     public LockCCTNode getChild(int index) {
