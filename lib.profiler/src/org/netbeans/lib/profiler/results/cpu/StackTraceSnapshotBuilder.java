@@ -93,6 +93,8 @@ public class StackTraceSnapshotBuilder {
         new MethodInfo("java.lang.ProcessImpl","waitForInterruptibly(long) : void"), // NOI18N
         new MethodInfo("sun.print.Win32PrintServiceLookup","notifyPrinterChange[native]"), // NOI18N
         new MethodInfo("sun.print.Win32PrintServiceLookup","notifyPrinterChange(long) : int"), // NOI18N
+        new MethodInfo("java.net.DualStackPlainSocketImpl","waitForConnect[native]"), // NOI18N
+        new MethodInfo("java.net.DualStackPlainSocketImpl","waitForConnect(int, int) : void"), // NOI18N
     });
 
     private InstrumentationFilter filter;
