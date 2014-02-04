@@ -345,7 +345,7 @@ public class LockContentionPanel extends ResultsPanel {
         }
         if (tempTop!=null) {
             //Sort the new tree
-            tempTop.sortChildren(getSortBy(sortingColumn), sortingOrder);
+//            tempTop.sortChildren(getSortBy(sortingColumn), sortingOrder);
             for (int i = 0; i < tempTop.getNChildren(); i++) {
                 LockCCTNode top = tempTop.getChild(i);
                 result.append(quote).append(top.getNodeName()).append(quote).append(separator);
@@ -393,7 +393,7 @@ public class LockContentionPanel extends ResultsPanel {
         }
         if (tempTop!=null) {
             //Sort the new tree
-            tempTop.sortChildren(getSortBy(sortingColumn), sortingOrder);
+//            tempTop.sortChildren(getSortBy(sortingColumn), sortingOrder);
             for (int i = 0; i < tempTop.getNChildren(); i++) {
                 LockCCTNode top = tempTop.getChild(i);
                 result.append(indent).append("<").append(first).append(">").append(newLine); // NOI18N
@@ -445,7 +445,7 @@ public class LockContentionPanel extends ResultsPanel {
         
         if (tempTop!=null) {
             //Sort the new tree
-            tempTop.sortChildren(getSortBy(sortingColumn), sortingOrder);
+//            tempTop.sortChildren(getSortBy(sortingColumn), sortingOrder);
             for (int i = 0; i < tempTop.getNChildren(); i++) {
                 LockCCTNode top = tempTop.getChild(i);
                 result.append("<tr><td><pre>").append(top.getNodeName()).append("</pre></td>"); // NOI18N
@@ -740,9 +740,14 @@ public class LockContentionPanel extends ResultsPanel {
         public Class getColumnClass(int column) {
             if (column == 0) {
                 return JTree.class;
-            } else {
-                return Object.class;
+            } else if (column == 1) {
+                return Double.class;
+            } else if (column == 2) {
+                return String.class;
+            } else if (column == 3) {
+                return Long.class;
             }
+            return null;
         }
 
         public int getColumnCount() {
@@ -796,20 +801,20 @@ public class LockContentionPanel extends ResultsPanel {
     }
     
     
-    private int getSortBy(int column) {
-        switch (column) {
-            case 0:
-                return LockCCTNode.SORT_BY_NAME;
-            case 1:
-                return LockCCTNode.SORT_BY_TIME;
-            case 2:
-                return LockCCTNode.SORT_BY_TIME;
-            case 3:
-                return LockCCTNode.SORT_BY_WAITS;
-            default:
-                return -1;
-        }
-    }
+//    private int getSortBy(int column) {
+//        switch (column) {
+//            case 0:
+//                return LockCCTNode.SORT_BY_NAME;
+//            case 1:
+//                return LockCCTNode.SORT_BY_TIME;
+//            case 2:
+//                return LockCCTNode.SORT_BY_TIME;
+//            case 3:
+//                return LockCCTNode.SORT_BY_WAITS;
+//            default:
+//                return -1;
+//        }
+//    }
     
     private JPopupMenu createTablePopup() {
         JPopupMenu popup = new JPopupMenu();

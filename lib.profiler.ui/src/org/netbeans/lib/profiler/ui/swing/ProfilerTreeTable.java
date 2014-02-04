@@ -122,8 +122,6 @@ public class ProfilerTreeTable extends ProfilerTable {
 
         tree.setRowHeight(rowHeight);
         setDefaultRenderer(JTree.class, tree);
-        
-        setDefaultRenderer(String.class, new LabelRenderer());
     }
     
     
@@ -222,7 +220,6 @@ public class ProfilerTreeTable extends ProfilerTable {
             sortKeys = newKeys == null ? Collections.emptyList() :
                        Collections.unmodifiableList(new ArrayList(newKeys));
             model.sort(newKeys == null ? null : getComparator());
-//            fireSortOrderChanged();
         }
         
         public List<? extends RowSorter.SortKey> getSortKeys() {
@@ -262,33 +259,52 @@ public class ProfilerTreeTable extends ProfilerTable {
     private static class TableModelImpl extends AbstractTableModel {
         
         private final ProfilerTreeTableTree tree;
-        private final TreeModelImpl treeModel;
+        private TreeModelImpl treeModel;
         private final ProfilerTreeTableModel treeTableModel;
         
         TableModelImpl(ProfilerTreeTableModel model) {
             this.treeTableModel = model;
-            treeModel = new TreeModelImpl(model.getRoot()) {
-                protected void fireTreeStructureChanged(Object source, Object[] path,
-                                        int[] childIndices,
-                                        Object[] children) {
-                    UIState uiState = tree == null ? null : getUIState(tree);
-                    super.fireTreeStructureChanged(source, path, childIndices, children);
-                    if (uiState != null) restoreUIState(tree, uiState);
-                }
-            };
+            
+            treeModel = treeModelImpl(model.getRoot(), null);
             
             model.addListener(new ProfilerTreeTableModel.Adapter() {
                 public void rootChanged(TreeNode oldRoot, TreeNode newRoot) {
-                    treeModel.setRoot(newRoot);
+                    // NOTE: would be cleaner to change root of existing model,
+                    //       wasn't able to easily resolve all related problems.
+//                    treeModel.setRoot(newRoot);
+                    
+                    Comparator comparator = treeModel != null ? treeModel.getComparator() : null;
+                    treeModel = treeModelImpl(newRoot, comparator);
+                    
+                    UIState uiState = getUIState(tree);
+                    tree.setChangingModel(true);
+                    tree.setModel(treeModel);
+                    if (uiState != null) restoreUIState(tree, uiState);
+                    tree.setChangingModel(false);
+                    
+                    fireTableDataChanged();
                 }
             });
                     
             tree = new ProfilerTreeTableTree(treeModel);
         }
         
+        private TreeModelImpl treeModelImpl(TreeNode root, Comparator comparator) {
+            return new TreeModelImpl(root, comparator) {
+                protected void fireTreeStructureChanged(Object source, Object[] path,
+                                        int[] childIndices,
+                                        Object[] children) {
+                    UIState uiState = tree == null ? null : getUIState(tree);
+                    super.fireTreeStructureChanged(source, path, childIndices, children);
+                    if (uiState != null) restoreUIState(tree, uiState);
+                    fireTableDataChanged();
+                }
+            };
+        }
+        
         
         void sort(Comparator comparator) {
-            treeModel.sort(comparator);
+            treeModel.setComparator(comparator);
         }
         
         
@@ -341,35 +357,23 @@ public class ProfilerTreeTable extends ProfilerTable {
         private Comparator comparator;
         private Map<Object, int[]> viewToModel;
         
-        private boolean isChanging;
         
-        
-        TreeModelImpl(TreeNode root) {
+        TreeModelImpl(TreeNode root, Comparator comp) {
             super(root);
+            comparator = comp;
         }
         
         
-        void sort(Comparator comp) {
+        void setComparator(Comparator comp) {
             comparator = comp;
             viewToModel = null;
             reload();
         }
         
-        
-        public void setRoot(TreeNode root) {
-            viewToModel = null;
-            
-            isChanging = true;
-            try {
-                super.setRoot(root);
-            } finally {
-                isChanging = false;
-            }
+        Comparator getComparator() {
+            return comparator;
         }
         
-        boolean isChanging() {
-            return isChanging;
-        }
         
         public Object getChild(Object parent, int index) {
             if (comparator == null) return super.getChild(parent, index);
@@ -457,28 +461,20 @@ public class ProfilerTreeTable extends ProfilerTable {
         
         private boolean internal;
         
-        public void treeExpanded(TreeExpansionEvent event) {
-            model.fireTableDataChanged();
-        }
+        public void treeExpanded(TreeExpansionEvent event) { notifyTable(); }
 
-        public void treeCollapsed(TreeExpansionEvent event) {
-            model.fireTableDataChanged();
-        }
+        public void treeCollapsed(TreeExpansionEvent event) { notifyTable(); }
 
-        public void treeNodesChanged(TreeModelEvent e) {
-            model.fireTableDataChanged();
-        }
+        public void treeNodesChanged(TreeModelEvent e) { notifyTable(); }
 
-        public void treeNodesInserted(TreeModelEvent e) {
-            model.fireTableDataChanged();
-        }
+        public void treeNodesInserted(TreeModelEvent e) { notifyTable(); }
 
-        public void treeNodesRemoved(TreeModelEvent e) {
-            model.fireTableDataChanged();
-        }
+        public void treeNodesRemoved(TreeModelEvent e) { notifyTable(); }
 
-        public void treeStructureChanged(TreeModelEvent e) {
-            model.fireTableDataChanged();
+        public void treeStructureChanged(TreeModelEvent e) { notifyTable(); }
+        
+        private void notifyTable() {
+            if (!tree.isChangingModel()) model.fireTableDataChanged();
         }
 
         public void valueChanged(TreeSelectionEvent e) {
@@ -594,8 +590,10 @@ public class ProfilerTreeTable extends ProfilerTable {
             return this;
         }
         
+        private final Dimension prefSize = new Dimension();
         public Dimension getPreferredSize() {
-            return new Dimension(currentX + currentWidth, rowHeight);
+            prefSize.setSize(currentX + currentWidth, rowHeight);
+            return prefSize;
         }
         
         public void paint(Graphics g) {
@@ -614,17 +612,17 @@ public class ProfilerTreeTable extends ProfilerTable {
         }
         
         public void expandPath(TreePath path) {
-            if (isChangingModel()) path = getSimilarPath(path);
+            if (changingModel) path = getSimilarPath(path);
             super.expandPath(path);
         }
         
         public void setSelectionPath(TreePath path) {
-            if (isChangingModel()) path = getSimilarPath(path);
+            if (changingModel) path = getSimilarPath(path);
             super.setSelectionPath(path);
         }
         
         public void setSelectionPaths(TreePath[] paths) {
-            if (isChangingModel() && paths != null)
+            if (changingModel && paths != null)
                 for (int i = 0; i < paths.length; i++)
                     paths[i] = getSimilarPath(paths[i]);
             super.setSelectionPaths(paths);
@@ -661,8 +659,14 @@ public class ProfilerTreeTable extends ProfilerTable {
             return p;
         }
         
-        private boolean isChangingModel() {
-            return ((TreeModelImpl)getModel()).isChanging();
+        private boolean changingModel;
+        
+        private void setChangingModel(boolean changing) {
+            changingModel = changing;
+        }
+        
+        boolean isChangingModel() {
+            return changingModel;
         }
         
     }
