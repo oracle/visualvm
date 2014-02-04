@@ -47,6 +47,8 @@ import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.server.system.HeapDump;
 import org.netbeans.lib.profiler.server.system.Timers;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -57,14 +59,14 @@ import java.io.File;
 public class TakeHeapdumpProfilingPointHandler extends ProfilingPointServerHandler {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static ProfilingPointServerHandler instance;
+    private static Map instances;
     private static final String TAKEN_HEAPDUMP_PREFIX = "heapdump-"; // NOI18N
     private static final String HEAPDUMP_EXTENSION = "hprof"; // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private String heapdumpFilePrefix;
-    private boolean remoteProfiling;
+    private final String heapdumpFilePrefix;
+    private final boolean remoteProfiling;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -76,8 +78,15 @@ public class TakeHeapdumpProfilingPointHandler extends ProfilingPointServerHandl
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static synchronized ProfilingPointServerHandler getInstance(String clientInfo) {
+        TakeHeapdumpProfilingPointHandler instance;
+        
+        if (instances == null) {
+            instances = new HashMap();
+        }
+        instance = (TakeHeapdumpProfilingPointHandler) instances.get(clientInfo);
         if (instance == null) {
             instance = new TakeHeapdumpProfilingPointHandler(clientInfo);
+            instances.put(clientInfo, instance);
         }
 
         return instance;
