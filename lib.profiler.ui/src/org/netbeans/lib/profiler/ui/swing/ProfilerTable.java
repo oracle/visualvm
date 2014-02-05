@@ -429,14 +429,14 @@ public class ProfilerTable extends JTable {
         return _getColumnModel().getColumnOffset(column);
     }
     
-    private void updateColumnsPreferredWidth() {
+    protected void updateColumnsPreferredWidth() {
         if (getRowCount() == 0) return;
         
         Rectangle visible = getVisibleRect();
         if (visible.isEmpty()) return;
         
         Point visibleP = visible.getLocation();
-        int first = rowAtPoint(visible.getLocation());
+        int first = rowAtPoint(visibleP);
         visibleP.translate(0, visible.height - 1);
         int last = rowAtPoint(visibleP);
         

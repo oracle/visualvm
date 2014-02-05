@@ -69,6 +69,7 @@ import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -183,7 +184,14 @@ public class ProfilerTreeTable extends ProfilerTable {
     
     
     protected TableRowSorter createRowSorter() {
-        ProfilerRowSorter s = new ProfilerTreeTableSorter(getModel());
+        ProfilerRowSorter s = new ProfilerTreeTableSorter(getModel()) {
+            public void allRowsChanged() {
+                // Must invoke later, JTree.getRowCount() not ready yet
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { updateColumnsPreferredWidth(); }
+                });
+            }
+        };
         s.setDefaultSortOrder(SortOrder.DESCENDING);
         s.setDefaultSortOrder(0, SortOrder.ASCENDING);
         s.setSortColumn(0);
@@ -273,14 +281,19 @@ public class ProfilerTreeTable extends ProfilerTable {
                     //       wasn't able to easily resolve all related problems.
 //                    treeModel.setRoot(newRoot);
                     
-                    Comparator comparator = treeModel != null ? treeModel.getComparator() : null;
-                    treeModel = treeModelImpl(newRoot, comparator);
-                    
-                    UIState uiState = getUIState(tree);
                     tree.setChangingModel(true);
-                    tree.setModel(treeModel);
-                    if (uiState != null) restoreUIState(tree, uiState);
-                    tree.setChangingModel(false);
+                    
+                    try {
+                        UIState uiState = getUIState(tree);
+
+                        Comparator comparator = treeModel != null ? treeModel.getComparator() : null;
+                        treeModel = treeModelImpl(newRoot, comparator);
+                        tree.setModel(treeModel);
+
+                        if (uiState != null) restoreUIState(tree, uiState);
+                    } finally {
+                        tree.setChangingModel(false);
+                    }
                     
                     fireTableDataChanged();
                 }
@@ -474,7 +487,9 @@ public class ProfilerTreeTable extends ProfilerTable {
         public void treeStructureChanged(TreeModelEvent e) { notifyTable(); }
         
         private void notifyTable() {
-            if (!tree.isChangingModel()) model.fireTableDataChanged();
+            if (tree.isChangingModel()) return;
+            if (tree.getClientProperty(UIUtils.PROP_EXPANSION_TRANSACTION) != null) return;
+            model.fireTableDataChanged();
         }
 
         public void valueChanged(TreeSelectionEvent e) {
@@ -484,7 +499,7 @@ public class ProfilerTreeTable extends ProfilerTable {
             int row = selected == null ? -1 : tree.getRowForPath(selected);
             try {
                 internal = true;
-                if (row != -1) selectRow(row, true);
+                if (row != -1) selectRow(row, !tree.isChangingModel());
                 else clearSelection();
             } finally {
                 internal = false;
