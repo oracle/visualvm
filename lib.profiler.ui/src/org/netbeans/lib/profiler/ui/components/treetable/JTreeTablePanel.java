@@ -51,6 +51,7 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelListener;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -217,7 +218,6 @@ public class JTreeTablePanel extends JPanel {
         treeTableScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         treeTableViewport = new CustomTreeTableViewport(treeTable);
         treeTableScrollPane.setViewport(treeTableViewport);
-        treeTableScrollPane.addMouseWheelListener(treeTable);
         // Enable vertical scrollbar only if needed
         final JScrollBar vScrollBar = treeTableScrollPane.getVerticalScrollBar();
         vScrollBar.getModel().addChangeListener(new ChangeListener() {
@@ -240,23 +240,49 @@ public class JTreeTablePanel extends JPanel {
         scrollBarPanel.setVisible(false);
         scrollBar.addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
-                if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
-                    int unitsToScroll = e.getUnitsToScroll();
-                    int direction = unitsToScroll < 0 ? -1 : 1;
-                    if (unitsToScroll != 0) {
-                        int increment = scrollBar.getUnitIncrement(direction);
-                        int oldValue = scrollBar.getValue();
-                        int newValue = oldValue + increment * unitsToScroll;
-                        newValue = Math.max(Math.min(newValue, scrollBar.getMaximum() -
-                                scrollBar.getVisibleAmount()), scrollBar.getMinimum());
-                        if (oldValue != newValue) scrollBar.setValue(newValue);
-                    }
-                }
+                scroll(scrollBar, e);
             }
         });
+        
+        MouseWheelListener[] listeners = treeTableScrollPane.getMouseWheelListeners();
+        if (listeners != null && listeners.length == 1) {
+            final MouseWheelListener listener = listeners[0];
+            treeTableScrollPane.removeMouseWheelListener(listener);
+            treeTableScrollPane.addMouseWheelListener(new MouseWheelListener() {
+                public void mouseWheelMoved(MouseWheelEvent e) {
+                    if (onlyShift(e) && treeTable.columnAtPoint(e.getPoint()) == 0) {
+                        scroll(scrollBar, e);
+                    } else {
+                        listener.mouseWheelMoved(e);
+                    }
+                    treeTable.mouseWheelMoved(e);
+                }
+            });
+        }
 
         add(treeTableScrollPane, BorderLayout.CENTER);
         add(scrollBarPanel, BorderLayout.SOUTH);
+    }
+    
+    private static void scroll(final JScrollBar scroller, final MouseWheelEvent event) {
+        if (event.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+            int unitsToScroll = event.getUnitsToScroll();
+            int direction = unitsToScroll < 0 ? -1 : 1;
+            if (unitsToScroll != 0) {
+                int increment = scroller.getUnitIncrement(direction);
+                int oldValue = scroller.getValue();
+                int newValue = oldValue + increment * unitsToScroll;
+                newValue = Math.max(Math.min(newValue, scroller.getMaximum() -
+                           scroller.getVisibleAmount()), scroller.getMinimum());
+                if (oldValue != newValue) scroller.setValue(newValue);
+            }
+            event.consume();
+        }
+    }
+    
+    private static boolean onlyShift(MouseEvent e) {
+        return e.isShiftDown() && !(e.isAltDown() || e.isAltGraphDown() ||
+                                    e.isControlDown() || e.isMetaDown());
     }
 
     private void updateScrollBar(boolean updateWidth) {
