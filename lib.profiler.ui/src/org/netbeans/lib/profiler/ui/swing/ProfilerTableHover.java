@@ -81,6 +81,10 @@ import javax.swing.table.TableCellRenderer;
  */
 class ProfilerTableHover {
     
+    private static final boolean REPAINT_ON_HIDE =
+            !Boolean.getBoolean("ProfilerTableHover.noRepaintOnHide"); // NOI18N
+    
+    
     static void install(ProfilerTable table) {
         new ProfilerTableHover(table).install();
     }
@@ -142,6 +146,9 @@ class ProfilerTableHover {
         popup.hide();
         popupRect = null;
         popup = null;
+        
+        // Make sure lightweight popups are cleared correctly when mouse-wheeling
+        if (REPAINT_ON_HIDE) table.repaint();
         
         // Skip AWT noise after closing popup
         SwingUtilities.invokeLater(new Runnable() {
@@ -325,6 +332,9 @@ class ProfilerTableHover {
             table.removeMouseMotionListener(this);
         }
         public void mouseMoved(MouseEvent e) {
+            // Do not display popup when a modifier is pressed (can't read all keys)
+            if (e.getModifiers() != 0) return;
+                    
             Point point = e.getPoint();
             // Skip AWT noise after closing popup
             if (point.equals(forwardPoint)) return;
