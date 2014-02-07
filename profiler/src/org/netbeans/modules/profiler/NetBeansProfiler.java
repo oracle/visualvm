@@ -1776,6 +1776,12 @@ public abstract class NetBeansProfiler extends Profiler {
         final boolean[] rslt = new boolean[1];
         final CountDownLatch latch = new CountDownLatch(1);
         
+        if (!CalibrationDataFileIO.validateCalibrationInput(sessionSettings.getJavaVersionString(), sessionSettings.getJavaExecutable())
+        || !runCalibration(true, sessionSettings.getJavaExecutable(), sessionSettings.getJavaVersionString(),sessionSettings.getSystemArchitecture())) {
+            ProfilerDialogs.displayError(Bundle.ProfilerModule_CalibrationFailedMessage());
+            return false;
+        }
+                
         new SwingWorker(false) {
             volatile private ProgressDisplayer pd;
             @Override
