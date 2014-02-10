@@ -256,8 +256,9 @@ public class ProfilerTableContainer extends JPanel {
         if (event.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
             int direction = event.getUnitsToScroll() < 0 ? -1 : 1;
             int increment = scroller.getUnitIncrement(direction);
+            int amount = event.getScrollAmount();
             int oldValue = scroller.getValue();
-            int newValue = oldValue + increment * direction;
+            int newValue = oldValue + increment * amount * direction;
             if (oldValue != newValue) scroller.setValue(newValue);
             event.consume();
         }

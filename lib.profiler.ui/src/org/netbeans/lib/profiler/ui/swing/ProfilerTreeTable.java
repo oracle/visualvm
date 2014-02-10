@@ -141,6 +141,26 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
     
     
+    public void setCellRenderer(TreeCellRenderer renderer) {
+        if (tree != null) tree.setCellRenderer(renderer);
+    }
+    
+    public void setTreeCellRenderer(ProfilerRenderer renderer) {
+        setCellRenderer(createTreeCellRenderer(renderer));
+    }
+    
+    public static TreeCellRenderer createTreeCellRenderer(final ProfilerRenderer renderer) {
+        return new TreeCellRenderer() {
+            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                renderer.setValue(value, row);
+                JComponent comp = renderer.getComponent();
+                comp.setOpaque(false);
+                comp.setForeground(tree.getForeground());
+                return comp;
+            }
+        };
+    }
+    
     Component getRenderer(TableCellRenderer renderer, int row, int column, boolean sized) {
         Component comp = super.getRenderer(renderer, row, column, sized);
         
@@ -544,7 +564,7 @@ public class ProfilerTreeTable extends ProfilerTable {
             setBorder(BorderFactory.createEmptyBorder());
             getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
             
-            setCellRenderer(createCellRenderer(new LabelRenderer()));
+            setCellRenderer(createTreeCellRenderer(new LabelRenderer()));
             
             setLargeModel(true);
         }
@@ -570,18 +590,18 @@ public class ProfilerTreeTable extends ProfilerTable {
             }
         }
         
-        static TreeCellRenderer createCellRenderer(final ProfilerRenderer renderer) {
-            return new TreeCellRenderer() {
-                public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-                    renderer.setValue(value, row);
-                    JComponent comp = renderer.getComponent();
-                    comp.setOpaque(false);
-                    comp.setForeground(tree.getForeground());
-                    ((JLabel)comp).setIcon(UIManager.getIcon("Tree.openIcon"));
-                    return comp;
-                }
-            };
-        }
+//        static TreeCellRenderer createCellRenderer(final ProfilerRenderer renderer) {
+//            return new TreeCellRenderer() {
+//                public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+//                    renderer.setValue(value, row);
+//                    JComponent comp = renderer.getComponent();
+//                    comp.setOpaque(false);
+//                    comp.setForeground(tree.getForeground());
+//                    ((JLabel)comp).setIcon(UIManager.getIcon("Tree.openIcon"));
+//                    return comp;
+//                }
+//            };
+//        }
 
         
         // Overridden for performance reasons.

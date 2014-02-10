@@ -101,6 +101,10 @@ import org.netbeans.lib.profiler.ui.components.tree.EnhancedTreeCellRenderer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
+import org.netbeans.lib.profiler.ui.swing.renderer.BarRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.BaseDetailsRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
 //import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
 //import org.netbeans.lib.profiler.ui.components.treetable.TreeTableModel;
 import org.netbeans.lib.profiler.utils.StringUtils;
@@ -223,6 +227,25 @@ public class LockContentionPanel extends ResultsPanel {
 //        treeTable.setRowMargin(UIConstants.TABLE_ROW_MARGIN);
 //        treeTable.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
 //        treeTable.getTree().setLargeModel(true);
+        
+        LockContentionRenderer lcRenderer = new LockContentionRenderer();
+        treeTable.setTreeCellRenderer(lcRenderer);
+        
+        BarRenderer barRenderer = new BarRenderer();
+        treeTable.setDefaultColumnWidth(1, 100);
+        treeTable.setColumnRenderer(1, barRenderer);
+        
+        Number refTime = new Long(123456789);
+        
+        BaseDetailsRenderer numberPercentRenderer = new BaseDetailsRenderer(new LabelRenderer(), "(100%)");
+        numberPercentRenderer.setValue(refTime, -1);
+        treeTable.setDefaultColumnWidth(2, numberPercentRenderer.getPreferredSize().width);
+        treeTable.setColumnRenderer(2, numberPercentRenderer);
+        
+        NumberRenderer numberRenderer = new NumberRenderer();
+        numberRenderer.setValue(refTime, -1);
+        treeTable.setDefaultColumnWidth(3, numberRenderer.getPreferredSize().width);
+        treeTable.setColumnRenderer(3, numberRenderer);
 
         // Disable traversing table cells using TAB and Shift+TAB
         Set keys = new HashSet(treeTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));

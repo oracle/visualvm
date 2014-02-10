@@ -130,8 +130,8 @@ public class ProfilerTable extends JTable {
         setRowSelectionAllowed(true);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         setGridColor(UIConstants.TABLE_VERTICAL_GRID_COLOR);
-        setSelectionBackground(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
-        setSelectionForeground(UIConstants.TABLE_SELECTION_FOREGROUND_COLOR);
+//        setSelectionBackground(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
+//        setSelectionForeground(UIConstants.TABLE_SELECTION_FOREGROUND_COLOR);
         setShowHorizontalLines(UIConstants.SHOW_TABLE_HORIZONTAL_GRID);
         setShowVerticalLines(UIConstants.SHOW_TABLE_VERTICAL_GRID);
         setRowMargin(UIConstants.TABLE_ROW_MARGIN);
@@ -168,16 +168,16 @@ public class ProfilerTable extends JTable {
     }
     
     public void setDefaultRenderer(Class<?> columnClass, ProfilerRenderer renderer) {
-        super.setDefaultRenderer(columnClass, createCellRenderer(renderer));
+        super.setDefaultRenderer(columnClass, createTableCellRenderer(renderer));
     }
     
     public void setColumnRenderer(int column, ProfilerRenderer renderer) {
         int _column = convertColumnIndexToModel(column);
         TableColumn tColumn = getColumnModel().getColumn(_column);
-        tColumn.setCellRenderer(createCellRenderer(renderer));
+        tColumn.setCellRenderer(createTableCellRenderer(renderer));
     }
     
-    public static TableCellRenderer createCellRenderer(final ProfilerRenderer renderer) {
+    public static TableCellRenderer createTableCellRenderer(final ProfilerRenderer renderer) {
         return new TableCellRenderer() {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 renderer.setValue(value, table.convertRowIndexToModel(row));

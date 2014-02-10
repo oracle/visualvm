@@ -77,11 +77,15 @@ public class BaseDetailsRenderer extends BaseRenderer {
         if (valueRenderer instanceof LabelRenderer)
             ((LabelRenderer)valueRenderer).setMargin(3, 3, 3, 0);
         
-        detailsRenderer = new LabelRenderer();
+        detailsRenderer = new LabelRenderer() {
+            public void setForeground(Color foreground) {
+                if (foreground == null) foreground = Color.BLACK;
+                super.setForeground(UIUtils.getDisabledForeground(foreground));
+            }
+        };
         detailsRenderer.setMargin(3, 0, 3, 3);
         
         detailsRenderer.changeFontSize(-1);
-        detailsRenderer.setForeground(UIUtils.getDisabledLineColor());
         detailsRenderer.setText(refDetailsString);
         detailsRendererWidth = detailsRenderer.getPreferredSize().width;
         
@@ -99,7 +103,7 @@ public class BaseDetailsRenderer extends BaseRenderer {
     public void setForeground(Color foreground) {
         super.setForeground(foreground);
         if (valueRenderer != null) valueRenderer.getComponent().setForeground(foreground);
-//        bracketRenderer.setForeground(foreground);
+        detailsRenderer.setForeground(foreground);
     }
     
     public void setBackground(Color background) {
