@@ -589,19 +589,6 @@ public class ProfilerTreeTable extends ProfilerTable {
                 super.setUI(ui);
             }
         }
-        
-//        static TreeCellRenderer createCellRenderer(final ProfilerRenderer renderer) {
-//            return new TreeCellRenderer() {
-//                public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-//                    renderer.setValue(value, row);
-//                    JComponent comp = renderer.getComponent();
-//                    comp.setOpaque(false);
-//                    comp.setForeground(tree.getForeground());
-//                    ((JLabel)comp).setIcon(UIManager.getIcon("Tree.openIcon"));
-//                    return comp;
-//                }
-//            };
-//        }
 
         
         // Overridden for performance reasons.

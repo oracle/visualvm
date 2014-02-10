@@ -55,6 +55,8 @@ import javax.swing.SwingConstants;
  */
 public abstract class MultiRenderer extends BaseRenderer {
     
+    private Dimension preferredSize;
+    
     
     protected int renderersGap() { return 0; }
     
@@ -92,7 +94,8 @@ public abstract class MultiRenderer extends BaseRenderer {
     }
     
     public Dimension getPreferredSize() {
-        Dimension preferredSize = new Dimension();
+        if (preferredSize == null) preferredSize = new Dimension();
+        else preferredSize.setSize(0, 0);
         
         ProfilerRenderer[] valueRenderers = valueRenderers();
         if (valueRenderers != null) {
@@ -104,7 +107,7 @@ public abstract class MultiRenderer extends BaseRenderer {
             preferredSize.width += renderersGap() * (valueRenderers.length - 1);
         }
         
-        return preferredSize;
+        return sharedDimension(preferredSize);
     }
     
     
