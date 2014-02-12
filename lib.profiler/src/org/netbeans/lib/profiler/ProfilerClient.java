@@ -643,18 +643,20 @@ public class ProfilerClient implements CommonConstants {
             }
         }
 
-        memCctProvider.beginTrans(false);
+        synchronized (this) {
+            memCctProvider.beginTrans(false);
 
-        try {
-            memCctProvider.updateInternals();
+            try {
+                memCctProvider.updateInternals();
 
-            if (instrType == INSTR_OBJECT_ALLOCATIONS) {
-                return new AllocMemoryResultsSnapshot(resultsStart, System.currentTimeMillis(), memCctProvider, this);
-            } else {
-                return new LivenessMemoryResultsSnapshot(resultsStart, System.currentTimeMillis(), memCctProvider, this);
+                if (instrType == INSTR_OBJECT_ALLOCATIONS) {
+                    return new AllocMemoryResultsSnapshot(resultsStart, System.currentTimeMillis(), memCctProvider, this);
+                } else {
+                    return new LivenessMemoryResultsSnapshot(resultsStart, System.currentTimeMillis(), memCctProvider, this);
+                }
+            } finally {
+                memCctProvider.endTrans();
             }
-        } finally {
-            memCctProvider.endTrans();
         }
     }
 
