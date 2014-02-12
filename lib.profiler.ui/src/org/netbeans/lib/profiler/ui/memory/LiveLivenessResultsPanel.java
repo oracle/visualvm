@@ -137,12 +137,14 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
         Object source = e.getSource();
 
         if (source == popupRemoveProfForClass) {
+            final int clickedLineLocal = clickedLine;
+            resTable.clearSelection();
             new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
                     MemoryCCTProvider olcgb = runner.getProfilerClient().getMemoryCCTProvider();
                     boolean[] newlyUnprofiledClasses = new boolean[sortedClassIds.length];
-                    int line = ((Integer) filteredToFullIndexes.get(clickedLine)).intValue();
+                    int line = ((Integer) filteredToFullIndexes.get(clickedLineLocal)).intValue();
 
                     if (!olcgb.classMarkedUnprofiled(sortedClassIds[line])) {
                         olcgb.markClassUnprofiled(sortedClassIds[line]);
@@ -166,6 +168,15 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
                 @Override
                 protected void done() {
                     prepareResults();
+                    if (resTable.getSelectedRow() == -1) { // selection was not changed
+                        int selectedLine = clickedLineLocal;
+                        if (resTable.getRowCount() == clickedLineLocal) {
+                            selectedLine--;
+                        }
+                        if (selectedLine >= 0) {
+                            resTable.setRowSelectionInterval(selectedLine,selectedLine);
+                        }
+                    }
                 }
             }.execute();
         } else if (source == popupRemoveProfForClassesBelow) {
@@ -290,7 +301,7 @@ public class LiveLivenessResultsPanel extends LivenessResultsPanel implements Li
 
     /**
      * Called when auto refresh is on and profiling session will finish
-     * to give the panel chance to do some cleanup before asynchrounous
+     * to give the panel chance to do some cleanup before asynchronous
      * call to updateLiveResults() will happen.
      *
      * Currently it closes the context menu if open, which would otherwise
