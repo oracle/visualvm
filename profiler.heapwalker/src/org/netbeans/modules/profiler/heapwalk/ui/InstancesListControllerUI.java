@@ -422,10 +422,16 @@ public class InstancesListControllerUI extends JTitledPanel {
 
                     instancesListTable.getTree().setSelectionPath(pathToSelectFinal);
 
-                    Rectangle pathToSelectBounds = instancesListTable.getTree().getPathBounds(pathToSelectFinal);
+                    final Rectangle pathToSelectBounds = instancesListTable.getTree().getPathBounds(pathToSelectFinal);
 
                     if (pathToSelectBounds != null) {
                         instancesListTable.scrollRectToVisible(pathToSelectBounds); // Fix for Issue 105299, pathToSelectBounds can be null
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                // Do it once again, sometimes needed to really show the instance
+                                instancesListTable.scrollRectToVisible(pathToSelectBounds);
+                            }
+                        });
                     }
 
                     if (sorting) {
