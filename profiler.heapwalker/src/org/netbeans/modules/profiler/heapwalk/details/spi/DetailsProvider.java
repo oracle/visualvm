@@ -100,7 +100,9 @@ public abstract class DetailsProvider {
     
     public static abstract class View extends JPanel {
         
-        private final RequestProcessor.Task workerTask;
+        private RequestProcessor.Task workerTask;
+        private Instance instance;
+        private Heap heap;
         
         // [Event Dispatch Thread] Constructor for default initial UI ("Loading content...")
         protected View(Instance instance, Heap heap) {
@@ -110,10 +112,22 @@ public abstract class DetailsProvider {
         }
         
         // [Event Dispatch Thread] Constructor for custom initial UI
-        protected View(final Instance instance, final Heap heap, Component initialView) {
+        protected View(Instance instance, Heap heap, Component initialView) {
             super(new BorderLayout());
             add(initialView, BorderLayout.CENTER);
             
+            this.instance = instance;
+            this.heap = heap;
+        }
+        
+        // [Worker Thread] Compute the view here, check Thread.interrupted(),
+        // use SwingUtilities.invokeLater() to display the result
+        protected abstract void computeView(Instance instance, Heap heap);
+        
+        public final void addNotify() {
+            super.addNotify();
+            
+            // #241316, this can't be called from constructor!
             workerTask = BrowserUtils.performTask(new Runnable() {
                 public void run() {
                     if (!Thread.interrupted()) computeView(instance, heap);
@@ -121,16 +135,12 @@ public abstract class DetailsProvider {
             });
         }
         
-        // [Worker Thread] Compute the view here, check Thread.interrupted(),
-        // use SwingUtilities.invokeLater() to display the result
-        protected abstract void computeView(Instance instance, Heap heap);
-        
         // [Event Dispatch Thread] Do any cleanup here if needed
         protected void removed() {}
         
         public final void removeNotify() {
-            super.removeNotify();
             workerTask.cancel();
+            super.removeNotify();
             removed();
         }
         
