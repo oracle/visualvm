@@ -290,7 +290,7 @@ public class CellTipManager implements MouseListener, MouseMotionListener, Mouse
                                                                                           component));
             // #241878 immediately send mouseReleased which won't be called automatically on closing the popup
             MouseEvent event2 = new MouseEvent((Component)source, MouseEvent.MOUSE_RELEASED,
-                                               System.currentTimeMillis(), event.getModifiers(),
+                                               event.getWhen() + 1, event.getModifiers(),
                                                event.getX(), event.getY(), event.getClickCount(),
                                                event.isPopupTrigger());
             ((CellTipAware) component).processMouseEvent(SwingUtilities.convertMouseEvent(
