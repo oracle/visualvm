@@ -88,6 +88,7 @@ import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.locks.LockCCTNode;
 import org.netbeans.lib.profiler.results.locks.LockCCTProvider;
 import org.netbeans.lib.profiler.results.locks.LockRuntimeCCTNode;
+import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.ResultsPanel;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.FlatToolBar;
@@ -102,8 +103,8 @@ import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
 import org.netbeans.lib.profiler.ui.swing.renderer.BarRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.BaseDetailsRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
 //import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
 //import org.netbeans.lib.profiler.ui.components.treetable.TreeTableModel;
@@ -170,6 +171,9 @@ public class LockContentionPanel extends ResultsPanel {
     private Listener cctListener;
     private long countsInMicrosec = 1;
     
+    private final HideableBarRenderer hbrTime;
+    private final HideableBarRenderer hbrWaits;
+    
     
     public LockContentionPanel() {        
         toolbar = ProfilerToolbar.create(true);
@@ -234,18 +238,40 @@ public class LockContentionPanel extends ResultsPanel {
         BarRenderer barRenderer = new BarRenderer();
         treeTable.setDefaultColumnWidth(1, 100);
         treeTable.setColumnRenderer(1, barRenderer);
+        treeTable.setColumnVisibility(1, false);
         
         Number refTime = new Long(123456789);
         
-        BaseDetailsRenderer numberPercentRenderer = new BaseDetailsRenderer(new LabelRenderer(), "(100%)");
-        numberPercentRenderer.setValue(refTime, -1);
-        treeTable.setDefaultColumnWidth(2, numberPercentRenderer.getPreferredSize().width);
-        treeTable.setColumnRenderer(2, numberPercentRenderer);
+//        BaseDetailsRenderer numberPercentRenderer = new BaseDetailsRenderer(new LabelRenderer(), "(100%)");
+//        NumberBarRenderer numberPercentRenderer = new NumberBarRenderer(Formatters.millisecondsFormat()) {
+//            public void setValue(Object value, int row) {
+//                LockCCTNode lnode = (LockCCTNode)treeTable.getValueAt(row, 0);
+//                setNumberValue(lnode.getTime(), row);
+//                setBarValue(lnode.getTimeInPerCent(), row);
+//            }
+//        };
         
-        NumberRenderer numberRenderer = new NumberRenderer();
-        numberRenderer.setValue(refTime, -1);
-        treeTable.setDefaultColumnWidth(3, numberRenderer.getPreferredSize().width);
-        treeTable.setColumnRenderer(3, numberRenderer);
+//        NumberRenderer nr = new NumberRenderer(Formatters.millisecondsFormat());
+//        nr.setValue(refTime, -1);
+        
+        NumberPercentRenderer npr = new NumberPercentRenderer(Formatters.millisecondsFormat());
+//        npr.setValue(refTime, -1);
+        hbrTime = new HideableBarRenderer(npr);
+        hbrTime.setMaxValue(refTime.longValue());
+        treeTable.setColumnRenderer(2, hbrTime);
+        treeTable.setDefaultColumnWidth(2, hbrTime.getOptimalWidth());
+        
+        hbrWaits = new HideableBarRenderer(new NumberRenderer());
+        hbrWaits.setMaxValue(12345);
+//        treeTable.setDefaultColumnWidth(3, hbrWaits.getOptimalWidth());
+        treeTable.setColumnRenderer(3, hbrWaits);
+        int waitsWidth = (hbrWaits.getNoBarWidth() + hbrWaits.getMaxNoBarWidth()) / 2;
+        treeTable.setDefaultColumnWidth(3, hbrWaits.getMaxNoBarWidth());
+        
+//        NumberRenderer numberRenderer = new NumberRenderer();
+//        numberRenderer.setValue(refTime, -1);
+//        treeTable.setDefaultColumnWidth(3, numberRenderer.getPreferredSize().width);
+//        treeTable.setColumnRenderer(3, numberRenderer);
 
         // Disable traversing table cells using TAB and Shift+TAB
         Set keys = new HashSet(treeTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
@@ -561,6 +587,8 @@ public class LockContentionPanel extends ResultsPanel {
                 }
                 
 //                newRoot.sortChildren(getSortBy(sortingColumn), sortingOrder);
+                hbrTime.setMaxValue(newRoot.getTime());
+                hbrWaits.setMaxValue(newRoot.getWaits());
                 treeTableModel.setRoot(newRoot);
             }
         });
@@ -766,7 +794,7 @@ public class LockContentionPanel extends ResultsPanel {
             } else if (column == 1) {
                 return Double.class;
             } else if (column == 2) {
-                return String.class;
+                return Long.class;
             } else if (column == 3) {
                 return Long.class;
             }
@@ -802,8 +830,10 @@ public class LockContentionPanel extends ResultsPanel {
                 case 1:
                     return lnode.getTimeInPerCent();
                 case 2:
-                    return getTimeInMillis(lnode) + " ms (" // NOI18N
-                    + percentFormat.format(lnode.getTimeInPerCent() / 100) + ")"; // NOI18N
+                    return lnode.getTime();
+//                    return lnode;
+//                    return getTimeInMillis(lnode) + " ms (" // NOI18N
+//                    + percentFormat.format(lnode.getTimeInPerCent() / 100) + ")"; // NOI18N
                 case 3:
                     return lnode.getWaits();
                     

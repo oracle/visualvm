@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,6 +24,11 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Contributor(s):
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -34,70 +39,56 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- *
- * Contributor(s):
- *
- * Portions Copyrighted 2013 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.results.locks;
 
-import org.netbeans.lib.profiler.results.CCTNode;
+package org.netbeans.lib.profiler.ui.swing.renderer;
+
+import java.text.Format;
+import org.netbeans.lib.profiler.ui.Formatters;
 
 /**
  *
- * @author Tomas Hurka
+ * @author Jiri Sedlacek
  */
-class TopLockCCTNode extends LockCCTNode {
+public class PercentRenderer extends FormattedLabelRenderer {
+    
+    private static final String NUL = Formatters.percentFormat().format(0);
+    private static final String NAN = NUL.replace("0", "-");  // NOI18N
+    
+    private long maxValue = 100;
 
-    private long totalTime;
-    private int totalWaits;
-
-    TopLockCCTNode() {
-        super(null);
+    
+    public PercentRenderer() {
+        super(Formatters.percentFormat());
     }
-
-    @Override
-    public String getNodeName() {
-        return "Invisible root node";  //NOI18N
+    
+    
+    public void setMaxValue(long maxValue) {
+        this.maxValue = maxValue;
     }
-
-    @Override
-    public long getTime() {
-        if (totalTime == 0) {
-            for (CCTNode ch : getChildren()) {
-                if (ch instanceof LockCCTNode) {
-                    totalTime += ((LockCCTNode) ch).getTime();
-                }
+    
+    public long getMaxValue() {
+        return maxValue;
+    }
+    
+    
+    protected String getValueString(Object value, int row, Format format) {
+        StringBuilder s = new StringBuilder();
+        s.append("("); // NOI18N
+        
+        if (maxValue == 0) {
+            s.append(NAN);
+        } else {
+            Number number = (Number)value;
+            if (number.doubleValue() == 0) {
+                s.append(NUL);
+            } else {
+                s.append(format.format(number.doubleValue() / maxValue));
             }
         }
-        return totalTime;
-    }
-
-    @Override
-    public int hashCode() {
-        return TopLockCCTNode.class.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof TopLockCCTNode;
-    }
-
-    @Override
-    public double getTimeInPerCent() {
-        return 100;
-    }
-
-    @Override
-    public long getWaits() {
-        if (totalWaits == 0) {
-            for (CCTNode ch : getChildren()) {
-                if (ch instanceof LockCCTNode) {
-                    totalWaits += ((LockCCTNode) ch).getWaits();
-                }
-            }
-        }
-        return totalWaits;
+        
+        s.append(")"); // NOI18N
+        return s.toString();
     }
     
 }

@@ -44,6 +44,7 @@ package org.netbeans.lib.profiler.ui.swing;
 
 import org.netbeans.lib.profiler.ui.swing.renderer.Movable;
 import java.awt.Component;
+import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -124,9 +125,24 @@ public class ProfilerTable extends JTable {
         if (sortable) setRowSorter(createRowSorter());
     }
     
+    public void createDefaultColumnsFromModel() {
+        TableModel m = getModel();
+        if (m != null) {
+            // Remove any current columns
+            ProfilerColumnModel cm = _getColumnModel();
+            while (cm.getColumnCount() > 0)
+                cm.removeColumn(cm.getColumn(0));
+
+            // Create new columns from the data model info
+            for (int i = 0; i < m.getColumnCount(); i++)
+                addColumn(cm.createTableColumn(i));
+        }
+    }
+    
     // --- UI tweaks -----------------------------------------------------------
     
     protected void setupAppearance() {
+        setAutoResizeMode(AUTO_RESIZE_NEXT_COLUMN);
         setRowSelectionAllowed(true);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         setGridColor(UIConstants.TABLE_VERTICAL_GRID_COLOR);
@@ -600,28 +616,42 @@ public class ProfilerTable extends JTable {
     
     public void doLayout() {
         ProfilerColumnModel cModel = _getColumnModel();
-        int toResizeIndex = cModel.getFitWidthColumn();
-        JTableHeader header = toResizeIndex != -1 ? getTableHeader() : null;
-        boolean resizing = header == null ? false : header.getResizingColumn() != null;
-        if (resizing || toResizeIndex == -1) {
-            super.doLayout();
-        } else {
-            Enumeration<TableColumn> columns = cModel.getColumns();
-            TableColumn toResizeColumn = null;
-            int columnsWidth = 0;
-            while (columns.hasMoreElements()) {
-                TableColumn column = columns.nextElement();
-                if (column.getModelIndex() == toResizeIndex) {
-                    if (!cModel.isColumnVisible(column)) {
-                        super.doLayout();
-                        return;
-                    }
-                    toResizeColumn = column;
-                } else {
-                    columnsWidth += column.getWidth();
-                }
+        TableColumn res = getTableHeader().getResizingColumn();
+        if (res != null) {
+            // Resizing column
+            int delta = getWidth() - cModel.getTotalColumnWidth();
+            TableColumn next = cModel.getNextVisibleColumn(res);
+            if (res == next) {
+                res.setWidth(res.getWidth() + delta);
+            } else {
+                next.setWidth(next.getWidth() + delta);
             }
-            if (toResizeColumn != null) toResizeColumn.setWidth(getWidth() - columnsWidth);
+        } else {
+            // Resizing table
+            int toResizeIndex = cModel.getFitWidthColumn();
+            if (toResizeIndex == -1) {
+                super.doLayout();
+            } else {
+                Enumeration<TableColumn> columns = cModel.getColumns();
+                TableColumn toResizeColumn = null;
+                int columnsWidth = 0;
+                while (columns.hasMoreElements()) {
+                    TableColumn column = columns.nextElement();
+                    if (column.getModelIndex() == toResizeIndex) {
+                        if (!cModel.isColumnVisible(column)) {
+                            super.doLayout();
+                            return;
+                        }
+                        toResizeColumn = column;
+                    } else {
+                        columnsWidth += column.getWidth();
+                    }
+                }
+                if (toResizeColumn != null) toResizeColumn.setWidth(getWidth() - columnsWidth);
+
+                // instead of super.doLayout()
+                layout();
+            }
         }
     }
     
@@ -698,6 +728,10 @@ public class ProfilerTable extends JTable {
                 if (hideableColums && UIUtils.isAquaLookAndFeel() && e.isPopupTrigger())
                     chooseColumns((Component)e.getSource(), e.getPoint());
                 super.processMouseEvent(e.getClickCount() > 1 ? clearClicks(e) : e);
+            }
+            public void setResizingColumn(TableColumn aColumn) {
+                _getColumnModel().setResizingColumn(aColumn);
+                super.setResizingColumn(aColumn);
             }
         };
     }

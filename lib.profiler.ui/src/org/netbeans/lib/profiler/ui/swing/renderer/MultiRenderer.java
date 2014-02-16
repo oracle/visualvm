@@ -125,7 +125,7 @@ public abstract class MultiRenderer extends BaseRenderer {
                 JComponent component = renderer.getComponent();
                 int componentWidth = component.getPreferredSize().width;
                 component.setSize(componentWidth, size.height);
-                component.move(xx, location.y);
+                renderer.move(xx, location.y);
                 component.paint(g);
                 xx += componentWidth + renderersGap;
             }
@@ -141,7 +141,7 @@ public abstract class MultiRenderer extends BaseRenderer {
                 int componentWidth = component.getPreferredSize().width;
                 component.setSize(componentWidth, size.height);
                 xx -= componentWidth;
-                component.move(xx, location.y);
+                renderer.move(xx, location.y);
                 component.paint(g);
                 xx -= renderersGap;
             }

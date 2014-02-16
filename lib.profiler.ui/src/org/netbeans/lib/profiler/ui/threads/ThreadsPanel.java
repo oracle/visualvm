@@ -64,7 +64,6 @@ import javax.swing.JToggleButton;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.table.AbstractTableModel;
@@ -253,8 +252,8 @@ public class ThreadsPanel extends JPanel {
         Number refTime = new Long(123456789);
         
         timeRelRenderer = new ThreadTimeRelRenderer(dataManager);
-        timeRelRenderer.setValue(refTime, -1);
-        threadsTable.setDefaultColumnWidth(timeRelRenderer.getPreferredSize().width);
+        timeRelRenderer.setMaxValue(refTime.longValue());
+        threadsTable.setDefaultColumnWidth(timeRelRenderer.getNoBarWidth());
         threadsTable.setDefaultRenderer(Long.class, timeRelRenderer);
         
         NumberRenderer numberRenderer = new NumberRenderer(Formatters.millisecondsFormat());
@@ -414,7 +413,7 @@ public class ThreadsPanel extends JPanel {
             public void dataReset() {
                 viewManager.reset();
                 firstChange = true;
-                timeRelRenderer.setBasis(0);
+                timeRelRenderer.setMaxValue(0);
                 threadsTableModel.fireTableDataChanged();
             }
         });

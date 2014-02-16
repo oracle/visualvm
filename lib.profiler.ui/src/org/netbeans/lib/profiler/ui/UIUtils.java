@@ -170,10 +170,12 @@ public final class UIUtils {
     }
     
     public static Color getDisabledForeground(Color c) {
-        if (isNimbusLookAndFeel()) return UIManager.getColor("nimbusDisabledText").darker(); //NOI18N
+        Color b = c.brighter();
+        if (c.getRGB() == b.getRGB()) return b; // Selection foreground
+        else if (isNimbusLookAndFeel()) return UIManager.getColor("nimbusDisabledText").darker(); //NOI18N
         else if (isMetalLookAndFeel()) return UIManager.getColor("Label.disabledForeground"); //NOI18N
-        else if (Color.BLACK.equals(c)) return Color.GRAY;
-        else return c.brighter();
+        else if (Color.BLACK.getRGB() == c.getRGB()) return Color.GRAY;
+        else return b;
     }
 
     public static int getDefaultRowHeight() {
