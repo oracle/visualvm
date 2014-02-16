@@ -286,8 +286,15 @@ public class CellTipManager implements MouseListener, MouseMotionListener, Mouse
         if (source instanceof Component && !JComponent.isLightweightComponent((Component) source)) {
             heavyweightPopupClosed = true;
             internalMousePressed = true;
-            ((CellTipAware) component).processMouseEvent(SwingUtilities.convertMouseEvent((Component) event.getSource(), event,
+            ((CellTipAware) component).processMouseEvent(SwingUtilities.convertMouseEvent((Component)source, event,
                                                                                           component));
+            // #241878 immediately send mouseReleased which won't be called automatically on closing the popup
+            MouseEvent event2 = new MouseEvent((Component)source, MouseEvent.MOUSE_RELEASED,
+                                               event.getWhen() + 1, event.getModifiers(),
+                                               event.getX(), event.getY(), event.getClickCount(),
+                                               event.isPopupTrigger());
+            ((CellTipAware) component).processMouseEvent(SwingUtilities.convertMouseEvent(
+                                               (Component)source, event2, component));
             internalMousePressed = false;
         } else {
             heavyweightPopupClosed = false;

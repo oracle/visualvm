@@ -247,6 +247,14 @@ class ProfilerTableHover {
                                              e.isPopupTrigger(), e.getButton());
             
             table.dispatchEvent(ee);
+            
+            // #241878 dispatch MOUSE_RELEASED after forwarding MOUSE_PRESSED
+            if (e.getID() == MouseEvent.MOUSE_PRESSED) {
+                ee = new MouseEvent(table, MouseEvent.MOUSE_RELEASED, e.getWhen() + 1,
+                                    e.getModifiers(), p.x, p.y, e.getClickCount(),
+                                    e.isPopupTrigger(), e.getButton());
+                table.dispatchEvent(ee);
+            }
         }
         
     }
