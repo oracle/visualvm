@@ -203,7 +203,7 @@ public abstract class Profiler {
      * internal unexpected problems that usually represent a bug in our code.
      *
      * @param severity The severity of the problem
-     * @param e The exception that occured
+     * @param e The exception that occurred
      */
     public abstract void notifyException(int severity, Exception e);
 
