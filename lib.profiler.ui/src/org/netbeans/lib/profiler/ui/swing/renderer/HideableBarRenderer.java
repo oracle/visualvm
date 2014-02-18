@@ -127,7 +127,7 @@ public class HideableBarRenderer extends MultiRenderer {
     }
     
     public int getMaxNoBarWidth() {
-        return maxRendererWidth + renderersGap() + MIN_BAR_WIDTH;
+        return maxRendererWidth + renderersGap() + MIN_BAR_WIDTH - 1;
     }
     
     public int getNoBarWidth() {

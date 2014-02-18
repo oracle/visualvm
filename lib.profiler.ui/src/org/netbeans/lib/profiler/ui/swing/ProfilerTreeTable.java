@@ -64,13 +64,11 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeExpansionEvent;
@@ -87,6 +85,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
@@ -545,8 +544,6 @@ public class ProfilerTreeTable extends ProfilerTable {
     
     private static class ProfilerTreeTableTree extends JTree implements TableCellRenderer {
         
-        private static BasicTreeUI SIMPLE_SYNTH_UI;
-
         private int currentX;
         private int currentWidth;
         
@@ -555,6 +552,8 @@ public class ProfilerTreeTable extends ProfilerTable {
         private boolean currentSelected;
         
         private boolean customRendering;
+        
+        private SynthLikeTreeUI synthLikeUI;
 
         
         ProfilerTreeTableTree(TreeModelImpl model) {
@@ -571,19 +570,20 @@ public class ProfilerTreeTable extends ProfilerTable {
         
         public void setUI(TreeUI ui) {
             if (ui instanceof SynthTreeUI) {
-                if (SIMPLE_SYNTH_UI == null) {
+                if (synthLikeUI == null) {
                     super.setUI(ui);
                     SynthTreeUI synthUI = (SynthTreeUI)ui;
                     int left = synthUI.getLeftChildIndent();
                     int right = synthUI.getRightChildIndent();
 
-                    SIMPLE_SYNTH_UI = new SimpleSynthTreeUI();
-                    super.setUI(SIMPLE_SYNTH_UI);
+                    synthLikeUI = new SynthLikeTreeUI();
+                    super.setUI(synthLikeUI);
 
-                    SIMPLE_SYNTH_UI.setLeftChildIndent(left + 4);
-                    SIMPLE_SYNTH_UI.setRightChildIndent(right);
+                    boolean nimbus = UIUtils.isNimbusLookAndFeel();
+                    synthLikeUI.setLeftChildIndent(left + (nimbus ? 4 : 6));
+                    synthLikeUI.setRightChildIndent(right);
                 } else {
-                    super.setUI(SIMPLE_SYNTH_UI);
+                    super.setUI(synthLikeUI);
                 }
             } else {
                 super.setUI(ui);
@@ -608,6 +608,7 @@ public class ProfilerTreeTable extends ProfilerTable {
             currentWidth = cellBounds.width;
             
             customRendering = ((ProfilerTable)table).isCustomRendering();
+            if (synthLikeUI != null) synthLikeUI.setSelected(isSelected);
             
             return this;
         }
@@ -694,44 +695,75 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
     
     
-    private static class SimpleSynthTreeUI extends BasicTreeUI {
-            
-        private static Icon COLLAPSED;
-        private static Icon EXPANDED;
+    private static class SynthLikeTreeUI extends BasicTreeUI {
         
+        private static final Icon[] ICONS = new Icon[4];
+        
+        static {
+            
+            final BufferedImage[] image = new BufferedImage[1];
+            BufferedImage tmp = new BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB);
+            
+            DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+            root.add(new DefaultMutableTreeNode());
+            
+            JTree tree = new JTree(root);
+            tree.setRootVisible(true);
+            tree.setShowsRootHandles(true);
+            tree.setSize(50, 50);
+            
+            tree.setUI(new SynthTreeUI() {
+                protected void drawCentered(Component c, Graphics graphics, Icon icon,
+                                        int x, int y) {
+                    int w = icon.getIconWidth();
+                    int h = icon.getIconHeight();
+                    image[0] = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+                    super.drawCentered(c, image[0].getGraphics(), icon, w / 2, h / 2);
+                }
+            });
+            
+            // Expanded
+            tree.expandRow(0);
+            tree.clearSelection();
+            tree.paint(tmp.getGraphics());
+            ICONS[0] = new ImageIcon(image[0]);
+            
+            // Expanded selected
+            tree.expandRow(0);
+            tree.setSelectionRow(0);
+            tree.paint(tmp.getGraphics());
+            ICONS[1] = new ImageIcon(image[0]);
+            
+            // Collapsed
+            tree.collapseRow(0);
+            tree.clearSelection();
+            tree.paint(tmp.getGraphics());
+            ICONS[2] = new ImageIcon(image[0]);
+            
+            // Collapsed selected
+            tree.collapseRow(0);
+            tree.setSelectionRow(0);
+            tree.paint(tmp.getGraphics());
+            ICONS[3] = new ImageIcon(image[0]);
+            
+        }
+        
+            
+        private boolean isSelected;
+        
+        void setSelected(boolean selected) { isSelected = selected; }
+        
+        public Icon getExpandedIcon() { return isSelected ? ICONS[1] : ICONS[0]; }
+        
+        public Icon getCollapsedIcon() { return isSelected ? ICONS[3] : ICONS[2]; }
         
         protected void paintHorizontalPartOfLeg(Graphics g, Rectangle clipBounds,
                                         Insets insets, Rectangle bounds,
-                                        TreePath path, int row,
-                                        boolean isExpanded,
-                                        boolean hasBeenExpanded, boolean
-                                        isLeaf) {}
+                                        TreePath path, int row, boolean isExpanded,
+                                        boolean hasBeenExpanded, boolean isLeaf) {}
 
         protected void paintVerticalPartOfLeg(Graphics g, Rectangle clipBounds,
-                              Insets insets, TreePath path) {}
-        
-        
-        public Icon getCollapsedIcon() {
-            if (COLLAPSED == null)
-                COLLAPSED = simpleSynthIcon(UIManager.getIcon("Tree.collapsedIcon")); // NOI18N
-            return COLLAPSED;
-        }
-
-        public Icon getExpandedIcon() {
-            if (EXPANDED == null)
-                EXPANDED = simpleSynthIcon(UIManager.getIcon("Tree.expandedIcon")); // NOI18N
-            return EXPANDED;
-        }
-
-        private static Icon simpleSynthIcon(Icon icon) {
-            JLabel l = new JLabel(icon, JLabel.LEADING);
-            l.setBorder(BorderFactory.createEmptyBorder());
-            l.setSize(l.getMinimumSize());
-            BufferedImage i = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(),
-                                                BufferedImage.TYPE_INT_ARGB);
-            l.paint(i.getGraphics());
-            return new ImageIcon(i);
-        }
+                                        Insets insets, TreePath path) {}
 
     }
     
