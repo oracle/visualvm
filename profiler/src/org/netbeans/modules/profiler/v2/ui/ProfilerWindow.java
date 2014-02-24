@@ -67,6 +67,7 @@ import org.netbeans.modules.profiler.v2.mode.ProfilerFeature;
 import org.netbeans.modules.profiler.v2.mode.ProfilerFeatures;
 import org.netbeans.modules.profiler.v2.session.ProjectSession;
 import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.Mode;
@@ -77,6 +78,7 @@ import org.openide.windows.WindowManager;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
+    "ProfilerWindow_profile=Profile",
     "ProfilerWindow_terminateCaption=Terminate Profiling Session",
     "ProfilerWindow_terminateMsg=Terminate profiling session?",
     "ProfilerWindow_loadingSession=Loading session features...",
@@ -115,7 +117,10 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     private ProfilerWindow(ProjectSession session) {
         this.session = session;
         
-        setDisplayName(ProjectUtilities.getDisplayName(session.getProject()));
+        Lookup.Provider project = session.getProject();
+        String windowName = project == null ? Bundle.ProfilerWindow_profile() :
+                                       ProjectUtilities.getDisplayName(project);
+        setDisplayName(windowName);
         setIcon(Icons.getImage(ProfilerIcons.PROFILE));
         
         setFocusable(true);
@@ -237,8 +242,8 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         toolbar = currentFeature.getToolbar();
         if (toolbar == null) toolbar = ProfilerToolbar.create(true);
         
-        toolbar.add(start);
-        toolbar.add(stop);
+        toolbar.add(start, 0);
+        toolbar.add(stop, 1);
         
         add(toolbar.getComponent(), BorderLayout.NORTH);
         revalidate();

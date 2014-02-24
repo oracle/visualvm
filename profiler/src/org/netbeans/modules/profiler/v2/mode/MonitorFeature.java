@@ -43,7 +43,13 @@
 
 package org.netbeans.modules.profiler.v2.mode;
 
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
+import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.NbBundle;
@@ -53,16 +59,87 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "MonitorFeature_name=Monitor"
+    "MonitorFeature_name=Monitor",
+    "MonitorFeature_graphs=Graphs:",
+    "MonitorFeature_application=Application:",
+    "MonitorFeature_threadDump=Thread Dump",
+    "MonitorFeature_heapDump=Heap Dump",
+    "MonitorFeature_gc=GC"
 })
 final class MonitorFeature extends ProfilerFeature.Basic {
+    
+    private JLabel grLabel;
+    private JButton grZoomInButton;
+    private JButton grZoomOutButton;
+    private JToggleButton grFitWidthButton;
+    
+    private JLabel apLabel;
+    private JButton apThreadDumpButton;
+    private JButton apHeapDumpButton;
+    private JButton apGCButton;
+    
+    private ProfilerToolbar toolbar;
+    
     
     MonitorFeature() {
         super(Bundle.MonitorFeature_name(), Icons.getIcon(ProfilerIcons.MONITORING));
     }
 
+    
     public JPanel getResultsUI() {
         return new JPanel();
+    }
+    
+    public ProfilerToolbar getToolbar() {
+        if (toolbar == null) {
+            grLabel = new JLabel(Bundle.MonitorFeature_graphs());
+            grLabel.setForeground(UIUtils.getDisabledLineColor());
+            
+            grZoomInButton = new JButton(Icons.getIcon(GeneralIcons.ZOOM_IN));
+            grZoomInButton.setEnabled(false);
+            
+            grZoomOutButton = new JButton(Icons.getIcon(GeneralIcons.ZOOM_OUT));
+            grZoomOutButton.setEnabled(false);
+            
+            grFitWidthButton = new JToggleButton(Icons.getIcon(GeneralIcons.SCALE_TO_FIT));
+            grFitWidthButton.setEnabled(false);
+            
+            apLabel = new JLabel(Bundle.MonitorFeature_application());
+            apLabel.setForeground(UIUtils.getDisabledLineColor());
+            
+            apThreadDumpButton = new JButton(Bundle.MonitorFeature_threadDump(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
+            apThreadDumpButton.setEnabled(false);
+            
+            apHeapDumpButton = new JButton(Bundle.MonitorFeature_heapDump(), Icons.getIcon(ProfilerIcons.HEAP_DUMP));
+            apHeapDumpButton.setEnabled(false);
+            
+            apGCButton = new JButton(Bundle.MonitorFeature_gc(), Icons.getIcon(ProfilerIcons.RUN_GC));
+            apGCButton.setEnabled(false);
+            
+            toolbar = ProfilerToolbar.create(true);
+            
+            toolbar.addSpace(2);
+            toolbar.addSeparator();
+            toolbar.addSpace(5);
+            
+            toolbar.add(grLabel);
+            toolbar.addSpace(2);
+            toolbar.add(grZoomInButton);
+            toolbar.add(grZoomOutButton);
+            toolbar.add(grFitWidthButton);
+            
+            toolbar.addSpace(2);
+            toolbar.addSeparator();
+            toolbar.addSpace(5);
+            
+            toolbar.add(apLabel);
+            toolbar.addSpace(2);
+            toolbar.add(apThreadDumpButton);
+            toolbar.add(apHeapDumpButton);
+            toolbar.add(apGCButton);
+        }
+        
+        return toolbar;
     }
     
 }
