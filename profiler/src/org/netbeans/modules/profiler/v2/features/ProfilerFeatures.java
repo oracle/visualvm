@@ -41,28 +41,31 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.mode;
+package org.netbeans.modules.profiler.v2.features;
 
-import javax.swing.JPanel;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.openide.util.NbBundle;
+import org.netbeans.modules.profiler.v2.session.ProjectSession;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@NbBundle.Messages({
-    "LocksFeature_name=Locks"
-})
-final class LocksFeature extends ProfilerFeature.Basic {
+public final class ProfilerFeatures {
     
-    LocksFeature() {
-        super(Bundle.LocksFeature_name(), Icons.getIcon(ProfilerIcons.WINDOW_LOCKS));
+    // To be called outside of EDT
+    public static ProfilerFeature[] getFeatures(ProjectSession session) {
+        return new ProfilerFeature[] {
+            new MonitorFeature(),
+            new CPUFeature(),
+            new MemoryFeature(),
+            null,
+            new ThreadsFeature(),
+            new LocksFeature()
+        };
     }
-
-    public JPanel getResultsUI() {
-        return new JPanel();
+    
+    // To be called outside of EDT
+    public static ProfilerFeature getSelectedFeatures(ProfilerFeature[] modes, ProjectSession session) {
+        return modes[0];
     }
     
 }

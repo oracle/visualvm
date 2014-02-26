@@ -44,6 +44,7 @@
 package org.netbeans.modules.profiler.v2.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -53,9 +54,12 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
@@ -63,8 +67,8 @@ import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.v2.mode.ProfilerFeature;
-import org.netbeans.modules.profiler.v2.mode.ProfilerFeatures;
+import org.netbeans.modules.profiler.v2.features.ProfilerFeature;
+import org.netbeans.modules.profiler.v2.features.ProfilerFeatures;
 import org.netbeans.modules.profiler.v2.session.ProjectSession;
 import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
 import org.openide.util.Lookup;
@@ -156,9 +160,14 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     
     // --- Implementation ------------------------------------------------------
     
-    private ProfilerToolbar toolbar;
+    private JPanel topContainer;
+    
     private PopupButton start;
     private JButton stop;
+    
+    private ProfilerToolbar toolbar;
+    private JToggleButton settingsButton;
+    private JPanel settingsUI;
     
     private void createUI() {
         setLayout(new BorderLayout(0, 0));
@@ -196,6 +205,10 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         stop.setEnabled(false);
 //        toolbar.add(stop);
         
+        topContainer = new JPanel(new BorderLayout(0, 0));
+        topContainer.setOpaque(false);
+        add(topContainer, BorderLayout.NORTH);
+        
         setCurrentFeature(selected);
         setAvailableFeatures(features);
     }
@@ -218,9 +231,17 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     
     private void setCurrentFeature(ProfilerFeature feature) {
         detachToolbar();
+        detachSettingsUI();
+        
+        toolbar = null;
+        settingsUI = null;
         currentFeature = feature;
+        
         attachToolbar();
         start.setText(currentFeature.getName());
+        
+        revalidate();
+        repaint();
     }
     
     private ProfilerFeature getCurrentFeature() {
@@ -245,9 +266,27 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         toolbar.add(start, 0);
         toolbar.add(stop, 1);
         
-        add(toolbar.getComponent(), BorderLayout.NORTH);
-        revalidate();
-        repaint();
+        JPanel settings = currentFeature.getSettingsUI();
+        if (settings != null) {
+            settingsUI = new JPanel(new BorderLayout(0, 0));
+            Color orig = settingsUI.getBackground();
+            settingsUI.setOpaque(true);
+            settingsUI.setBackground(UIUtils.getProfilerResultsBackground());
+            settingsUI.add(settings, BorderLayout.CENTER);
+            settingsUI.add(UIUtils.createHorizontalLine(orig), BorderLayout.SOUTH);
+            settingsButton = new JToggleButton(Icons.getIcon(GeneralIcons.SETTINGS)) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    super.fireActionPerformed(e);
+                    if (isSelected()) attachSettingsUI();
+                    else detachSettingsUI();
+                    revalidate();
+                    repaint();
+                }
+            };
+            toolbar.add(settingsButton);
+        }
+        
+        topContainer.add(toolbar.getComponent(), BorderLayout.NORTH);
     }
     
     private void detachToolbar() {
@@ -255,8 +294,18 @@ public final class ProfilerWindow extends ProfilerTopComponent {
             toolbar.remove(start);
             toolbar.remove(stop);
             
-            remove(toolbar.getComponent());
+            if (settingsButton != null) toolbar.remove(settingsButton);
+            
+            topContainer.remove(toolbar.getComponent());
         }
+    }
+    
+    private void attachSettingsUI() {
+        topContainer.add(settingsUI, BorderLayout.SOUTH);
+    }
+    
+    private void detachSettingsUI() {
+        if (settingsUI != null) topContainer.remove(settingsUI);
     }
     
     

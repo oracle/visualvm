@@ -41,59 +41,46 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.mode;
+package org.netbeans.modules.profiler.v2.ui.components;
 
+import java.awt.Insets;
+import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JPanel;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.modules.profiler.v2.session.ProjectSession;
+import javax.swing.JButton;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public abstract class ProfilerFeature {
+public class SmallButton extends JButton {
     
-    // To be called outside of EDT
-    public abstract String getName();
+    {
+        setMargin(smallMargin(getMargin()));
+    }
     
-    // To be called outside of EDT
-    public abstract Icon getIcon();
-    
-    
-    // To be called in EDT
-    public abstract JPanel getResultsUI();
-    
-    // To be called in EDT
-    public abstract JPanel getSettingsUI();
-    
-    // To be called in EDT
-    public abstract ProfilerToolbar getToolbar();
+    public SmallButton() { super(); }
+
+    public SmallButton(Icon icon) { super(icon); }
+
+    public SmallButton(String text) { super(text); }
+
+    public SmallButton(Action a) { super(a); }
+
+    public SmallButton(String text, Icon icon) { super(text, icon); }
     
     
-    public abstract boolean supportsSession(ProjectSession session);
-    
-    
-    public static abstract class Basic extends ProfilerFeature {
-        
-        private final String name;
-        private final Icon icon;
-        
-        public Basic(String name, Icon icon) {
-            this.name = name;
-            this.icon = icon;
+    private static Insets smallMargin(Insets margin) {
+        if (UIUtils.isNimbus()) {
+            margin.top = 0;
+            margin.left = -6;
+            margin.bottom = 0;
+            margin.right = -6;
+        } else {
+            margin.left = margin.top + 3;
+            margin.right = margin.top + 3;
         }
-        
-        public String getName() { return name; }
-    
-        public Icon getIcon() { return icon; }
-        
-        public JPanel getSettingsUI() { return null; }
-        
-        public ProfilerToolbar getToolbar() { return null; }
-        
-        public boolean supportsSession(ProjectSession session) { return true; }
-        
+        return margin;
     }
     
 }

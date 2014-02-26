@@ -48,8 +48,8 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JPopupMenu;
+import static javax.swing.SwingConstants.LEADING;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 
@@ -57,9 +57,9 @@ import org.netbeans.modules.profiler.api.icons.Icons;
  *
  * @author Jiri Sedlacek
  */
-public class PopupButton extends JButton {
+public class PopupButton extends SmallButton {
     
-    private static final Icon DROPDOWN_ICON = Icons.getIcon(GeneralIcons.SORT_DESCENDING);
+    private static final Icon DROPDOWN_ICON = Icons.getIcon(GeneralIcons.POPUP_ARROW);
     private static final int DROPDOWN_ICON_WIDTH = DROPDOWN_ICON.getIconWidth();
     private static final int DROPDOWN_ICON_HEIGHT = DROPDOWN_ICON.getIconHeight();
     
@@ -85,7 +85,7 @@ public class PopupButton extends JButton {
     protected void displayPopup() {
         JPopupMenu popup = new JPopupMenu();
         populatePopup(popup);
-        popup.show(this, 0, getHeight());
+        if (popup.getComponentCount() > 0) popup.show(this, 0, getHeight());
     }
     
     protected void populatePopup(JPopupMenu popup) {
@@ -109,7 +109,7 @@ public class PopupButton extends JButton {
     
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        DROPDOWN_ICON.paintIcon(this, g, getWidth() - DROPDOWN_ICON_WIDTH - 5,
+        DROPDOWN_ICON.paintIcon(this, g, getWidth() - DROPDOWN_ICON_WIDTH - 7,
                                         (getHeight() - DROPDOWN_ICON_HEIGHT) / 2);
     }
     

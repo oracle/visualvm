@@ -559,7 +559,7 @@ public class ProfilerTable extends JTable {
             };
             HeaderComponent corner = !hideable ? new HeaderComponent(chooser) :
                                                  new HeaderComponent(chooser) {
-                private Icon icon = Icons.getIcon(GeneralIcons.SORT_DESCENDING);
+                private Icon icon = Icons.getIcon(GeneralIcons.POPUP_ARROW);
                 protected void paintComponent(Graphics g) {
                     super.paintComponent(g);
                     int x = (getWidth() - icon.getIconWidth()) / 2 - 1;

@@ -41,28 +41,59 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.mode;
+package org.netbeans.modules.profiler.v2.features;
 
+import javax.swing.Icon;
 import javax.swing.JPanel;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.openide.util.NbBundle;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.modules.profiler.v2.session.ProjectSession;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@NbBundle.Messages({
-    "MemoryFeature_name=Memory"
-})
-final class MemoryFeature extends ProfilerFeature.Basic {
+public abstract class ProfilerFeature {
     
-    MemoryFeature() {
-        super(Bundle.MemoryFeature_name(), Icons.getIcon(ProfilerIcons.MEMORY));
-    }
-
-    public JPanel getResultsUI() {
-        return new JPanel();
+    // To be called outside of EDT
+    public abstract String getName();
+    
+    // To be called outside of EDT
+    public abstract Icon getIcon();
+    
+    
+    // To be called in EDT
+    public abstract JPanel getResultsUI();
+    
+    // To be called in EDT
+    public abstract JPanel getSettingsUI();
+    
+    // To be called in EDT
+    public abstract ProfilerToolbar getToolbar();
+    
+    
+    public abstract boolean supportsSession(ProjectSession session);
+    
+    
+    public static abstract class Basic extends ProfilerFeature {
+        
+        private final String name;
+        private final Icon icon;
+        
+        public Basic(String name, Icon icon) {
+            this.name = name;
+            this.icon = icon;
+        }
+        
+        public String getName() { return name; }
+    
+        public Icon getIcon() { return icon; }
+        
+        public JPanel getSettingsUI() { return null; }
+        
+        public ProfilerToolbar getToolbar() { return null; }
+        
+        public boolean supportsSession(ProjectSession session) { return true; }
+        
     }
     
 }

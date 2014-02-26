@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.mode;
+package org.netbeans.modules.profiler.v2.features;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;

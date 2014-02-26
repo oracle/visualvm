@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.mode;
+package org.netbeans.modules.profiler.v2.features;
 
 import java.awt.event.ActionEvent;
 import javax.swing.JButton;

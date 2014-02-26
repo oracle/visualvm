@@ -41,31 +41,37 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.mode;
+package org.netbeans.modules.profiler.v2.ui.components;
 
-import org.netbeans.modules.profiler.v2.session.ProjectSession;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class ProfilerFeatures {
-    
-    // To be called outside of EDT
-    public static ProfilerFeature[] getFeatures(ProjectSession session) {
-        return new ProfilerFeature[] {
-            new MonitorFeature(),
-            new CPUFeature(),
-            new MemoryFeature(),
-            null,
-            new ThreadsFeature(),
-            new LocksFeature()
-        };
+public class TitledMenuSeparator extends JPopupMenu.Separator {
+        
+    public TitledMenuSeparator(String text) {
+        setLayout(new BorderLayout());
+
+        JLabel l = new JLabel(text);
+        l.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        l.setOpaque(true);
+        l.setForeground(UIUtils.getDisabledLineColor());
+//        l.setForeground(UIManager.getColor("Label.disabledForeground")); // NOI18N
+        l.setFont(l.getFont().deriveFont(l.getFont().getSize2D() - 1));
+        add(l, BorderLayout.WEST);
     }
-    
-    // To be called outside of EDT
-    public static ProfilerFeature getSelectedFeatures(ProfilerFeature[] modes, ProjectSession session) {
-        return modes[0];
+
+    public Dimension getPreferredSize() {
+        Dimension d = getComponent(0).getPreferredSize();
+        d.width += 25;
+        return d;
     }
-    
+
 }

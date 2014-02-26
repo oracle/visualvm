@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.mode;
+package org.netbeans.modules.profiler.v2.features;
 
 import java.awt.event.ActionEvent;
 import javax.swing.JButton;
@@ -49,10 +49,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JToggleButton;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
@@ -63,75 +61,51 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "CPUFeature_name=CPU",
-    "CPUFeature_lrLabel=Live results:",
-    "CPUFeature_viewHotSpots=Hot Spots",
-    "CPUFeature_viewCallTree=Call Tree",
-    "CPUFeature_viewCombined=Combined",
-    "CPUFeature_pdLabel=Profiling data:", 
-    "CPUFeature_snapshot=Snapshot", 
-    "CPUFeature_apLabel=Application:", 
-    "CPUFeature_threadDump=Thread Dump"
+    "LocksFeature_name=Locks",
+    "LocksFeature_show=View by:",
+    "LocksFeature_aggregationByThreads=Threads",
+    "LocksFeature_aggregationByMonitors=Monitors",
+    "LocksFeature_application=Application:",
+    "LocksFeature_threadDump=Thread Dump"
 })
-final class CPUFeature extends ProfilerFeature.Basic {
+final class LocksFeature extends ProfilerFeature.Basic {
     
-    private static enum View { HOT_SPOTS, CALL_TREE, COMBINED }
+    private static enum Aggregation { BY_THREADS, BY_MONITORS }
     
-    private JLabel lrLabel;
-    private JButton lrPauseButton;
-    private JToggleButton lrRefreshButton;
-    private PopupButton lrView;
-    
-    private JLabel pdLabel;
-    private JButton pdSnapshotButton;
-    private JButton pdResetResultsButton;
+    private JLabel shLabel;
+    private PopupButton shAggregation;
     
     private JLabel apLabel;
     private JButton apThreadDumpButton;
     
     private ProfilerToolbar toolbar;
     
-    private View view;
+    private Aggregation aggregation;
     
     
-    CPUFeature() {
-        super(Bundle.CPUFeature_name(), Icons.getIcon(ProfilerIcons.CPU));
+    LocksFeature() {
+        super(Bundle.LocksFeature_name(), Icons.getIcon(ProfilerIcons.WINDOW_LOCKS));
     }
-
     
+
     public JPanel getResultsUI() {
         return new JPanel();
     }
     
     public ProfilerToolbar getToolbar() {
         if (toolbar == null) {
-            lrLabel = new JLabel(Bundle.CPUFeature_lrLabel());
-            lrLabel.setForeground(UIUtils.getDisabledLineColor());
+            shLabel = new JLabel(Bundle.LocksFeature_show());
+            shLabel.setForeground(UIUtils.getDisabledLineColor());
             
-            lrPauseButton = new JButton(Icons.getIcon(GeneralIcons.PAUSE));
-            lrPauseButton.setEnabled(false);
-            
-            lrRefreshButton = new JToggleButton(Icons.getIcon(GeneralIcons.UPDATE_NOW));
-            lrRefreshButton.setEnabled(false);
-            
-            lrView = new PopupButton() {
-                protected void populatePopup(JPopupMenu popup) { populateViews(popup); }
+            shAggregation = new PopupButton() {
+                protected void populatePopup(JPopupMenu popup) { populateFilters(popup); }
             };
-            lrView.setEnabled(false);
+            shAggregation.setEnabled(false);
             
-            pdLabel = new JLabel(Bundle.CPUFeature_pdLabel());
-            pdLabel.setForeground(UIUtils.getDisabledLineColor());
-            
-            pdSnapshotButton = new JButton(Bundle.CPUFeature_snapshot(), Icons.getIcon(ProfilerIcons.SNAPSHOT_TAKE));
-            pdSnapshotButton.setEnabled(false);
-            
-            pdResetResultsButton = new JButton(Icons.getIcon(ProfilerIcons.RESET_RESULTS));
-            pdResetResultsButton.setEnabled(false);
-            
-            apLabel = new JLabel(Bundle.CPUFeature_apLabel());
+            apLabel = new JLabel(Bundle.LocksFeature_application());
             apLabel.setForeground(UIUtils.getDisabledLineColor());
             
-            apThreadDumpButton = new JButton(Bundle.CPUFeature_threadDump(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
+            apThreadDumpButton = new JButton(Bundle.LocksFeature_threadDump(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
             apThreadDumpButton.setEnabled(false);
             
             toolbar = ProfilerToolbar.create(true);
@@ -140,20 +114,9 @@ final class CPUFeature extends ProfilerFeature.Basic {
             toolbar.addSeparator();
             toolbar.addSpace(5);
             
-            toolbar.add(lrLabel);
+            toolbar.add(shLabel);
             toolbar.addSpace(2);
-            toolbar.add(lrPauseButton);
-            toolbar.add(lrRefreshButton);
-            toolbar.add(lrView);
-            
-            toolbar.addSpace(2);
-            toolbar.addSeparator();
-            toolbar.addSpace(5);
-            
-            toolbar.add(pdLabel);
-            toolbar.addSpace(2);
-            toolbar.add(pdSnapshotButton);
-            toolbar.add(pdResetResultsButton);
+            toolbar.add(shAggregation);
             
             toolbar.addSpace(2);
             toolbar.addSeparator();
@@ -163,46 +126,39 @@ final class CPUFeature extends ProfilerFeature.Basic {
             toolbar.addSpace(2);
             toolbar.add(apThreadDumpButton);
             
-            setView(View.HOT_SPOTS);
+            setAggregation(Aggregation.BY_THREADS);
         }
         
         return toolbar;
     }
     
-    private void populateViews(JPopupMenu popup) {
-        popup.add(new JRadioButtonMenuItem(Bundle.CPUFeature_viewHotSpots(), getView() == View.HOT_SPOTS) {
-            protected void fireActionPerformed(ActionEvent e) { setView(View.HOT_SPOTS); }
+    private void populateFilters(JPopupMenu popup) {
+        popup.add(new JRadioButtonMenuItem(Bundle.LocksFeature_aggregationByThreads(), getAggregation() == Aggregation.BY_THREADS) {
+            protected void fireActionPerformed(ActionEvent e) { setAggregation(Aggregation.BY_THREADS); }
         });
         
-        popup.add(new JRadioButtonMenuItem(Bundle.CPUFeature_viewCallTree(), getView() == View.CALL_TREE) {
-            protected void fireActionPerformed(ActionEvent e) { setView(View.CALL_TREE); }
-        });
-        
-        popup.add(new JRadioButtonMenuItem(Bundle.CPUFeature_viewCombined(), getView() == View.COMBINED) {
-            protected void fireActionPerformed(ActionEvent e) { setView(View.COMBINED); }
+        popup.add(new JRadioButtonMenuItem(Bundle.LocksFeature_aggregationByMonitors(), getAggregation() == Aggregation.BY_MONITORS) {
+            protected void fireActionPerformed(ActionEvent e) { setAggregation(Aggregation.BY_MONITORS); }
         });
     }
 
-    private void setView(View view) {
-        if (view == this.view) return;
+    private void setAggregation(Aggregation aggregation) {
+        if (aggregation == this.aggregation) return;
         
-        this.view = view;
+        this.aggregation = aggregation;
         
-        switch (view) {
-            case HOT_SPOTS:
-                lrView.setText(Bundle.CPUFeature_viewHotSpots());
+        switch (aggregation) {
+            case BY_THREADS:
+                shAggregation.setText(Bundle.LocksFeature_aggregationByThreads());
                 break;
-            case CALL_TREE:
-                lrView.setText(Bundle.CPUFeature_viewCallTree());
-                break;
-            case COMBINED:
-                lrView.setText(Bundle.CPUFeature_viewCombined());
+            case BY_MONITORS:
+                shAggregation.setText(Bundle.LocksFeature_aggregationByMonitors());
                 break;
         }
     }
     
-    private View getView() {
-        return view;
+    private Aggregation getAggregation() {
+        return aggregation;
     }
     
 }
