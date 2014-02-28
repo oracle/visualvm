@@ -350,7 +350,7 @@ public class LiveFlatProfileCollectorPanel extends FlatProfilePanel implements L
          // Header
         StringBuffer result = new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE></HEAD><BODY><TABLE border=\"1\"><tr>"); // NOI18N
         for (int i = 0; i < ( columnCount); i++) {
-            result.append("<th>").append(columnNames[i]).append("</th>"); //NOI18N
+            result.append("<th>").append(columnNames[i]).append(columnNames[i].equals("Total Time")?" [&micro;s]":"").append("</th>"); //NOI18N
         }
         result.append("</tr>"); //NOI18N
 

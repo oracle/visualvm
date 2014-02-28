@@ -1,6 +1,6 @@
  profilerinterface
 
- Timestamp is 52f0cecb (Tue Feb 04 12:28:11 2014)
+ Timestamp is 530db30a (Wed Feb 26 10:25:30 2014)
 
  Preferred load address is 0000000180000000
 
@@ -14,14 +14,14 @@
  0002:000000f0 00000008H .CRT$XIAA               DATA
  0002:000000f8 00000008H .CRT$XIZ                DATA
  0002:00000100 00000010H .rdata                  DATA
- 0002:00000110 000007a8H .xdata                  DATA
- 0002:000008b8 00000028H .idata$2                DATA
- 0002:000008e0 00000014H .idata$3                DATA
- 0002:000008f8 000000d8H .idata$4                DATA
- 0002:000009d0 0000017cH .idata$6                DATA
+ 0002:00000110 000007a4H .xdata                  DATA
+ 0002:000008b4 00000028H .idata$2                DATA
+ 0002:000008dc 00000014H .idata$3                DATA
+ 0002:000008f0 000000d8H .idata$4                DATA
+ 0002:000009c8 0000017cH .idata$6                DATA
  0002:00000b50 00000e26H .edata                  DATA
- 0003:00000000 00001f70H .data                   DATA
- 0003:00001f70 00000300H .bss                    DATA
+ 0003:00000000 00001ec0H .data                   DATA
+ 0003:00001ec0 00000300H .bss                    DATA
  0004:00000000 00000588H .pdata                  DATA
  0005:00000000 00000058H .rsrc$01                DATA
  0005:00000060 00000398H .rsrc$02                DATA
@@ -86,11 +86,11 @@
  0001:00003440       get_saved_class_file_bytes 0000000180004440 f   class_file_cache.obj
  0001:00003600       try_removing_bytes_for_unloaded_classes 0000000180004600 f   class_file_cache.obj
  0001:00003610       getOwner                   0000000180004610 f   class_file_cache.obj
- 0001:000036e0       initializeMethods          00000001800046e0 f   class_file_cache.obj
- 0001:00003a90       waitInterceptor            0000000180004a90 f   class_file_cache.obj
- 0001:00003b60       sleepInterceptor           0000000180004b60 f   class_file_cache.obj
- 0001:00003c30       parkInterceptor            0000000180004c30 f   class_file_cache.obj
- 0001:00003d20       monitor_contended_enter_hook 0000000180004d20 f   class_file_cache.obj
+ 0001:00003680       initializeMethods          0000000180004680 f   class_file_cache.obj
+ 0001:00003a30       waitInterceptor            0000000180004a30 f   class_file_cache.obj
+ 0001:00003b00       sleepInterceptor           0000000180004b00 f   class_file_cache.obj
+ 0001:00003bd0       parkInterceptor            0000000180004bd0 f   class_file_cache.obj
+ 0001:00003cc0       monitor_contended_enter_hook 0000000180004cc0 f   class_file_cache.obj
  0001:00003dc0       monitor_contended_entered_hook 0000000180004dc0 f   class_file_cache.obj
  0001:00003e40       vm_object_alloc            0000000180004e40 f   class_file_cache.obj
  0001:00003eb0       Java_org_netbeans_lib_profiler_server_system_Classes_setParkTrackingEnabled 0000000180004eb0 f   class_file_cache.obj
@@ -150,23 +150,23 @@
  0002:000000f8       __xi_z                     00000001800070f8     MSVCRT:cinitexe.obj
  0002:00000100       __real@447a0000            0000000180007100     GC.obj
  0002:00000108       _pDefaultRawDllMain        0000000180007108     MSVCRT:crtdll.obj
- 0002:000008b8       __IMPORT_DESCRIPTOR_msvcrt 00000001800078b8     MSVCRT:msvcrt.dll
- 0002:000008cc       __IMPORT_DESCRIPTOR_KERNEL32 00000001800078cc     kernel32:KERNEL32.dll
- 0002:000008e0       __NULL_IMPORT_DESCRIPTOR   00000001800078e0     MSVCRT:msvcrt.dll
- 0003:00001f50       _fltused                   000000018000af50     MSVCRT:dllsupp.obj
- 0003:00001f54       __native_dllmain_reason    000000018000af54     MSVCRT:natstart.obj
- 0003:00001f58       __native_vcclrit_reason    000000018000af58     MSVCRT:natstart.obj
- 0003:00001f60       __security_cookie          000000018000af60     MSVCRT:gs_cookie.obj
- 0003:00001f68       __security_cookie_complement 000000018000af68     MSVCRT:gs_cookie.obj
- 0003:00002228       _jvmti                     000000018000b228     <common>
- 0003:00002230       _jvmti_callbacks           000000018000b230     <common>
- 0003:00002238       JVM_DumpHeap15             000000018000b238     <common>
- 0003:00002240       __native_startup_state     000000018000b240     <common>
- 0003:00002248       __native_startup_lock      000000018000b248     <common>
- 0003:00002250       __onexitend                000000018000b250     <common>
- 0003:00002258       __onexitbegin              000000018000b258     <common>
- 0003:00002260       _pRawDllMain               000000018000b260     <common>
- 0003:00002268       __dyn_tls_init_callback    000000018000b268     <common>
+ 0002:000008b4       __IMPORT_DESCRIPTOR_msvcrt 00000001800078b4     MSVCRT:msvcrt.dll
+ 0002:000008c8       __IMPORT_DESCRIPTOR_KERNEL32 00000001800078c8     kernel32:KERNEL32.dll
+ 0002:000008dc       __NULL_IMPORT_DESCRIPTOR   00000001800078dc     MSVCRT:msvcrt.dll
+ 0003:00001ea0       _fltused                   000000018000aea0     MSVCRT:dllsupp.obj
+ 0003:00001ea4       __native_dllmain_reason    000000018000aea4     MSVCRT:natstart.obj
+ 0003:00001ea8       __native_vcclrit_reason    000000018000aea8     MSVCRT:natstart.obj
+ 0003:00001eb0       __security_cookie          000000018000aeb0     MSVCRT:gs_cookie.obj
+ 0003:00001eb8       __security_cookie_complement 000000018000aeb8     MSVCRT:gs_cookie.obj
+ 0003:00002178       _jvmti                     000000018000b178     <common>
+ 0003:00002180       _jvmti_callbacks           000000018000b180     <common>
+ 0003:00002188       JVM_DumpHeap15             000000018000b188     <common>
+ 0003:00002190       __native_startup_state     000000018000b190     <common>
+ 0003:00002198       __native_startup_lock      000000018000b198     <common>
+ 0003:000021a0       __onexitend                000000018000b1a0     <common>
+ 0003:000021a8       __onexitbegin              000000018000b1a8     <common>
+ 0003:000021b0       _pRawDllMain               000000018000b1b0     <common>
+ 0003:000021b8       __dyn_tls_init_callback    000000018000b1b8     <common>
 
  entry point at        0001:00004f64
 
