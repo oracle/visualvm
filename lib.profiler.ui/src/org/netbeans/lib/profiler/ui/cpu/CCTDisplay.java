@@ -223,7 +223,7 @@ public class CCTDisplay extends SnapshotCPUResultsPanel implements ScreenshotPro
         StringBuffer result;
         result=new StringBuffer("<HTML><HEAD><meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /><TITLE>"+viewName+"</TITLE><style type=\"text/css\">pre.method{overflow:auto;width:600;height:30;vertical-align:baseline}pre.parent{overflow:auto;width:400;height:30;vertical-align:baseline}td.method{text-align:left;width:600}td.parent{text-align:left;width:400}td.right{text-align:right;white-space:nowrap}</style></HEAD><BODY><table border=\"1\"><tr>"); // NOI18N
         for (int i = 0; i < columnCount; i++) {
-            result.append("<th>").append(columnNames[i]).append("</th>"); // NOI18N
+            result.append("<th>").append(columnNames[i]).append(columnNames[i].equals("Total Time")?" [&micro;s]":"").append("</th>"); // NOI18N
         }
         result.append("</tr>"); //NOI18N
 
