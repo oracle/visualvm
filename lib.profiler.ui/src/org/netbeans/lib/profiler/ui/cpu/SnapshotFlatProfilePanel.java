@@ -98,7 +98,7 @@ public class SnapshotFlatProfilePanel extends FlatProfilePanel implements Screen
 
          // NOI18N
         for (int i = 0; i < (columnCount); i++) {
-            result.append("<th>").append(columnNames[i]).append("</th>");
+            result.append("<th>").append(columnNames[i]).append(columnNames[i].equals("Total Time")?" [&micro;s]":"").append("</th>");
         }
         result.append("</tr>");
         eDD.dumpData(result);

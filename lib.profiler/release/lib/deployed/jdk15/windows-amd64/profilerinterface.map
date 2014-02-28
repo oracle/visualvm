@@ -1,25 +1,25 @@
  profilerinterface
 
- Timestamp is 528a79da (Mon Nov 18 21:34:34 2013)
+ Timestamp is 530ded90 (Wed Feb 26 14:35:12 2014)
 
  Preferred load address is 0000000010000000
 
  Start         Length     Name                   Class
- 0001:00000000 00005043H .text                   CODE
+ 0001:00000000 00005023H .text                   CODE
  0002:00000000 000000a0H .idata$5                DATA
  0002:000000a0 00000008H .CRT$XCA                DATA
  0002:000000a8 00000008H .CRT$XCZ                DATA
  0002:000000b0 00000008H .CRT$XIA                DATA
  0002:000000b8 00000008H .CRT$XIZ                DATA
  0002:000000c0 00000004H .rdata                  DATA
- 0002:000000c4 000008f0H .xdata                  DATA
- 0002:000009b4 00000028H .idata$2                DATA
- 0002:000009dc 00000014H .idata$3                DATA
- 0002:000009f0 000000a0H .idata$4                DATA
- 0002:00000a90 000000ecH .idata$6                DATA
+ 0002:000000c4 000008e8H .xdata                  DATA
+ 0002:000009ac 00000028H .idata$2                DATA
+ 0002:000009d4 00000014H .idata$3                DATA
+ 0002:000009e8 000000a0H .idata$4                DATA
+ 0002:00000a88 000000ecH .idata$6                DATA
  0002:00000b80 00000e26H .edata                  DATA
- 0003:00000000 00001904H .data                   DATA
- 0003:00001910 000002f0H .bss                    DATA
+ 0003:00000000 00001894H .data                   DATA
+ 0003:000018a0 000002f0H .bss                    DATA
  0004:00000000 000005acH .pdata                  DATA
  0005:00000000 00000058H .rsrc$01                DATA
  0005:00000060 00000398H .rsrc$02                DATA
@@ -83,33 +83,33 @@
  0001:00003560       get_saved_class_file_bytes 0000000010004560 f   class_file_cache.obj
  0001:00003740       try_removing_bytes_for_unloaded_classes 0000000010004740 f   class_file_cache.obj
  0001:00003750       getOwner                   0000000010004750 f   class_file_cache.obj
- 0001:00003830       initializeMethods          0000000010004830 f   class_file_cache.obj
- 0001:00003c00       waitInterceptor            0000000010004c00 f   class_file_cache.obj
- 0001:00003ce0       sleepInterceptor           0000000010004ce0 f   class_file_cache.obj
- 0001:00003dc0       parkInterceptor            0000000010004dc0 f   class_file_cache.obj
- 0001:00003eb0       monitor_contended_enter_hook 0000000010004eb0 f   class_file_cache.obj
- 0001:00003f60       monitor_contended_entered_hook 0000000010004f60 f   class_file_cache.obj
- 0001:00003fe0       vm_object_alloc            0000000010004fe0 f   class_file_cache.obj
- 0001:00004060       Java_org_netbeans_lib_profiler_server_system_Classes_setParkTrackingEnabled 0000000010005060 f   class_file_cache.obj
- 0001:000040c0       Java_org_netbeans_lib_profiler_server_system_Classes_setLockContentionMonitoringEnabled 00000000100050c0 f   class_file_cache.obj
- 0001:000040d0       Java_org_netbeans_lib_profiler_server_system_Classes_setWaitTrackingEnabled 00000000100050d0 f   class_file_cache.obj
- 0001:00004140       Java_org_netbeans_lib_profiler_server_system_Classes_setSleepTrackingEnabled 0000000010005140 f   class_file_cache.obj
- 0001:000041a0       Java_org_netbeans_lib_profiler_server_system_Classes_setVMObjectAllocEnabled 00000000100051a0 f   class_file_cache.obj
- 0001:000041f0       save_class_file_bytes      00000000100051f0 f   class_file_cache.obj
- 0001:00004450       class_file_load_hook       0000000010005450 f   class_file_cache.obj
- 0001:000045d0       native_method_bind_hook    00000000100055d0 f   class_file_cache.obj
- 0001:00004980       parse_options_and_extract_params 0000000010005980 f   attach.obj
- 0001:00004b50       setupAndCallProfilerRuntimeActivate 0000000010005b50 f   attach.obj
- 0001:00004d20       vm_init_hook               0000000010005d20 f   attach.obj
- 0001:00004d2e       malloc                     0000000010005d2e f   MSVCRT:msvcrt.dll
- 0001:00004d34       memcpy                     0000000010005d34 f   MSVCRT:msvcrt.dll
- 0001:00004d3a       memmove                    0000000010005d3a f   MSVCRT:msvcrt.dll
- 0001:00004d40       memset                     0000000010005d40 f   MSVCRT:msvcrt.dll
- 0001:00004d50       _CRT_INIT                  0000000010005d50 f   MSVCRT:crtdll.obj
- 0001:00004e30       _DllMainCRTStartup         0000000010005e30 f   MSVCRT:crtdll.obj
- 0001:00004fa0       _initterm                  0000000010005fa0 f   MSVCRT:msvcrt.dll
- 0001:00004fb0       _malloc_crt                0000000010005fb0 f   MSVCRT:crtheap.obj
- 0001:00005020       DllMain                    0000000010006020 f   MSVCRT:dllmain.obj
+ 0001:000037c0       initializeMethods          00000000100047c0 f   class_file_cache.obj
+ 0001:00003b90       waitInterceptor            0000000010004b90 f   class_file_cache.obj
+ 0001:00003c70       sleepInterceptor           0000000010004c70 f   class_file_cache.obj
+ 0001:00003d50       parkInterceptor            0000000010004d50 f   class_file_cache.obj
+ 0001:00003e40       monitor_contended_enter_hook 0000000010004e40 f   class_file_cache.obj
+ 0001:00003f40       monitor_contended_entered_hook 0000000010004f40 f   class_file_cache.obj
+ 0001:00003fc0       vm_object_alloc            0000000010004fc0 f   class_file_cache.obj
+ 0001:00004040       Java_org_netbeans_lib_profiler_server_system_Classes_setParkTrackingEnabled 0000000010005040 f   class_file_cache.obj
+ 0001:000040a0       Java_org_netbeans_lib_profiler_server_system_Classes_setLockContentionMonitoringEnabled 00000000100050a0 f   class_file_cache.obj
+ 0001:000040b0       Java_org_netbeans_lib_profiler_server_system_Classes_setWaitTrackingEnabled 00000000100050b0 f   class_file_cache.obj
+ 0001:00004120       Java_org_netbeans_lib_profiler_server_system_Classes_setSleepTrackingEnabled 0000000010005120 f   class_file_cache.obj
+ 0001:00004180       Java_org_netbeans_lib_profiler_server_system_Classes_setVMObjectAllocEnabled 0000000010005180 f   class_file_cache.obj
+ 0001:000041d0       save_class_file_bytes      00000000100051d0 f   class_file_cache.obj
+ 0001:00004430       class_file_load_hook       0000000010005430 f   class_file_cache.obj
+ 0001:000045b0       native_method_bind_hook    00000000100055b0 f   class_file_cache.obj
+ 0001:00004960       parse_options_and_extract_params 0000000010005960 f   attach.obj
+ 0001:00004b30       setupAndCallProfilerRuntimeActivate 0000000010005b30 f   attach.obj
+ 0001:00004d00       vm_init_hook               0000000010005d00 f   attach.obj
+ 0001:00004d0e       malloc                     0000000010005d0e f   MSVCRT:msvcrt.dll
+ 0001:00004d14       memcpy                     0000000010005d14 f   MSVCRT:msvcrt.dll
+ 0001:00004d1a       memmove                    0000000010005d1a f   MSVCRT:msvcrt.dll
+ 0001:00004d20       memset                     0000000010005d20 f   MSVCRT:msvcrt.dll
+ 0001:00004d30       _CRT_INIT                  0000000010005d30 f   MSVCRT:crtdll.obj
+ 0001:00004e10       _DllMainCRTStartup         0000000010005e10 f   MSVCRT:crtdll.obj
+ 0001:00004f80       _initterm                  0000000010005f80 f   MSVCRT:msvcrt.dll
+ 0001:00004f90       _malloc_crt                0000000010005f90 f   MSVCRT:crtheap.obj
+ 0001:00005000       DllMain                    0000000010006000 f   MSVCRT:dllmain.obj
  0002:00000000       __imp_Sleep                0000000010007000     kernel32:KERNEL32.dll
  0002:00000008       __imp_GetModuleHandleA     0000000010007008     kernel32:KERNEL32.dll
  0002:00000010       __imp_GetProcAddress       0000000010007010     kernel32:KERNEL32.dll
@@ -135,18 +135,18 @@
  0002:000000b0       __xi_a                     00000000100070b0     MSVCRT:cinitexe.obj
  0002:000000b8       __xi_z                     00000000100070b8     MSVCRT:cinitexe.obj
  0002:000000c0       __real@447a0000            00000000100070c0     GC.obj
- 0002:000009b4       __IMPORT_DESCRIPTOR_msvcrt 00000000100079b4     MSVCRT:msvcrt.dll
- 0002:000009c8       __IMPORT_DESCRIPTOR_KERNEL32 00000000100079c8     kernel32:KERNEL32.dll
- 0002:000009dc       __NULL_IMPORT_DESCRIPTOR   00000000100079dc     MSVCRT:msvcrt.dll
- 0003:00001900       _fltused                   000000001000a900     MSVCRT:dllsupp.obj
- 0003:00001bd0       _jvmti                     000000001000abd0     <common>
- 0003:00001bd8       _jvmti_callbacks           000000001000abd8     <common>
- 0003:00001be0       JVM_DumpHeap15             000000001000abe0     <common>
- 0003:00001be8       __onexitend                000000001000abe8     <common>
- 0003:00001bf0       __onexitbegin              000000001000abf0     <common>
- 0003:00001bf8       _pRawDllMain               000000001000abf8     <common>
+ 0002:000009ac       __IMPORT_DESCRIPTOR_msvcrt 00000000100079ac     MSVCRT:msvcrt.dll
+ 0002:000009c0       __IMPORT_DESCRIPTOR_KERNEL32 00000000100079c0     kernel32:KERNEL32.dll
+ 0002:000009d4       __NULL_IMPORT_DESCRIPTOR   00000000100079d4     MSVCRT:msvcrt.dll
+ 0003:00001890       _fltused                   000000001000a890     MSVCRT:dllsupp.obj
+ 0003:00001b60       _jvmti                     000000001000ab60     <common>
+ 0003:00001b68       _jvmti_callbacks           000000001000ab68     <common>
+ 0003:00001b70       JVM_DumpHeap15             000000001000ab70     <common>
+ 0003:00001b78       __onexitend                000000001000ab78     <common>
+ 0003:00001b80       __onexitbegin              000000001000ab80     <common>
+ 0003:00001b88       _pRawDllMain               000000001000ab88     <common>
 
- entry point at        0001:00004e30
+ entry point at        0001:00004e10
 
  Static symbols
 

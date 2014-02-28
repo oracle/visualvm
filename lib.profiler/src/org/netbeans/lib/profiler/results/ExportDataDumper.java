@@ -46,6 +46,10 @@ package org.netbeans.lib.profiler.results;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -66,6 +70,7 @@ public class ExportDataDumper {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
+    OutputStreamWriter osw;
     BufferedOutputStream bos;
     IOException caughtEx;
     int numExceptions=0;
@@ -74,6 +79,12 @@ public class ExportDataDumper {
 
     public ExportDataDumper(FileOutputStream fw) {
         bos = new BufferedOutputStream(fw, BUFFER_SIZE);
+        try {
+            osw = new OutputStreamWriter(bos, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            numExceptions++;
+            Logger.getLogger(ExportDataDumper.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -107,7 +118,7 @@ public class ExportDataDumper {
         }
 
         try {
-            if (s!=null) bos.write(s.toString().getBytes());
+            if (s!=null) osw.append(s);
         } catch (IOException ex) {
             caughtEx = ex;
             System.out.println(s);
@@ -118,6 +129,7 @@ public class ExportDataDumper {
 
     public void close() {
         try {
+            osw.close();
             bos.close();
         } catch (IOException ex) {
             caughtEx = ex;
