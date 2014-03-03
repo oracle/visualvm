@@ -164,6 +164,8 @@ public abstract class ProfilerToolbar {
             if (component instanceof JLabel) return false;
             if (component instanceof JPanel) return false;
             if (component instanceof JSeparator) return false;
+            if (component instanceof JToolBar) return false;
+            if (component instanceof Box.Filler) return false;
             return true;
         }
         

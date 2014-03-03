@@ -70,7 +70,7 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.v2.features.ProfilerFeature;
 import org.netbeans.modules.profiler.v2.features.ProfilerFeatures;
 import org.netbeans.modules.profiler.v2.session.ProjectSession;
-import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
+import org.netbeans.modules.profiler.v2.ui.components.DropdownButton;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -162,7 +162,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     
     private JPanel topContainer;
     
-    private PopupButton start;
+    private DropdownButton start;
     private JButton stop;
     
     private ProfilerToolbar toolbar;
@@ -171,6 +171,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     
     private void createUI() {
         setLayout(new BorderLayout(0, 0));
+        setFocusable(false);
         
         final ProfilerToolbar temp = ProfilerToolbar.create(true);
         add(temp.getComponent(), BorderLayout.NORTH);
@@ -194,7 +195,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     }
     
     private void popupulateUI(final ProfilerFeature[] features, final ProfilerFeature selected) {
-        start = new PopupButton(selected.getName(), Icons.getIcon(GeneralIcons.START)) {
+        start = new DropdownButton(selected.getName(), Icons.getIcon(GeneralIcons.START)) {
             protected void populatePopup(JPopupMenu popup) { populatePopupImpl(popup); }
         };
 //        toolbar.add(start);

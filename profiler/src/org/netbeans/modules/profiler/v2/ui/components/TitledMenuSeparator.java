@@ -44,9 +44,13 @@
 package org.netbeans.modules.profiler.v2.ui.components;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Rectangle;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import org.netbeans.lib.profiler.ui.UIUtils;
 
@@ -54,18 +58,37 @@ import org.netbeans.lib.profiler.ui.UIUtils;
  *
  * @author Jiri Sedlacek
  */
-public class TitledMenuSeparator extends JPopupMenu.Separator {
-        
+public class TitledMenuSeparator extends JPanel {
+    
     public TitledMenuSeparator(String text) {
         setLayout(new BorderLayout());
+        setOpaque(false);
 
         JLabel l = new JLabel(text);
         l.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        l.setOpaque(true);
-        l.setForeground(UIUtils.getDisabledLineColor());
-//        l.setForeground(UIManager.getColor("Label.disabledForeground")); // NOI18N
-        l.setFont(l.getFont().deriveFont(l.getFont().getSize2D() - 1));
+        if (UIUtils.isWindowsLookAndFeel()) l.setOpaque(true);
+        l.setFont(l.getFont().deriveFont(Font.BOLD, l.getFont().getSize2D() - 1));
+        if (UIUtils.isWindowsLookAndFeel()) l.setForeground(UIUtils.getDisabledLineColor());
+        
         add(l, BorderLayout.WEST);
+        
+        if (UIUtils.isGTKLookAndFeel()) {
+            add(UIUtils.createHorizontalSeparator(), BorderLayout.CENTER);
+        } else {
+            add(new JPopupMenu.Separator(), BorderLayout.CENTER);
+        }
+    }
+    
+    public void doLayout() {
+        super.doLayout();
+        Component c = getComponent(1);
+        
+        int h = c.getPreferredSize().height;
+        Rectangle b = c.getBounds();
+        
+        b.y = (b.height - h) / 2;
+        b.height = h;
+        c.setBounds(b);
     }
 
     public Dimension getPreferredSize() {
