@@ -752,8 +752,9 @@ public class InstancesListControllerUI extends JTitledPanel {
                     Instance selectedInstance = null;
 
                     if (selectedRow != -1) {
-                        HeapWalkerNode selectedNode = (HeapWalkerNode) instancesListTable.getTree().getPathForRow(selectedRow)
-                                                                                         .getLastPathComponent();
+                        TreePath selectedPath = instancesListTable.getTree().getPathForRow(selectedRow);
+                        HeapWalkerNode selectedNode = selectedPath == null ? null :
+                                                     (HeapWalkerNode)selectedPath.getLastPathComponent();
 
                         if (selectedNode instanceof InstancesListController.InstancesListInstanceNode) {
                             selectedInstance = ((InstancesListController.InstancesListInstanceNode) selectedNode).getInstance();

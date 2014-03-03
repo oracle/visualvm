@@ -319,12 +319,13 @@ jthread getOwner(jvmtiEnv *jvmti_env, jobject object) {
     assert(res == JVMTI_ERROR_NONE);
     (*jvmti_env)->Deallocate(jvmti_env, (void*)usage.waiters);
     (*jvmti_env)->Deallocate(jvmti_env, (void*)usage.notify_waiters);
-    if (usage.owner == NULL) {
-        jint hash;
-        res = (*jvmti_env)->GetObjectHashCode(jvmti_env, object, &hash);
-        assert(res == JVMTI_ERROR_NONE);        
-        fprintf(stderr, "Profiler Agent Warning: NULL owner for lock %x.\n", (unsigned int)hash);
-    }
+/*    if (usage.owner == NULL) {
+*        jint hash;
+*        res = (*jvmti_env)->GetObjectHashCode(jvmti_env, object, &hash);
+*        assert(res == JVMTI_ERROR_NONE);        
+*        fprintf(stderr, "Profiler Agent Warning: NULL owner for lock %x.\n", (unsigned int)hash);
+*    }
+*/
     return usage.owner;
 }
 
