@@ -197,14 +197,12 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     private void popupulateUI(final ProfilerFeature[] features, final ProfilerFeature selected) {
         start = new DropdownButton(selected.getName(), Icons.getIcon(GeneralIcons.START)) {
             protected void populatePopup(JPopupMenu popup) { populatePopupImpl(popup); }
+            protected void performAction() { performStartImpl(); }
         };
-//        toolbar.add(start);
         
-//        toolbar.addSpace(2);
-        
-        stop = new JButton(Icons.getIcon(GeneralIcons.STOP));
-        stop.setEnabled(false);
-//        toolbar.add(stop);
+        stop = new JButton(Icons.getIcon(GeneralIcons.STOP)) {
+            protected void fireActionPerformed(ActionEvent e) { performStopImpl(); }
+        };
         
         topContainer = new JPanel(new BorderLayout(0, 0));
         topContainer.setOpaque(false);
@@ -212,6 +210,21 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         
         setCurrentFeature(selected);
         setAvailableFeatures(features);
+        
+        session.addListener(new ProjectSession.Listener() {
+            public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
+                updateButtons();
+            }
+        });
+        updateButtons();
+    }
+    
+    private void performStartImpl() {
+        session.start(session.getProfilingSettings(), null);
+    }
+    
+    private void performStopImpl() {
+        session.terminate();
     }
     
     private void populatePopupImpl(JPopupMenu popup) {        
@@ -224,6 +237,13 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         
         if (popup.getComponentCount() > 0) popup.addSeparator();
         popup.add(new JMenuItem(Bundle.ProfilerWindow_createCustom()));
+    }
+    
+    
+    private void updateButtons() {
+        ProjectSession.State state = session.getState();
+        start.setEnabled(state == ProjectSession.State.INACTIVE);
+        stop.setEnabled(state == ProjectSession.State.RUNNING);
     }
     
     
