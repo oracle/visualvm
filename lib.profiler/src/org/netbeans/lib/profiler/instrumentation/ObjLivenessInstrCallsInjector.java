@@ -48,6 +48,7 @@ import org.netbeans.lib.profiler.classfile.BaseClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.utils.MiscUtils;
 
 
@@ -75,14 +76,16 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     protected boolean[] allUnprofiledClassStatusArray;
+    private final InstrumentationFilter instrFilter;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public ObjLivenessInstrCallsInjector(DynamicClassInfo clazz, int baseCPoolCount, int methodIdx,
-                                         boolean[] allUnprofiledClassStatusArray) {
+                                         boolean[] allUnprofiledClassStatusArray, InstrumentationFilter instrFilter) {
         super(clazz, methodIdx);
         this.baseCPoolCount = baseCPoolCount;
         this.allUnprofiledClassStatusArray = allUnprofiledClassStatusArray;
+        this.instrFilter = instrFilter;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -118,6 +121,9 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                             int classCPIdx = getU2(bci + 1);
                             String refClassName = clazz.getRefClassName(classCPIdx);
 
+                            if (!instrFilter.passesFilter(refClassName)) {
+                                continue;
+                            }
                             if (bc == opc_new) {
                                 refClazz = ClassManager.javaClassOrPlaceholderForName(refClassName, loaderId);
                             } else if (bc == opc_anewarray) {
@@ -186,6 +192,9 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
 
                             int classId = refClazz.getInstrClassId();
 
+                            if (!instrFilter.passesFilter(refClazz.getName())) {
+                                continue;
+                            }
                             if ((allUnprofiledClassStatusArray == null) || !allUnprofiledClassStatusArray[classId]) {
                                 injectTraceObjAlloc(classId, bci + 2);
                                 nInjections++;

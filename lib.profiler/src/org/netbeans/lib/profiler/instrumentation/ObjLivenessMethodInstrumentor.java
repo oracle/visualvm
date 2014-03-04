@@ -43,13 +43,14 @@
 
 package org.netbeans.lib.profiler.instrumentation;
 
+import java.util.Enumeration;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.classfile.BaseClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
+import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import java.util.Enumeration;
 
 
 /**
@@ -132,6 +133,7 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
     protected boolean[] allUnprofiledClassStatusArray;
     protected int operationCode; // Depending on this value, use different methods to mark/determine if a method needs rewriting
     private final ProfilerEngineSettings engineSettings;
+    private final InstrumentationFilter instrFilter;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -139,6 +141,7 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
         super(status, isLiveness ? INJ_OBJECT_LIVENESS : INJ_OBJECT_ALLOCATIONS);
         this.engineSettings = engineSettings;
         msbi = new MethodScanerForBannedInstantiations();
+        instrFilter = engineSettings.getInstrumentationFilter();
         operationCode = STANDARD_INSTRUMENTATION;
     }
 
@@ -233,8 +236,8 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
 
     protected byte[] instrumentMethod(DynamicClassInfo clazz, int methodIdx) {
         return InstrumentationFactory.instrumentForMemoryProfiling(clazz, methodIdx, allUnprofiledClassStatusArray, injType,
-                                                                   getRuntimeProfilingPoints(engineSettings.getRuntimeProfilingPoints(),
-                                                                                             clazz, methodIdx));
+                                             getRuntimeProfilingPoints(engineSettings.getRuntimeProfilingPoints(),clazz, methodIdx),
+                                             instrFilter);
     }
 
     protected boolean methodNeedsInstrumentation(ClassInfo clazz, int methodIdx) {
