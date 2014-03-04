@@ -44,7 +44,6 @@
 package org.netbeans.lib.profiler.server.system;
 
 import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
 
 
 /**
@@ -54,9 +53,6 @@ import java.lang.management.ThreadMXBean;
  * @author  Misha Dmitriev
  */
 public class Timers {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    private static ThreadMXBean mxbean;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -84,7 +80,7 @@ public class Timers {
 
     /** Should be called at earliest possible time */
     public static void initialize() {
-        mxbean = ManagementFactory.getThreadMXBean();
+        ManagementFactory.getThreadMXBean();
         getThreadCPUTimeInNanos();
     }
 
