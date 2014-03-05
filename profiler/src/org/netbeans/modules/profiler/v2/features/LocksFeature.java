@@ -44,13 +44,20 @@
 package org.netbeans.modules.profiler.v2.features;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
+import org.netbeans.lib.profiler.common.Profiler;
+import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
+import org.netbeans.lib.profiler.common.event.ProfilingStateAdapter;
+import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.locks.LockContentionPanel;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
@@ -82,6 +89,9 @@ final class LocksFeature extends ProfilerFeature.Basic {
     
     private Aggregation aggregation;
     
+    private LockContentionPanel locksPanel;
+    private ProfilingSettings settings;
+    
     
     LocksFeature() {
         super(Bundle.LocksFeature_name(), Icons.getIcon(ProfilerIcons.WINDOW_LOCKS));
@@ -89,7 +99,8 @@ final class LocksFeature extends ProfilerFeature.Basic {
     
 
     public JPanel getResultsUI() {
-        return new JPanel();
+        if (locksPanel == null) initResultsUI();
+        return locksPanel;
     }
     
     public ProfilerToolbar getToolbar() {
@@ -132,6 +143,15 @@ final class LocksFeature extends ProfilerFeature.Basic {
         return toolbar;
     }
     
+    public ProfilingSettings getSettings() {
+        if (settings == null) {
+            settings = ProfilingSettingsPresets.createMonitorPreset();
+            settings.setThreadsMonitoringEnabled(false);
+            settings.setLockContentionMonitoringEnabled(true);
+        }
+        return settings;
+    }
+    
     private void populateFilters(JPopupMenu popup) {
         popup.add(new JRadioButtonMenuItem(Bundle.LocksFeature_aggregationByThreads(), getAggregation() == Aggregation.BY_THREADS) {
             protected void fireActionPerformed(ActionEvent e) { setAggregation(Aggregation.BY_THREADS); }
@@ -159,6 +179,53 @@ final class LocksFeature extends ProfilerFeature.Basic {
     
     private Aggregation getAggregation() {
         return aggregation;
+    }
+    
+    private void initResultsUI() {
+        locksPanel = new LockContentionPanel();
+        
+        profilingStateChanged(Profiler.getDefault().getProfilingState());
+        updateLocksView();
+        
+        locksPanel.addLockContentionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                Profiler.getDefault().setLockContentionMonitoringEnabled(true);
+                locksPanel.lockContentionEnabled();
+            }
+        });
+        Profiler.getDefault().addProfilingStateListener(new ProfilingStateAdapter() {
+            public void profilingStateChanged(final ProfilingStateEvent e) {
+                LocksFeature.this.profilingStateChanged(e.getNewState());
+            }
+            public void lockContentionMonitoringChanged() {
+                updateLocksView();
+            }
+        });
+    }
+    
+    private void updateLocksView() {
+        if (Profiler.getDefault().getLockContentionMonitoringEnabled()) {
+            locksPanel.lockContentionEnabled();
+        } else {
+            locksPanel.lockContentionDisabled();
+        }
+    }
+
+    
+    private void profilingStateChanged(final boolean enable) {
+        if (enable) {
+            locksPanel.profilingSessionStarted();
+        } else {
+            locksPanel.profilingSessionFinished();
+        }
+    }
+
+    private void profilingStateChanged(final int profilingState) {
+        if (profilingState == Profiler.PROFILING_RUNNING) {
+            profilingStateChanged(true);
+        } else {
+            profilingStateChanged(false);
+        }
     }
     
 }

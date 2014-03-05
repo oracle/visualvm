@@ -44,14 +44,21 @@
 package org.netbeans.modules.profiler.v2.features;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
+import org.netbeans.lib.profiler.common.Profiler;
+import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
+import org.netbeans.lib.profiler.common.event.ProfilingStateAdapter;
+import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -93,6 +100,9 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
     
     private Filter filter;
     
+    private ThreadsPanel threadsPanel;
+    private ProfilingSettings settings;
+    
     
     ThreadsFeature() {
         super(Bundle.ThreadsFeature_name(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
@@ -100,7 +110,8 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
 
     
     public JPanel getResultsUI() {
-        return new JPanel();
+        if (threadsPanel == null) initResultsUI();
+        return threadsPanel;
     }
     
     public ProfilerToolbar getToolbar() {
@@ -165,6 +176,15 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
         return toolbar;
     }
     
+    public ProfilingSettings getSettings() {
+        if (settings == null) {
+            settings = ProfilingSettingsPresets.createMonitorPreset();
+            settings.setThreadsMonitoringEnabled(true);
+            settings.setLockContentionMonitoringEnabled(false);
+        }
+        return settings;
+    }
+    
     private void populateFilters(JPopupMenu popup) {
         popup.add(new JRadioButtonMenuItem(Bundle.ThreadsFeature_filterAll(), getFilter() == Filter.ALL) {
             protected void fireActionPerformed(ActionEvent e) { setFilter(Filter.ALL); }
@@ -199,6 +219,51 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
     
     private Filter getFilter() {
         return filter;
+    }
+    
+    private void initResultsUI() {
+        threadsPanel = new ThreadsPanel(Profiler.getDefault().getThreadsManager(), null);
+        threadsPanel.addThreadsMonitoringActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                Profiler.getDefault().setThreadsMonitoringEnabled(true);
+            }
+        });
+        
+        profilingStateChanged(Profiler.getDefault().getProfilingState());
+        updateThreadsView();
+        
+        Profiler.getDefault().addProfilingStateListener(new ProfilingStateAdapter(){
+            public void profilingStateChanged(final ProfilingStateEvent e) {
+                ThreadsFeature.this.profilingStateChanged(e.getNewState());
+            }
+            public void threadsMonitoringChanged() {
+                updateThreadsView();
+            }
+        });
+    }
+    
+    private void updateThreadsView() {
+        if (Profiler.getDefault().getThreadsMonitoringEnabled()) {
+            threadsPanel.threadsMonitoringEnabled();
+        } else {
+            threadsPanel.threadsMonitoringDisabled();
+        }
+    }
+    
+    private void profilingStateChanged(final boolean enable) {
+        if (enable) {
+            threadsPanel.profilingSessionStarted();
+        } else {
+            threadsPanel.profilingSessionFinished();
+        }
+    }
+    
+    private void profilingStateChanged(final int profilingState) {
+        if (profilingState == Profiler.PROFILING_RUNNING) {
+            profilingStateChanged(true);
+        } else {
+            profilingStateChanged(false);
+        }
     }
     
 }

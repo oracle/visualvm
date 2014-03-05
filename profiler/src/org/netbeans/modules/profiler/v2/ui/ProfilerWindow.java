@@ -59,6 +59,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
@@ -168,6 +171,12 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     private ProfilerToolbar toolbar;
     private JToggleButton settingsButton;
     private JPanel settingsUI;
+    private JPanel resultsUI;
+    
+    private AttachSettings attachSettings;
+    
+    private ChangeListener listener;
+    
     
     private void createUI() {
         setLayout(new BorderLayout(0, 0));
@@ -221,7 +230,8 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     
     private void performStartImpl() {
         start.setPushed(true);
-        session.start(session.getProfilingSettings(), null);
+        System.err.println(">>> Starting with threads X: " + currentFeature.getSettings().getThreadsMonitoringEnabled());
+        session.start(currentFeature.getSettings(), attachSettings);
     }
     
     private void performStopImpl() {
@@ -252,18 +262,34 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     private ProfilerFeature[] availableFeatures;
     
     private void setCurrentFeature(ProfilerFeature feature) {
+        if (currentFeature == feature) return;
+        
         detachToolbar();
+        detachResultsUI();
         detachSettingsUI();
         
+        if (listener != null && currentFeature != null)
+            currentFeature.removeChangeListener(listener);
+        
         toolbar = null;
-        settingsUI = null;
+        resultsUI = null;
         currentFeature = feature;
         
         attachToolbar();
+        attachResultsUI();
         start.setText(currentFeature.getName());
         
         revalidate();
         repaint();
+        
+        if (session.inProgress()) session.modify(currentFeature.getSettings());
+        
+        if (listener == null) listener = new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if (session.inProgress()) session.modify(currentFeature.getSettings());
+            }
+        };
+        currentFeature.addChangeListener(listener);
     }
     
     private ProfilerFeature getCurrentFeature() {
@@ -328,6 +354,18 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     
     private void detachSettingsUI() {
         if (settingsUI != null) topContainer.remove(settingsUI);
+    }
+    
+    private void attachResultsUI() {
+        resultsUI = currentFeature.getResultsUI();
+        add(resultsUI, BorderLayout.CENTER);
+    }
+    
+    private void detachResultsUI() {
+        if (resultsUI != null) {
+            remove(resultsUI);
+            settingsUI = null;
+        }
     }
     
     

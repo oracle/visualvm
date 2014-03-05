@@ -49,7 +49,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JPopupMenu;
-import static javax.swing.SwingConstants.LEADING;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 
@@ -83,9 +82,14 @@ public class PopupButton extends SmallButton {
     }
     
     protected void displayPopup() {
-        JPopupMenu popup = new JPopupMenu();
-        populatePopup(popup);
-        if (popup.getComponentCount() > 0) popup.show(this, 0, getHeight());
+        JPopupMenu menu = new JPopupMenu();
+        populatePopup(menu);
+        if (menu.getComponentCount() > 0) {
+            Dimension size = menu.getPreferredSize();
+            size.width = Math.max(size.width, getWidth());
+            menu.setPreferredSize(size);
+            menu.show(this, 0, getHeight());
+        }
     }
     
     protected void populatePopup(JPopupMenu popup) {

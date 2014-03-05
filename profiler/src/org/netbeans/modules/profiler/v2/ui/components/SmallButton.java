@@ -56,6 +56,7 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 public class SmallButton extends JButton {
     
     {
+        setDefaultCapable(false);
         setMargin(smallMargin(getMargin()));
     }
     

@@ -43,8 +43,13 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.v2.session.ProjectSession;
 
@@ -73,8 +78,17 @@ public abstract class ProfilerFeature {
     
     public abstract boolean supportsSession(ProjectSession session);
     
+    public abstract ProfilingSettings getSettings();
+    
+    
+    public abstract void addChangeListener(ChangeListener listener);
+    
+    public abstract void removeChangeListener(ChangeListener listener);
+    
     
     public static abstract class Basic extends ProfilerFeature {
+        
+        private Set<ChangeListener> listeners;
         
         private final String name;
         private final Icon icon;
@@ -93,6 +107,22 @@ public abstract class ProfilerFeature {
         public ProfilerToolbar getToolbar() { return null; }
         
         public boolean supportsSession(ProjectSession session) { return true; }
+        
+        
+        public void addChangeListener(ChangeListener listener) {
+            if (listeners == null) listeners = new HashSet();
+            listeners.add(listener);
+        }
+    
+        public void removeChangeListener(ChangeListener listener) {
+            if (listeners != null) listeners.remove(listener);
+        }
+        
+        protected void fireChange() {
+            if (listeners == null) return;
+            ChangeEvent e = new ChangeEvent(this);
+            for (ChangeListener listener : listeners) listener.stateChanged(e);
+        }
         
     }
     

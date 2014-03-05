@@ -58,6 +58,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
+import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
@@ -236,6 +238,10 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         }
         
         return toolbar;
+    }
+    
+    public ProfilingSettings getSettings() {
+        return ProfilingSettingsPresets.createMemoryPreset();
     }
     
 }

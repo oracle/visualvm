@@ -102,14 +102,9 @@ public abstract class ProjectSession {
     }
     
     
-    public ProfilingSettings getProfilingSettings() {
-        return ProfilingSettingsPresets.createMonitorPreset();
-    }
+    public abstract ProfilingSettings getProfilingSettings();
     
-    public AttachSettings getAttachSettings() {
-        return null;
-    }
-    
+    public abstract AttachSettings getAttachSettings();
     
     public abstract void start(ProfilingSettings pSettings, AttachSettings aSettings);
     

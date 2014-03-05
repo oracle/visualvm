@@ -249,7 +249,7 @@ public class ThreadsPanel extends JPanel {
         TableCellRenderer headerRenderer = header.getDefaultRenderer();
         header.setDefaultRenderer(new TimelineHeaderRenderer(headerRenderer, 1, viewManager));
         
-        Number refTime = new Long(123456789);
+        Number refTime = new Long(1234567);
         
         timeRelRenderer = new ThreadTimeRelRenderer(dataManager);
         timeRelRenderer.setMaxValue(refTime.longValue());

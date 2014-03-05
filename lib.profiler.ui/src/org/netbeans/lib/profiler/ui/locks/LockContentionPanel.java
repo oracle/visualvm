@@ -240,7 +240,7 @@ public class LockContentionPanel extends ResultsPanel {
         treeTable.setColumnRenderer(1, barRenderer);
         treeTable.setColumnVisibility(1, false);
         
-        Number refTime = new Long(123456789);
+        Number refTime = new Long(123456);
         
 //        BaseDetailsRenderer numberPercentRenderer = new BaseDetailsRenderer(new LabelRenderer(), "(100%)");
 //        NumberBarRenderer numberPercentRenderer = new NumberBarRenderer(Formatters.millisecondsFormat()) {
@@ -262,7 +262,7 @@ public class LockContentionPanel extends ResultsPanel {
         treeTable.setDefaultColumnWidth(2, hbrTime.getOptimalWidth());
         
         hbrWaits = new HideableBarRenderer(new NumberRenderer());
-        hbrWaits.setMaxValue(12345);
+        hbrWaits.setMaxValue(1234567);
 //        treeTable.setDefaultColumnWidth(3, hbrWaits.getOptimalWidth());
         treeTable.setColumnRenderer(3, hbrWaits);
         int waitsWidth = (hbrWaits.getNoBarWidth() + hbrWaits.getMaxNoBarWidth()) / 2;
