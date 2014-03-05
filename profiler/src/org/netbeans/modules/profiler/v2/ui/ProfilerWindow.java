@@ -195,7 +195,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     }
     
     private void popupulateUI(final ProfilerFeature[] features, final ProfilerFeature selected) {
-        start = new DropdownButton(selected.getName(), Icons.getIcon(GeneralIcons.START)) {
+        start = new DropdownButton(selected.getName(), Icons.getIcon(GeneralIcons.START), true) {
             protected void populatePopup(JPopupMenu popup) { populatePopupImpl(popup); }
             protected void performAction() { performStartImpl(); }
         };
@@ -220,6 +220,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     }
     
     private void performStartImpl() {
+        start.setPushed(true);
         session.start(session.getProfilingSettings(), null);
     }
     
@@ -242,7 +243,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     
     private void updateButtons() {
         ProjectSession.State state = session.getState();
-        start.setEnabled(state == ProjectSession.State.INACTIVE);
+        start.setPushed(state != ProjectSession.State.INACTIVE);
         stop.setEnabled(state == ProjectSession.State.RUNNING);
     }
     

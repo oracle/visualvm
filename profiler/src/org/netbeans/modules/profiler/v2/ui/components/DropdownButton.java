@@ -56,6 +56,8 @@ import javax.swing.AbstractAction;
 import javax.swing.DefaultButtonModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
@@ -67,8 +69,7 @@ import org.netbeans.modules.profiler.api.icons.Icons;
  *
  * @author Jiri Sedlacek
  */
-// NOTE: extend JPanel to have a button-like appearance
-public class DropdownButton extends JToolBar {
+public class DropdownButton extends JPanel {
     
     private static final Icon DROPDOWN_ICON = Icons.getIcon(GeneralIcons.POPUP_ARROW);
     private static final int DROPDOWN_ICON_WIDTH = DROPDOWN_ICON.getIconWidth();
@@ -76,11 +77,6 @@ public class DropdownButton extends JToolBar {
     
     private static final String NO_ACTION = "none"; // NOI18N
     private static final String POPUP_ACTION = "displayPopup"; // NOI18N
-    
-    
-    private final Button button;
-    private final Popup popup;
-    
     
     private static final int POPUP_EXTENT;
     private static final int POPUP_OFFSET;
@@ -117,24 +113,43 @@ public class DropdownButton extends JToolBar {
     }
     
     
-    public DropdownButton() { this(null, null); }
-
-    public DropdownButton(Icon icon) { this(null, icon); }
-
-    public DropdownButton(String text) { this(text, null); }
+    private final JComponent container;
+    private final Button button;
+    private final Popup popup;
     
-    public DropdownButton(String text, Icon icon) {
-        setFloatable(false);
+    private boolean pushed;
+    
+    
+    public DropdownButton(String text, Icon icon, boolean toolbar) {
+        setOpaque(false);
+        
+        if (toolbar) {
+            JToolBar tb = new JToolBar() {
+                public void doLayout() {
+                    for (Component c : getComponents())
+                        c.setBounds(0, 0, getWidth(), getHeight());
+                }
+                public void paint(Graphics g) {
+                    paintChildren(g);
+                }
+            };
+            tb.setFloatable(false);
+            tb.setFocusable(false);
+            container = tb;
+            add(container);
+        } else {
+            container = this;
+        }
         
         button = new Button(text, icon);
-        add(button);
+        container.add(button);
         
         popup = new Popup();
-        add(popup);
+        container.add(popup);
         
         KeyStroke down = KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0);
-        getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(down, POPUP_ACTION);
-        getActionMap().put(POPUP_ACTION, new AbstractAction() {
+        container.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(down, POPUP_ACTION);
+        container.getActionMap().put(POPUP_ACTION, new AbstractAction() {
             public void actionPerformed(ActionEvent e) { displayPopup(); }
         });
     }
@@ -151,6 +166,16 @@ public class DropdownButton extends JToolBar {
     public boolean isEnabled() {
         return button == null ? false : button.isEnabled();
     }
+    
+    public void setPushed(boolean p) {
+        pushed = p;
+        repaint();
+    }
+    
+    public boolean isPushed() {
+        return pushed;
+    }
+    
     
     public void setText(String text) {
         if (button != null) button.setText(text);
@@ -199,7 +224,7 @@ public class DropdownButton extends JToolBar {
         DROPDOWN_ICON.paintIcon(this, g, getWidth() - DROPDOWN_ICON_WIDTH - POPUP_OFFSET,
                                         (getHeight() - DROPDOWN_ICON_HEIGHT) / 2);
         
-        if (!button.isEnabled() || getComponent(0) == popup) {
+        if (pushed || !button.isEnabled() || container.getComponent(0) == popup) {
             g.setColor(Color.GRAY);
             g.drawLine(getWidth() - POPUP_EXTENT, POPUP_MARGIN,
                        getWidth() - POPUP_EXTENT, getHeight() - POPUP_MARGIN);
@@ -230,14 +255,14 @@ public class DropdownButton extends JToolBar {
     }
     
     private boolean exposeButton() {
-        if (getComponent(0) == button) return false;
+        if (container.getComponent(0) == button) return false;
         Component c = button.isEnabled() ? button : popup;
         boolean focus = c.isFocusOwner();
         if (focus) {
             setFocusable(true);
             requestFocusInWindow();
         }
-        add(popup);
+        container.add(popup);
         if (focus) {
             c.requestFocusInWindow();
             setFocusable(false);
@@ -247,14 +272,14 @@ public class DropdownButton extends JToolBar {
     }
     
     private boolean exposePopup() {
-        if (getComponent(0) == popup) return false;
+        if (container.getComponent(0) == popup) return false;
         Component c = button.isEnabled() ? button : popup;
         boolean focus = c.isFocusOwner();
         if (focus) {
             setFocusable(true);
             requestFocusInWindow();
         }
-        add(button);
+        container.add(button);
         if (focus) {
             c.requestFocusInWindow();
             setFocusable(false);
@@ -279,8 +304,8 @@ public class DropdownButton extends JToolBar {
     }
     
     public void doLayout() {
-        button.setBounds(0, 0, getWidth(), getHeight());
-        popup.setBounds(0, 0, getWidth(), getHeight());
+        for (Component c : getComponents())
+            c.setBounds(0, 0, getWidth(), getHeight());
     }
     
     
@@ -292,6 +317,12 @@ public class DropdownButton extends JToolBar {
             setModel(new DefaultButtonModel() {
                 public boolean isRollover() {
                     return super.isRollover() || (isEnabled() && popup.getModel().isRollover());
+                }
+                public boolean isPressed() {
+                    return pushed || super.isPressed();
+                }
+                public boolean isArmed() {
+                    return pushed || super.isArmed();
                 }
             });
             
@@ -319,7 +350,7 @@ public class DropdownButton extends JToolBar {
         
         public void paint(Graphics g) {
             Rectangle c = g.getClipBounds();
-            if (!isEnabled() || getParent().getComponent(0) != this)
+            if (pushed || !isEnabled() || container.getComponent(0) != this)
                 g.setClip(0, 0, getWidth() - POPUP_EXTENT, getHeight());
             super.paint(g);
             g.setClip(c);
@@ -335,6 +366,12 @@ public class DropdownButton extends JToolBar {
         
         Popup() {
             super(" "); // NOI18N
+            
+            setModel(new DefaultButtonModel() {
+                public boolean isRollover() {
+                    return super.isRollover() || pushed;
+                }
+            });
             
             setHorizontalAlignment(LEADING);
             setDefaultCapable(false);
@@ -355,6 +392,10 @@ public class DropdownButton extends JToolBar {
         
         private void processEventImpl(AWTEvent e) {
             super.processEvent(e);
+            if (e.getID() == MouseEvent.MOUSE_PRESSED) {
+                if (isFocusable()) requestFocus();
+                else button.requestFocus();
+            }
         }
         
         public boolean hasFocus() {
@@ -367,7 +408,7 @@ public class DropdownButton extends JToolBar {
         }
         
         public void paint(Graphics g) {
-            if (!button.isEnabled() || getParent().getComponent(0) == this) {
+            if (pushed || !button.isEnabled() || container.getComponent(0) == this) {
                 Rectangle c = g.getClipBounds();
                 g.setClip(getWidth() - POPUP_EXTENT, 0, POPUP_EXTENT, getHeight());
                 super.paint(g);
