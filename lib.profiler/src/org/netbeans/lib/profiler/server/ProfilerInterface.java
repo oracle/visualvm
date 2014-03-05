@@ -286,7 +286,7 @@ public class ProfilerInterface implements CommonConstants {
     }
 
     // TODO [release]: change value to FALSE to remove the print code below entirely by compiler
-    private static final boolean DEBUG = System.getProperty("org.netbeans.lib.profiler.server.ProfilerInterface.classLoadHook") != null; // NOI18N
+    private static final boolean DEBUG = Boolean.getBoolean("org.netbeans.lib.profiler.server.ProfilerInterface.classLoadHook"); // NOI18N
     private static final boolean INSTRUMENT_JFLUID_CLASSES = Boolean.getBoolean("org.netbeans.lib.profiler.server.instrumentJFluidClasses"); // NOI18N
 
     // The lock used to serialize requests from server to client. May be used outside this class.
