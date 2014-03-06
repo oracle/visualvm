@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler.v2.features;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -54,14 +53,13 @@ import javax.swing.JToggleButton;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
-import org.netbeans.lib.profiler.common.event.ProfilingStateAdapter;
-import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.v2.session.ProjectSession;
 import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
 import org.openide.util.NbBundle;
 
@@ -107,7 +105,7 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
     ThreadsFeature() {
         super(Bundle.ThreadsFeature_name(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
     }
-
+    
     
     public JPanel getResultsUI() {
         if (threadsPanel == null) initResultsUI();
@@ -223,47 +221,17 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
     
     private void initResultsUI() {
         threadsPanel = new ThreadsPanel(Profiler.getDefault().getThreadsManager(), null);
-        threadsPanel.addThreadsMonitoringActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                Profiler.getDefault().setThreadsMonitoringEnabled(true);
-            }
-        });
-        
-        profilingStateChanged(Profiler.getDefault().getProfilingState());
-        updateThreadsView();
-        
-        Profiler.getDefault().addProfilingStateListener(new ProfilingStateAdapter(){
-            public void profilingStateChanged(final ProfilingStateEvent e) {
-                ThreadsFeature.this.profilingStateChanged(e.getNewState());
-            }
-            public void threadsMonitoringChanged() {
-                updateThreadsView();
-            }
-        });
+        threadsPanel.threadsMonitoringEnabled();
+        stateChanged(null, getSessionState());
     }
     
-    private void updateThreadsView() {
-        if (Profiler.getDefault().getThreadsMonitoringEnabled()) {
-            threadsPanel.threadsMonitoringEnabled();
+    public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
+        if (newState == null || newState == ProjectSession.State.INACTIVE) {
+            if (threadsPanel != null) threadsPanel.profilingSessionFinished();
         } else {
-            threadsPanel.threadsMonitoringDisabled();
+            if (threadsPanel != null) threadsPanel.profilingSessionStarted();
         }
-    }
-    
-    private void profilingStateChanged(final boolean enable) {
-        if (enable) {
-            threadsPanel.profilingSessionStarted();
-        } else {
-            threadsPanel.profilingSessionFinished();
-        }
-    }
-    
-    private void profilingStateChanged(final int profilingState) {
-        if (profilingState == Profiler.PROFILING_RUNNING) {
-            profilingStateChanged(true);
-        } else {
-            profilingStateChanged(false);
-        }
+            
     }
     
 }

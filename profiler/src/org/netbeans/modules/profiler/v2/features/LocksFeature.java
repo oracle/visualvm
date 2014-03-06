@@ -60,6 +60,7 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.locks.LockContentionPanel;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.v2.session.ProjectSession;
 import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
 import org.openide.util.NbBundle;
 
@@ -183,48 +184,15 @@ final class LocksFeature extends ProfilerFeature.Basic {
     
     private void initResultsUI() {
         locksPanel = new LockContentionPanel();
-        
-        profilingStateChanged(Profiler.getDefault().getProfilingState());
-        updateLocksView();
-        
-        locksPanel.addLockContentionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                Profiler.getDefault().setLockContentionMonitoringEnabled(true);
-                locksPanel.lockContentionEnabled();
-            }
-        });
-        Profiler.getDefault().addProfilingStateListener(new ProfilingStateAdapter() {
-            public void profilingStateChanged(final ProfilingStateEvent e) {
-                LocksFeature.this.profilingStateChanged(e.getNewState());
-            }
-            public void lockContentionMonitoringChanged() {
-                updateLocksView();
-            }
-        });
+        locksPanel.lockContentionEnabled();
+        stateChanged(null, getSessionState());
     }
     
-    private void updateLocksView() {
-        if (Profiler.getDefault().getLockContentionMonitoringEnabled()) {
-            locksPanel.lockContentionEnabled();
+    public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
+        if (newState == null || newState == ProjectSession.State.INACTIVE) {
+            if (locksPanel != null) locksPanel.profilingSessionFinished();
         } else {
-            locksPanel.lockContentionDisabled();
-        }
-    }
-
-    
-    private void profilingStateChanged(final boolean enable) {
-        if (enable) {
-            locksPanel.profilingSessionStarted();
-        } else {
-            locksPanel.profilingSessionFinished();
-        }
-    }
-
-    private void profilingStateChanged(final int profilingState) {
-        if (profilingState == Profiler.PROFILING_RUNNING) {
-            profilingStateChanged(true);
-        } else {
-            profilingStateChanged(false);
+            if (locksPanel != null) locksPanel.profilingSessionStarted();
         }
     }
     

@@ -48,7 +48,7 @@ import java.util.Objects;
 import java.util.Set;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
+import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.openide.util.Lookup;
 
 /**
@@ -71,6 +71,7 @@ public abstract class ProjectSession {
     
     public ProjectSession(Lookup.Provider project) {
         this.project = project;
+        state = State.INACTIVE;
     }
     
     
@@ -78,15 +79,13 @@ public abstract class ProjectSession {
         return project;
     }
     
-    protected void setState(State newState) {
+    protected void setState(State newState) { // not null
         State oldState;
         synchronized (this) {
             oldState = state;
             state = newState;
         }
-        
-        if (oldState == null || !oldState.equals(newState))
-            fireStateChanged(oldState, newState);
+        if (!oldState.equals(newState)) fireStateChanged(oldState, newState);
     }
     
     public synchronized State getState() {
@@ -94,7 +93,7 @@ public abstract class ProjectSession {
     }
     
     public synchronized boolean inProgress() {
-        return state != null && !state.equals(State.INACTIVE);
+        return state != State.INACTIVE;
     }
     
     public /*synchronized*/ Type getType() {
@@ -120,6 +119,11 @@ public abstract class ProjectSession {
     
     public int hashCode() {
         return Objects.hashCode(project);
+    }
+    
+    
+    public String toString() {
+        return "ProjectSession for " + ProjectUtilities.getDisplayName(project); // NOI18N
     }
     
     

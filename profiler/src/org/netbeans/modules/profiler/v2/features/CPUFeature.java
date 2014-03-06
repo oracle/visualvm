@@ -59,17 +59,24 @@ import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
+import org.netbeans.lib.profiler.TargetAppRunner;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
+import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
+import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.cpu.CPUTableView;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.v2.session.ProjectSession;
 import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
 import org.netbeans.modules.profiler.v2.ui.components.SmallButton;
 import org.netbeans.modules.profiler.v2.ui.components.TitledMenuSeparator;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -107,6 +114,9 @@ final class CPUFeature extends ProfilerFeature.Basic {
     
     private View view;
     
+    private CPUTableView tableView;
+    private ProfilingSettings settings;
+    
     
     CPUFeature() {
         super(Bundle.CPUFeature_name(), Icons.getIcon(ProfilerIcons.CPU));
@@ -114,7 +124,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
 
     
     public JPanel getResultsUI() {
-        return new JPanel();
+        if (tableView == null) initResultsUI();
+        return tableView;
     }
     
     public JPanel getSettingsUI() {
@@ -253,7 +264,10 @@ final class CPUFeature extends ProfilerFeature.Basic {
     }
     
     public ProfilingSettings getSettings() {
-        return ProfilingSettingsPresets.createCPUPreset();
+        if (settings == null) {
+            settings = ProfilingSettingsPresets.createCPUPreset();
+        }
+        return settings;
     }
     
     private void populateViews(JPopupMenu popup) {
@@ -291,5 +305,55 @@ final class CPUFeature extends ProfilerFeature.Basic {
     private View getView() {
         return view;
     }
+    
+    private void initResultsUI() {
+        tableView = new CPUTableView();
+    }
+    
+    public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
+        if (newState == null || newState == ProjectSession.State.INACTIVE) {
+            stopResults();
+        } else {
+            startResults();
+        }
+    }
+    
+    private RequestProcessor processor;
+    
+    private void startResults() {
+        if (tableView != null) tableView.setData(null);
+        
+        if (processor == null) processor = new RequestProcessor("CPU Data Refresher"); // NOI18N
+        
+        Runnable refresher = new Runnable() {
+            public void run() {
+                if (tableView != null) {
+                    TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
+                    FlatProfileProvider dataProvider = runner.getProfilerClient().getFlatProfileProvider();
+                    FlatProfileContainer data = dataProvider == null ? null : dataProvider.createFlatProfile();
+                    if (data != null) tableView.setData(data);
+                }
+                
+                if (processor != null && !processor.isShutdown()) processor.post(this, 1500);
+            }
+        };
+        
+        processor.post(refresher, 500);
+    }
+    
+    private void stopResults() {
+        if (processor != null) processor.shutdownNow();
+        processor = null;
+    }
+    
+//    public void attachedToSession(ProjectSession session) {
+//        super.attachedToSession(session);
+//        if (tableView != null) tableView.setData(null);
+//    }
+    
+//    public void detachedFromSession(ProjectSession session) {
+//        super.detachedFromSession(session);
+//        if (tableView != null) tableView.setData(null);
+//    }
     
 }

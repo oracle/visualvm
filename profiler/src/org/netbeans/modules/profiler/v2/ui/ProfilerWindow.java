@@ -230,7 +230,6 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     
     private void performStartImpl() {
         start.setPushed(true);
-        System.err.println(">>> Starting with threads X: " + currentFeature.getSettings().getThreadsMonitoringEnabled());
         session.start(currentFeature.getSettings(), attachSettings);
     }
     
@@ -268,12 +267,16 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         detachResultsUI();
         detachSettingsUI();
         
+        if (currentFeature != null) currentFeature.detachedFromSession(session);
+        
         if (listener != null && currentFeature != null)
             currentFeature.removeChangeListener(listener);
         
         toolbar = null;
         resultsUI = null;
         currentFeature = feature;
+        
+        currentFeature.attachedToSession(session);
         
         attachToolbar();
         attachResultsUI();

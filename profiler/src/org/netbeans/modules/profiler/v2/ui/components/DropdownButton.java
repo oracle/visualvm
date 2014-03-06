@@ -224,7 +224,7 @@ public class DropdownButton extends JPanel {
         DROPDOWN_ICON.paintIcon(this, g, getWidth() - DROPDOWN_ICON_WIDTH - POPUP_OFFSET,
                                         (getHeight() - DROPDOWN_ICON_HEIGHT) / 2);
         
-        if (pushed || !button.isEnabled() || container.getComponent(0) == popup) {
+        if (pushed || !button.isEnabled() || container.getComponent(0) == popup || button.getModel().isRollover() || button.isFocusOwner()) {
             g.setColor(Color.GRAY);
             g.drawLine(getWidth() - POPUP_EXTENT, POPUP_MARGIN,
                        getWidth() - POPUP_EXTENT, getHeight() - POPUP_MARGIN);

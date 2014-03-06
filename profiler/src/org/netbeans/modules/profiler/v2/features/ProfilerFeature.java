@@ -81,17 +81,24 @@ public abstract class ProfilerFeature {
     public abstract ProfilingSettings getSettings();
     
     
+    public void attachedToSession(ProjectSession session) {}
+    
+    public void detachedFromSession(ProjectSession session) {}
+    
+    
     public abstract void addChangeListener(ChangeListener listener);
     
     public abstract void removeChangeListener(ChangeListener listener);
     
     
-    public static abstract class Basic extends ProfilerFeature {
+    public static abstract class Basic extends ProfilerFeature implements ProjectSession.Listener {
         
         private Set<ChangeListener> listeners;
         
         private final String name;
         private final Icon icon;
+        
+        private ProjectSession attachedSession;
         
         public Basic(String name, Icon icon) {
             this.name = name;
@@ -106,7 +113,30 @@ public abstract class ProfilerFeature {
         
         public ProfilerToolbar getToolbar() { return null; }
         
+        
         public boolean supportsSession(ProjectSession session) { return true; }
+        
+        public void attachedToSession(ProjectSession session) {
+            attachedSession = session;
+            attachedSession.addListener(this);
+            stateChanged(null, attachedSession.getState());
+        }
+    
+        public void detachedFromSession(ProjectSession session) {
+            attachedSession.removeListener(this);
+            stateChanged(attachedSession.getState(), null);
+            attachedSession = null;
+        }
+        
+        public ProjectSession getSession() {
+            return attachedSession;
+        }
+        
+        public ProjectSession.State getSessionState() {
+            return attachedSession == null ? null : attachedSession.getState();
+        }
+        
+        public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {}
         
         
         public void addChangeListener(ChangeListener listener) {
