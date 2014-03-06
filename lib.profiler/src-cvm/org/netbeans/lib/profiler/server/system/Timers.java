@@ -74,6 +74,18 @@ public class Timers {
   
     public static native long getThreadCPUTimeInNanos();
 
+    /**
+     * Returns the approximate accumulated process CPU elapsed time in
+     * nanoseconds. Note that the time is normalized to one processor.
+     * This method returns <tt>-1</tt> if the collection elapsed
+     * time is undefined for this collector.
+     *
+     * @return the approximate accumulated process CPU elapsed time in
+     * nanoseconds.
+     */
+    public static long getProcessCpuTime() {
+        return -1;
+    }
 
     /**
      * WORKS ONLY ON UNIX, calls nanosleep(). On Solaris, this is more precise
