@@ -46,13 +46,16 @@ package org.netbeans.modules.profiler.v2.session;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import org.netbeans.lib.profiler.common.AttachSettings;
+import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.openide.util.Lookup;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class ProjectSession {
+public abstract class ProjectSession {
     
     public static enum State { STARTED, RUNNING, PAUSED, INACTIVE }
     public static enum Type { PROFILE, ATTACH }
@@ -75,14 +78,15 @@ public final class ProjectSession {
         return project;
     }
     
-    private void setState(State newState) {
+    protected void setState(State newState) {
         State oldState;
         synchronized (this) {
             oldState = state;
             state = newState;
         }
         
-        if (!oldState.equals(newState)) fireStateChanged(oldState, newState);
+        if (oldState == null || !oldState.equals(newState))
+            fireStateChanged(oldState, newState);
     }
     
     public synchronized State getState() {
@@ -90,8 +94,7 @@ public final class ProjectSession {
     }
     
     public synchronized boolean inProgress() {
-//        return !state.equals(State.INACTIVE);
-        return true;
+        return state != null && !state.equals(State.INACTIVE);
     }
     
     public /*synchronized*/ Type getType() {
@@ -99,11 +102,20 @@ public final class ProjectSession {
     }
     
     
-    public void start() {
+    public ProfilingSettings getProfilingSettings() {
+        return ProfilingSettingsPresets.createMonitorPreset();
     }
     
-    public void terminate() {
+    public AttachSettings getAttachSettings() {
+        return null;
     }
+    
+    
+    public abstract void start(ProfilingSettings pSettings, AttachSettings aSettings);
+    
+    public abstract void modify(ProfilingSettings pSettings);
+    
+    public abstract void terminate();
     
     
     public boolean equals(Object o) {

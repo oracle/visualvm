@@ -140,12 +140,16 @@ public class DropdownButton extends JToolBar {
     }
     
     
-    public void setButtonEnabled(boolean enabled) {
-        button.setEnabled(enabled);
+    public void setEnabled(boolean enabled) {
+        if (button != null) {
+            button.setEnabled(enabled);
+            if (enabled) exposeButton();
+            else exposePopup();
+        }
     }
     
-    public boolean isButtonEnabled() {
-        return button.isEnabled();
+    public boolean isEnabled() {
+        return button == null ? false : button.isEnabled();
     }
     
     public void setText(String text) {
@@ -177,6 +181,10 @@ public class DropdownButton extends JToolBar {
     }
     
     protected void populatePopup(JPopupMenu menu) {
+        // Implementation here
+    }
+    
+    protected void performAction() {
         // Implementation here
     }
     
@@ -289,6 +297,11 @@ public class DropdownButton extends JToolBar {
             
             setHorizontalAlignment(LEADING);
             setDefaultCapable(false);
+        }
+        
+        protected void fireActionPerformed(ActionEvent e) {
+            super.fireActionPerformed(e);
+            performAction();
         }
         
         protected void processEvent(AWTEvent e) {

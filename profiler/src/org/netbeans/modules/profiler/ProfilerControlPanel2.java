@@ -2047,16 +2047,16 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
     }
 
     public void open() {
-        if (needsDocking()) { // needs docking
-
-            Mode mode = WindowManager.getDefault().findMode(Bundle.ProfilerControlPanel2_WindowMode());
-
-            if (mode != null) {
-                mode.dockInto(this);
-            }
-        }
-
-        super.open();
+//        if (needsDocking()) { // needs docking
+//
+//            Mode mode = WindowManager.getDefault().findMode(Bundle.ProfilerControlPanel2_WindowMode());
+//
+//            if (mode != null) {
+//                mode.dockInto(this);
+//            }
+//        }
+//
+//        super.open();
     }
 
     public void paint(final Graphics g) {
