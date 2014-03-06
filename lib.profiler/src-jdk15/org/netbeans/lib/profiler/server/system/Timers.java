@@ -44,7 +44,9 @@
 package org.netbeans.lib.profiler.server.system;
 
 import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
+import javax.management.MBeanAttributeInfo;
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
 
 
 /**
@@ -54,9 +56,16 @@ import java.lang.management.ThreadMXBean;
  * @author  Misha Dmitriev
  */
 public class Timers {
+    
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static ThreadMXBean mxbean;
+    private static MBeanServerConnection conn;
+    private static final String PROCESS_CPU_TIME_ATTR = "ProcessCpuTime"; // NOI18N
+    private static final String PROCESSING_CAPACITY_ATTR = "ProcessingCapacity"; // NOI18N
+    private static ObjectName osName;
+    private static long processCPUTimeMultiplier;
+    private static int processorsCount;
+    private static boolean processCPUTimeAttribute;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -76,6 +85,28 @@ public class Timers {
     public static native long getThreadCPUTimeInNanos();
 
     /**
+     * Returns the approximate accumulated process CPU elapsed time
+     * in nanoseconds. Note that the time is normalized to one processor.
+     * This method returns <tt>-1</tt> if the collection
+     * elapsed time is undefined for this collector.
+     *
+     * @return the approximate accumulated process CPU elapsed time
+     * in nanoseconds.
+     */
+    public static long getProcessCpuTime() {
+        if (processCPUTimeAttribute) {
+             try {
+                 Long cputime = (Long)conn.getAttribute(osName,PROCESS_CPU_TIME_ATTR);
+
+                 return (cputime.longValue()*processCPUTimeMultiplier)/processorsCount;
+             } catch (Exception ex) {
+                 ex.printStackTrace();
+             }
+        }
+        return -1;
+    }
+
+    /**
      * This is relevant only on Solaris. By default, the resolution of the thread local CPU timer is 10 ms. If we enable
      * micro state accounting, it enables significantly (but possibly at a price of some overhead). So I turn it on only
      * when thread CPU timestamps are really collected.
@@ -84,8 +115,30 @@ public class Timers {
 
     /** Should be called at earliest possible time */
     public static void initialize() {
-        mxbean = ManagementFactory.getThreadMXBean();
+        ManagementFactory.getThreadMXBean();
         getThreadCPUTimeInNanos();
+        try {
+            MBeanAttributeInfo[] attrs;
+            
+            conn = ManagementFactory.getPlatformMBeanServer();
+            osName = new ObjectName(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
+            attrs = conn.getMBeanInfo(osName).getAttributes();
+            processCPUTimeMultiplier = 1;
+            processorsCount = ManagementFactory.getOperatingSystemMXBean().getAvailableProcessors();
+            for (int i = 0; i < attrs.length; i++) {
+                String name = attrs[i].getName();
+                
+                if (PROCESS_CPU_TIME_ATTR.equals(name)) {
+                    processCPUTimeAttribute = true;
+                }
+                if (PROCESSING_CAPACITY_ATTR.equals(name)) {
+                    Number mul = (Number) conn.getAttribute(osName,PROCESSING_CAPACITY_ATTR);
+                    processCPUTimeMultiplier = mul.longValue();
+                }
+             }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**

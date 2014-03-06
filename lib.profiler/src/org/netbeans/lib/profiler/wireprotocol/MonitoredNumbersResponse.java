@@ -69,8 +69,9 @@ public class MonitoredNumbersResponse extends Response {
     public static final int GC_TIME_IDX = 5;
     public static final int GC_PAUSE_IDX = 6;
     public static final int LOADED_CLASSES_IDX = 7;
-    public static final int TIMESTAMP_IDX = 8;
-    public static final int GENERAL_NUMBERS_SIZE = 9;
+    public static final int CPU_TIME_IDX = 8;
+    public static final int TIMESTAMP_IDX = 9;
+    public static final int GENERAL_NUMBERS_SIZE = 10;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
