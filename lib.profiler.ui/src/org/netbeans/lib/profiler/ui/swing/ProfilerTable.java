@@ -311,9 +311,9 @@ public class ProfilerTable extends JTable {
         return !isCustomRendering() && super.isFocusOwner();
     }
     
-    public boolean isCellEditable(int row, int column) {
-        return false;
-    }
+//    public boolean isCellEditable(int row, int column) {
+//        return false;
+//    }
     
     public void setVisibleRows(int rows) {
         Dimension size = super.getPreferredScrollableViewportSize();

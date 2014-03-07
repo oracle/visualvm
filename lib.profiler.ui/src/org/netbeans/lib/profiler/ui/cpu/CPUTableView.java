@@ -44,6 +44,8 @@
 package org.netbeans.lib.profiler.ui.cpu;
 
 import java.awt.BorderLayout;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
@@ -51,6 +53,7 @@ import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
+import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
@@ -66,6 +69,7 @@ public class CPUTableView extends JPanel {
     private ProfilerTable table;
     
     private FlatProfileContainer data;
+    private Set<Integer> selections;
     
     
     public CPUTableView() {
@@ -95,6 +99,8 @@ public class CPUTableView extends JPanel {
                     renderers[3].setMaxValue(maxTimes[3]);
                     renderers[4].setMaxValue(maxInvocations);
                     
+                    if (selections == null) selections = new HashSet();
+                    
                     tableModel.fireTableDataChanged();
                 }
             }
@@ -111,6 +117,7 @@ public class CPUTableView extends JPanel {
         table.setColumnVisibility(1, false);
         table.setColumnVisibility(3, false);
         table.setColumnVisibility(5, false);
+        table.setColumnVisibility(6, false);
         table.setSortColumn(2);
         
         renderers = new HideableBarRenderer[5];
@@ -134,6 +141,7 @@ public class CPUTableView extends JPanel {
         table.setColumnRenderer(3, renderers[2]);
         table.setColumnRenderer(4, renderers[3]);
         table.setColumnRenderer(5, renderers[4]);
+        table.setColumnRenderer(6, new CheckBoxRenderer());
         
         table.setDefaultColumnWidth(1, renderers[0].getNoBarWidth());
         table.setDefaultColumnWidth(2, renderers[1].getOptimalWidth());
@@ -163,6 +171,8 @@ public class CPUTableView extends JPanel {
                 return "Total Time (CPU)";
             } else if (columnIndex == 5) {
                 return "Samples";
+            } else if (columnIndex == 6) {
+                return "Selected";
             }
             return null;
         }
@@ -172,6 +182,8 @@ public class CPUTableView extends JPanel {
                 return String.class;
             } else if (columnIndex == 5) {
                 return Integer.class;
+            } else if (columnIndex == 6) {
+                return Boolean.class;
             } else {
                 return Long.class;
             }
@@ -182,7 +194,7 @@ public class CPUTableView extends JPanel {
         }
 
         public int getColumnCount() {
-            return 6;
+            return 7;
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
@@ -200,13 +212,23 @@ public class CPUTableView extends JPanel {
                 return data.getTotalTimeInMcs1AtRow(rowIndex);
             } else if (columnIndex == 5) {
                 return data.getNInvocationsAtRow(rowIndex);
+            } else if (columnIndex == 6) {
+                return selections.contains(data.getMethodIdAtRow(rowIndex));
             }
 
             return null;
         }
+        
+        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            if (columnIndex == 6) {
+                int methodId = data.getMethodIdAtRow(rowIndex);
+                if (Boolean.TRUE.equals(aValue)) selections.add(methodId);
+                else selections.remove(methodId);
+            }
+        }
 
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return false;
+            return columnIndex == 6;
         }
         
     }

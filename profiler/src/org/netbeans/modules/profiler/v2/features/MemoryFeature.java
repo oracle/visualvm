@@ -274,9 +274,11 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private RequestProcessor processor;
     
     private void startResults() {
+        if (processor != null) return;
+        
         if (tableView != null) tableView.setData(null);
         
-        if (processor == null) processor = new RequestProcessor("Memory Data Refresher"); // NOI18N
+        processor = new RequestProcessor("Memory Data Refresher"); // NOI18N
         
         Runnable refresher = new Runnable() {
             public void run() {

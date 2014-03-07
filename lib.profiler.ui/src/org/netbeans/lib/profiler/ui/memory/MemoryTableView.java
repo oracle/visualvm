@@ -44,6 +44,8 @@
 package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
@@ -51,6 +53,7 @@ import org.netbeans.lib.profiler.results.memory.HeapHistogram;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
+import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
@@ -65,6 +68,7 @@ public class MemoryTableView extends JPanel {
     private ProfilerTable table;
     
     private HeapHistogram.ClassInfo[] data;
+    private Set<Integer> selections;
     
     
     public MemoryTableView() {
@@ -76,11 +80,15 @@ public class MemoryTableView extends JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if (tableModel != null) {
-                    HeapHistogram.ClassInfo[] empty = new HeapHistogram.ClassInfo[0];
-                    data = histogram == null ? empty : histogram.getHeapHistogram().toArray(empty);
+                    Set<HeapHistogram.ClassInfo> classes = histogram == null ? null :
+                                                 histogram.getHeapHistogram();
+                    data = classes == null ? new HeapHistogram.ClassInfo[0] :
+                           classes.toArray(new HeapHistogram.ClassInfo[classes.size()]);
                     
                     renderers[0].setMaxValue(histogram == null ? 0 : histogram.getTotalHeapBytes());
                     renderers[1].setMaxValue(histogram == null ? 0 : histogram.getTotalHeapInstances());
+                    
+                    if (selections == null) selections = new HashSet();
                     
                     tableModel.fireTableDataChanged();
                 }
@@ -95,6 +103,7 @@ public class MemoryTableView extends JPanel {
         tableModel = new MemoryTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null);
+        table.setColumnVisibility(3, false);
         table.setSortColumn(1);
         
         renderers = new HideableBarRenderer[2];
@@ -107,6 +116,7 @@ public class MemoryTableView extends JPanel {
         table.setColumnRenderer(0, new JavaNameRenderer());
         table.setColumnRenderer(1, renderers[0]);
         table.setColumnRenderer(2, renderers[1]);
+        table.setColumnRenderer(3, new CheckBoxRenderer());
         
         table.setDefaultColumnWidth(1, renderers[0].getOptimalWidth());
         table.setDefaultColumnWidth(2, renderers[1].getNoBarWidth());
@@ -127,6 +137,8 @@ public class MemoryTableView extends JPanel {
                 return "Live Bytes";
             } else if (columnIndex == 2) {
                 return "Live Objects";
+            } else if (columnIndex == 3) {
+                return "Selected";
             }
             return null;
         }
@@ -134,6 +146,8 @@ public class MemoryTableView extends JPanel {
         public Class<?> getColumnClass(int columnIndex) {
             if (columnIndex == 0) {
                 return String.class;
+            } else if (columnIndex == 3) {
+                return Boolean.class;
             } else {
                 return Long.class;
             }
@@ -144,7 +158,7 @@ public class MemoryTableView extends JPanel {
         }
 
         public int getColumnCount() {
-            return 3;
+            return 4;
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
@@ -156,13 +170,23 @@ public class MemoryTableView extends JPanel {
                 return data[rowIndex].getBytes();
             } else if (columnIndex == 2) {
                 return data[rowIndex].getInstancesCount();
+            } else if (columnIndex == 3) {
+                return selections.contains(data[rowIndex].hashCode());
             }
 
             return null;
         }
 
+        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            if (columnIndex == 3) {
+                int methodId = data[rowIndex].hashCode();
+                if (Boolean.TRUE.equals(aValue)) selections.add(methodId);
+                else selections.remove(methodId);
+            }
+        }
+
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return false;
+            return columnIndex == 3;
         }
         
     }

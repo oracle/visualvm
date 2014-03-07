@@ -130,7 +130,9 @@ public final class RunCalibrationAction extends AbstractAction {
         Object[][] columnData = new Object[platforms.size()][2];
         for (int i = 0; i < platforms.size(); i++)
             columnData[i] = new Object[] { platforms.get(i), null };
-        final TableModel model = new DefaultTableModel(columnData, columnNames);
+        final TableModel model = new DefaultTableModel(columnData, columnNames) {
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() { displayUI(model); }

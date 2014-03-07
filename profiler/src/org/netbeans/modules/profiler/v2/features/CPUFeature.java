@@ -321,9 +321,11 @@ final class CPUFeature extends ProfilerFeature.Basic {
     private RequestProcessor processor;
     
     private void startResults() {
+        if (processor != null) return;
+        
         if (tableView != null) tableView.setData(null);
         
-        if (processor == null) processor = new RequestProcessor("CPU Data Refresher"); // NOI18N
+        processor = new RequestProcessor("CPU Data Refresher"); // NOI18N
         
         Runnable refresher = new Runnable() {
             public void run() {
