@@ -136,7 +136,8 @@ public abstract class ProfilerToolbar {
                         tb.addSeparator();
                         PREFERRED_HEIGHT = tb.getPreferredSize().height;
                     }
-                    dim.height = Math.max(dim.height, PREFERRED_HEIGHT);
+                    dim.height = getParent() instanceof JToolBar ? 1 :
+                                 Math.max(dim.height, PREFERRED_HEIGHT);
                     return dim;
                 }
                 public void doLayout() {
@@ -189,7 +190,7 @@ public abstract class ProfilerToolbar {
         @Override
         public Component add(ProfilerToolbar toolbar, int index) {
             JToolBar implToolbar = ((Impl)toolbar).toolbar;
-            implToolbar.setBorderPainted(false);
+            implToolbar.setBorder(BorderFactory.createEmptyBorder());
             implToolbar.setOpaque(false);
             return add(implToolbar, index);
         }
