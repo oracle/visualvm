@@ -47,22 +47,25 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 import org.netbeans.lib.profiler.TargetAppRunner;
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
+import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -71,10 +74,12 @@ import org.netbeans.lib.profiler.ui.cpu.CPUTableView;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
 import org.netbeans.modules.profiler.v2.session.ProjectSession;
 import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
 import org.netbeans.modules.profiler.v2.ui.components.SmallButton;
 import org.netbeans.modules.profiler.v2.ui.components.TitledMenuSeparator;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -96,6 +101,7 @@ import org.openide.util.RequestProcessor;
 final class CPUFeature extends ProfilerFeature.Basic {
     
     private static enum View { HOT_SPOTS, CALL_TREE, COMBINED }
+    private static enum Mode { SAMPLED_ALL, SAMPLED_PROJECT, INSTR_CLASS, INSTR_METHOD, INSTR_SELECTED }
     
     private JLabel lrLabel;
     private JButton lrPauseButton;
@@ -112,10 +118,14 @@ final class CPUFeature extends ProfilerFeature.Basic {
     private ProfilerToolbar toolbar;
     private JPanel settingsUI;
     
-    private View view;
+    private View view = View.HOT_SPOTS;
     
     private CPUTableView tableView;
-    private ProfilingSettings settings;
+    
+    private Mode mode = Mode.SAMPLED_ALL;
+    private PopupButton modeButton;
+    
+    private Lookup.Provider project;
     
     
     CPUFeature() {
@@ -134,24 +144,37 @@ final class CPUFeature extends ProfilerFeature.Basic {
             settingsUI.setOpaque(false);
             settingsUI.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             settingsUI.setLayout(new BoxLayout(settingsUI, BoxLayout.LINE_AXIS));
-
-    //        panel.add(Box.createHorizontalStrut(10));
+            
+            settingsUI.setVisible(false); // TODO: should restore last state
 
             settingsUI.add(new JLabel("Profile:"));
 
             settingsUI.add(Box.createHorizontalStrut(5));
 
-            settingsUI.add(new PopupButton("All classes") {
+            modeButton = new PopupButton("All classes") {
                 protected void populatePopup(JPopupMenu popup) {
                     popup.add(new TitledMenuSeparator("Quick (sampled)"));
-                    popup.add(new JRadioButtonMenuItem("All classes", true));
-                    popup.add(new JMenuItem("Project classes"));
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_ALL), mode == Mode.SAMPLED_ALL) {
+                        protected void fireActionPerformed(ActionEvent e) { setMode(Mode.SAMPLED_ALL); }
+                    });
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_PROJECT), mode == Mode.SAMPLED_PROJECT) {
+                        protected void fireActionPerformed(ActionEvent e) { setMode(Mode.SAMPLED_PROJECT); }
+                    });
                     
                     popup.add(new TitledMenuSeparator("Advanced (instrumented)"));
-                    popup.add(new JMenuItem("Single class"));
-                    popup.add(new JMenuItem("Single method"));
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_CLASS), mode == Mode.INSTR_CLASS) {
+                        protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_CLASS); }
+                    });
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_METHOD), mode == Mode.INSTR_METHOD) {
+                        protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_METHOD); }
+                    });
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_SELECTED), mode == Mode.INSTR_SELECTED) {
+                        { setEnabled(tableView.hasSelection()); }
+                        protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_SELECTED); }
+                    });
                 }
-            });
+            };
+            settingsUI.add(modeButton);
 
             settingsUI.add(Box.createHorizontalStrut(5));
 
@@ -186,13 +209,40 @@ final class CPUFeature extends ProfilerFeature.Basic {
 
             settingsUI.add(Box.createHorizontalStrut(5));
 
-            settingsUI.add(new SmallButton("Apply"));
+            settingsUI.add(new SmallButton("Apply") {
+                protected void fireActionPerformed(ActionEvent e) {
+                    tableView.setData(null);
+                    fireChange();
+                }
+            });
 
             settingsUI.add(Box.createHorizontalStrut(5));
 
-            settingsUI.add(new SmallButton("Cancel"));
+            settingsUI.add(new SmallButton("Cancel") {
+                protected void fireActionPerformed(ActionEvent e) {
+                    // TODO: clear changes
+                    settingsUI.setVisible(false);
+                }
+            });
         }
         return settingsUI;
+    }
+    
+    private void setMode(Mode m) {
+        if (mode == m) return;
+        mode = m;
+        modeButton.setText(getModeName(m));
+    }
+    
+    private String getModeName(Mode m) {
+        switch (m) {
+            case SAMPLED_ALL: return "All classes";
+            case SAMPLED_PROJECT: return "Project classes";
+            case INSTR_CLASS: return "Single class";
+            case INSTR_METHOD: return "Single method";
+            case INSTR_SELECTED: return "Selected methods";
+        }
+        return null;
     }
     
     public ProfilerToolbar getToolbar() {
@@ -206,7 +256,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
             lrRefreshButton = new JToggleButton(Icons.getIcon(GeneralIcons.UPDATE_NOW));
             lrRefreshButton.setEnabled(false);
             
-            lrView = new PopupButton() {
+            lrView = new PopupButton(Bundle.CPUFeature_viewHotSpots()) {
                 protected void populatePopup(JPopupMenu popup) { populateViews(popup); }
             };
             lrView.setEnabled(false);
@@ -255,8 +305,6 @@ final class CPUFeature extends ProfilerFeature.Basic {
             toolbar.addSpace(2);
             toolbar.add(apThreadDumpButton);
             
-            toolbar.addFiller();
-            
             setView(View.HOT_SPOTS);
         }
         
@@ -264,9 +312,33 @@ final class CPUFeature extends ProfilerFeature.Basic {
     }
     
     public ProfilingSettings getSettings() {
-        if (settings == null) {
-            settings = ProfilingSettingsPresets.createCPUPreset();
+        if (project == null) return null;
+        
+        ProfilingSettings settings = null;
+        
+        switch (mode)  {
+            case SAMPLED_ALL:
+                settings = ProfilingSettingsPresets.createCPUPreset();
+                break;
+                
+            case SAMPLED_PROJECT:
+                settings = ProfilingSettingsPresets.createCPUPreset();
+                
+                ProjectContentsSupport pcs = ProjectContentsSupport.get(project);
+                String filter = pcs.getInstrumentationFilter(false);
+                SimpleFilter f = new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE, filter); // NOI18N
+                settings.setSelectedInstrumentationFilter(f);
+                break;
+                
+            case INSTR_SELECTED:
+                settings = ProfilingSettingsPresets.createCPUPreset(ProfilingSettings.PROFILE_CPU_PART);
+                settings.setThreadCPUTimerOn(true);
+                
+                ClientUtils.SourceCodeSelection[] selections = tableView.getSelections();
+                if (selections.length > 0) settings.addRootMethods(selections);
         }
+        
+        if (settings == null) settings = ProfilingSettingsPresets.createCPUPreset();
         return settings;
     }
     
@@ -307,7 +379,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
     }
     
     private void initResultsUI() {
-        tableView = new CPUTableView();
+        TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
+        tableView = new CPUTableView(runner.getProfilingSessionStatus());
     }
     
     public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
@@ -348,14 +421,16 @@ final class CPUFeature extends ProfilerFeature.Basic {
         processor = null;
     }
     
-//    public void attachedToSession(ProjectSession session) {
-//        super.attachedToSession(session);
+    public void attachedToSession(ProjectSession session) {
+        super.attachedToSession(session);
+        project = session.getProject();
 //        if (tableView != null) tableView.setData(null);
-//    }
+    }
     
-//    public void detachedFromSession(ProjectSession session) {
-//        super.detachedFromSession(session);
+    public void detachedFromSession(ProjectSession session) {
+        super.detachedFromSession(session);
+        project = null;
 //        if (tableView != null) tableView.setData(null);
-//    }
+    }
     
 }

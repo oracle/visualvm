@@ -46,6 +46,7 @@ package org.netbeans.modules.profiler.v2.features;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -127,8 +128,8 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             settingsUI.setOpaque(false);
             settingsUI.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             settingsUI.setLayout(new BoxLayout(settingsUI, BoxLayout.LINE_AXIS));
-
-    //        panel.add(Box.createHorizontalStrut(10));
+            
+            settingsUI.setVisible(false); // TODO: should restore last state
 
             settingsUI.add(new JLabel("Profile:"));
 
@@ -178,11 +179,21 @@ final class MemoryFeature extends ProfilerFeature.Basic {
 
             settingsUI.add(Box.createHorizontalStrut(5));
 
-            settingsUI.add(new SmallButton("Apply"));
+            settingsUI.add(new SmallButton("Apply") {
+                protected void fireActionPerformed(ActionEvent e) {
+                    tableView.setData(null);
+                    fireChange();
+                }
+            });
 
             settingsUI.add(Box.createHorizontalStrut(5));
 
-            settingsUI.add(new SmallButton("Cancel"));
+            settingsUI.add(new SmallButton("Cancel") {
+                protected void fireActionPerformed(ActionEvent e) {
+                    // TODO: clear changes
+                    settingsUI.setVisible(false);
+                }
+            });
         }
         return settingsUI;
     }
@@ -244,8 +255,6 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             toolbar.addSpace(2);
             toolbar.add(apHeapDumpButton);
             toolbar.add(apGCButton);
-            
-            toolbar.addFiller();
         }
         
         return toolbar;

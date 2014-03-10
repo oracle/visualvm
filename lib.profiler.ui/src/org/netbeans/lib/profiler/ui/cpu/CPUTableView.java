@@ -44,11 +44,13 @@
 package org.netbeans.lib.profiler.ui.cpu;
 
 import java.awt.BorderLayout;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
+import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
@@ -65,14 +67,20 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
  */
 public class CPUTableView extends JPanel {
     
+    private static final ClientUtils.SourceCodeSelection[] EMPTY_SELECTION =
+            new ClientUtils.SourceCodeSelection[0];
+    
+    private final ProfilingSessionStatus sessionStatus;
+    
     private CPUTableModel tableModel;
     private ProfilerTable table;
     
     private FlatProfileContainer data;
-    private Set<Integer> selections;
+    private Map<Integer, ClientUtils.SourceCodeSelection> selections;
     
     
-    public CPUTableView() {
+    public CPUTableView(ProfilingSessionStatus status) {
+        sessionStatus = status;
         initUI();
     }
     
@@ -99,12 +107,21 @@ public class CPUTableView extends JPanel {
                     renderers[3].setMaxValue(maxTimes[3]);
                     renderers[4].setMaxValue(maxInvocations);
                     
-                    if (selections == null) selections = new HashSet();
+                    if (selections == null) selections = new HashMap();
                     
                     tableModel.fireTableDataChanged();
                 }
             }
         });
+    }
+    
+    public boolean hasSelection() {
+        return selections != null && !selections.isEmpty();
+    }
+    
+    public ClientUtils.SourceCodeSelection[] getSelections() {
+        return !hasSelection() ? EMPTY_SELECTION :
+                selections.values().toArray(EMPTY_SELECTION);
     }
     
     
@@ -153,6 +170,19 @@ public class CPUTableView extends JPanel {
         
         setLayout(new BorderLayout());
         add(tableContainer, BorderLayout.CENTER);
+    }
+    
+    
+    private ClientUtils.SourceCodeSelection selectionForId(int methodId) {
+        sessionStatus.beginTrans(false);
+        try {
+            String className = sessionStatus.getInstrMethodClasses()[methodId];
+            String methodName = sessionStatus.getInstrMethodNames()[methodId];
+            String methodSig = sessionStatus.getInstrMethodSignatures()[methodId];
+            return new ClientUtils.SourceCodeSelection(className, methodName, methodSig);
+        } finally {
+            sessionStatus.endTrans();
+        }
     }
     
     
@@ -213,7 +243,7 @@ public class CPUTableView extends JPanel {
             } else if (columnIndex == 5) {
                 return data.getNInvocationsAtRow(rowIndex);
             } else if (columnIndex == 6) {
-                return selections.contains(data.getMethodIdAtRow(rowIndex));
+                return selections.containsKey(data.getMethodIdAtRow(rowIndex));
             }
 
             return null;
@@ -222,8 +252,11 @@ public class CPUTableView extends JPanel {
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
             if (columnIndex == 6) {
                 int methodId = data.getMethodIdAtRow(rowIndex);
-                if (Boolean.TRUE.equals(aValue)) selections.add(methodId);
-                else selections.remove(methodId);
+                if (Boolean.TRUE.equals(aValue)) {
+                    selections.put(methodId, selectionForId(methodId));
+                } else {
+                    selections.remove(methodId);
+                }
             }
         }
 

@@ -46,6 +46,8 @@ package org.netbeans.modules.profiler.v2.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -164,12 +166,12 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     // --- Implementation ------------------------------------------------------
     
     private JPanel topContainer;
+    private ProfilerToolbar toolbar;
+    private ProfilerToolbar featureToolbar;
     
     private DropdownButton start;
     private JButton stop;
-    
-    private ProfilerToolbar toolbar;
-    private JToggleButton settingsButton;
+    private SettingsPresenter settingsButton;
     private JPanel settingsUI;
     private JPanel resultsUI;
     
@@ -182,12 +184,16 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         setLayout(new BorderLayout(0, 0));
         setFocusable(false);
         
-        final ProfilerToolbar temp = ProfilerToolbar.create(true);
-        add(temp.getComponent(), BorderLayout.NORTH);
+        topContainer = new JPanel(new BorderLayout(0, 0));
+        topContainer.setOpaque(false);
+        add(topContainer, BorderLayout.NORTH);
         
-        JLabel loading = new JLabel(Bundle.ProfilerWindow_loadingSession());
+        toolbar = ProfilerToolbar.create(true);
+        topContainer.add(toolbar.getComponent(), BorderLayout.NORTH);
+        
+        final JLabel loading = new JLabel(Bundle.ProfilerWindow_loadingSession());
         loading.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-        temp.add(loading);
+        toolbar.add(loading);
         
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
@@ -195,7 +201,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
                 final ProfilerFeature selected = ProfilerFeatures.getSelectedFeatures(modes, session);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        remove(temp.getComponent());
+                        toolbar.remove(loading);
                         popupulateUI(modes, selected);
                     }
                 });
@@ -208,14 +214,14 @@ public final class ProfilerWindow extends ProfilerTopComponent {
             protected void populatePopup(JPopupMenu popup) { populatePopupImpl(popup); }
             protected void performAction() { performStartImpl(); }
         };
+        toolbar.add(start);
         
         stop = new JButton(Icons.getIcon(GeneralIcons.STOP)) {
             protected void fireActionPerformed(ActionEvent e) { performStopImpl(); }
         };
+        toolbar.add(stop);
         
-        topContainer = new JPanel(new BorderLayout(0, 0));
-        topContainer.setOpaque(false);
-        add(topContainer, BorderLayout.NORTH);
+        toolbar.addFiller();
         
         setCurrentFeature(selected);
         setAvailableFeatures(features);
@@ -263,24 +269,21 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     private void setCurrentFeature(ProfilerFeature feature) {
         if (currentFeature == feature) return;
         
-        detachToolbar();
-        detachResultsUI();
-        detachSettingsUI();
-        
         if (currentFeature != null) currentFeature.detachedFromSession(session);
-        
         if (listener != null && currentFeature != null)
             currentFeature.removeChangeListener(listener);
         
-        toolbar = null;
-        resultsUI = null;
-        currentFeature = feature;
+        detachResultsUI();
+        detachToolbar();
+        detachSettingsUI();
         
+        currentFeature = feature;
+        start.setText(currentFeature.getName());
         currentFeature.attachedToSession(session);
         
+        attachSettingsUI();
         attachToolbar();
         attachResultsUI();
-        start.setText(currentFeature.getName());
         
         revalidate();
         repaint();
@@ -311,12 +314,25 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     // --- Toolbar -------------------------------------------------------------
     
     public void attachToolbar() {
-        toolbar = currentFeature.getToolbar();
-        if (toolbar == null) toolbar = ProfilerToolbar.create(true);
+        if (settingsButton != null) toolbar.add(settingsButton, 3);
         
-        toolbar.add(start, 0);
-        toolbar.add(stop, 1);
+        featureToolbar = currentFeature.getToolbar();
+        if (featureToolbar != null) toolbar.add(featureToolbar, 2);
+    }
+    
+    private void detachToolbar() {
+        if (featureToolbar != null) {
+            toolbar.remove(featureToolbar);
+            featureToolbar = null;
+        }
         
+        if (settingsButton != null) {
+            settingsButton.cleanup();
+            toolbar.remove(settingsButton);
+        }
+    }
+    
+    private void attachSettingsUI() {
         JPanel settings = currentFeature.getSettingsUI();
         if (settings != null) {
             settingsUI = new JPanel(new BorderLayout(0, 0));
@@ -325,38 +341,20 @@ public final class ProfilerWindow extends ProfilerTopComponent {
             settingsUI.setBackground(UIUtils.getProfilerResultsBackground());
             settingsUI.add(settings, BorderLayout.CENTER);
             settingsUI.add(UIUtils.createHorizontalLine(orig), BorderLayout.SOUTH);
-            settingsButton = new JToggleButton(Icons.getIcon(GeneralIcons.SETTINGS)) {
-                protected void fireActionPerformed(ActionEvent e) {
-                    super.fireActionPerformed(e);
-                    if (isSelected()) attachSettingsUI();
-                    else detachSettingsUI();
-                    revalidate();
-                    repaint();
-                }
-            };
-            toolbar.add(settingsButton);
-        }
-        
-        topContainer.add(toolbar.getComponent(), BorderLayout.NORTH);
-    }
-    
-    private void detachToolbar() {
-        if (toolbar != null) {
-            toolbar.remove(start);
-            toolbar.remove(stop);
+            settingsUI.setVisible(settings.isVisible());
+            topContainer.add(settingsUI, BorderLayout.SOUTH);
             
-            if (settingsButton != null) toolbar.remove(settingsButton);
-            
-            topContainer.remove(toolbar.getComponent());
+            settingsButton = new SettingsPresenter(settings, settingsUI);
         }
-    }
-    
-    private void attachSettingsUI() {
-        topContainer.add(settingsUI, BorderLayout.SOUTH);
     }
     
     private void detachSettingsUI() {
-        if (settingsUI != null) topContainer.remove(settingsUI);
+        if (settingsUI != null) {
+            topContainer.remove(settingsUI);
+            settingsUI = null;
+            
+            settingsButton = null;
+        }
     }
     
     private void attachResultsUI() {
@@ -367,7 +365,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     private void detachResultsUI() {
         if (resultsUI != null) {
             remove(resultsUI);
-            settingsUI = null;
+            resultsUI = null;
         }
     }
     
@@ -389,6 +387,51 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     
     protected String preferredID() {
         return this.getClass().getName();
+    }
+    
+    
+    // --- Private classes -----------------------------------------------------
+    
+    private static final class SettingsPresenter extends JToggleButton
+                                                 implements ComponentListener {
+        
+        private final JPanel settings;
+        private final JPanel container;
+        
+        SettingsPresenter(JPanel settings, JPanel container) {
+            super(Icons.getIcon(GeneralIcons.SETTINGS));
+            
+            this.settings = settings;
+            this.container = container;
+            
+            settings.addComponentListener(this);
+            updateVisibility(settings.isVisible());
+        }
+        
+        protected void fireActionPerformed(ActionEvent e) {
+            updateVisibility(isSelected());
+        }
+        
+        void cleanup() {
+            settings.removeComponentListener(this);
+        }
+        
+        private void updateVisibility(boolean visible) {
+            setSelected(visible);
+            settings.setVisible(visible);
+            container.setVisible(visible);
+            container.revalidate();
+            container.repaint();
+        }
+        
+        public void componentShown(ComponentEvent e) { updateVisibility(true); }
+
+        public void componentHidden(ComponentEvent e) { updateVisibility(false); }
+        
+        public void componentResized(ComponentEvent e) {}
+        
+        public void componentMoved(ComponentEvent e) {}
+        
     }
     
 }
