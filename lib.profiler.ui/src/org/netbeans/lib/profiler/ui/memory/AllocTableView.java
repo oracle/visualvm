@@ -44,12 +44,11 @@
 package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
-import org.netbeans.lib.profiler.results.memory.HeapHistogram;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
@@ -62,38 +61,72 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
  *
  * @author Jiri Sedlacek
  */
-public class MemoryTableView extends JPanel {
+class AllocTableView extends JPanel {
+    
+    private static final String[] EMPTY_SELECTION = new String[0];
     
     private MemoryTableModel tableModel;
     private ProfilerTable table;
     
-    private HeapHistogram.ClassInfo[] data;
-    private Set<Integer> selections;
+    private int nTrackedItems;
+    private String[] classNames;
+    private int[] nTotalAllocObjects;
+    private long[] totalAllocObjectsSize;
+    
+    private Map<Integer, String> selections;
     
     
-    public MemoryTableView() {
+    public AllocTableView() {
         initUI();
     }
     
     
-    public void setData(final HeapHistogram histogram) {
+    void setData(final int _nTrackedItems, final String[] _classNames,
+                 final int[] _nTotalAllocObjects, final long[] _totalAllocObjectsSize) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if (tableModel != null) {
-                    Set<HeapHistogram.ClassInfo> classes = histogram == null ? null :
-                                                 histogram.getHeapHistogram();
-                    data = classes == null ? new HeapHistogram.ClassInfo[0] :
-                           classes.toArray(new HeapHistogram.ClassInfo[classes.size()]);
+                    nTrackedItems = _nTrackedItems;
+                    classNames = _classNames;
+                    nTotalAllocObjects = _nTotalAllocObjects;
+                    totalAllocObjectsSize = _totalAllocObjectsSize;
                     
-                    renderers[0].setMaxValue(histogram == null ? 0 : histogram.getTotalHeapBytes());
-                    renderers[1].setMaxValue(histogram == null ? 0 : histogram.getTotalHeapInstances());
+                    long totalObjects = 0;
+                    long totalBytes = 0;
+                    for (int i = 0; i < nTrackedItems; i++) {
+                        totalObjects += nTotalAllocObjects[i];
+                        totalBytes += totalAllocObjectsSize[i];
+                    }
+                    renderers[0].setMaxValue(totalObjects);
+                    renderers[1].setMaxValue(totalBytes);
                     
-                    if (selections == null) selections = new HashSet();
+                    if (selections == null) selections = new HashMap();
                     
                     tableModel.fireTableDataChanged();
                 }
             }
         });
+    }
+    
+    void resetData() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                nTrackedItems = 0;
+                classNames = null;
+                nTotalAllocObjects = null;
+                totalAllocObjectsSize = null;
+                selections = null;
+            }
+        });
+    }
+    
+    boolean hasSelection() {
+        return selections != null && !selections.isEmpty();
+    }
+    
+    String[] getSelections() {
+        return !hasSelection() ? EMPTY_SELECTION :
+                selections.values().toArray(EMPTY_SELECTION);
     }
     
     
@@ -134,9 +167,9 @@ public class MemoryTableView extends JPanel {
             if (columnIndex == 0) {
                 return "Name";
             } else if (columnIndex == 1) {
-                return "Live Bytes";
+                return "Allocated Bytes";
             } else if (columnIndex == 2) {
-                return "Live Objects";
+                return "Allocated Objects";
             } else if (columnIndex == 3) {
                 return "Selected";
             }
@@ -146,15 +179,18 @@ public class MemoryTableView extends JPanel {
         public Class<?> getColumnClass(int columnIndex) {
             if (columnIndex == 0) {
                 return String.class;
+            } else if (columnIndex == 1) {
+                return Long.class;
+            } else if (columnIndex == 2) {
+                return Integer.class;
             } else if (columnIndex == 3) {
                 return Boolean.class;
-            } else {
-                return Long.class;
             }
+            return null;
         }
 
         public int getRowCount() {
-            return data == null ? 0 : data.length;
+            return nTrackedItems;
         }
 
         public int getColumnCount() {
@@ -162,16 +198,16 @@ public class MemoryTableView extends JPanel {
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
-            if (data == null) return null;
+            if (nTrackedItems == 0) return null;
             
             if (columnIndex == 0) {
-                return data[rowIndex].getName();
+                return classNames[rowIndex];
             } else if (columnIndex == 1) {
-                return data[rowIndex].getBytes();
+                return totalAllocObjectsSize[rowIndex];
             } else if (columnIndex == 2) {
-                return data[rowIndex].getInstancesCount();
+                return nTotalAllocObjects[rowIndex];
             } else if (columnIndex == 3) {
-                return selections.contains(data[rowIndex].hashCode());
+                return selections.containsKey(rowIndex);
             }
 
             return null;
@@ -179,9 +215,8 @@ public class MemoryTableView extends JPanel {
 
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
             if (columnIndex == 3) {
-                int methodId = data[rowIndex].hashCode();
-                if (Boolean.TRUE.equals(aValue)) selections.add(methodId);
-                else selections.remove(methodId);
+                if (Boolean.FALSE.equals(aValue)) selections.remove(rowIndex);
+                else selections.put(rowIndex, getValueAt(rowIndex, 0).toString());
             }
         }
 

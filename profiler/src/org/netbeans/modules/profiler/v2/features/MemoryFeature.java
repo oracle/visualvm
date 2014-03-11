@@ -53,7 +53,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
@@ -64,17 +63,20 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
-import org.netbeans.lib.profiler.results.memory.HeapHistogram;
+import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.memory.MemoryTableView;
+import org.netbeans.lib.profiler.ui.memory.MemoryView;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.v2.session.ProjectSession;
 import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
 import org.netbeans.modules.profiler.v2.ui.components.SmallButton;
 import org.netbeans.modules.profiler.v2.ui.components.TitledMenuSeparator;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -93,6 +95,8 @@ import org.openide.util.RequestProcessor;
 })
 final class MemoryFeature extends ProfilerFeature.Basic {
     
+    private static enum Mode { SAMPLED_ALL, SAMPLED_PROJECT, INSTR_CLASS, INSTR_SELECTED }
+    
     private JLabel lrLabel;
     private JButton lrPauseButton;
     private JToggleButton lrRefreshButton;
@@ -108,8 +112,12 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private ProfilerToolbar toolbar;
     private JPanel settingsUI;
     
-    private MemoryTableView tableView;
-    private ProfilingSettings settings;
+    private MemoryView tableView;
+    
+    private Mode mode = Mode.SAMPLED_ALL;
+    private PopupButton modeButton;
+    
+    private Lookup.Provider project;
     
     
     MemoryFeature() {
@@ -135,16 +143,27 @@ final class MemoryFeature extends ProfilerFeature.Basic {
 
             settingsUI.add(Box.createHorizontalStrut(5));
 
-            settingsUI.add(new PopupButton("All classes") {
+            modeButton = new PopupButton("All classes") {
                 protected void populatePopup(JPopupMenu popup) {
                     popup.add(new TitledMenuSeparator("Quick (sampled)"));
-                    popup.add(new JRadioButtonMenuItem("All classes", true));
-                    popup.add(new JMenuItem("Project classes"));
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_ALL), mode == Mode.SAMPLED_ALL) {
+                        protected void fireActionPerformed(ActionEvent e) { setMode(Mode.SAMPLED_ALL); }
+                    });
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_PROJECT), mode == Mode.SAMPLED_PROJECT) {
+                        protected void fireActionPerformed(ActionEvent e) { setMode(Mode.SAMPLED_PROJECT); }
+                    });
                     
                     popup.add(new TitledMenuSeparator("Advanced (instrumented)"));
-                    popup.add(new JMenuItem("Single class"));
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_CLASS), mode == Mode.INSTR_CLASS) {
+                        protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_CLASS); }
+                    });
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_SELECTED), mode == Mode.INSTR_SELECTED) {
+                        { setEnabled(tableView.hasSelection()); }
+                        protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_SELECTED); }
+                    });
                 }
-            });
+            };
+            settingsUI.add(modeButton);
 
             settingsUI.add(Box.createHorizontalStrut(5));
 
@@ -181,8 +200,9 @@ final class MemoryFeature extends ProfilerFeature.Basic {
 
             settingsUI.add(new SmallButton("Apply") {
                 protected void fireActionPerformed(ActionEvent e) {
-                    tableView.setData(null);
+                    tableView.resetData();
                     fireChange();
+                    settingsUI.setVisible(false);
                 }
             });
 
@@ -196,6 +216,22 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             });
         }
         return settingsUI;
+    }
+    
+    private void setMode(Mode m) {
+        if (mode == m) return;
+        mode = m;
+        modeButton.setText(getModeName(m));
+    }
+    
+    private String getModeName(Mode m) {
+        switch (m) {
+            case SAMPLED_ALL: return "All classes";
+            case SAMPLED_PROJECT: return "Project classes";
+            case INSTR_CLASS: return "Single class";
+            case INSTR_SELECTED: return "Selected classes";
+        }
+        return null;
     }
     
     public ProfilerToolbar getToolbar() {
@@ -261,21 +297,54 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     }
     
     public ProfilingSettings getSettings() {
-        if (settings == null) {
-            settings = ProfilingSettingsPresets.createMemoryPreset();
+        if (project == null) return null;
+        
+        ProfilingSettings settings = null;
+        
+        switch (mode)  {
+            case SAMPLED_ALL:
+                settings = ProfilingSettingsPresets.createMemoryPreset();
+                break;
+                
+            case SAMPLED_PROJECT:
+                settings = ProfilingSettingsPresets.createMemoryPreset();
+                
+                ProjectContentsSupport pcs = ProjectContentsSupport.get(project);
+                String filter = pcs.getInstrumentationFilter(false);
+                SimpleFilter f = new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE, filter); // NOI18N
+                settings.setSelectedInstrumentationFilter(f);
+                break;
+                
+            case INSTR_SELECTED:
+                settings = ProfilingSettingsPresets.createMemoryPreset(ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS);
+                settings.setThreadCPUTimerOn(true);
+                
+                StringBuilder b = new StringBuilder();
+                String[] selections = tableView.getSelections();
+                for (int i = 0; i < selections.length; i++) {
+                    b.append(selections[i]);
+                    if (i < selections.length - 1) b.append(", "); // NOI18N
+                }
+                
+                SimpleFilter ff = new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE, b.toString()); // NOI18N
+                settings.setSelectedInstrumentationFilter(ff);
+                break;
         }
+        
+        if (settings == null) settings = ProfilingSettingsPresets.createMemoryPreset();
         return settings;
     }
     
     
     private void initResultsUI() {
-        tableView = new MemoryTableView();
+        TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
+        tableView = new MemoryView(runner.getProfilerClient());
     }
     
     public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
         if (newState == null || newState == ProjectSession.State.INACTIVE) {
             stopResults();
-        } else {
+        } else if (newState == ProjectSession.State.RUNNING) {
             startResults();
         }
     }
@@ -285,20 +354,22 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private void startResults() {
         if (processor != null) return;
         
-        if (tableView != null) tableView.setData(null);
+        if (tableView != null) tableView.resetData();
         
         processor = new RequestProcessor("Memory Data Refresher"); // NOI18N
         
         Runnable refresher = new Runnable() {
             public void run() {
                 if (tableView != null) {
-                    TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
-                    try {
-                        HeapHistogram data = runner.getProfilerClient().getHeapHistogram();
-                        if (data != null) tableView.setData(data);
-                    } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                        stopResults();
-                    }
+                    ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+                        public void run() {
+                            try {
+                                tableView.refreshData();
+                            } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                                stopResults();
+                            }
+                        }
+                    });
                 }
                 
                 if (processor != null && !processor.isShutdown()) processor.post(this, 1500);
@@ -313,14 +384,16 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         processor = null;
     }
     
-//    public void attachedToSession(ProjectSession session) {
-//        super.attachedToSession(session);
-//        if (tableView != null) tableView.setData(null);
-//    }
+    public void attachedToSession(ProjectSession session) {
+        super.attachedToSession(session);
+        project = session.getProject();
+//        if (tableView != null) tableView.resetData();
+    }
     
-//    public void detachedFromSession(ProjectSession session) {
-//        super.detachedFromSession(session);
-//        if (tableView != null) tableView.setData(null);
-//    }
+    public void detachedFromSession(ProjectSession session) {
+        super.detachedFromSession(session);
+        project = null;
+//        if (tableView != null) tableView.resetData();
+    }
     
 }

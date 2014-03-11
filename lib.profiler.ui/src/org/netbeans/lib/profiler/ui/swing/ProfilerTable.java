@@ -85,6 +85,7 @@ import javax.swing.event.RowSorterListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -229,6 +230,15 @@ public class ProfilerTable extends JTable {
         } else {
             return c;
         }
+    }
+    
+    public Component prepareEditor(TableCellEditor editor, int row, int column) {
+        Component c = super.prepareEditor(editor, row, column);
+        
+        c.setForeground(getSelectionForeground());
+        c.setBackground(getSelectionBackground());
+        
+        return c;
     }
     
     private ScrollableRenderer _renderer;

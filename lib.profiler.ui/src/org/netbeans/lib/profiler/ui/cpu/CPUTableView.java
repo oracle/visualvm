@@ -49,9 +49,11 @@ import java.util.Map;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
+import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
+import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
@@ -70,7 +72,7 @@ public class CPUTableView extends JPanel {
     private static final ClientUtils.SourceCodeSelection[] EMPTY_SELECTION =
             new ClientUtils.SourceCodeSelection[0];
     
-    private final ProfilingSessionStatus sessionStatus;
+    private final ProfilerClient client;
     
     private CPUTableModel tableModel;
     private ProfilerTable table;
@@ -79,17 +81,25 @@ public class CPUTableView extends JPanel {
     private Map<Integer, ClientUtils.SourceCodeSelection> selections;
     
     
-    public CPUTableView(ProfilingSessionStatus status) {
-        sessionStatus = status;
+    public CPUTableView(ProfilerClient client) {
+        this.client = client;
         initUI();
     }
     
     
-    public void setData(final FlatProfileContainer d) {
+    public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
+        client.forceObtainedResultsDump(true);
+        FlatProfileProvider dataProvider = client.getFlatProfileProvider();
+        final FlatProfileContainer newData = dataProvider == null ? null :
+                                             dataProvider.createFlatProfile();
+        if (newData != null) setData(newData);
+    }
+    
+    private void setData(final FlatProfileContainer newData) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if (tableModel != null) {
-                    data = d;
+                    data = newData;
                     
                     long[] maxTimes = new long[4];
                     int maxInvocations = 0;
@@ -107,12 +117,17 @@ public class CPUTableView extends JPanel {
                     renderers[3].setMaxValue(maxTimes[3]);
                     renderers[4].setMaxValue(maxInvocations);
                     
-                    if (selections == null) selections = new HashMap();
+                    if (data == null) selections = null; // reset data
+                    else if (selections == null) selections = new HashMap();
                     
                     tableModel.fireTableDataChanged();
                 }
             }
         });
+    }
+    
+    public void resetData() {
+        setData(null);
     }
     
     public boolean hasSelection() {
@@ -174,6 +189,7 @@ public class CPUTableView extends JPanel {
     
     
     private ClientUtils.SourceCodeSelection selectionForId(int methodId) {
+        ProfilingSessionStatus sessionStatus = client.getStatus();
         sessionStatus.beginTrans(false);
         try {
             String className = sessionStatus.getInstrMethodClasses()[methodId];

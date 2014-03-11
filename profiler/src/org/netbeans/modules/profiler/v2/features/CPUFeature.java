@@ -47,7 +47,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -65,9 +64,6 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.CPUTableView;
@@ -75,6 +71,7 @@ import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.v2.session.ProjectSession;
 import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
 import org.netbeans.modules.profiler.v2.ui.components.SmallButton;
@@ -211,8 +208,9 @@ final class CPUFeature extends ProfilerFeature.Basic {
 
             settingsUI.add(new SmallButton("Apply") {
                 protected void fireActionPerformed(ActionEvent e) {
-                    tableView.setData(null);
+                    tableView.resetData();
                     fireChange();
+                    settingsUI.setVisible(false);
                 }
             });
 
@@ -336,6 +334,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 
                 ClientUtils.SourceCodeSelection[] selections = tableView.getSelections();
                 if (selections.length > 0) settings.addRootMethods(selections);
+                break;
         }
         
         if (settings == null) settings = ProfilingSettingsPresets.createCPUPreset();
@@ -380,13 +379,13 @@ final class CPUFeature extends ProfilerFeature.Basic {
     
     private void initResultsUI() {
         TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
-        tableView = new CPUTableView(runner.getProfilingSessionStatus());
+        tableView = new CPUTableView(runner.getProfilerClient());
     }
     
     public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
         if (newState == null || newState == ProjectSession.State.INACTIVE) {
             stopResults();
-        } else {
+        } else if (newState == ProjectSession.State.RUNNING) {
             startResults();
         }
     }
@@ -396,17 +395,22 @@ final class CPUFeature extends ProfilerFeature.Basic {
     private void startResults() {
         if (processor != null) return;
         
-        if (tableView != null) tableView.setData(null);
+        if (tableView != null) tableView.resetData();
         
         processor = new RequestProcessor("CPU Data Refresher"); // NOI18N
         
         Runnable refresher = new Runnable() {
             public void run() {
                 if (tableView != null) {
-                    TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
-                    FlatProfileProvider dataProvider = runner.getProfilerClient().getFlatProfileProvider();
-                    FlatProfileContainer data = dataProvider == null ? null : dataProvider.createFlatProfile();
-                    if (data != null) tableView.setData(data);
+                    ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+                        public void run() {
+                            try {
+                                tableView.refreshData();
+                            } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                                stopResults();
+                            }
+                        }
+                    });
                 }
                 
                 if (processor != null && !processor.isShutdown()) processor.post(this, 1500);
@@ -424,13 +428,13 @@ final class CPUFeature extends ProfilerFeature.Basic {
     public void attachedToSession(ProjectSession session) {
         super.attachedToSession(session);
         project = session.getProject();
-//        if (tableView != null) tableView.setData(null);
+//        if (tableView != null) tableView.resetData();
     }
     
     public void detachedFromSession(ProjectSession session) {
         super.detachedFromSession(session);
         project = null;
-//        if (tableView != null) tableView.setData(null);
+//        if (tableView != null) tableView.resetData();
     }
     
 }

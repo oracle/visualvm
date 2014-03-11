@@ -240,6 +240,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     }
     
     private void performStopImpl() {
+        stop.setEnabled(false);
         session.terminate();
     }
     
@@ -259,6 +260,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     private void updateButtons() {
         ProjectSession.State state = session.getState();
         start.setPushed(state != ProjectSession.State.INACTIVE);
+//        start.setEnabled(state == ProjectSession.State.INACTIVE);
         stop.setEnabled(state == ProjectSession.State.RUNNING);
     }
     

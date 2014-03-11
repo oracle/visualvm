@@ -57,7 +57,7 @@ import org.openide.util.Lookup;
  */
 public abstract class ProjectSession {
     
-    public static enum State { STARTED, RUNNING, PAUSED, INACTIVE }
+    public static enum State { STARTED, RUNNING, PAUSED, TRANSITION, STOPPED, INACTIVE }
     public static enum Type { PROFILE, ATTACH }
     
     
