@@ -216,13 +216,14 @@ public class PrestimeCPUCCTNodeFree extends PrestimeCPUCCTNode {
         String newline = System.getProperty("line.separator"); // NOI18N
         StringBuffer result = new StringBuffer(indent+"<node>"+newline); //NOI18N
         result.append(indent).append(" <Name>").append(replaceHTMLCharacters(getNodeName())).append("</Name>").append(newline); //NOI18N
-        result.append(indent).append(" <Parent>").append(replaceHTMLCharacters((getParent()==null)?("none"):(((PrestimeCPUCCTNodeFree)getParent()).getNodeName()))).append("</Parent>").append(newline); //NOI18N
-        result.append(indent).append(" <Time_Relative>").append(percentFormat.format(((double)getTotalTime0InPerCent())/100)).append("</Time_Relative>").append(newline); //NOI18N
-        result.append(indent).append(" <Time>").append(getTotalTime0()).append("</Time>").append(newline); //NOI18N
+        CCTNode p = getParent();
+        result.append(indent).append(" <Parent>").append(replaceHTMLCharacters((p==null)?("none"):(((PrestimeCPUCCTNodeFree)getParent()).getNodeName()))).append("</Parent>").append(newline); //NOI18N
+        result.append(indent).append(" <Time_Relative>").append(percentFormat.format( p==null ? ((double)getTotalTime0InPerCent())/100 : 100 )).append("</Time_Relative>").append(newline); //NOI18N
+        result.append(indent).append(" <Time>").append(p==null ? getTotalTime0() : "N/A").append("</Time>").append(newline); //NOI18N
         if (container.collectingTwoTimeStamps) {
             result.append(indent).append(" <Time-CPU>").append(getTotalTime1()).append("</Time-CPU>").append(newline); //NOI18N
         }
-        result.append(indent).append(" <Invocations>").append(getNCalls()).append("</Invocations>").append(newline); //NOI18N
+        result.append(indent).append(" <Invocations>").append(p==null ? getNCalls() : 1 ).append("</Invocations>").append(newline); //NOI18N
         eDD.dumpData(result); //dumps the current row
         // children nodes
         if (children!=null) {
