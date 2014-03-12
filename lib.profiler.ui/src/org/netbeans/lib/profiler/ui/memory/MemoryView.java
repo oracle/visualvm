@@ -47,6 +47,7 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.memory.HeapHistogram;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
@@ -62,6 +63,7 @@ public class MemoryView extends JPanel {
     
     private SampledTableView sampledView;
     private AllocTableView allocView;
+    private LivenessTableView livenessView;
     
     private JPanel currentView;
     
@@ -77,6 +79,7 @@ public class MemoryView extends JPanel {
         if (newView != currentView) {
             removeAll();
             resetData();
+            System.err.println(">>> Changed view from " + currentView.getClass().getName() + " to " + newView.getClass().getName());
             currentView = newView;
             add(currentView, BorderLayout.CENTER);
             revalidate();
@@ -90,9 +93,9 @@ public class MemoryView extends JPanel {
             client.forceObtainedResultsDump(true);
             ProfilingSessionStatus status = client.getStatus();
             MemoryCCTProvider oacgb = client.getMemoryCCTProvider();
+            if (oacgb == null) throw new ClientUtils.TargetAppOrVMTerminated(ClientUtils.TargetAppOrVMTerminated.VM);
             if (oacgb.getObjectsSizePerClass() != null) {
                 int _nTrackedItems = status.getNInstrClasses();
-                String[] _classNames = status.getClassNames();
                 int[] _nTotalAllocObjects = client.getAllocatedObjectsCountResults();
                 long[] _totalAllocObjectsSize = oacgb.getAllocObjectNumbers();
 
@@ -101,11 +104,50 @@ public class MemoryView extends JPanel {
                 if (_nTrackedItems > _totalAllocObjectsSize.length)
                     _nTrackedItems = _totalAllocObjectsSize.length;
                 
+                String[] _classNames = status.getClassNames();
                 for (int i = 0; i < _classNames.length; i++)
                     _classNames[i] = StringUtils.userFormClassName(_classNames[i]);
 
                 allocView.setData(_nTrackedItems, _classNames, _nTotalAllocObjects,
                                   _totalAllocObjectsSize);
+            }
+        } else if (currentView == livenessView) {
+            client.forceObtainedResultsDump(true);
+            ProfilingSessionStatus status = client.getStatus();
+            MemoryCCTProvider olcgb = client.getMemoryCCTProvider();
+            if (olcgb == null) throw new ClientUtils.TargetAppOrVMTerminated(ClientUtils.TargetAppOrVMTerminated.VM);
+            if (olcgb.getObjectsSizePerClass() != null) {
+                MemoryCCTProvider.ObjectNumbersContainer onc = olcgb.getLivenessObjectNumbers();
+                long[] _nTrackedAllocObjects = onc.nTrackedAllocObjects;
+                int[] _nTrackedLiveObjects = onc.nTrackedLiveObjects;
+                long[] _trackedLiveObjectsSize = onc.trackedLiveObjectsSize;
+                float[] _avgObjectAge = onc.avgObjectAge;
+                int[] _maxSurvGen = onc.maxSurvGen;
+                int _nInstrClasses = onc.nInstrClasses;
+
+                if (((_nTrackedLiveObjects == null) && (_nTrackedAllocObjects == null)) ||
+                     (_avgObjectAge == null) || (_maxSurvGen == null)) return;
+
+                int[] _nTotalAllocObjects = client.getAllocatedObjectsCountResults();
+
+                int _nTrackedItems = Math.min(_nTrackedAllocObjects.length, _nTrackedLiveObjects.length);
+                _nTrackedItems = Math.min(_nTrackedItems, _trackedLiveObjectsSize.length);
+                _nTrackedItems = Math.min(_nTrackedItems, _avgObjectAge.length);
+                _nTrackedItems = Math.min(_nTrackedItems, _maxSurvGen.length);
+                _nTrackedItems = Math.min(_nTrackedItems, _nInstrClasses);
+                _nTrackedItems = Math.min(_nTrackedItems, _nTotalAllocObjects.length);
+
+                for (int i = 0; i < _nTrackedItems; i++)
+                    if (_nTrackedAllocObjects[i] == -1)
+                        _nTotalAllocObjects[i] = 0;
+                
+                String[] _classNames = status.getClassNames();
+                for (int i = 0; i < _classNames.length; i++)
+                    _classNames[i] = StringUtils.userFormClassName(_classNames[i]);
+
+                livenessView.setData(_nTrackedItems, _classNames, _nTrackedLiveObjects,
+                                     _trackedLiveObjectsSize, _nTrackedAllocObjects,
+                                     _avgObjectAge, _maxSurvGen, _nTotalAllocObjects);
             }
         }
     }
@@ -117,6 +159,8 @@ public class MemoryView extends JPanel {
             sampledView.resetData();
         } else if (currentView == allocView) {
             allocView.resetData();
+        } else if (currentView == livenessView) {
+            livenessView.resetData();
         }
     }
     
@@ -128,6 +172,8 @@ public class MemoryView extends JPanel {
             return sampledView.hasSelection();
         } else if (currentView == allocView) {
             return allocView.hasSelection();
+        } else if (currentView == livenessView) {
+            return livenessView.hasSelection();
         } else {
             return false;
         }
@@ -140,6 +186,8 @@ public class MemoryView extends JPanel {
             return sampledView.getSelections();
         } else if (currentView == allocView) {
             return allocView.getSelections();
+        } else if (currentView == livenessView) {
+            return livenessView.getSelections();
         } else {
             return null;
         }
@@ -147,17 +195,31 @@ public class MemoryView extends JPanel {
     
     
     private JPanel getView() {
-        if (client.currentInstrTypeIsMemoryProfiling()) {
-            if (allocView == null) allocView = new AllocTableView();
-            return allocView;
-        } else {
-            if (sampledView == null) sampledView = new SampledTableView();
-            return sampledView;
+        switch (client.getCurrentInstrType()) {
+//            case CommonConstants.INSTR_NONE_MEMORY_SAMPLING:
+//                if (sampledView == null) sampledView = new SampledTableView();
+//                return sampledView;
+            case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
+                if (allocView == null) allocView = new AllocTableView();
+                return allocView;
+            case CommonConstants.INSTR_OBJECT_LIVENESS:
+                if (livenessView == null) livenessView = new LivenessTableView();
+                return livenessView;
+            default:
+                if (sampledView == null) sampledView = new SampledTableView();
+                return sampledView;
+//                return null;
         }
     }
     
     private void initUI() {
         setLayout(new BorderLayout(0, 0));
+        
+        // TODO: read last state?
+        currentView = getView();
+        add(currentView, BorderLayout.CENTER);
+        revalidate();
+        repaint();
     }
     
 }

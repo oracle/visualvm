@@ -316,7 +316,8 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 break;
                 
             case INSTR_SELECTED:
-                settings = ProfilingSettingsPresets.createMemoryPreset(ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS);
+//                settings = ProfilingSettingsPresets.createMemoryPreset(ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS);
+                settings = ProfilingSettingsPresets.createMemoryPreset(ProfilingSettings.PROFILE_MEMORY_LIVENESS);
                 settings.setThreadCPUTimerOn(true);
                 
                 StringBuilder b = new StringBuilder();
