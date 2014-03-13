@@ -125,6 +125,11 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
     
     
+    public TreePath getPathForRow(int row) {
+        return tree.getPathForRow(row);
+    }
+    
+    
     public void setRowHeight(int rowHeight) {
         super.setRowHeight(rowHeight);
         if (tree != null) tree.setRowHeight(rowHeight);

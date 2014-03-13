@@ -55,7 +55,7 @@ import org.netbeans.lib.profiler.ui.UIUtils;
  */
 public class NumberPercentRenderer extends MultiRenderer {
     
-    private final NumberRenderer numberRenderer;
+    private final ProfilerRenderer valueRenderer;
     private final PercentRenderer percentRenderer;
     
     private final ProfilerRenderer[] renderers;
@@ -64,12 +64,15 @@ public class NumberPercentRenderer extends MultiRenderer {
     
     
     public NumberPercentRenderer() {
-        this(null);
+        this((Format)null);
     }
     
     public NumberPercentRenderer(Format customFormat) {
-        numberRenderer = new NumberRenderer(customFormat);
-        numberRenderer.setMargin(3, 3, 3, 0);
+        this(createNumberRenderer(customFormat));
+    }
+    
+    public NumberPercentRenderer(ProfilerRenderer renderer) {
+        valueRenderer = renderer;
         
         percentRenderer = new PercentRenderer() {
             public void setForeground(Color foreground) {
@@ -90,7 +93,7 @@ public class NumberPercentRenderer extends MultiRenderer {
         int fixedWidth = percentRenderer.getPreferredSize().width;
         percentSize.width = fixedWidth;
         
-        renderers = new ProfilerRenderer[] { numberRenderer, percentRenderer };
+        renderers = new ProfilerRenderer[] { valueRenderer, percentRenderer };
         
         setOpaque(true);
         setHorizontalAlignment(SwingConstants.TRAILING);
@@ -107,15 +110,22 @@ public class NumberPercentRenderer extends MultiRenderer {
     }
     
     public void setValue(Object value, int row) {
-        numberRenderer.setValue(value, row);
+        valueRenderer.setValue(value, row);
         percentRenderer.setValue(value, row);
     }
     
     
     public Dimension getPreferredSize() {
-        Dimension dim = numberRenderer.getPreferredSize();
+        Dimension dim = valueRenderer.getComponent().getPreferredSize();
         dim.width += percentRenderer.getPreferredSize().width;
         return sharedDimension(dim);
+    }
+    
+    
+    private static ProfilerRenderer createNumberRenderer(Format customFormat) {
+        NumberRenderer numberRenderer = new NumberRenderer(customFormat);
+        numberRenderer.setMargin(3, 3, 3, 0);
+        return numberRenderer;
     }
     
 }

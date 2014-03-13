@@ -46,7 +46,9 @@ package org.netbeans.lib.profiler.results.cpu;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import java.text.MessageFormat;
+import java.util.Enumeration;
 import java.util.ResourceBundle;
+import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.results.FilterSortSupport;
 
 
@@ -79,6 +81,36 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
     public static final int SORT_BY_TIME_0 = 2;
     public static final int SORT_BY_TIME_1 = 3;
     public static final int SORT_BY_INVOCATIONS = 4;
+    
+    
+    public static final PrestimeCPUCCTNode EMPTY = new PrestimeCPUCCTNode() {
+        public PrestimeCPUCCTNode getChild(int index) { return null; }
+        public PrestimeCPUCCTNode[] getChildren() { return new PrestimeCPUCCTNode[0]; }
+        public int getIndexOfChild(Object child) { return -1; }
+        public int getNChildren() { return 0; }
+        public String getNodeName() { return ""; } // NOI18N
+        public long getTime() { return 0; }
+        public double getTimeInPerCent() { return 0; }
+        public long getWaits() { return 0; }
+
+        public int getMethodId() { return -1; }
+        public int getNCalls() { return -1; }
+        public long getSleepTime0() { return -1; }
+        public int getThreadId() { return -1; }
+        public long getTotalTime0() { return -1; }
+        public float getTotalTime0InPerCent() { return -1; }
+        public long getTotalTime1() { return -1; }
+        public float getTotalTime1InPerCent() { return -1; }
+        public long getWaitTime0() { return -1; }
+        public void sortChildren(int sortBy, boolean sortOrder) {}
+        public TreeNode getChildAt(int childIndex) { return null; }
+        public int getChildCount() { return -1; }
+        public CCTNode getParent() { return null; }
+        public int getIndex(TreeNode node) { return -1; }
+        public boolean getAllowsChildren() { return false; }
+        public boolean isLeaf() { return true; }
+        public Enumeration children() { return null; }
+    };
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -99,6 +131,42 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
         this.container = container;
         this.parent = parent;
     }
+    
+    //--- TreeNode adapter ---
+    public Enumeration<PrestimeCPUCCTNode> children() {
+        return new Enumeration<PrestimeCPUCCTNode>() {
+            private int index = 0;
+            
+            public boolean hasMoreElements() {
+                return children != null && index < children.length;
+            }
+
+            public PrestimeCPUCCTNode nextElement() {
+                return children[index++];
+            }
+        };
+    }
+    
+    public boolean isLeaf() {
+        return getChildCount() == 0;
+    }
+    
+    public boolean getAllowsChildren() {
+        return true;
+    }
+    
+    public int getIndex(TreeNode node) {
+        return getIndexOfChild(node);
+    }
+    
+    public int getChildCount() {
+        return getNChildren();
+    }
+    
+    public TreeNode getChildAt(int index) {
+        return getChild(index);
+    }
+    //---
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -167,15 +235,22 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
     
     public boolean equals(Object o) {
         if (!(o instanceof PrestimeCPUCCTNode)) return false;
-        if (isThreadNode()) return super.equals(o); // #205942
-        if (parent == null) return super.equals(o); // Required for filtering & sorting
-        return getNodeName().equals(((PrestimeCPUCCTNode)o).getNodeName());
+        PrestimeCPUCCTNode oo = (PrestimeCPUCCTNode)o;
+//        if (isThreadNode()) return super.equals(o); // #205942
+//        if (parent == null) return super.equals(o); // Required for filtering & sorting
+//        return getNodeName().equals(((PrestimeCPUCCTNode)o).getNodeName());
+        if (parent == null) return oo.parent == null;
+        if (isThreadNode()) return oo.getNodeName().equals(getNodeName());
+        return getMethodId() == oo.getMethodId();
     }
     
     public int hashCode() {
-        if (isThreadNode()) return super.hashCode(); // #205942
-        if (parent == null) return super.hashCode(); // Required for filtering & sorting
-        return getNodeName().hashCode();
+//        if (isThreadNode()) return super.hashCode(); // #205942
+//        if (parent == null) return super.hashCode(); // Required for filtering & sorting
+//        return getNodeName().hashCode();
+        if (parent == null) return 1;
+        if (isThreadNode()) return getNodeName().hashCode();
+        return getMethodId();
     }
 
     public CCTNode getParent() {

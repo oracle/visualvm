@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -41,28 +41,30 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results;
+package org.netbeans.lib.profiler.ui.swing.renderer;
 
-import javax.swing.tree.TreeNode;
-
+import javax.swing.SwingConstants;
+import org.netbeans.lib.profiler.ui.Formatters;
+import org.netbeans.lib.profiler.utils.StringUtils;
 
 /**
- * This interface must be implemented by every CCT node.
  *
  * @author Jiri Sedlacek
  */
-public interface CCTNode extends TreeNode {
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public CCTNode getChild(int index);
-
-    public CCTNode[] getChildren();
-
-    public int getIndexOfChild(Object child);
-
-    public int getNChildren();
-
-    public CCTNode getParent();
-
-    //public boolean hasChildren();
+public class McsTimeRenderer extends FormattedLabelRenderer {
+    
+    public McsTimeRenderer() {
+        super(Formatters.millisecondsFormat());
+        setHorizontalAlignment(SwingConstants.TRAILING);
+        
+        // NOTE: Configured as value renderer for NumberPercentRenderer
+        //       Should be changed when used as a standalone renderer
+        setMargin(3, 3, 3, 0);
+    }
+    
+    public void setValue(Object value, int row) {
+        long lvalue = ((Number)value).longValue();
+        super.setValue(StringUtils.mcsTimeToString(lvalue), row);
+    }
+    
 }

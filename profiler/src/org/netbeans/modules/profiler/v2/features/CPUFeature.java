@@ -66,7 +66,7 @@ import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.cpu.CPUTableView;
+import org.netbeans.lib.profiler.ui.cpu.CPUTreeTableView;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -117,7 +117,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
     
     private View view = View.HOT_SPOTS;
     
-    private CPUTableView tableView;
+//    private CPUTableView tableView;
+    private CPUTreeTableView treeTableView;
     
     private Mode mode = Mode.SAMPLED_ALL;
     private PopupButton modeButton;
@@ -131,8 +132,10 @@ final class CPUFeature extends ProfilerFeature.Basic {
 
     
     public JPanel getResultsUI() {
-        if (tableView == null) initResultsUI();
-        return tableView;
+//        if (tableView == null) initResultsUI();
+//        return tableView;
+        if (treeTableView == null) initResultsUI();
+        return treeTableView;
     }
     
     public JPanel getSettingsUI() {
@@ -166,7 +169,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_METHOD); }
                     });
                     popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_SELECTED), mode == Mode.INSTR_SELECTED) {
-                        { setEnabled(tableView.hasSelection()); }
+//                        { setEnabled(tableView.hasSelection()); }
+                        { setEnabled(treeTableView.hasSelection()); }
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_SELECTED); }
                     });
                 }
@@ -208,7 +212,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
 
             settingsUI.add(new SmallButton("Apply") {
                 protected void fireActionPerformed(ActionEvent e) {
-                    tableView.resetData();
+//                    tableView.resetData();
+                    treeTableView.resetData();
                     fireChange();
                     settingsUI.setVisible(false);
                 }
@@ -332,7 +337,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 settings = ProfilingSettingsPresets.createCPUPreset(ProfilingSettings.PROFILE_CPU_PART);
                 settings.setThreadCPUTimerOn(true);
                 
-                ClientUtils.SourceCodeSelection[] selections = tableView.getSelections();
+//                ClientUtils.SourceCodeSelection[] selections = tableView.getSelections();
+                ClientUtils.SourceCodeSelection[] selections = treeTableView.getSelections();
                 if (selections.length > 0) settings.addRootMethods(selections);
                 break;
         }
@@ -379,7 +385,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
     
     private void initResultsUI() {
         TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
-        tableView = new CPUTableView(runner.getProfilerClient());
+//        tableView = new CPUTableView(runner.getProfilerClient());
+        treeTableView = new CPUTreeTableView(runner.getProfilerClient());
     }
     
     public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
@@ -395,17 +402,20 @@ final class CPUFeature extends ProfilerFeature.Basic {
     private void startResults() {
         if (processor != null) return;
         
-        if (tableView != null) tableView.resetData();
+//        if (tableView != null) tableView.resetData();
+        if (treeTableView != null) treeTableView.resetData();
         
         processor = new RequestProcessor("CPU Data Refresher"); // NOI18N
         
         Runnable refresher = new Runnable() {
             public void run() {
-                if (tableView != null) {
+//                if (tableView != null) {
+                if (treeTableView != null) {
                     ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                         public void run() {
                             try {
-                                tableView.refreshData();
+//                                tableView.refreshData();
+                                treeTableView.refreshData();
                             } catch (ClientUtils.TargetAppOrVMTerminated ex) {
                                 stopResults();
                             }
@@ -417,7 +427,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
             }
         };
         
-        processor.post(refresher, 500);
+        processor.post(refresher);
     }
     
     private void stopResults() {

@@ -97,7 +97,7 @@ public class HideableBarRenderer extends MultiRenderer {
         if (oldDigits < newDigits) {
             // Number of the same pow10 created using only digit '9'
 //            int ref = (int)Math.pow(10, Math.ceil(Math.log10(maxValue + 1))) - 1;
-            mainRenderer.setValue((int)Math.pow(10, newDigits) - 1, -1);
+            mainRenderer.setValue((long)Math.pow(10, newDigits) - 1, -1);
             int mainWidth = mainRenderer.getComponent().getPreferredSize().width;
             maxRendererWidth = Math.max(maxRendererWidth, mainWidth);
         }

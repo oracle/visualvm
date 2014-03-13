@@ -88,7 +88,6 @@ import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.locks.LockCCTNode;
 import org.netbeans.lib.profiler.results.locks.LockCCTProvider;
 import org.netbeans.lib.profiler.results.locks.LockRuntimeCCTNode;
-import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.ResultsPanel;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.FlatToolBar;
@@ -104,6 +103,7 @@ import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
 import org.netbeans.lib.profiler.ui.swing.renderer.BarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.McsTimeRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
 //import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
@@ -254,7 +254,7 @@ public class LockContentionPanel extends ResultsPanel {
 //        NumberRenderer nr = new NumberRenderer(Formatters.millisecondsFormat());
 //        nr.setValue(refTime, -1);
         
-        NumberPercentRenderer npr = new NumberPercentRenderer(Formatters.millisecondsFormat());
+        NumberPercentRenderer npr = new NumberPercentRenderer(new McsTimeRenderer());
 //        npr.setValue(refTime, -1);
         hbrTime = new HideableBarRenderer(npr);
         hbrTime.setMaxValue(refTime.longValue());

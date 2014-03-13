@@ -79,7 +79,6 @@ public class MemoryView extends JPanel {
         if (newView != currentView) {
             removeAll();
             resetData();
-            System.err.println(">>> Changed view from " + currentView.getClass().getName() + " to " + newView.getClass().getName());
             currentView = newView;
             add(currentView, BorderLayout.CENTER);
             revalidate();

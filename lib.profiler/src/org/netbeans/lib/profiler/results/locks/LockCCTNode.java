@@ -82,7 +82,7 @@ public abstract class LockCCTNode implements CCTNode, TreeNode {
     }
     
     
-    //---
+    //--- TreeNode adapter ---
     public Enumeration<LockCCTNode> children() {
         return new Enumeration<LockCCTNode>() {
             private int index = 0;

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -41,28 +41,46 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results;
+package org.netbeans.lib.profiler.ui.cpu;
 
-import javax.swing.tree.TreeNode;
-
+import javax.swing.Icon;
+import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
+import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 /**
- * This interface must be implemented by every CCT node.
  *
  * @author Jiri Sedlacek
  */
-public interface CCTNode extends TreeNode {
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public CCTNode getChild(int index);
-
-    public CCTNode[] getChildren();
-
-    public int getIndexOfChild(Object child);
-
-    public int getNChildren();
-
-    public CCTNode getParent();
-
-    //public boolean hasChildren();
+public class CPUJavaNameRenderer extends JavaNameRenderer {
+    
+    public void setValue(Object value, int row) {
+        if (value instanceof PrestimeCPUCCTNode) {
+            PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)value;
+            
+            if (node.isSelfTimeNode()) {
+                setNormalValue(node.getNodeName());
+                setBoldValue(""); // NOI18N
+                setGrayValue(""); // NOI18N
+            } else if (node.isThreadNode()) {
+                setNormalValue(""); // NOI18N
+                setBoldValue(node.getNodeName());
+                setGrayValue(""); // NOI18N
+            } else {
+                super.setValue(node.getNodeName(), row);
+            }
+            
+            Icon icon = null;
+            
+            if (node.isThreadNode()) icon = Icons.getIcon(ProfilerIcons.THREAD);
+            else if (node.isLeaf()) icon = Icons.getIcon(ProfilerIcons.NODE_LEAF);
+            else icon = Icons.getIcon(ProfilerIcons.NODE_FORWARD);
+            
+            setIcon(icon);
+        } else {
+            super.setValue(value, row);
+        }
+    }
+    
 }

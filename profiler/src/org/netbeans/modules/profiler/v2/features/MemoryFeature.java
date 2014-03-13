@@ -51,6 +51,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -112,6 +113,10 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private ProfilerToolbar toolbar;
     private JPanel settingsUI;
     
+    private Component instrCheckboxesSpace;
+    private JCheckBox lifecycleCheckbox;
+    private JCheckBox allocationsCheckbox;
+    
     private MemoryView tableView;
     
     private Mode mode = Mode.SAMPLED_ALL;
@@ -166,6 +171,17 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             settingsUI.add(modeButton);
 
             settingsUI.add(Box.createHorizontalStrut(5));
+            
+            
+            instrCheckboxesSpace = settingsUI.add(Box.createHorizontalStrut(5));
+            
+            lifecycleCheckbox = new JCheckBox("Record full lifecycle");
+            lifecycleCheckbox.setOpaque(false);
+            settingsUI.add(lifecycleCheckbox);
+            
+            allocationsCheckbox = new JCheckBox("Record allocations");
+            allocationsCheckbox.setOpaque(false);
+            settingsUI.add(allocationsCheckbox);
 
 
             settingsUI.add(Box.createGlue());
@@ -214,6 +230,8 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                     settingsUI.setVisible(false);
                 }
             });
+            
+            updateModeUI();
         }
         return settingsUI;
     }
@@ -221,7 +239,16 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private void setMode(Mode m) {
         if (mode == m) return;
         mode = m;
-        modeButton.setText(getModeName(m));
+        updateModeUI();
+    }
+    
+    private void updateModeUI() {
+        modeButton.setText(getModeName(mode));
+        
+        boolean instr = mode == Mode.INSTR_CLASS || mode == Mode.INSTR_SELECTED;
+        instrCheckboxesSpace.setVisible(instr);
+        lifecycleCheckbox.setVisible(instr);
+        allocationsCheckbox.setVisible(instr);
     }
     
     private String getModeName(Mode m) {
@@ -316,9 +343,12 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 break;
                 
             case INSTR_SELECTED:
-//                settings = ProfilingSettingsPresets.createMemoryPreset(ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS);
-                settings = ProfilingSettingsPresets.createMemoryPreset(ProfilingSettings.PROFILE_MEMORY_LIVENESS);
-                settings.setThreadCPUTimerOn(true);
+                int type = lifecycleCheckbox.isSelected() ? ProfilingSettings.PROFILE_MEMORY_LIVENESS :
+                                                            ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS;
+                settings = ProfilingSettingsPresets.createMemoryPreset(type);
+                
+                int stackLimit = allocationsCheckbox.isSelected() ? -1 : 0;
+                settings.setAllocStackTraceLimit(stackLimit);
                 
                 StringBuilder b = new StringBuilder();
                 String[] selections = tableView.getSelections();
@@ -377,7 +407,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             }
         };
         
-        processor.post(refresher, 2000);
+        processor.post(refresher);
     }
     
     private void stopResults() {

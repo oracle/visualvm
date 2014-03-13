@@ -44,7 +44,6 @@ package org.netbeans.lib.profiler.ui.swing;
 
 import org.netbeans.lib.profiler.ui.swing.renderer.Movable;
 import java.awt.Component;
-import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -456,7 +455,7 @@ public class ProfilerTable extends JTable {
     }
     
     protected void updateColumnsPreferredWidth() {
-        if (getRowCount() == 0) return;
+        if (scrollableColumns == null || getRowCount() == 0) return;
         
         Rectangle visible = getVisibleRect();
         if (visible.isEmpty()) return;
