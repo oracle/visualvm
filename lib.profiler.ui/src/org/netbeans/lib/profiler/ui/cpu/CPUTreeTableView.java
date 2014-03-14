@@ -44,8 +44,11 @@
 package org.netbeans.lib.profiler.ui.cpu;
 
 import java.awt.BorderLayout;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -71,9 +74,6 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
  */
 public class CPUTreeTableView extends JPanel {
     
-    private static final ClientUtils.SourceCodeSelection[] EMPTY_SELECTION =
-            new ClientUtils.SourceCodeSelection[0];
-    
     private final ProfilerClient client;
     
     private CPUTreeTableModel treeTableModel;
@@ -88,23 +88,7 @@ public class CPUTreeTableView extends JPanel {
     }
     
     
-    public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
-        client.forceObtainedResultsDump(true);
-        try {
-            CPUResultsSnapshot newData = client.getCPUProfilingResultsSnapshot(false);
-            if (newData != null) setData(newData);
-        } catch (CPUResultsSnapshot.NoDataAvailableException e) {
-        } catch (Throwable t) {
-            if (t instanceof ClientUtils.TargetAppOrVMTerminated) {
-                throw ((ClientUtils.TargetAppOrVMTerminated)t);
-            } else {
-                System.err.println(">>> " + t.getMessage());
-                t.printStackTrace(System.err);
-            }
-        }
-    }
-    
-    private void setData(final CPUResultsSnapshot newData) {
+    void setData(final CPUResultsSnapshot newData) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if (treeTableModel != null) {
@@ -128,9 +112,9 @@ public class CPUTreeTableView extends JPanel {
         return selections != null && !selections.isEmpty();
     }
     
-    public ClientUtils.SourceCodeSelection[] getSelections() {
-        return !hasSelection() ? EMPTY_SELECTION :
-                selections.values().toArray(EMPTY_SELECTION);
+    public Set<ClientUtils.SourceCodeSelection[]> getSelections() {
+        return !hasSelection() ? Collections.EMPTY_SET :
+                new HashSet(selections.values());
     }
     
     
@@ -269,6 +253,7 @@ public class CPUTreeTableView extends JPanel {
                 } else {
                     selections.remove(methodId);
                 }
+                treeTable.repaint(); // Should invoke fireTableDataChanged()
             }
         }
 

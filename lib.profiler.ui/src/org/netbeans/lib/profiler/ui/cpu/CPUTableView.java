@@ -44,8 +44,11 @@
 package org.netbeans.lib.profiler.ui.cpu;
 
 import java.awt.BorderLayout;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
@@ -53,7 +56,6 @@ import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
@@ -68,9 +70,6 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
  * @author Jiri Sedlacek
  */
 public class CPUTableView extends JPanel {
-    
-    private static final ClientUtils.SourceCodeSelection[] EMPTY_SELECTION =
-            new ClientUtils.SourceCodeSelection[0];
     
     private final ProfilerClient client;
     
@@ -87,15 +86,7 @@ public class CPUTableView extends JPanel {
     }
     
     
-    public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
-        client.forceObtainedResultsDump(true);
-        FlatProfileProvider dataProvider = client.getFlatProfileProvider();
-        final FlatProfileContainer newData = dataProvider == null ? null :
-                                             dataProvider.createFlatProfile();
-        if (newData != null) setData(newData);
-    }
-    
-    private void setData(final FlatProfileContainer newData) {
+    void setData(final FlatProfileContainer newData) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if (tableModel != null) {
@@ -134,9 +125,9 @@ public class CPUTableView extends JPanel {
         return selections != null && !selections.isEmpty();
     }
     
-    public ClientUtils.SourceCodeSelection[] getSelections() {
-        return !hasSelection() ? EMPTY_SELECTION :
-                selections.values().toArray(EMPTY_SELECTION);
+    public Set<ClientUtils.SourceCodeSelection[]> getSelections() {
+        return !hasSelection() ? Collections.EMPTY_SET :
+                new HashSet(selections.values());
     }
     
     

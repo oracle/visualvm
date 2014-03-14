@@ -117,7 +117,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private JCheckBox lifecycleCheckbox;
     private JCheckBox allocationsCheckbox;
     
-    private MemoryView tableView;
+    private MemoryView memoryView;
     
     private Mode mode = Mode.SAMPLED_ALL;
     private PopupButton modeButton;
@@ -131,8 +131,8 @@ final class MemoryFeature extends ProfilerFeature.Basic {
 
     
     public JPanel getResultsUI() {
-        if (tableView == null) initResultsUI();
-        return tableView;
+        if (memoryView == null) initResultsUI();
+        return memoryView;
     }
     
     public JPanel getSettingsUI() {
@@ -163,7 +163,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_CLASS); }
                     });
                     popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_SELECTED), mode == Mode.INSTR_SELECTED) {
-                        { setEnabled(tableView.hasSelection()); }
+                        { setEnabled(memoryView.hasSelection()); }
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_SELECTED); }
                     });
                 }
@@ -216,7 +216,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
 
             settingsUI.add(new SmallButton("Apply") {
                 protected void fireActionPerformed(ActionEvent e) {
-                    tableView.resetData();
+                    memoryView.resetData();
                     fireChange();
                     settingsUI.setVisible(false);
                 }
@@ -351,7 +351,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 settings.setAllocStackTraceLimit(stackLimit);
                 
                 StringBuilder b = new StringBuilder();
-                String[] selections = tableView.getSelections();
+                String[] selections = memoryView.getSelections();
                 for (int i = 0; i < selections.length; i++) {
                     b.append(selections[i]);
                     if (i < selections.length - 1) b.append(", "); // NOI18N
@@ -369,7 +369,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     
     private void initResultsUI() {
         TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
-        tableView = new MemoryView(runner.getProfilerClient());
+        memoryView = new MemoryView(runner.getProfilerClient());
     }
     
     public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
@@ -385,17 +385,17 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private void startResults() {
         if (processor != null) return;
         
-        if (tableView != null) tableView.resetData();
+        if (memoryView != null) memoryView.resetData();
         
         processor = new RequestProcessor("Memory Data Refresher"); // NOI18N
         
         Runnable refresher = new Runnable() {
             public void run() {
-                if (tableView != null) {
+                if (memoryView != null) {
                     ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                         public void run() {
                             try {
-                                tableView.refreshData();
+                                memoryView.refreshData();
                             } catch (ClientUtils.TargetAppOrVMTerminated ex) {
                                 stopResults();
                             }
@@ -407,7 +407,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             }
         };
         
-        processor.post(refresher);
+        processor.post(refresher, 2000);
     }
     
     private void stopResults() {
