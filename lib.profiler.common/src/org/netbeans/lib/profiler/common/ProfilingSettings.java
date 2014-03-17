@@ -611,8 +611,7 @@ public class ProfilingSettings {
 
         // No filter
         if (getSelectedInstrumentationFilter().equals(FilterUtils.NONE_FILTER)) {
-            instrumentationFilter.setFilterType(InstrumentationFilter.INSTR_FILTER_NONE);
-            instrumentationFilter.setFilterStrings(""); //NOI18N
+            instrumentationFilter.clearFilter();
 
             return;
         }
@@ -627,8 +626,7 @@ public class ProfilingSettings {
                 instrumentationFilter.setFilterStrings(quickFilter.getFilterValue());
             } else {
                 // Quick Filter cancelled and no previous filter defined => filterType=INSTR_FILTER_NONE
-                instrumentationFilter.setFilterType(InstrumentationFilter.INSTR_FILTER_NONE);
-                instrumentationFilter.setFilterStrings(""); //NOI18N
+                instrumentationFilter.clearFilter();
             }
 
             return;
@@ -674,8 +672,7 @@ public class ProfilingSettings {
         }
 
         // Unknown or no filter
-        instrumentationFilter.setFilterType(InstrumentationFilter.INSTR_FILTER_NONE);
-        instrumentationFilter.setFilterStrings(""); //NOI18N
+        instrumentationFilter.clearFilter();
     }
 
     // -- Settings duplication -------------------------------------------------------------------------------------------
