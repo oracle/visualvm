@@ -88,11 +88,11 @@ public abstract class LockCCTNode implements CCTNode, TreeNode {
             private int index = 0;
             
             public boolean hasMoreElements() {
-                return children != null && index < children.size();
+                return getChildren() != null && index < getChildren().length;
             }
 
             public LockCCTNode nextElement() {
-                return children.get(index++);
+                return getChildren()[index++];
             }
         };
     }

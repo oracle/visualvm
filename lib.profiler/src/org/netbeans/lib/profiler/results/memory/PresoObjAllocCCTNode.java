@@ -112,11 +112,11 @@ public class PresoObjAllocCCTNode implements CCTNode {
             private int index = 0;
             
             public boolean hasMoreElements() {
-                return children != null && index < children.length;
+                return getChildren() != null && index < getChildren().length;
             }
 
             public PresoObjAllocCCTNode nextElement() {
-                return children[index++];
+                return (PresoObjAllocCCTNode)getChildren()[index++];
             }
         };
     }

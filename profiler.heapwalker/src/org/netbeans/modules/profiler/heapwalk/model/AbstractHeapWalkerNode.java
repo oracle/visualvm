@@ -43,10 +43,12 @@
 
 package org.netbeans.modules.profiler.heapwalk.model;
 
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.TreeNode;
 
 
 /**
@@ -79,6 +81,38 @@ public abstract class AbstractHeapWalkerNode implements HeapWalkerNode {
         this.parent = parent;
         this.mode = mode;
     }
+    
+    //--- TreeNode adapter ---
+    public Enumeration<HeapWalkerNode> children() {
+        return new Enumeration<HeapWalkerNode>() {
+            private int index = 0;
+            
+            public boolean hasMoreElements() {
+                return getChildren() != null && index < getChildren().length;
+            }
+
+            public HeapWalkerNode nextElement() {
+                return getChildren()[index++];
+            }
+        };
+    }
+    
+    public boolean getAllowsChildren() {
+        return true;
+    }
+    
+    public int getIndex(TreeNode node) {
+        return getIndexOfChild(node);
+    }
+    
+    public int getChildCount() {
+        return getNChildren();
+    }
+    
+    public TreeNode getChildAt(int index) {
+        return getChild(index);
+    }
+    //---
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 

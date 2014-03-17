@@ -138,11 +138,11 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
             private int index = 0;
             
             public boolean hasMoreElements() {
-                return children != null && index < children.length;
+                return getChildren() != null && index < getChildren().length;
             }
 
             public PrestimeCPUCCTNode nextElement() {
-                return children[index++];
+                return (PrestimeCPUCCTNode)getChildren()[index++];
             }
         };
     }
