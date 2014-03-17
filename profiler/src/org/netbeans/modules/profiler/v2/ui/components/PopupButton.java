@@ -49,6 +49,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JPopupMenu;
+import javax.swing.JToolBar;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 
@@ -62,8 +64,14 @@ public class PopupButton extends SmallButton {
     private static final int DROPDOWN_ICON_WIDTH = DROPDOWN_ICON.getIconWidth();
     private static final int DROPDOWN_ICON_HEIGHT = DROPDOWN_ICON.getIconHeight();
     
+    private int iconOffset;
     
-    { setHorizontalAlignment(LEADING); }
+    
+    {
+        iconOffset = 7;
+        setHorizontalAlignment(LEADING);
+    }
+    
     
     public PopupButton() { super(); }
 
@@ -111,9 +119,17 @@ public class PopupButton extends SmallButton {
         return getPreferredSize();
     }
     
+    public void addNotify() {
+        super.addNotify();
+        if (UIUtils.isWindowsLookAndFeel() && getParent() instanceof JToolBar) {
+            if (getIcon() == NO_ICON) setIconTextGap(2);
+            iconOffset = 5;
+        }
+    }
+    
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        DROPDOWN_ICON.paintIcon(this, g, getWidth() - DROPDOWN_ICON_WIDTH - 7,
+        DROPDOWN_ICON.paintIcon(this, g, getWidth() - DROPDOWN_ICON_WIDTH - iconOffset,
                                         (getHeight() - DROPDOWN_ICON_HEIGHT) / 2);
     }
     

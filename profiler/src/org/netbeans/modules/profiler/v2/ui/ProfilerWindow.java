@@ -105,7 +105,19 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         // To be called in EDT only - synchronization & UI creation
         assert SwingUtilities.isEventDispatchThread();
         
-        if (MAP == null) MAP = new HashMap();
+        if (MAP == null) {
+            MAP = new HashMap();
+        } else {
+            // Remove once multiple profiling sessions are supported
+            for (ProjectSession otherSession : MAP.keySet()) {
+                if (!session.equals(otherSession)) {
+                    Reference<ProfilerWindow> reference = MAP.get(otherSession);
+                    ProfilerWindow window = reference == null ? null : reference.get();
+                    if (window != null && !window.close()) return window;
+                    else MAP.remove(otherSession);
+                }
+            }
+        }
         
         Reference<ProfilerWindow> reference = MAP.get(session);
         ProfilerWindow window = reference == null ? null : reference.get();

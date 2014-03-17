@@ -43,10 +43,13 @@
 
 package org.netbeans.modules.profiler.v2.ui.components;
 
+import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.Insets;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JToolBar;
 import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
@@ -55,31 +58,55 @@ import org.netbeans.lib.profiler.ui.UIUtils;
  */
 public class SmallButton extends JButton {
     
+    protected static final Icon NO_ICON = new Icon() {
+        public int getIconWidth() { return 0; }
+        public int getIconHeight() { return 16; }
+        public void paintIcon(Component c, Graphics g, int x, int y) {}
+    };
+    
+    
     {
         setDefaultCapable(false);
-        setMargin(smallMargin(getMargin()));
+        setOpaque(false);
     }
     
-    public SmallButton() { super(); }
+    
+    public SmallButton() { super();  }
 
-    public SmallButton(Icon icon) { super(icon); }
+    public SmallButton(Icon icon) { this(null, icon); }
 
-    public SmallButton(String text) { super(text); }
+    public SmallButton(String text) { this(text, null); }
 
     public SmallButton(Action a) { super(a); }
 
-    public SmallButton(String text, Icon icon) { super(text, icon); }
+    public SmallButton(String text, Icon icon) { super(text); setIcon(icon); }
     
     
-    private static Insets smallMargin(Insets margin) {
-        if (UIUtils.isNimbus()) {
-            margin.top = 0;
-            margin.left = -6;
-            margin.bottom = 0;
-            margin.right = -6;
-        } else {
-            margin.left = margin.top + 3;
-            margin.right = margin.top + 3;
+    public void setIcon(Icon defaultIcon) {
+        if (defaultIcon == null) {
+            defaultIcon = NO_ICON;
+            setIconTextGap(0);
+        }
+        super.setIcon(defaultIcon);
+    }
+    
+    public Insets getMargin() {
+        Insets margin = super.getMargin();
+        if (margin != null) {
+            if (getParent() instanceof JToolBar) {
+                if (UIUtils.isNimbus()) {
+                    margin.left = margin.top + 3;
+                    margin.right = margin.top + 3;
+                }
+            } else {
+                if (UIUtils.isNimbus()) {
+                    margin.left = margin.top - 6;
+                    margin.right = margin.top - 6;
+                } else {
+                    margin.left = margin.top + 3;
+                    margin.right = margin.top + 3;
+                }
+            }
         }
         return margin;
     }

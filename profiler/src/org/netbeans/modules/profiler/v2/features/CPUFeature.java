@@ -158,7 +158,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.SAMPLED_PROJECT); }
                     });
                     
-                    popup.add(new TitledMenuSeparator("Advanced (instrumented)"));
+                    popup.add(new TitledMenuSeparator("Detailed (instrumented)"));
                     popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_CLASS), mode == Mode.INSTR_CLASS) {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_CLASS); }
                     });
