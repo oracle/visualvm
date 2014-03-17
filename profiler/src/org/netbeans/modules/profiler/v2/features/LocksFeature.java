@@ -44,17 +44,13 @@
 package org.netbeans.modules.profiler.v2.features;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
-import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
-import org.netbeans.lib.profiler.common.event.ProfilingStateAdapter;
-import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.locks.LockContentionPanel;
@@ -91,7 +87,6 @@ final class LocksFeature extends ProfilerFeature.Basic {
     private Aggregation aggregation;
     
     private LockContentionPanel locksPanel;
-    private ProfilingSettings settings;
     
     
     LocksFeature() {
@@ -145,11 +140,9 @@ final class LocksFeature extends ProfilerFeature.Basic {
     }
     
     public ProfilingSettings getSettings() {
-        if (settings == null) {
-            settings = ProfilingSettingsPresets.createMonitorPreset();
-            settings.setThreadsMonitoringEnabled(false);
-            settings.setLockContentionMonitoringEnabled(true);
-        }
+        ProfilingSettings settings = ProfilingSettingsPresets.createMonitorPreset();
+        settings.setThreadsMonitoringEnabled(false);
+        settings.setLockContentionMonitoringEnabled(true);
         return settings;
     }
     

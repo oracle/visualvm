@@ -47,10 +47,12 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.monitor.MonitorView;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -82,6 +84,8 @@ final class MonitorFeature extends ProfilerFeature.Basic {
     
     private ProfilerToolbar toolbar;
     
+    private MonitorView monitorView;
+    
     
     MonitorFeature() {
         super(Bundle.MonitorFeature_name(), Icons.getIcon(ProfilerIcons.MONITORING));
@@ -89,7 +93,8 @@ final class MonitorFeature extends ProfilerFeature.Basic {
 
     
     public JPanel getResultsUI() {
-        return new JPanel();
+        if (monitorView == null) initResultsUI();
+        return monitorView;
     }
     
     public ProfilerToolbar getToolbar() {
@@ -145,7 +150,14 @@ final class MonitorFeature extends ProfilerFeature.Basic {
     }
     
     public ProfilingSettings getSettings() {
-        return ProfilingSettingsPresets.createMonitorPreset();
+        ProfilingSettings settings = ProfilingSettingsPresets.createMonitorPreset();
+        settings.setThreadsMonitoringEnabled(false);
+        settings.setLockContentionMonitoringEnabled(false);
+        return settings;
+    }
+    
+    private void initResultsUI() {
+        monitorView = new MonitorView(Profiler.getDefault().getVMTelemetryManager());
     }
     
 }

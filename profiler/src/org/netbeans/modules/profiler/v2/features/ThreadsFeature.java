@@ -99,7 +99,6 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
     private Filter filter;
     
     private ThreadsPanel threadsPanel;
-    private ProfilingSettings settings;
     
     
     ThreadsFeature() {
@@ -175,11 +174,9 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
     }
     
     public ProfilingSettings getSettings() {
-        if (settings == null) {
-            settings = ProfilingSettingsPresets.createMonitorPreset();
-            settings.setThreadsMonitoringEnabled(true);
-            settings.setLockContentionMonitoringEnabled(false);
-        }
+        ProfilingSettings settings = ProfilingSettingsPresets.createMonitorPreset();
+        settings.setThreadsMonitoringEnabled(true);
+        settings.setLockContentionMonitoringEnabled(false);
         return settings;
     }
     
