@@ -620,9 +620,7 @@ public class ProfilingSettings {
         if (getSelectedInstrumentationFilter().equals(quickFilter)) {
             if (quickFilter.getFilterValue().length() > 0) {
                 // Quick Filter defined
-                instrumentationFilter.setFilterType((quickFilter.getFilterType() == SimpleFilter.SIMPLE_FILTER_EXCLUSIVE)
-                                                    ? InstrumentationFilter.INSTR_FILTER_EXCLUSIVE
-                                                    : InstrumentationFilter.INSTR_FILTER_INCLUSIVE);
+                instrumentationFilter.setFilterType(getInstrumentationFilterType(quickFilter));
                 instrumentationFilter.setFilterStrings(quickFilter.getFilterValue());
             } else {
                 // Quick Filter cancelled and no previous filter defined => filterType=INSTR_FILTER_NONE
@@ -635,9 +633,7 @@ public class ProfilingSettings {
         // Filter defined by ProjectTypeProfiler
         if (getSelectedInstrumentationFilter() instanceof SimpleFilter) {
             SimpleFilter ptpFilter = (SimpleFilter) getSelectedInstrumentationFilter();
-            instrumentationFilter.setFilterType((ptpFilter.getFilterType() == SimpleFilter.SIMPLE_FILTER_EXCLUSIVE)
-                                                ? InstrumentationFilter.INSTR_FILTER_EXCLUSIVE
-                                                : InstrumentationFilter.INSTR_FILTER_INCLUSIVE);
+            instrumentationFilter.setFilterType(getInstrumentationFilterType(ptpFilter));
             instrumentationFilter.setFilterStrings(ptpFilter.getFilterValue());
 
             return;
@@ -1008,5 +1004,20 @@ public class ProfilingSettings {
         final Object ret = props.get(key);
 
         return (ret != null) ? (String) ret : defaultValue;
+    }
+    
+    private static int getInstrumentationFilterType(SimpleFilter simpleFiler) {        
+        switch (simpleFiler.getFilterType()) {
+            case SimpleFilter.SIMPLE_FILTER_NONE:
+                return InstrumentationFilter.INSTR_FILTER_NONE;
+            case SimpleFilter.SIMPLE_FILTER_EXCLUSIVE:
+                return InstrumentationFilter.INSTR_FILTER_EXCLUSIVE;
+            case SimpleFilter.SIMPLE_FILTER_INCLUSIVE:
+                return InstrumentationFilter.INSTR_FILTER_INCLUSIVE;
+            case SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT:
+                return InstrumentationFilter.INSTR_FILTER_INCLUSIVE_EXACT;
+            default:
+                throw new IllegalArgumentException("Illegal Simple filter type:"+simpleFiler.getFilterType());
+        }
     }
 }

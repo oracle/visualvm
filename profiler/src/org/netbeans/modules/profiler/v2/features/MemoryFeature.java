@@ -357,7 +357,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                     if (i < selections.length - 1) b.append(", "); // NOI18N
                 }
                 
-                SimpleFilter ff = new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE, b.toString()); // NOI18N
+                SimpleFilter ff = new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT, b.toString()); // NOI18N
                 settings.setSelectedInstrumentationFilter(ff);
                 break;
         }
