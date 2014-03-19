@@ -121,7 +121,7 @@ class HeapHistogramManager {
         try {
             in.close();
         } catch (IOException ex) {
-            System.err.println(CommonConstants.ENGINE_WARNING + getClass() + "cannot close InputStream");
+            System.err.println(CommonConstants.ENGINE_WARNING + getClass() + "cannot close InputStream");	// NOI18N
         }
         return histogram;
     }
@@ -335,7 +335,7 @@ class HeapHistogramManager {
                         name = jvmName;
                 }
                 for (int i = 0; i <= index; i++) {
-                    name += "[]";
+                    name += "[]";           // NOI18N
                 }
             } else if (isPermGen()) {
                 name = (String) permGenNames.get(jvmName);
