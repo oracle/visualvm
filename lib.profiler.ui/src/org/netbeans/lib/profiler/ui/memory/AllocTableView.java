@@ -97,8 +97,8 @@ class AllocTableView extends JPanel {
                         totalObjects += nTotalAllocObjects[i];
                         totalBytes += totalAllocObjectsSize[i];
                     }
-                    renderers[0].setMaxValue(totalObjects);
-                    renderers[1].setMaxValue(totalBytes);
+                    renderers[0].setMaxValue(totalBytes);
+                    renderers[1].setMaxValue(totalObjects);
                     
                     if (selections == null) selections = new HashMap();
                     

@@ -79,6 +79,8 @@ import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterListener;
 import javax.swing.event.TableModelEvent;
@@ -352,25 +354,60 @@ public class ProfilerTable extends JTable {
     
     private boolean shadeUnfocusedSelection = false;
     
+    private boolean internal;
+    private Object selection;
+    private ListSelectionListener selectionListener;
+    
+    public void setSelectionModel(ListSelectionModel newModel) {
+        ListSelectionModel oldModel = getSelectionModel();
+        if (oldModel != null && selectionListener != null)
+            oldModel.removeListSelectionListener(selectionListener);
+        
+        super.setSelectionModel(newModel);
+        
+        if (newModel != null) {
+            if (selectionListener == null) selectionListener = new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent e) { if (!internal) saveSelection(); }
+            };
+            newModel.addListSelectionListener(selectionListener);
+        }
+    }
+    
+    protected void saveSelection() {
+        selection = getSelectedValue(mainColumn);
+    }
+    
+    protected void restoreSelection() {
+        if (selection != null) selection = selectValue(selection, mainColumn, false);
+    }
+    
     public void selectRow(int row, boolean scrollToVisible) {
-        setRowSelectionInterval(row, row);
+        internal = true;
+        try { setRowSelectionInterval(row, row); }
+        finally { internal = false; }
         if (scrollToVisible) scrollRectToVisible(getCellRect(row, getSelectedColumn(), true));
     }
     
     public void selectColumn(int column, boolean scrollToVisible) {
-        setColumnSelectionInterval(column, column);
+        internal = true;
+        try { setColumnSelectionInterval(column, column); }
+        finally { internal = false; }
         if (scrollToVisible) scrollRectToVisible(getCellRect(getSelectedRow(), column, true));
     }
     
-    public void selectValue(Object value, int column, boolean scrollToVisible) {
-        if (value == null) return;
+    public Object selectValue(Object value, int column, boolean scrollToVisible) {
+        if (value == null) return null;
         
         int _column = convertColumnIndexToView(column);
-        for (int row = 0; row < getRowCount(); row++)
-            if (value.equals(getValueAt(row, _column))) {
+        for (int row = 0; row < getRowCount(); row++) {
+            Object _value = getValueAt(row, _column);
+            if (value.equals(_value)) {
                 selectRow(row, scrollToVisible);
-                break;
+                return _value;
             }
+        }
+        
+        return null;
     }
     
     public Object getSelectedValue(int column) {
@@ -381,9 +418,10 @@ public class ProfilerTable extends JTable {
     }
     
     public void tableChanged(TableModelEvent e) {
-        Object selected = getSelectedValue(mainColumn);
-        super.tableChanged(e);
-        if (selected != null) selectValue(selected, mainColumn, false);
+        internal = true;
+        try { super.tableChanged(e); }
+        finally { internal = false; }
+        restoreSelection();
     }
     
     public final void setShadeUnfocusedSelection(boolean shade) {
