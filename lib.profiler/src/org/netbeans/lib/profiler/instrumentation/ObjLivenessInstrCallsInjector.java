@@ -50,6 +50,8 @@ import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.utils.MiscUtils;
+import org.netbeans.lib.profiler.utils.StringUtils;
+import org.netbeans.lib.profiler.utils.VMUtils;
 
 
 /**
@@ -121,14 +123,35 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                             int classCPIdx = getU2(bci + 1);
                             String refClassName = clazz.getRefClassName(classCPIdx);
 
-                            if (!instrFilter.passesFilter(refClassName)) {
-                                continue;
-                            }
                             if (bc == opc_new) {
+                                if (!instrFilter.passesFilter(refClassName)) {
+                                    continue;
+                                }
                                 refClazz = ClassManager.javaClassOrPlaceholderForName(refClassName, loaderId);
                             } else if (bc == opc_anewarray) {
+                                if (!instrFilter.passesFilter(refClassName.concat("[]"))) {    // NOI18N
+                                    continue;
+                                }
                                 refClazz = ClassManager.javaClassForObjectArrayType(refClassName);
                             } else {
+                                int dimension = refClassName.lastIndexOf('[');
+                                String baseClass = refClassName.substring(dimension+1);
+                                String className;
+                                
+                                if (VMUtils.isVMPrimitiveType(baseClass)) {
+                                    className = StringUtils.userFormClassName(refClassName);
+                                } else {
+                                    StringBuilder arrayClass = new StringBuilder(refClassName.length()+dimension+1);
+                                    arrayClass.append(refClassName.substring(dimension+1));
+
+                                    for (int i = 0; i <= dimension; i++) {
+                                        arrayClass.append("[]");        // NOI18N
+                                    }
+                                    className = arrayClass.toString();
+                                }
+                                if (!instrFilter.passesFilter(className)) {
+                                    continue;
+                                }
                                 refClazz = ClassRepository.lookupSpecialClass(refClassName);
                             }
 
@@ -191,8 +214,9 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                             refClazz = ClassManager.javaClassForPrimitiveArrayType(arrayClassId);
 
                             int classId = refClazz.getInstrClassId();
+                            String className = StringUtils.userFormClassName(refClazz.getName());
 
-                            if (!instrFilter.passesFilter(refClazz.getName())) {
+                            if (!instrFilter.passesFilter(className)) {
                                 continue;
                             }
                             if ((allUnprofiledClassStatusArray == null) || !allUnprofiledClassStatusArray[classId]) {
