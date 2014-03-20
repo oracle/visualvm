@@ -49,7 +49,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.ProfilerClient;
@@ -137,11 +139,16 @@ public class CPUTableView extends JPanel {
         tableModel = new CPUTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null);
-        table.setColumnVisibility(1, false);
-        table.setColumnVisibility(3, false);
-        table.setColumnVisibility(5, false);
+        table.setMainColumn(1);
+        table.setFitWidthColumn(1);
+        
+        table.setSortColumn(3);
+        table.setDefaultSortOrder(1, SortOrder.ASCENDING);
+        
+        table.setColumnVisibility(0, false);
+        table.setColumnVisibility(2, false);
+        table.setColumnVisibility(4, false);
         table.setColumnVisibility(6, false);
-        table.setSortColumn(2);
         
         renderers = new HideableBarRenderer[5];
         
@@ -158,19 +165,21 @@ public class CPUTableView extends JPanel {
         renderers[3].setMaxValue(refTime);
         renderers[4].setMaxValue(refTime);
         
-        table.setColumnRenderer(0, new JavaNameRenderer());
-        table.setColumnRenderer(1, renderers[0]);
-        table.setColumnRenderer(2, renderers[1]);
-        table.setColumnRenderer(3, renderers[2]);
-        table.setColumnRenderer(4, renderers[3]);
-        table.setColumnRenderer(5, renderers[4]);
-        table.setColumnRenderer(6, new CheckBoxRenderer());
+        table.setColumnRenderer(0, new CheckBoxRenderer());
+        table.setColumnRenderer(1, new JavaNameRenderer());
+        table.setColumnRenderer(2, renderers[0]);
+        table.setColumnRenderer(3, renderers[1]);
+        table.setColumnRenderer(4, renderers[2]);
+        table.setColumnRenderer(5, renderers[3]);
+        table.setColumnRenderer(6, renderers[4]);
         
-        table.setDefaultColumnWidth(1, renderers[0].getNoBarWidth());
-        table.setDefaultColumnWidth(2, renderers[1].getOptimalWidth());
-        table.setDefaultColumnWidth(3, renderers[2].getNoBarWidth());
-        table.setDefaultColumnWidth(4, renderers[3].getNoBarWidth());
-        table.setDefaultColumnWidth(5, renderers[4].getNoBarWidth());
+        int w = new JLabel(table.getColumnName(0)).getPreferredSize().width;
+        table.setDefaultColumnWidth(0, w + 15);
+        table.setDefaultColumnWidth(2, renderers[0].getNoBarWidth());
+        table.setDefaultColumnWidth(3, renderers[1].getOptimalWidth());
+        table.setDefaultColumnWidth(4, renderers[2].getNoBarWidth());
+        table.setDefaultColumnWidth(5, renderers[3].getNoBarWidth());
+        table.setDefaultColumnWidth(6, renderers[4].getNoBarWidth());
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(table, false, null);
         
@@ -196,30 +205,30 @@ public class CPUTableView extends JPanel {
     private class CPUTableModel extends AbstractTableModel {
         
         public String getColumnName(int columnIndex) {
-            if (columnIndex == 0) {
+            if (columnIndex == 1) {
                 return "Name";
-            } else if (columnIndex == 1) {
-                return "Self Time";
             } else if (columnIndex == 2) {
-                return "Self Time (CPU)";
+                return "Self Time";
             } else if (columnIndex == 3) {
-                return "Total Time";
+                return "Self Time (CPU)";
             } else if (columnIndex == 4) {
-                return "Total Time (CPU)";
+                return "Total Time";
             } else if (columnIndex == 5) {
-                return "Samples";
+                return "Total Time (CPU)";
             } else if (columnIndex == 6) {
+                return "Samples";
+            } else if (columnIndex == 0) {
                 return "Selected";
             }
             return null;
         }
 
         public Class<?> getColumnClass(int columnIndex) {
-            if (columnIndex == 0) {
+            if (columnIndex == 1) {
                 return String.class;
-            } else if (columnIndex == 5) {
-                return Integer.class;
             } else if (columnIndex == 6) {
+                return Integer.class;
+            } else if (columnIndex == 0) {
                 return Boolean.class;
             } else {
                 return Long.class;
@@ -237,19 +246,19 @@ public class CPUTableView extends JPanel {
         public Object getValueAt(int rowIndex, int columnIndex) {
             if (data == null) return null;
             
-            if (columnIndex == 0) {
+            if (columnIndex == 1) {
                 return data.getMethodNameAtRow(rowIndex);
-            } else if (columnIndex == 1) {
-                return data.getTimeInMcs0AtRow(rowIndex);
             } else if (columnIndex == 2) {
-                return data.getTimeInMcs1AtRow(rowIndex);
+                return data.getTimeInMcs0AtRow(rowIndex);
             } else if (columnIndex == 3) {
-                return data.getTotalTimeInMcs0AtRow(rowIndex);
+                return data.getTimeInMcs1AtRow(rowIndex);
             } else if (columnIndex == 4) {
-                return data.getTotalTimeInMcs1AtRow(rowIndex);
+                return data.getTotalTimeInMcs0AtRow(rowIndex);
             } else if (columnIndex == 5) {
-                return data.getNInvocationsAtRow(rowIndex);
+                return data.getTotalTimeInMcs1AtRow(rowIndex);
             } else if (columnIndex == 6) {
+                return data.getNInvocationsAtRow(rowIndex);
+            } else if (columnIndex == 0) {
                 return selections.containsKey(data.getMethodIdAtRow(rowIndex));
             }
 
@@ -257,7 +266,7 @@ public class CPUTableView extends JPanel {
         }
         
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-            if (columnIndex == 6) {
+            if (columnIndex == 0) {
                 int methodId = data.getMethodIdAtRow(rowIndex);
                 if (Boolean.TRUE.equals(aValue)) {
                     selections.put(methodId, selectionForId(methodId));
@@ -268,7 +277,7 @@ public class CPUTableView extends JPanel {
         }
 
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return columnIndex == 6;
+            return columnIndex == 0;
         }
         
     }

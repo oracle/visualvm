@@ -42,7 +42,6 @@
  */
 package org.netbeans.lib.profiler.ui.swing;
 
-import org.netbeans.lib.profiler.ui.swing.renderer.Movable;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -75,6 +74,7 @@ import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -94,6 +94,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.swing.renderer.Movable;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -647,7 +648,7 @@ public class ProfilerTable extends JTable {
         for (final TableColumn c : columns)
             popup.add(new JCheckBoxMenuItem(c.getHeaderValue().toString(), c.getWidth() > 0) {
                 {
-                    setEnabled(c.getModelIndex() != 0);
+                    setEnabled(c.getModelIndex() != mainColumn);
 //                    setToolTipText(cModel.getColumnToolTip(c.getModelIndex()));
                 }
                 protected void fireActionPerformed(ActionEvent e) {
@@ -715,7 +716,6 @@ public class ProfilerTable extends JTable {
     protected TableRowSorter createRowSorter() {
         ProfilerRowSorter s = new ProfilerRowSorter(getModel());
         s.setDefaultSortOrder(SortOrder.DESCENDING);
-        s.setDefaultSortOrder(0, SortOrder.ASCENDING);
         s.setSortColumn(0);
         return s;
     }
@@ -733,6 +733,16 @@ public class ProfilerTable extends JTable {
     
     public void setDefaultSortOrder(int column, SortOrder sortOrder) {
         if (isSortable()) _getRowSorter().setDefaultSortOrder(column, sortOrder);
+    }
+    
+    // --- Row filter ----------------------------------------------------------
+    
+    public void setRowFilter(RowFilter filter) {
+        _getRowSorter().setRowFilter(filter);
+    }
+    
+    public RowFilter getRowFilter() {
+        return _getRowSorter().getRowFilter();
     }
     
     // --- Default action ------------------------------------------------------

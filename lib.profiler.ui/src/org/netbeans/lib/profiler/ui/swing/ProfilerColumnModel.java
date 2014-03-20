@@ -183,8 +183,12 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
     void setDefaultColumnWidth(int column, int width) {
         if (defaultColumnWidths == null) defaultColumnWidths = new HashMap();
         defaultColumnWidths.put(column, width);
-        TableColumn c = getModelColumn(column);
-        if (c != null) c.setWidth(width);
+        if (isColumnVisible(column)) {
+            TableColumn c = getModelColumn(column);
+            if (c != null) c.setWidth(width);
+        } else {
+            hiddenColumnWidths.put(column, width);
+        }
     }
     
     int getDefaultColumnWidth(int column) {

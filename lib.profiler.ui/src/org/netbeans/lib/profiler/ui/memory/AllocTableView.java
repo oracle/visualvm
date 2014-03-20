@@ -46,7 +46,10 @@ package org.netbeans.lib.profiler.ui.memory;
 import java.awt.BorderLayout;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.RowFilter;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.ui.Formatters;
@@ -136,8 +139,20 @@ class AllocTableView extends JPanel {
         tableModel = new MemoryTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null);
-        table.setColumnVisibility(3, false);
-        table.setSortColumn(1);
+        table.setMainColumn(1);
+        table.setFitWidthColumn(1);
+        
+        table.setSortColumn(2);
+        table.setDefaultSortOrder(1, SortOrder.ASCENDING);
+        
+        table.setColumnVisibility(0, false);
+        
+        // Filter out classes with no instances
+        table.setRowFilter(new RowFilter() {
+            public boolean include(RowFilter.Entry entry) {
+                return ((Number)entry.getValue(3)).intValue() > 0;
+            }
+        });
         
         renderers = new HideableBarRenderer[2];
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
@@ -146,13 +161,15 @@ class AllocTableView extends JPanel {
         renderers[0].setMaxValue(123456789);
         renderers[1].setMaxValue(12345678);
         
-        table.setColumnRenderer(0, new JavaNameRenderer());
-        table.setColumnRenderer(1, renderers[0]);
-        table.setColumnRenderer(2, renderers[1]);
-        table.setColumnRenderer(3, new CheckBoxRenderer());
+        table.setColumnRenderer(0, new CheckBoxRenderer());
+        table.setColumnRenderer(1, new JavaNameRenderer());
+        table.setColumnRenderer(2, renderers[0]);
+        table.setColumnRenderer(3, renderers[1]);
         
-        table.setDefaultColumnWidth(1, renderers[0].getOptimalWidth());
-        table.setDefaultColumnWidth(2, renderers[1].getNoBarWidth());
+        int w = new JLabel(table.getColumnName(0)).getPreferredSize().width;
+        table.setDefaultColumnWidth(0, w + 15);
+        table.setDefaultColumnWidth(2, renderers[0].getOptimalWidth());
+        table.setDefaultColumnWidth(3, renderers[1].getNoBarWidth());
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(table, false, null);
         
@@ -164,26 +181,26 @@ class AllocTableView extends JPanel {
     private class MemoryTableModel extends AbstractTableModel {
         
         public String getColumnName(int columnIndex) {
-            if (columnIndex == 0) {
+            if (columnIndex == 1) {
                 return "Name";
-            } else if (columnIndex == 1) {
-                return "Allocated Bytes";
             } else if (columnIndex == 2) {
-                return "Allocated Objects";
+                return "Allocated Bytes";
             } else if (columnIndex == 3) {
+                return "Allocated Objects";
+            } else if (columnIndex == 0) {
                 return "Selected";
             }
             return null;
         }
 
         public Class<?> getColumnClass(int columnIndex) {
-            if (columnIndex == 0) {
+            if (columnIndex == 1) {
                 return String.class;
-            } else if (columnIndex == 1) {
-                return Long.class;
             } else if (columnIndex == 2) {
-                return Integer.class;
+                return Long.class;
             } else if (columnIndex == 3) {
+                return Integer.class;
+            } else if (columnIndex == 0) {
                 return Boolean.class;
             }
             return null;
@@ -200,13 +217,13 @@ class AllocTableView extends JPanel {
         public Object getValueAt(int rowIndex, int columnIndex) {
             if (nTrackedItems == 0) return null;
             
-            if (columnIndex == 0) {
+            if (columnIndex == 1) {
                 return classNames[rowIndex];
-            } else if (columnIndex == 1) {
-                return totalAllocObjectsSize[rowIndex];
             } else if (columnIndex == 2) {
-                return nTotalAllocObjects[rowIndex];
+                return totalAllocObjectsSize[rowIndex];
             } else if (columnIndex == 3) {
+                return nTotalAllocObjects[rowIndex];
+            } else if (columnIndex == 0) {
                 return selections.containsKey(rowIndex);
             }
 
@@ -214,14 +231,14 @@ class AllocTableView extends JPanel {
         }
 
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-            if (columnIndex == 3) {
+            if (columnIndex == 0) {
                 if (Boolean.FALSE.equals(aValue)) selections.remove(rowIndex);
-                else selections.put(rowIndex, getValueAt(rowIndex, 0).toString());
+                else selections.put(rowIndex, getValueAt(rowIndex, 1).toString());
             }
         }
 
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return columnIndex == 3;
+            return columnIndex == 0;
         }
         
     }

@@ -47,7 +47,9 @@ import java.awt.BorderLayout;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.results.memory.HeapHistogram;
@@ -121,8 +123,13 @@ class SampledTableView extends JPanel {
         tableModel = new MemoryTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null);
-        table.setColumnVisibility(3, false);
-        table.setSortColumn(1);
+        table.setMainColumn(1);
+        table.setFitWidthColumn(1);
+        
+        table.setSortColumn(2);
+        table.setDefaultSortOrder(1, SortOrder.ASCENDING);
+        
+        table.setColumnVisibility(0, false);
         
         renderers = new HideableBarRenderer[2];
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
@@ -131,13 +138,15 @@ class SampledTableView extends JPanel {
         renderers[0].setMaxValue(123456789);
         renderers[1].setMaxValue(12345678);
         
-        table.setColumnRenderer(0, new JavaNameRenderer());
-        table.setColumnRenderer(1, renderers[0]);
-        table.setColumnRenderer(2, renderers[1]);
-        table.setColumnRenderer(3, new CheckBoxRenderer());
+        table.setColumnRenderer(0, new CheckBoxRenderer());
+        table.setColumnRenderer(1, new JavaNameRenderer());
+        table.setColumnRenderer(2, renderers[0]);
+        table.setColumnRenderer(3, renderers[1]);
         
-        table.setDefaultColumnWidth(1, renderers[0].getOptimalWidth());
-        table.setDefaultColumnWidth(2, renderers[1].getNoBarWidth());
+        int w = new JLabel(table.getColumnName(0)).getPreferredSize().width;
+        table.setDefaultColumnWidth(0, w + 15);
+        table.setDefaultColumnWidth(2, renderers[0].getOptimalWidth());
+        table.setDefaultColumnWidth(3, renderers[1].getNoBarWidth());
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(table, false, null);
         
@@ -149,22 +158,22 @@ class SampledTableView extends JPanel {
     private class MemoryTableModel extends AbstractTableModel {
         
         public String getColumnName(int columnIndex) {
-            if (columnIndex == 0) {
+            if (columnIndex == 1) {
                 return "Name";
-            } else if (columnIndex == 1) {
-                return "Live Bytes";
             } else if (columnIndex == 2) {
-                return "Live Objects";
+                return "Live Bytes";
             } else if (columnIndex == 3) {
+                return "Live Objects";
+            } else if (columnIndex == 0) {
                 return "Selected";
             }
             return null;
         }
 
         public Class<?> getColumnClass(int columnIndex) {
-            if (columnIndex == 0) {
+            if (columnIndex == 1) {
                 return String.class;
-            } else if (columnIndex == 3) {
+            } else if (columnIndex == 0) {
                 return Boolean.class;
             } else {
                 return Long.class;
@@ -182,13 +191,13 @@ class SampledTableView extends JPanel {
         public Object getValueAt(int rowIndex, int columnIndex) {
             if (data == null) return null;
             
-            if (columnIndex == 0) {
+            if (columnIndex == 1) {
                 return data[rowIndex].getName();
-            } else if (columnIndex == 1) {
-                return data[rowIndex].getBytes();
             } else if (columnIndex == 2) {
-                return data[rowIndex].getInstancesCount();
+                return data[rowIndex].getBytes();
             } else if (columnIndex == 3) {
+                return data[rowIndex].getInstancesCount();
+            } else if (columnIndex == 0) {
                 return selections.containsKey(data[rowIndex]);
             }
 
@@ -196,7 +205,7 @@ class SampledTableView extends JPanel {
         }
 
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-            if (columnIndex == 3) {
+            if (columnIndex == 0) {
                 HeapHistogram.ClassInfo classInfo = data[rowIndex];
                 if (Boolean.FALSE.equals(aValue)) selections.remove(classInfo);
                 else selections.put(classInfo, classInfo.getName());
@@ -204,7 +213,7 @@ class SampledTableView extends JPanel {
         }
 
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return columnIndex == 3;
+            return columnIndex == 0;
         }
         
     }
