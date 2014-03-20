@@ -146,7 +146,7 @@ class SampledTableView extends JPanel {
         int w = new JLabel(table.getColumnName(0)).getPreferredSize().width;
         table.setDefaultColumnWidth(0, w + 15);
         table.setDefaultColumnWidth(2, renderers[0].getOptimalWidth());
-        table.setDefaultColumnWidth(3, renderers[1].getNoBarWidth());
+        table.setDefaultColumnWidth(3, renderers[1].getMaxNoBarWidth());
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(table, false, null);
         
@@ -209,6 +209,7 @@ class SampledTableView extends JPanel {
                 HeapHistogram.ClassInfo classInfo = data[rowIndex];
                 if (Boolean.FALSE.equals(aValue)) selections.remove(classInfo);
                 else selections.put(classInfo, classInfo.getName());
+                tableModel.fireTableDataChanged();
             }
         }
 

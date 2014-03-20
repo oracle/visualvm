@@ -119,6 +119,8 @@ class AllocTableView extends JPanel {
                 nTotalAllocObjects = null;
                 totalAllocObjectsSize = null;
                 selections = null;
+                
+                tableModel.fireTableDataChanged();
             }
         });
     }
@@ -169,7 +171,7 @@ class AllocTableView extends JPanel {
         int w = new JLabel(table.getColumnName(0)).getPreferredSize().width;
         table.setDefaultColumnWidth(0, w + 15);
         table.setDefaultColumnWidth(2, renderers[0].getOptimalWidth());
-        table.setDefaultColumnWidth(3, renderers[1].getNoBarWidth());
+        table.setDefaultColumnWidth(3, renderers[1].getMaxNoBarWidth());
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(table, false, null);
         
@@ -234,6 +236,7 @@ class AllocTableView extends JPanel {
             if (columnIndex == 0) {
                 if (Boolean.FALSE.equals(aValue)) selections.remove(rowIndex);
                 else selections.put(rowIndex, getValueAt(rowIndex, 1).toString());
+                tableModel.fireTableDataChanged();
             }
         }
 

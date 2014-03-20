@@ -175,11 +175,12 @@ public class CPUTableView extends JPanel {
         
         int w = new JLabel(table.getColumnName(0)).getPreferredSize().width;
         table.setDefaultColumnWidth(0, w + 15);
-        table.setDefaultColumnWidth(2, renderers[0].getNoBarWidth());
+        table.setDefaultColumnWidth(2, renderers[0].getMaxNoBarWidth());
         table.setDefaultColumnWidth(3, renderers[1].getOptimalWidth());
-        table.setDefaultColumnWidth(4, renderers[2].getNoBarWidth());
-        table.setDefaultColumnWidth(5, renderers[3].getNoBarWidth());
-        table.setDefaultColumnWidth(6, renderers[4].getNoBarWidth());
+        table.setDefaultColumnWidth(4, renderers[2].getMaxNoBarWidth());
+        table.setDefaultColumnWidth(5, renderers[3].getMaxNoBarWidth());
+        w = new JLabel(table.getColumnName(6)).getPreferredSize().width;
+        table.setDefaultColumnWidth(6, Math.max(renderers[4].getNoBarWidth(), w + 15));
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(table, false, null);
         
@@ -273,6 +274,7 @@ public class CPUTableView extends JPanel {
                 } else {
                     selections.remove(methodId);
                 }
+                tableModel.fireTableDataChanged();
             }
         }
 

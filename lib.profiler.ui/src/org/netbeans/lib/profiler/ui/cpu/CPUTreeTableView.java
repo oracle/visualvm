@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.ui.cpu;
 
 import java.awt.BorderLayout;
+import java.awt.Graphics;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -158,7 +159,23 @@ public class CPUTreeTableView extends JPanel {
         renderers[1].setMaxValue(refTime);
         renderers[2].setMaxValue(refTime);
         
-        treeTable.setColumnRenderer(0, new CheckBoxRenderer());
+        treeTable.setColumnRenderer(0, new CheckBoxRenderer() {
+            private boolean visible;
+            public void setValue(Object value, int row) {
+                super.setValue(value, row);
+                TreePath path = treeTable.getPathForRow(row);
+                PrestimeCPUCCTNode cpuNode = (PrestimeCPUCCTNode)path.getLastPathComponent();
+                visible = !cpuNode.isThreadNode() && !cpuNode.isFilteredNode();
+            }
+            public void paint(Graphics g) {
+                if (visible) {
+                    super.paint(g);
+                } else {
+                    g.setColor(getBackground());
+                    g.fillRect(0, 0, size.width, size.height);
+                }
+            }
+        });
         treeTable.setTreeCellRenderer(new CPUJavaNameRenderer());
         treeTable.setColumnRenderer(2, renderers[0]);
         treeTable.setColumnRenderer(3, renderers[1]);
@@ -167,8 +184,9 @@ public class CPUTreeTableView extends JPanel {
         int w = new JLabel(treeTable.getColumnName(0)).getPreferredSize().width;
         treeTable.setDefaultColumnWidth(0, w + 15);
         treeTable.setDefaultColumnWidth(2, renderers[0].getOptimalWidth());
-        treeTable.setDefaultColumnWidth(3, renderers[1].getNoBarWidth());
-        treeTable.setDefaultColumnWidth(4, renderers[2].getNoBarWidth());
+        treeTable.setDefaultColumnWidth(3, renderers[1].getMaxNoBarWidth());
+        w = new JLabel(treeTable.getColumnName(4)).getPreferredSize().width;
+        treeTable.setDefaultColumnWidth(4, Math.max(renderers[2].getNoBarWidth(), w + 15));
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(treeTable, false, null);
         
@@ -262,12 +280,14 @@ public class CPUTreeTableView extends JPanel {
                 } else {
                     selections.remove(methodId);
                 }
-                treeTable.repaint(); // Should invoke fireTableDataChanged()
+                treeTableModel.dataChanged();
             }
         }
 
         public boolean isCellEditable(TreeNode node, int columnIndex) {
-            return columnIndex == 0;
+            if (columnIndex != 0) return false;
+            PrestimeCPUCCTNode cpuNode = (PrestimeCPUCCTNode)node;
+            return !cpuNode.isThreadNode() && !cpuNode.isFilteredNode();
         }
         
     }

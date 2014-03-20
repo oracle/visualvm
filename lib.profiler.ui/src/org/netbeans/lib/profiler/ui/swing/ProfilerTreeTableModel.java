@@ -83,6 +83,10 @@ public interface ProfilerTreeTableModel {
             this.root = root;
         }
         
+        public void dataChanged() {
+            fireDataChanged();
+        }
+        
         public void setRoot(TreeNode newRoot) {
             TreeNode oldRoot = root;
             root = newRoot;
@@ -105,6 +109,12 @@ public interface ProfilerTreeTableModel {
             }
         }
         
+        protected void fireDataChanged() {
+            if (listeners != null)
+                for (Listener listener : listeners)
+                    listener.dataChanged();
+        }
+        
         protected void fireStructureChanged() {
             if (listeners != null)
                 for (Listener listener : listeners)
@@ -122,6 +132,8 @@ public interface ProfilerTreeTableModel {
     
     public static interface Listener {
         
+        public void dataChanged();
+        
         public void structureChanged();
         
         public void rootChanged(TreeNode oldRoot, TreeNode newRoot);
@@ -129,6 +141,8 @@ public interface ProfilerTreeTableModel {
     }
     
     public static class Adapter implements Listener {
+        
+        public void dataChanged() {}
         
         public void structureChanged() {}
         

@@ -139,6 +139,8 @@ class LivenessTableView extends JPanel {
                 avgObjectAge = null;
                 maxSurvGen = null;
                 nTotalAllocObjects = null;
+                
+                tableModel.fireTableDataChanged();
             }
         });
     }
@@ -199,9 +201,9 @@ class LivenessTableView extends JPanel {
         int w = new JLabel(table.getColumnName(0)).getPreferredSize().width;
         table.setDefaultColumnWidth(0, w + 15);
         table.setDefaultColumnWidth(2, renderers[0].getOptimalWidth());
-        table.setDefaultColumnWidth(3, renderers[1].getNoBarWidth());
-        table.setDefaultColumnWidth(4, renderers[2].getNoBarWidth());
-        table.setDefaultColumnWidth(5, renderers[3].getNoBarWidth());
+        table.setDefaultColumnWidth(3, renderers[1].getMaxNoBarWidth());
+        table.setDefaultColumnWidth(4, renderers[2].getMaxNoBarWidth());
+        table.setDefaultColumnWidth(5, renderers[3].getMaxNoBarWidth());
         table.setDefaultColumnWidth(6, renderers[3].getNoBarWidth() - 25);
         table.setDefaultColumnWidth(7, renderers[3].getNoBarWidth() - 25);
         
@@ -292,6 +294,7 @@ class LivenessTableView extends JPanel {
             if (columnIndex == 0) {
                 if (Boolean.FALSE.equals(aValue)) selections.remove(rowIndex);
                 else selections.put(rowIndex, getValueAt(rowIndex, 1).toString());
+                tableModel.fireTableDataChanged();
             }
         }
 

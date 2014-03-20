@@ -300,6 +300,9 @@ public class ProfilerTreeTable extends ProfilerTable {
             treeModel = treeModelImpl(model.getRoot(), null);
             
             model.addListener(new ProfilerTreeTableModel.Adapter() {
+                public void dataChanged() {
+                    fireTableDataChanged();
+                }
                 public void rootChanged(TreeNode oldRoot, TreeNode newRoot) {
                     // NOTE: would be cleaner to change root of existing model,
                     //       wasn't able to easily resolve all related problems.
