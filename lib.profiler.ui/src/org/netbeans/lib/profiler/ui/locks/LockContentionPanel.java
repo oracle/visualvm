@@ -138,6 +138,8 @@ public class LockContentionPanel extends ResultsPanel {
     private static final String MODE_MONITORS = messages.getString("LockContentionPanel_ModeMonitors"); // NOI18N
     // -----
     
+    public static enum Aggregation { BY_THREADS, BY_MONITORS }
+    
     private final ProfilerToolbar toolbar;
     
 //    private final LocksTreeTableModel realTreeTableModel;
@@ -159,6 +161,8 @@ public class LockContentionPanel extends ResultsPanel {
     private EnhancedTreeCellRenderer treeCellRenderer = new LockContentionTreeCellRenderer();
     private String[] columnToolTips;
     private int[] columnWidths;
+    
+    private Aggregation aggregation = Aggregation.BY_THREADS;
     
     private boolean lockContentionEnabled;
     private final JPanel contentPanel;
@@ -235,10 +239,10 @@ public class LockContentionPanel extends ResultsPanel {
         LockContentionRenderer lcRenderer = new LockContentionRenderer();
         treeTable.setTreeCellRenderer(lcRenderer);
         
-        BarRenderer barRenderer = new BarRenderer();
-        treeTable.setDefaultColumnWidth(1, 100);
-        treeTable.setColumnRenderer(1, barRenderer);
-        treeTable.setColumnVisibility(1, false);
+//        BarRenderer barRenderer = new BarRenderer();
+//        treeTable.setDefaultColumnWidth(1, 100);
+//        treeTable.setColumnRenderer(1, barRenderer);
+//        treeTable.setColumnVisibility(1, false);
         
         Number refTime = new Long(123456);
         
@@ -258,15 +262,14 @@ public class LockContentionPanel extends ResultsPanel {
 //        npr.setValue(refTime, -1);
         hbrTime = new HideableBarRenderer(npr);
         hbrTime.setMaxValue(refTime.longValue());
-        treeTable.setColumnRenderer(2, hbrTime);
-        treeTable.setDefaultColumnWidth(2, hbrTime.getOptimalWidth());
+        treeTable.setColumnRenderer(1, hbrTime);
+        treeTable.setDefaultColumnWidth(1, hbrTime.getOptimalWidth());
         
         hbrWaits = new HideableBarRenderer(new NumberRenderer());
         hbrWaits.setMaxValue(1234567);
 //        treeTable.setDefaultColumnWidth(3, hbrWaits.getOptimalWidth());
-        treeTable.setColumnRenderer(3, hbrWaits);
-        int waitsWidth = (hbrWaits.getNoBarWidth() + hbrWaits.getMaxNoBarWidth()) / 2;
-        treeTable.setDefaultColumnWidth(3, hbrWaits.getMaxNoBarWidth());
+        treeTable.setColumnRenderer(2, hbrWaits);
+        treeTable.setDefaultColumnWidth(2, hbrWaits.getMaxNoBarWidth());
         
 //        NumberRenderer numberRenderer = new NumberRenderer();
 //        numberRenderer.setValue(refTime, -1);
@@ -331,6 +334,17 @@ public class LockContentionPanel extends ResultsPanel {
         setDefaultSorting();
         prepareResults(); // Disables combo
     }
+    
+    
+    public void setAggregation(Aggregation aggregation) {
+        this.aggregation = aggregation;
+        prepareResults();
+    }
+    
+    public Aggregation getAggregation() {
+        return aggregation;
+    }
+    
     
     private class Listener implements LockCCTProvider.Listener {
 
@@ -575,15 +589,16 @@ public class LockContentionPanel extends ResultsPanel {
     public void prepareResults() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                modeCombo.setEnabled(root != null);
                 if (root == null) return;
                 
-                String mode = modeCombo.getSelectedItem().toString();
                 LockCCTNode newRoot = null;
-                if (MODE_THREADS.equals(mode)) {
-                    newRoot = root.getThreads();
-                } else if (MODE_MONITORS.equals(mode)) {
-                    newRoot = root.getMonitors();
+                switch (aggregation) {
+                    case BY_THREADS:
+                        newRoot = root.getThreads();
+                        break;
+                    case BY_MONITORS:
+                        newRoot = root.getMonitors();
+                        break;
                 }
                 
 //                newRoot.sortChildren(getSortBy(sortingColumn), sortingOrder);
@@ -655,7 +670,7 @@ public class LockContentionPanel extends ResultsPanel {
     }
     
     private void initColumnsData() {
-        columnCount = 4;
+        columnCount = 3;
         
         columnWidths = new int[columnCount - 1]; // Width of the first column fits to width
         columnNames = new String[columnCount];
@@ -665,27 +680,27 @@ public class LockContentionPanel extends ResultsPanel {
         columnNames[0] = LOCKS_THREADS_COLUMN_NAME;
         columnToolTips[0] = LOCKS_THREADS_COLUMN_TOOLTIP;
 
-        columnNames[1] = TIME_COLUMN_NAME;
-        columnToolTips[1] = TIME_COLUMN_TOOLTIP;
+//        columnNames[1] = TIME_COLUMN_NAME;
+//        columnToolTips[1] = TIME_COLUMN_TOOLTIP;
         
-        columnNames[2] = TIME_REL_COLUMN_NAME;
-        columnToolTips[2] = TIME_REL_COLUMN_TOOLTIP;
+        columnNames[1] = TIME_REL_COLUMN_NAME;
+        columnToolTips[1] = TIME_REL_COLUMN_TOOLTIP;
         
-        columnNames[3] = WAITS_COLUMN_NAME;
-        columnToolTips[3] = WAITS_COLUMN_TOOLTIP;
+        columnNames[2] = WAITS_COLUMN_NAME;
+        columnToolTips[2] = WAITS_COLUMN_TOOLTIP;
 
         int maxWidth = getFontMetrics(getFont()).charWidth('W') * 12; // NOI18N // initial width of data columns
 
         columnRenderers[0] = null;
 
-        columnWidths[1 - 1] = maxWidth;
-        columnRenderers[1] = new CustomBarCellRenderer(0, 100);
+//        columnWidths[1 - 1] = maxWidth;
+//        columnRenderers[1] = new CustomBarCellRenderer(0, 100);
         
-        columnWidths[2 - 1] = maxWidth;
-        columnRenderers[2] = new LabelBracketTableCellRenderer(JLabel.TRAILING);
+        columnWidths[1 - 1] = maxWidth;
+        columnRenderers[1] = new LabelBracketTableCellRenderer(JLabel.TRAILING);
 
-        columnWidths[3 - 1] = maxWidth;
-        columnRenderers[3] = new LabelTableCellRenderer(JLabel.TRAILING);
+        columnWidths[2 - 1] = maxWidth;
+        columnRenderers[2] = new LabelTableCellRenderer(JLabel.TRAILING);
     }
     
     private void setColumnsData() {
@@ -792,10 +807,8 @@ public class LockContentionPanel extends ResultsPanel {
             if (column == 0) {
                 return JTree.class;
             } else if (column == 1) {
-                return Double.class;
-            } else if (column == 2) {
                 return Long.class;
-            } else if (column == 3) {
+            } else if (column == 2) {
                 return Long.class;
             }
             return null;
@@ -828,13 +841,11 @@ public class LockContentionPanel extends ResultsPanel {
                 case 0:
                     return lnode;
                 case 1:
-                    return lnode.getTimeInPerCent();
-                case 2:
                     return lnode.getTime();
 //                    return lnode;
 //                    return getTimeInMillis(lnode) + " ms (" // NOI18N
 //                    + percentFormat.format(lnode.getTimeInPerCent() / 100) + ")"; // NOI18N
-                case 3:
+                case 2:
                     return lnode.getWaits();
                     
                 default:

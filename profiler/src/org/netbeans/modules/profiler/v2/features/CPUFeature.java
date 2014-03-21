@@ -47,6 +47,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -58,25 +59,27 @@ import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
-import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.CPUView;
+import org.netbeans.modules.profiler.actions.ResetResultsAction;
+import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.v2.session.ProjectSession;
+import org.netbeans.modules.profiler.v2.ui.components.GrayLabel;
 import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
 import org.netbeans.modules.profiler.v2.ui.components.SmallButton;
 import org.netbeans.modules.profiler.v2.ui.components.TitledMenuSeparator;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -101,8 +104,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
     private static enum Mode { SAMPLED_ALL, SAMPLED_PROJECT, INSTR_CLASS, INSTR_METHOD, INSTR_SELECTED }
     
     private JLabel lrLabel;
-    private JButton lrPauseButton;
-    private JToggleButton lrRefreshButton;
+    private JToggleButton lrPauseButton;
+    private JButton lrRefreshButton;
     private PopupButton lrView;
     
     private JLabel pdLabel;
@@ -121,8 +124,6 @@ final class CPUFeature extends ProfilerFeature.Basic {
     
     private Mode mode = Mode.SAMPLED_ALL;
     private PopupButton modeButton;
-    
-    private Lookup.Provider project;
     
     
     CPUFeature() {
@@ -251,31 +252,42 @@ final class CPUFeature extends ProfilerFeature.Basic {
     
     public ProfilerToolbar getToolbar() {
         if (toolbar == null) {
-            lrLabel = new JLabel(Bundle.CPUFeature_lrLabel());
-            lrLabel.setForeground(UIUtils.getDisabledLineColor());
+            lrLabel = new GrayLabel(Bundle.CPUFeature_lrLabel());
             
-            lrPauseButton = new JButton(Icons.getIcon(GeneralIcons.PAUSE));
+            lrPauseButton = new JToggleButton(Icons.getIcon(GeneralIcons.PAUSE)) {
+                protected void fireItemStateChanged(ItemEvent event) {
+                    if (!isSelected()) refreshResults();
+                    else skipRefresh = true;
+                    refreshToolbar();
+                }
+            };
             lrPauseButton.setEnabled(false);
             
-            lrRefreshButton = new JToggleButton(Icons.getIcon(GeneralIcons.UPDATE_NOW));
-            lrRefreshButton.setEnabled(false);
+            lrRefreshButton = new JButton(Icons.getIcon(GeneralIcons.UPDATE_NOW)) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    refreshResults();
+                }
+            };
             
             lrView = new PopupButton(Bundle.CPUFeature_viewHotSpots()) {
                 protected void populatePopup(JPopupMenu popup) { populateViews(popup); }
             };
-//            lrView.setEnabled(false);
             
-            pdLabel = new JLabel(Bundle.CPUFeature_pdLabel());
-            pdLabel.setForeground(UIUtils.getDisabledLineColor());
+            pdLabel = new GrayLabel(Bundle.CPUFeature_pdLabel());
             
-            pdSnapshotButton = new JButton(Bundle.CPUFeature_snapshot(), Icons.getIcon(ProfilerIcons.SNAPSHOT_TAKE));
-            pdSnapshotButton.setEnabled(false);
+            pdSnapshotButton = new JButton(TakeSnapshotAction.getInstance());
+            pdSnapshotButton.setHideActionText(true);
+            pdSnapshotButton.setText(Bundle.CPUFeature_snapshot());
             
-            pdResetResultsButton = new JButton(Icons.getIcon(ProfilerIcons.RESET_RESULTS));
-            pdResetResultsButton.setEnabled(false);
+            pdResetResultsButton = new JButton(ResetResultsAction.getInstance()) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    cpuView.resetData();
+                    super.fireActionPerformed(e);
+                }
+            };
+            pdResetResultsButton.setHideActionText(true);
             
-            apLabel = new JLabel(Bundle.CPUFeature_apLabel());
-            apLabel.setForeground(UIUtils.getDisabledLineColor());
+            apLabel = new GrayLabel(Bundle.CPUFeature_apLabel());
             
             apThreadDumpButton = new JButton(Bundle.CPUFeature_threadDump(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
             apThreadDumpButton.setEnabled(false);
@@ -309,14 +321,15 @@ final class CPUFeature extends ProfilerFeature.Basic {
             toolbar.addSpace(2);
             toolbar.add(apThreadDumpButton);
             
-//            setView(View.HOT_SPOTS);
+            refreshToolbar();
         }
         
         return toolbar;
     }
     
     public ProfilingSettings getSettings() {
-        if (project == null) return null;
+        ProjectSession session = getSession();
+        if (session == null) return null;
         
         ProfilingSettings settings = null;
         
@@ -328,7 +341,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
             case SAMPLED_PROJECT:
                 settings = ProfilingSettingsPresets.createCPUPreset();
                 
-                ProjectContentsSupport pcs = ProjectContentsSupport.get(project);
+                ProjectContentsSupport pcs = ProjectContentsSupport.get(session.getProject());
                 String filter = pcs.getInstrumentationFilter(false);
                 SimpleFilter f = new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE, filter); // NOI18N
                 settings.setSelectedInstrumentationFilter(f);
@@ -380,6 +393,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 lrView.setText(Bundle.CPUFeature_viewCombined());
                 break;
         }
+        
+        refreshResults();
     }
     
     private View getView() {
@@ -392,15 +407,39 @@ final class CPUFeature extends ProfilerFeature.Basic {
         setView(View.HOT_SPOTS);
     }
     
+    private void refreshToolbar() {
+        ProjectSession session = getSession();
+        refreshToolbar(session == null ? null : session.getState());
+    }
+    
+    private void refreshToolbar(final ProjectSession.State state) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                boolean running = state == ProjectSession.State.RUNNING;
+                lrPauseButton.setEnabled(running);
+                lrRefreshButton.setEnabled(running && lrPauseButton.isSelected());
+                
+                boolean inactive = state == ProjectSession.State.INACTIVE;
+                lrLabel.setEnabled(!inactive);
+                pdLabel.setEnabled(!inactive);
+                apLabel.setEnabled(!inactive);
+            }
+        });
+    }
+    
     public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
         if (newState == null || newState == ProjectSession.State.INACTIVE) {
             stopResults();
         } else if (newState == ProjectSession.State.RUNNING) {
             startResults();
         }
+        refreshToolbar(newState);
     }
     
     private RequestProcessor processor;
+    private Runnable refresher;
+    private boolean forceRefresh;
+    private boolean skipRefresh;
     
     private void startResults() {
         if (processor != null) return;
@@ -409,13 +448,14 @@ final class CPUFeature extends ProfilerFeature.Basic {
         
         processor = new RequestProcessor("CPU Data Refresher"); // NOI18N
         
-        Runnable refresher = new Runnable() {
+        refresher = new Runnable() {
             public void run() {
                 if (cpuView != null) {
                     ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                         public void run() {
                             try {
-                                cpuView.refreshData();
+                                if (skipRefresh) skipRefresh = false;
+                                else cpuView.refreshData();
                             } catch (ClientUtils.TargetAppOrVMTerminated ex) {
                                 stopResults();
                             }
@@ -423,28 +463,45 @@ final class CPUFeature extends ProfilerFeature.Basic {
                     });
                 }
                 
-                if (processor != null && !processor.isShutdown()) processor.post(this, 1500);
+                refreshResults(1500);
             }
         };
         
-        processor.post(refresher);
+        refreshResults();
+    }
+    
+    private void refreshResults() {
+        skipRefresh = false;
+        forceRefresh = true;
+        refreshResults(0);
+    }
+    
+    private void refreshResults(int delay) {
+        // TODO: needs synchronization!
+        if (processor != null && !processor.isShutdown()) {
+            if (forceRefresh || lrPauseButton == null || !lrPauseButton.isSelected()) {
+                processor.post(refresher, delay);
+                forceRefresh = false;
+            }
+        }
     }
     
     private void stopResults() {
-        if (processor != null) processor.shutdownNow();
-        processor = null;
+        if (processor != null) {
+            processor.shutdownNow();
+            processor = null;
+            refresher = null;
+        }
     }
     
-    public void attachedToSession(ProjectSession session) {
-        super.attachedToSession(session);
-        project = session.getProject();
-//        if (cpuView != null) tableView.resetData();
-    }
-    
-    public void detachedFromSession(ProjectSession session) {
-        super.detachedFromSession(session);
-        project = null;
-//        if (cpuView != null) tableView.resetData();
-    }
+//    public void attachedToSession(ProjectSession session) {
+//        super.attachedToSession(session);
+////        if (cpuView != null) tableView.resetData();
+//    }
+//    
+//    public void detachedFromSession(ProjectSession session) {
+//        super.detachedFromSession(session);
+////        if (cpuView != null) tableView.resetData();
+//    }
     
 }

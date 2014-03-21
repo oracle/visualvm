@@ -43,23 +43,23 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
-import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.v2.session.ProjectSession;
+import org.netbeans.modules.profiler.v2.ui.components.GrayLabel;
 import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
 import org.openide.util.NbBundle;
 
@@ -81,22 +81,18 @@ import org.openide.util.NbBundle;
 })
 final class ThreadsFeature extends ProfilerFeature.Basic {
     
-    private static enum Filter { ALL, LIVE, FINISHED }
-    
     private JLabel shLabel;
     private PopupButton shFilter;
     
     private JLabel tlLabel;
-    private JButton tlZoomInButton;
-    private JButton tlZoomOutButton;
-    private JToggleButton tlFitWidthButton;
+    private Component tlZoomInButton;
+    private Component tlZoomOutButton;
+    private Component tlFitWidthButton;
     
     private JLabel apLabel;
     private JButton apThreadDumpButton;
     
     private ProfilerToolbar toolbar;
-    
-    private Filter filter;
     
     private ThreadsPanel threadsPanel;
     
@@ -113,28 +109,22 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
     
     public ProfilerToolbar getToolbar() {
         if (toolbar == null) {
-            shLabel = new JLabel(Bundle.ThreadsFeature_show());
-            shLabel.setForeground(UIUtils.getDisabledLineColor());
+            getResultsUI(); // threadsPanel must be ready for toolbar actions
+            
+            shLabel = new GrayLabel(Bundle.ThreadsFeature_show());
             
             shFilter = new PopupButton() {
                 protected void populatePopup(JPopupMenu popup) { populateFilters(popup); }
             };
-            shFilter.setEnabled(false);
             
-            tlLabel = new JLabel(Bundle.ThreadsFeature_timeline());
-            tlLabel.setForeground(UIUtils.getDisabledLineColor());
+            tlLabel = new GrayLabel(Bundle.ThreadsFeature_timeline());
             
-            tlZoomInButton = new JButton(Icons.getIcon(GeneralIcons.ZOOM_IN));
-            tlZoomInButton.setEnabled(false);
             
-            tlZoomOutButton = new JButton(Icons.getIcon(GeneralIcons.ZOOM_OUT));
-            tlZoomOutButton.setEnabled(false);
+            tlZoomInButton = threadsPanel.getZoomIn();
+            tlZoomOutButton = threadsPanel.getZoomOut();
+            tlFitWidthButton = threadsPanel.getFitWidth();
             
-            tlFitWidthButton = new JToggleButton(Icons.getIcon(GeneralIcons.SCALE_TO_FIT));
-            tlFitWidthButton.setEnabled(false);
-            
-            apLabel = new JLabel(Bundle.ThreadsFeature_application());
-            apLabel.setForeground(UIUtils.getDisabledLineColor());
+            apLabel = new GrayLabel(Bundle.ThreadsFeature_application());
             
             apThreadDumpButton = new JButton(Bundle.ThreadsFeature_threadDump(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
             apThreadDumpButton.setEnabled(false);
@@ -167,7 +157,7 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
             toolbar.addSpace(2);
             toolbar.add(apThreadDumpButton);
             
-            setFilter(Filter.ALL);
+            setFilter(ThreadsPanel.Filter.ALL);
         }
         
         return toolbar;
@@ -181,23 +171,23 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
     }
     
     private void populateFilters(JPopupMenu popup) {
-        popup.add(new JRadioButtonMenuItem(Bundle.ThreadsFeature_filterAll(), getFilter() == Filter.ALL) {
-            protected void fireActionPerformed(ActionEvent e) { setFilter(Filter.ALL); }
+        ThreadsPanel.Filter f = threadsPanel.getFilter();
+        
+        popup.add(new JRadioButtonMenuItem(Bundle.ThreadsFeature_filterAll(), f == ThreadsPanel.Filter.ALL) {
+            protected void fireActionPerformed(ActionEvent e) { setFilter(ThreadsPanel.Filter.ALL); }
         });
         
-        popup.add(new JRadioButtonMenuItem(Bundle.ThreadsFeature_filterLive(), getFilter() == Filter.LIVE) {
-            protected void fireActionPerformed(ActionEvent e) { setFilter(Filter.LIVE); }
+        popup.add(new JRadioButtonMenuItem(Bundle.ThreadsFeature_filterLive(), f == ThreadsPanel.Filter.LIVE) {
+            protected void fireActionPerformed(ActionEvent e) { setFilter(ThreadsPanel.Filter.LIVE); }
         });
         
-        popup.add(new JRadioButtonMenuItem(Bundle.ThreadsFeature_filterFinished(), getFilter() == Filter.FINISHED) {
-            protected void fireActionPerformed(ActionEvent e) { setFilter(Filter.FINISHED); }
+        popup.add(new JRadioButtonMenuItem(Bundle.ThreadsFeature_filterFinished(), f == ThreadsPanel.Filter.FINISHED) {
+            protected void fireActionPerformed(ActionEvent e) { setFilter(ThreadsPanel.Filter.FINISHED); }
         });
     }
 
-    private void setFilter(Filter filter) {
-        if (filter == this.filter) return;
-        
-        this.filter = filter;
+    private void setFilter(ThreadsPanel.Filter filter) {
+        threadsPanel.setFilter(filter);
         
         switch (filter) {
             case ALL:
@@ -212,23 +202,39 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
         }
     }
     
-    private Filter getFilter() {
-        return filter;
-    }
-    
     private void initResultsUI() {
         threadsPanel = new ThreadsPanel(Profiler.getDefault().getThreadsManager(), null);
         threadsPanel.threadsMonitoringEnabled();
         stateChanged(null, getSessionState());
     }
     
+//    private void refreshToolbar() {
+//        ProjectSession session = getSession();
+//        refreshToolbar(session == null ? null : session.getState());
+//    }
+    
+    private void refreshToolbar(final ProjectSession.State state) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+//                boolean running = state == ProjectSession.State.RUNNING;
+//                lrPauseButton.setEnabled(running);
+//                lrRefreshButton.setEnabled(running && lrPauseButton.isSelected());
+                
+                boolean inactive = state == ProjectSession.State.INACTIVE;
+                shLabel.setEnabled(!inactive);
+                tlLabel.setEnabled(!inactive);
+                apLabel.setEnabled(!inactive);
+            }
+        });
+    }
+    
     public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
         if (newState == null || newState == ProjectSession.State.INACTIVE) {
             if (threadsPanel != null) threadsPanel.profilingSessionFinished();
-        } else {
+        } else if (newState == ProjectSession.State.RUNNING) {
             if (threadsPanel != null) threadsPanel.profilingSessionStarted();
         }
-            
+        refreshToolbar(newState);
     }
     
 }

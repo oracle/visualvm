@@ -95,6 +95,8 @@ public class ThreadsPanel extends JPanel {
         return ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.threads.Bundle"); // NOI18N
     }
     
+    public static enum Filter { ALL, LIVE, FINISHED }
+    
     private static final String LAYOUT_ENABLED = "ENABLED"; // NOI18N
     private static final String LAYOUT_DISABLED = "DISABLED"; // NOI18N
     
@@ -107,7 +109,11 @@ public class ThreadsPanel extends JPanel {
     private JComboBox threadStateFilter;
     private JPanel legendPanel;
     
-    private Component fitAct;
+    private Filter filter = Filter.ALL;
+    
+    private Component zoomInAction;
+    private Component zoomOutAction;
+    private Component fitAction;
     
     private JPanel contentPanel;
     private JPanel notificationPanel;
@@ -138,6 +144,36 @@ public class ThreadsPanel extends JPanel {
         };
         
         initUI(saveView);
+    }
+    
+    
+    public void setFilter(Filter filter) {
+        RowFilter _filter = null;
+        switch (filter) {
+            case LIVE:
+                _filter = new RowFilter() {
+                    public boolean include(RowFilter.Entry entry) {
+                        ThreadData data = (ThreadData)entry.getValue(0);
+                        return ThreadData.isAliveState(data.getLastState());
+                    }
+                };
+                break;
+            case FINISHED:
+                _filter = new RowFilter() {
+                    public boolean include(RowFilter.Entry entry) {
+                        ThreadData data = (ThreadData)entry.getValue(0);
+                        return !ThreadData.isAliveState(data.getLastState());
+                    }
+                };
+                break;
+        }
+        TableRowSorter sorter = (TableRowSorter)threadsTable.getRowSorter();
+        sorter.setRowFilter(_filter);
+        this.filter = filter;
+    }
+    
+    public Filter getFilter() {
+        return filter;
     }
     
     
@@ -296,11 +332,11 @@ public class ThreadsPanel extends JPanel {
         threadsToolbar.add(saveView);
         threadsToolbar.addSeparator();
         
-        final Action zoomInAction = viewManager.zoomInAction();
-        threadsToolbar.add(new JButton(zoomInAction) {
+        final Action zoomIn = viewManager.zoomInAction();
+        zoomInAction = new JButton(zoomIn) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
-                Object newOffset = zoomInAction.getValue(ViewManager.PROP_NEW_OFFSET);
+                Object newOffset = zoomIn.getValue(ViewManager.PROP_NEW_OFFSET);
                 if (newOffset != null) {
                     int _newOffset = ((Integer)newOffset).intValue();
                     threadsTable.setColumnOffset(1, _newOffset);
@@ -310,13 +346,14 @@ public class ThreadsPanel extends JPanel {
             public boolean isEnabled() {
                 return threadsTable.isShowing() && super.isEnabled();
             }
-        });
+        };
+        threadsToolbar.add(zoomInAction);
         
-        final Action zoomOutAction = viewManager.zoomOutAction();
-        threadsToolbar.add(new JButton(zoomOutAction) {
+        final Action zoomOut = viewManager.zoomOutAction();
+        zoomOutAction = new JButton(zoomOut) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
-                Object newOffset = zoomOutAction.getValue(ViewManager.PROP_NEW_OFFSET);
+                Object newOffset = zoomOut.getValue(ViewManager.PROP_NEW_OFFSET);
                 if (newOffset != null) {
                     int _newOffset = ((Integer)newOffset).intValue();
                     threadsTable.setColumnOffset(1, _newOffset);
@@ -326,15 +363,17 @@ public class ThreadsPanel extends JPanel {
             public boolean isEnabled() {
                 return threadsTable.isShowing() && super.isEnabled();
             }
-        });
+        };
+        threadsToolbar.add(zoomOut);
         
-        fitAct = threadsToolbar.add(new JToggleButton(viewManager.fitAction()) {
+        fitAction = new JToggleButton(viewManager.fitAction()) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 threadsTableModel.fireTableDataChanged();
             }
-        });
-        fitAct.setEnabled(false);
+        };
+        fitAction.setEnabled(false);
+        threadsToolbar.add(fitAction);
         
         threadsToolbar.addSeparator();
         
@@ -460,6 +499,18 @@ public class ThreadsPanel extends JPanel {
         return threadsToolbar.getComponent();
     }
     
+    public Component getZoomIn() {
+        return zoomInAction;
+    }
+    
+    public Component getZoomOut() {
+        return zoomOutAction;
+    }
+    
+    public Component getFitWidth() {
+        return fitAction;
+    }
+    
     public BufferedImage getCurrentViewScreenshot(boolean onlyVisibleArea) {
         return threadsTableContainer.createTableScreenshot(onlyVisibleArea);
     }
@@ -474,13 +525,13 @@ public class ThreadsPanel extends JPanel {
     
     public void threadsMonitoringDisabled() {
         ((CardLayout)getLayout()).show(this, LAYOUT_DISABLED);
-        fitAct.setEnabled(false);
+        fitAction.setEnabled(false);
         threadsToolbar.getComponent().repaint();
     }
 
     public void threadsMonitoringEnabled() {
         ((CardLayout)getLayout()).show(this, LAYOUT_ENABLED);
-        fitAct.setEnabled(true);
+        fitAction.setEnabled(true);
         threadsToolbar.getComponent().repaint();
     }
     

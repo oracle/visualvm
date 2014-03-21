@@ -142,7 +142,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         String windowName = project == null ? Bundle.ProfilerWindow_profile() :
                                        ProjectUtilities.getDisplayName(project);
         setDisplayName(windowName);
-        setIcon(Icons.getImage(ProfilerIcons.PROFILE));
+        updateIcon();
         
         setFocusable(true);
         setRequestFocusEnabled(true);
@@ -240,10 +240,16 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         
         session.addListener(new ProjectSession.Listener() {
             public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
+                updateIcon();
                 updateButtons();
             }
         });
         updateButtons();
+    }
+    
+    private void updateIcon() {
+        if (session.inProgress()) setIcon(Icons.getImage(ProfilerIcons.PROFILE_RUNNING));
+        else setIcon(Icons.getImage(ProfilerIcons.PROFILE_INACTIVE));
     }
     
     private void performStartImpl() {

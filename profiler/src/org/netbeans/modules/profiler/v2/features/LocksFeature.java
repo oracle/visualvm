@@ -49,14 +49,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
-import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.locks.LockContentionPanel;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.v2.session.ProjectSession;
+import org.netbeans.modules.profiler.v2.ui.components.GrayLabel;
 import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
 import org.openide.util.NbBundle;
 
@@ -74,8 +75,6 @@ import org.openide.util.NbBundle;
 })
 final class LocksFeature extends ProfilerFeature.Basic {
     
-    private static enum Aggregation { BY_THREADS, BY_MONITORS }
-    
     private JLabel shLabel;
     private PopupButton shAggregation;
     
@@ -83,8 +82,6 @@ final class LocksFeature extends ProfilerFeature.Basic {
     private JButton apThreadDumpButton;
     
     private ProfilerToolbar toolbar;
-    
-    private Aggregation aggregation;
     
     private LockContentionPanel locksPanel;
     
@@ -101,16 +98,15 @@ final class LocksFeature extends ProfilerFeature.Basic {
     
     public ProfilerToolbar getToolbar() {
         if (toolbar == null) {
-            shLabel = new JLabel(Bundle.LocksFeature_show());
-            shLabel.setForeground(UIUtils.getDisabledLineColor());
+            getResultsUI(); // locksPanel must be ready for toolbar actions
+            
+            shLabel = new GrayLabel(Bundle.LocksFeature_show());
             
             shAggregation = new PopupButton() {
                 protected void populatePopup(JPopupMenu popup) { populateFilters(popup); }
             };
-            shAggregation.setEnabled(false);
             
-            apLabel = new JLabel(Bundle.LocksFeature_application());
-            apLabel.setForeground(UIUtils.getDisabledLineColor());
+            apLabel = new GrayLabel(Bundle.LocksFeature_application());
             
             apThreadDumpButton = new JButton(Bundle.LocksFeature_threadDump(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
             apThreadDumpButton.setEnabled(false);
@@ -133,7 +129,7 @@ final class LocksFeature extends ProfilerFeature.Basic {
             toolbar.addSpace(2);
             toolbar.add(apThreadDumpButton);
             
-            setAggregation(Aggregation.BY_THREADS);
+            setAggregation(LockContentionPanel.Aggregation.BY_THREADS);
         }
         
         return toolbar;
@@ -147,19 +143,19 @@ final class LocksFeature extends ProfilerFeature.Basic {
     }
     
     private void populateFilters(JPopupMenu popup) {
-        popup.add(new JRadioButtonMenuItem(Bundle.LocksFeature_aggregationByThreads(), getAggregation() == Aggregation.BY_THREADS) {
-            protected void fireActionPerformed(ActionEvent e) { setAggregation(Aggregation.BY_THREADS); }
+        LockContentionPanel.Aggregation a = locksPanel.getAggregation();
+        
+        popup.add(new JRadioButtonMenuItem(Bundle.LocksFeature_aggregationByThreads(), a == LockContentionPanel.Aggregation.BY_THREADS) {
+            protected void fireActionPerformed(ActionEvent e) { setAggregation(LockContentionPanel.Aggregation.BY_THREADS); }
         });
         
-        popup.add(new JRadioButtonMenuItem(Bundle.LocksFeature_aggregationByMonitors(), getAggregation() == Aggregation.BY_MONITORS) {
-            protected void fireActionPerformed(ActionEvent e) { setAggregation(Aggregation.BY_MONITORS); }
+        popup.add(new JRadioButtonMenuItem(Bundle.LocksFeature_aggregationByMonitors(), a == LockContentionPanel.Aggregation.BY_MONITORS) {
+            protected void fireActionPerformed(ActionEvent e) { setAggregation(LockContentionPanel.Aggregation.BY_MONITORS); }
         });
     }
 
-    private void setAggregation(Aggregation aggregation) {
-        if (aggregation == this.aggregation) return;
-        
-        this.aggregation = aggregation;
+    private void setAggregation(LockContentionPanel.Aggregation aggregation) {
+        locksPanel.setAggregation(aggregation);
         
         switch (aggregation) {
             case BY_THREADS:
@@ -171,22 +167,38 @@ final class LocksFeature extends ProfilerFeature.Basic {
         }
     }
     
-    private Aggregation getAggregation() {
-        return aggregation;
-    }
-    
     private void initResultsUI() {
         locksPanel = new LockContentionPanel();
         locksPanel.lockContentionEnabled();
         stateChanged(null, getSessionState());
     }
     
+//    private void refreshToolbar() {
+//        ProjectSession session = getSession();
+//        refreshToolbar(session == null ? null : session.getState());
+//    }
+    
+    private void refreshToolbar(final ProjectSession.State state) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+//                boolean running = state == ProjectSession.State.RUNNING;
+//                lrPauseButton.setEnabled(running);
+//                lrRefreshButton.setEnabled(running && lrPauseButton.isSelected());
+                
+                boolean inactive = state == ProjectSession.State.INACTIVE;
+                shLabel.setEnabled(!inactive);
+                apLabel.setEnabled(!inactive);
+            }
+        });
+    }
+    
     public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
         if (newState == null || newState == ProjectSession.State.INACTIVE) {
             if (locksPanel != null) locksPanel.profilingSessionFinished();
-        } else {
+        } else if (newState == ProjectSession.State.RUNNING) {
             if (locksPanel != null) locksPanel.profilingSessionStarted();
         }
+        refreshToolbar(newState);
     }
     
 }
