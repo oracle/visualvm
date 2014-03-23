@@ -54,6 +54,7 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -149,8 +150,6 @@ public class ProfilerTable extends JTable {
         setRowSelectionAllowed(true);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         setGridColor(UIConstants.TABLE_VERTICAL_GRID_COLOR);
-//        setSelectionBackground(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
-//        setSelectionForeground(UIConstants.TABLE_SELECTION_FOREGROUND_COLOR);
         setShowHorizontalLines(UIConstants.SHOW_TABLE_HORIZONTAL_GRID);
         setShowVerticalLines(UIConstants.SHOW_TABLE_VERTICAL_GRID);
         setRowMargin(UIConstants.TABLE_ROW_MARGIN);
@@ -323,10 +322,6 @@ public class ProfilerTable extends JTable {
         return !isCustomRendering() && super.isFocusOwner();
     }
     
-//    public boolean isCellEditable(int row, int column) {
-//        return false;
-//    }
-    
     public void setVisibleRows(int rows) {
         Dimension size = super.getPreferredScrollableViewportSize();
         size.height = rows * getRowHeight();
@@ -409,6 +404,10 @@ public class ProfilerTable extends JTable {
         }
         
         return null;
+    }
+    
+    public Object getSelectedValue() {
+        return getSelectedValue(mainColumn);
     }
     
     public Object getSelectedValue(int column) {
@@ -755,6 +754,113 @@ public class ProfilerTable extends JTable {
     
     public void performDefaultAction() {
         if (defaultAction != null) defaultAction.actionPerformed(null);
+    }
+    
+    // --- Popup menu ----------------------------------------------------------
+    
+    private long pressedWhen;
+    private Point pressedPoint;
+    private boolean providesPopupMenu;
+    
+    public final void providePopupMenu(boolean provide) {
+        providesPopupMenu = provide;
+    }
+    
+    public final boolean providesPopupMenu() {
+        return providesPopupMenu;
+    }
+    
+    protected void populatePopup(JPopupMenu popup, Object value) {
+        // Implementation here
+    }
+    
+    protected void popupShowing() {}
+    
+    protected void popupHidden() {}
+    
+    protected void processMouseEvent(final MouseEvent e) {
+        // --- Resolve CellTips/MouseEvent incompatibilities -------------------
+        //     TBD: doesn't work for heavyweight popups (RELEASED / CLICKED)
+        MouseEvent clickEvent = null;
+        if (e.getID() == MouseEvent.MOUSE_PRESSED) {
+            pressedWhen = e.getWhen();
+            pressedPoint = null;
+        } else if (e.getID() == MouseEvent.MOUSE_RELEASED) {
+            if (e.getWhen() - pressedWhen == 1) {
+                // #241878 dispatch MOUSE_RELEASED after forwarding MOUSE_PRESSED
+                pressedPoint = e.getPoint();
+                super.processMouseEvent(e);
+                return;
+            } else if (e.getPoint().equals(pressedPoint)) {
+                pressedPoint = null;
+                clickEvent = new MouseEvent(e.getComponent(), MouseEvent.MOUSE_CLICKED,
+                                            e.getWhen() + 1, e.getModifiers(),
+                                            e.getX(), e.getY(), e.getClickCount(),
+                                            e.isPopupTrigger(), e.getButton());
+            }
+            pressedWhen = 0;
+        }
+        // ---------------------------------------------------------------------
+        
+        boolean popupEvent = providesPopupMenu && SwingUtilities.isRightMouseButton(e);
+        
+        if (popupEvent && e.getID() == MouseEvent.MOUSE_PRESSED) {
+            int row = rowAtPoint(e.getPoint());
+            if (row != -1) selectRow(row, true);
+        }
+        
+        super.processMouseEvent(e);
+        
+        if (popupEvent && e.getID() == MouseEvent.MOUSE_CLICKED) {
+            int row = rowAtPoint(e.getPoint());
+            if (row != -1) {
+                selectRow(row, true);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { showPopupMenu(e); };
+                });
+            }
+        }
+        
+        if (clickEvent != null) processMouseEvent(clickEvent);
+    }
+    
+    protected void processKeyEvent(KeyEvent e) {
+        int code = e.getKeyCode();
+        if (code == KeyEvent.VK_CONTEXT_MENU ||
+           (code == KeyEvent.VK_F10 && e.getModifiers() == InputEvent.SHIFT_MASK)) {
+            e.consume();
+            showPopupMenu(null);
+        }
+        
+        super.processKeyEvent(e);
+    }
+    
+    private void showPopupMenu(MouseEvent e) {
+        JPopupMenu popup = new JPopupMenu() {
+            public void setVisible(boolean visible) {
+                if (visible) popupShowing();
+                super.setVisible(visible);
+                if (!visible) popupHidden();
+            }
+        };
+        
+        Object value = getSelectedValue();
+        populatePopup(popup, value);
+        
+        if (popup.getComponentCount() > 0) {
+            if (e == null) {
+                int r = value == null ? -1 : getSelectedRow();
+                boolean b = r == -1;
+                int c = b ? -1 : convertColumnIndexToView(mainColumn);
+                Rectangle t = b ? getVisibleRect() : getCellRect(r, c, false);
+                Dimension s = popup.getPreferredSize();
+                int x = t.x + (t.width - s.width) / 2;
+                int y = t.y + (b ? (t.height - s.height) / 2 : getRowHeight() - 4);
+                popup.show(this, Math.max(x, 0), Math.max(y, 0));
+            } else {
+                popup.show(this, e.getX(), e.getY());
+            }
+        }
     }
     
     // --- Persistence ---------------------------------------------------------
