@@ -406,10 +406,6 @@ public class ProfilerTable extends JTable {
         return null;
     }
     
-    public Object getSelectedValue() {
-        return getSelectedValue(mainColumn);
-    }
-    
     public Object getSelectedValue(int column) {
         int row = getSelectedRow();
         if (row == -1) return null;
@@ -493,7 +489,7 @@ public class ProfilerTable extends JTable {
     }
     
     protected void updateColumnsPreferredWidth() {
-        if (scrollableColumns == null || getRowCount() == 0) return;
+        if (scrolling || scrollableColumns == null || getRowCount() == 0) return;
         
         Rectangle visible = getVisibleRect();
         if (visible.isEmpty()) return;
@@ -560,7 +556,10 @@ public class ProfilerTable extends JTable {
         } else {
             getModel().addTableModelListener(new TableModelListener() {
                 public void tableChanged(TableModelEvent e) {
-                    updateColumnsPreferredWidth();
+                    // Must invoke later, JTree.getRowCount() not ready yet
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() { updateColumnsPreferredWidth(); }
+                    });
                 }
             }); 
         }
@@ -592,6 +591,7 @@ public class ProfilerTable extends JTable {
     // --- Columns hiding & layout ---------------------------------------------
     
     private final boolean hideableColums;
+    private boolean scrolling;
     
     protected void configureEnclosingScrollPane() {
         super.configureEnclosingScrollPane();
@@ -619,7 +619,9 @@ public class ProfilerTable extends JTable {
             if (scrollableColumns != null && !scrollableColumns.isEmpty())
                 scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
                     public void adjustmentValueChanged(AdjustmentEvent e) {
-                        if (!e.getValueIsAdjusting()) updateColumnsPreferredWidth();
+                        scrolling = e.getValueIsAdjusting();
+                        updateColumnsPreferredWidth();
+//                        if (!e.getValueIsAdjusting()) updateColumnsPreferredWidth();
                     }
                 });
         }
@@ -844,7 +846,7 @@ public class ProfilerTable extends JTable {
             }
         };
         
-        Object value = getSelectedValue();
+        Object value = getSelectedValue(mainColumn);
         populatePopup(popup, value);
         
         if (popup.getComponentCount() > 0) {

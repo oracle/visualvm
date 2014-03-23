@@ -316,13 +316,12 @@ public class ProfilerTreeTable extends ProfilerTable {
                         Comparator comparator = treeModel != null ? treeModel.getComparator() : null;
                         treeModel = treeModelImpl(newRoot, comparator);
                         tree.setModel(treeModel);
+                        fireTableDataChanged();
 
                         if (uiState != null) restoreUIState(tree, uiState);
                     } finally {
                         tree.setChangingModel(false);
                     }
-                    
-                    fireTableDataChanged();
                 }
             });
                     
@@ -453,6 +452,10 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
     
     
+    protected void saveSelection() {}
+    
+    protected void restoreSelection() {}
+    
     static UIState getUIState(JTree tree) {
         TreePath[] selectedPaths = tree.getSelectionPaths();
         TreePath rootPath = new TreePath(tree.getModel().getRoot());
@@ -516,7 +519,10 @@ public class ProfilerTreeTable extends ProfilerTable {
         private void notifyTable() {
             if (tree.isChangingModel()) return;
             if (tree.getClientProperty(UIUtils.PROP_EXPANSION_TRANSACTION) != null) return;
+            
+            TreePath[] selectedPaths = tree.getSelectionPaths();
             model.fireTableDataChanged();
+            tree.setSelectionPaths(selectedPaths);
         }
 
         public void valueChanged(TreeSelectionEvent e) {

@@ -390,6 +390,8 @@ class ProfilerTableHover {
         }
         
         boolean valueChanged() {
+            if (table.getRowCount() <= row) return true;
+            if (table.getColumnCount() <= column) return true;
             Object v = table.getValueAt(row, column);
             if (v == null && value == null) return false;
             if (v != null && value != null) return !v.equals(value);

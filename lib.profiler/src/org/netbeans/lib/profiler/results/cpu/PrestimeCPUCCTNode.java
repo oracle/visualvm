@@ -240,7 +240,7 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
 //        if (parent == null) return super.equals(o); // Required for filtering & sorting
 //        return getNodeName().equals(((PrestimeCPUCCTNode)o).getNodeName());
         if (parent == null) return oo.parent == null;
-        if (isThreadNode()) return oo.getNodeName().equals(getNodeName());
+        if (isThreadNode()) return container.getThreadId() == oo.container.getThreadId();
         return getMethodId() == oo.getMethodId();
     }
     
@@ -249,7 +249,7 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
 //        if (parent == null) return super.hashCode(); // Required for filtering & sorting
 //        return getNodeName().hashCode();
         if (parent == null) return 1;
-        if (isThreadNode()) return getNodeName().hashCode();
+        if (isThreadNode()) return container.getThreadId();
         return getMethodId();
     }
 
