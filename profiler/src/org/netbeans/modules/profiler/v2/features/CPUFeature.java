@@ -70,6 +70,7 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.CPUView;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
+import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -80,6 +81,7 @@ import org.netbeans.modules.profiler.v2.ui.components.GrayLabel;
 import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
 import org.netbeans.modules.profiler.v2.ui.components.SmallButton;
 import org.netbeans.modules.profiler.v2.ui.components.TitledMenuSeparator;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -124,6 +126,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
     
     private Mode mode = Mode.SAMPLED_ALL;
     private PopupButton modeButton;
+    
+    private boolean popupPause;
     
     
     CPUFeature() {
@@ -403,7 +407,33 @@ final class CPUFeature extends ProfilerFeature.Basic {
     
     private void initResultsUI() {
         TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
-        cpuView = new CPUView(runner.getProfilerClient());
+        
+        cpuView = new CPUView(runner.getProfilerClient(), GoToSource.isAvailable()) {
+            public void showSource(ClientUtils.SourceCodeSelection value) {
+                Lookup.Provider project = getSession().getProject();
+                String className = value.getClassName();
+                String methodName = value.getMethodName();
+                String methodSig = value.getMethodSignature();
+                GoToSource.openSource(project, className, methodName, methodSig);
+            }
+            public void profileMethod(ClientUtils.SourceCodeSelection value) {
+            }
+            public void selectMethod(ClientUtils.SourceCodeSelection value) {
+            }
+            public void popupShowing() {
+                if (lrPauseButton.isEnabled() && !lrRefreshButton.isEnabled()) {
+                    popupPause = true;
+                    lrPauseButton.setSelected(true);
+                }
+            }
+            public void popupHidden() {
+                if (lrPauseButton.isEnabled() && popupPause) {
+                    popupPause = false;
+                    lrPauseButton.setSelected(false);
+                }
+            }
+        };
+        
         setView(View.HOT_SPOTS);
     }
     
@@ -417,7 +447,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
             public void run() {
                 boolean running = state == ProjectSession.State.RUNNING;
                 lrPauseButton.setEnabled(running);
-                lrRefreshButton.setEnabled(running && lrPauseButton.isSelected());
+                lrRefreshButton.setEnabled(!popupPause && running && lrPauseButton.isSelected());
                 
                 boolean inactive = state == ProjectSession.State.INACTIVE;
                 lrLabel.setEnabled(!inactive);

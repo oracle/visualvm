@@ -45,9 +45,13 @@ package org.netbeans.lib.profiler.ui.cpu;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.util.Set;
 import javax.swing.BorderFactory;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
@@ -64,19 +68,21 @@ import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
  *
  * @author Jiri Sedlacek
  */
-public class CPUView extends JPanel {
+public abstract class CPUView extends JPanel {
     
     private static final ClientUtils.SourceCodeSelection[] EMPTY_SELECTION =
                      new ClientUtils.SourceCodeSelection[0];
     
     private final ProfilerClient client;
+    private final boolean showSourceSupported;
     
     private CPUTableView tableView;
     private CPUTreeTableView treeTableView;
     
     
-    public CPUView(ProfilerClient client) {
+    public CPUView(ProfilerClient client, boolean showSourceSupported) {
         this.client = client;
+        this.showSourceSupported = showSourceSupported;
         initUI();
     }
     
@@ -90,7 +96,7 @@ public class CPUView extends JPanel {
     public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
         client.forceObtainedResultsDump(true);
         
-        if (treeTableView.isVisible()) {
+//        if (treeTableView.isVisible()) {
             try {
                 CPUResultsSnapshot newData = client.getCPUProfilingResultsSnapshot(false);
                 if (newData != null) treeTableView.setData(newData);
@@ -103,14 +109,14 @@ public class CPUView extends JPanel {
                     t.printStackTrace(System.err);
                 }
             }
-        }
+//        }
         
-        if (tableView.isVisible()) {
+//        if (tableView.isVisible()) {
             FlatProfileProvider dataProvider = client.getFlatProfileProvider();
             final FlatProfileContainer newData = dataProvider == null ? null :
                                                  dataProvider.createFlatProfile();
             if (newData != null) tableView.setData(newData);
-        }
+//        }
     }
     
     public void resetData() {
@@ -147,11 +153,69 @@ public class CPUView extends JPanel {
     }
     
     
+    public abstract void showSource(ClientUtils.SourceCodeSelection value);
+    
+    public abstract void profileMethod(ClientUtils.SourceCodeSelection value);
+    
+    public abstract void selectMethod(ClientUtils.SourceCodeSelection value);
+    
+    public void popupShowing() {};
+    
+    public void popupHidden() {};
+    
+    
     private void initUI() {
         setLayout(new BorderLayout(0, 0));
         
-        treeTableView = new CPUTreeTableView(client);
-        tableView = new CPUTableView(client);
+        treeTableView = new CPUTreeTableView(client) {
+            protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
+                if (showSourceSupported) showSource(value);
+            }
+            protected void populatePopup(JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
+                if (showSourceSupported) {
+                    popup.add(new JMenuItem("Go to Source") {
+                        { setEnabled(value != null); setFont(getFont().deriveFont(Font.BOLD)); }
+                        protected void fireActionPerformed(ActionEvent e) { showSource(value); }
+                    });
+                    popup.addSeparator();
+                }
+                popup.add(new JMenuItem("Profile this Method") {
+                    { setEnabled(value != null); }
+                    protected void fireActionPerformed(ActionEvent e) { profileMethod(value); }
+                });
+                popup.add(new JMenuItem("Select for Profiling") {
+                    { setEnabled(value != null); }
+                    protected void fireActionPerformed(ActionEvent e) { selectMethod(value); }
+                });
+            }
+            protected void popupShowing() { CPUView.this.popupShowing(); }
+            protected void popupHidden()  { CPUView.this.popupHidden(); }
+        };
+        
+        tableView = new CPUTableView(client) {
+            protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
+                if (showSourceSupported) showSource(value);
+            }
+            protected void populatePopup(JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
+                if (showSourceSupported) {
+                    popup.add(new JMenuItem("Go to Source") {
+                        { setEnabled(value != null); setFont(getFont().deriveFont(Font.BOLD)); }
+                        protected void fireActionPerformed(ActionEvent e) { showSource(value); }
+                    });
+                    popup.addSeparator();
+                }
+                popup.add(new JMenuItem("Profile this Method") {
+                    { setEnabled(value != null); }
+                    protected void fireActionPerformed(ActionEvent e) { profileMethod(value); }
+                });
+                popup.add(new JMenuItem("Select for Profiling") {
+                    { setEnabled(value != null); }
+                    protected void fireActionPerformed(ActionEvent e) { selectMethod(value); }
+                });
+            }
+            protected void popupShowing() { CPUView.this.popupShowing(); }
+            protected void popupHidden()  { CPUView.this.popupHidden(); }
+        };
         
         JSplitPane split = new JExtendedSplitPane(JSplitPane.VERTICAL_SPLIT) {
             {

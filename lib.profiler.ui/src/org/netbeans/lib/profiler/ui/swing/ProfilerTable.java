@@ -779,6 +779,12 @@ public class ProfilerTable extends JTable {
     
     protected void popupHidden() {}
     
+    protected Object getValueForPopup(int row) {
+        if (row == -1) return null;
+        if (row >= getModel().getRowCount()) return null; // #239936
+        return getValueAt(row, convertColumnIndexToView(mainColumn));
+    }
+    
     protected void processMouseEvent(final MouseEvent e) {
         // --- Resolve CellTips/MouseEvent incompatibilities -------------------
         //     TBD: doesn't work for heavyweight popups (RELEASED / CLICKED)
@@ -845,15 +851,15 @@ public class ProfilerTable extends JTable {
             }
         };
         
-        Object value = getSelectedValue(mainColumn);
+        int row = getSelectedRow();
+        Object value = getValueForPopup(row);
         populatePopup(popup, value);
         
         if (popup.getComponentCount() > 0) {
             if (e == null) {
-                int r = value == null ? -1 : getSelectedRow();
-                boolean b = r == -1;
+                boolean b = row == -1;
                 int c = b ? -1 : convertColumnIndexToView(mainColumn);
-                Rectangle t = b ? getVisibleRect() : getCellRect(r, c, false);
+                Rectangle t = b ? getVisibleRect() : getCellRect(row, c, false);
                 Dimension s = popup.getPreferredSize();
                 int x = t.x + (t.width - s.width) / 2;
                 int y = t.y + (b ? (t.height - s.height) / 2 : getRowHeight() - 4);
