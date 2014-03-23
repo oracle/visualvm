@@ -621,7 +621,6 @@ public class ProfilerTable extends JTable {
                     public void adjustmentValueChanged(AdjustmentEvent e) {
                         scrolling = e.getValueIsAdjusting();
                         updateColumnsPreferredWidth();
-//                        if (!e.getValueIsAdjusting()) updateColumnsPreferredWidth();
                     }
                 });
         }
