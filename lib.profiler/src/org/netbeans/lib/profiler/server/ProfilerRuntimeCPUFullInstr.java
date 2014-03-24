@@ -43,9 +43,6 @@
 
 package org.netbeans.lib.profiler.server;
 
-import org.netbeans.lib.profiler.server.system.Timers;
-
-
 /**
  * This class contains the actual methods for full instrumentation recursive CPU profiling, calls to which are injected
  * into the target application (TA) bytecodes when they are instrumented.
@@ -75,7 +72,7 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
 
         ThreadInfo ti = ThreadInfo.getThreadInfo();
 
-        if (ti.inProfilingRuntimeMethod > 0) {
+        if (ti.inProfilingRuntimeMethod > 0 || ti.stackDepth > stackDepthLimit) {
             return;
         }
 
@@ -129,7 +126,7 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
 
         if (ti.isInitialized() && ti.inCallGraph) { // ti == null may happen if instrumentation has been removed or data collectors reset
 
-            if (ti.inProfilingRuntimeMethod > 0) {
+            if (ti.inProfilingRuntimeMethod > 0 || ti.stackDepth > stackDepthLimit) {
                 return;
             }
 
@@ -156,7 +153,7 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
         ThreadInfo ti = ThreadInfo.getThreadInfo();
 
         if (ti.isInitialized() && ti.inCallGraph && (ti.rootMethodStackDepth > 0)) {
-            if (ti.inProfilingRuntimeMethod > 0) {
+            if (ti.inProfilingRuntimeMethod > 0 || ti.stackDepth > stackDepthLimit) {
                 return;
             }
 
@@ -190,7 +187,7 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
 
         if (ti.isInitialized() && ti.inCallGraph && (ti.rootMethodStackDepth > 0)) { // ti == null may happen if instrumentation has been removed or data collectors reset
 
-            if (ti.inProfilingRuntimeMethod > 0) {
+            if (ti.inProfilingRuntimeMethod > 0 || ti.stackDepth > stackDepthLimit) {
                 return;
             }
 

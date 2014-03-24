@@ -107,6 +107,7 @@ public class ProfilingSettings {
     public static final String PROP_INSTRUMENT_METHOD_INVOKE = "profiler.settings.instrument.method.invoke"; //NOI18N
     public static final String PROP_INSTRUMENT_SPAWNED_THREADS = "profiler.settings.instrument.spawned.threads"; //NOI18N
     public static final String PROP_N_PROFILED_THREADS_LIMIT = "profiler.settings.n.profiled.threads.limit"; //NOI18N
+    public static final String PROP_STACK_DEPTH_LIMIT = "profiler.settings.stack.depth.limit"; //NOI18N
     public static final String PROP_SORT_RESULTS_BY_THREAD_CPU_TIME = "profiler.settings.sort.results.by.thread.cpu.time"; //NOI18N
     public static final String PROP_SAMPLING_INTERVAL = "profiler.settings.sampling.interval"; //NOI18N
     public static final String PROP_INSTRUMENTATION_ROOT_METHODS_SIZE = "profiler.settings.instrumentation.root.methods.size"; //NOI18N
@@ -170,6 +171,7 @@ public class ProfilingSettings {
     private int cpuProfilingType = CommonConstants.CPU_INSTR_FULL;
     private int instrScheme = CommonConstants.INSTRSCHEME_LAZY;
     private int nProfiledThreadsLimit = 32;
+    private int stackDepthLimit = Integer.MAX_VALUE;
     private int profilingType = PROFILE_CPU_SAMPLING;
 
     // CPU Profiling: Sampled
@@ -413,6 +415,14 @@ public class ProfilingSettings {
         return nProfiledThreadsLimit;
     }
 
+    public void setStackDepthLimit(int num) {
+        stackDepthLimit = num;
+    }
+
+    public int getStackDepthLimit() {
+        return stackDepthLimit;
+    }
+
     public void setOverrideGlobalSettings(final boolean override) {
         overrideGlobalSettings = override;
     }
@@ -583,6 +593,7 @@ public class ProfilingSettings {
             settings.setNProfiledThreadsLimit(Integer.MAX_VALUE); // zero or negative value means we do not limit it, just remember value for the UI
         }
 
+        settings.setStackDepthLimit(getStackDepthLimit());
         settings.setSortResultsByThreadCPUTime(getSortResultsByThreadCPUTime());
 
         settings.setSamplingInterval(getSamplingInterval());
@@ -700,6 +711,7 @@ public class ProfilingSettings {
         settings.setInstrumentMethodInvoke(getInstrumentMethodInvoke());
         settings.setInstrumentSpawnedThreads(getInstrumentSpawnedThreads());
         settings.setNProfiledThreadsLimit(getNProfiledThreadsLimit());
+        settings.setStackDepthLimit(getStackDepthLimit());
         settings.setSortResultsByThreadCPUTime(getSortResultsByThreadCPUTime());
 
         settings.setSamplingInterval(getSamplingInterval());
@@ -760,6 +772,8 @@ public class ProfilingSettings {
         sb.append("instrumentSpawnedThreads: ").append(getInstrumentSpawnedThreads()); //NOI18N
         sb.append('\n'); //NOI18N
         sb.append("nProfiledThreadsLimit: ").append(getNProfiledThreadsLimit()); //NOI18N
+        sb.append('\n'); //NOI18N
+        sb.append("stackDepthLimit: ").append(getStackDepthLimit()); //NOI18N
         sb.append('\n'); //NOI18N
         sb.append("sortResultsByThreadCPUTime: ").append(getSortResultsByThreadCPUTime()); //NOI18N
         sb.append('\n'); //NOI18N
@@ -830,6 +844,7 @@ public class ProfilingSettings {
         setInstrumentSpawnedThreads(Boolean.valueOf(getProperty(props, prefix + PROP_INSTRUMENT_SPAWNED_THREADS, "false"))
                                            .booleanValue()); //NOI18N
         setNProfiledThreadsLimit(Integer.parseInt(getProperty(props, prefix + PROP_N_PROFILED_THREADS_LIMIT, "32"))); //NOI18N
+        setStackDepthLimit(Integer.parseInt(getProperty(props, prefix + PROP_STACK_DEPTH_LIMIT, String.valueOf(Integer.MAX_VALUE))));
         setSortResultsByThreadCPUTime(Boolean.valueOf(getProperty(props, prefix + PROP_SORT_RESULTS_BY_THREAD_CPU_TIME, "false"))
                                              .booleanValue()); //NOI18N
         setProfileUnderlyingFramework(Boolean.valueOf(getProperty(props, prefix + PROP_PROFILE_UNDERLYING_FRAMEWORK, "false"))

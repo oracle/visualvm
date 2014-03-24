@@ -110,6 +110,7 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
     private int cpuProfilingType = CPU_INSTR_FULL;
     private int instrScheme = INSTRSCHEME_LAZY; // See CommonConstants for definitions
     private int nProfiledThreadsLimit = 32;
+    private int stackDepthLimit = Integer.MAX_VALUE;
     private int portNo = 5140;
     private int samplingInterval = 10;
     private int samplingFrequency = 10;
@@ -290,6 +291,14 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
 
     public int getNProfiledThreadsLimit() {
         return nProfiledThreadsLimit;
+    }
+
+    public void setStackDepthLimit(int num) {
+        stackDepthLimit = num;
+    }
+
+    public int getStackDepthLimit() {
+        return stackDepthLimit;
     }
 
     public void setPortNo(int pNo) {
