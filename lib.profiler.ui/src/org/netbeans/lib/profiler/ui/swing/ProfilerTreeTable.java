@@ -199,6 +199,7 @@ public class ProfilerTreeTable extends ProfilerTable {
                                                          e.getModifiers(), treeX, e.getY(),
                                                          e.getClickCount(), e.isPopupTrigger());
                     tree.dispatchEvent(newEvent);
+                    e.consume();
                 }
             }
         }

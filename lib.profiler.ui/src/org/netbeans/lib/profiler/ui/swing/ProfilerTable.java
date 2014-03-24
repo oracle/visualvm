@@ -56,7 +56,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -164,12 +163,6 @@ public class ProfilerTable extends JTable {
         getActionMap().put("DEFAULT_ACTION", new AbstractAction() { // NOI18N
                     public void actionPerformed(ActionEvent e) { performDefaultAction(); }
                 });
-        addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
-                    performDefaultAction();
-            }
-        });
         
         addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) { ProfilerTable.this.focusGained(); }
@@ -785,10 +778,10 @@ public class ProfilerTable extends JTable {
         return getValueAt(row, convertColumnIndexToView(mainColumn));
     }
     
-    protected void processMouseEvent(final MouseEvent e) {
+    protected void processMouseEvent(MouseEvent e) {
         // --- Resolve CellTips/MouseEvent incompatibilities -------------------
         //     TBD: doesn't work for heavyweight popups (RELEASED / CLICKED)
-        MouseEvent clickEvent = null;
+        MouseEvent generatedClick = null;
         if (e.getID() == MouseEvent.MOUSE_PRESSED) {
             pressedWhen = e.getWhen();
             pressedPoint = null;
@@ -800,35 +793,44 @@ public class ProfilerTable extends JTable {
                 return;
             } else if (e.getPoint().equals(pressedPoint)) {
                 pressedPoint = null;
-                clickEvent = new MouseEvent(e.getComponent(), MouseEvent.MOUSE_CLICKED,
-                                            e.getWhen() + 1, e.getModifiers(),
-                                            e.getX(), e.getY(), e.getClickCount(),
-                                            e.isPopupTrigger(), e.getButton());
+                generatedClick = new MouseEvent(e.getComponent(), MouseEvent.MOUSE_CLICKED,
+                                                e.getWhen() + 1, e.getModifiers(),
+                                                e.getX(), e.getY(), e.getClickCount(),
+                                                e.isPopupTrigger(), e.getButton());
             }
             pressedWhen = 0;
         }
         // ---------------------------------------------------------------------
         
         boolean popupEvent = providesPopupMenu && SwingUtilities.isRightMouseButton(e);
+        boolean clickEvent = e.getID() == MouseEvent.MOUSE_CLICKED && SwingUtilities.isLeftMouseButton(e);
+        int row = rowAtPoint(e.getPoint());
         
-        if (popupEvent && e.getID() == MouseEvent.MOUSE_PRESSED) {
-            int row = rowAtPoint(e.getPoint());
-            if (row != -1) selectRow(row, true);
+        // Do not process doubleclick in editable cell (checkbox)
+        if (clickEvent && row != -1 && e.getClickCount() > 1) {
+            if (isCellEditable(row, columnAtPoint(e.getPoint())))
+                e = clearClicks(e);
         }
+        
+        // Right-press selects row for popup
+        if (popupEvent && e.getID() == MouseEvent.MOUSE_PRESSED && row != -1)
+            selectRow(row, true);
         
         super.processMouseEvent(e);
         
-        if (popupEvent && e.getID() == MouseEvent.MOUSE_CLICKED) {
-            int row = rowAtPoint(e.getPoint());
-            if (row != -1) {
-                selectRow(row, true);
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() { showPopupMenu(e); };
-                });
-            }
+        // Right-click selects row and opens popup
+        if (popupEvent && e.getID() == MouseEvent.MOUSE_CLICKED && row != -1) {
+            selectRow(row, true);
+            final MouseEvent me = e;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() { showPopupMenu(me); };
+            });
         }
         
-        if (clickEvent != null) processMouseEvent(clickEvent);
+        // Only perform default action if not already processed (expand tree)
+        if (!e.isConsumed() && clickEvent && e.getClickCount() == 2) performDefaultAction();
+        
+        if (generatedClick != null) processMouseEvent(generatedClick);
     }
     
     protected void processKeyEvent(KeyEvent e) {
