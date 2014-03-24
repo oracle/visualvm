@@ -497,6 +497,8 @@ public class SnapshotInfoPanel extends JPanel {
                 htmlText.append(ps.getNProfiledThreadsLimit());
             }
 
+            htmlText.append("<br>"); // NOI18N
+            htmlText.append("<strong>"); // NOI18N
             htmlText.append(Bundle.SnapshotInfoPanel_StackDepthLimitString()).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
             if (ps.getStackDepthLimit() == Integer.MAX_VALUE) {
