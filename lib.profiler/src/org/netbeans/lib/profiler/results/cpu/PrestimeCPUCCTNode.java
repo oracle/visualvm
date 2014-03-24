@@ -236,21 +236,50 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
     public boolean equals(Object o) {
         if (!(o instanceof PrestimeCPUCCTNode)) return false;
         PrestimeCPUCCTNode oo = (PrestimeCPUCCTNode)o;
-//        if (isThreadNode()) return super.equals(o); // #205942
-//        if (parent == null) return super.equals(o); // Required for filtering & sorting
-//        return getNodeName().equals(((PrestimeCPUCCTNode)o).getNodeName());
+        
+        // Handle root
         if (parent == null) return oo.parent == null;
+        
+        // Handle toplevel thread nodes
         if (isThreadNode()) return container.getThreadId() == oo.container.getThreadId();
+        
+        // Handle self time nodes
+        if (isSelfTimeNode()) return oo.isSelfTimeNode();
+        
+        // Handle filtered-out containers
+        if (isFilteredNode()) return oo.isFilteredNode();
+        
+        // Handle "when called from" containers
+        if (isContextCallsNode()) return getMethodId() == oo.getMethodId();
+        
+        // Handle regular method nodes
         return getMethodId() == oo.getMethodId();
+        
+//        // Expected fallback for packages/classes view (no methodIDs)
+//        return getNodeName().equals(((PrestimeCPUCCTNode)o).getNodeName());
     }
     
-    public int hashCode() {
-//        if (isThreadNode()) return super.hashCode(); // #205942
-//        if (parent == null) return super.hashCode(); // Required for filtering & sorting
-//        return getNodeName().hashCode();
+    public int hashCode() {        
+        // Handle root
         if (parent == null) return 1;
+        
+        // Handle toplevel thread nodes
         if (isThreadNode()) return container.getThreadId();
+        
+        // Handle self time nodes
+        if (isSelfTimeNode()) return -1;
+        
+        // Handle filtered-out containers
+        if (isFilteredNode()) return -10;
+        
+        // Handle "when called from" containers
+        if (isContextCallsNode()) return Integer.MIN_VALUE + getMethodId();
+        
+        // Handle regular method nodes
         return getMethodId();
+        
+//        // Expected fallback for packages/classes view (no methodIDs)
+//        return getNodeName().hashCode();
     }
 
     public CCTNode getParent() {
