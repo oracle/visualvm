@@ -221,7 +221,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 protected void fireActionPerformed(ActionEvent e) {
                     memoryView.resetData();
                     fireChange();
-                    settingsUI.setVisible(false);
+//                    settingsUI.setVisible(false);
                 }
             });
 
@@ -245,15 +245,6 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         updateModeUI();
     }
     
-    private void updateModeUI() {
-        modeButton.setText(getModeName(mode));
-        
-        boolean instr = mode == Mode.INSTR_CLASS || mode == Mode.INSTR_SELECTED;
-        instrCheckboxesSpace.setVisible(instr);
-        lifecycleCheckbox.setVisible(instr);
-        allocationsCheckbox.setVisible(instr);
-    }
-    
     private String getModeName(Mode m) {
         switch (m) {
             case SAMPLED_ALL: return "All classes";
@@ -262,6 +253,15 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             case INSTR_SELECTED: return "Selected classes";
         }
         return null;
+    }
+    
+    private void updateModeUI() {
+        modeButton.setText(getModeName(mode));
+        
+        boolean instr = mode == Mode.INSTR_CLASS || mode == Mode.INSTR_SELECTED;
+        instrCheckboxesSpace.setVisible(instr);
+        lifecycleCheckbox.setVisible(instr);
+        allocationsCheckbox.setVisible(instr);
     }
     
     public ProfilerToolbar getToolbar() {

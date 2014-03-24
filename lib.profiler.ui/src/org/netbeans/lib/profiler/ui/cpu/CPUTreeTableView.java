@@ -198,8 +198,9 @@ public abstract class CPUTreeTableView extends JPanel {
             private boolean visible;
             public void setValue(Object value, int row) {
                 super.setValue(value, row);
-                Object node = treeTable.getPathForRow(row).getLastPathComponent();
-                visible = treeTableModel.isCellEditable((TreeNode)node, 0);
+                TreePath path = treeTable.getPathForRow(row);
+                PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)path.getLastPathComponent();
+                visible = !node.isThreadNode() && !node.isSelfTimeNode() && !node.isFilteredNode();
             }
             public void paint(Graphics g) {
                 if (visible) {
@@ -245,7 +246,7 @@ public abstract class CPUTreeTableView extends JPanel {
     private ClientUtils.SourceCodeSelection valueForRow(int row) {
         PrestimeCPUCCTNode node = nodeAtRow(row);
         if (node == null) return null;
-        else if (node.isThreadNode() || node.isFilteredNode()) return null;
+        else if (node.isThreadNode() || node.isFilteredNode() || node.isSelfTimeNode()) return null;
         else return selectionForId(node.getMethodId());
     }
     

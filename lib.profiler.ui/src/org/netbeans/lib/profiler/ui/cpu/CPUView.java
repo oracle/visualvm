@@ -63,6 +63,7 @@ import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
+import org.netbeans.lib.profiler.utils.Wildcards;
 
 /**
  *
@@ -155,13 +156,27 @@ public abstract class CPUView extends JPanel {
     
     public abstract void showSource(ClientUtils.SourceCodeSelection value);
     
-    public abstract void profileMethod(ClientUtils.SourceCodeSelection value);
+    public abstract void profileSingle(ClientUtils.SourceCodeSelection value);
     
-    public abstract void selectMethod(ClientUtils.SourceCodeSelection value);
+    public abstract void selectForProfiling(ClientUtils.SourceCodeSelection[] value);
     
     public void popupShowing() {};
     
     public void popupHidden() {};
+    
+    
+    private void profileMethod(ClientUtils.SourceCodeSelection value) {
+        profileSingle(value);
+    }
+    
+    private void profileClass(ClientUtils.SourceCodeSelection value) {
+        profileSingle(new ClientUtils.SourceCodeSelection(
+                value.getClassName(), Wildcards.ALLWILDCARD, null));
+    }
+    
+    private void selectMethod(ClientUtils.SourceCodeSelection value) {
+        selectForProfiling(new ClientUtils.SourceCodeSelection[] { value });
+    }
     
     
     private void initUI() {
@@ -183,6 +198,11 @@ public abstract class CPUView extends JPanel {
                     { setEnabled(value != null); }
                     protected void fireActionPerformed(ActionEvent e) { profileMethod(value); }
                 });
+                popup.add(new JMenuItem("Profile this Class") {
+                    { setEnabled(value != null); }
+                    protected void fireActionPerformed(ActionEvent e) { profileClass(value); }
+                });
+                popup.addSeparator();
                 popup.add(new JMenuItem("Select for Profiling") {
                     { setEnabled(value != null); }
                     protected void fireActionPerformed(ActionEvent e) { selectMethod(value); }
@@ -208,6 +228,11 @@ public abstract class CPUView extends JPanel {
                     { setEnabled(value != null); }
                     protected void fireActionPerformed(ActionEvent e) { profileMethod(value); }
                 });
+                popup.add(new JMenuItem("Profile this Class") {
+                    { setEnabled(value != null); }
+                    protected void fireActionPerformed(ActionEvent e) { profileClass(value); }
+                });
+                popup.addSeparator();
                 popup.add(new JMenuItem("Select for Profiling") {
                     { setEnabled(value != null); }
                     protected void fireActionPerformed(ActionEvent e) { selectMethod(value); }

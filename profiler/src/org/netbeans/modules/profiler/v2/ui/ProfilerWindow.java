@@ -64,6 +64,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.AttachSettings;
+import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
@@ -252,9 +253,19 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         else setIcon(Icons.getImage(ProfilerIcons.PROFILE_INACTIVE));
     }
     
+    private ProfilingSettings __currentSettings() {
+        ProfilingSettings settings = currentFeature.getSettings();
+        System.err.println();
+        System.err.println("=================================================");
+        System.err.println(settings.debug());
+        System.err.println("=================================================");
+        System.err.println();
+        return settings;
+    }
+    
     private void performStartImpl() {
         start.setPushed(true);
-        session.start(currentFeature.getSettings(), attachSettings);
+        session.start(__currentSettings(), attachSettings);
     }
     
     private void performStopImpl() {
@@ -308,11 +319,11 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         revalidate();
         repaint();
         
-        if (session.inProgress()) session.modify(currentFeature.getSettings());
+        if (session.inProgress()) session.modify(__currentSettings());
         
         if (listener == null) listener = new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                if (session.inProgress()) session.modify(currentFeature.getSettings());
+                if (session.inProgress()) session.modify(__currentSettings());
             }
         };
         currentFeature.addChangeListener(listener);

@@ -58,7 +58,9 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -66,8 +68,10 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.CPUView;
+import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
 import org.netbeans.modules.profiler.api.GoToSource;
@@ -120,6 +124,11 @@ final class CPUFeature extends ProfilerFeature.Basic {
     private ProfilerToolbar toolbar;
     private JPanel settingsUI;
     
+    private Component instrSettingsSpace;
+    private JLabel outgoingLabel;
+    private Component outgoingSpace;
+    private JSpinner outgoingSpinner;
+    
     private View view;
     
     private CPUView cpuView;
@@ -132,6 +141,19 @@ final class CPUFeature extends ProfilerFeature.Basic {
     
     CPUFeature() {
         super(Bundle.CPUFeature_name(), Icons.getIcon(ProfilerIcons.CPU));
+    }
+    
+    
+    private ClientUtils.SourceCodeSelection[] selection;
+    private void profileSingle(ClientUtils.SourceCodeSelection selection) {
+        this.selection = new ClientUtils.SourceCodeSelection[] { selection };
+        setMode(Wildcards.ALLWILDCARD.equals(selection.getMethodName()) ?
+                Mode.INSTR_CLASS : Mode.INSTR_METHOD);
+        getSettingsUI().setVisible(true);
+    }
+    
+    private void selectForProfiling(ClientUtils.SourceCodeSelection[] selection) {
+        
     }
 
     
@@ -179,6 +201,20 @@ final class CPUFeature extends ProfilerFeature.Basic {
             settingsUI.add(modeButton);
 
             settingsUI.add(Box.createHorizontalStrut(5));
+            
+            
+            instrSettingsSpace = settingsUI.add(Box.createHorizontalStrut(8));
+            
+            outgoingLabel = new JLabel("Outgoing calls:");
+            settingsUI.add(outgoingLabel);
+            
+            outgoingSpace = settingsUI.add(Box.createHorizontalStrut(5));
+            
+            outgoingSpinner = new JExtendedSpinner(new SpinnerNumberModel(5, 1, 10, 1)) {
+                public Dimension getPreferredSize() { return getMinimumSize(); }
+                public Dimension getMaximumSize() { return getMinimumSize(); }
+            };
+            settingsUI.add(outgoingSpinner);
 
 
             settingsUI.add(Box.createGlue());
@@ -215,7 +251,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 protected void fireActionPerformed(ActionEvent e) {
                     cpuView.resetData();
                     fireChange();
-                    settingsUI.setVisible(false);
+//                    settingsUI.setVisible(false);
                     
                     // Proof of concept, show Call Tree when switching to root methods
                     if (mode == Mode.INSTR_SELECTED && view == View.HOT_SPOTS) {
@@ -233,6 +269,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
                     settingsUI.setVisible(false);
                 }
             });
+            
+            updateModeUI();
         }
         return settingsUI;
     }
@@ -240,7 +278,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
     private void setMode(Mode m) {
         if (mode == m) return;
         mode = m;
-        modeButton.setText(getModeName(m));
+        updateModeUI();
     }
     
     private String getModeName(Mode m) {
@@ -252,6 +290,16 @@ final class CPUFeature extends ProfilerFeature.Basic {
             case INSTR_SELECTED: return "Selected methods";
         }
         return null;
+    }
+    
+    private void updateModeUI() {
+        modeButton.setText(getModeName(mode));
+        
+        boolean instr = mode == Mode.INSTR_CLASS || mode == Mode.INSTR_METHOD || mode == Mode.INSTR_SELECTED;
+        instrSettingsSpace.setVisible(instr);
+        outgoingLabel.setVisible(instr);
+        outgoingSpace.setVisible(instr);
+        outgoingSpinner.setVisible(instr);
     }
     
     public ProfilerToolbar getToolbar() {
@@ -351,12 +399,22 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 settings.setSelectedInstrumentationFilter(f);
                 break;
                 
+            case INSTR_CLASS:
+            case INSTR_METHOD:
+                settings = ProfilingSettingsPresets.createCPUPreset(ProfilingSettings.PROFILE_CPU_PART);
+                settings.setThreadCPUTimerOn(true);
+                
+                if (selection != null) settings.addRootMethods(selection);
+                settings.setStackDepthLimit(((Number)outgoingSpinner.getValue()).intValue());
+                break;
+                
             case INSTR_SELECTED:
                 settings = ProfilingSettingsPresets.createCPUPreset(ProfilingSettings.PROFILE_CPU_PART);
                 settings.setThreadCPUTimerOn(true);
                 
                 ClientUtils.SourceCodeSelection[] selections = cpuView.getSelections();
-                if (selections.length > 0) settings.addRootMethods(selections);
+                if (selections != null) settings.addRootMethods(selections);
+                settings.setStackDepthLimit(((Number)outgoingSpinner.getValue()).intValue());
                 break;
         }
         
@@ -416,9 +474,11 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 String methodSig = value.getMethodSignature();
                 GoToSource.openSource(project, className, methodName, methodSig);
             }
-            public void profileMethod(ClientUtils.SourceCodeSelection value) {
+            public void profileSingle(ClientUtils.SourceCodeSelection value) {
+                CPUFeature.this.profileSingle(value);
             }
-            public void selectMethod(ClientUtils.SourceCodeSelection value) {
+            public void selectForProfiling(ClientUtils.SourceCodeSelection[] value) {
+                CPUFeature.this.selectForProfiling(value);
             }
             public void popupShowing() {
                 if (lrPauseButton.isEnabled() && !lrRefreshButton.isEnabled()) {
