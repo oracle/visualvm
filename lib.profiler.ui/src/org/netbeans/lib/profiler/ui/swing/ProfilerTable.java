@@ -908,12 +908,11 @@ public class ProfilerTable extends JTable {
         };
     }
     
-    private MouseEvent clearClicks(MouseEvent e) {
-        // Clears doubleclicks to prevent misses when switching sort order
-        MouseEvent ee = new MouseEvent((Component)e.getSource(), e.getID(), e.getWhen(),
-                                       e.getModifiers(), e.getX(), e.getY(),
-                                       1, e.isPopupTrigger(), e.getButton());
-        return ee;
+    protected static MouseEvent clearClicks(MouseEvent e) {
+        // Clear unwanted doubleclicks
+        return new MouseEvent((Component)e.getSource(), e.getID(), e.getWhen(),
+                              e.getModifiers(), e.getX(), e.getY(),
+                              1, e.isPopupTrigger(), e.getButton());
     }
     
 }
