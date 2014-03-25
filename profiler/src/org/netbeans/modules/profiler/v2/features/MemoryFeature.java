@@ -285,8 +285,8 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             
             lrPauseButton = new JToggleButton(Icons.getIcon(GeneralIcons.PAUSE)) {
                 protected void fireItemStateChanged(ItemEvent event) {
-                    if (!isSelected()) refreshResults();
-                    else skipRefresh = true;
+                    paused = isSelected();
+                    if (!paused) refreshResults();
                     refreshToolbar();
                 }
             };
@@ -456,6 +456,8 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             stopResults();
         } else if (isRunning(newState)) {
             startResults();
+        } else if (newState == ProjectSession.State.STARTED) {
+            resetResults();
         }
         refreshToolbar(newState);
     }
@@ -468,55 +470,50 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     }
     
     private volatile boolean running;
+    private volatile boolean paused;
+    private volatile boolean forceRefresh;
+    
     private Runnable refresher;
-    private boolean forceRefresh;
-    private boolean skipRefresh;
     
     private void startResults() {
         if (running) return;
         running = true;
         
-        if (memoryView != null) memoryView.resetData();
+        resetResults();
         
         refresher = new Runnable() {
             public void run() {
-                if (memoryView != null && running) {
-                    ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
-                        public void run() {
-                            try {
-                                if (running) {
-                                    if (skipRefresh) skipRefresh = false;
-                                    else memoryView.refreshData();
-                                    refreshResults(1500);
-                                }
-                            } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                                stopResults();
-                            }
-                        }
-                    });
+                if (running) {
+                    try {
+                        if (!paused || forceRefresh)
+                            if (memoryView != null) memoryView.refreshData();
+
+                        if (!forceRefresh) refreshResults(1500);
+                        else forceRefresh = false;
+                    } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                        stopResults();
+                    }
                 }
             }
         };
         
-        skipRefresh = false;
-        forceRefresh = true;
+        forceRefresh = false;
         refreshResults(1000);
     }
     
     private void refreshResults() {
-        skipRefresh = false;
         forceRefresh = true;
         refreshResults(0);
     }
     
     private void refreshResults(int delay) {
         // TODO: needs synchronization!
-        if (running && refresher != null) {
-            if (forceRefresh || lrPauseButton == null || !lrPauseButton.isSelected()) {
-                ProfilerUtils.runInProfilerRequestProcessor(refresher, delay);
-                forceRefresh = false;
-            }
-        }
+        if (running && refresher != null)
+            ProfilerUtils.runInProfilerRequestProcessor(refresher, delay);
+    }
+    
+    private void resetResults() {
+        if (memoryView != null) memoryView.resetData();
     }
     
     private void stopResults() {

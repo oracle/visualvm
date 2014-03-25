@@ -305,8 +305,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
             
             lrPauseButton = new JToggleButton(Icons.getIcon(GeneralIcons.PAUSE)) {
                 protected void fireItemStateChanged(ItemEvent event) {
-                    if (!isSelected()) refreshResults();
-                    else skipRefresh = true;
+                    paused = isSelected();
+                    if (!paused) refreshResults();
                     refreshToolbar();
                 }
             };
@@ -402,7 +402,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 settings.setThreadCPUTimerOn(true);
                 
                 if (selection != null) settings.addRootMethods(selection);
-                settings.setStackDepthLimit(((Number)outgoingSpinner.getValue()).intValue());
+//                settings.setStackDepthLimit(((Number)outgoingSpinner.getValue()).intValue());
                 break;
                 
             case INSTR_SELECTED:
@@ -411,7 +411,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 
                 ClientUtils.SourceCodeSelection[] selections = cpuView.getSelections();
                 if (selections != null) settings.addRootMethods(selections);
-                settings.setStackDepthLimit(((Number)outgoingSpinner.getValue()).intValue());
+//                settings.setStackDepthLimit(((Number)outgoingSpinner.getValue()).intValue());
                 break;
         }
         
@@ -539,9 +539,10 @@ final class CPUFeature extends ProfilerFeature.Basic {
     }
    
     private volatile boolean running;
+    private volatile boolean paused;
+    private volatile boolean forceRefresh;
+    
     private Runnable refresher;
-    private boolean forceRefresh;
-    private boolean skipRefresh;
     
     private void startResults() {
         if (running) return;
@@ -551,43 +552,33 @@ final class CPUFeature extends ProfilerFeature.Basic {
         
         refresher = new Runnable() {
             public void run() {
-                if (cpuView != null && running) {
-                    ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
-                        public void run() {
-                            try {
-                                if (running) {
-                                    if (skipRefresh) skipRefresh = false;
-                                    else cpuView.refreshData();
-                                    refreshResults(1500);
-                                }
-                            } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                                stopResults();
-                            }
-                        }
-                    });
+                if (running) {
+                    try {
+                        if (!paused || forceRefresh)
+                            if (cpuView != null) cpuView.refreshData();
+                        
+                        if (!forceRefresh) refreshResults(1500);
+                        else forceRefresh = false;
+                    } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                        stopResults();
+                    }
                 }
             }
         };
         
-        skipRefresh = false;
-        forceRefresh = true;
-        refreshResults();
+        forceRefresh = false;
+        refreshResults(1000);
     }
     
     private void refreshResults() {
-        skipRefresh = false;
         forceRefresh = true;
         refreshResults(0);
     }
     
     private void refreshResults(int delay) {
         // TODO: needs synchronization!
-        if (running && refresher != null) {
-            if (forceRefresh || lrPauseButton == null || !lrPauseButton.isSelected()) {
-                ProfilerUtils.runInProfilerRequestProcessor(refresher, delay);
-                forceRefresh = false;
-            }
-        }
+        if (running && refresher != null)
+            ProfilerUtils.runInProfilerRequestProcessor(refresher, delay);
     }
     
     private void resetResults() {

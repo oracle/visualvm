@@ -60,7 +60,6 @@ import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
 import org.netbeans.lib.profiler.utils.Wildcards;
@@ -97,27 +96,28 @@ public abstract class CPUView extends JPanel {
     public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
         client.forceObtainedResultsDump(true);
         
-//        if (treeTableView.isVisible()) {
-            try {
-                CPUResultsSnapshot newData = client.getCPUProfilingResultsSnapshot(false);
-                if (newData != null) treeTableView.setData(newData);
-            } catch (CPUResultsSnapshot.NoDataAvailableException e) {
-            } catch (Throwable t) {
-                if (t instanceof ClientUtils.TargetAppOrVMTerminated) {
-                    throw ((ClientUtils.TargetAppOrVMTerminated)t);
-                } else {
-                    System.err.println(">>> " + t.getMessage());
-                    t.printStackTrace(System.err);
-                }
+        try {
+            CPUResultsSnapshot snapshotData =
+                    client.getStatus().getInstrMethodClasses() == null ?
+                    null : client.getCPUProfilingResultsSnapshot(false);
+
+            if (snapshotData != null) {
+                FlatProfileContainer flatData = snapshotData.getFlatProfile(
+                        -1, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
+
+                treeTableView.setData(snapshotData);
+                tableView.setData(flatData);
+
             }
-//        }
-        
-//        if (tableView.isVisible()) {
-            FlatProfileProvider dataProvider = client.getFlatProfileProvider();
-            final FlatProfileContainer newData = dataProvider == null ? null :
-                                                 dataProvider.createFlatProfile();
-            if (newData != null) tableView.setData(newData);
-//        }
+        } catch (CPUResultsSnapshot.NoDataAvailableException e) {
+        } catch (Throwable t) {
+            if (t instanceof ClientUtils.TargetAppOrVMTerminated) {
+                throw ((ClientUtils.TargetAppOrVMTerminated)t);
+            } else {
+                System.err.println(">>> " + t.getMessage());
+                t.printStackTrace(System.err);
+            }
+        }
     }
     
     public void resetData() {
