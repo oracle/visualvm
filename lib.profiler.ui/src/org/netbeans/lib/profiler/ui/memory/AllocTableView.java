@@ -44,10 +44,13 @@
 package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
@@ -64,7 +67,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
  *
  * @author Jiri Sedlacek
  */
-class AllocTableView extends JPanel {
+abstract class AllocTableView extends JPanel {
     
     private static final String[] EMPTY_SELECTION = new String[0];
     
@@ -135,12 +138,44 @@ class AllocTableView extends JPanel {
     }
     
     
+    protected abstract void performDefaultAction(String value);
+    
+    protected abstract void populatePopup(JPopupMenu popup, String value);
+    
+    protected abstract void popupShowing();
+    
+    protected abstract void popupHidden();
+    
+    
     private HideableBarRenderer[] renderers;
     
     private void initUI() {
         tableModel = new MemoryTableModel();
         
-        table = new ProfilerTable(tableModel, true, true, null);
+        table = new ProfilerTable(tableModel, true, true, null) {
+            protected String getValueForPopup(int row) {
+                return valueForRow(row);
+            }
+            protected void populatePopup(JPopupMenu popup, Object value) {
+                AllocTableView.this.populatePopup(popup, (String)value);
+            }
+            protected void popupShowing() {
+                AllocTableView.this.popupShowing();
+            }
+            protected void popupHidden() {
+                AllocTableView.this.popupHidden();
+            }
+        };
+        
+        table.providePopupMenu(true);
+        table.setDefaultAction(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                int row = table.getSelectedRow();
+                String value = valueForRow(row);
+                if (value != null) performDefaultAction(value);
+            }
+        });
+        
         table.setMainColumn(1);
         table.setFitWidthColumn(1);
         
@@ -177,6 +212,13 @@ class AllocTableView extends JPanel {
         
         setLayout(new BorderLayout());
         add(tableContainer, BorderLayout.CENTER);
+    }
+    
+    
+    private String valueForRow(int row) {
+        if (nTrackedItems == 0 || row == -1) return null;
+        if (row >= tableModel.getRowCount()) return null; // #239936
+        return classNames[table.convertRowIndexToModel(row)];
     }
     
     

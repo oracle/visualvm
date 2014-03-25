@@ -44,7 +44,11 @@
 package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.global.CommonConstants;
@@ -57,9 +61,10 @@ import org.netbeans.lib.profiler.utils.StringUtils;
  *
  * @author Jiri Sedlacek
  */
-public class MemoryView extends JPanel {
+public abstract class MemoryView extends JPanel {
     
     private final ProfilerClient client;
+    private final boolean showSourceSupported;
     
     private SampledTableView sampledView;
     private AllocTableView allocView;
@@ -68,8 +73,9 @@ public class MemoryView extends JPanel {
     private JPanel currentView;
     
     
-    public MemoryView(ProfilerClient client) {
+    public MemoryView(ProfilerClient client, boolean showSourceSupported) {
         this.client = client;
+        this.showSourceSupported = showSourceSupported;
         initUI();
     }
     
@@ -193,23 +199,83 @@ public class MemoryView extends JPanel {
     }
     
     
+    public abstract void showSource(String value);
+    
+    public abstract void profileSingle(String value);
+    
+    public abstract void selectForProfiling(String[] value);
+    
+    public void popupShowing() {};
+    
+    public void popupHidden() {};
+    
+    
     private JPanel getView() {
         switch (client.getCurrentInstrType()) {
 //            case CommonConstants.INSTR_NONE_MEMORY_SAMPLING:
 //                if (sampledView == null) sampledView = new SampledTableView();
 //                return sampledView;
             case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
-                if (allocView == null) allocView = new AllocTableView();
+                if (allocView == null) allocView = new AllocTableView() {
+                    protected void performDefaultAction(String value) {
+                        if (showSourceSupported) showSource(value);
+                    }
+                    protected void populatePopup(JPopupMenu popup, String value) {
+                        MemoryView.this.populatePopup(popup, value);
+                    }
+                    protected void popupShowing() { MemoryView.this.popupShowing(); }
+                    protected void popupHidden()  { MemoryView.this.popupHidden(); }
+                };
                 return allocView;
             case CommonConstants.INSTR_OBJECT_LIVENESS:
-                if (livenessView == null) livenessView = new LivenessTableView();
+                if (livenessView == null) livenessView = new LivenessTableView() {
+                    protected void performDefaultAction(String value) {
+                        if (showSourceSupported) showSource(value);
+                    }
+                    protected void populatePopup(JPopupMenu popup, String value) {
+                        MemoryView.this.populatePopup(popup, value);
+                    }
+                    protected void popupShowing() { MemoryView.this.popupShowing(); }
+                    protected void popupHidden()  { MemoryView.this.popupHidden(); }
+                };
                 return livenessView;
             default:
-                if (sampledView == null) sampledView = new SampledTableView();
+                if (sampledView == null) sampledView = new SampledTableView() {
+                    protected void performDefaultAction(String value) {
+                        if (showSourceSupported) showSource(value);
+                    }
+                    protected void populatePopup(JPopupMenu popup, String value) {
+                        MemoryView.this.populatePopup(popup, value);
+                    }
+                    protected void popupShowing() { MemoryView.this.popupShowing(); }
+                    protected void popupHidden()  { MemoryView.this.popupHidden(); }
+                };
                 return sampledView;
 //                return null;
         }
     }
+    
+    private void populatePopup(JPopupMenu popup, final String value) {
+        if (showSourceSupported) {
+            popup.add(new JMenuItem("Go to Source") {
+                { setEnabled(value != null); setFont(getFont().deriveFont(Font.BOLD)); }
+                protected void fireActionPerformed(ActionEvent e) { showSource(value); }
+            });
+            popup.addSeparator();
+        }
+        
+        popup.add(new JMenuItem("Profile this Class") {
+            { setEnabled(value != null); }
+            protected void fireActionPerformed(ActionEvent e) { profileSingle(value); }
+        });
+        
+        popup.addSeparator();
+        popup.add(new JMenuItem("Select for Profiling") {
+            { setEnabled(value != null); }
+            protected void fireActionPerformed(ActionEvent e) { selectForProfiling(new String[] { value }); }
+        });
+    }
+    
     
     private void initUI() {
         setLayout(new BorderLayout(0, 0));

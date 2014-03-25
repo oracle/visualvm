@@ -186,27 +186,8 @@ public abstract class CPUView extends JPanel {
             protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
                 if (showSourceSupported) showSource(value);
             }
-            protected void populatePopup(JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
-                if (showSourceSupported) {
-                    popup.add(new JMenuItem("Go to Source") {
-                        { setEnabled(value != null); setFont(getFont().deriveFont(Font.BOLD)); }
-                        protected void fireActionPerformed(ActionEvent e) { showSource(value); }
-                    });
-                    popup.addSeparator();
-                }
-                popup.add(new JMenuItem("Profile this Method") {
-                    { setEnabled(value != null); }
-                    protected void fireActionPerformed(ActionEvent e) { profileMethod(value); }
-                });
-                popup.add(new JMenuItem("Profile this Class") {
-                    { setEnabled(value != null); }
-                    protected void fireActionPerformed(ActionEvent e) { profileClass(value); }
-                });
-                popup.addSeparator();
-                popup.add(new JMenuItem("Select for Profiling") {
-                    { setEnabled(value != null); }
-                    protected void fireActionPerformed(ActionEvent e) { selectMethod(value); }
-                });
+            protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
+                CPUView.this.populatePopup(popup, value);
             }
             protected void popupShowing() { CPUView.this.popupShowing(); }
             protected void popupHidden()  { CPUView.this.popupHidden(); }
@@ -216,27 +197,8 @@ public abstract class CPUView extends JPanel {
             protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
                 if (showSourceSupported) showSource(value);
             }
-            protected void populatePopup(JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
-                if (showSourceSupported) {
-                    popup.add(new JMenuItem("Go to Source") {
-                        { setEnabled(value != null); setFont(getFont().deriveFont(Font.BOLD)); }
-                        protected void fireActionPerformed(ActionEvent e) { showSource(value); }
-                    });
-                    popup.addSeparator();
-                }
-                popup.add(new JMenuItem("Profile this Method") {
-                    { setEnabled(value != null); }
-                    protected void fireActionPerformed(ActionEvent e) { profileMethod(value); }
-                });
-                popup.add(new JMenuItem("Profile this Class") {
-                    { setEnabled(value != null); }
-                    protected void fireActionPerformed(ActionEvent e) { profileClass(value); }
-                });
-                popup.addSeparator();
-                popup.add(new JMenuItem("Select for Profiling") {
-                    { setEnabled(value != null); }
-                    protected void fireActionPerformed(ActionEvent e) { selectMethod(value); }
-                });
+            protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
+                CPUView.this.populatePopup(popup, value);
             }
             protected void popupShowing() { CPUView.this.popupShowing(); }
             protected void popupHidden()  { CPUView.this.popupHidden(); }
@@ -265,6 +227,32 @@ public abstract class CPUView extends JPanel {
         
 //        // TODO: read last state?
 //        setView(true, false);
+    }
+    
+    private void populatePopup(JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
+        if (showSourceSupported) {
+            popup.add(new JMenuItem("Go to Source") {
+                { setEnabled(value != null); setFont(getFont().deriveFont(Font.BOLD)); }
+                protected void fireActionPerformed(ActionEvent e) { showSource(value); }
+            });
+            popup.addSeparator();
+        }
+        
+        popup.add(new JMenuItem("Profile this Method") {
+            { setEnabled(value != null); }
+            protected void fireActionPerformed(ActionEvent e) { profileMethod(value); }
+        });
+        
+        popup.add(new JMenuItem("Profile this Class") {
+            { setEnabled(value != null); }
+            protected void fireActionPerformed(ActionEvent e) { profileClass(value); }
+        });
+        
+        popup.addSeparator();
+        popup.add(new JMenuItem("Select for Profiling") {
+            { setEnabled(value != null); }
+            protected void fireActionPerformed(ActionEvent e) { selectMethod(value); }
+        });
     }
     
 }

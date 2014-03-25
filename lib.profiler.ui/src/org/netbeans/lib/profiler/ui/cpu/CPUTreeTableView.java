@@ -78,7 +78,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
  *
  * @author Jiri Sedlacek
  */
-public abstract class CPUTreeTableView extends JPanel {
+abstract class CPUTreeTableView extends JPanel {
     
     private final ProfilerClient client;
     

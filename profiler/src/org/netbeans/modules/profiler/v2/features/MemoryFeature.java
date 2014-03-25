@@ -73,6 +73,7 @@ import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.RunGCAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
+import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -83,6 +84,7 @@ import org.netbeans.modules.profiler.v2.ui.components.GrayLabel;
 import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
 import org.netbeans.modules.profiler.v2.ui.components.SmallButton;
 import org.netbeans.modules.profiler.v2.ui.components.TitledMenuSeparator;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -126,9 +128,23 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private Mode mode = Mode.SAMPLED_ALL;
     private PopupButton modeButton;
     
+    private boolean popupPause;
+    
     
     MemoryFeature() {
         super(Bundle.MemoryFeature_name(), Icons.getIcon(ProfilerIcons.MEMORY));
+    }
+    
+    
+    private String[] selection;
+    private void profileSingle(String selection) {
+        this.selection = new String[] { selection };
+        setMode(Mode.INSTR_CLASS);
+        getSettingsUI().setVisible(true);
+    }
+    
+    private void selectForProfiling(String[] selection) {
+        
     }
 
     
@@ -361,6 +377,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 settings.setSelectedInstrumentationFilter(f);
                 break;
                 
+            case INSTR_CLASS:
             case INSTR_SELECTED:
                 int type = lifecycleCheckbox.isSelected() ? ProfilingSettings.PROFILE_MEMORY_LIVENESS :
                                                             ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS;
@@ -370,7 +387,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 settings.setAllocStackTraceLimit(stackLimit);
                 
                 StringBuilder b = new StringBuilder();
-                String[] selections = memoryView.getSelections();
+                String[] selections = mode == Mode.INSTR_CLASS ? selection : memoryView.getSelections();
                 for (int i = 0; i < selections.length; i++) {
                     b.append(selections[i]);
                     if (i < selections.length - 1) b.append(", "); // NOI18N
@@ -388,7 +405,30 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     
     private void initResultsUI() {
         TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
-        memoryView = new MemoryView(runner.getProfilerClient());
+        memoryView = new MemoryView(runner.getProfilerClient(), GoToSource.isAvailable()) {
+            public void showSource(String value) {
+                Lookup.Provider project = getSession().getProject();
+                GoToSource.openSource(project, value, "", ""); // NOI18N
+            }
+            public void profileSingle(String value) {
+                MemoryFeature.this.profileSingle(value);
+            }
+            public void selectForProfiling(String[] value) {
+                MemoryFeature.this.selectForProfiling(value);
+            }
+            public void popupShowing() {
+                if (lrPauseButton.isEnabled() && !lrRefreshButton.isEnabled()) {
+                    popupPause = true;
+                    lrPauseButton.setSelected(true);
+                }
+            }
+            public void popupHidden() {
+                if (lrPauseButton.isEnabled() && popupPause) {
+                    popupPause = false;
+                    lrPauseButton.setSelected(false);
+                }
+            }
+        };
     }
     
     private void refreshToolbar() {
@@ -401,7 +441,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             public void run() {
                 boolean running = isRunning(state);
                 lrPauseButton.setEnabled(running);
-                lrRefreshButton.setEnabled(running && lrPauseButton.isSelected());
+                lrRefreshButton.setEnabled(!popupPause && running && lrPauseButton.isSelected());
                 
                 boolean inactive = state == ProjectSession.State.INACTIVE;
                 lrLabel.setEnabled(!inactive);
@@ -460,7 +500,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         
         skipRefresh = false;
         forceRefresh = true;
-        refreshResults();
+        refreshResults(1000);
     }
     
     private void refreshResults() {

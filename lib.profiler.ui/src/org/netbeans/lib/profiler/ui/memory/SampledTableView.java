@@ -44,11 +44,14 @@
 package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
@@ -65,7 +68,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
  *
  * @author Jiri Sedlacek
  */
-class SampledTableView extends JPanel {
+abstract class SampledTableView extends JPanel {
     
     private static final String[] EMPTY_SELECTION = new String[0];
     
@@ -117,12 +120,44 @@ class SampledTableView extends JPanel {
     }
     
     
+    protected abstract void performDefaultAction(String value);
+    
+    protected abstract void populatePopup(JPopupMenu popup, String value);
+    
+    protected abstract void popupShowing();
+    
+    protected abstract void popupHidden();
+    
+    
     private HideableBarRenderer[] renderers;
     
     private void initUI() {
         tableModel = new MemoryTableModel();
         
-        table = new ProfilerTable(tableModel, true, true, null);
+        table = new ProfilerTable(tableModel, true, true, null) {
+            protected String getValueForPopup(int row) {
+                return valueForRow(row);
+            }
+            protected void populatePopup(JPopupMenu popup, Object value) {
+                SampledTableView.this.populatePopup(popup, (String)value);
+            }
+            protected void popupShowing() {
+                SampledTableView.this.popupShowing();
+            }
+            protected void popupHidden() {
+                SampledTableView.this.popupHidden();
+            }
+        };
+        
+        table.providePopupMenu(true);
+        table.setDefaultAction(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                int row = table.getSelectedRow();
+                String value = valueForRow(row);
+                if (value != null) performDefaultAction(value);
+            }
+        });
+        
         table.setMainColumn(1);
         table.setFitWidthColumn(1);
         
@@ -152,6 +187,13 @@ class SampledTableView extends JPanel {
         
         setLayout(new BorderLayout());
         add(tableContainer, BorderLayout.CENTER);
+    }
+    
+    
+    private String valueForRow(int row) {
+        if (data == null || row == -1) return null;
+        if (row >= tableModel.getRowCount()) return null; // #239936
+        return data[table.convertRowIndexToModel(row)].getName();
     }
     
     

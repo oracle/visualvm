@@ -74,7 +74,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
  *
  * @author Jiri Sedlacek
  */
-public abstract class CPUTableView extends JPanel {
+abstract class CPUTableView extends JPanel {
     
     private final ProfilerClient client;
     
