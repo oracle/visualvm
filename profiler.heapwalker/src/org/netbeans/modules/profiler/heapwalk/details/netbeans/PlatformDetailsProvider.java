@@ -80,6 +80,7 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
     private static final String FIXED_21_30 = "org.openide.util.CharSequences$Fixed6Bit_21_30"; // NOI18N
     private static final String BYTE_BASED_SEQUENCE = "org.openide.util.CharSequences$ByteBasedSequence"; // NOI18N
     private static final String CHAR_BASED_SEQUENCE = "org.openide.util.CharSequences$CharBasedSequence"; // NOI18N
+    private static final String REQUEST_PROCESSOR = "org.openide.util.RequestProcessor";     // NOI18N
     
     LinkedHashMap<Long, String> cache = new LinkedHashMap<Long, String>(10000) {
 
@@ -95,7 +96,8 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
               FILE_OBJ,FOLDER_OBJ, FILE_NAME,FOLDER_NAME,ABSTRACT_FOLDER,
               BFS_BASE,
               FIXED_0_7,FIXED_8_15,FIXED_16_23,FIXED_1_10,FIXED_11_20,
-              FIXED_21_30,BYTE_BASED_SEQUENCE,CHAR_BASED_SEQUENCE);
+              FIXED_21_30,BYTE_BASED_SEQUENCE,CHAR_BASED_SEQUENCE,
+              REQUEST_PROCESSOR);
     }
 
     @Override
@@ -226,6 +228,8 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
             }
         } else if (CHAR_BASED_SEQUENCE.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "value", heap);    // NOI18N
+        } else if (REQUEST_PROCESSOR.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "name", heap);     // NOI18N
         }
         return null;
     }
