@@ -61,12 +61,12 @@ import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
-import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.McsTimeRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
 
@@ -187,10 +187,10 @@ public abstract class CPUTableView extends JPanel {
         
         renderers = new HideableBarRenderer[5];
         
-        renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.millisecondsFormat()));
-        renderers[1] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.millisecondsFormat()));
-        renderers[2] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.millisecondsFormat()));
-        renderers[3] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.millisecondsFormat()));
+        renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer()));
+        renderers[1] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer()));
+        renderers[2] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer()));
+        renderers[3] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer()));
         renderers[4] = new HideableBarRenderer(new NumberRenderer());
         
         long refTime = 123456;

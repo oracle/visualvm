@@ -257,7 +257,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         ProfilingSettings settings = currentFeature.getSettings();
         System.err.println();
         System.err.println("=================================================");
-        System.err.println(settings.debug());
+        System.err.print(settings.debug());
         System.err.println("=================================================");
         System.err.println();
         return settings;
