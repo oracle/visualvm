@@ -54,6 +54,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
+import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -235,6 +236,24 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
             if (threadsPanel != null) threadsPanel.profilingSessionStarted();
         }
         refreshToolbar(newState);
+    }
+    
+    public void attachedToSession(ProjectSession session) {
+        super.attachedToSession(session);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                Profiler.getDefault().getThreadsManager().resetStates();
+            }
+        });
+    }
+    
+    public void detachedFromSession(ProjectSession session) {
+        super.detachedFromSession(session);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                Profiler.getDefault().getThreadsManager().resetStates();
+            }
+        });
     }
     
 }

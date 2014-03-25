@@ -69,7 +69,11 @@ public final class ProfilerUtils {
         return profilerErrorManager;
     }
     
-    public static void runInProfilerRequestProcessor(final Runnable r) {
+    public static void runInProfilerRequestProcessor(Runnable r) {
         getProfilerRequestProcessor().post(r);
-    }    
+    }
+    
+    public static void runInProfilerRequestProcessor(Runnable r, int delay) {
+        getProfilerRequestProcessor().post(r, delay);
+    }
 }

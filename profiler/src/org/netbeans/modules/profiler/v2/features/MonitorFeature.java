@@ -187,4 +187,22 @@ final class MonitorFeature extends ProfilerFeature.Basic {
         refreshToolbar(newState);
     }
     
+    public void attachedToSession(ProjectSession session) {
+        super.attachedToSession(session);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                Profiler.getDefault().getVMTelemetryManager().reset();
+            }
+        });
+    }
+    
+    public void detachedFromSession(ProjectSession session) {
+        super.detachedFromSession(session);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                Profiler.getDefault().getVMTelemetryManager().reset();
+            }
+        });
+    }
+    
 }

@@ -84,7 +84,6 @@ import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
 import org.netbeans.modules.profiler.v2.ui.components.SmallButton;
 import org.netbeans.modules.profiler.v2.ui.components.TitledMenuSeparator;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -400,7 +399,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private void refreshToolbar(final ProjectSession.State state) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                boolean running = state == ProjectSession.State.RUNNING;
+                boolean running = isRunning(state);
                 lrPauseButton.setEnabled(running);
                 lrRefreshButton.setEnabled(running && lrPauseButton.isSelected());
                 
@@ -415,46 +414,53 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
         if (newState == null || newState == ProjectSession.State.INACTIVE) {
             stopResults();
-        } else if (newState == ProjectSession.State.RUNNING) {
+        } else if (isRunning(newState)) {
             startResults();
         }
         refreshToolbar(newState);
     }
     
-    private RequestProcessor processor;
+    private boolean isRunning(ProjectSession.State state) {
+        if (state != ProjectSession.State.RUNNING) return false;
+        ProjectSession session = getSession();
+        if (session == null) return false;
+        return ProfilingSettings.isMemorySettings(session.getProfilingSettings());
+    }
+    
+    private volatile boolean running;
     private Runnable refresher;
     private boolean forceRefresh;
     private boolean skipRefresh;
     
     private void startResults() {
-        if (processor != null) return;
+        if (running) return;
+        running = true;
         
         if (memoryView != null) memoryView.resetData();
         
-        processor = new RequestProcessor("Memory Data Refresher"); // NOI18N
-        
         refresher = new Runnable() {
             public void run() {
-                if (memoryView != null) {
+                if (memoryView != null && running) {
                     ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                         public void run() {
                             try {
-                                if (skipRefresh) skipRefresh = false;
-                                else memoryView.refreshData();
+                                if (running) {
+                                    if (skipRefresh) skipRefresh = false;
+                                    else memoryView.refreshData();
+                                    refreshResults(1500);
+                                }
                             } catch (ClientUtils.TargetAppOrVMTerminated ex) {
                                 stopResults();
                             }
                         }
                     });
                 }
-                
-                refreshResults(1500);
             }
         };
         
         skipRefresh = false;
         forceRefresh = true;
-        refreshResults(2000);
+        refreshResults();
     }
     
     private void refreshResults() {
@@ -465,27 +471,29 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     
     private void refreshResults(int delay) {
         // TODO: needs synchronization!
-        if (processor != null && !processor.isShutdown()) {
+        if (running && refresher != null) {
             if (forceRefresh || lrPauseButton == null || !lrPauseButton.isSelected()) {
-                processor.post(refresher, delay);
+                ProfilerUtils.runInProfilerRequestProcessor(refresher, delay);
                 forceRefresh = false;
             }
         }
     }
     
     private void stopResults() {
-        if (processor != null) processor.shutdownNow();
-        processor = null;
+        if (refresher != null) {
+            running = false;
+            refresher = null;
+        }
     }
     
-//    public void attachedToSession(ProjectSession session) {
-//        super.attachedToSession(session);
-////        if (tableView != null) tableView.resetData();
-//    }
-//    
-//    public void detachedFromSession(ProjectSession session) {
-//        super.detachedFromSession(session);
-////        if (tableView != null) tableView.resetData();
-//    }
+    public void attachedToSession(ProjectSession session) {
+        super.attachedToSession(session);
+        if (memoryView != null) memoryView.resetData();
+    }
+    
+    public void detachedFromSession(ProjectSession session) {
+        super.detachedFromSession(session);
+        if (memoryView != null) memoryView.resetData();
+    }
     
 }
