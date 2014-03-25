@@ -119,7 +119,11 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private ProfilerToolbar toolbar;
     private JPanel settingsUI;
     
-    private Component instrCheckboxesSpace;
+    private Component instrSettingsSpace;
+    private JLabel selectedLabel;
+    private Component selectedSpace1;
+    private Component selectedSeparator;
+    private Component selectedSpace2;
     private JCheckBox lifecycleCheckbox;
     private JCheckBox allocationsCheckbox;
     
@@ -130,16 +134,18 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     
     private boolean popupPause;
     
+    private String[] selectedClasses;
+    
     
     MemoryFeature() {
         super(Bundle.MemoryFeature_name(), Icons.getIcon(ProfilerIcons.MEMORY));
     }
     
     
-    private String[] selection;
     private void profileSingle(String selection) {
-        this.selection = new String[] { selection };
+        selectedClasses = new String[] { selection };
         setMode(Mode.INSTR_CLASS);
+        updateModeUI();
         getSettingsUI().setVisible(true);
     }
     
@@ -188,10 +194,22 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             };
             settingsUI.add(modeButton);
 
-            settingsUI.add(Box.createHorizontalStrut(5));
+            instrSettingsSpace = settingsUI.add(Box.createHorizontalStrut(8));
             
+            selectedLabel = new JLabel();
+            settingsUI.add(selectedLabel);
             
-            instrCheckboxesSpace = settingsUI.add(Box.createHorizontalStrut(5));
+            selectedSpace1 = settingsUI.add(Box.createHorizontalStrut(8));
+            
+            selectedSeparator = Box.createHorizontalStrut(1);
+            selectedSeparator.setBackground(Color.GRAY);
+            if (selectedSeparator instanceof JComponent) ((JComponent)selectedSeparator).setOpaque(true);
+            Dimension d = selectedSeparator.getMaximumSize();
+            d.height = 20;
+            selectedSeparator.setMaximumSize(d);
+            settingsUI.add(selectedSeparator);
+            
+            selectedSpace2 = settingsUI.add(Box.createHorizontalStrut(8));
             
             lifecycleCheckbox = new JCheckBox("Record full lifecycle");
             lifecycleCheckbox.setOpaque(false);
@@ -220,17 +238,17 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 }
             });
 
-            settingsUI.add(Box.createHorizontalStrut(5));
+            settingsUI.add(Box.createHorizontalStrut(8));
 
             Component sep1 = Box.createHorizontalStrut(1);
             sep1.setBackground(Color.GRAY);
             if (sep1 instanceof JComponent) ((JComponent)sep1).setOpaque(true);
-            Dimension d = sep1.getMaximumSize();
-            d.height = 20;
-            sep1.setMaximumSize(d);
+            Dimension dd = sep1.getMaximumSize();
+            dd.height = 20;
+            sep1.setMaximumSize(dd);
             settingsUI.add(sep1);
 
-            settingsUI.add(Box.createHorizontalStrut(5));
+            settingsUI.add(Box.createHorizontalStrut(8));
 
             settingsUI.add(new SmallButton("Apply") {
                 protected void fireActionPerformed(ActionEvent e) {
@@ -273,10 +291,35 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private void updateModeUI() {
         modeButton.setText(getModeName(mode));
         
-        boolean instr = mode == Mode.INSTR_CLASS || mode == Mode.INSTR_SELECTED;
-        instrCheckboxesSpace.setVisible(instr);
-        lifecycleCheckbox.setVisible(instr);
-        allocationsCheckbox.setVisible(instr);
+        boolean instrumentation = isInstrumentation();
+        instrSettingsSpace.setVisible(instrumentation);
+        selectedLabel.setVisible(instrumentation);
+        selectedSpace1.setVisible(instrumentation);
+        selectedSeparator.setVisible(instrumentation);
+        selectedSpace2.setVisible(instrumentation);
+        lifecycleCheckbox.setVisible(instrumentation);
+        allocationsCheckbox.setVisible(instrumentation);
+        
+        if (mode == Mode.INSTR_CLASS) {
+            int count = selectedClasses == null ? 0 : selectedClasses.length;
+            if (count == 0) {
+                selectedLabel.setText("No class");
+            } else if (count == 1) {
+                selectedLabel.setText(selectedClasses[0]);
+            } else {
+                selectedLabel.setText(count + " classes");
+            }
+        } else if (mode == Mode.INSTR_SELECTED) {
+            String[] selections = memoryView.getSelections();
+            int count = selections == null ? 0 : selections.length;
+            if (count == 0) {
+                selectedLabel.setText("No class");
+            } else if (count == 1) {
+                selectedLabel.setText(selections[0]);
+            } else {
+                selectedLabel.setText(count + " classes");
+            }
+        }
     }
     
     public ProfilerToolbar getToolbar() {
@@ -387,7 +430,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 settings.setAllocStackTraceLimit(stackLimit);
                 
                 StringBuilder b = new StringBuilder();
-                String[] selections = mode == Mode.INSTR_CLASS ? selection : memoryView.getSelections();
+                String[] selections = mode == Mode.INSTR_CLASS ? selectedClasses : memoryView.getSelections();
                 for (int i = 0; i < selections.length; i++) {
                     b.append(selections[i]);
                     if (i < selections.length - 1) b.append(", "); // NOI18N
@@ -460,6 +503,11 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             resetResults();
         }
         refreshToolbar(newState);
+    }
+    
+    private boolean isInstrumentation() {
+        return mode == Mode.INSTR_CLASS ||
+               mode == Mode.INSTR_SELECTED;
     }
     
     private boolean isRunning(ProjectSession.State state) {

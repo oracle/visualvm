@@ -124,6 +124,10 @@ final class CPUFeature extends ProfilerFeature.Basic {
     private JPanel settingsUI;
     
     private Component instrSettingsSpace;
+    private JLabel selectedLabel;
+    private Component selectedSpace1;
+    private Component selectedSeparator;
+    private Component selectedSpace2;
     private JLabel outgoingLabel;
     private Component outgoingSpace;
     private JSpinner outgoingSpinner;
@@ -137,17 +141,24 @@ final class CPUFeature extends ProfilerFeature.Basic {
     
     private boolean popupPause;
     
+    private ClientUtils.SourceCodeSelection[] selectedClasses;
+    private ClientUtils.SourceCodeSelection[] selectedMethods;
+    
     
     CPUFeature() {
         super(Bundle.CPUFeature_name(), Icons.getIcon(ProfilerIcons.CPU));
     }
     
     
-    private ClientUtils.SourceCodeSelection[] selection;
     private void profileSingle(ClientUtils.SourceCodeSelection selection) {
-        this.selection = new ClientUtils.SourceCodeSelection[] { selection };
-        setMode(Wildcards.ALLWILDCARD.equals(selection.getMethodName()) ?
-                Mode.INSTR_CLASS : Mode.INSTR_METHOD);
+        if (Wildcards.ALLWILDCARD.equals(selection.getMethodName())) {
+            selectedClasses = new ClientUtils.SourceCodeSelection[] { selection };
+            setMode(Mode.INSTR_CLASS);
+        } else {
+            selectedMethods = new ClientUtils.SourceCodeSelection[] { selection };
+            setMode(Mode.INSTR_METHOD);
+        }
+        updateModeUI();
         getSettingsUI().setVisible(true);
     }
     
@@ -197,12 +208,24 @@ final class CPUFeature extends ProfilerFeature.Basic {
                     });
                 }
             };
-            settingsUI.add(modeButton);
-
-            settingsUI.add(Box.createHorizontalStrut(5));
-            
+            settingsUI.add(modeButton);            
             
             instrSettingsSpace = settingsUI.add(Box.createHorizontalStrut(8));
+            
+            selectedLabel = new JLabel();
+            settingsUI.add(selectedLabel);
+            
+            selectedSpace1 = settingsUI.add(Box.createHorizontalStrut(8));
+            
+            selectedSeparator = Box.createHorizontalStrut(1);
+            selectedSeparator.setBackground(Color.GRAY);
+            if (selectedSeparator instanceof JComponent) ((JComponent)selectedSeparator).setOpaque(true);
+            Dimension d = selectedSeparator.getMaximumSize();
+            d.height = 20;
+            selectedSeparator.setMaximumSize(d);
+            settingsUI.add(selectedSeparator);
+            
+            selectedSpace2 = settingsUI.add(Box.createHorizontalStrut(8));
             
             outgoingLabel = new JLabel("Outgoing calls:");
             settingsUI.add(outgoingLabel);
@@ -234,17 +257,17 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 }
             });
 
-            settingsUI.add(Box.createHorizontalStrut(5));
+            settingsUI.add(Box.createHorizontalStrut(8));
 
             Component sep1 = Box.createHorizontalStrut(1);
             sep1.setBackground(Color.GRAY);
             if (sep1 instanceof JComponent) ((JComponent)sep1).setOpaque(true);
-            Dimension d = sep1.getMaximumSize();
-            d.height = 20;
-            sep1.setMaximumSize(d);
+            Dimension dd = sep1.getMaximumSize();
+            dd.height = 20;
+            sep1.setMaximumSize(dd);
             settingsUI.add(sep1);
 
-            settingsUI.add(Box.createHorizontalStrut(5));
+            settingsUI.add(Box.createHorizontalStrut(8));
 
             settingsUI.add(new SmallButton("Apply") {
                 protected void fireActionPerformed(ActionEvent e) {
@@ -294,9 +317,43 @@ final class CPUFeature extends ProfilerFeature.Basic {
         
         boolean instrumentation = isInstrumentation();
         instrSettingsSpace.setVisible(instrumentation);
+        selectedLabel.setVisible(instrumentation);
+        selectedSpace1.setVisible(instrumentation);
+        selectedSeparator.setVisible(instrumentation);
+        selectedSpace2.setVisible(instrumentation);
         outgoingLabel.setVisible(instrumentation);
         outgoingSpace.setVisible(instrumentation);
         outgoingSpinner.setVisible(instrumentation);
+        
+        if (mode == Mode.INSTR_CLASS) {
+            int count = selectedClasses == null ? 0 : selectedClasses.length;
+            if (count == 0) {
+                selectedLabel.setText("No class");
+            } else if (count == 1) {
+                selectedLabel.setText(selectedClasses[0].getClassName());
+            } else {
+                selectedLabel.setText(count + " classes");
+            }
+        } else if (mode == Mode.INSTR_METHOD) {
+            int count = selectedMethods == null ? 0 : selectedMethods.length;
+            if (count == 0) {
+                selectedLabel.setText("No method");
+            } else if (count == 1) {
+                selectedLabel.setText(selectedMethods[0].getClassName() + "." + selectedMethods[0].getMethodName());
+            } else {
+                selectedLabel.setText(count + " methods");
+            }
+        } else if (mode == Mode.INSTR_SELECTED) {
+            ClientUtils.SourceCodeSelection[] selections = cpuView.getSelections();
+            int count = selections == null ? 0 : selections.length;
+            if (count == 0) {
+                selectedLabel.setText("No method");
+            } else if (count == 1) {
+                selectedLabel.setText(selections[0].getClassName() + "." + selections[0].getMethodName());
+            } else {
+                selectedLabel.setText(count + " methods");
+            }
+        }
     }
     
     public ProfilerToolbar getToolbar() {
@@ -401,8 +458,10 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 settings = ProfilingSettingsPresets.createCPUPreset(ProfilingSettings.PROFILE_CPU_PART);
                 settings.setThreadCPUTimerOn(true);
                 
+                ClientUtils.SourceCodeSelection[] selection = mode == Mode.INSTR_CLASS ? selectedClasses :
+                                                                                         selectedMethods;
                 if (selection != null) settings.addRootMethods(selection);
-//                settings.setStackDepthLimit(((Number)outgoingSpinner.getValue()).intValue());
+                settings.setStackDepthLimit(((Number)outgoingSpinner.getValue()).intValue());
                 break;
                 
             case INSTR_SELECTED:
@@ -411,7 +470,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 
                 ClientUtils.SourceCodeSelection[] selections = cpuView.getSelections();
                 if (selections != null) settings.addRootMethods(selections);
-//                settings.setStackDepthLimit(((Number)outgoingSpinner.getValue()).intValue());
+                settings.setStackDepthLimit(((Number)outgoingSpinner.getValue()).intValue());
                 break;
         }
         
