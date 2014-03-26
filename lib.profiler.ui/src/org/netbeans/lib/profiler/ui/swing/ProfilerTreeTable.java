@@ -183,6 +183,8 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
 
     protected void processMouseEvent(MouseEvent e) {
+        MouseEvent treeEvent = null;
+        
         if (e != null) {
             Point point = e.getPoint();
             int column = columnAtPoint(point);
@@ -196,10 +198,9 @@ public class ProfilerTreeTable extends ProfilerTable {
                     int _column = convertColumnIndexToModel(column);
                     int treeX = point.x - tableCellRect.x + getColumnOffset(_column);
                     if (treeX > treeCellRect.x) treeX = treeCellRect.x + treeCellRect.width / 2;
-                    MouseEvent newEvent = new MouseEvent(tree, e.getID(), e.getWhen(),
-                                                         e.getModifiers(), treeX, e.getY(),
-                                                         e.getClickCount(), e.isPopupTrigger());
-                    tree.dispatchEvent(newEvent);
+                    treeEvent = new MouseEvent(tree, e.getID(), e.getWhen(),
+                                               e.getModifiers(), treeX, e.getY(),
+                                               e.getClickCount(), e.isPopupTrigger());
                     
                     // Prevent invoking default action on doubleclick
                     e = clearClicks(e);
@@ -208,6 +209,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         }
         
         super.processMouseEvent(e);
+        if (treeEvent != null) tree.dispatchEvent(treeEvent);
     }
     
     
