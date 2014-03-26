@@ -46,6 +46,7 @@ package org.netbeans.lib.profiler.ui.graphs;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -98,6 +99,9 @@ public final class CPUGraphPanel extends GraphPanel {
     private final VMTelemetryModels models;
 
     private final boolean smallPanel;
+    
+    private final Color CPU_COLOR = ColorFactory.getPredefinedColor(0);
+    private final Color GC_COLOR = ColorFactory.getPredefinedColor(1);
 
 
     // --- Constructors --------------------------------------------------------
@@ -191,25 +195,25 @@ public final class CPUGraphPanel extends GraphPanel {
         XYItem cpuTimeItem = models.cpuItemsModel().getItem(0);
         XYItemPainter cpuTimePainter = (XYItemPainter)paintersModel.getPainter(cpuTimeItem);
         PercentLongMarksPainter cpuTimeMarksPainter = new PercentLongMarksPainter(0, 1000);
-        cpuTimeMarksPainter.setForeground(GraphsUI.PROFILER_RED);
+//        cpuTimeMarksPainter.setForeground(GraphsUI.PROFILER_RED);
         AxisComponent cAxis =
                 new AxisComponent(chart, new DecimalXYItemMarksComputer(
                          cpuTimeItem, cpuTimePainter, chart.getChartContext(),
                          SwingConstants.VERTICAL),
                          cpuTimeMarksPainter, SwingConstants.WEST,
-                         AxisComponent.NO_MESH);
+                         AxisComponent.MESH_FOREGROUND);
 
         // GC time axis
-        XYItem gcTimeItem = models.cpuItemsModel().getItem(1);
-        XYItemPainter gcTimePainter = (XYItemPainter)paintersModel.getPainter(gcTimeItem);
-        PercentLongMarksPainter gcTimeMarksPainter = new PercentLongMarksPainter(0, 1000);
-        gcTimeMarksPainter.setForeground(GraphsUI.GC_TIME_PAINTER_LINE_COLOR);
-        AxisComponent gAxis =
-                new AxisComponent(chart, new DecimalXYItemMarksComputer(
-                         gcTimeItem, gcTimePainter, chart.getChartContext(),
-                         SwingConstants.VERTICAL),
-                         gcTimeMarksPainter, SwingConstants.EAST,
-                         AxisComponent.NO_MESH);
+//        XYItem gcTimeItem = models.cpuItemsModel().getItem(1);
+//        XYItemPainter gcTimePainter = (XYItemPainter)paintersModel.getPainter(gcTimeItem);
+//        PercentLongMarksPainter gcTimeMarksPainter = new PercentLongMarksPainter(0, 1000);
+//        gcTimeMarksPainter.setForeground(GraphsUI.GC_TIME_PAINTER_LINE_COLOR);
+//        AxisComponent gAxis =
+//                new AxisComponent(chart, new DecimalXYItemMarksComputer(
+//                         gcTimeItem, gcTimePainter, chart.getChartContext(),
+//                         SwingConstants.VERTICAL),
+//                         gcTimeMarksPainter, SwingConstants.EAST,
+//                         AxisComponent.NO_MESH);
 
         // Chart panel (chart & axes)
         JPanel chartPanel = new JPanel(new CrossBorderLayout());
@@ -222,59 +226,59 @@ public final class CPUGraphPanel extends GraphPanel {
                                               SwingConstants.SOUTH_WEST });
         chartPanel.add(cAxis, new Integer[] { SwingConstants.WEST,
                                               SwingConstants.SOUTH_WEST });
-        chartPanel.add(gAxis, new Integer[] { SwingConstants.EAST,
-                                              SwingConstants.SOUTH_EAST });
+//        chartPanel.add(gAxis, new Integer[] { SwingConstants.EAST,
+//                                              SwingConstants.SOUTH_EAST });
 
         // Small panel UI
         if (smallPanel) {
 
-            // Customize chart
-            chart.setMouseZoomingEnabled(false);
-            chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_NONE);
-
-            // CPU
-            JLabel heapSizeSmall = new JLabel("CPU Time",
-                                              new ColorIcon(GraphsUI.
-                                              PROFILER_RED, null,
-                                              8, 8), SwingConstants.LEADING);
-            heapSizeSmall.setFont(getFont().deriveFont((float)(getFont().getSize()) - 1));
-            heapSizeSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-
-            // Used heap
-            JLabel usedHeapSmall = new JLabel(GraphsUI.GC_TIME_NAME,
-                                              new ColorIcon(GraphsUI.
-                                              GC_TIME_PAINTER_LINE_COLOR, null,
-                                              8, 8), SwingConstants.LEADING);
-            usedHeapSmall.setFont(getFont().deriveFont((float) (getFont().getSize()) - 1));
-            usedHeapSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-
-            // Legend container
-            JPanel smallLegendPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 1));
-            smallLegendPanel.setBackground(GraphsUI.SMALL_LEGEND_BACKGROUND_COLOR);
-            smallLegendPanel.setBorder(new LineBorder(GraphsUI.SMALL_LEGEND_BORDER_COLOR, 1));
-            smallLegendPanel.add(heapSizeSmall);
-            smallLegendPanel.add(usedHeapSmall);
-            JPanel smallLegendContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
-            smallLegendContainer.setBackground(GraphsUI.SMALL_LEGEND_BACKGROUND_COLOR);
-            smallLegendContainer.add(smallLegendPanel);
-
-            // Master UI
-            setLayout(new BorderLayout());
-            add(chartPanel, BorderLayout.CENTER);
-            add(smallLegendContainer, BorderLayout.SOUTH);
-
-
-            // Doubleclick action
-            chart.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent e) {
-                    if (SwingUtilities.isLeftMouseButton(e) &&
-                        e.getClickCount() == 2)
-                            chartAction.actionPerformed(null);
-                }
-            });
-
-            // Toolbar actions
-            chartActions = new Action[] {};
+//            // Customize chart
+//            chart.setMouseZoomingEnabled(false);
+//            chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_NONE);
+//
+//            // CPU
+//            JLabel heapSizeSmall = new JLabel("CPU Time",
+//                                              new ColorIcon(GraphsUI.
+//                                              PROFILER_RED, null,
+//                                              8, 8), SwingConstants.LEADING);
+//            heapSizeSmall.setFont(getFont().deriveFont((float)(getFont().getSize()) - 1));
+//            heapSizeSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+//
+//            // Used heap
+//            JLabel usedHeapSmall = new JLabel(GraphsUI.GC_TIME_NAME,
+//                                              new ColorIcon(GraphsUI.
+//                                              GC_TIME_PAINTER_LINE_COLOR, null,
+//                                              8, 8), SwingConstants.LEADING);
+//            usedHeapSmall.setFont(getFont().deriveFont((float) (getFont().getSize()) - 1));
+//            usedHeapSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+//
+//            // Legend container
+//            JPanel smallLegendPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 1));
+//            smallLegendPanel.setBackground(GraphsUI.SMALL_LEGEND_BACKGROUND_COLOR);
+//            smallLegendPanel.setBorder(new LineBorder(GraphsUI.SMALL_LEGEND_BORDER_COLOR, 1));
+//            smallLegendPanel.add(heapSizeSmall);
+//            smallLegendPanel.add(usedHeapSmall);
+//            JPanel smallLegendContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+//            smallLegendContainer.setBackground(GraphsUI.SMALL_LEGEND_BACKGROUND_COLOR);
+//            smallLegendContainer.add(smallLegendPanel);
+//
+//            // Master UI
+//            setLayout(new BorderLayout());
+//            add(chartPanel, BorderLayout.CENTER);
+//            add(smallLegendContainer, BorderLayout.SOUTH);
+//
+//
+//            // Doubleclick action
+//            chart.addMouseListener(new MouseAdapter() {
+//                public void mouseClicked(MouseEvent e) {
+//                    if (SwingUtilities.isLeftMouseButton(e) &&
+//                        e.getClickCount() == 2)
+//                            chartAction.actionPerformed(null);
+//                }
+//            });
+//
+//            // Toolbar actions
+//            chartActions = new Action[] {};
 
         // Big panel UI
         } else {
@@ -298,35 +302,42 @@ public final class CPUGraphPanel extends GraphPanel {
             JPanel chartContainer = new JPanel(new BorderLayout());
             chartContainer.setBorder(BorderFactory.createEmptyBorder());
             chartContainer.add(chartPanel, BorderLayout.CENTER);
-            chartContainer.add(hScrollBar, BorderLayout.SOUTH);
+//            chartContainer.add(hScrollBar, BorderLayout.SOUTH);
 
             // Heap Size
             JLabel heapSizeBig = new JLabel("CPU Time",
-                                            new ColorIcon(GraphsUI.
-                                            SURVGEN_PAINTER_LINE_COLOR, Color.
+                                            new ColorIcon(CPU_COLOR, Color.
                                             BLACK, 18, 9), SwingConstants.LEADING);
             heapSizeBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
             // Used heap
             JLabel usedHeapBig = new JLabel(GraphsUI.GC_TIME_NAME,
-                                            new ColorIcon(GraphsUI.
-                                            GC_TIME_PAINTER_LINE_COLOR, Color.
+                                            new ColorIcon(GC_COLOR, Color.
                                             BLACK, 18, 9), SwingConstants.LEADING);
             usedHeapBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
             // Legend container
-            JPanel bigLegendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 7, 8));
+            JPanel bigLegendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 7, 0));
+            bigLegendPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 15));
             bigLegendPanel.setOpaque(false);
             bigLegendPanel.add(heapSizeBig);
             bigLegendPanel.add(usedHeapBig);
             
             JPanel legendContainer = new JPanel(new BorderLayout(0, 0));
-            UIUtils.decorateProfilerPanel(legendContainer);
-            legendContainer.add(UIUtils.createHorizontalLine(legendContainer.getBackground()), BorderLayout.NORTH);
+            legendContainer.setOpaque(true);
+            legendContainer.setBackground(UIUtils.getProfilerResultsBackground());
+//            UIUtils.decorateProfilerPanel(legendContainer);
+//            legendContainer.add(UIUtils.createHorizontalLine(legendContainer.getBackground()), BorderLayout.NORTH);
             legendContainer.add(bigLegendPanel, BorderLayout.CENTER);
 
             // Master UI
             setLayout(new BorderLayout());
+            JLabel caption = new JLabel("CPU and GC", JLabel.CENTER);
+            caption.setFont(caption.getFont().deriveFont(Font.BOLD));
+            caption.setBorder(BorderFactory.createEmptyBorder(20, 0, 5, 0));
+            caption.setOpaque(true);
+            caption.setBackground(UIUtils.getProfilerResultsBackground());
+            add(caption, BorderLayout.NORTH);
             add(chartContainer, BorderLayout.CENTER);
             add(legendContainer, BorderLayout.SOUTH);
 
@@ -416,36 +427,38 @@ public final class CPUGraphPanel extends GraphPanel {
         // CPU
         SynchronousXYItemPainter cpuTimePainter =
                 SynchronousXYItemPainter.relativePainter(GraphsUI.GC_TIME_PAINTER_LINE_WIDTH,
-                                                      GraphsUI.PROFILER_RED,
-                                                      GraphsUI.GC_TIME_PAINTER_FILL_COLOR,
+                                                      CPU_COLOR,
+                                                      null,
                                                       10);
-        SynchronousXYItemMarker cpuTimeMarker =
-                 SynchronousXYItemMarker.relativePainter(GraphsUI.GC_TIME_MARKER_RADIUS,
-                                                      GraphsUI.GC_TIME_MARKER_LINE1_WIDTH,
-                                                      GraphsUI.GC_TIME_MARKER_LINE1_COLOR,
-                                                      GraphsUI.GC_TIME_MARKER_LINE2_WIDTH,
-                                                      GraphsUI.GC_TIME_MARKER_LINE2_COLOR,
-                                                      GraphsUI.PROFILER_RED,
-                                                      10);
-        XYItemPainter ctp = new CompoundXYItemPainter(cpuTimePainter,
-                                                      cpuTimeMarker);
+//        SynchronousXYItemMarker cpuTimeMarker =
+//                 SynchronousXYItemMarker.relativePainter(GraphsUI.GC_TIME_MARKER_RADIUS,
+//                                                      GraphsUI.GC_TIME_MARKER_LINE1_WIDTH,
+//                                                      GraphsUI.GC_TIME_MARKER_LINE1_COLOR,
+//                                                      GraphsUI.GC_TIME_MARKER_LINE2_WIDTH,
+//                                                      GraphsUI.GC_TIME_MARKER_LINE2_COLOR,
+//                                                      GraphsUI.PROFILER_RED,
+//                                                      10);
+//        XYItemPainter ctp = new CompoundXYItemPainter(cpuTimePainter,
+//                                                      cpuTimeMarker);
+        XYItemPainter ctp = cpuTimePainter;
 
         // Relative time spent in GC
         SynchronousXYItemPainter gcTimePainter =
                 SynchronousXYItemPainter.relativePainter(GraphsUI.GC_TIME_PAINTER_LINE_WIDTH,
-                                                      GraphsUI.GC_TIME_PAINTER_LINE_COLOR,
-                                                      GraphsUI.GC_TIME_PAINTER_FILL_COLOR,
+                                                      GC_COLOR,
+                                                      null,
                                                       10);
-        SynchronousXYItemMarker gcTimeMarker =
-                 SynchronousXYItemMarker.relativePainter(GraphsUI.GC_TIME_MARKER_RADIUS,
-                                                      GraphsUI.GC_TIME_MARKER_LINE1_WIDTH,
-                                                      GraphsUI.GC_TIME_MARKER_LINE1_COLOR,
-                                                      GraphsUI.GC_TIME_MARKER_LINE2_WIDTH,
-                                                      GraphsUI.GC_TIME_MARKER_LINE2_COLOR,
-                                                      GraphsUI.GC_TIME_MARKER_FILL_COLOR,
-                                                      10);
-        XYItemPainter gtp = new CompoundXYItemPainter(gcTimePainter,
-                                                      gcTimeMarker);
+//        SynchronousXYItemMarker gcTimeMarker =
+//                 SynchronousXYItemMarker.relativePainter(GraphsUI.GC_TIME_MARKER_RADIUS,
+//                                                      GraphsUI.GC_TIME_MARKER_LINE1_WIDTH,
+//                                                      GraphsUI.GC_TIME_MARKER_LINE1_COLOR,
+//                                                      GraphsUI.GC_TIME_MARKER_LINE2_WIDTH,
+//                                                      GraphsUI.GC_TIME_MARKER_LINE2_COLOR,
+//                                                      GraphsUI.GC_TIME_MARKER_FILL_COLOR,
+//                                                      10);
+//        XYItemPainter gtp = new CompoundXYItemPainter(gcTimePainter,
+//                                                      gcTimeMarker);
+        XYItemPainter gtp = gcTimePainter;
 
         // Model
         ItemsModel items = models.cpuItemsModel();

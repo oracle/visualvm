@@ -193,13 +193,13 @@ public final class VMTelemetryModels {
         };
         survivingGenerationsItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.SURVGEN_INITIAL_VALUE));
 
-        // Relative time spent in GC
-        SynchronousXYItem gcTimeItem = new SynchronousXYItem(GraphsUI.GC_TIME_NAME, 0, 1000) {
-            public long getYValue(int index) {
-                return dataManager.relativeGCTimeInPerMil[index];
-            }
-        };
-        gcTimeItem.setInitialBounds(new LongRect(0, 0, 0, 1000));
+//        // Relative time spent in GC
+//        SynchronousXYItem gcTimeItem = new SynchronousXYItem(GraphsUI.GC_TIME_NAME, 0, 1000) {
+//            public long getYValue(int index) {
+//                return dataManager.relativeGCTimeInPerMil[index];
+//            }
+//        };
+//        gcTimeItem.setInitialBounds(new LongRect(0, 0, 0, 1000));
 
         // GC intervals
         ProfilerGCXYItem gcIntervalsItem = new ProfilerGCXYItem("") { // NOI18N
@@ -217,8 +217,7 @@ public final class VMTelemetryModels {
         // Model
         SynchronousXYItemsModel model = new SynchronousXYItemsModel(timeline,
                  new SynchronousXYItem[] { gcIntervalsItem,
-                                        survivingGenerationsItem,
-                                        gcTimeItem });
+                                        survivingGenerationsItem });
 
         return model;
     }
