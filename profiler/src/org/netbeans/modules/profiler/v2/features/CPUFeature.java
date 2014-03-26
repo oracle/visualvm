@@ -271,7 +271,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
 
             settingsUI.add(new SmallButton("Apply") {
                 protected void fireActionPerformed(ActionEvent e) {
-                    cpuView.resetData();
+                    stopResults();
+                    resetResults();
                     fireChange();
 //                    settingsUI.setVisible(false);
                     
@@ -387,7 +388,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
             
             pdResetResultsButton = new JButton(ResetResultsAction.getInstance()) {
                 protected void fireActionPerformed(ActionEvent e) {
-                    cpuView.resetData();
+                    resetResults();
                     super.fireActionPerformed(e);
                 }
             };
@@ -449,7 +450,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 
                 ProjectContentsSupport pcs = ProjectContentsSupport.get(session.getProject());
                 String filter = pcs.getInstrumentationFilter(false);
-                SimpleFilter f = new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE, filter); // NOI18N
+                SimpleFilter f = new SimpleFilter("Project only classes",
+                                 SimpleFilter.SIMPLE_FILTER_INCLUSIVE, filter); // NOI18N
                 settings.setSelectedInstrumentationFilter(f);
                 break;
                 
@@ -653,12 +655,12 @@ final class CPUFeature extends ProfilerFeature.Basic {
     
     public void attachedToSession(ProjectSession session) {
         super.attachedToSession(session);
-        if (cpuView != null) cpuView.resetData();
+        resetResults();
     }
     
     public void detachedFromSession(ProjectSession session) {
         super.detachedFromSession(session);
-        if (cpuView != null) cpuView.resetData();
+        resetResults();
     }
     
 }

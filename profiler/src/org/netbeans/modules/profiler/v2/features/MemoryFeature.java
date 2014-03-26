@@ -252,7 +252,8 @@ final class MemoryFeature extends ProfilerFeature.Basic {
 
             settingsUI.add(new SmallButton("Apply") {
                 protected void fireActionPerformed(ActionEvent e) {
-                    memoryView.resetData();
+                    stopResults();
+                    resetResults();
                     fireChange();
 //                    settingsUI.setVisible(false);
                 }
@@ -349,7 +350,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             
             pdResetResultsButton = new JButton(ResetResultsAction.getInstance()) {
                 protected void fireActionPerformed(ActionEvent e) {
-                    memoryView.resetData();
+                    resetResults();
                     super.fireActionPerformed(e);
                 }
             };
@@ -573,12 +574,12 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     
     public void attachedToSession(ProjectSession session) {
         super.attachedToSession(session);
-        if (memoryView != null) memoryView.resetData();
+        if (memoryView != null) resetResults();
     }
     
     public void detachedFromSession(ProjectSession session) {
         super.detachedFromSession(session);
-        if (memoryView != null) memoryView.resetData();
+        if (memoryView != null) resetResults();
     }
     
 }
