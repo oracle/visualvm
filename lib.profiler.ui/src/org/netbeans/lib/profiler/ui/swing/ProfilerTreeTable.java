@@ -193,7 +193,8 @@ public class ProfilerTreeTable extends ProfilerTable {
                 
                 if (treeCellRect != null) {
                     Rectangle tableCellRect = getCellRect(row, column, true);
-                    int treeX = point.x - tableCellRect.x;
+                    int _column = convertColumnIndexToModel(column);
+                    int treeX = point.x - tableCellRect.x + getColumnOffset(_column);
                     if (treeX > treeCellRect.x) treeX = treeCellRect.x + treeCellRect.width / 2;
                     MouseEvent newEvent = new MouseEvent(tree, e.getID(), e.getWhen(),
                                                          e.getModifiers(), treeX, e.getY(),

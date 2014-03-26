@@ -311,7 +311,7 @@ public final class CPUGraphPanel extends GraphPanel {
             heapSizeBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
             // Used heap
-            JLabel usedHeapBig = new JLabel(GraphsUI.GC_TIME_NAME,
+            JLabel usedHeapBig = new JLabel("GC Time",
                                             new ColorIcon(GC_COLOR, Color.
                                             BLACK, 18, 9), SwingConstants.LEADING);
             usedHeapBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
