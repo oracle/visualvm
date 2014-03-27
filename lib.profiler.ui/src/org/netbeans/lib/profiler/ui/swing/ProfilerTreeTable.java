@@ -440,7 +440,9 @@ public class ProfilerTreeTable extends ProfilerTable {
         private int[] viewToModel(Object parent) {
             if (viewToModel == null) viewToModel = new HashMap();
             
-            int[] indexes = viewToModel.get(parent);
+            TreePath parentPath = new TreePath(getPathToRoot((TreeNode)parent));
+            int[] indexes = viewToModel.get(parentPath);
+            
             if (indexes == null) {
                 Object[] children = new Object[super.getChildCount(parent)];
                 for (int i = 0; i < children.length; i++)
@@ -449,7 +451,7 @@ public class ProfilerTreeTable extends ProfilerTable {
                 indexes = new int[children.length];
                 for (int i = 0; i < indexes.length; i++)
                     indexes[i] = super.getIndexOfChild(parent, children[i]);
-                viewToModel.put(parent, indexes);
+                viewToModel.put(parentPath, indexes);
             }
             
             return indexes;
