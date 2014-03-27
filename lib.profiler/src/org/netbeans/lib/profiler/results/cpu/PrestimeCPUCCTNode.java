@@ -104,7 +104,7 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
         public long getWaitTime0() { return -1; }
         public void sortChildren(int sortBy, boolean sortOrder) {}
         public TreeNode getChildAt(int childIndex) { return null; }
-        public int getChildCount() { return -1; }
+        public int getChildCount() { return 0; }
         public CCTNode getParent() { return null; }
         public int getIndex(TreeNode node) { return -1; }
         public boolean getAllowsChildren() { return false; }
