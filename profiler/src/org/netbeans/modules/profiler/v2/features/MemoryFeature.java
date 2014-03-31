@@ -48,6 +48,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -136,9 +138,28 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     
     private String[] selectedClasses;
     
+    private final Set<String> selection;
+    
     
     MemoryFeature() {
         super(Bundle.MemoryFeature_name(), Icons.getIcon(ProfilerIcons.MEMORY));
+        
+        selection = new HashSet() {
+            public boolean add(Object value) {
+                boolean _add = super.add(value);
+                selectionChanged();
+                return _add;
+            }
+            public boolean remove(Object value) {
+                boolean _remove = super.remove(value);
+                selectionChanged();
+                return _remove;
+            }
+            public void clear() {
+                super.clear();
+                selectionChanged();
+            }
+        };
     }
     
     
@@ -151,6 +172,12 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     
     private void selectForProfiling(String[] selection) {
         
+    }
+    
+    
+    private void selectionChanged() {
+        memoryView.refreshSelection();
+        updateModeUI();
     }
 
     
@@ -174,7 +201,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
 
             modeButton = new PopupButton("All classes") {
                 protected void populatePopup(JPopupMenu popup) {
-                    popup.add(new TitledMenuSeparator("Quick (sampled)"));
+                    popup.add(new TitledMenuSeparator("General (sampled)"));
                     popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_ALL), mode == Mode.SAMPLED_ALL) {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.SAMPLED_ALL); }
                     });
@@ -182,12 +209,12 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.SAMPLED_PROJECT); }
                     });
                     
-                    popup.add(new TitledMenuSeparator("Detailed (instrumented)"));
+                    popup.add(new TitledMenuSeparator("Focused (instrumented)"));
                     popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_CLASS), mode == Mode.INSTR_CLASS) {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_CLASS); }
                     });
                     popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_SELECTED), mode == Mode.INSTR_SELECTED) {
-                        { setEnabled(memoryView.hasSelection()); }
+//                        { setEnabled(memoryView.hasSelection()); }
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_SELECTED); }
                     });
                 }
@@ -311,12 +338,11 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 selectedLabel.setText(count + " classes");
             }
         } else if (mode == Mode.INSTR_SELECTED) {
-            String[] selections = memoryView.getSelections();
-            int count = selections == null ? 0 : selections.length;
+            int count = selection.size();
             if (count == 0) {
                 selectedLabel.setText("No class");
             } else if (count == 1) {
-                selectedLabel.setText(selections[0]);
+                selectedLabel.setText(selection.iterator().next());
             } else {
                 selectedLabel.setText(count + " classes");
             }
@@ -431,7 +457,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 settings.setAllocStackTraceLimit(stackLimit);
                 
                 StringBuilder b = new StringBuilder();
-                String[] selections = mode == Mode.INSTR_CLASS ? selectedClasses : memoryView.getSelections();
+                String[] selections = mode == Mode.INSTR_CLASS ? selectedClasses : selection.toArray(new String[selection.size()]);
                 for (int i = 0; i < selections.length; i++) {
                     b.append(selections[i]);
                     if (i < selections.length - 1) b.append(", "); // NOI18N
@@ -449,7 +475,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     
     private void initResultsUI() {
         TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
-        memoryView = new MemoryView(runner.getProfilerClient(), GoToSource.isAvailable()) {
+        memoryView = new MemoryView(runner.getProfilerClient(), selection, GoToSource.isAvailable()) {
             public void showSource(String value) {
                 Lookup.Provider project = getSession().getProject();
                 GoToSource.openSource(project, value, "", ""); // NOI18N

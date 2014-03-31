@@ -45,8 +45,7 @@ package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -69,8 +68,6 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
  */
 abstract class AllocTableView extends JPanel {
     
-    private static final String[] EMPTY_SELECTION = new String[0];
-    
     private MemoryTableModel tableModel;
     private ProfilerTable table;
     
@@ -79,10 +76,12 @@ abstract class AllocTableView extends JPanel {
     private int[] nTotalAllocObjects;
     private long[] totalAllocObjectsSize;
     
-    private Map<Integer, String> selections;
+    private final Set<String> selection;
     
     
-    public AllocTableView() {
+    public AllocTableView(Set<String> selection) {
+        this.selection = selection;
+        
         initUI();
     }
     
@@ -106,8 +105,6 @@ abstract class AllocTableView extends JPanel {
                     renderers[0].setMaxValue(totalBytes);
                     renderers[1].setMaxValue(totalObjects);
                     
-                    if (selections == null) selections = new HashMap();
-                    
                     tableModel.fireTableDataChanged();
                 }
             }
@@ -121,20 +118,15 @@ abstract class AllocTableView extends JPanel {
                 classNames = null;
                 nTotalAllocObjects = null;
                 totalAllocObjectsSize = null;
-                selections = null;
                 
                 tableModel.fireTableDataChanged();
             }
         });
     }
     
-    boolean hasSelection() {
-        return selections != null && !selections.isEmpty();
-    }
     
-    String[] getSelections() {
-        return !hasSelection() ? EMPTY_SELECTION :
-                selections.values().toArray(EMPTY_SELECTION);
+    public void refreshSelection() {
+        tableModel.fireTableDataChanged();
     }
     
     
@@ -268,7 +260,7 @@ abstract class AllocTableView extends JPanel {
             } else if (columnIndex == 3) {
                 return nTotalAllocObjects[rowIndex];
             } else if (columnIndex == 0) {
-                return selections.containsKey(rowIndex);
+                return selection.contains(classNames[rowIndex]);
             }
 
             return null;
@@ -276,9 +268,8 @@ abstract class AllocTableView extends JPanel {
 
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
             if (columnIndex == 0) {
-                if (Boolean.FALSE.equals(aValue)) selections.remove(rowIndex);
-                else selections.put(rowIndex, getValueAt(rowIndex, 1).toString());
-                tableModel.fireTableDataChanged();
+                if (Boolean.FALSE.equals(aValue)) selection.remove(classNames[rowIndex]);
+                else selection.add(classNames[rowIndex]);
             }
         }
 

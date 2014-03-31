@@ -46,6 +46,7 @@ package org.netbeans.lib.profiler.ui.memory;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.util.Set;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -72,10 +73,14 @@ public abstract class MemoryView extends JPanel {
     
     private JPanel currentView;
     
+    private final Set<String> selection;
     
-    public MemoryView(ProfilerClient client, boolean showSourceSupported) {
+    
+    public MemoryView(ProfilerClient client, Set<String> selection, boolean showSourceSupported) {
         this.client = client;
+        this.selection = selection;
         this.showSourceSupported = showSourceSupported;
+        
         initUI();
     }
     
@@ -170,32 +175,38 @@ public abstract class MemoryView extends JPanel {
     }
     
     
-    public boolean hasSelection() {
-        if (currentView == null) {
-            return false;
-        } else if (currentView == sampledView) {
-            return sampledView.hasSelection();
-        } else if (currentView == allocView) {
-            return allocView.hasSelection();
-        } else if (currentView == livenessView) {
-            return livenessView.hasSelection();
-        } else {
-            return false;
-        }
-    }
+//    public boolean hasSelection() {
+//        if (currentView == null) {
+//            return false;
+//        } else if (currentView == sampledView) {
+//            return sampledView.hasSelection();
+//        } else if (currentView == allocView) {
+//            return allocView.hasSelection();
+//        } else if (currentView == livenessView) {
+//            return livenessView.hasSelection();
+//        } else {
+//            return false;
+//        }
+//    }
+//    
+//    public String[] getSelections() {
+//        if (!hasSelection()) {
+//            return new String[0];
+//        } else if (currentView == sampledView) {
+//            return sampledView.getSelections();
+//        } else if (currentView == allocView) {
+//            return allocView.getSelections();
+//        } else if (currentView == livenessView) {
+//            return livenessView.getSelections();
+//        } else {
+//            return null;
+//        }
+//    }
     
-    public String[] getSelections() {
-        if (!hasSelection()) {
-            return new String[0];
-        } else if (currentView == sampledView) {
-            return sampledView.getSelections();
-        } else if (currentView == allocView) {
-            return allocView.getSelections();
-        } else if (currentView == livenessView) {
-            return livenessView.getSelections();
-        } else {
-            return null;
-        }
+    public void refreshSelection() {
+        if (sampledView != null) sampledView.refreshSelection();
+        if (allocView != null) allocView.refreshSelection();
+        if (livenessView != null) livenessView.refreshSelection();
     }
     
     
@@ -216,7 +227,7 @@ public abstract class MemoryView extends JPanel {
 //                if (sampledView == null) sampledView = new SampledTableView();
 //                return sampledView;
             case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
-                if (allocView == null) allocView = new AllocTableView() {
+                if (allocView == null) allocView = new AllocTableView(selection) {
                     protected void performDefaultAction(String value) {
                         if (showSourceSupported) showSource(value);
                     }
@@ -228,7 +239,7 @@ public abstract class MemoryView extends JPanel {
                 };
                 return allocView;
             case CommonConstants.INSTR_OBJECT_LIVENESS:
-                if (livenessView == null) livenessView = new LivenessTableView() {
+                if (livenessView == null) livenessView = new LivenessTableView(selection) {
                     protected void performDefaultAction(String value) {
                         if (showSourceSupported) showSource(value);
                     }
@@ -240,7 +251,7 @@ public abstract class MemoryView extends JPanel {
                 };
                 return livenessView;
             default:
-                if (sampledView == null) sampledView = new SampledTableView() {
+                if (sampledView == null) sampledView = new SampledTableView(selection) {
                     protected void performDefaultAction(String value) {
                         if (showSourceSupported) showSource(value);
                     }

@@ -45,8 +45,6 @@ package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
@@ -70,17 +68,17 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
  */
 abstract class SampledTableView extends JPanel {
     
-    private static final String[] EMPTY_SELECTION = new String[0];
-    
     private MemoryTableModel tableModel;
     private ProfilerTable table;
     
     private HeapHistogram.ClassInfo[] data;
     
-    private Map<HeapHistogram.ClassInfo, String> selections;
+    private final Set<String> selection;
     
     
-    public SampledTableView() {
+    public SampledTableView(Set<String> selection) {
+        this.selection = selection;
+        
         initUI();
     }
     
@@ -97,9 +95,6 @@ abstract class SampledTableView extends JPanel {
                     renderers[0].setMaxValue(histogram == null ? 0 : histogram.getTotalHeapBytes());
                     renderers[1].setMaxValue(histogram == null ? 0 : histogram.getTotalHeapInstances());
                     
-                    if (data == null) selections = null; // reset data
-                    else if (selections == null) selections = new HashMap();
-                    
                     tableModel.fireTableDataChanged();
                 }
             }
@@ -110,13 +105,9 @@ abstract class SampledTableView extends JPanel {
         setData(null);
     }
     
-    boolean hasSelection() {
-        return selections != null && !selections.isEmpty();
-    }
     
-    String[] getSelections() {
-        return !hasSelection() ? EMPTY_SELECTION :
-                selections.values().toArray(EMPTY_SELECTION);
+    public void refreshSelection() {
+        tableModel.fireTableDataChanged();
     }
     
     
@@ -240,7 +231,7 @@ abstract class SampledTableView extends JPanel {
             } else if (columnIndex == 3) {
                 return data[rowIndex].getInstancesCount();
             } else if (columnIndex == 0) {
-                return selections.containsKey(data[rowIndex]);
+                return selection.contains(data[rowIndex].getName());
             }
 
             return null;
@@ -248,10 +239,8 @@ abstract class SampledTableView extends JPanel {
 
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
             if (columnIndex == 0) {
-                HeapHistogram.ClassInfo classInfo = data[rowIndex];
-                if (Boolean.FALSE.equals(aValue)) selections.remove(classInfo);
-                else selections.put(classInfo, classInfo.getName());
-                tableModel.fireTableDataChanged();
+                if (Boolean.FALSE.equals(aValue)) selection.remove(data[rowIndex].getName());
+                else selection.add(data[rowIndex].getName());
             }
         }
 

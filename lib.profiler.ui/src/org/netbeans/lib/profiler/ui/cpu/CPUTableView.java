@@ -45,11 +45,7 @@ package org.netbeans.lib.profiler.ui.cpu;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -82,11 +78,13 @@ abstract class CPUTableView extends JPanel {
     private ProfilerTable table;
     
     private FlatProfileContainer data;
-    private Map<Integer, ClientUtils.SourceCodeSelection> selections;
+    private final Map<Integer, ClientUtils.SourceCodeSelection> selection;
     
     
-    public CPUTableView(ProfilerClient client) {
+    public CPUTableView(ProfilerClient client, Map<Integer, ClientUtils.SourceCodeSelection> selection) {
         this.client = client;
+        this.selection = selection;
+        
         initUI();
     }
     
@@ -113,9 +111,6 @@ abstract class CPUTableView extends JPanel {
                     renderers[3].setMaxValue(maxTimes[3]);
                     renderers[4].setMaxValue(maxInvocations);
                     
-                    if (data == null) selections = null; // reset data
-                    else if (selections == null) selections = new HashMap();
-                    
                     tableModel.fireTableDataChanged();
                 }
             }
@@ -126,13 +121,9 @@ abstract class CPUTableView extends JPanel {
         setData(null);
     }
     
-    public boolean hasSelection() {
-        return selections != null && !selections.isEmpty();
-    }
     
-    public Set<ClientUtils.SourceCodeSelection[]> getSelections() {
-        return !hasSelection() ? Collections.EMPTY_SET :
-                new HashSet(selections.values());
+    public void refreshSelection() {
+        tableModel.fireTableDataChanged();
     }
     
     
@@ -302,7 +293,7 @@ abstract class CPUTableView extends JPanel {
             } else if (columnIndex == 6) {
                 return data.getNInvocationsAtRow(rowIndex);
             } else if (columnIndex == 0) {
-                return selections.containsKey(data.getMethodIdAtRow(rowIndex));
+                return selection.containsKey(data.getMethodIdAtRow(rowIndex));
             }
 
             return null;
@@ -312,11 +303,10 @@ abstract class CPUTableView extends JPanel {
             if (columnIndex == 0) {
                 int methodId = data.getMethodIdAtRow(rowIndex);
                 if (Boolean.TRUE.equals(aValue)) {
-                    selections.put(methodId, selectionForId(methodId));
+                    selection.put(methodId, selectionForId(methodId));
                 } else {
-                    selections.remove(methodId);
+                    selection.remove(methodId);
                 }
-                tableModel.fireTableDataChanged();
             }
         }
 

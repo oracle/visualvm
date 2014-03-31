@@ -47,7 +47,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.util.Set;
+import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -70,9 +70,6 @@ import org.netbeans.lib.profiler.utils.Wildcards;
  */
 public abstract class CPUView extends JPanel {
     
-    private static final ClientUtils.SourceCodeSelection[] EMPTY_SELECTION =
-                     new ClientUtils.SourceCodeSelection[0];
-    
     private final ProfilerClient client;
     private final boolean showSourceSupported;
     
@@ -80,10 +77,12 @@ public abstract class CPUView extends JPanel {
     private CPUTreeTableView treeTableView;
     
     
-    public CPUView(ProfilerClient client, boolean showSourceSupported) {
+    public CPUView(ProfilerClient client, Map<Integer, ClientUtils.SourceCodeSelection> selection,
+                   boolean showSourceSupported) {
         this.client = client;
         this.showSourceSupported = showSourceSupported;
-        initUI();
+        
+        initUI(selection);
     }
     
     
@@ -125,32 +124,10 @@ public abstract class CPUView extends JPanel {
         tableView.resetData();
     }
     
-    public boolean hasSelection() {
-        if (tableView.isVisible()) {
-            if (treeTableView.isVisible()) {
-                return tableView.hasSelection() || treeTableView.hasSelection();
-            } else {
-                return tableView.hasSelection();
-            }
-        } else { 
-            return treeTableView.hasSelection();
-        }
-    }
     
-    public ClientUtils.SourceCodeSelection[] getSelections() {
-        if (!hasSelection()) {
-            return EMPTY_SELECTION;
-        } else if (tableView.isVisible()) {
-            if (treeTableView.isVisible()) {
-                Set<ClientUtils.SourceCodeSelection[]> selections = tableView.getSelections();
-                selections.addAll(treeTableView.getSelections());
-                return selections.toArray(EMPTY_SELECTION);
-            } else {
-                return tableView.getSelections().toArray(EMPTY_SELECTION);
-            }
-        } else {
-            return treeTableView.getSelections().toArray(EMPTY_SELECTION);
-        }
+    public void refreshSelection() {
+        treeTableView.refreshSelection();
+        tableView.refreshSelection();
     }
     
     
@@ -179,10 +156,10 @@ public abstract class CPUView extends JPanel {
     }
     
     
-    private void initUI() {
+    private void initUI(Map<Integer, ClientUtils.SourceCodeSelection> selection) {
         setLayout(new BorderLayout(0, 0));
         
-        treeTableView = new CPUTreeTableView(client) {
+        treeTableView = new CPUTreeTableView(client, selection) {
             protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
                 if (showSourceSupported) showSource(value);
             }
@@ -193,7 +170,7 @@ public abstract class CPUView extends JPanel {
             protected void popupHidden()  { CPUView.this.popupHidden(); }
         };
         
-        tableView = new CPUTableView(client) {
+        tableView = new CPUTableView(client, selection) {
             protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
                 if (showSourceSupported) showSource(value);
             }

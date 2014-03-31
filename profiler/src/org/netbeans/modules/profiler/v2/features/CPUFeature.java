@@ -48,6 +48,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -144,9 +146,28 @@ final class CPUFeature extends ProfilerFeature.Basic {
     private ClientUtils.SourceCodeSelection[] selectedClasses;
     private ClientUtils.SourceCodeSelection[] selectedMethods;
     
+    private final Map<Integer, ClientUtils.SourceCodeSelection> selection;
+    
     
     CPUFeature() {
         super(Bundle.CPUFeature_name(), Icons.getIcon(ProfilerIcons.CPU));
+        
+        selection = new HashMap() {
+            public Object put(Object key, Object value) {
+                Object _put = super.put(key, value);
+                selectionChanged();
+                return _put;
+            }
+            public Object remove(Object key) {
+                Object _remove = super.remove(key);
+                selectionChanged();
+                return _remove;
+            }
+            public void clear() {
+                super.clear();
+                selectionChanged();
+            }
+        };
     }
     
     
@@ -164,6 +185,12 @@ final class CPUFeature extends ProfilerFeature.Basic {
     
     private void selectForProfiling(ClientUtils.SourceCodeSelection[] selection) {
         
+    }
+    
+    
+    private void selectionChanged() {
+        cpuView.refreshSelection();
+        updateModeUI();
     }
 
     
@@ -187,7 +214,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
 
             modeButton = new PopupButton("All classes") {
                 protected void populatePopup(JPopupMenu popup) {
-                    popup.add(new TitledMenuSeparator("Quick (sampled)"));
+                    popup.add(new TitledMenuSeparator("General (sampled)"));
                     popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_ALL), mode == Mode.SAMPLED_ALL) {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.SAMPLED_ALL); }
                     });
@@ -195,7 +222,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.SAMPLED_PROJECT); }
                     });
                     
-                    popup.add(new TitledMenuSeparator("Detailed (instrumented)"));
+                    popup.add(new TitledMenuSeparator("Focused (instrumented)"));
                     popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_CLASS), mode == Mode.INSTR_CLASS) {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_CLASS); }
                     });
@@ -203,7 +230,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_METHOD); }
                     });
                     popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_SELECTED), mode == Mode.INSTR_SELECTED) {
-                        { setEnabled(cpuView.hasSelection()); }
+//                        { setEnabled(!selection.isEmpty()); }
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_SELECTED); }
                     });
                 }
@@ -345,12 +372,12 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 selectedLabel.setText(count + " methods");
             }
         } else if (mode == Mode.INSTR_SELECTED) {
-            ClientUtils.SourceCodeSelection[] selections = cpuView.getSelections();
-            int count = selections == null ? 0 : selections.length;
+            int count = selection.size();
             if (count == 0) {
                 selectedLabel.setText("No method");
             } else if (count == 1) {
-                selectedLabel.setText(selections[0].getClassName() + "." + selections[0].getMethodName());
+                ClientUtils.SourceCodeSelection sel = selection.values().iterator().next();
+                selectedLabel.setText(sel.getClassName() + "." + sel.getMethodName());
             } else {
                 selectedLabel.setText(count + " methods");
             }
@@ -460,9 +487,9 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 settings = ProfilingSettingsPresets.createCPUPreset(ProfilingSettings.PROFILE_CPU_PART);
                 settings.setThreadCPUTimerOn(true);
                 
-                ClientUtils.SourceCodeSelection[] selection = mode == Mode.INSTR_CLASS ? selectedClasses :
-                                                                                         selectedMethods;
-                if (selection != null) settings.addRootMethods(selection);
+                ClientUtils.SourceCodeSelection[] sel = mode == Mode.INSTR_CLASS ? selectedClasses :
+                                                                                   selectedMethods;
+                if (selection != null) settings.addRootMethods(sel);
                 settings.setStackDepthLimit(((Number)outgoingSpinner.getValue()).intValue());
                 break;
                 
@@ -470,7 +497,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 settings = ProfilingSettingsPresets.createCPUPreset(ProfilingSettings.PROFILE_CPU_PART);
                 settings.setThreadCPUTimerOn(true);
                 
-                ClientUtils.SourceCodeSelection[] selections = cpuView.getSelections();
+                ClientUtils.SourceCodeSelection[] selections = selection.values().toArray(
+                        new ClientUtils.SourceCodeSelection[selection.size()]);
                 if (selections != null) settings.addRootMethods(selections);
                 settings.setStackDepthLimit(((Number)outgoingSpinner.getValue()).intValue());
                 break;
@@ -524,7 +552,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
     private void initResultsUI() {
         TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
         
-        cpuView = new CPUView(runner.getProfilerClient(), GoToSource.isAvailable()) {
+        cpuView = new CPUView(runner.getProfilerClient(), selection, GoToSource.isAvailable()) {
             public void showSource(ClientUtils.SourceCodeSelection value) {
                 Lookup.Provider project = getSession().getProject();
                 String className = value.getClassName();

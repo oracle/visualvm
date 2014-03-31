@@ -46,11 +46,7 @@ package org.netbeans.lib.profiler.ui.cpu;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -85,11 +81,13 @@ abstract class CPUTreeTableView extends JPanel {
     private CPUTreeTableModel treeTableModel;
     private ProfilerTreeTable treeTable;
     
-    private Map<Integer, ClientUtils.SourceCodeSelection> selections;
+    private final Map<Integer, ClientUtils.SourceCodeSelection> selection;
     
     
-    public CPUTreeTableView(ProfilerClient client) {
+    public CPUTreeTableView(ProfilerClient client, Map<Integer, ClientUtils.SourceCodeSelection> selection) {
         this.client = client;
+        this.selection = selection;
+        
         initUI();
     }
     
@@ -97,14 +95,9 @@ abstract class CPUTreeTableView extends JPanel {
     void setData(final CPUResultsSnapshot newData) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                if (treeTableModel != null) {
-                    PrestimeCPUCCTNode root = newData == null ? PrestimeCPUCCTNode.EMPTY :
-                                              newData.getRootNode(CPUResultsSnapshot.METHOD_LEVEL_VIEW);
-                    
-                    if (newData == null) selections = null; // reset data
-                    else if (selections == null) selections = new HashMap();
-                    
-                    treeTableModel.setRoot(root);
+                if (treeTableModel != null) {                 
+                    treeTableModel.setRoot(newData == null ? PrestimeCPUCCTNode.EMPTY :
+                                           newData.getRootNode(CPUResultsSnapshot.METHOD_LEVEL_VIEW));
                 }
             }
         });
@@ -114,13 +107,9 @@ abstract class CPUTreeTableView extends JPanel {
         setData(null);
     }
     
-    public boolean hasSelection() {
-        return selections != null && !selections.isEmpty();
-    }
     
-    public Set<ClientUtils.SourceCodeSelection[]> getSelections() {
-        return !hasSelection() ? Collections.EMPTY_SET :
-                new HashSet(selections.values());
+    public void refreshSelection() {
+        treeTableModel.dataChanged();
     }
     
     
@@ -313,7 +302,7 @@ abstract class CPUTreeTableView extends JPanel {
             } else if (columnIndex == 4) {
                 return cpuNode.getNCalls();
             } else if (columnIndex == 0) {
-                return selections.containsKey(cpuNode.getMethodId());
+                return selection.containsKey(cpuNode.getMethodId());
             }
 
             return null;
@@ -324,11 +313,10 @@ abstract class CPUTreeTableView extends JPanel {
                 PrestimeCPUCCTNode cpuNode = (PrestimeCPUCCTNode)node;
                 int methodId = cpuNode.getMethodId();
                 if (Boolean.TRUE.equals(aValue)) {
-                    selections.put(methodId, selectionForId(methodId));
+                    selection.put(methodId, selectionForId(methodId));
                 } else {
-                    selections.remove(methodId);
+                    selection.remove(methodId);
                 }
-                treeTableModel.dataChanged();
             }
         }
 
