@@ -43,6 +43,8 @@
 package org.netbeans.lib.profiler.results.cpu;
 
 import java.util.*;
+import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 
 /**
  *
@@ -50,7 +52,7 @@ import java.util.*;
  */
 public class DiffFlatProfileContainer extends FlatProfileContainer {
     
-    private final String[] names;
+    private final ClientUtils.SourceCodeSelection[] sels;
     private final double wholeGraphNetTime0;
     private final double wholeGraphNetTime1;
     private final long minTime;
@@ -60,13 +62,13 @@ public class DiffFlatProfileContainer extends FlatProfileContainer {
     static DiffFlatProfileContainer create(FlatProfileContainer c1, FlatProfileContainer c2) {
         boolean collectingTwoTimeStamps = c1.collectingTwoTimeStamps && c2.collectingTwoTimeStamps;
         
-        Set<String> names1 = new HashSet();
+        Set<ClientUtils.SourceCodeSelection> sels1 = new HashSet();
         int rows1 = c1.timeInMcs0.length;
-        for (int i = 0; i < rows1; i++) names1.add(c1.getMethodNameAtRow(i));
+        for (int i = 0; i < rows1; i++) sels1.add(c1.getSourceCodeSelectionAtRow(i));
         
-        Map<String, Integer> names2 = new HashMap();
+        Map<ClientUtils.SourceCodeSelection, Integer> sels2 = new HashMap();
         int rows2 = c2.timeInMcs0.length;
-        for (int i = 0; i < rows2; i++) names2.put(c2.getMethodNameAtRow(i), i);
+        for (int i = 0; i < rows2; i++) sels2.put(c2.getSourceCodeSelectionAtRow(i), i);
         
         int pointer = 0;
         long[] timesInMcs0 = new long[rows1 + rows2];
@@ -74,11 +76,11 @@ public class DiffFlatProfileContainer extends FlatProfileContainer {
         long[] totalTimesInMcs0 = new long[rows1 + rows2];
         long[] totalTimesInMcs1 = collectingTwoTimeStamps ? new long[rows1 + rows2] : null;
         int[] nInvocations = new int[rows1 + rows2];
-        String[] names = new String[rows1 + rows2];
+        ClientUtils.SourceCodeSelection[] sels = new ClientUtils.SourceCodeSelection[rows1 + rows2];
         int[] methodIDs = new int[rows1 + rows2];
         
         for (int i = 0; i < rows1; i++) {
-            String name = c1.getMethodNameAtRow(i);
+            ClientUtils.SourceCodeSelection sel = c1.getSourceCodeSelectionAtRow(i);
             timesInMcs0[pointer] = -c1.timeInMcs0[i];
             totalTimesInMcs0[pointer] = -c1.totalTimeInMcs0[i];
             if (collectingTwoTimeStamps) {
@@ -86,10 +88,10 @@ public class DiffFlatProfileContainer extends FlatProfileContainer {
                 totalTimesInMcs1[pointer] = -c1.totalTimeInMcs1[i];
             }
             nInvocations[pointer] = -c1.nInvocations[i];
-            names[pointer] = name;
+            sels[pointer] = sel;
             methodIDs[pointer] = c1.methodIds[i];
             
-            Integer i2 = names2.get(name);
+            Integer i2 = sels2.get(sel);
             if (i2 != null) {
                 timesInMcs0[pointer] += c2.timeInMcs0[i2];
                 totalTimesInMcs0[pointer] += c2.totalTimeInMcs0[i2];
@@ -103,8 +105,8 @@ public class DiffFlatProfileContainer extends FlatProfileContainer {
         }
         
         for (int i = 0; i < rows2; i++) {
-            String name = c2.getMethodNameAtRow(i);
-            if (!names1.contains(name)) {
+            ClientUtils.SourceCodeSelection sel = c2.getSourceCodeSelectionAtRow(i);
+            if (!sels1.contains(sel)) {
                 timesInMcs0[pointer] = c2.timeInMcs0[i];
                 totalTimesInMcs0[pointer] = c2.totalTimeInMcs0[i];
                 if (collectingTwoTimeStamps) {
@@ -112,7 +114,7 @@ public class DiffFlatProfileContainer extends FlatProfileContainer {
                     totalTimesInMcs1[pointer] = c2.totalTimeInMcs1[i];
                 }
                 nInvocations[pointer] = c2.nInvocations[i];
-                names[pointer] = name;
+                sels[pointer] = sel;
                 methodIDs[pointer] = -c2.methodIds[i];
                 pointer++;
             }
@@ -124,16 +126,16 @@ public class DiffFlatProfileContainer extends FlatProfileContainer {
         return new DiffFlatProfileContainer(collectingTwoTimeStamps, 
                 Arrays.copyOf(timesInMcs0, pointer), collectingTwoTimeStamps ? Arrays.copyOf(timesInMcs1, pointer) : null,
                 Arrays.copyOf(totalTimesInMcs0, pointer), collectingTwoTimeStamps ? Arrays.copyOf(totalTimesInMcs1, pointer) : null,
-                Arrays.copyOf(nInvocations, pointer), Arrays.copyOf(names, pointer),
+                Arrays.copyOf(nInvocations, pointer), Arrays.copyOf(sels, pointer),
                 Arrays.copyOf(methodIDs, pointer), pointer, wholeGraphNetTime0, wholeGraphNetTime1);
     }
     
     private DiffFlatProfileContainer(boolean collectingTwoTimeStamps, long[] timeInMcs0, long[] timeInMcs1, 
-             long[] totalTimeInMcs0, long[] totalTimeInMcs1, int[] nInvocations, String[] names, 
+             long[] totalTimeInMcs0, long[] totalTimeInMcs1, int[] nInvocations, ClientUtils.SourceCodeSelection[] sels, 
              int[] methodIDs, int nMethods, double wholeGraphNetTime0, double wholeGraphNetTime1) {
         super(timeInMcs0, timeInMcs1, totalTimeInMcs0, totalTimeInMcs1, nInvocations, null, nMethods);
         this.collectingTwoTimeStamps = collectingTwoTimeStamps;
-        this.names = names;
+        this.sels = sels;
         this.wholeGraphNetTime0 = wholeGraphNetTime0;
         this.wholeGraphNetTime1 = wholeGraphNetTime1;
         
@@ -156,7 +158,15 @@ public class DiffFlatProfileContainer extends FlatProfileContainer {
 
     @Override
     public String getMethodNameAtRow(int row) {
-        return names[row];
+        ClientUtils.SourceCodeSelection sel = getSourceCodeSelectionAtRow(row);
+        return MethodNameFormatterFactory.getDefault().getFormatter()
+                                         .formatMethodName(sel.getClassName(), sel.getMethodName(),
+                                                           sel.getMethodSignature()).toFormatted();
+    }
+    
+    @Override
+    public ClientUtils.SourceCodeSelection getSourceCodeSelectionAtRow(int row) {
+        return sels[row];
     }
 
     @Override
@@ -178,9 +188,9 @@ public class DiffFlatProfileContainer extends FlatProfileContainer {
     }
     
     protected void swap(int a, int b) {
-        String name = names[a];
-        names[a] = names[b];
-        names[b] = name;
+        ClientUtils.SourceCodeSelection sel = sels[a];
+        sels[a] = sels[b];
+        sels[b] = sel;
     }
     
 }

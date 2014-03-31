@@ -319,6 +319,7 @@ abstract class LivenessTableView extends JPanel {
             } else if (columnIndex == 7) {
                 return maxSurvGen[rowIndex];
             } else if (columnIndex == 0) {
+                if (selection.isEmpty()) return Boolean.FALSE;
                 return selection.contains(classNames[rowIndex]);
             }
 

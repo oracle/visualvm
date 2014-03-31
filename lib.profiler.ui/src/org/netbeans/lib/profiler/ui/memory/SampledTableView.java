@@ -231,6 +231,7 @@ abstract class SampledTableView extends JPanel {
             } else if (columnIndex == 3) {
                 return data[rowIndex].getInstancesCount();
             } else if (columnIndex == 0) {
+                if (selection.isEmpty()) return Boolean.FALSE;
                 return selection.contains(data[rowIndex].getName());
             }
 

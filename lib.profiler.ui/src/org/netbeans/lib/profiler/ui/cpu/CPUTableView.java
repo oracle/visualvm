@@ -46,6 +46,7 @@ package org.netbeans.lib.profiler.ui.cpu;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -78,10 +79,12 @@ abstract class CPUTableView extends JPanel {
     private ProfilerTable table;
     
     private FlatProfileContainer data;
-    private final Map<Integer, ClientUtils.SourceCodeSelection> selection;
+    
+    private Map<Integer, ClientUtils.SourceCodeSelection> idMap;
+    private final Set<ClientUtils.SourceCodeSelection> selection;
     
     
-    public CPUTableView(ProfilerClient client, Map<Integer, ClientUtils.SourceCodeSelection> selection) {
+    public CPUTableView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection) {
         this.client = client;
         this.selection = selection;
         
@@ -89,9 +92,10 @@ abstract class CPUTableView extends JPanel {
     }
     
     
-    void setData(final FlatProfileContainer newData) {
+    void setData(final FlatProfileContainer newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                idMap = newIdMap;
                 if (tableModel != null) {
                     data = newData;
                     
@@ -118,7 +122,7 @@ abstract class CPUTableView extends JPanel {
     }
     
     public void resetData() {
-        setData(null);
+        setData(null, null);
     }
     
     
@@ -293,7 +297,8 @@ abstract class CPUTableView extends JPanel {
             } else if (columnIndex == 6) {
                 return data.getNInvocationsAtRow(rowIndex);
             } else if (columnIndex == 0) {
-                return selection.containsKey(data.getMethodIdAtRow(rowIndex));
+                if (selection.isEmpty()) return Boolean.FALSE;
+                return selection.contains(idMap.get(data.getMethodIdAtRow(rowIndex)));
             }
 
             return null;
@@ -302,11 +307,8 @@ abstract class CPUTableView extends JPanel {
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
             if (columnIndex == 0) {
                 int methodId = data.getMethodIdAtRow(rowIndex);
-                if (Boolean.TRUE.equals(aValue)) {
-                    selection.put(methodId, selectionForId(methodId));
-                } else {
-                    selection.remove(methodId);
-                }
+                if (Boolean.TRUE.equals(aValue)) selection.add(idMap.get(methodId));
+                else selection.remove(idMap.get(methodId));
             }
         }
 

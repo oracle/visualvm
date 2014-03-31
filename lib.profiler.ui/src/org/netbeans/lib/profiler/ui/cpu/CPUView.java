@@ -47,7 +47,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -77,7 +79,7 @@ public abstract class CPUView extends JPanel {
     private CPUTreeTableView treeTableView;
     
     
-    public CPUView(ProfilerClient client, Map<Integer, ClientUtils.SourceCodeSelection> selection,
+    public CPUView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection,
                    boolean showSourceSupported) {
         this.client = client;
         this.showSourceSupported = showSourceSupported;
@@ -103,9 +105,13 @@ public abstract class CPUView extends JPanel {
             if (snapshotData != null) {
                 FlatProfileContainer flatData = snapshotData.getFlatProfile(
                         -1, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
+                
+                Map<Integer, ClientUtils.SourceCodeSelection> idMap = new HashMap();
+                for (int i = 0; i < flatData.getNRows(); i++) // TODO: getNRows is filtered, may not work for tree data!
+                    idMap.put(flatData.getMethodIdAtRow(i), flatData.getSourceCodeSelectionAtRow(i));
 
-                treeTableView.setData(snapshotData);
-                tableView.setData(flatData);
+                treeTableView.setData(snapshotData, idMap);
+                tableView.setData(flatData, idMap);
 
             }
         } catch (CPUResultsSnapshot.NoDataAvailableException e) {
@@ -156,7 +162,7 @@ public abstract class CPUView extends JPanel {
     }
     
     
-    private void initUI(Map<Integer, ClientUtils.SourceCodeSelection> selection) {
+    private void initUI(Set<ClientUtils.SourceCodeSelection> selection) {
         setLayout(new BorderLayout(0, 0));
         
         treeTableView = new CPUTreeTableView(client, selection) {

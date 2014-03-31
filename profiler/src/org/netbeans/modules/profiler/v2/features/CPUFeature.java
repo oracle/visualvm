@@ -48,8 +48,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -146,20 +146,20 @@ final class CPUFeature extends ProfilerFeature.Basic {
     private ClientUtils.SourceCodeSelection[] selectedClasses;
     private ClientUtils.SourceCodeSelection[] selectedMethods;
     
-    private final Map<Integer, ClientUtils.SourceCodeSelection> selection;
+    private final Set<ClientUtils.SourceCodeSelection> selection;
     
     
     CPUFeature() {
         super(Bundle.CPUFeature_name(), Icons.getIcon(ProfilerIcons.CPU));
         
-        selection = new HashMap() {
-            public Object put(Object key, Object value) {
-                Object _put = super.put(key, value);
+        selection = new HashSet() {
+            public boolean add(Object value) {
+                boolean _add = super.add(value);
                 selectionChanged();
-                return _put;
+                return _add;
             }
-            public Object remove(Object key) {
-                Object _remove = super.remove(key);
+            public boolean remove(Object value) {
+                boolean _remove = super.remove(value);
                 selectionChanged();
                 return _remove;
             }
@@ -184,7 +184,11 @@ final class CPUFeature extends ProfilerFeature.Basic {
     }
     
     private void selectForProfiling(ClientUtils.SourceCodeSelection[] selection) {
-        
+        for (ClientUtils.SourceCodeSelection selected : selection)
+            this.selection.add(selected);
+        setMode(Mode.INSTR_SELECTED);
+        updateModeUI();
+        getSettingsUI().setVisible(true);
     }
     
     
@@ -376,7 +380,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
             if (count == 0) {
                 selectedLabel.setText("No method");
             } else if (count == 1) {
-                ClientUtils.SourceCodeSelection sel = selection.values().iterator().next();
+                ClientUtils.SourceCodeSelection sel = selection.iterator().next();
                 selectedLabel.setText(sel.getClassName() + "." + sel.getMethodName());
             } else {
                 selectedLabel.setText(count + " methods");
@@ -497,7 +501,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 settings = ProfilingSettingsPresets.createCPUPreset(ProfilingSettings.PROFILE_CPU_PART);
                 settings.setThreadCPUTimerOn(true);
                 
-                ClientUtils.SourceCodeSelection[] selections = selection.values().toArray(
+                ClientUtils.SourceCodeSelection[] selections = selection.toArray(
                         new ClientUtils.SourceCodeSelection[selection.size()]);
                 if (selections != null) settings.addRootMethods(selections);
                 settings.setStackDepthLimit(((Number)outgoingSpinner.getValue()).intValue());

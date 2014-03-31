@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.results.cpu;
 
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.utils.IntSorter;
 import org.netbeans.lib.profiler.utils.LongSorter;
@@ -112,6 +113,8 @@ public abstract class FlatProfileContainer {
     }
 
     public abstract String getMethodNameAtRow(int row);
+    
+    public abstract ClientUtils.SourceCodeSelection getSourceCodeSelectionAtRow(int row);
 
     public int getNInvocationsAtRow(int row) {
         return nInvocations[row];

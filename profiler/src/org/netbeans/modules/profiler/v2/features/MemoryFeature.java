@@ -48,6 +48,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.BorderFactory;
@@ -171,7 +172,10 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     }
     
     private void selectForProfiling(String[] selection) {
-        
+        this.selection.addAll(Arrays.asList(selection));
+        setMode(Mode.INSTR_SELECTED);
+        updateModeUI();
+        getSettingsUI().setVisible(true);
     }
     
     

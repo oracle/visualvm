@@ -260,6 +260,7 @@ abstract class AllocTableView extends JPanel {
             } else if (columnIndex == 3) {
                 return nTotalAllocObjects[rowIndex];
             } else if (columnIndex == 0) {
+                if (selection.isEmpty()) return Boolean.FALSE;
                 return selection.contains(classNames[rowIndex]);
             }
 

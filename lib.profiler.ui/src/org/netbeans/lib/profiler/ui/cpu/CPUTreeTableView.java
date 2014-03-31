@@ -47,6 +47,7 @@ import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -81,10 +82,11 @@ abstract class CPUTreeTableView extends JPanel {
     private CPUTreeTableModel treeTableModel;
     private ProfilerTreeTable treeTable;
     
-    private final Map<Integer, ClientUtils.SourceCodeSelection> selection;
+    private Map<Integer, ClientUtils.SourceCodeSelection> idMap;
+    private final Set<ClientUtils.SourceCodeSelection> selection;
     
     
-    public CPUTreeTableView(ProfilerClient client, Map<Integer, ClientUtils.SourceCodeSelection> selection) {
+    public CPUTreeTableView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection) {
         this.client = client;
         this.selection = selection;
         
@@ -92,10 +94,11 @@ abstract class CPUTreeTableView extends JPanel {
     }
     
     
-    void setData(final CPUResultsSnapshot newData) {
+    void setData(final CPUResultsSnapshot newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                if (treeTableModel != null) {                 
+                idMap = newIdMap;
+                if (treeTableModel != null) {
                     treeTableModel.setRoot(newData == null ? PrestimeCPUCCTNode.EMPTY :
                                            newData.getRootNode(CPUResultsSnapshot.METHOD_LEVEL_VIEW));
                 }
@@ -104,7 +107,7 @@ abstract class CPUTreeTableView extends JPanel {
     }
     
     public void resetData() {
-        setData(null);
+        setData(null, null);
     }
     
     
@@ -302,7 +305,8 @@ abstract class CPUTreeTableView extends JPanel {
             } else if (columnIndex == 4) {
                 return cpuNode.getNCalls();
             } else if (columnIndex == 0) {
-                return selection.containsKey(cpuNode.getMethodId());
+                if (selection.isEmpty()) return Boolean.FALSE;
+                return selection.contains(idMap.get(cpuNode.getMethodId()));
             }
 
             return null;
@@ -312,11 +316,8 @@ abstract class CPUTreeTableView extends JPanel {
             if (columnIndex == 0) {
                 PrestimeCPUCCTNode cpuNode = (PrestimeCPUCCTNode)node;
                 int methodId = cpuNode.getMethodId();
-                if (Boolean.TRUE.equals(aValue)) {
-                    selection.put(methodId, selectionForId(methodId));
-                } else {
-                    selection.remove(methodId);
-                }
+                if (Boolean.TRUE.equals(aValue)) selection.add(idMap.get(methodId));
+                else selection.remove(idMap.get(methodId));
             }
         }
 
