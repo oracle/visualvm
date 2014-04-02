@@ -405,6 +405,9 @@ public class ThreadsPanel extends JPanel {
         threadsToolbar.add(threadStateFilter);
         
         contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setOpaque(true);
+        contentPanel.setBackground(UIUtils.getProfilerResultsBackground());
+        
         contentPanel.add(threadsTableContainer, BorderLayout.CENTER);
         contentPanel.add(legendPanel, BorderLayout.SOUTH);
         

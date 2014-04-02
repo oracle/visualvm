@@ -431,31 +431,37 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         return toolbar;
     }
     
-    public ProfilingSettings getSettings() {
+    public boolean supportsSettings(ProfilingSettings settings) {
+        return !ProfilingSettings.isCPUSettings(settings);
+    }
+    
+    public void configureSettings(ProfilingSettings settings) {
         ProjectSession session = getSession();
-        if (session == null) return null;
-        
-        ProfilingSettings settings = null;
+//        if (session == null) return ProfilingSettingsPresets.createMemoryPreset();
+//        
+//        ProfilingSettings settings = null;
         
         switch (mode)  {
             case SAMPLED_ALL:
-                settings = ProfilingSettingsPresets.createMemoryPreset();
+                settings.setProfilingType(ProfilingSettings.PROFILE_MEMORY_SAMPLING);
                 break;
                 
             case SAMPLED_PROJECT:
-                settings = ProfilingSettingsPresets.createMemoryPreset();
+                settings.setProfilingType(ProfilingSettings.PROFILE_MEMORY_SAMPLING);
                 
-                ProjectContentsSupport pcs = ProjectContentsSupport.get(session.getProject());
-                String filter = pcs.getInstrumentationFilter(false);
-                SimpleFilter f = new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE, filter); // NOI18N
-                settings.setSelectedInstrumentationFilter(f);
+                if (session != null) {
+                    ProjectContentsSupport pcs = ProjectContentsSupport.get(session.getProject());
+                    String filter = pcs.getInstrumentationFilter(false);
+                    SimpleFilter f = new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE, filter); // NOI18N
+                    settings.setSelectedInstrumentationFilter(f);
+                }
                 break;
                 
             case INSTR_CLASS:
             case INSTR_SELECTED:
                 int type = lifecycleCheckbox.isSelected() ? ProfilingSettings.PROFILE_MEMORY_LIVENESS :
                                                             ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS;
-                settings = ProfilingSettingsPresets.createMemoryPreset(type);
+                settings.setProfilingType(type);
                 
                 int stackLimit = allocationsCheckbox.isSelected() ? -1 : 0;
                 settings.setAllocStackTraceLimit(stackLimit);
@@ -472,8 +478,8 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 break;
         }
         
-        if (settings == null) settings = ProfilingSettingsPresets.createMemoryPreset();
-        return settings;
+//        if (settings == null) settings = ProfilingSettingsPresets.createMemoryPreset();
+//        return settings;
     }
     
     

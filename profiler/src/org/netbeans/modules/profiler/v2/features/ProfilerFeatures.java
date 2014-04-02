@@ -43,7 +43,10 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.netbeans.modules.profiler.v2.session.ProjectSession;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -51,21 +54,63 @@ import org.netbeans.modules.profiler.v2.session.ProjectSession;
  */
 public final class ProfilerFeatures {
     
-    // To be called outside of EDT
-    public static ProfilerFeature[] getFeatures(ProjectSession session) {
-        return new ProfilerFeature[] {
-            new MonitorFeature(),
-            new CPUFeature(),
-            new MemoryFeature(),
-            null,
-            new ThreadsFeature(),
-            new LocksFeature()
-        };
+    // Must be called outside of EDT
+    public static ProfilerFeatures forSession(ProjectSession session) {
+        return new ProfilerFeatures(session);
     }
     
-    // To be called outside of EDT
-    public static ProfilerFeature getSelectedFeatures(ProfilerFeature[] modes, ProjectSession session) {
-        return modes[0];
+    
+    private final List<ProfilerFeature> features;
+    
+    
+    private ProfilerFeatures(ProjectSession session) {
+        features = new ArrayList();
+        
+        addBuiltInFeatures(features, true);
+        addCustomFeatures(features, session.getProject());
+    }
+    
+    
+    // Must be called in EDT
+    public ProfilerFeature[] getFeatures() {
+        return features.toArray(new ProfilerFeature[features.size()]);
+    }
+    
+    // Must be called in EDT
+    public ProfilerFeature getDefaultFeature() {
+        return features.get(0);
+    }
+    
+    
+    // Must be called in EDT
+    public ProfilerFeature createCustomFeature() {
+        List<ProfilerFeature> availableFeatures = new ArrayList();
+        addBuiltInFeatures(availableFeatures, false);
+        
+        ProfilerFeature custom = CustomFeature.create(availableFeatures.toArray(
+                                 new ProfilerFeature[availableFeatures.size()]));
+        if (custom != null) addCustomFeature(custom);
+        
+        return custom;
+    }
+    
+    
+    private void addBuiltInFeatures(List list, boolean separator) {
+        list.add(new MonitorFeature());
+        list.add(new CPUFeature());
+        list.add(new MemoryFeature());
+        if (separator) list.add(null);
+        list.add(new ThreadsFeature());
+        list.add(new LocksFeature());
+    }
+    
+    private void addCustomFeatures(List list, Lookup.Provider project) {
+        // TODO: read saved custom features
+    }
+    
+    private void addCustomFeature(ProfilerFeature feature) {
+        features.add(0, feature);
+        if (features.size() == 7) features.add(1, null); // Separator between custom and default features
     }
     
 }

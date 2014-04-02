@@ -323,6 +323,8 @@ public class LockContentionPanel extends ResultsPanel {
         contentPanel = new JPanel(new CardLayout());
         contentPanel.add(notificationPanel, "DISABLED"); // NOI18N
         contentPanel.add(treeTablePanel, "ENABLED"); // NOI18N
+        contentPanel.setOpaque(true);
+        contentPanel.setBackground(UIUtils.getProfilerResultsBackground());
         
         add(contentPanel, BorderLayout.CENTER);
         

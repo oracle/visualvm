@@ -178,6 +178,8 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     
     // --- Implementation ------------------------------------------------------
     
+    private ProfilerFeatures features;
+    
     private JPanel topContainer;
     private ProfilerToolbar toolbar;
     private ProfilerToolbar featureToolbar;
@@ -210,19 +212,20 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                final ProfilerFeature[] modes = ProfilerFeatures.getFeatures(session);
-                final ProfilerFeature selected = ProfilerFeatures.getSelectedFeatures(modes, session);
+                features = ProfilerFeatures.forSession(session);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         toolbar.remove(loading);
-                        popupulateUI(modes, selected);
+                        popupulateUI();
                     }
                 });
             }
         });
     }
     
-    private void popupulateUI(final ProfilerFeature[] features, final ProfilerFeature selected) {
+    private void popupulateUI() {
+        ProfilerFeature selected = features.getDefaultFeature();
+        
         start = new DropdownButton(selected.getName(), Icons.getIcon(GeneralIcons.START), true) {
             protected void populatePopup(JPopupMenu popup) { populatePopupImpl(popup); }
             protected void performAction() { performStartImpl(); }
@@ -237,7 +240,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         toolbar.addFiller();
         
         setCurrentFeature(selected);
-        setAvailableFeatures(features);
+//        setAvailableFeatures(features);
         
         session.addListener(new ProjectSession.Listener() {
             public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
@@ -254,7 +257,8 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     }
     
     private ProfilingSettings __currentSettings() {
-        ProfilingSettings settings = currentFeature.getSettings();
+        ProfilingSettings settings = new ProfilingSettings(currentFeature.getName());
+        currentFeature.configureSettings(settings);
         System.err.println();
         System.err.println("=================================================");
         System.err.print(settings.debug());
@@ -274,15 +278,21 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     }
     
     private void populatePopupImpl(JPopupMenu popup) {        
-        for (final ProfilerFeature mode : getAvailableFeatures()) {
-            if (mode == null) popup.addSeparator();
-            else popup.add(new JRadioButtonMenuItem(mode.getName(), mode == getCurrentFeature()) {
-                protected void fireActionPerformed(ActionEvent e) { setCurrentFeature(mode); }
+        for (final ProfilerFeature feature : features.getFeatures()) {
+            if (feature == null) popup.addSeparator();
+            else popup.add(new JRadioButtonMenuItem(feature.getName(), feature == getCurrentFeature()) {
+                protected void fireActionPerformed(ActionEvent e) { setCurrentFeature(feature); }
             });
         }
         
         if (popup.getComponentCount() > 0) popup.addSeparator();
-        popup.add(new JMenuItem(Bundle.ProfilerWindow_createCustom()));
+        popup.add(new JMenuItem(Bundle.ProfilerWindow_createCustom()) {
+//            { setEnabled(!session.inProgress()); }
+            protected void fireActionPerformed(ActionEvent e) {
+                ProfilerFeature newFeature = features.createCustomFeature();
+                if (newFeature != null) setCurrentFeature(newFeature);
+            }
+        });
     }
     
     
@@ -295,7 +305,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     
     
     private ProfilerFeature currentFeature;
-    private ProfilerFeature[] availableFeatures;
+//    private ProfilerFeature[] availableFeatures;
     
     private void setCurrentFeature(ProfilerFeature feature) {
         if (currentFeature == feature) return;
@@ -333,13 +343,13 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         return currentFeature;
     }
     
-    private void setAvailableFeatures(ProfilerFeature[] features) {
-        availableFeatures = features;
-    }
-    
-    private ProfilerFeature[] getAvailableFeatures() {
-        return availableFeatures;
-    }
+//    private void setAvailableFeatures(ProfilerFeature[] features) {
+//        availableFeatures = features;
+//    }
+//    
+//    private ProfilerFeature[] getAvailableFeatures() {
+//        return availableFeatures;
+//    }
     
     
     // --- Toolbar -------------------------------------------------------------

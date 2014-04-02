@@ -82,6 +82,7 @@ public class ProfilerTableContainer extends JPanel {
     public ProfilerTableContainer(final ProfilerTable table, boolean decorated,
                                   ColumnChangeAdapter adapter) {
         super(new BorderLayout());
+        setOpaque(false);
         
         this.table = table;
         
@@ -126,6 +127,7 @@ public class ProfilerTableContainer extends JPanel {
                     return d;
                 }
             };
+            scrollersPanel.setOpaque(false);
 
             for (final Integer column : scrollableColumns) {
                 final JScrollBar scroller = new JScrollBar(JScrollBar.HORIZONTAL) {

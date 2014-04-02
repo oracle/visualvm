@@ -70,6 +70,7 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.CPUView;
@@ -465,31 +466,43 @@ final class CPUFeature extends ProfilerFeature.Basic {
         return toolbar;
     }
     
-    public ProfilingSettings getSettings() {
+    public boolean supportsSettings(ProfilingSettings settings) {
+        return !ProfilingSettings.isMemorySettings(settings);
+    }
+    
+    public void configureSettings(ProfilingSettings settings) {
         ProjectSession session = getSession();
-        if (session == null) return null;
+//        if (session == null) return ProfilingSettingsPresets.createCPUPreset();
         
-        ProfilingSettings settings = null;
+//        ProfilingSettings settings = null;
+        
+        // TODO: read from global settings (Options)
+        settings.setThreadCPUTimerOn(true);
+        settings.setInstrumentGetterSetterMethods(false);
+        settings.setInstrumentEmptyMethods(false);
+        settings.setInstrumentMethodInvoke(true);
+        settings.setExcludeWaitTime(true);
         
         switch (mode)  {
             case SAMPLED_ALL:
-                settings = ProfilingSettingsPresets.createCPUPreset();
+                configureSampledSettings(settings);
                 break;
                 
             case SAMPLED_PROJECT:
-                settings = ProfilingSettingsPresets.createCPUPreset();
+                configureSampledSettings(settings);
                 
-                ProjectContentsSupport pcs = ProjectContentsSupport.get(session.getProject());
-                String filter = pcs.getInstrumentationFilter(false);
-                SimpleFilter f = new SimpleFilter("Project only classes",
-                                 SimpleFilter.SIMPLE_FILTER_INCLUSIVE, filter); // NOI18N
-                settings.setSelectedInstrumentationFilter(f);
+                if (session != null) {
+                    ProjectContentsSupport pcs = ProjectContentsSupport.get(session.getProject());
+                    String filter = pcs.getInstrumentationFilter(false);
+                    SimpleFilter f = new SimpleFilter("Project only classes",
+                                     SimpleFilter.SIMPLE_FILTER_INCLUSIVE, filter); // NOI18N
+                    settings.setSelectedInstrumentationFilter(f);
+                }
                 break;
                 
             case INSTR_CLASS:
             case INSTR_METHOD:
-                settings = ProfilingSettingsPresets.createCPUPreset(ProfilingSettings.PROFILE_CPU_PART);
-                settings.setThreadCPUTimerOn(true);
+                configureInstrumentedSettings(settings);
                 
                 ClientUtils.SourceCodeSelection[] sel = mode == Mode.INSTR_CLASS ? selectedClasses :
                                                                                    selectedMethods;
@@ -498,8 +511,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 break;
                 
             case INSTR_SELECTED:
-                settings = ProfilingSettingsPresets.createCPUPreset(ProfilingSettings.PROFILE_CPU_PART);
-                settings.setThreadCPUTimerOn(true);
+                configureInstrumentedSettings(settings);
                 
                 ClientUtils.SourceCodeSelection[] selections = selection.toArray(
                         new ClientUtils.SourceCodeSelection[selection.size()]);
@@ -508,8 +520,21 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 break;
         }
         
-        if (settings == null) settings = ProfilingSettingsPresets.createCPUPreset();
-        return settings;
+//        if (settings == null) settings = ProfilingSettingsPresets.createCPUPreset();
+//        return settings;
+    }
+    
+    private void configureSampledSettings(ProfilingSettings settings) {
+        settings.setProfilingType(ProfilingSettings.PROFILE_CPU_SAMPLING);
+        settings.setCPUProfilingType(CommonConstants.CPU_SAMPLED);
+        settings.setSamplingFrequency(10);
+    }
+    
+    private void configureInstrumentedSettings(ProfilingSettings settings) {
+        settings.setProfilingType(ProfilingSettings.PROFILE_CPU_PART);
+        settings.setCPUProfilingType(CommonConstants.CPU_INSTR_FULL);
+        settings.setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
+        settings.setInstrumentSpawnedThreads(false);
     }
     
     private void populateViews(JPopupMenu popup) {
@@ -530,6 +555,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
         if (view == this.view) return;
         
         this.view = view;
+        
+        getToolbar(); // Toolbar must be ready for lrView
         
         switch (view) {
             case HOT_SPOTS:

@@ -76,9 +76,9 @@ public abstract class ProfilerFeature {
     public abstract ProfilerToolbar getToolbar();
     
     
-    public abstract boolean supportsSession(ProjectSession session);
+    public abstract boolean supportsSettings(ProfilingSettings settings);
     
-    public abstract ProfilingSettings getSettings();
+    public abstract void configureSettings(ProfilingSettings settings);
     
     
     public void attachedToSession(ProjectSession session) {}
@@ -112,9 +112,6 @@ public abstract class ProfilerFeature {
         public JPanel getSettingsUI() { return null; }
         
         public ProfilerToolbar getToolbar() { return null; }
-        
-        
-        public boolean supportsSession(ProjectSession session) { return true; }
         
         public void attachedToSession(ProjectSession session) {
             attachedSession = session;

@@ -164,11 +164,13 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
         return toolbar;
     }
     
-    public ProfilingSettings getSettings() {
-        ProfilingSettings settings = ProfilingSettingsPresets.createMonitorPreset();
+    public boolean supportsSettings(ProfilingSettings settings) {
+        return true;
+    }
+    
+    public void configureSettings(ProfilingSettings settings) {
         settings.setThreadsMonitoringEnabled(true);
-        settings.setLockContentionMonitoringEnabled(false);
-        return settings;
+        settings.setThreadsSamplingEnabled(false);
     }
     
     private void populateFilters(JPopupMenu popup) {

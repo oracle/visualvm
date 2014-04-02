@@ -172,7 +172,7 @@ public class ProfilingSettings {
     private int instrScheme = CommonConstants.INSTRSCHEME_LAZY;
     private int nProfiledThreadsLimit = 32;
     private int stackDepthLimit = Integer.MAX_VALUE;
-    private int profilingType = PROFILE_CPU_SAMPLING;
+    private int profilingType = PROFILE_MONITOR;
 
     // CPU Profiling: Sampled
     private int samplingInterval = 10; // hybrid

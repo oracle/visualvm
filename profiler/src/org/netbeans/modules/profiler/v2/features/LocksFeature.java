@@ -135,11 +135,12 @@ final class LocksFeature extends ProfilerFeature.Basic {
         return toolbar;
     }
     
-    public ProfilingSettings getSettings() {
-        ProfilingSettings settings = ProfilingSettingsPresets.createMonitorPreset();
-        settings.setThreadsMonitoringEnabled(false);
+    public boolean supportsSettings(ProfilingSettings settings) {
+        return true;
+    }
+    
+    public void configureSettings(ProfilingSettings settings) {
         settings.setLockContentionMonitoringEnabled(true);
-        return settings;
     }
     
     private void populateFilters(JPopupMenu popup) {

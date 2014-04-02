@@ -153,11 +153,11 @@ final class MonitorFeature extends ProfilerFeature.Basic {
         return toolbar;
     }
     
-    public ProfilingSettings getSettings() {
-        ProfilingSettings settings = ProfilingSettingsPresets.createMonitorPreset();
-        settings.setThreadsMonitoringEnabled(false);
-        settings.setLockContentionMonitoringEnabled(false);
-        return settings;
+    public boolean supportsSettings(ProfilingSettings settings) {
+        return true;
+    }
+    
+    public void configureSettings(ProfilingSettings settings) {
     }
     
     private void initResultsUI() {
