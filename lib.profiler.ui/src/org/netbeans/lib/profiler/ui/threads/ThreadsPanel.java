@@ -329,8 +329,10 @@ public class ThreadsPanel extends JPanel {
         legendPanel.add(monitorLegend);
         
         threadsToolbar = ProfilerToolbar.create(true);
-        threadsToolbar.add(saveView);
-        threadsToolbar.addSeparator();
+        if (saveView != null) {
+            threadsToolbar.add(saveView);
+            threadsToolbar.addSeparator();
+        }
         
         final Action zoomIn = viewManager.zoomInAction();
         zoomInAction = new JButton(zoomIn) {
