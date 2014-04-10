@@ -147,7 +147,9 @@
     </folder>
     <folder name="OptionsDialog">
         <folder name="Advanced.instance_hidden"/>
+        <file name="Appearance.instance_hidden"/>
         <folder name="General.instance_hidden"/>
+        <file name="Keymaps.instance_hidden"/>
         <file name="Network.instance">
             <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.modules.appui.options.NetworkOptionsCategory.instance"/>
             <attr name="position" intvalue="2000"/>

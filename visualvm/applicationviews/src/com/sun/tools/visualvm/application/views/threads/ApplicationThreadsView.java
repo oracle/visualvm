@@ -55,9 +55,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.ui.threads.ThreadsDetailsPanel;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
-import org.netbeans.lib.profiler.ui.threads.ThreadsTablePanel;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -157,25 +155,7 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
         final DataViewComponent dvc = new DataViewComponent(mvs.getMasterView(), new DataViewComponent.MasterViewConfiguration(false));
 
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Threads_visualization"), true), DataViewComponent.TOP_LEFT); // NOI18N
-
-        final DetailsViewSupport detailsViewSupport = new DetailsViewSupport(threadsManager);
-        final DataViewComponent.DetailsView detailsView = detailsViewSupport.getDetailsView();
-        ThreadsPanel.ThreadsDetailsCallback timelineCallback = new ThreadsPanel.ThreadsDetailsCallback() {
-            public void showDetails(final int[] indexes) {
-                detailsViewSupport.showDetails(indexes);
-                dvc.selectDetailsView(detailsView);
-            }
-        };
-        ThreadsTablePanel.ThreadsDetailsCallback tableCallback = new ThreadsTablePanel.ThreadsDetailsCallback() {
-            public void showDetails(final int[] indexes) {
-                detailsViewSupport.showDetails(indexes);
-                dvc.selectDetailsView(detailsView);
-            }
-        };
-
-        dvc.addDetailsView(new TimelineViewSupport(threadsManager, timelineCallback).getDetailsView(), DataViewComponent.TOP_LEFT);
-        dvc.addDetailsView(new TableViewSupport(threadsManager, tableCallback).getDetailsView(), DataViewComponent.TOP_LEFT);
-        dvc.addDetailsView(detailsView, DataViewComponent.TOP_LEFT);
+        dvc.addDetailsView(new TimelineViewSupport(threadsManager).getDetailsView(), DataViewComponent.TOP_LEFT);
 
         return dvc;
     }
@@ -319,81 +299,25 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
     private static class TimelineViewSupport extends JPanel {
 
-        TimelineViewSupport(VisualVMThreadsDataManager threadsManager, ThreadsPanel.ThreadsDetailsCallback callback) {
-            initComponents(threadsManager, callback);
+        TimelineViewSupport(VisualVMThreadsDataManager threadsManager) {
+            initComponents(threadsManager);
         }
 
         DataViewComponent.DetailsView getDetailsView() {
             return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Timeline"), null, 10, this, null);  // NOI18N
         }
 
-        private void initComponents(VisualVMThreadsDataManager threadsManager, ThreadsPanel.ThreadsDetailsCallback callback) {
+        private void initComponents(VisualVMThreadsDataManager threadsManager) {
             setLayout(new BorderLayout());
             setOpaque(false);
 
-            ThreadsPanel threadsPanel = new ThreadsPanel(threadsManager, callback, true);
+            ThreadsPanel threadsPanel = new ThreadsPanel(threadsManager, null);
             threadsPanel.threadsMonitoringEnabled();
 
             JComponent toolbar = (JComponent)threadsPanel.getToolbar();
 
             add(toolbar, BorderLayout.NORTH);
             add(threadsPanel, BorderLayout.CENTER);
-        }
-    }
-
-    // --- Timeline ------------------------------------------------------------
-
-    private static class TableViewSupport extends JPanel {
-
-        TableViewSupport(VisualVMThreadsDataManager threadsManager, ThreadsTablePanel.ThreadsDetailsCallback callback) {
-            initComponents(threadsManager, callback);
-        }
-
-        DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Table"), null, 20, this, null);  // NOI18N
-        }
-
-        private void initComponents(VisualVMThreadsDataManager threadsManager, ThreadsTablePanel.ThreadsDetailsCallback callback) {
-            setLayout(new BorderLayout());
-            setOpaque(false);
-
-            ThreadsTablePanel threadsPanel = new ThreadsTablePanel(threadsManager, callback, true);
-            threadsPanel.setOpaque(false);
-
-            JComponent toolbar = (JComponent)threadsPanel.getToolbar();
-            
-            add(toolbar, BorderLayout.NORTH);
-            add(threadsPanel, BorderLayout.CENTER);
-        }
-    }
-
-    // --- Details -------------------------------------------------------------
-
-    private static class DetailsViewSupport extends JPanel {
-
-        private ThreadsDetailsPanel threadsDetailsPanel;
-
-        DetailsViewSupport(VisualVMThreadsDataManager threadsManager) {
-            initComponents(threadsManager);
-        }
-
-        DataViewComponent.DetailsView getDetailsView() {
-            return new DataViewComponent.DetailsView(NbBundle.getMessage(ApplicationThreadsView.class, "LBL_Details"), null, 30, this, null);   // NOI18N
-        }
-
-        void showDetails(int[] indexes) {
-            threadsDetailsPanel.showDetails(indexes);
-        }
-
-        private void initComponents(VisualVMThreadsDataManager threadsManager) {
-            setLayout(new BorderLayout());
-            setOpaque(false);
-            
-            threadsDetailsPanel = new ThreadsDetailsPanel(threadsManager, true);
-            JComponent toolbar = (JComponent)threadsDetailsPanel.getToolbar();
-
-            add(toolbar, BorderLayout.NORTH);
-            add(threadsDetailsPanel, BorderLayout.CENTER);
         }
     }
 }

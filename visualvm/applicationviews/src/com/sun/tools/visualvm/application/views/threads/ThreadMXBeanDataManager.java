@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.client.MonitoredData;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.wireprotocol.MonitoredNumbersResponse;
@@ -89,7 +90,14 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
         try {
             ThreadMonitoredDataResponse resp = new ThreadMonitoredDataResponse();
             resp.fillInThreadData();
-            processData(MonitoredData.getMonitoredData(resp));
+            final MonitoredData monitoredData = MonitoredData.getMonitoredData(resp);
+            SwingUtilities.invokeLater(new Runnable() {
+
+                public void run() {
+                    // must run in AWT
+                    processData(monitoredData);
+                }
+            });
         } catch (Exception ex) {
             LOGGER.throwing(ThreadMXBeanDataManager.class.getName(), "refreshThreads", ex); // NOI18N
         }
