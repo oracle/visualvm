@@ -59,11 +59,11 @@ import org.netbeans.modules.profiler.v2.session.ProjectSession;
  */
 public abstract class ProfilerFeature {
     
-    // To be called outside of EDT
     public abstract String getName();
     
-    // To be called outside of EDT
     public abstract Icon getIcon();
+    
+    public abstract int getPosition();
     
     
     // To be called in EDT
@@ -97,17 +97,21 @@ public abstract class ProfilerFeature {
         
         private final String name;
         private final Icon icon;
+        private final int position;
         
         private ProjectSession attachedSession;
         
-        public Basic(String name, Icon icon) {
+        public Basic(String name, Icon icon, int position) {
             this.name = name;
             this.icon = icon;
+            this.position = position;
         }
         
         public String getName() { return name; }
     
         public Icon getIcon() { return icon; }
+        
+        public int getPosition() { return position; }
         
         public JPanel getSettingsUI() { return null; }
         

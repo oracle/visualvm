@@ -45,20 +45,26 @@ package org.netbeans.modules.profiler.v2.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.ItemEvent;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
@@ -88,7 +94,9 @@ import org.openide.windows.WindowManager;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
+    "ProfilerWindow_caption=Profile",
     "ProfilerWindow_profile=Profile",
+    "ProfilerWindow_attach=Attach",
     "ProfilerWindow_terminateCaption=Terminate Profiling Session",
     "ProfilerWindow_terminateMsg=Terminate profiling session?",
     "ProfilerWindow_loadingSession=Loading session features...",
@@ -102,8 +110,9 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     
     private static Map<ProjectSession, Reference<ProfilerWindow>> MAP;
     
+    // To be called in EDT only - synchronization & UI creation
     public static ProfilerWindow forSession(ProjectSession session) {
-        // To be called in EDT only - synchronization & UI creation
+        
         assert SwingUtilities.isEventDispatchThread();
         
         if (MAP == null) {
@@ -140,7 +149,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         this.session = session;
         
         Lookup.Provider project = session.getProject();
-        String windowName = project == null ? Bundle.ProfilerWindow_profile() :
+        String windowName = project == null ? Bundle.ProfilerWindow_caption() :
                                        ProjectUtilities.getDisplayName(project);
         setDisplayName(windowName);
         updateIcon();
@@ -180,31 +189,23 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     
     private ProfilerFeatures features;
     
-    private JPanel topContainer;
     private ProfilerToolbar toolbar;
     private ProfilerToolbar featureToolbar;
+    private FeaturesView featuresView;
     
     private DropdownButton start;
     private JButton stop;
     private SettingsPresenter settingsButton;
-    private JPanel settingsUI;
-    private JPanel resultsUI;
     
     private AttachSettings attachSettings;
-    
-    private ChangeListener listener;
     
     
     private void createUI() {
         setLayout(new BorderLayout(0, 0));
         setFocusable(false);
         
-        topContainer = new JPanel(new BorderLayout(0, 0));
-        topContainer.setOpaque(false);
-        add(topContainer, BorderLayout.NORTH);
-        
         toolbar = ProfilerToolbar.create(true);
-        topContainer.add(toolbar.getComponent(), BorderLayout.NORTH);
+        add(toolbar.getComponent(), BorderLayout.NORTH);
         
         final JLabel loading = new JLabel(Bundle.ProfilerWindow_loadingSession());
         loading.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
@@ -223,11 +224,11 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         });
     }
     
-    private void popupulateUI() {
-        ProfilerFeature selected = features.getDefaultFeature();
-        
-        start = new DropdownButton(selected.getName(), Icons.getIcon(GeneralIcons.START), true) {
-            protected void populatePopup(JPopupMenu popup) { populatePopupImpl(popup); }
+    private void popupulateUI() {  
+        String _name = attachSettings != null ? Bundle.ProfilerWindow_attach() :
+                                                Bundle.ProfilerWindow_profile();
+        start = new DropdownButton(_name, Icons.getIcon(GeneralIcons.START), true) {
+            public void displayPopup() { displayPopupImpl(); }
             protected void performAction() { performStartImpl(); }
         };
         toolbar.add(start);
@@ -239,8 +240,28 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         
         toolbar.addFiller();
         
-        setCurrentFeature(selected);
-//        setAvailableFeatures(features);
+        settingsButton = new SettingsPresenter();
+        toolbar.add(settingsButton);
+        
+        featuresView = new FeaturesView(null);
+        add(featuresView, BorderLayout.CENTER);
+        
+        features.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) { updateFeatures(); }
+        });
+        updateFeatures();
+        
+        featuresView.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if (featureToolbar != null) toolbar.remove(featureToolbar);
+                ProfilerFeature selected = featuresView.getSelectedFeature();
+                featureToolbar = selected == null ? null : selected.getToolbar();
+                if (featureToolbar != null) toolbar.add(featureToolbar, 2);
+                settingsButton.setFeature(selected);
+                doLayout();
+                repaint();
+            }
+        });
         
         session.addListener(new ProjectSession.Listener() {
             public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
@@ -251,14 +272,35 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         updateButtons();
     }
     
+    
     private void updateIcon() {
         if (session.inProgress()) setIcon(Icons.getImage(ProfilerIcons.PROFILE_RUNNING));
         else setIcon(Icons.getImage(ProfilerIcons.PROFILE_INACTIVE));
     }
     
+    private void updateButtons() {
+        ProjectSession.State state = session.getState();
+        start.setPushed(state != ProjectSession.State.INACTIVE);
+        stop.setEnabled(state == ProjectSession.State.RUNNING);
+    }
+    
+    
+    private void updateFeatures() {
+        ProfilingSettings settings = features.getSettings();
+        start.setEnabled(settings != null);
+        
+        // TODO: optimize!
+        featuresView.removeFeatures();
+        for (ProfilerFeature feature : features.getSelectedFeatures())
+            featuresView.addFeature(feature);
+        featuresView.repaint();
+        
+        if (session.inProgress()) session.modify(__currentSettings());
+    }
+    
+    
     private ProfilingSettings __currentSettings() {
-        ProfilingSettings settings = new ProfilingSettings(currentFeature.getName());
-        currentFeature.configureSettings(settings);
+        ProfilingSettings settings = features.getSettings();
         System.err.println();
         System.err.println("=================================================");
         System.err.print(settings.debug());
@@ -277,137 +319,171 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         session.terminate();
     }
     
-    private void populatePopupImpl(JPopupMenu popup) {        
-        for (final ProfilerFeature feature : features.getFeatures()) {
-            if (feature == null) popup.addSeparator();
-            else popup.add(new JRadioButtonMenuItem(feature.getName(), feature == getCurrentFeature()) {
-                protected void fireActionPerformed(ActionEvent e) { setCurrentFeature(feature); }
+    
+    // --- Profile/Attach popup ------------------------------------------------
+    
+    private void displayPopupImpl() {
+        final Set<ProfilerFeature> _features = features.getFeatures();
+        final Set<ProfilerFeature> _selected = features.getSelectedFeatures();
+        final List<ToggleButtonMenuItem> _items = new ArrayList();
+        
+        // --- Feature items ---
+        int lastPosition = -1;
+        for (final ProfilerFeature feature : _features) {
+            int currentPosition = feature.getPosition();
+            if (lastPosition == -1) lastPosition = currentPosition;
+            if (currentPosition - lastPosition > 1) _items.add(null);
+            lastPosition = currentPosition;
+            
+            _items.add(new ToggleButtonMenuItem(feature.getName(), feature.getIcon()) {
+                {
+                    setPressed(_selected.contains(feature));
+                }
+                protected void fireActionPerformed(ActionEvent e) {
+                    features.toggleFeatureSelection(feature);
+                }
             });
         }
         
-        if (popup.getComponentCount() > 0) popup.addSeparator();
-        popup.add(new JMenuItem(Bundle.ProfilerWindow_createCustom()) {
-//            { setEnabled(!session.inProgress()); }
-            protected void fireActionPerformed(ActionEvent e) {
-                ProfilerFeature newFeature = features.createCustomFeature();
-                if (newFeature != null) setCurrentFeature(newFeature);
-            }
-        });
-    }
-    
-    
-    private void updateButtons() {
-        ProjectSession.State state = session.getState();
-        start.setPushed(state != ProjectSession.State.INACTIVE);
-//        start.setEnabled(state == ProjectSession.State.INACTIVE);
-        stop.setEnabled(state == ProjectSession.State.RUNNING);
-    }
-    
-    
-    private ProfilerFeature currentFeature;
-//    private ProfilerFeature[] availableFeatures;
-    
-    private void setCurrentFeature(ProfilerFeature feature) {
-        if (currentFeature == feature) return;
-        
-        if (currentFeature != null) currentFeature.detachedFromSession(session);
-        if (listener != null && currentFeature != null)
-            currentFeature.removeChangeListener(listener);
-        
-        detachResultsUI();
-        detachToolbar();
-        detachSettingsUI();
-        
-        currentFeature = feature;
-        start.setText(currentFeature.getName());
-        currentFeature.attachedToSession(session);
-        
-        attachSettingsUI();
-        attachToolbar();
-        attachResultsUI();
-        
-        revalidate();
-        repaint();
-        
-        if (session.inProgress()) session.modify(__currentSettings());
-        
-        if (listener == null) listener = new ChangeListener() {
+        // --- Features listener ---
+        final ChangeListener listener = new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                if (session.inProgress()) session.modify(__currentSettings());
+                int index = 0;
+                for (ProfilerFeature feature : _features) {
+                    ToggleButtonMenuItem item = _items.get(index++);
+                    if (item == null) item = _items.get(index++);
+                    item.setPressed(_selected.contains(feature));
+                }
             }
         };
-        currentFeature.addChangeListener(listener);
-    }
-    
-    private ProfilerFeature getCurrentFeature() {
-        return currentFeature;
-    }
-    
-//    private void setAvailableFeatures(ProfilerFeature[] features) {
-//        availableFeatures = features;
-//    }
-//    
-//    private ProfilerFeature[] getAvailableFeatures() {
-//        return availableFeatures;
-//    }
-    
-    
-    // --- Toolbar -------------------------------------------------------------
-    
-    public void attachToolbar() {
-        if (settingsButton != null) toolbar.add(settingsButton, 3);
         
-        featureToolbar = currentFeature.getToolbar();
-        if (featureToolbar != null) toolbar.add(featureToolbar, 2);
-    }
-    
-    private void detachToolbar() {
-        if (featureToolbar != null) {
-            toolbar.remove(featureToolbar);
-            featureToolbar = null;
+        // --- Other controls ---
+        JCheckBoxMenuItem singleFeature = new StayOpenPopupMenu.CheckBoxItem("Profile multiple features") {
+            { setSelected(!features.isSingleFeatureSelection()); }
+            protected void fireItemStateChanged(ItemEvent event) {
+                features.setSingleFeatureSelection(!isSelected());
+            }
+        };
+        
+        JCheckBoxMenuItem advancedSettings = new StayOpenPopupMenu.CheckBoxItem("Enable advanced settings") {
+//            { setSelected(!features.isSingleFeatureSelection()); }
+            protected void fireItemStateChanged(ItemEvent event) {
+//                features.setSingleFeatureSelection(!isSelected());
+            }
+        };
+        
+        JCheckBoxMenuItem usePPoints = new StayOpenPopupMenu.CheckBoxItem("Use defined Profiling Points") {
+            {
+                setSelected(features.getUseProfilingPoints());
+                setEnabled(!session.inProgress());
+            }
+            protected void fireItemStateChanged(ItemEvent event) {
+                features.setUseProfilingPoints(isSelected());
+            }
+        };
+        
+        // --- Popup menu ---
+        StayOpenPopupMenu popup = new StayOpenPopupMenu() {
+            public void setVisible(boolean visible) {
+                if (visible) features.addChangeListener(listener);
+                else features.removeChangeListener(listener);
+                super.setVisible(visible);
+            }
+        };
+        popup.setLayout(new GridBagLayout());
+        if (!UIUtils.isAquaLookAndFeel()) {
+            popup.setForceBackground(true);
+            Color background = UIUtils.getProfilerResultsBackground();
+            popup.setBackground(new Color(background.getRGB())); // JPopupMenu doesn't seem to follow ColorUIResource
         }
         
-        if (settingsButton != null) {
-            settingsButton.cleanup();
-            toolbar.remove(settingsButton);
+        // --- Popup crowding ---
+        int left = 12;
+        int labl = 5;
+        int y = 0;
+        GridBagConstraints c;
+                
+        JLabel profileL = new JLabel("Profile:", JLabel.LEADING);
+        profileL.setFont(popup.getFont().deriveFont(Font.BOLD));
+        c = new GridBagConstraints();
+//        c.gridx = 0;
+        c.gridy = y++;
+        c.insets = new Insets(5, labl, 5, 5);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        popup.add(profileL, c);
+        
+        for (ToggleButtonMenuItem item : _items) {
+            if (item == null) {
+                JPanel p = new JPanel(null);
+                p.setOpaque(false);
+                c = new GridBagConstraints();
+//                c.gridx = 0;
+                c.gridy = y++;
+                c.insets = new Insets(4, 0, 4, 0);
+                c.fill = GridBagConstraints.HORIZONTAL;
+                popup.add(p, c);
+            } else {
+                c = new GridBagConstraints();
+//                c.gridx = 0;
+                c.gridy = y++;
+                c.insets = new Insets(0, left, 0, 5);
+                c.fill = GridBagConstraints.HORIZONTAL;
+                popup.add(item, c);
+            }
         }
-    }
-    
-    private void attachSettingsUI() {
-        JPanel settings = currentFeature.getSettingsUI();
-        if (settings != null) {
-            settingsUI = new JPanel(new BorderLayout(0, 0));
-            Color orig = settingsUI.getBackground();
-            settingsUI.setOpaque(true);
-            settingsUI.setBackground(UIUtils.getProfilerResultsBackground());
-            settingsUI.add(settings, BorderLayout.CENTER);
-            settingsUI.add(UIUtils.createHorizontalLine(orig), BorderLayout.SOUTH);
-            settingsUI.setVisible(settings.isVisible());
-            topContainer.add(settingsUI, BorderLayout.SOUTH);
-            
-            settingsButton = new SettingsPresenter(settings, settingsUI);
-        }
-    }
-    
-    private void detachSettingsUI() {
-        if (settingsUI != null) {
-            topContainer.remove(settingsUI);
-            settingsUI = null;
-            
-            settingsButton = null;
-        }
-    }
-    
-    private void attachResultsUI() {
-        resultsUI = currentFeature.getResultsUI();
-        add(resultsUI, BorderLayout.CENTER);
-    }
-    
-    private void detachResultsUI() {
-        if (resultsUI != null) {
-            remove(resultsUI);
-            resultsUI = null;
-        }
+
+        JLabel settingsL = new JLabel("Settings:", JLabel.LEADING);
+        settingsL.setFont(popup.getFont().deriveFont(Font.BOLD));
+        c = new GridBagConstraints();
+//        c.gridx = 0;
+        c.gridy = y++;
+        c.insets = new Insets(8, labl, 5, 5);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        popup.add(settingsL, c);
+
+        c = new GridBagConstraints();
+//        c.gridx = 0;
+        c.gridy = y++;
+        c.insets = new Insets(0, left, 0, 5);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        popup.add(singleFeature, c);
+
+        c = new GridBagConstraints();
+//        c.gridx = 0;
+        c.gridy = y++;
+        c.insets = new Insets(0, left, 0, 5);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        popup.add(advancedSettings, c);
+
+        JLabel ppointsL = new JLabel("Profiling Points:", JLabel.LEADING);
+        ppointsL.setFont(popup.getFont().deriveFont(Font.BOLD));
+        c = new GridBagConstraints();
+//        c.gridx = 0;
+        c.gridy = y++;
+        c.insets = new Insets(8, labl, 5, 5);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        popup.add(ppointsL, c);
+
+        c = new GridBagConstraints();
+//        c.gridx = 0;
+        c.gridy = y++;
+        c.insets = new Insets(0, left, 0, 5);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        popup.add(usePPoints, c);
+
+        JPanel footer = new JPanel(null);
+        footer.setOpaque(false);
+        c = new GridBagConstraints();
+//        c.gridx = 0;
+        c.gridy = y++;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.insets = new Insets(3, 0, 0, 0);
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.fill = GridBagConstraints.BOTH;
+        popup.add(footer, c);
+        
+        popup.show(start, 0, start.getHeight());
     }
     
     
@@ -436,38 +512,39 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     private static final class SettingsPresenter extends JToggleButton
                                                  implements ComponentListener {
         
-        private final JPanel settings;
-        private final JPanel container;
+        private JPanel settings;
         
-        SettingsPresenter(JPanel settings, JPanel container) {
+        SettingsPresenter() {
             super(Icons.getIcon(GeneralIcons.SETTINGS));
-            
-            this.settings = settings;
-            this.container = container;
-            
-            settings.addComponentListener(this);
-            updateVisibility(settings.isVisible());
+            updateVisibility();
+        }
+        
+        void setFeature(ProfilerFeature feature) {
+            if (settings != null) settings.removeComponentListener(this);
+            settings = feature == null ? null : feature.getSettingsUI();
+            if (settings != null) settings.addComponentListener(this);
+            updateVisibility();
         }
         
         protected void fireActionPerformed(ActionEvent e) {
-            updateVisibility(isSelected());
+            if (settings != null) {
+                settings.setVisible(isSelected());
+                settings.getParent().setVisible(isSelected());
+            }
         }
         
         void cleanup() {
             settings.removeComponentListener(this);
         }
         
-        private void updateVisibility(boolean visible) {
-            setSelected(visible);
-            settings.setVisible(visible);
-            container.setVisible(visible);
-            container.revalidate();
-            container.repaint();
+        private void updateVisibility() {
+            setVisible(settings != null);
+            setSelected(isVisible() && settings.isVisible());
         }
         
-        public void componentShown(ComponentEvent e) { updateVisibility(true); }
+        public void componentShown(ComponentEvent e) { updateVisibility(); }
 
-        public void componentHidden(ComponentEvent e) { updateVisibility(false); }
+        public void componentHidden(ComponentEvent e) { updateVisibility(); }
         
         public void componentResized(ComponentEvent e) {}
         

@@ -68,7 +68,6 @@ import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
@@ -96,7 +95,7 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "CPUFeature_name=CPU",
+    "CPUFeature_name=Methods",
     "CPUFeature_lrLabel=Live results:",
     "CPUFeature_viewHotSpots=Hot Spots",
     "CPUFeature_viewCallTree=Call Tree",
@@ -151,7 +150,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
     
     
     CPUFeature() {
-        super(Bundle.CPUFeature_name(), Icons.getIcon(ProfilerIcons.CPU));
+        super(Bundle.CPUFeature_name(), Icons.getIcon(ProfilerIcons.CPU), 12);
         
         selection = new HashSet() {
             public boolean add(Object value) {
@@ -620,7 +619,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
     }
     
     private void refreshToolbar(final ProjectSession.State state) {
-        SwingUtilities.invokeLater(new Runnable() {
+        if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 boolean running = isRunning(state);
                 lrPauseButton.setEnabled(running);

@@ -68,7 +68,6 @@ import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.memory.MemoryView;
@@ -95,7 +94,7 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "MemoryFeature_name=Memory",
+    "MemoryFeature_name=Objects",
     "MemoryFeature_lrLabel=Live results:",
     "MemoryFeature_pdLabel=Profiling data:", 
     "MemoryFeature_snapshot=Snapshot", 
@@ -143,7 +142,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     
     
     MemoryFeature() {
-        super(Bundle.MemoryFeature_name(), Icons.getIcon(ProfilerIcons.MEMORY));
+        super(Bundle.MemoryFeature_name(), Icons.getIcon(ProfilerIcons.MEMORY), 13);
         
         selection = new HashSet() {
             public boolean add(Object value) {
@@ -517,7 +516,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     }
     
     private void refreshToolbar(final ProjectSession.State state) {
-        SwingUtilities.invokeLater(new Runnable() {
+        if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 boolean running = isRunning(state);
                 lrPauseButton.setEnabled(running);

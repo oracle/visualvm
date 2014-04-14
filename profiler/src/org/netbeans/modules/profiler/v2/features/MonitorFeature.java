@@ -50,7 +50,6 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.monitor.MonitorView;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
@@ -67,7 +66,7 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "MonitorFeature_name=Monitor",
+    "MonitorFeature_name=Telemetry",
     "MonitorFeature_graphs=Graphs:",
     "MonitorFeature_application=Application:",
     "MonitorFeature_threadDump=Thread Dump",
@@ -92,7 +91,7 @@ final class MonitorFeature extends ProfilerFeature.Basic {
     
     
     MonitorFeature() {
-        super(Bundle.MonitorFeature_name(), Icons.getIcon(ProfilerIcons.MONITORING));
+        super(Bundle.MonitorFeature_name(), Icons.getIcon(ProfilerIcons.MONITORING), 10);
     }
 
     
@@ -170,7 +169,7 @@ final class MonitorFeature extends ProfilerFeature.Basic {
 //    }
     
     private void refreshToolbar(final ProjectSession.State state) {
-        SwingUtilities.invokeLater(new Runnable() {
+        if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
 //                boolean running = state == ProjectSession.State.RUNNING;
 //                lrPauseButton.setEnabled(running);

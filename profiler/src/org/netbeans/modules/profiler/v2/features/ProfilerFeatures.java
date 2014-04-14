@@ -43,12 +43,17 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.modules.profiler.v2.session.ProjectSession;
-import org.openide.util.Lookup;
 
 /**
+ * NOTE: All methods must be invoked from the EDT except of forSession().
  *
  * @author Jiri Sedlacek
  */
@@ -60,57 +65,140 @@ public final class ProfilerFeatures {
     }
     
     
-    private final List<ProfilerFeature> features;
+    private final ProjectSession session;
+    
+    private final Set<ProfilerFeature> features;
+    private final Set<ProfilerFeature> selected;
+    
+    private final Set<ChangeListener> listeners;
+    private final ChangeListener listener = new ChangeListener() {
+        public void stateChanged(ChangeEvent e) { fireChange(); }
+    };
+    
+    private boolean singleFeature;
+    
+    private boolean ppoints;
     
     
     private ProfilerFeatures(ProjectSession session) {
-        features = new ArrayList();
+        this.session = session;
         
-        addBuiltInFeatures(features, true);
-        addCustomFeatures(features, session.getProject());
-    }
-    
-    
-    // Must be called in EDT
-    public ProfilerFeature[] getFeatures() {
-        return features.toArray(new ProfilerFeature[features.size()]);
-    }
-    
-    // Must be called in EDT
-    public ProfilerFeature getDefaultFeature() {
-        return features.get(0);
-    }
-    
-    
-    // Must be called in EDT
-    public ProfilerFeature createCustomFeature() {
-        List<ProfilerFeature> availableFeatures = new ArrayList();
-        addBuiltInFeatures(availableFeatures, false);
+        singleFeature = true; // TODO: read last state
+        ppoints = true; // TODO: read last state
         
-        ProfilerFeature custom = CustomFeature.create(availableFeatures.toArray(
-                                 new ProfilerFeature[availableFeatures.size()]));
-        if (custom != null) addCustomFeature(custom);
+        Comparator<ProfilerFeature> comparator = new Comparator<ProfilerFeature>() {
+            public int compare(ProfilerFeature f1, ProfilerFeature f2) {
+                return Integer.compare(f1.getPosition(), f2.getPosition());
+            }
+        };
         
-        return custom;
+        features = new TreeSet(comparator);
+        selected = new TreeSet(comparator);
+        
+        listeners = new HashSet();
+        
+        popuplateFeatures(features);
     }
     
     
-    private void addBuiltInFeatures(List list, boolean separator) {
-        list.add(new MonitorFeature());
-        list.add(new CPUFeature());
-        list.add(new MemoryFeature());
-        if (separator) list.add(null);
-        list.add(new ThreadsFeature());
-        list.add(new LocksFeature());
+    public Set<ProfilerFeature> getFeatures() {
+        return features;
     }
     
-    private void addCustomFeatures(List list, Lookup.Provider project) {
-        // TODO: read saved custom features
+    public Set<ProfilerFeature> getSelectedFeatures() {
+        return selected;
     }
     
-    private void addCustomFeature(ProfilerFeature feature) {
-        features.add(0, feature);
-        if (features.size() == 7) features.add(1, null); // Separator between custom and default features
+    public void selectFeature(ProfilerFeature feature) {
+        if (singleFeature) {
+            if (selected.size() == 1 && selected.contains(feature)) return;
+            for (ProfilerFeature f : selected) {
+                f.detachedFromSession(session);
+                f.removeChangeListener(listener);
+            }
+            selected.clear();
+            selected.add(feature);
+            feature.addChangeListener(listener);
+            feature.attachedToSession(session);
+            fireChange();
+        } else {
+            if (selected.add(feature)) {
+                // TODO: implement restrictions (Methods | Objects mutually exclusive)
+                feature.addChangeListener(listener);
+                feature.attachedToSession(session);
+                fireChange();
+            }
+        }
+    }
+    
+    public void deselectFeature(ProfilerFeature feature) {
+        if (selected.remove(feature)) {
+            feature.detachedFromSession(session);
+            feature.removeChangeListener(listener);
+            fireChange();
+        }
+    }
+    
+    public void toggleFeatureSelection(ProfilerFeature feature) {
+        if (selected.contains(feature)) deselectFeature(feature);
+        else selectFeature(feature);
+    }
+    
+    
+    public void setSingleFeatureSelection(boolean single) {
+        singleFeature = single;
+        if (singleFeature && !selected.isEmpty())
+            selectFeature(selected.iterator().next());
+    }
+    
+    public boolean isSingleFeatureSelection() {
+        return singleFeature;
+    }
+    
+    
+    public void setUseProfilingPoints(boolean use) {
+        ppoints = use;
+    }
+    
+    public boolean getUseProfilingPoints() {
+        return ppoints;
+    }
+    
+    
+    public ProfilingSettings getSettings() {
+        if (selected.isEmpty()) return null;
+        
+        ProfilingSettings settings = new ProfilingSettings();
+        for (ProfilerFeature f : selected) f.configureSettings(settings);
+        
+        settings.setUseProfilingPoints(ppoints);
+        
+        return settings;
+    }
+    
+    
+    public void addChangeListener(ChangeListener listener) {
+        listeners.add(listener);
+    }
+    
+    public void removeChangeListener(ChangeListener listener) {
+        listeners.remove(listener);
+    }
+    
+    private void fireChange() {
+        if (listeners.isEmpty()) return;
+        ChangeEvent e = new ChangeEvent(this);
+        for (ChangeListener listener : listeners) listener.stateChanged(e);
+    }
+    
+    
+    private void popuplateFeatures(Set set) {
+        // TODO: read Feature settings
+        set.add(new CPUFeature());
+        set.add(new MemoryFeature());
+        set.add(new MonitorFeature());
+        set.add(new ThreadsFeature());
+        set.add(new LocksFeature());
     }
     
 }

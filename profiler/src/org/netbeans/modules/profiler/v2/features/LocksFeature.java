@@ -51,7 +51,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.locks.LockContentionPanel;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -87,7 +86,7 @@ final class LocksFeature extends ProfilerFeature.Basic {
     
     
     LocksFeature() {
-        super(Bundle.LocksFeature_name(), Icons.getIcon(ProfilerIcons.WINDOW_LOCKS));
+        super(Bundle.LocksFeature_name(), Icons.getIcon(ProfilerIcons.WINDOW_LOCKS), 16);
     }
     
 
@@ -180,7 +179,7 @@ final class LocksFeature extends ProfilerFeature.Basic {
 //    }
     
     private void refreshToolbar(final ProjectSession.State state) {
-        SwingUtilities.invokeLater(new Runnable() {
+        if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
 //                boolean running = state == ProjectSession.State.RUNNING;
 //                lrPauseButton.setEnabled(running);

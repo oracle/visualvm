@@ -53,8 +53,6 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
-import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -99,7 +97,7 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
     
     
     ThreadsFeature() {
-        super(Bundle.ThreadsFeature_name(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
+        super(Bundle.ThreadsFeature_name(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS), 15);
     }
     
     
@@ -217,7 +215,7 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
 //    }
     
     private void refreshToolbar(final ProjectSession.State state) {
-        SwingUtilities.invokeLater(new Runnable() {
+        if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
 //                boolean running = state == ProjectSession.State.RUNNING;
 //                lrPauseButton.setEnabled(running);
