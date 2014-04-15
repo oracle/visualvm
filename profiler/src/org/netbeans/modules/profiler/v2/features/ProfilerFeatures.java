@@ -45,6 +45,7 @@ package org.netbeans.modules.profiler.v2.features;
 
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.event.ChangeEvent;
@@ -123,7 +124,15 @@ public final class ProfilerFeatures {
             fireChange();
         } else {
             if (selected.add(feature)) {
-                // TODO: implement restrictions (Methods | Objects mutually exclusive)
+                ProfilingSettings ps = new ProfilingSettings();
+                feature.configureSettings(ps);
+                
+                Iterator<ProfilerFeature> it = selected.iterator();
+                while (it.hasNext()) {
+                    ProfilerFeature f = it.next();
+                    if (f != selected && !f.supportsSettings(ps)) it.remove();
+                }
+                
                 feature.addChangeListener(listener);
                 feature.attachedToSession(session);
                 fireChange();
@@ -132,6 +141,7 @@ public final class ProfilerFeatures {
     }
     
     public void deselectFeature(ProfilerFeature feature) {
+        if (selected.size() == 1 && selected.contains(feature) && session.inProgress()) return;
         if (selected.remove(feature)) {
             feature.detachedFromSession(session);
             feature.removeChangeListener(listener);

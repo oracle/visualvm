@@ -191,6 +191,8 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     
     private ProfilerToolbar toolbar;
     private ProfilerToolbar featureToolbar;
+    private ProfilerToolbar statusBar;
+    private JPanel container;
     private FeaturesView featuresView;
     
     private DropdownButton start;
@@ -238,13 +240,20 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         };
         toolbar.add(stop);
         
+        statusBar = new ProfilerStatus(session).getToolbar();
+        statusBar.getComponent().setVisible(false); // TODO: read last state
+        toolbar.add(statusBar);
+        
         toolbar.addFiller();
         
         settingsButton = new SettingsPresenter();
         toolbar.add(settingsButton);
         
+        container = new JPanel(new BorderLayout(0, 0));
+        add(container, BorderLayout.CENTER);
+        
         featuresView = new FeaturesView(null);
-        add(featuresView, BorderLayout.CENTER);
+        container.add(featuresView, BorderLayout.CENTER);
         
         features.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) { updateFeatures(); }
@@ -256,7 +265,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
                 if (featureToolbar != null) toolbar.remove(featureToolbar);
                 ProfilerFeature selected = featuresView.getSelectedFeature();
                 featureToolbar = selected == null ? null : selected.getToolbar();
-                if (featureToolbar != null) toolbar.add(featureToolbar, 2);
+                if (featureToolbar != null) toolbar.add(featureToolbar, 3);
                 settingsButton.setFeature(selected);
                 doLayout();
                 repaint();
@@ -303,7 +312,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         ProfilingSettings settings = features.getSettings();
         System.err.println();
         System.err.println("=================================================");
-        System.err.print(settings.debug());
+        System.err.print(settings == null ? "no settings" : settings.debug());
         System.err.println("=================================================");
         System.err.println();
         return settings;
@@ -365,10 +374,10 @@ public final class ProfilerWindow extends ProfilerTopComponent {
             }
         };
         
-        JCheckBoxMenuItem advancedSettings = new StayOpenPopupMenu.CheckBoxItem("Enable advanced settings") {
-//            { setSelected(!features.isSingleFeatureSelection()); }
+        JCheckBoxMenuItem showStatus = new StayOpenPopupMenu.CheckBoxItem("Show profiling status") {
+            { setSelected(statusBar.getComponent().isVisible()); }
             protected void fireItemStateChanged(ItemEvent event) {
-//                features.setSingleFeatureSelection(!isSelected());
+                statusBar.getComponent().setVisible(isSelected());
             }
         };
         
@@ -419,7 +428,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
                 c = new GridBagConstraints();
 //                c.gridx = 0;
                 c.gridy = y++;
-                c.insets = new Insets(4, 0, 4, 0);
+                c.insets = new Insets(5, 0, 5, 0);
                 c.fill = GridBagConstraints.HORIZONTAL;
                 popup.add(p, c);
             } else {
@@ -453,7 +462,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         c.gridy = y++;
         c.insets = new Insets(0, left, 0, 5);
         c.fill = GridBagConstraints.HORIZONTAL;
-        popup.add(advancedSettings, c);
+        popup.add(showStatus, c);
 
         JLabel ppointsL = new JLabel("Profiling Points:", JLabel.LEADING);
         ppointsL.setFont(popup.getFont().deriveFont(Font.BOLD));
