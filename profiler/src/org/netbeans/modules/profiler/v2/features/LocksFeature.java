@@ -129,6 +129,8 @@ final class LocksFeature extends ProfilerFeature.Basic {
             toolbar.add(apThreadDumpButton);
             
             setAggregation(LockContentionPanel.Aggregation.BY_THREADS);
+            
+            refreshToolbar(getSessionState());
         }
         
         return toolbar;
@@ -179,7 +181,7 @@ final class LocksFeature extends ProfilerFeature.Basic {
 //    }
     
     private void refreshToolbar(final ProjectSession.State state) {
-        if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
+        if (state != null && toolbar != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
 //                boolean running = state == ProjectSession.State.RUNNING;
 //                lrPauseButton.setEnabled(running);
