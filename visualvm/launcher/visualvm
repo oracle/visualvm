@@ -152,8 +152,8 @@ heap_size () {
         mem=640
     fi
     mem=`expr $mem / 5`
-    if [ $mem -gt 768 ] ; then
-        mem=768
+    if [ $mem -gt 1024 ] ; then
+        mem=1024
     elif [ $mem -lt 96 ] ; then
         mem=96
     fi

@@ -516,7 +516,7 @@ void VisualVMLauncher::adjustHeapAndPermGenSize() {
         if (areWeOn32bits())
             maxheap = 512;
         else
-            maxheap = 768;
+            maxheap = 1024;
         // find how much memory we have and add -Xmx as 1/5 of the memory
         MEMORYSTATUS ms = {0};
         GlobalMemoryStatus(&ms);
