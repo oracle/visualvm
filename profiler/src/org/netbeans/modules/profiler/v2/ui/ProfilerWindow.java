@@ -252,7 +252,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         container = new JPanel(new BorderLayout(0, 0));
         add(container, BorderLayout.CENTER);
         
-        featuresView = new FeaturesView(null);
+        featuresView = new FeaturesView(new WelcomePanel());
         container.add(featuresView, BorderLayout.CENTER);
         
         features.addChangeListener(new ChangeListener() {
