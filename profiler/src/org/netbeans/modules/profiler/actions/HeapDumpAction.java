@@ -48,8 +48,6 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerControlPanel2;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
@@ -398,28 +396,6 @@ public final class HeapDumpAction extends ProfilingAwareAction {
         Object oldText = getProperty(SHORT_DESCRIPTION);
         putProperty(SHORT_DESCRIPTION, text);
         firePropertyChange(SHORT_DESCRIPTION, oldText, text);
-    }
-
-    private boolean isHeapDumpSupported() {
-        // not supported for JDK other than 1.6 & 1.7 & 1.5.0_12 and up
-        TargetAppRunner targetApp = Profiler.getDefault().getTargetAppRunner();
-        String jdkVersion = targetApp.getProfilerEngineSettings().getTargetJDKVersionString();
-
-        if (CommonConstants.JDK_16_STRING.equals(jdkVersion)
-           || CommonConstants.JDK_17_STRING.equals(jdkVersion)
-           || CommonConstants.JDK_18_STRING.equals(jdkVersion)) {
-            return true;
-        }
-
-        if (CommonConstants.JDK_15_STRING.equals(jdkVersion)) {
-            String fullJDKString = targetApp.getProfilingSessionStatus().fullTargetJDKVersionString;
-            int minorNumber = Platform.getJDKMinorNumber(fullJDKString);
-            
-            if (minorNumber >= 12) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private static JFileChooser getSnapshotDirectoryChooser() {
