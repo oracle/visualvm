@@ -49,6 +49,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -71,6 +72,7 @@ class WelcomePanel extends JPanel {
         pp.setBackground(background);
         
         HTMLTextArea a1 = new HTMLTextArea("<font size='+1'>Configure Profiling Session</font>");
+        a1.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, a1.getForeground()));
         a1.setBackground(background);
         if (UIUtils.isNimbus()) a1.setOpaque(false);
         GridBagConstraints c = new GridBagConstraints();
