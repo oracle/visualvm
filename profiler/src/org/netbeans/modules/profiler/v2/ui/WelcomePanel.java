@@ -49,21 +49,21 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.v2.ProfilerFeature;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class WelcomePanel extends JPanel {
+public class WelcomePanel extends JPanel {
     
-    WelcomePanel() {
+    public WelcomePanel(Set<ProfilerFeature> features) {
         
         Color background = UIUtils.getProfilerResultsBackground();
         
@@ -71,12 +71,14 @@ class WelcomePanel extends JPanel {
         pp.setOpaque(true);
         pp.setBackground(background);
         
+        int y = 0;
+        
         HTMLTextArea a1 = new HTMLTextArea("<font size='+1'>Configure Profiling Session</font>");
         a1.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, a1.getForeground()));
         a1.setBackground(background);
         if (UIUtils.isNimbus()) a1.setOpaque(false);
         GridBagConstraints c = new GridBagConstraints();
-        c.gridy = 0;
+        c.gridy = y++;
         c.weightx = 1;
         c.weighty = 1;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -89,7 +91,7 @@ class WelcomePanel extends JPanel {
         a2.setBackground(background);
         if (UIUtils.isNimbus()) a2.setOpaque(false);
         c = new GridBagConstraints();
-        c.gridy = 1;
+        c.gridy = y++;
         c.weightx = 1;
         c.weighty = 1;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -98,126 +100,37 @@ class WelcomePanel extends JPanel {
         c.insets = new Insets(20, 20, 10, 20);
         pp.add(a2, c);
         
-        JLabel l11 = new JLabel("Telemetry:", Icons.getIcon(ProfilerIcons.MONITORING), JLabel.LEADING);
-        l11.setFont(l11.getFont().deriveFont(Font.BOLD));
-        c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 2;
-        c.gridwidth = 1;
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(3, 40, 10, 10);
-        pp.add(l11, c);
+        for (ProfilerFeature feature : features) {
         
-        JLabel l12 = new JLabel("Monitor CPU and Memory usage, number of threads and loaded classes");
-        l12.setEnabled(false);
-        c = new GridBagConstraints();
-        c.gridx = 1;
-        c.gridy = 2;
-//        c.weightx = 1;
-        c.gridwidth = 1;
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(3, 0, 10, 20);
-        pp.add(l12, c);
+            JLabel l1 = new JLabel(feature.getName(), feature.getIcon(), JLabel.LEADING);
+            l1.setFont(l1.getFont().deriveFont(Font.BOLD));
+            c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = y;
+            c.gridwidth = 1;
+            c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.insets = new Insets(3, 40, 10, 10);
+            pp.add(l1, c);
+
+            JLabel l2 = new JLabel(feature.getDescription());
+            l2.setEnabled(false);
+            c = new GridBagConstraints();
+            c.gridx = 1;
+            c.gridy = y++;
+            c.gridwidth = 1;
+            c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.insets = new Insets(3, 0, 10, 20);
+            pp.add(l2, c);
         
-        JLabel l21 = new JLabel("Methods:", Icons.getIcon(ProfilerIcons.CPU), JLabel.LEADING);
-        l21.setFont(l11.getFont());
-        c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 3;
-        c.gridwidth = 1;
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(0, 40, 10, 10);
-        pp.add(l21, c);
-        
-        JLabel l22 = new JLabel("Profile method execution times and invocation counts, including call trees");
-        l22.setEnabled(false);
-        c = new GridBagConstraints();
-        c.gridx = 1;
-        c.gridy = 3;
-//        c.weightx = 1;
-        c.gridwidth = 1;
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(0, 0, 10, 20);
-        pp.add(l22, c);
-        
-        JLabel l31 = new JLabel("Objects:", Icons.getIcon(ProfilerIcons.MEMORY), JLabel.LEADING);
-        l31.setFont(l11.getFont());
-        c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 4;
-        c.gridwidth = 1;
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(0, 40, 10, 10);
-        pp.add(l31, c);
-        
-        JLabel l32 = new JLabel("Profile size and count of allocated objects, including allocation trees");
-        l32.setEnabled(false);
-        c = new GridBagConstraints();
-        c.gridx = 1;
-        c.gridy = 4;
-//        c.weightx = 1;
-        c.gridwidth = 1;
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(0, 0, 10, 20);
-        pp.add(l32, c);
-        
-        JLabel l41 = new JLabel("Threads:", Icons.getIcon(ProfilerIcons.WINDOW_THREADS), JLabel.LEADING);
-        l41.setFont(l11.getFont());
-        c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 5;
-        c.gridwidth = 1;
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(0, 40, 10, 10);
-        pp.add(l41, c);
-        
-        JLabel l42 = new JLabel("Monitor thread states and times");
-        l42.setEnabled(false);
-        c = new GridBagConstraints();
-        c.gridx = 1;
-        c.gridy = 5;
-//        c.weightx = 1;
-        c.gridwidth = 1;
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(0, 0, 10, 20);
-        pp.add(l42, c);
-        
-        JLabel l51 = new JLabel("Locks:", Icons.getIcon(ProfilerIcons.WINDOW_LOCKS), JLabel.LEADING);
-        l51.setFont(l11.getFont());
-        c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 6;
-        c.gridwidth = 1;
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(0, 40, 10, 10);
-        pp.add(l51, c);
-        
-        JLabel l52 = new JLabel("Collect lock contention data");
-        l52.setEnabled(false);
-        c = new GridBagConstraints();
-        c.gridx = 1;
-        c.gridy = 6;
-//        c.weightx = 1;
-        c.gridwidth = 1;
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(0, 0, 10, 20);
-        pp.add(l52, c);
+        }
         
         HTMLTextArea a3 = new HTMLTextArea("To profile multiple features simultaneously, select the <b>Profile multiple features</b> choice. Note that profiling <b>Methods</b> and <b>Objects</b> is mutually exclusive.");
         a3.setBackground(background);
         if (UIUtils.isNimbus()) a3.setOpaque(false);
         c = new GridBagConstraints();
-        c.gridy = 7;
+        c.gridy = y++;
         c.weightx = 1;
         c.weighty = 1;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -230,7 +143,7 @@ class WelcomePanel extends JPanel {
         a4.setBackground(background);
         if (UIUtils.isNimbus()) a4.setOpaque(false);
         c = new GridBagConstraints();
-        c.gridy = 8;
+        c.gridy = y++;
         c.weightx = 1;
         c.weighty = 1;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -243,7 +156,7 @@ class WelcomePanel extends JPanel {
         a5.setBackground(background);
         if (UIUtils.isNimbus()) a5.setOpaque(false);
         c = new GridBagConstraints();
-        c.gridy = 9;
+        c.gridy = y++;
         c.weightx = 1;
         c.weighty = 1;
         c.gridwidth = GridBagConstraints.REMAINDER;

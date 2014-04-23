@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.features;
+package org.netbeans.modules.profiler.v2;
 
 import java.util.Comparator;
 import java.util.HashSet;
@@ -51,22 +51,17 @@ import java.util.TreeSet;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.modules.profiler.v2.session.ProjectSession;
+import org.netbeans.modules.profiler.v2.ProfilerFeature.Provider;
+import org.openide.util.Lookup;
 
 /**
- * NOTE: All methods must be invoked from the EDT except of forSession().
+ * Note: all methods excluding constructor to be called in EDT.
  *
  * @author Jiri Sedlacek
  */
-public final class ProfilerFeatures {
+final class ProfilerFeatures {
     
-    // Must be called outside of EDT
-    public static ProfilerFeatures forSession(ProjectSession session) {
-        return new ProfilerFeatures(session);
-    }
-    
-    
-    private final ProjectSession session;
+    private final ProfilerSession session;
     
     private final Set<ProfilerFeature> features;
     private final Set<ProfilerFeature> selected;
@@ -81,7 +76,7 @@ public final class ProfilerFeatures {
     private boolean ppoints;
     
     
-    private ProfilerFeatures(ProjectSession session) {
+    ProfilerFeatures(ProfilerSession session) {
         this.session = session;
         
         singleFeature = true; // TODO: read last state
@@ -98,19 +93,20 @@ public final class ProfilerFeatures {
         
         listeners = new HashSet();
         
-        popuplateFeatures(features);
+        for (Provider provider : Lookup.getDefault().lookupAll(Provider.class))
+            features.addAll(provider.getFeatures(session.getProject()));
     }
     
     
-    public Set<ProfilerFeature> getFeatures() {
+    Set<ProfilerFeature> getFeatures() {
         return features;
     }
     
-    public Set<ProfilerFeature> getSelectedFeatures() {
+    Set<ProfilerFeature> getSelectedFeatures() {
         return selected;
     }
     
-    public void selectFeature(ProfilerFeature feature) {
+    void selectFeature(ProfilerFeature feature) {
         if (singleFeature) {
             if (selected.size() == 1 && selected.contains(feature)) return;
             for (ProfilerFeature f : selected) {
@@ -140,7 +136,7 @@ public final class ProfilerFeatures {
         }
     }
     
-    public void deselectFeature(ProfilerFeature feature) {
+    void deselectFeature(ProfilerFeature feature) {
         if (selected.size() == 1 && selected.contains(feature) && session.inProgress()) return;
         if (selected.remove(feature)) {
             feature.detachedFromSession(session);
@@ -149,33 +145,33 @@ public final class ProfilerFeatures {
         }
     }
     
-    public void toggleFeatureSelection(ProfilerFeature feature) {
+    void toggleFeatureSelection(ProfilerFeature feature) {
         if (selected.contains(feature)) deselectFeature(feature);
         else selectFeature(feature);
     }
     
     
-    public void setSingleFeatureSelection(boolean single) {
+    void setSingleFeatureSelection(boolean single) {
         singleFeature = single;
         if (singleFeature && !selected.isEmpty())
             selectFeature(selected.iterator().next());
     }
     
-    public boolean isSingleFeatureSelection() {
+    boolean isSingleFeatureSelection() {
         return singleFeature;
     }
     
     
-    public void setUseProfilingPoints(boolean use) {
+    void setUseProfilingPoints(boolean use) {
         ppoints = use;
     }
     
-    public boolean getUseProfilingPoints() {
+    boolean getUseProfilingPoints() {
         return ppoints;
     }
     
     
-    public ProfilingSettings getSettings() {
+    ProfilingSettings getSettings() {
         if (selected.isEmpty()) return null;
         
         ProfilingSettings settings = new ProfilingSettings();
@@ -187,11 +183,11 @@ public final class ProfilerFeatures {
     }
     
     
-    public void addChangeListener(ChangeListener listener) {
+    void addChangeListener(ChangeListener listener) {
         listeners.add(listener);
     }
     
-    public void removeChangeListener(ChangeListener listener) {
+    void removeChangeListener(ChangeListener listener) {
         listeners.remove(listener);
     }
     
@@ -199,16 +195,6 @@ public final class ProfilerFeatures {
         if (listeners.isEmpty()) return;
         ChangeEvent e = new ChangeEvent(this);
         for (ChangeListener listener : listeners) listener.stateChanged(e);
-    }
-    
-    
-    private void popuplateFeatures(Set set) {
-        // TODO: read Feature settings
-        set.add(new CPUFeature());
-        set.add(new MemoryFeature());
-        set.add(new MonitorFeature());
-        set.add(new ThreadsFeature());
-        set.add(new LocksFeature());
     }
     
 }

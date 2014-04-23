@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
+import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import java.awt.event.ActionEvent;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -53,11 +54,11 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.locks.LockContentionPanel;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.v2.session.ProjectSession;
-import org.netbeans.modules.profiler.v2.ui.components.GrayLabel;
-import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
+import org.netbeans.modules.profiler.v2.ui.GrayLabel;
+import org.netbeans.modules.profiler.v2.ui.PopupButton;
 import org.openide.util.NbBundle;
 
 /**
@@ -66,6 +67,7 @@ import org.openide.util.NbBundle;
  */
 @NbBundle.Messages({
     "LocksFeature_name=Locks",
+    "LocksFeature_description=Collect lock contention data",
     "LocksFeature_show=View by:",
     "LocksFeature_aggregationByThreads=Threads",
     "LocksFeature_aggregationByMonitors=Monitors",
@@ -86,7 +88,8 @@ final class LocksFeature extends ProfilerFeature.Basic {
     
     
     LocksFeature() {
-        super(Bundle.LocksFeature_name(), Icons.getIcon(ProfilerIcons.WINDOW_LOCKS), 16);
+        super(Icons.getIcon(ProfilerIcons.WINDOW_LOCKS), Bundle.LocksFeature_name(),
+              Bundle.LocksFeature_description(), 16);
     }
     
 
@@ -172,7 +175,7 @@ final class LocksFeature extends ProfilerFeature.Basic {
     private void initResultsUI() {
         locksPanel = new LockContentionPanel();
         locksPanel.lockContentionEnabled();
-        stateChanged(null, getSessionState());
+        profilingStateChanged(-1, getSessionState());
     }
     
 //    private void refreshToolbar() {
@@ -180,24 +183,24 @@ final class LocksFeature extends ProfilerFeature.Basic {
 //        refreshToolbar(session == null ? null : session.getState());
 //    }
     
-    private void refreshToolbar(final ProjectSession.State state) {
-        if (state != null && toolbar != null) SwingUtilities.invokeLater(new Runnable() {
+    private void refreshToolbar(int state) {
+        final boolean inactive = state == NetBeansProfiler.PROFILING_INACTIVE;
+        if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
 //                boolean running = state == ProjectSession.State.RUNNING;
 //                lrPauseButton.setEnabled(running);
 //                lrRefreshButton.setEnabled(running && lrPauseButton.isSelected());
                 
-                boolean inactive = state == ProjectSession.State.INACTIVE;
                 shLabel.setEnabled(!inactive);
                 apLabel.setEnabled(!inactive);
             }
         });
     }
     
-    public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
-        if (newState == null || newState == ProjectSession.State.INACTIVE) {
+    protected void profilingStateChanged(int oldState, int newState) {
+        if (newState == NetBeansProfiler.PROFILING_INACTIVE) {
             if (locksPanel != null) locksPanel.profilingSessionFinished();
-        } else if (newState == ProjectSession.State.RUNNING) {
+        } else if (newState == NetBeansProfiler.PROFILING_RUNNING) {
             if (locksPanel != null) locksPanel.profilingSessionStarted();
         }
         refreshToolbar(newState);

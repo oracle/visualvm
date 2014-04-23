@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.ui;
+package org.netbeans.modules.profiler.v2;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -53,12 +53,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ItemEvent;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -71,18 +67,22 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.v2.features.ProfilerFeature;
-import org.netbeans.modules.profiler.v2.features.ProfilerFeatures;
-import org.netbeans.modules.profiler.v2.session.ProjectSession;
-import org.netbeans.modules.profiler.v2.ui.components.DropdownButton;
+import org.netbeans.modules.profiler.v2.ui.FeaturesView;
+import org.netbeans.modules.profiler.v2.ui.ProfilerStatus;
+import org.netbeans.modules.profiler.v2.ui.StayOpenPopupMenu;
+import org.netbeans.modules.profiler.v2.ui.ToggleButtonMenuItem;
+import org.netbeans.modules.profiler.v2.ui.WelcomePanel;
+import org.netbeans.modules.profiler.v2.ui.DropdownButton;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -104,48 +104,13 @@ import org.openide.windows.WindowManager;
     "#NOI18N",
     "ProfilerWindow_mode=editor"
 })
-public final class ProfilerWindow extends ProfilerTopComponent {
+class ProfilerWindow extends ProfilerTopComponent {    
     
-    // --- Static --------------------------------------------------------------
+    // --- Constructor ---------------------------------------------------------
     
-    private static Map<ProjectSession, Reference<ProfilerWindow>> MAP;
+    private final ProfilerSession session;
     
-    // To be called in EDT only - synchronization & UI creation
-    public static ProfilerWindow forSession(ProjectSession session) {
-        
-        assert SwingUtilities.isEventDispatchThread();
-        
-        if (MAP == null) {
-            MAP = new HashMap();
-        } else {
-            // Remove once multiple profiling sessions are supported
-            for (ProjectSession otherSession : MAP.keySet()) {
-                if (!session.equals(otherSession)) {
-                    Reference<ProfilerWindow> reference = MAP.get(otherSession);
-                    ProfilerWindow window = reference == null ? null : reference.get();
-                    if (window != null && !window.close()) return window;
-                    else MAP.remove(otherSession);
-                }
-            }
-        }
-        
-        Reference<ProfilerWindow> reference = MAP.get(session);
-        ProfilerWindow window = reference == null ? null : reference.get();
-        
-        if (window == null) {
-            window = new ProfilerWindow(session);
-            MAP.put(session, new WeakReference(window));
-        }
-        
-        return window;
-    }
-    
-    
-    // --- Instance ------------------------------------------------------------
-    
-    private final ProjectSession session;
-    
-    private ProfilerWindow(ProjectSession session) {
+    ProfilerWindow(ProfilerSession session) {
         this.session = session;
         
         Lookup.Provider project = session.getProject();
@@ -154,34 +119,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         setDisplayName(windowName);
         updateIcon();
         
-        setFocusable(true);
-        setRequestFocusEnabled(true);
-        
         createUI();
-    }
-    
-    
-    private ProjectSession getSession() {
-        return session;
-    }
-    
-    
-    public boolean canClose() {
-        if (!super.canClose()) return false;
-        if (!session.inProgress()) return true;
-        
-        if (ProfilerDialogs.displayConfirmation(Bundle.ProfilerWindow_terminateMsg(),
-                                                Bundle.ProfilerWindow_terminateCaption())) {
-            session.terminate();
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-    protected void componentClosed() {
-        MAP.remove(getSession());
-        super.componentClosed();
     }
     
     
@@ -215,7 +153,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                features = ProfilerFeatures.forSession(session);
+                features = session.getFeatures();
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         toolbar.remove(loading);
@@ -252,7 +190,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         container = new JPanel(new BorderLayout(0, 0));
         add(container, BorderLayout.CENTER);
         
-        featuresView = new FeaturesView(new WelcomePanel());
+        featuresView = new FeaturesView(new WelcomePanel(features.getFeatures()));
         container.add(featuresView, BorderLayout.CENTER);
         
         features.addChangeListener(new ChangeListener() {
@@ -272,8 +210,8 @@ public final class ProfilerWindow extends ProfilerTopComponent {
             }
         });
         
-        session.addListener(new ProjectSession.Listener() {
-            public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
+        session.addListener(new SimpleProfilingStateAdapter() {
+            public void update() {
                 updateIcon();
                 updateButtons();
             }
@@ -282,15 +220,19 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     }
     
     
+    void updateSession() {
+        
+    }
+    
     private void updateIcon() {
         if (session.inProgress()) setIcon(Icons.getImage(ProfilerIcons.PROFILE_RUNNING));
         else setIcon(Icons.getImage(ProfilerIcons.PROFILE_INACTIVE));
     }
     
     private void updateButtons() {
-        ProjectSession.State state = session.getState();
-        start.setPushed(state != ProjectSession.State.INACTIVE);
-        stop.setEnabled(state == ProjectSession.State.RUNNING);
+        int state = session.getState();
+        start.setPushed(state != NetBeansProfiler.PROFILING_INACTIVE);
+        stop.setEnabled(state == NetBeansProfiler.PROFILING_RUNNING);
     }
     
     
@@ -304,7 +246,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
             featuresView.addFeature(feature);
         featuresView.repaint();
         
-        if (session.inProgress()) session.modify(__currentSettings());
+        if (session.inProgress()) session.doModify(__currentSettings());
     }
     
     
@@ -320,7 +262,7 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     
     private void performStartImpl() {
         start.setPushed(true);
-        session.start(__currentSettings(), attachSettings);
+        session.doStart(__currentSettings(), attachSettings);
     }
     
     private void performStopImpl() {
@@ -415,7 +357,6 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         JLabel profileL = new JLabel("Profile:", JLabel.LEADING);
         profileL.setFont(popup.getFont().deriveFont(Font.BOLD));
         c = new GridBagConstraints();
-//        c.gridx = 0;
         c.gridy = y++;
         c.insets = new Insets(5, labl, 5, 5);
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -426,14 +367,12 @@ public final class ProfilerWindow extends ProfilerTopComponent {
                 JPanel p = new JPanel(null);
                 p.setOpaque(false);
                 c = new GridBagConstraints();
-//                c.gridx = 0;
                 c.gridy = y++;
                 c.insets = new Insets(5, 0, 5, 0);
                 c.fill = GridBagConstraints.HORIZONTAL;
                 popup.add(p, c);
             } else {
                 c = new GridBagConstraints();
-//                c.gridx = 0;
                 c.gridy = y++;
                 c.insets = new Insets(0, left, 0, 5);
                 c.fill = GridBagConstraints.HORIZONTAL;
@@ -444,21 +383,18 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         JLabel settingsL = new JLabel("Settings:", JLabel.LEADING);
         settingsL.setFont(popup.getFont().deriveFont(Font.BOLD));
         c = new GridBagConstraints();
-//        c.gridx = 0;
         c.gridy = y++;
         c.insets = new Insets(8, labl, 5, 5);
         c.fill = GridBagConstraints.HORIZONTAL;
         popup.add(settingsL, c);
 
         c = new GridBagConstraints();
-//        c.gridx = 0;
         c.gridy = y++;
         c.insets = new Insets(0, left, 0, 5);
         c.fill = GridBagConstraints.HORIZONTAL;
         popup.add(singleFeature, c);
 
         c = new GridBagConstraints();
-//        c.gridx = 0;
         c.gridy = y++;
         c.insets = new Insets(0, left, 0, 5);
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -467,14 +403,12 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         JLabel ppointsL = new JLabel("Profiling Points:", JLabel.LEADING);
         ppointsL.setFont(popup.getFont().deriveFont(Font.BOLD));
         c = new GridBagConstraints();
-//        c.gridx = 0;
         c.gridy = y++;
         c.insets = new Insets(8, labl, 5, 5);
         c.fill = GridBagConstraints.HORIZONTAL;
         popup.add(ppointsL, c);
 
         c = new GridBagConstraints();
-//        c.gridx = 0;
         c.gridy = y++;
         c.insets = new Insets(0, left, 0, 5);
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -483,7 +417,6 @@ public final class ProfilerWindow extends ProfilerTopComponent {
         JPanel footer = new JPanel(null);
         footer.setOpaque(false);
         c = new GridBagConstraints();
-//        c.gridx = 0;
         c.gridy = y++;
         c.weightx = 1;
         c.weighty = 1;
@@ -497,6 +430,19 @@ public final class ProfilerWindow extends ProfilerTopComponent {
     
     
     // --- TopComponent --------------------------------------------------------
+    
+    public boolean canClose() {
+        if (!super.canClose()) return false;
+        if (!session.inProgress()) return true;
+        
+        if (ProfilerDialogs.displayConfirmation(Bundle.ProfilerWindow_terminateMsg(),
+                                                Bundle.ProfilerWindow_terminateCaption())) {
+            session.terminate();
+            return true;
+        } else {
+            return false;
+        }
+    }
     
     public void open() {
         WindowManager windowManager = WindowManager.getDefault();

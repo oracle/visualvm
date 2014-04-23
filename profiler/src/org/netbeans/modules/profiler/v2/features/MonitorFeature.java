@@ -43,22 +43,23 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
+import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.monitor.MonitorView;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.RunGCAction;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.v2.session.ProjectSession;
-import org.netbeans.modules.profiler.v2.ui.components.GrayLabel;
+import org.netbeans.modules.profiler.v2.ProfilerSession;
+import org.netbeans.modules.profiler.v2.ui.GrayLabel;
 import org.openide.util.NbBundle;
 
 /**
@@ -67,6 +68,7 @@ import org.openide.util.NbBundle;
  */
 @NbBundle.Messages({
     "MonitorFeature_name=Telemetry",
+    "MonitorFeature_description=Monitor CPU and Memory usage, number of threads and loaded classes",
     "MonitorFeature_graphs=Graphs:",
     "MonitorFeature_application=Application:",
     "MonitorFeature_threadDump=Thread Dump",
@@ -91,7 +93,8 @@ final class MonitorFeature extends ProfilerFeature.Basic {
     
     
     MonitorFeature() {
-        super(Bundle.MonitorFeature_name(), Icons.getIcon(ProfilerIcons.MONITORING), 10);
+        super(Icons.getIcon(ProfilerIcons.MONITORING), Bundle.MonitorFeature_name(),
+              Bundle.MonitorFeature_description(), 10);
     }
 
     
@@ -162,7 +165,7 @@ final class MonitorFeature extends ProfilerFeature.Basic {
     }
     
     private void initResultsUI() {
-        monitorView = new MonitorView(Profiler.getDefault().getVMTelemetryManager());
+        monitorView = new MonitorView(getSession().getProfiler().getVMTelemetryManager());
     }
     
 //    private void refreshToolbar() {
@@ -170,38 +173,38 @@ final class MonitorFeature extends ProfilerFeature.Basic {
 //        refreshToolbar(session == null ? null : session.getState());
 //    }
     
-    private void refreshToolbar(final ProjectSession.State state) {
-        if (state != null && toolbar != null) SwingUtilities.invokeLater(new Runnable() {
+   private void refreshToolbar(int state) {
+        final boolean inactive = state == NetBeansProfiler.PROFILING_INACTIVE;
+        if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
 //                boolean running = state == ProjectSession.State.RUNNING;
 //                lrPauseButton.setEnabled(running);
 //                lrRefreshButton.setEnabled(running && lrPauseButton.isSelected());
                 
-                boolean inactive = state == ProjectSession.State.INACTIVE;
                 grLabel.setEnabled(!inactive);
                 apLabel.setEnabled(!inactive);
             }
         });
     }
     
-    public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
+    protected void profilingStateChanged(int oldState, int newState) {
         refreshToolbar(newState);
     }
     
-    public void attachedToSession(ProjectSession session) {
+    public void attachedToSession(final ProfilerSession session) {
         super.attachedToSession(session);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                Profiler.getDefault().getVMTelemetryManager().reset();
+                session.getProfiler().getVMTelemetryManager().reset();
             }
         });
     }
     
-    public void detachedFromSession(ProjectSession session) {
+    public void detachedFromSession(final ProfilerSession session) {
         super.detachedFromSession(session);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                Profiler.getDefault().getVMTelemetryManager().reset();
+                session.getProfiler().getVMTelemetryManager().reset();
             }
         });
     }

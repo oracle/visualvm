@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
+import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -66,7 +67,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
@@ -74,6 +74,7 @@ import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.CPUView;
 import org.netbeans.lib.profiler.utils.Wildcards;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
 import org.netbeans.modules.profiler.api.GoToSource;
@@ -82,11 +83,11 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
-import org.netbeans.modules.profiler.v2.session.ProjectSession;
-import org.netbeans.modules.profiler.v2.ui.components.GrayLabel;
-import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
-import org.netbeans.modules.profiler.v2.ui.components.SmallButton;
-import org.netbeans.modules.profiler.v2.ui.components.TitledMenuSeparator;
+import org.netbeans.modules.profiler.v2.ProfilerSession;
+import org.netbeans.modules.profiler.v2.ui.GrayLabel;
+import org.netbeans.modules.profiler.v2.ui.PopupButton;
+import org.netbeans.modules.profiler.v2.ui.SmallButton;
+import org.netbeans.modules.profiler.v2.ui.TitledMenuSeparator;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -96,6 +97,7 @@ import org.openide.util.NbBundle;
  */
 @NbBundle.Messages({
     "CPUFeature_name=Methods",
+    "CPUFeature_description=Profile method execution times and invocation counts, including call trees",
     "CPUFeature_lrLabel=Live results:",
     "CPUFeature_viewHotSpots=Hot Spots",
     "CPUFeature_viewCallTree=Call Tree",
@@ -150,7 +152,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
     
     
     CPUFeature() {
-        super(Bundle.CPUFeature_name(), Icons.getIcon(ProfilerIcons.CPU), 12);
+        super(Icons.getIcon(ProfilerIcons.CPU), Bundle.CPUFeature_name(),
+              Bundle.CPUFeature_description(), 12);
         
         selection = new HashSet() {
             public boolean add(Object value) {
@@ -396,7 +399,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 protected void fireItemStateChanged(ItemEvent event) {
                     paused = isSelected();
                     if (!paused) refreshResults();
-                    refreshToolbar();
+                    refreshToolbar(getSessionState());
                 }
             };
             lrPauseButton.setEnabled(false);
@@ -459,7 +462,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
             toolbar.addSpace(2);
             toolbar.add(apThreadDumpButton);
             
-            refreshToolbar();
+            refreshToolbar(getSessionState());
         }
         
         return toolbar;
@@ -470,7 +473,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
     }
     
     public void configureSettings(ProfilingSettings settings) {
-        ProjectSession session = getSession();
+        ProfilerSession session = getSession();
 //        if (session == null) return ProfilingSettingsPresets.createCPUPreset();
         
 //        ProfilingSettings settings = null;
@@ -580,7 +583,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
     }
     
     private void initResultsUI() {
-        TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
+        TargetAppRunner runner = getSession().getProfiler().getTargetAppRunner();
         
         cpuView = new CPUView(runner.getProfilerClient(), selection, GoToSource.isAvailable()) {
             public void showSource(ClientUtils.SourceCodeSelection value) {
@@ -613,19 +616,14 @@ final class CPUFeature extends ProfilerFeature.Basic {
         setView(View.HOT_SPOTS);
     }
     
-    private void refreshToolbar() {
-        ProjectSession session = getSession();
-        refreshToolbar(session == null ? null : session.getState());
-    }
-    
-    private void refreshToolbar(final ProjectSession.State state) {
+    private void refreshToolbar(final int state) {
         if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 boolean running = isRunning(state);
                 lrPauseButton.setEnabled(running);
                 lrRefreshButton.setEnabled(!popupPause && running && lrPauseButton.isSelected());
                 
-                boolean inactive = state == ProjectSession.State.INACTIVE;
+                boolean inactive = state == NetBeansProfiler.PROFILING_INACTIVE;
                 lrLabel.setEnabled(!inactive);
                 pdLabel.setEnabled(!inactive);
                 apLabel.setEnabled(!inactive);
@@ -633,12 +631,12 @@ final class CPUFeature extends ProfilerFeature.Basic {
         });
     }
     
-    public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
-        if (newState == null || newState == ProjectSession.State.INACTIVE) {
+    protected void profilingStateChanged(int oldState, int newState) {
+        if (newState == NetBeansProfiler.PROFILING_INACTIVE) {
             stopResults();
         } else if (isRunning(newState)) {
             startResults();
-        } else if (newState == ProjectSession.State.STARTED) {
+        } else if (newState == NetBeansProfiler.PROFILING_STARTED) {
             resetResults();
         }
         refreshToolbar(newState);
@@ -650,9 +648,9 @@ final class CPUFeature extends ProfilerFeature.Basic {
                mode == Mode.INSTR_SELECTED;
     }
     
-    private boolean isRunning(ProjectSession.State state) {
-        if (state != ProjectSession.State.RUNNING) return false;
-        ProjectSession session = getSession();
+    private boolean isRunning(int state) {
+        if (state != NetBeansProfiler.PROFILING_RUNNING) return false;
+        ProfilerSession session = getSession();
         if (session == null) return false;
         return ProfilingSettings.isCPUSettings(session.getProfilingSettings());
     }
@@ -711,12 +709,12 @@ final class CPUFeature extends ProfilerFeature.Basic {
         }
     }
     
-    public void attachedToSession(ProjectSession session) {
+    public void attachedToSession(ProfilerSession session) {
         super.attachedToSession(session);
         resetResults();
     }
     
-    public void detachedFromSession(ProjectSession session) {
+    public void detachedFromSession(ProfilerSession session) {
         super.detachedFromSession(session);
         resetResults();
     }

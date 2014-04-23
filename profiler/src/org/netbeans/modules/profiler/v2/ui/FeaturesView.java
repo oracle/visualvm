@@ -57,13 +57,13 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.v2.features.ProfilerFeature;
+import org.netbeans.modules.profiler.v2.ProfilerFeature;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class FeaturesView extends JPanel {
+public class FeaturesView extends JPanel {
     
     private JTabbedPane tabs;
     private final Component defaultView;

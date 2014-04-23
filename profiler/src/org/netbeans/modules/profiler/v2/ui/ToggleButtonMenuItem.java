@@ -60,7 +60,7 @@ import org.netbeans.lib.profiler.ui.UIUtils;
  *
  * @author Jiri Sedlacek
  */
-class ToggleButtonMenuItem extends StayOpenPopupMenu.Item {
+public class ToggleButtonMenuItem extends StayOpenPopupMenu.Item {
     
     private final JLabel label;
     private final Icon selectedIcon;
@@ -69,7 +69,7 @@ class ToggleButtonMenuItem extends StayOpenPopupMenu.Item {
     private boolean pressed;
 
 
-    ToggleButtonMenuItem(String text, Icon icon) {
+    public ToggleButtonMenuItem(String text, Icon icon) {
         super(sizeText(text));
         setLayout(null);
 

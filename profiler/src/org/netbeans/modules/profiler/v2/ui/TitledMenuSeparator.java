@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.ui.components;
+package org.netbeans.modules.profiler.v2.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

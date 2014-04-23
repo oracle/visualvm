@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
+import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import javax.swing.JButton;
@@ -51,15 +52,15 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
+import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.v2.session.ProjectSession;
-import org.netbeans.modules.profiler.v2.ui.components.GrayLabel;
-import org.netbeans.modules.profiler.v2.ui.components.PopupButton;
+import org.netbeans.modules.profiler.v2.ProfilerSession;
+import org.netbeans.modules.profiler.v2.ui.GrayLabel;
+import org.netbeans.modules.profiler.v2.ui.PopupButton;
 import org.openide.util.NbBundle;
 
 /**
@@ -68,6 +69,7 @@ import org.openide.util.NbBundle;
  */
 @NbBundle.Messages({
     "ThreadsFeature_name=Threads",
+    "ThreadsFeature_description=Monitor thread states and times",
     "ThreadsFeature_show=Show:",
     "ThreadsFeature_filterAll=All threads",
     "ThreadsFeature_filterLive=Live threads",
@@ -97,7 +99,8 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
     
     
     ThreadsFeature() {
-        super(Bundle.ThreadsFeature_name(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS), 15);
+        super(Icons.getIcon(ProfilerIcons.WINDOW_THREADS), Bundle.ThreadsFeature_name(),
+              Bundle.ThreadsFeature_description(), 15);
     }
     
     
@@ -206,9 +209,9 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
     }
     
     private void initResultsUI() {
-        threadsPanel = new ThreadsPanel(Profiler.getDefault().getThreadsManager(), null);
+        threadsPanel = new ThreadsPanel(getSession().getProfiler().getThreadsManager(), null);
         threadsPanel.threadsMonitoringEnabled();
-        stateChanged(null, getSessionState());
+        profilingStateChanged(-1, getSessionState());
     }
     
 //    private void refreshToolbar() {
@@ -216,14 +219,14 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
 //        refreshToolbar(session == null ? null : session.getState());
 //    }
     
-    private void refreshToolbar(final ProjectSession.State state) {
-        if (state != null && toolbar != null) SwingUtilities.invokeLater(new Runnable() {
+    private void refreshToolbar(int state) {
+        final boolean inactive = state == NetBeansProfiler.PROFILING_INACTIVE;
+        if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
 //                boolean running = state == ProjectSession.State.RUNNING;
 //                lrPauseButton.setEnabled(running);
 //                lrRefreshButton.setEnabled(running && lrPauseButton.isSelected());
                 
-                boolean inactive = state == ProjectSession.State.INACTIVE;
                 shLabel.setEnabled(!inactive);
                 tlLabel.setEnabled(!inactive);
                 apLabel.setEnabled(!inactive);
@@ -231,29 +234,30 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
         });
     }
     
-    public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
-        if (newState == null || newState == ProjectSession.State.INACTIVE) {
+    protected void profilingStateChanged(int oldState, int newState) {
+        if (newState == NetBeansProfiler.PROFILING_INACTIVE) {
             if (threadsPanel != null) threadsPanel.profilingSessionFinished();
-        } else if (newState == ProjectSession.State.RUNNING) {
+        } else if (newState == NetBeansProfiler.PROFILING_RUNNING) {
             if (threadsPanel != null) threadsPanel.profilingSessionStarted();
         }
         refreshToolbar(newState);
     }
     
-    public void attachedToSession(ProjectSession session) {
+    public void attachedToSession(final ProfilerSession session) {
         super.attachedToSession(session);
+        profilingStateChanged(-1, getSessionState());
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                Profiler.getDefault().getThreadsManager().resetStates();
+                session.getProfiler().getThreadsManager().resetStates();
             }
         });
     }
     
-    public void detachedFromSession(ProjectSession session) {
+    public void detachedFromSession(final ProfilerSession session) {
         super.detachedFromSession(session);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                Profiler.getDefault().getThreadsManager().resetStates();
+                session.getProfiler().getThreadsManager().resetStates();
             }
         });
     }

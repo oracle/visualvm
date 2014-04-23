@@ -71,7 +71,7 @@ import javax.swing.MenuSelectionManager;
  *
  * @author Jiri Sedlacek
  */
-class StayOpenPopupMenu extends JPopupMenu {
+public class StayOpenPopupMenu extends JPopupMenu {
     
     private boolean forceBackground;
     

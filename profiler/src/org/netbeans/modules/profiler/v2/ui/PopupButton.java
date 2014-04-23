@@ -41,74 +41,96 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.ui.components;
+package org.netbeans.modules.profiler.v2.ui;
 
-import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Insets;
+import java.awt.event.ActionEvent;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JButton;
+import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class SmallButton extends JButton {
+public class PopupButton extends SmallButton {
     
-    protected static final Icon NO_ICON = new Icon() {
-        public int getIconWidth() { return 0; }
-        public int getIconHeight() { return 16; }
-        public void paintIcon(Component c, Graphics g, int x, int y) {}
-    };
+    private static final Icon DROPDOWN_ICON = Icons.getIcon(GeneralIcons.POPUP_ARROW);
+    private static final int DROPDOWN_ICON_WIDTH = DROPDOWN_ICON.getIconWidth();
+    private static final int DROPDOWN_ICON_HEIGHT = DROPDOWN_ICON.getIconHeight();
+    
+    private int iconOffset;
     
     
     {
-        setDefaultCapable(false);
-        setOpaque(false);
+        iconOffset = 7;
+        setHorizontalAlignment(LEADING);
     }
     
     
-    public SmallButton() { this(null, null);  }
+    public PopupButton() { super(); }
 
-    public SmallButton(Icon icon) { this(null, icon); }
+    public PopupButton(Icon icon) { super(icon); }
 
-    public SmallButton(String text) { this(text, null); }
+    public PopupButton(String text) { super(text); }
 
-    public SmallButton(Action a) { super(a); }
+    public PopupButton(Action a) { super(a); }
 
-    public SmallButton(String text, Icon icon) { super(text); setIcon(icon); }
+    public PopupButton(String text, Icon icon) { super(text, icon); }
     
     
-    public void setIcon(Icon defaultIcon) {
-        if (defaultIcon == null) {
-            defaultIcon = NO_ICON;
-            setIconTextGap(0);
-        }
-        super.setIcon(defaultIcon);
+    protected void fireActionPerformed(ActionEvent e) {
+        super.fireActionPerformed(e);
+        displayPopup();
     }
     
-    public Insets getMargin() {
-        Insets margin = super.getMargin();
-        if (margin != null) {
-            if (getParent() instanceof JToolBar) {
-                if (UIUtils.isNimbus()) {
-                    margin.left = margin.top + 3;
-                    margin.right = margin.top + 3;
-                }
-            } else {
-                if (UIUtils.isNimbus()) {
-                    margin.left = margin.top - 6;
-                    margin.right = margin.top - 6;
-                } else {
-                    margin.left = margin.top + 3;
-                    margin.right = margin.top + 3;
-                }
-            }
+    protected void displayPopup() {
+        JPopupMenu menu = new JPopupMenu();
+        populatePopup(menu);
+        if (menu.getComponentCount() > 0) {
+            Dimension size = menu.getPreferredSize();
+            size.width = Math.max(size.width, getWidth());
+            menu.setPreferredSize(size);
+            menu.show(this, 0, getHeight());
         }
-        return margin;
+    }
+    
+    protected void populatePopup(JPopupMenu popup) {
+        // Implementation here
+    }
+    
+    
+    public Dimension getPreferredSize() {
+        Dimension size = super.getPreferredSize();
+        size.width += DROPDOWN_ICON_WIDTH + 5;
+        return size;
+    }
+    
+    public Dimension getMinimumSize() {
+        return getPreferredSize();
+    }
+    
+    public Dimension getMaximumSize() {
+        return getPreferredSize();
+    }
+    
+    public void addNotify() {
+        super.addNotify();
+        if (UIUtils.isWindowsLookAndFeel() && getParent() instanceof JToolBar) {
+            if (getIcon() == NO_ICON) setIconTextGap(2);
+            iconOffset = 5;
+        }
+    }
+    
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        DROPDOWN_ICON.paintIcon(this, g, getWidth() - DROPDOWN_ICON_WIDTH - iconOffset,
+                                        (getHeight() - DROPDOWN_ICON_HEIGHT) / 2);
     }
     
 }

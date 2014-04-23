@@ -45,25 +45,24 @@ package org.netbeans.modules.profiler.v2.ui;
 
 import java.awt.Dimension;
 import javax.swing.JLabel;
-import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.modules.profiler.v2.session.ProjectSession;
-import org.netbeans.modules.profiler.v2.ui.components.GrayLabel;
+import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.v2.ProfilerSession;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class ProfilerStatus {
+public class ProfilerStatus {
     
     private final JLabel status;
     private final FixedWidthLabel label;
     private final ProfilerToolbar toolbar;
     
-    ProfilerStatus(final ProjectSession session) {
+    public ProfilerStatus(final ProfilerSession session) {
         toolbar = ProfilerToolbar.create(false);
         
         toolbar.addSpace(2);
@@ -81,63 +80,61 @@ class ProfilerStatus {
         
         toolbar.addSpace(3);
         
-        session.addListener(new ProjectSession.Listener() {
-            public void stateChanged(ProjectSession.State oldState, ProjectSession.State newState) {
-                updateStatus(newState);
-            }
-        });
-        
         // TODO: listener leaks, unregister!
-        Profiler.getDefault().addProfilingStateListener(new SimpleProfilingStateAdapter() {
-            protected void update() {
-                // TODO: doesn't work correctly, misses events
-                ProfilingSessionStatus pss = Profiler.getDefault().getTargetAppRunner().getProfilingSessionStatus();
-                switch (pss.currentInstrType) {
-                    case CommonConstants.INSTR_RECURSIVE_FULL:
-                    case CommonConstants.INSTR_RECURSIVE_SAMPLED:
-                        int m = pss.getNInstrMethods();
-                        label.setDetailedText("Running, " + m + " methods instrumented");
-                        break;
-                    case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
-                    case CommonConstants.INSTR_OBJECT_LIVENESS:
-                        int c = pss.getNInstrClasses();
-                        label.setDetailedText("Running, " + c + " classes instrumented");
-                        break;
-                        
-                }
-            }
+        session.addListener(new SimpleProfilingStateAdapter() {
+            public void update() { updateStatus(session); }
         });
         
-        updateStatus(session.getState());
+        updateStatus(session);
     }
     
     public ProfilerToolbar getToolbar() {
         return toolbar;
     }
     
-    private void updateStatus(ProjectSession.State state) {
+    private void updateStatus(ProfilerSession session) {
+        int state = session.getState();
+        
         switch (state) {
-            case INACTIVE:
+            case NetBeansProfiler.PROFILING_INACTIVE:
                 label.setText("Inactive");
                 break;
-            case PAUSED:
+            case NetBeansProfiler.PROFILING_PAUSED:
                 label.setText("Paused");
                 break;
-            case STARTED:
+            case NetBeansProfiler.PROFILING_STARTED:
                 label.setText("Starting");
                 break;
-            case STOPPED:
+            case NetBeansProfiler.PROFILING_STOPPED:
                 label.setText("Stopped");
                 break;
-            case TRANSITION:
+            case NetBeansProfiler.PROFILING_IN_TRANSITION:
                 label.setText("Changing");
                 break;
-            case RUNNING:
-                label.setText("Running");
+            case NetBeansProfiler.PROFILING_RUNNING:
+                updateRunningStatus(session);
                 break;
         }
         
-        status.setEnabled(state != ProjectSession.State.INACTIVE);
+        status.setEnabled(state != NetBeansProfiler.PROFILING_INACTIVE);
+    }
+    
+    private void updateRunningStatus(ProfilerSession session) {
+        ProfilingSessionStatus pss = session.getProfiler().getTargetAppRunner().getProfilingSessionStatus();
+        switch (pss.currentInstrType) {
+            case CommonConstants.INSTR_RECURSIVE_FULL:
+            case CommonConstants.INSTR_RECURSIVE_SAMPLED:
+                int m = pss.getNInstrMethods();
+                label.setDetailedText("Running, " + m + " methods instrumented");
+                break;
+            case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
+            case CommonConstants.INSTR_OBJECT_LIVENESS:
+                int c = pss.getNInstrClasses();
+                label.setDetailedText("Running, " + c + " classes instrumented");
+                break;
+            default:
+                label.setText("Running");
+        }
     }
     
     
