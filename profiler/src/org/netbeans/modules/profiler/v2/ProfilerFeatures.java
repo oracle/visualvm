@@ -68,7 +68,7 @@ final class ProfilerFeatures {
     
     private final Set<ChangeListener> listeners;
     private final ChangeListener listener = new ChangeListener() {
-        public void stateChanged(ChangeEvent e) { fireChange(); }
+        public void stateChanged(ChangeEvent e) { fireChange(e.getSource()); }
     };
     
     private boolean singleFeature;
@@ -117,7 +117,7 @@ final class ProfilerFeatures {
             selected.add(feature);
             feature.addChangeListener(listener);
             feature.attachedToSession(session);
-            fireChange();
+            fireChange(feature);
         } else {
             if (selected.add(feature)) {
                 ProfilingSettings ps = new ProfilingSettings();
@@ -131,7 +131,7 @@ final class ProfilerFeatures {
                 
                 feature.addChangeListener(listener);
                 feature.attachedToSession(session);
-                fireChange();
+                fireChange(feature);
             }
         }
     }
@@ -141,7 +141,7 @@ final class ProfilerFeatures {
         if (selected.remove(feature)) {
             feature.detachedFromSession(session);
             feature.removeChangeListener(listener);
-            fireChange();
+            fireChange(feature);
         }
     }
     
@@ -191,9 +191,9 @@ final class ProfilerFeatures {
         listeners.remove(listener);
     }
     
-    private void fireChange() {
+    private void fireChange(Object source) {
         if (listeners.isEmpty()) return;
-        ChangeEvent e = new ChangeEvent(this);
+        ChangeEvent e = new ChangeEvent(source == null ? this : source);
         for (ChangeListener listener : listeners) listener.stateChanged(e);
     }
     

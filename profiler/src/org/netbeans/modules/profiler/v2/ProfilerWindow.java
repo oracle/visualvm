@@ -194,9 +194,12 @@ class ProfilerWindow extends ProfilerTopComponent {
         container.add(featuresView, BorderLayout.CENTER);
         
         features.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) { updateFeatures(); }
+            public void stateChanged(ChangeEvent e) {
+                updateFeatures(e.getSource() instanceof ProfilerFeature ?
+                               (ProfilerFeature)e.getSource() : null);
+            }
         });
-        updateFeatures();
+        updateFeatures(null);
         
         featuresView.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -236,14 +239,17 @@ class ProfilerWindow extends ProfilerTopComponent {
     }
     
     
-    private void updateFeatures() {
+    private void updateFeatures(ProfilerFeature changed) {
         ProfilingSettings settings = features.getSettings();
         start.setEnabled(settings != null);
         
         // TODO: optimize!
+        ProfilerFeature restore = featuresView.getSelectedFeature();
         featuresView.removeFeatures();
-        for (ProfilerFeature feature : features.getSelectedFeatures())
-            featuresView.addFeature(feature);
+        Set<ProfilerFeature> selected = features.getSelectedFeatures();
+        for (ProfilerFeature feature : selected) featuresView.addFeature(feature);
+        if (selected.contains(changed)) featuresView.selectFeature(changed);
+        else featuresView.selectFeature(restore);
         featuresView.repaint();
         
         if (session.inProgress()) session.doModify(__currentSettings());

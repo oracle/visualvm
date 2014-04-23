@@ -50,6 +50,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
@@ -146,7 +147,9 @@ public class FeaturesView extends JPanel {
     
     public final void selectFeature(ProfilerFeature feature) {
         if (tabs == null) return;
-        tabs.setSelectedComponent(feature.getResultsUI());
+        for (Component c : tabs.getComponents())
+            if (((JComponent)c).getClientProperty(ProfilerFeature.class) == feature)
+                tabs.setSelectedComponent(c);
     }
     
     public final void selectFeature(int index) {
