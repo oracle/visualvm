@@ -278,6 +278,33 @@ class ProfilerWindow extends ProfilerTopComponent {
         final Set<ProfilerFeature> _selected = features.getSelectedFeatures();
         final List<ToggleButtonMenuItem> _items = new ArrayList();
         
+        // --- Features listener ---
+        final ChangeListener listener = new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                int index = 0;
+                for (ProfilerFeature feature : _features) {
+                    ToggleButtonMenuItem item = _items.get(index++);
+                    if (item == null) item = _items.get(index++);
+                    item.setPressed(_selected.contains(feature));
+                }
+            }
+        };
+        
+        // --- Popup menu ---
+        final StayOpenPopupMenu popup = new StayOpenPopupMenu() {
+            public void setVisible(boolean visible) {
+                if (visible) features.addChangeListener(listener);
+                else features.removeChangeListener(listener);
+                super.setVisible(visible);
+            }
+        };
+        popup.setLayout(new GridBagLayout());
+        if (!UIUtils.isAquaLookAndFeel()) {
+            popup.setForceBackground(true);
+            Color background = UIUtils.getProfilerResultsBackground();
+            popup.setBackground(new Color(background.getRGB())); // JPopupMenu doesn't seem to follow ColorUIResource
+        }
+        
         // --- Feature items ---
         int lastPosition = -1;
         for (final ProfilerFeature feature : _features) {
@@ -292,21 +319,11 @@ class ProfilerWindow extends ProfilerTopComponent {
                 }
                 protected void fireActionPerformed(ActionEvent e) {
                     features.toggleFeatureSelection(feature);
+                    if (features.isSingleFeatureSelection() && isPressed())
+                        /*if (session.inProgress())*/ popup.setVisible(false);
                 }
             });
         }
-        
-        // --- Features listener ---
-        final ChangeListener listener = new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                int index = 0;
-                for (ProfilerFeature feature : _features) {
-                    ToggleButtonMenuItem item = _items.get(index++);
-                    if (item == null) item = _items.get(index++);
-                    item.setPressed(_selected.contains(feature));
-                }
-            }
-        };
         
         // --- Other controls ---
         JCheckBoxMenuItem singleFeature = new StayOpenPopupMenu.CheckBoxItem("Profile multiple features") {
@@ -332,21 +349,6 @@ class ProfilerWindow extends ProfilerTopComponent {
                 features.setUseProfilingPoints(isSelected());
             }
         };
-        
-        // --- Popup menu ---
-        StayOpenPopupMenu popup = new StayOpenPopupMenu() {
-            public void setVisible(boolean visible) {
-                if (visible) features.addChangeListener(listener);
-                else features.removeChangeListener(listener);
-                super.setVisible(visible);
-            }
-        };
-        popup.setLayout(new GridBagLayout());
-        if (!UIUtils.isAquaLookAndFeel()) {
-            popup.setForceBackground(true);
-            Color background = UIUtils.getProfilerResultsBackground();
-            popup.setBackground(new Color(background.getRGB())); // JPopupMenu doesn't seem to follow ColorUIResource
-        }
         
         // --- Popup crowding ---
         int left = 12;
