@@ -106,7 +106,12 @@ public class FeaturesView extends JPanel {
         
         JPanel settings = feature.getSettingsUI();
         if (settings != null) {
-            JPanel pan = new JPanel(new BorderLayout(0, 0));
+            JPanel pan = new JPanel(new BorderLayout(0, 0)) {
+                public void setVisible(boolean visible) {
+                    super.setVisible(visible);
+                    for (Component c : getComponents()) c.setVisible(visible);
+                }
+            };
             pan.setOpaque(true);
             pan.setBackground(UIUtils.getProfilerResultsBackground());
             pan.add(settings, BorderLayout.CENTER);

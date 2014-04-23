@@ -479,14 +479,14 @@ class ProfilerWindow extends ProfilerTopComponent {
         
         SettingsPresenter() {
             super(Icons.getIcon(GeneralIcons.SETTINGS));
-            updateVisibility();
+            updateVisibility(false);
         }
         
         void setFeature(ProfilerFeature feature) {
             if (settings != null) settings.removeComponentListener(this);
             settings = feature == null ? null : feature.getSettingsUI();
+            updateVisibility(false);
             if (settings != null) settings.addComponentListener(this);
-            updateVisibility();
         }
         
         protected void fireActionPerformed(ActionEvent e) {
@@ -500,14 +500,15 @@ class ProfilerWindow extends ProfilerTopComponent {
             settings.removeComponentListener(this);
         }
         
-        private void updateVisibility() {
+        private void updateVisibility(boolean parent) {
             setVisible(settings != null);
-            setSelected(isVisible() && settings.isVisible());
+            setSelected(settings != null && settings.isVisible());
+            if (parent) settings.getParent().setVisible(settings.isVisible());
         }
         
-        public void componentShown(ComponentEvent e) { updateVisibility(); }
+        public void componentShown(ComponentEvent e) { updateVisibility(true); }
 
-        public void componentHidden(ComponentEvent e) { updateVisibility(); }
+        public void componentHidden(ComponentEvent e) { updateVisibility(true); }
         
         public void componentResized(ComponentEvent e) {}
         
