@@ -54,7 +54,7 @@ import org.netbeans.lib.profiler.ui.UIUtils;
  */
 public class GrayLabel extends JLabel {
     
-    private static Color ENABLED_FOREGROUND;
+//    private static Color ENABLED_FOREGROUND;
     
     
     public GrayLabel() { super(); }
@@ -71,8 +71,9 @@ public class GrayLabel extends JLabel {
     
     
     public void setEnabled(boolean enabled) {
-        if (ENABLED_FOREGROUND == null) ENABLED_FOREGROUND = getForeground();
-        setForeground(enabled ? ENABLED_FOREGROUND : UIUtils.getDisabledLineColor());
+        setForeground(UIUtils.getDisabledLineColor());
+//        if (ENABLED_FOREGROUND == null) ENABLED_FOREGROUND = getForeground();
+//        setForeground(enabled ? ENABLED_FOREGROUND : UIUtils.getDisabledLineColor());
     }
     
 }

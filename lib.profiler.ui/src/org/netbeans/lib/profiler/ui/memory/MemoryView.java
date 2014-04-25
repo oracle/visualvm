@@ -275,7 +275,7 @@ public abstract class MemoryView extends JPanel {
             popup.addSeparator();
         }
         
-        popup.add(new JMenuItem("Profile this Class") {
+        popup.add(new JMenuItem("Profile Class") {
             { setEnabled(value != null); }
             protected void fireActionPerformed(ActionEvent e) { profileSingle(value); }
         });

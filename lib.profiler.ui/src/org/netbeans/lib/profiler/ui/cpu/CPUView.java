@@ -221,12 +221,12 @@ public abstract class CPUView extends JPanel {
             popup.addSeparator();
         }
         
-        popup.add(new JMenuItem("Profile this Method") {
+        popup.add(new JMenuItem("Profile Method") {
             { setEnabled(value != null); }
             protected void fireActionPerformed(ActionEvent e) { profileMethod(value); }
         });
         
-        popup.add(new JMenuItem("Profile this Class") {
+        popup.add(new JMenuItem("Profile Class") {
             { setEnabled(value != null); }
             protected void fireActionPerformed(ActionEvent e) { profileClass(value); }
         });
