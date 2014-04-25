@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
-import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -80,8 +79,10 @@ import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.ui.GrayLabel;
 import org.netbeans.modules.profiler.v2.ui.PopupButton;
@@ -163,6 +164,16 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 selectionChanged();
             }
         };
+    }
+    
+    
+    public boolean supportsConfiguration(Lookup configuration) {
+        return configuration.lookup(SourceClassInfo.class) != null;
+    }
+    
+    public void configure(Lookup configuration) {
+        SourceClassInfo classInfo = configuration.lookup(SourceClassInfo.class);
+        if (classInfo != null) profileSingle(classInfo.getQualifiedName());
     }
     
     

@@ -87,6 +87,11 @@ public abstract class ProfilerFeature {
     public abstract void configureSettings(ProfilingSettings settings);
     
     
+    public abstract boolean supportsConfiguration(Lookup configuration);
+    
+    public abstract void configure(Lookup configuration);
+    
+    
     protected void attachedToSession(ProfilerSession session) {}
     
     protected void detachedFromSession(ProfilerSession session) {}
@@ -126,6 +131,10 @@ public abstract class ProfilerFeature {
         public JPanel getSettingsUI() { return null; }
         
         public ProfilerToolbar getToolbar() { return null; }
+        
+        public boolean supportsConfiguration(Lookup configuration) { return false; }
+    
+        public void configure(Lookup configuration) {}
         
         protected void attachedToSession(ProfilerSession session) {
             attachedSession = session;

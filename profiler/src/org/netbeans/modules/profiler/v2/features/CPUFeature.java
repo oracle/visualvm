@@ -70,6 +70,7 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.CPUView;
@@ -81,6 +82,8 @@ import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.api.java.SourceClassInfo;
+import org.netbeans.modules.profiler.api.java.SourceMethodInfo;
 import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
@@ -174,24 +177,56 @@ final class CPUFeature extends ProfilerFeature.Basic {
     }
     
     
-    private void profileSingle(ClientUtils.SourceCodeSelection selection) {
-        if (Wildcards.ALLWILDCARD.equals(selection.getMethodName())) {
-            selectedClasses = new ClientUtils.SourceCodeSelection[] { selection };
-            setMode(Mode.INSTR_CLASS);
-        } else {
-            selectedMethods = new ClientUtils.SourceCodeSelection[] { selection };
-            setMode(Mode.INSTR_METHOD);
-        }
-        updateModeUI();
-        getSettingsUI().setVisible(true);
+    public boolean supportsConfiguration(Lookup configuration) {
+        return configuration.lookup(SourceMethodInfo.class) != null ||
+               configuration.lookup(SourceClassInfo.class) != null;
     }
     
-    private void selectForProfiling(ClientUtils.SourceCodeSelection[] selection) {
-        for (ClientUtils.SourceCodeSelection selected : selection)
-            this.selection.add(selected);
-        setMode(Mode.INSTR_SELECTED);
-        updateModeUI();
-        getSettingsUI().setVisible(true);
+    public void configure(Lookup configuration) {
+        // Handle Profile Method action
+        SourceMethodInfo methodInfo = configuration.lookup(SourceMethodInfo.class);
+        if (methodInfo != null) {
+            profileSingle(new ClientUtils.SourceCodeSelection(methodInfo.getClassName(),
+                              methodInfo.getName(), methodInfo.getSignature()));
+            return;
+        }
+        
+        // Handle Profile Class action
+        SourceClassInfo classInfo = configuration.lookup(SourceClassInfo.class);
+        if (classInfo != null) {
+            profileSingle(new ClientUtils.SourceCodeSelection(classInfo.getQualifiedName(),
+                              Wildcards.ALLWILDCARD, null));
+            return;
+        }
+    }
+    
+    
+    private void profileSingle(final ClientUtils.SourceCodeSelection sel) {
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                if (Wildcards.ALLWILDCARD.equals(sel.getMethodName())) {
+                    selectedClasses = new ClientUtils.SourceCodeSelection[] { sel };
+                    setMode(Mode.INSTR_CLASS);
+                } else {
+                    selectedMethods = new ClientUtils.SourceCodeSelection[] { sel };
+                    setMode(Mode.INSTR_METHOD);
+                }
+                updateModeUI();
+                getSettingsUI().setVisible(true);
+            }
+        });
+    }
+    
+    private void selectForProfiling(final ClientUtils.SourceCodeSelection[] sel) {
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                for (ClientUtils.SourceCodeSelection selected : sel)
+                    selection.add(selected);
+                setMode(Mode.INSTR_SELECTED);
+                updateModeUI();
+                getSettingsUI().setVisible(true);
+            }
+        });
     }
     
     

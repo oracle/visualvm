@@ -44,15 +44,17 @@
 package org.netbeans.modules.profiler.v2;
 
 import java.util.Objects;
+import java.util.Set;
 import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
+import org.openide.util.lookup.Lookups;
 
 /**
  *
@@ -62,30 +64,49 @@ public abstract class ProfilerSession {
     
     // --- Static access -------------------------------------------------------
     
-    private static ProfilerSession ACTIVE_SESSION;
-    private static final Object ACTIVE_SESSION_LOCK = new Object();
+    private static ProfilerSession CURRENT_SESSION;
+    private static final Object CURRENT_SESSION_LOCK = new Object();
     
     
     public static ProfilerSession forContext(Lookup context) {
         // Try to reuse the active session first
-        synchronized(ACTIVE_SESSION_LOCK) {
-            if (ACTIVE_SESSION != null && ACTIVE_SESSION.isCompatibleContext(context)) {
-                ACTIVE_SESSION.setContext(context);
-                return ACTIVE_SESSION;
+        synchronized(CURRENT_SESSION_LOCK) {
+            if (CURRENT_SESSION != null && CURRENT_SESSION.isCompatibleContext(context)) {
+                CURRENT_SESSION.setContext(context);
+                return CURRENT_SESSION;
             }
         }
         
         // Create a new session, will eliminate another session when showing UI
         Provider provider = Lookup.getDefault().lookup(Provider.class);
-        ProfilerSession session = provider == null ? null : provider.getSession(context);
-        return session;
+        return provider == null ? null : provider.getSession(context);
     };
     
-//    public static ProfilerSession activeSession() {
-//        synchronized(ACTIVE_SESSION_LOCK) {
-//            return ACTIVE_SESSION;
-//        }
-//    }
+    public static ProfilerSession forProject(Lookup.Provider project) {
+        // Try to reuse the active session first
+        synchronized(CURRENT_SESSION_LOCK) {
+            if (CURRENT_SESSION != null && project.equals(CURRENT_SESSION.getProject())) {
+                return CURRENT_SESSION;
+            }
+        }
+        
+        // Create a new session, will eliminate another session when showing UI
+        Provider provider = Lookup.getDefault().lookup(Provider.class);
+        return provider == null ? null : provider.getSession(Lookups.fixed(project));
+    };
+    
+    public static ProfilerSession currentSession() {
+        synchronized(CURRENT_SESSION_LOCK) {
+            return CURRENT_SESSION;
+        }
+    }
+    
+    
+    public static void findAndConfigure(Lookup conf, Lookup.Provider project) {
+        final ProfilerSession current = currentSession();
+        if (current != null) current.configure(conf);
+        else ProfilerSessions.createAndConfigure(conf, project);
+    }
     
     // --- Constructor ---------------------------------------------------------
     
@@ -143,32 +164,23 @@ public abstract class ProfilerSession {
     public final void requestActive() {
         UIUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
-                synchronized(ACTIVE_SESSION_LOCK) {
-                    if (ACTIVE_SESSION != null && ACTIVE_SESSION != ProfilerSession.this) {
-                        ProfilerWindow w = ACTIVE_SESSION.window;
+                synchronized(CURRENT_SESSION_LOCK) {
+                    if (CURRENT_SESSION != null && CURRENT_SESSION != ProfilerSession.this) {
+                        ProfilerWindow w = CURRENT_SESSION.window;
                         if (w != null && !w.close()) return;
                     }
                 }
 
-                if (window == null) {
-                    window = new ProfilerWindow(ProfilerSession.this) {
-                        protected void componentClosed() {
-                            super.componentClosed();
-                            cleanup();
-                        }
-                    };
-                    window.open();
-                    window.requestActive();
-                }
+                ProfilerWindow w = getWindow();
+                w.open();
+                w.requestActive();
 
-                synchronized(ACTIVE_SESSION_LOCK) {
-                    ACTIVE_SESSION = ProfilerSession.this;
+                synchronized(CURRENT_SESSION_LOCK) {
+                    CURRENT_SESSION = ProfilerSession.this;
                 }
             }
         });
     };
-    
-    public final void configure(ClientUtils.SourceCodeSelection selection) {}
     
     // --- Profiler API bridge -------------------------------------------------
     
@@ -220,9 +232,63 @@ public abstract class ProfilerSession {
     
     // --- Implementation ------------------------------------------------------
     
+    private ProfilerWindow getWindow() {
+        assert SwingUtilities.isEventDispatchThread();
+        
+        if (window == null) {
+            window = new ProfilerWindow(ProfilerSession.this) {
+                protected void componentClosed() {
+                    super.componentClosed();
+                    cleanup();
+                }
+            };
+        }
+        return window;
+    }
+    
+    private void configure(final Lookup conf) {
+        final ProfilerFeatures _features = getFeatures();
+        final Set<ProfilerFeature> compatA = ProfilerFeatures.getCompatible(
+                                             _features.getAvailable(), conf);
+        if (compatA.isEmpty()) {
+            // TODO: might offer creating a new profiling session if the current is not in progress
+            ProfilerDialogs.displayInfo("Action not supported by the current profiling session.");
+        } else {
+            // Resolving selected features in only supported in EDT
+            UIUtils.runInEventDispatchThread(new Runnable() {
+                public void run() {
+                    Set<ProfilerFeature> compatS = ProfilerFeatures.getCompatible(
+                                                   _features.getSelected(), conf);
+
+                    ProfilerFeature feature;
+                    if (compatS.size() == 1) {
+                        // Exactly one selected feature handles the action
+                        feature = compatS.iterator().next();
+                    } else if (!compatS.isEmpty()) {
+                        // Multiple selected features handle the action
+                        feature = ProfilerSessions.selectFeature(ProfilerSession.this, compatS);
+                    } else if (compatA.size() == 1) {
+                        // Exactly one available feature handles the action
+                        feature = compatA.iterator().next();
+                    } else {
+                        // Multiple available features handle the action
+                        feature = ProfilerSessions.selectFeature(ProfilerSession.this, compatA);
+                    }
+
+                    if (feature != null) {
+                        _features.selectFeature(feature);
+                        feature.configure(conf);
+                        getWindow().selectFeature(feature);
+                        requestActive();
+                    }
+                }
+            });
+        }
+    }
+    
     private void cleanup() {
-        synchronized(ACTIVE_SESSION_LOCK) {
-            if (ACTIVE_SESSION == this) ACTIVE_SESSION = null;
+        synchronized(CURRENT_SESSION_LOCK) {
+            if (CURRENT_SESSION == this) CURRENT_SESSION = null;
         }
         
         // TODO: unregister listeners (this.addListener) to prevent memory leaks

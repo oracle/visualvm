@@ -78,10 +78,9 @@ made subject to such option by the copyright holder.
         <folder name="text">
             <folder name="x-java">
                 <folder name="Popup">
-                    <folder name="Profiling">
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#Editors/text/x-java/Popup/Profiling"/>
+                    <folder name="Profile">
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#Editors/text/x-java/Popup/Profile"/>
                         <attr name="position" intvalue="1920"/>
-                        <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-AddRootMethodAction.shadow"/>
                     </folder>
                 </folder>
             </folder>

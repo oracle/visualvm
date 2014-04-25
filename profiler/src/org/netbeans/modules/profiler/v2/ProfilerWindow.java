@@ -122,6 +122,15 @@ class ProfilerWindow extends ProfilerTopComponent {
         createUI();
     }
     
+    // --- API -----------------------------------------------------------------
+    
+    void updateSession() {
+        
+    }
+    
+    void selectFeature(ProfilerFeature feature) {
+        if (featuresView != null) featuresView.selectFeature(feature);
+    }
     
     // --- Implementation ------------------------------------------------------
     
@@ -190,7 +199,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         container = new JPanel(new BorderLayout(0, 0));
         add(container, BorderLayout.CENTER);
         
-        featuresView = new FeaturesView(new WelcomePanel(features.getFeatures()));
+        featuresView = new FeaturesView(new WelcomePanel(features.getAvailable()));
         container.add(featuresView, BorderLayout.CENTER);
         
         features.addChangeListener(new ChangeListener() {
@@ -223,10 +232,6 @@ class ProfilerWindow extends ProfilerTopComponent {
     }
     
     
-    void updateSession() {
-        
-    }
-    
     private void updateIcon() {
         if (session.inProgress()) setIcon(Icons.getImage(ProfilerIcons.PROFILE_RUNNING));
         else setIcon(Icons.getImage(ProfilerIcons.PROFILE_INACTIVE));
@@ -246,7 +251,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         // TODO: optimize!
         ProfilerFeature restore = featuresView.getSelectedFeature();
         featuresView.removeFeatures();
-        Set<ProfilerFeature> selected = features.getSelectedFeatures();
+        Set<ProfilerFeature> selected = features.getSelected();
         for (ProfilerFeature feature : selected) featuresView.addFeature(feature);
         if (selected.contains(changed)) featuresView.selectFeature(changed);
         else featuresView.selectFeature(restore);
@@ -280,8 +285,8 @@ class ProfilerWindow extends ProfilerTopComponent {
     // --- Profile/Attach popup ------------------------------------------------
     
     private void displayPopupImpl() {
-        final Set<ProfilerFeature> _features = features.getFeatures();
-        final Set<ProfilerFeature> _selected = features.getSelectedFeatures();
+        final Set<ProfilerFeature> _features = features.getAvailable();
+        final Set<ProfilerFeature> _selected = features.getSelected();
         final List<ToggleButtonMenuItem> _items = new ArrayList();
         
         // --- Features listener ---

@@ -55,11 +55,18 @@ import org.netbeans.modules.profiler.v2.ProfilerFeature.Provider;
 import org.openide.util.Lookup;
 
 /**
- * Note: all methods excluding constructor to be called in EDT.
+ * Note: all methods excluding constructor and getAvailable() to be called in EDT.
  *
  * @author Jiri Sedlacek
  */
 final class ProfilerFeatures {
+    
+    private static final Comparator<ProfilerFeature> FEATURES_COMPARATOR =
+        new Comparator<ProfilerFeature>() {
+            public int compare(ProfilerFeature f1, ProfilerFeature f2) {
+                return Integer.compare(f1.getPosition(), f2.getPosition());
+            }
+        };
     
     private final ProfilerSession session;
     
@@ -82,14 +89,8 @@ final class ProfilerFeatures {
         singleFeature = true; // TODO: read last state
         ppoints = true; // TODO: read last state
         
-        Comparator<ProfilerFeature> comparator = new Comparator<ProfilerFeature>() {
-            public int compare(ProfilerFeature f1, ProfilerFeature f2) {
-                return Integer.compare(f1.getPosition(), f2.getPosition());
-            }
-        };
-        
-        features = new TreeSet(comparator);
-        selected = new TreeSet(comparator);
+        features = new TreeSet(FEATURES_COMPARATOR);
+        selected = new TreeSet(FEATURES_COMPARATOR);
         
         listeners = new HashSet();
         
@@ -98,12 +99,18 @@ final class ProfilerFeatures {
     }
     
     
-    Set<ProfilerFeature> getFeatures() {
+    Set<ProfilerFeature> getAvailable() {
         return features;
     }
     
-    Set<ProfilerFeature> getSelectedFeatures() {
+    Set<ProfilerFeature> getSelected() {
         return selected;
+    }
+    
+    static Set<ProfilerFeature> getCompatible(Set<ProfilerFeature> f, Lookup c) {
+        Set<ProfilerFeature> s = new TreeSet(FEATURES_COMPARATOR);
+        for (ProfilerFeature p : f) if (p.supportsConfiguration(c)) s.add(p);
+        return s;
     }
     
     void selectFeature(ProfilerFeature feature) {
