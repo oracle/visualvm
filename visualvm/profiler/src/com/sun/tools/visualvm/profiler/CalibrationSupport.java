@@ -55,9 +55,8 @@ final class CalibrationSupport {
         Properties properties = jvm.getSystemProperties();
         if (properties == null) return false;
         
-        String java = Platform.getJDKVersionString(properties.getProperty("java.version"));  // NOI18N
-        // TODO: will be public in NetBeans 8.0: Platform.getSystemArchitecture("jdk1x")
-        int arch = "64".equals(properties.getProperty("sun.arch.data.model")) ? Platform.ARCH_64 : Platform.ARCH_32; // NOI18N
+        String java = Platform.getJDKVersionString(properties.getProperty("java.version"));  // NOI18N        
+        int arch = Platform.getSystemArchitecture(properties.getProperty("sun.arch.data.model"));   // NOI18N
         if (checkCalibration(java, arch)) return true;
         
         String executable = JavaInfo.getJDKExecutable(properties.getProperty("java.home")); // NOI18N
