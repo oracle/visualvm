@@ -73,6 +73,7 @@ public final class ProfilerSupport {
     private static final String JAVA_RT_16_PREFIX = "1.6.0";  // NOI18N
     private static final String JAVA_RT_17_PREFIX = "1.7.0";  // NOI18N
     private static final String JAVA_RT_18_PREFIX = "1.8.0";  // NOI18N
+    private static final String JAVA_RT_19_PREFIX = "1.9.0";  // NOI18N
     
     private static ProfilerSupport instance;
     
@@ -162,6 +163,8 @@ public final class ProfilerSupport {
             return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 7); // NOI18N
         if (Platform.JDK_18_STRING.equals(code))
             return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 8); // NOI18N
+        if (Platform.JDK_19_STRING.equals(code))
+            return NbBundle.getMessage(ProfilerSupport.class, "STR_Java_platform_name", 9); // NOI18N
         throw new IllegalArgumentException("Unknown java code " + code); // NOI18N
     }
     
@@ -303,8 +306,8 @@ public final class ProfilerSupport {
         // User explicitly requests to profile any VM
         if (FORCE_PROFILING_SUPPORTED) return true;
         
-        // Profiled application needs to be running JDK 6.0 or 7.0 or 8.0
-        if (!jvm.is16() && !jvm.is17() && !jvm.is18()) return false;
+        // Profiled application needs to be running JDK 6.0 or 7.0 or 8.0 or 9.0
+        if (!jvm.is16() && !jvm.is17() && !jvm.is18() && !jvm.is19()) return false;
         
         String vmName = jvm.getVmName();
         String vmVendor = jvm.getVmVendor();
@@ -349,6 +352,8 @@ public final class ProfilerSupport {
                 }
             } else if (javaRTVersion.startsWith(JAVA_RT_18_PREFIX)) {
                 return false;
+            } else if (javaRTVersion.startsWith(JAVA_RT_19_PREFIX)) {
+                return false;
             }
         // OpenJDK -------------------------------------------------------------
         } else if(vmName.startsWith(OPENJDK_VM_NAME_PREFIX)) {
@@ -369,6 +374,9 @@ public final class ProfilerSupport {
             }
             // OpenJDK 8 should be OK
             else if (javaRTVersion.startsWith(JAVA_RT_18_PREFIX)) {
+                return false;
+            }
+            else if (javaRTVersion.startsWith(JAVA_RT_19_PREFIX)) {
                 return false;
             }
         }

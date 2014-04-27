@@ -86,6 +86,17 @@ public abstract class Jvm extends Model {
     }
 
     /**
+     * Tests if target JVM is JRE 1.9.
+     * @return <CODE>true</CODE> if JVM is JRE 1.9, <CODE>false</CODE> otherwise
+     * 
+     * @since VisualVM 1.3.8
+     */
+    public boolean is19() {
+        // default implementation for backward compatibility
+        return false;
+    }
+
+    /**
      * Tests if VisualVM can attach to target JVM via
      * <a href=http://download.oracle.com/javase/6/docs/technotes/guides/attach/index.html>Attach API</a>.
      * @return <CODE>true</CODE> if VisualVM can attach to target JVMvia Attach API, <CODE>false</CODE> otherwise
