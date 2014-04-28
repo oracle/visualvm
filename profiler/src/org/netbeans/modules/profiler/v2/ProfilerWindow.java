@@ -199,7 +199,15 @@ class ProfilerWindow extends ProfilerTopComponent {
         container = new JPanel(new BorderLayout(0, 0));
         add(container, BorderLayout.CENTER);
         
-        featuresView = new FeaturesView(new WelcomePanel(features.getAvailable()));
+        JPanel welcomePanel = new WelcomePanel(features.getAvailable()) {
+            public void showDropdown() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { start.clickPopup(); }
+                });
+            }
+            
+        };
+        featuresView = new FeaturesView(welcomePanel);
         container.add(featuresView, BorderLayout.CENTER);
         
         features.addChangeListener(new ChangeListener() {

@@ -49,6 +49,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.net.URL;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -61,7 +62,7 @@ import org.netbeans.modules.profiler.v2.ProfilerFeature;
  *
  * @author Jiri Sedlacek
  */
-public class WelcomePanel extends JPanel {
+public abstract class WelcomePanel extends JPanel {
     
     public WelcomePanel(Set<ProfilerFeature> features) {
         
@@ -87,7 +88,9 @@ public class WelcomePanel extends JPanel {
         c.insets = new Insets(20, 20, 0, 20);
         pp.add(a1, c);
         
-        HTMLTextArea a2 = new HTMLTextArea("Choose the feature to be profiled using the <b>Profile</b> dropdown in the above toolbar:");
+        HTMLTextArea a2 = new HTMLTextArea("Choose the feature to be profiled using the <b><a href='#'>Profile</a></b> dropdown in the above toolbar:") {
+            protected void showURL(URL url) { showDropdown(); }
+        };
         a2.setBackground(background);
         if (UIUtils.isNimbus()) a2.setOpaque(false);
         c = new GridBagConstraints();
@@ -195,5 +198,7 @@ public class WelcomePanel extends JPanel {
         add(pp, x);
         
     }
+    
+    public abstract void showDropdown();
     
 }

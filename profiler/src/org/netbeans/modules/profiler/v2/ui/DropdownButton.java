@@ -194,6 +194,10 @@ public class DropdownButton extends JPanel {
     }
     
     
+    public void clickPopup() {
+        if (popup != null) popup.doClick();
+    }
+    
     public void displayPopup() {
         JPopupMenu menu = new JPopupMenu();
         populatePopup(menu);
