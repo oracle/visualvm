@@ -134,22 +134,7 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                                 }
                                 refClazz = ClassManager.javaClassForObjectArrayType(refClassName);
                             } else {
-                                int dimension = refClassName.lastIndexOf('[');
-                                String baseClass = refClassName.substring(dimension+1);
-                                String className;
-                                
-                                if (VMUtils.isVMPrimitiveType(baseClass)) {
-                                    className = StringUtils.userFormClassName(refClassName);
-                                } else {
-                                    StringBuilder arrayClass = new StringBuilder(refClassName.length()+dimension+1);
-                                    arrayClass.append(refClassName.substring(dimension+1));
-
-                                    for (int i = 0; i <= dimension; i++) {
-                                        arrayClass.append("[]");        // NOI18N
-                                    }
-                                    className = arrayClass.toString();
-                                }
-                                if (!instrFilter.passesFilter(className)) {
+                                if (!instrFilter.passesFilter(getMultiArrayClassName(refClassName))) {
                                     break;
                                 }
                                 refClazz = ClassRepository.lookupSpecialClass(refClassName);
@@ -246,6 +231,24 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
         }
 
         return createPackedMethodInfo();
+    }
+
+    private static String getMultiArrayClassName(String refClassName) {
+        int dimension = refClassName.lastIndexOf('[');
+        String baseClass = refClassName.substring(dimension+1);
+        String className;
+        if (VMUtils.isVMPrimitiveType(baseClass)) {
+            className = StringUtils.userFormClassName(refClassName);
+        } else {
+            StringBuilder arrayClass = new StringBuilder(refClassName.length()+dimension+1);
+            arrayClass.append(refClassName.substring(dimension+1));
+            
+            for (int i = 0; i <= dimension; i++) {
+                arrayClass.append("[]");        // NOI18N
+            }
+            className = arrayClass.toString();
+        }
+        return className;
     }
 
     private static void initializeInjectedCode() {
