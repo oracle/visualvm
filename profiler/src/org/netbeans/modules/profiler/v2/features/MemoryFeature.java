@@ -125,6 +125,9 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private ProfilerToolbar toolbar;
     private JPanel settingsUI;
     
+    private JButton applyButton;
+    private JButton cancelButton;
+    
     private Component instrSettingsSpace;
     private JLabel selectedLabel;
     private Component selectedSpace1;
@@ -294,26 +297,39 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             settingsUI.add(sep1);
 
             settingsUI.add(Box.createHorizontalStrut(8));
+            
+            final Component applyButtonSpace = Box.createHorizontalStrut(5);
 
-            settingsUI.add(new SmallButton("Apply") {
+            applyButton = new SmallButton("Apply") {
                 protected void fireActionPerformed(ActionEvent e) {
                     stopResults();
                     resetResults();
                     fireChange();
 //                    settingsUI.setVisible(false);
                 }
-            });
+                public void setVisible(boolean visible) {
+                    super.setVisible(visible);
+                    applyButtonSpace.setVisible(visible);
+                }
+            };
+            settingsUI.add(applyButton);
 
-            settingsUI.add(Box.createHorizontalStrut(5));
+            settingsUI.add(applyButtonSpace);
 
-            settingsUI.add(new SmallButton("Cancel") {
+            cancelButton = new SmallButton() {
                 protected void fireActionPerformed(ActionEvent e) {
                     // TODO: clear changes
                     settingsUI.setVisible(false);
                 }
-            });
+            };
+            settingsUI.add(cancelButton);
+            
+            ProfilerSession session = getSession();
+            int state = session != null ? session.getState() :
+                        NetBeansProfiler.PROFILING_INACTIVE;
             
             updateModeUI();
+            updateApplyCancel(state);
         }
         return settingsUI;
     }
@@ -365,6 +381,23 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 selectedLabel.setText(count + " classes");
             }
         }
+    }
+    
+    private void updateApplyCancel(int state) {
+        if (applyButton == null || cancelButton == null) return;
+        
+        boolean changed = true; // TODO: settings changed?
+        boolean running = isRunning(state);
+        boolean progress = state != NetBeansProfiler.PROFILING_INACTIVE;
+        
+        applyButton.setVisible(progress);
+        applyButton.setEnabled(running && changed);
+        if (applyButton.isEnabled()) applyButton.setToolTipText("Apply changed settings to the currently running session");
+        else applyButton.setToolTipText(null);
+        
+        cancelButton.setText(running && changed ? "Cancel" : "Close");
+        cancelButton.setToolTipText(running && changed ? "Reset recent changes and hide the settings panel" :
+                                                         "Hide the settings panel");
     }
     
     public ProfilerToolbar getToolbar() {
@@ -552,6 +585,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         } else if (newState == NetBeansProfiler.PROFILING_STARTED) {
             resetResults();
         }
+        updateApplyCancel(newState);
         refreshToolbar(newState);
     }
     
