@@ -236,9 +236,9 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
     private static String getMultiArrayClassName(String refClassName) {
         int dimension = refClassName.lastIndexOf('[');
         String baseClass = refClassName.substring(dimension+1);
-        String className;
+
         if (VMUtils.isVMPrimitiveType(baseClass)) {
-            className = StringUtils.userFormClassName(refClassName);
+            return StringUtils.userFormClassName(refClassName);
         } else {
             StringBuilder arrayClass = new StringBuilder(refClassName.length()+dimension+1);
             arrayClass.append(refClassName.substring(dimension+1));
@@ -246,9 +246,8 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
             for (int i = 0; i <= dimension; i++) {
                 arrayClass.append("[]");        // NOI18N
             }
-            className = arrayClass.toString();
+            return arrayClass.toString();
         }
-        return className;
     }
 
     private static void initializeInjectedCode() {
