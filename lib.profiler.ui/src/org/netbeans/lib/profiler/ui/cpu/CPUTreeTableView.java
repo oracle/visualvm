@@ -156,6 +156,8 @@ abstract class CPUTreeTableView extends JPanel {
         
         treeTable.setRootVisible(false);
         treeTable.setShowsRootHandles(true);
+        treeTable.makeTreeAutoExpandable(2);
+        
         treeTable.setMainColumn(1);
         treeTable.setFitWidthColumn(1);
         

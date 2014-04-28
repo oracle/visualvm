@@ -144,6 +144,10 @@ public class ProfilerTreeTable extends ProfilerTable {
         if (tree != null) tree.setRootVisible(rootVisible);
     }
     
+    public void makeTreeAutoExpandable(int maxChildToExpand) {
+        if (tree != null) UIUtils.makeTreeAutoExpandable(tree, maxChildToExpand);
+    }
+    
     
     public void setCellRenderer(TreeCellRenderer renderer) {
         if (tree != null) tree.setCellRenderer(renderer);
