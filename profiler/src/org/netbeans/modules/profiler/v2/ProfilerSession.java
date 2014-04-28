@@ -161,6 +161,11 @@ public abstract class ProfilerSession {
     
     public final AttachSettings getAttachSettings() { return attachSettings; }
     
+    public final void setAttach(boolean attach) {
+        if (!attach) clearAttachSettings();
+        else initAttachSettings();
+    }
+    
     public final void requestActive() {
         UIUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
@@ -284,6 +289,20 @@ public abstract class ProfilerSession {
                 }
             });
         }
+    }
+    
+    private void initAttachSettings() {
+        if (attachSettings != null) return;
+        
+        attachSettings = new AttachSettings();
+        // TODO: load attach settings
+    }
+    
+    private void clearAttachSettings() {
+        if (attachSettings == null) return;
+        
+        // TODO: save attach settings
+        attachSettings = null;
     }
     
     private void cleanup() {
