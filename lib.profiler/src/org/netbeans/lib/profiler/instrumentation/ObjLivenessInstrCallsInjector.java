@@ -125,12 +125,12 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
 
                             if (bc == opc_new) {
                                 if (!instrFilter.passesFilter(refClassName)) {
-                                    continue;
+                                    break;
                                 }
                                 refClazz = ClassManager.javaClassOrPlaceholderForName(refClassName, loaderId);
                             } else if (bc == opc_anewarray) {
                                 if (!instrFilter.passesFilter(refClassName.concat("[]"))) {    // NOI18N
-                                    continue;
+                                    break;
                                 }
                                 refClazz = ClassManager.javaClassForObjectArrayType(refClassName);
                             } else {
@@ -150,20 +150,20 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                                     className = arrayClass.toString();
                                 }
                                 if (!instrFilter.passesFilter(className)) {
-                                    continue;
+                                    break;
                                 }
                                 refClazz = ClassRepository.lookupSpecialClass(refClassName);
                             }
 
                             if (refClazz == null) {
-                                continue; // Warning already issued
+                                break; // Warning already issued
                             }
 
                             int classId = refClazz.getInstrClassId();
 
                             if ((allUnprofiledClassStatusArray != null) && (allUnprofiledClassStatusArray.length > classId)
                                     && allUnprofiledClassStatusArray[classId]) {
-                                continue;
+                                break;
                             }
 
                             if ((bc == opc_anewarray) || (bc == opc_multianewarray)) { // Simply inject the call after the bytecode instruction
