@@ -56,6 +56,8 @@ import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.actions.HeapDumpAction;
+import org.netbeans.modules.profiler.actions.RunGCAction;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
@@ -92,6 +94,8 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
     
     private JLabel apLabel;
     private JButton apThreadDumpButton;
+    private JButton apHeapDumpButton;
+    private JButton apGCButton;
     
     private ProfilerToolbar toolbar;
     
@@ -131,6 +135,14 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
             apThreadDumpButton = new JButton(Bundle.ThreadsFeature_threadDump(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
             apThreadDumpButton.setEnabled(false);
             
+            apHeapDumpButton = new JButton(HeapDumpAction.getInstance());
+            apHeapDumpButton.setHideActionText(true);
+            apHeapDumpButton.setText(Bundle.MemoryFeature_heapDump());
+            
+            apGCButton = new JButton(RunGCAction.getInstance());
+            apGCButton.setHideActionText(true);
+            apGCButton.setText(Bundle.MemoryFeature_gc());
+            
             toolbar = ProfilerToolbar.create(true);
             
             toolbar.addSpace(2);
@@ -158,6 +170,8 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
             toolbar.add(apLabel);
             toolbar.addSpace(2);
             toolbar.add(apThreadDumpButton);
+            toolbar.add(apHeapDumpButton);
+            toolbar.add(apGCButton);
             
             setFilter(ThreadsPanel.Filter.ALL);
             

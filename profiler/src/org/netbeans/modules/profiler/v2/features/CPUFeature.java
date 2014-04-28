@@ -76,7 +76,9 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.CPUView;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
+import org.netbeans.modules.profiler.actions.RunGCAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
@@ -126,6 +128,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
     
     private JLabel apLabel;
     private JButton apThreadDumpButton;
+    private JButton apHeapDumpButton;
+    private JButton apGCButton;
     
     private ProfilerToolbar toolbar;
     private JPanel settingsUI;
@@ -468,6 +472,14 @@ final class CPUFeature extends ProfilerFeature.Basic {
             apThreadDumpButton = new JButton(Bundle.CPUFeature_threadDump(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
             apThreadDumpButton.setEnabled(false);
             
+            apHeapDumpButton = new JButton(HeapDumpAction.getInstance());
+            apHeapDumpButton.setHideActionText(true);
+            apHeapDumpButton.setText(Bundle.MemoryFeature_heapDump());
+            
+            apGCButton = new JButton(RunGCAction.getInstance());
+            apGCButton.setHideActionText(true);
+            apGCButton.setText(Bundle.MemoryFeature_gc());
+            
             toolbar = ProfilerToolbar.create(true);
             
             toolbar.addSpace(2);
@@ -496,6 +508,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
             toolbar.add(apLabel);
             toolbar.addSpace(2);
             toolbar.add(apThreadDumpButton);
+            toolbar.add(apHeapDumpButton);
+            toolbar.add(apGCButton);
             
             refreshToolbar(getSessionState());
         }

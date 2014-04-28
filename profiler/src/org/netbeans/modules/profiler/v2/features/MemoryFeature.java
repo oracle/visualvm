@@ -118,6 +118,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private JButton pdResetResultsButton;
     
     private JLabel apLabel;
+    private JButton apThreadDumpButton;
     private JButton apHeapDumpButton;
     private JButton apGCButton;
     
@@ -401,6 +402,9 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             
             apLabel = new GrayLabel(Bundle.MemoryFeature_apLabel());
             
+            apThreadDumpButton = new JButton(Bundle.CPUFeature_threadDump(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
+            apThreadDumpButton.setEnabled(false);
+            
             apHeapDumpButton = new JButton(HeapDumpAction.getInstance());
             apHeapDumpButton.setHideActionText(true);
             apHeapDumpButton.setText(Bundle.MemoryFeature_heapDump());
@@ -435,6 +439,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             
             toolbar.add(apLabel);
             toolbar.addSpace(2);
+            toolbar.add(apThreadDumpButton);
             toolbar.add(apHeapDumpButton);
             toolbar.add(apGCButton);
             
