@@ -604,7 +604,7 @@ public class LockContentionPanel extends ResultsPanel {
                 }
                 
 //                newRoot.sortChildren(getSortBy(sortingColumn), sortingOrder);
-                hbrTime.setMaxValue(newRoot.getTime());
+                hbrTime.setMaxValue(getTimeInMicroSec(newRoot));
                 hbrWaits.setMaxValue(newRoot.getWaits());
                 treeTableModel.setRoot(newRoot);
             }
@@ -666,8 +666,12 @@ public class LockContentionPanel extends ResultsPanel {
         enableLockContentionButton.removeActionListener(listener);
     }
     
+    private long getTimeInMicroSec(LockCCTNode node) {
+        return node.getTime() / countsInMicrosec;
+    }
+
     private String getTimeInMillis(LockCCTNode node) {
-        long microSec = node.getTime() / countsInMicrosec;
+        long microSec = getTimeInMicroSec(node);
         return StringUtils.mcsTimeToString(microSec);
     }
     
@@ -843,7 +847,7 @@ public class LockContentionPanel extends ResultsPanel {
                 case 0:
                     return lnode;
                 case 1:
-                    return lnode.getTime();
+                    return getTimeInMicroSec(lnode);
 //                    return lnode;
 //                    return getTimeInMillis(lnode) + " ms (" // NOI18N
 //                    + percentFormat.format(lnode.getTimeInPerCent() / 100) + ")"; // NOI18N
