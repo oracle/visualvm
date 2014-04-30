@@ -140,7 +140,7 @@ public class LockDataFrameProcessor extends AbstractLockDataFrameProcessor {
                 }
                 case CommonConstants.ADJUST_TIME: {
                     long timeStamp0 = getTimeStamp(buffer);
-                    long timeStamp1 = getTimeStamp(buffer);
+                    long timeStamp1 = collectingTwoTimeStamps ? getTimeStamp(buffer) : 0;
                     if (LOGGER.isLoggable(Level.FINEST)) {
                         LOGGER.log(Level.FINEST, "Adjust time , tId={0}", currentThreadId); // NOI18N
                     }
