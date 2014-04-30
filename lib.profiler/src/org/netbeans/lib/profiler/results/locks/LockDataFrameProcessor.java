@@ -56,7 +56,7 @@ public class LockDataFrameProcessor extends AbstractLockDataFrameProcessor {
 
         while (buffer.hasRemaining()) {
             if (LOGGER.isLoggable(Level.FINEST)) {
-                LOGGER.finest("Command start offset "+buffer.arrayOffset()); // NOI18N
+                LOGGER.finest("Command start offset "+buffer.position()); // NOI18N
             }
             byte eventType = buffer.get();
 
@@ -159,11 +159,11 @@ public class LockDataFrameProcessor extends AbstractLockDataFrameProcessor {
                 }
             }
             if (LOGGER.isLoggable(Level.FINEST)) {
-                    LOGGER.finest("Command end offset "+buffer.arrayOffset()); // NOI18N
+                    LOGGER.finest("Command end offset "+buffer.position()); // NOI18N
             }
         }
         if (LOGGER.isLoggable(Level.FINEST)) {
-                LOGGER.finest("Buffer end offset "+buffer.arrayOffset()); // NOI18N
+                LOGGER.finest("Buffer end offset "+buffer.position()); // NOI18N
         }
 
     }
