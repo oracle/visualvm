@@ -192,6 +192,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         this.selection.addAll(Arrays.asList(selection));
         setMode(Mode.INSTR_SELECTED);
         updateModeUI();
+        memoryView.showSelectionColumn();
         getSettingsUI().setVisible(true);
     }
     

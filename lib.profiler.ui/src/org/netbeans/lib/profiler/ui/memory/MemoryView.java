@@ -203,6 +203,12 @@ public abstract class MemoryView extends JPanel {
 //        }
 //    }
     
+    public void showSelectionColumn() {
+        if (sampledView != null) sampledView.showSelectionColumn();
+        if (allocView != null) allocView.showSelectionColumn();
+        if (livenessView != null) livenessView.showSelectionColumn();
+    }
+    
     public void refreshSelection() {
         if (sampledView != null) sampledView.refreshSelection();
         if (allocView != null) allocView.refreshSelection();

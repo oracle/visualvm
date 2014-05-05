@@ -111,6 +111,10 @@ abstract class CPUTreeTableView extends JPanel {
     }
     
     
+    public void showSelectionColumn() {
+        treeTable.setColumnVisibility(0, true);
+    }
+    
     public void refreshSelection() {
         treeTableModel.dataChanged();
     }

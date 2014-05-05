@@ -146,6 +146,10 @@ abstract class LivenessTableView extends JPanel {
     }
     
     
+    public void showSelectionColumn() {
+        table.setColumnVisibility(0, true);
+    }
+    
     public void refreshSelection() {
         tableModel.fireTableDataChanged();
     }

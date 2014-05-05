@@ -231,6 +231,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
                     selection.add(selected);
                 setMode(Mode.INSTR_SELECTED);
                 updateModeUI();
+                cpuView.showSelectionColumn();
                 getSettingsUI().setVisible(true);
             }
         });

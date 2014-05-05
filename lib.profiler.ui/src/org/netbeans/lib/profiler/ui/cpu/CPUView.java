@@ -131,6 +131,11 @@ public abstract class CPUView extends JPanel {
     }
     
     
+    public void showSelectionColumn() {
+        treeTableView.showSelectionColumn();
+        tableView.showSelectionColumn();
+    }
+    
     public void refreshSelection() {
         treeTableView.refreshSelection();
         tableView.refreshSelection();

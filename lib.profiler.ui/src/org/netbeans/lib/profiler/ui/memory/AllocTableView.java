@@ -125,6 +125,10 @@ abstract class AllocTableView extends JPanel {
     }
     
     
+    public void showSelectionColumn() {
+        table.setColumnVisibility(0, true);
+    }
+    
     public void refreshSelection() {
         tableModel.fireTableDataChanged();
     }
