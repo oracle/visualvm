@@ -85,7 +85,7 @@ public abstract class ProfilerSession {
     public static ProfilerSession forProject(Lookup.Provider project) {
         // Try to reuse the active session first
         synchronized(CURRENT_SESSION_LOCK) {
-            if (CURRENT_SESSION != null && project.equals(CURRENT_SESSION.getProject())) {
+            if (CURRENT_SESSION != null && Objects.equals(project, CURRENT_SESSION.getProject())) {
                 return CURRENT_SESSION;
             }
         }

@@ -112,6 +112,7 @@ class ProfilerWindow extends ProfilerTopComponent {
     
     ProfilerWindow(ProfilerSession session) {
         this.session = session;
+        attachSettings = session.getAttachSettings();
         
         Lookup.Provider project = session.getProject();
         String windowName = project == null ? Bundle.ProfilerWindow_caption() :
