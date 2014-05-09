@@ -57,11 +57,11 @@ final class ProfilerSessions {
     static void createAndConfigure(Lookup configuration, Lookup.Provider project) {
         if (project == null) project = ProjectUtilities.getMainProject();
         
-        ProfilerDialogs.displayInfo("\nWill open a dialog for selecting the project to profile\nand eventually to choose a feature to handle the action.\n\nPreselected project: " + ProjectUtilities.getDisplayName(project));
+        ProfilerDialogs.displayInfo("\n[TODO]\n\nWill open a dialog for selecting the project to profile\nand eventually to choose a feature to handle the action.\n\nPreselected project: " + ProjectUtilities.getDisplayName(project));
     }
     
     static ProfilerFeature selectFeature(ProfilerSession session, Set<ProfilerFeature> features) {
-        ProfilerDialogs.displayInfo("\nWill open a dialog to choose a feature to handle the action.\n\nPreselected feature: " + features.iterator().next().getName());
+        ProfilerDialogs.displayInfo("\n[TODO]\n\nWill open a dialog to choose a feature to handle the action.\n\nPreselected feature: " + features.iterator().next().getName());
         return features.iterator().next();
     }
     

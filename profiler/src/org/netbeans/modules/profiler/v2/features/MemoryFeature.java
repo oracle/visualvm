@@ -45,7 +45,9 @@ package org.netbeans.modules.profiler.v2.features;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.util.Arrays;
@@ -80,6 +82,7 @@ import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.RunGCAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
 import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -140,7 +143,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private PopupButton modeButton;
     
     private Component instrSettingsSpace;
-    private JLabel selectedLabel;
+    private JButton selectedLabel;
     private Component selectedSpace1;
     private Component selectedSeparator;
     private Component selectedSpace2;
@@ -267,7 +270,25 @@ final class MemoryFeature extends ProfilerFeature.Basic {
 
             instrSettingsSpace = settingsUI.add(Box.createHorizontalStrut(8));
             
-            selectedLabel = new JLabel();
+            selectedLabel = new JButton() {
+                public void setText(String text) {
+                    super.setText("<html>" + text + ", <a href='#'>edit</a></html>");
+                }
+                protected void fireActionPerformed(ActionEvent e) {
+                    ProfilerDialogs.displayInfo("\n[TODO]\n\nWill open a dialog for editing classes to profile.");
+                }
+                public Dimension getMinimumSize() {
+                    return getPreferredSize();
+                }
+                public Dimension getMaximumSize() {
+                    return getPreferredSize();
+                }
+            };
+            selectedLabel.setContentAreaFilled(false);
+            selectedLabel.setBorderPainted(true);
+            selectedLabel.setMargin(new Insets(0, 0, 0, 0));
+            selectedLabel.setBorder(BorderFactory.createEmptyBorder());
+            selectedLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             settingsUI.add(selectedLabel);
             
             selectedSpace1 = settingsUI.add(Box.createHorizontalStrut(8));
