@@ -204,7 +204,13 @@ public class FeaturesView extends JPanel {
         } else {
             tp.setBorder(BorderFactory.createEmptyBorder());
             Insets i = UIManager.getInsets("TabbedPane.contentBorderInsets"); // NOI18N
-            if (i != null) tp.setBorder(BorderFactory.createEmptyBorder(-i.top, -i.left, 0, -i.right));
+            int bottomOffset = 0;
+            if (UIUtils.isMetalLookAndFeel()) {
+                bottomOffset = -i.bottom + 1;
+            } else if (UIUtils.isWindowsLookAndFeel()) {
+                bottomOffset = -i.bottom;
+            }
+            if (i != null) tp.setBorder(BorderFactory.createEmptyBorder(-i.top, -i.left, bottomOffset, -i.right));
         }
         
         // Fix for Issue 115062 (CTRL-PageUp/PageDown should move between snapshot tabs)
