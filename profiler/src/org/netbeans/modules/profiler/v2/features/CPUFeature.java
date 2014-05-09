@@ -49,7 +49,11 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -117,6 +121,11 @@ final class CPUFeature extends ProfilerFeature.Basic {
     private static enum View { HOT_SPOTS, CALL_TREE, COMBINED }
     private static enum Mode { SAMPLED_ALL, SAMPLED_PROJECT, INSTR_CLASS, INSTR_METHOD, INSTR_SELECTED }
     
+    private final Map<Mode, Properties> settingsCache = new HashMap();
+    private Mode appliedMode;
+    private Properties appliedSettings;
+    private Mode currentMode = Mode.SAMPLED_ALL;
+    
     private JLabel lrLabel;
     private JToggleButton lrPauseButton;
     private JButton lrRefreshButton;
@@ -134,8 +143,10 @@ final class CPUFeature extends ProfilerFeature.Basic {
     private ProfilerToolbar toolbar;
     private JPanel settingsUI;
     
+    private JPanel applyPanel;
     private JButton applyButton;
-    private JButton cancelButton;
+    
+    private PopupButton modeButton;
     
     private Component instrSettingsSpace;
     private JLabel selectedLabel;
@@ -150,9 +161,6 @@ final class CPUFeature extends ProfilerFeature.Basic {
     
     private CPUView cpuView;
     
-    private Mode mode = Mode.SAMPLED_ALL;
-    private PopupButton modeButton;
-    
     private boolean popupPause;
     
     private ClientUtils.SourceCodeSelection[] selectedClasses;
@@ -164,6 +172,9 @@ final class CPUFeature extends ProfilerFeature.Basic {
     CPUFeature() {
         super(Icons.getIcon(ProfilerIcons.CPU), Bundle.CPUFeature_name(),
               Bundle.CPUFeature_description(), 12);
+        
+        loadSettings();
+        fireChange(); // updates last mode & settings
         
         selection = new HashSet() {
             public boolean add(Object value) {
@@ -181,6 +192,15 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 selectionChanged();
             }
         };
+    }
+    
+    
+    private void loadSettings() {
+        settingsCache.put(Mode.SAMPLED_ALL, new Properties());
+        settingsCache.put(Mode.SAMPLED_PROJECT, new Properties());
+        settingsCache.put(Mode.INSTR_CLASS, new Properties());
+        settingsCache.put(Mode.INSTR_METHOD, new Properties());
+        settingsCache.put(Mode.INSTR_SELECTED, new Properties());
     }
     
     
@@ -220,6 +240,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 }
                 updateModeUI();
                 getSettingsUI().setVisible(true);
+                settingsChanged();
             }
         });
     }
@@ -241,6 +262,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
     private void selectionChanged() {
         cpuView.refreshSelection();
         updateModeUI();
+        settingsChanged();
     }
 
     
@@ -265,21 +287,21 @@ final class CPUFeature extends ProfilerFeature.Basic {
             modeButton = new PopupButton("All classes") {
                 protected void populatePopup(JPopupMenu popup) {
                     popup.add(new TitledMenuSeparator("General (sampled)"));
-                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_ALL), mode == Mode.SAMPLED_ALL) {
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_ALL), currentMode == Mode.SAMPLED_ALL) {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.SAMPLED_ALL); }
                     });
-                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_PROJECT), mode == Mode.SAMPLED_PROJECT) {
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_PROJECT), currentMode == Mode.SAMPLED_PROJECT) {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.SAMPLED_PROJECT); }
                     });
                     
                     popup.add(new TitledMenuSeparator("Focused (instrumented)"));
-                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_CLASS), mode == Mode.INSTR_CLASS) {
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_CLASS), currentMode == Mode.INSTR_CLASS) {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_CLASS); }
                     });
-                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_METHOD), mode == Mode.INSTR_METHOD) {
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_METHOD), currentMode == Mode.INSTR_METHOD) {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_METHOD); }
                     });
-                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_SELECTED), mode == Mode.INSTR_SELECTED) {
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_SELECTED), currentMode == Mode.INSTR_SELECTED) {
 //                        { setEnabled(!selection.isEmpty()); }
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_SELECTED); }
                     });
@@ -312,6 +334,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
             outgoingSpinner = new JExtendedSpinner(new SpinnerNumberModel(5, 1, 10, 1)) {
                 public Dimension getPreferredSize() { return getMinimumSize(); }
                 public Dimension getMaximumSize() { return getMinimumSize(); }
+                protected void fireStateChanged() { settingsChanged(); super.fireStateChanged(); }
             };
             settingsUI.add(outgoingSpinner);
 
@@ -333,8 +356,12 @@ final class CPUFeature extends ProfilerFeature.Basic {
                     return getPreferredSize();
                 }
             });
-
-            settingsUI.add(Box.createHorizontalStrut(8));
+            
+            applyPanel = new JPanel();
+            applyPanel.setOpaque(false);
+            applyPanel.setLayout(new BoxLayout(applyPanel, BoxLayout.LINE_AXIS));
+            
+            applyPanel.add(Box.createHorizontalStrut(8));
 
             Component sep1 = Box.createHorizontalStrut(1);
             sep1.setBackground(Color.GRAY);
@@ -342,54 +369,40 @@ final class CPUFeature extends ProfilerFeature.Basic {
             Dimension dd = sep1.getMaximumSize();
             dd.height = 20;
             sep1.setMaximumSize(dd);
-            settingsUI.add(sep1);
+            applyPanel.add(sep1);
 
-            settingsUI.add(Box.createHorizontalStrut(8));
+            applyPanel.add(Box.createHorizontalStrut(8));
             
-            final Component applyButtonSpace = Box.createHorizontalStrut(5);
-
             applyButton = new SmallButton("Apply") {
                 protected void fireActionPerformed(ActionEvent e) {
                     stopResults();
                     resetResults();
                     fireChange();
-//                    settingsUI.setVisible(false);
                     
                     // Proof of concept, show Call Tree when switching to root methods
                     if (isInstrumentation() && running && refresher != null)
                         setView(View.CALL_TREE);
                 }
-                public void setVisible(boolean visible) {
-                    super.setVisible(visible);
-                    applyButtonSpace.setVisible(visible);
-                }
             };
-            settingsUI.add(applyButton);
-
-            settingsUI.add(applyButtonSpace);
-
-            cancelButton = new SmallButton() {
-                protected void fireActionPerformed(ActionEvent e) {
-                    // TODO: clear changes
-                    settingsUI.setVisible(false);
-                }
-            };
-            settingsUI.add(cancelButton);
+            applyPanel.add(applyButton);
+            
+            settingsUI.add(applyPanel);
             
             ProfilerSession session = getSession();
             int state = session != null ? session.getState() :
                         NetBeansProfiler.PROFILING_INACTIVE;
             
             updateModeUI();
-            updateApplyCancel(state);
+            updateApply(state);
         }
         return settingsUI;
     }
     
     private void setMode(Mode m) {
-        if (mode == m) return;
-        mode = m;
+        if (currentMode == m) return;
+        currentMode = m;
         updateModeUI();
+        settingsChanged();
     }
     
     private String getModeName(Mode m) {
@@ -404,7 +417,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
     }
     
     private void updateModeUI() {
-        modeButton.setText(getModeName(mode));
+        modeButton.setText(getModeName(currentMode));
         
         boolean instrumentation = isInstrumentation();
         instrSettingsSpace.setVisible(instrumentation);
@@ -416,7 +429,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
         outgoingSpace.setVisible(instrumentation);
         outgoingSpinner.setVisible(instrumentation);
         
-        if (mode == Mode.INSTR_CLASS) {
+        if (currentMode == Mode.INSTR_CLASS) {
             int count = selectedClasses == null ? 0 : selectedClasses.length;
             if (count == 0) {
                 selectedLabel.setText("No class");
@@ -425,7 +438,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
             } else {
                 selectedLabel.setText(count + " classes");
             }
-        } else if (mode == Mode.INSTR_METHOD) {
+        } else if (currentMode == Mode.INSTR_METHOD) {
             int count = selectedMethods == null ? 0 : selectedMethods.length;
             if (count == 0) {
                 selectedLabel.setText("No method");
@@ -434,7 +447,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
             } else {
                 selectedLabel.setText(count + " methods");
             }
-        } else if (mode == Mode.INSTR_SELECTED) {
+        } else if (currentMode == Mode.INSTR_SELECTED) {
             int count = selection.size();
             if (count == 0) {
                 selectedLabel.setText("No method");
@@ -445,23 +458,140 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 selectedLabel.setText(count + " methods");
             }
         }
+        
+        restoreSettings(settingsCache.get(currentMode));
     }
     
-    private void updateApplyCancel(int state) {
-        if (applyButton == null || cancelButton == null) return;
+    private void updateApply(int state) {
+        if (applyButton == null) return;
         
-        boolean changed = true; // TODO: settings changed?
-        boolean running = isRunning(state);
-        boolean progress = state != NetBeansProfiler.PROFILING_INACTIVE;
+        applyPanel.setVisible(state != NetBeansProfiler.PROFILING_INACTIVE);
         
-        applyButton.setVisible(progress);
-        applyButton.setEnabled(running && changed);
-        if (applyButton.isEnabled()) applyButton.setToolTipText("Apply changed settings to the currently running session");
-        else applyButton.setToolTipText(null);
-        
-        cancelButton.setText(running && changed ? "Cancel" : "Close");
-        cancelButton.setToolTipText(running && changed ? "Reset recent changes and hide the settings panel" :
-                                                         "Hide the settings panel");
+        if (applyPanel.isVisible())
+            applyButton.setEnabled(settingsValid() && pendingChanges());
+    }
+    
+    protected void fireChange() {
+        appliedMode = currentMode;
+        appliedSettings = new Properties();
+        appliedSettings.putAll(settingsCache.get(appliedMode));
+        super.fireChange();
+    }
+    
+    private boolean pendingChanges() {
+        if (appliedMode != currentMode) return true;
+        return !appliedSettings.equals(settingsCache.get(currentMode));
+    }
+    
+    private void updateCurrentSettings() {
+        Properties settings = settingsCache.get(currentMode);
+        switch (currentMode)  {
+            case SAMPLED_ALL:
+                break;
+                
+            case SAMPLED_PROJECT:
+                break;
+                
+            case INSTR_CLASS:
+                int count = selectedClasses == null ? 0 : selectedClasses.length;
+                settings.put("selectionSize", Integer.toString(count));
+                for (int i = 0; i < count; i++) {
+                    ClientUtils.SourceCodeSelection sel = selectedClasses[i];
+                    settings.put("selection" + Integer.toString(i), ClientUtils.selectionToString(sel));
+                }
+                settings.put("outgoing", outgoingSpinner.getValue().toString());
+                break;
+                
+            case INSTR_METHOD:
+                count = selectedMethods == null ? 0 : selectedMethods.length;
+                settings.put("selectionSize", Integer.toString(count));
+                for (int i = 0; i < count; i++) {
+                    ClientUtils.SourceCodeSelection sel = selectedMethods[i];
+                    settings.put("selection" + Integer.toString(i), ClientUtils.selectionToString(sel));
+                }
+                settings.put("outgoing", outgoingSpinner.getValue().toString());
+                break;
+                
+            case INSTR_SELECTED:
+                count = selection == null ? 0 : selection.size();
+                settings.put("selectionSize", Integer.toString(count));
+                Iterator<ClientUtils.SourceCodeSelection> it = count == 0 ? null : selection.iterator();
+                for (int i = 0; i < count; i++) {
+                    ClientUtils.SourceCodeSelection sel = it.next();
+                    settings.put("selection" + Integer.toString(i), ClientUtils.selectionToString(sel));
+                }
+                settings.put("outgoing", outgoingSpinner.getValue().toString());
+                break;
+        }
+    }
+    
+    private void restoreSettings(Properties settings) {
+//        setMode(m);
+        switch (currentMode)  {
+            case SAMPLED_ALL:
+                break;
+                
+            case SAMPLED_PROJECT:
+                break;
+                
+            case INSTR_CLASS:
+//                String _count = settings.getProperty("selectionSize");
+//                int count = _count == null ? 0 : Integer.parseInt(_count);
+//                selectedClasses = new ClientUtils.SourceCodeSelection[count];
+//                for (int i = 0; i < count; i++) {
+//                    String sel = settings.getProperty("selection" + Integer.toString(i));
+//                    selectedClasses[i] = ClientUtils.stringToSelection(sel);
+//                }
+                String _outgoing = settings.getProperty("outgoing", "5");
+                outgoingSpinner.setValue(Integer.parseInt(_outgoing));
+                break;
+                
+            case INSTR_METHOD:
+//                _count = settings.getProperty("selectionSize");
+//                count = _count == null ? 0 : Integer.parseInt(_count);
+//                selectedMethods = new ClientUtils.SourceCodeSelection[count];
+//                for (int i = 0; i < count; i++) {
+//                    String sel = settings.getProperty("selection" + Integer.toString(i));
+//                    selectedMethods[i] = ClientUtils.stringToSelection(sel);
+//                }
+                _outgoing = settings.getProperty("outgoing", "5");
+                outgoingSpinner.setValue(Integer.parseInt(_outgoing));
+                break;
+                
+            case INSTR_SELECTED:
+//                selection.clear();
+//                _count = settings.getProperty("selectionSize");
+//                count = _count == null ? 0 : Integer.parseInt(_count);
+//                for (int i = 0; i < count; i++) {
+//                    String sel = settings.getProperty("selection" + Integer.toString(i));
+//                    selection.add(ClientUtils.stringToSelection(sel));
+//                }
+                _outgoing = settings.getProperty("outgoing", "5");
+                outgoingSpinner.setValue(Integer.parseInt(_outgoing));
+                break;
+        }
+    }
+    
+    public boolean settingsValid() {
+        switch (currentMode) {
+            case SAMPLED_ALL:
+                return true;
+                
+            case SAMPLED_PROJECT:
+                return true;
+                
+            case INSTR_CLASS:
+                return selectedClasses != null && selectedClasses.length > 0;
+                
+            case INSTR_METHOD:
+                return selectedMethods != null && selectedMethods.length > 0;
+                
+            case INSTR_SELECTED:
+                return selection != null && !selection.isEmpty();
+                
+            default:
+                return false;
+        }
     }
     
     public ProfilerToolbar getToolbar() {
@@ -551,6 +681,14 @@ final class CPUFeature extends ProfilerFeature.Basic {
         return toolbar;
     }
     
+    private void settingsChanged() {
+        updateCurrentSettings();
+        ProfilerSession session = getSession();
+        if (session == null || !session.inProgress()) fireChange();
+        updateApply(session != null ? session.getState() :
+                    NetBeansProfiler.PROFILING_INACTIVE);
+    }
+    
     public boolean supportsSettings(ProfilingSettings settings) {
         return !ProfilingSettings.isMemorySettings(settings);
     }
@@ -568,7 +706,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
         settings.setInstrumentMethodInvoke(true);
         settings.setExcludeWaitTime(true);
         
-        switch (mode)  {
+        switch (currentMode)  {
             case SAMPLED_ALL:
                 configureSampledSettings(settings);
                 break;
@@ -589,9 +727,9 @@ final class CPUFeature extends ProfilerFeature.Basic {
             case INSTR_METHOD:
                 configureInstrumentedSettings(settings);
                 
-                ClientUtils.SourceCodeSelection[] sel = mode == Mode.INSTR_CLASS ? selectedClasses :
+                ClientUtils.SourceCodeSelection[] sel = currentMode == Mode.INSTR_CLASS ? selectedClasses :
                                                                                    selectedMethods;
-                if (selection != null) settings.addRootMethods(sel);
+                if (sel != null) settings.addRootMethods(sel);
                 settings.setStackDepthLimit(((Number)outgoingSpinner.getValue()).intValue());
                 break;
                 
@@ -722,14 +860,14 @@ final class CPUFeature extends ProfilerFeature.Basic {
         } else if (newState == NetBeansProfiler.PROFILING_STARTED) {
             resetResults();
         }
-        updateApplyCancel(newState);
+        updateApply(newState);
         refreshToolbar(newState);
     }
     
     private boolean isInstrumentation() {
-        return mode == Mode.INSTR_CLASS ||
-               mode == Mode.INSTR_METHOD ||
-               mode == Mode.INSTR_SELECTED;
+        return currentMode == Mode.INSTR_CLASS ||
+               currentMode == Mode.INSTR_METHOD ||
+               currentMode == Mode.INSTR_SELECTED;
     }
     
     private boolean isRunning(int state) {

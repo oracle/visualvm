@@ -49,7 +49,11 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -109,6 +113,11 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     
     private static enum Mode { SAMPLED_ALL, SAMPLED_PROJECT, INSTR_CLASS, INSTR_SELECTED }
     
+    private final Map<Mode, Properties> settingsCache = new HashMap();
+    private Mode appliedMode;
+    private Properties appliedSettings;
+    private Mode currentMode = Mode.SAMPLED_ALL;
+    
     private JLabel lrLabel;
     private JToggleButton lrPauseButton;
     private JButton lrRefreshButton;
@@ -125,8 +134,10 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private ProfilerToolbar toolbar;
     private JPanel settingsUI;
     
+    private JPanel applyPanel;
     private JButton applyButton;
-    private JButton cancelButton;
+    
+    private PopupButton modeButton;
     
     private Component instrSettingsSpace;
     private JLabel selectedLabel;
@@ -138,9 +149,6 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     
     private MemoryView memoryView;
     
-    private Mode mode = Mode.SAMPLED_ALL;
-    private PopupButton modeButton;
-    
     private boolean popupPause;
     
     private String[] selectedClasses;
@@ -151,6 +159,9 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     MemoryFeature() {
         super(Icons.getIcon(ProfilerIcons.MEMORY), Bundle.MemoryFeature_name(),
               Bundle.MemoryFeature_description(), 13);
+        
+        loadSettings();
+        fireChange(); // updates last mode & settings
         
         selection = new HashSet() {
             public boolean add(Object value) {
@@ -171,6 +182,14 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     }
     
     
+    private void loadSettings() {
+        settingsCache.put(Mode.SAMPLED_ALL, new Properties());
+        settingsCache.put(Mode.SAMPLED_PROJECT, new Properties());
+        settingsCache.put(Mode.INSTR_CLASS, new Properties());
+        settingsCache.put(Mode.INSTR_SELECTED, new Properties());
+    }
+    
+    
     public boolean supportsConfiguration(Lookup configuration) {
         return configuration.lookup(SourceClassInfo.class) != null;
     }
@@ -186,6 +205,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         setMode(Mode.INSTR_CLASS);
         updateModeUI();
         getSettingsUI().setVisible(true);
+        settingsChanged();
     }
     
     private void selectForProfiling(String[] selection) {
@@ -194,12 +214,14 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         updateModeUI();
         memoryView.showSelectionColumn();
         getSettingsUI().setVisible(true);
+        settingsChanged();
     }
     
     
     private void selectionChanged() {
         memoryView.refreshSelection();
         updateModeUI();
+        settingsChanged();
     }
 
     
@@ -224,18 +246,18 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             modeButton = new PopupButton("All classes") {
                 protected void populatePopup(JPopupMenu popup) {
                     popup.add(new TitledMenuSeparator("General (sampled)"));
-                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_ALL), mode == Mode.SAMPLED_ALL) {
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_ALL), currentMode == Mode.SAMPLED_ALL) {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.SAMPLED_ALL); }
                     });
-                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_PROJECT), mode == Mode.SAMPLED_PROJECT) {
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_PROJECT), currentMode == Mode.SAMPLED_PROJECT) {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.SAMPLED_PROJECT); }
                     });
                     
                     popup.add(new TitledMenuSeparator("Focused (instrumented)"));
-                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_CLASS), mode == Mode.INSTR_CLASS) {
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_CLASS), currentMode == Mode.INSTR_CLASS) {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_CLASS); }
                     });
-                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_SELECTED), mode == Mode.INSTR_SELECTED) {
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_SELECTED), currentMode == Mode.INSTR_SELECTED) {
 //                        { setEnabled(memoryView.hasSelection()); }
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_SELECTED); }
                     });
@@ -260,11 +282,15 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             
             selectedSpace2 = settingsUI.add(Box.createHorizontalStrut(8));
             
-            lifecycleCheckbox = new JCheckBox("Record full lifecycle");
+            lifecycleCheckbox = new JCheckBox("Record full lifecycle") {
+                protected void fireStateChanged() { settingsChanged(); super.fireStateChanged(); }
+            };
             lifecycleCheckbox.setOpaque(false);
             settingsUI.add(lifecycleCheckbox);
             
-            allocationsCheckbox = new JCheckBox("Record allocations");
+            allocationsCheckbox = new JCheckBox("Record allocations") {
+                protected void fireStateChanged() { settingsChanged(); super.fireStateChanged(); }
+            };
             allocationsCheckbox.setOpaque(false);
             settingsUI.add(allocationsCheckbox);
 
@@ -287,7 +313,11 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 }
             });
 
-            settingsUI.add(Box.createHorizontalStrut(8));
+            applyPanel = new JPanel();
+            applyPanel.setOpaque(false);
+            applyPanel.setLayout(new BoxLayout(applyPanel, BoxLayout.LINE_AXIS));
+            
+            applyPanel.add(Box.createHorizontalStrut(8));
 
             Component sep1 = Box.createHorizontalStrut(1);
             sep1.setBackground(Color.GRAY);
@@ -295,50 +325,36 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             Dimension dd = sep1.getMaximumSize();
             dd.height = 20;
             sep1.setMaximumSize(dd);
-            settingsUI.add(sep1);
+            applyPanel.add(sep1);
 
-            settingsUI.add(Box.createHorizontalStrut(8));
+            applyPanel.add(Box.createHorizontalStrut(8));
             
-            final Component applyButtonSpace = Box.createHorizontalStrut(5);
-
             applyButton = new SmallButton("Apply") {
                 protected void fireActionPerformed(ActionEvent e) {
                     stopResults();
                     resetResults();
                     fireChange();
-//                    settingsUI.setVisible(false);
-                }
-                public void setVisible(boolean visible) {
-                    super.setVisible(visible);
-                    applyButtonSpace.setVisible(visible);
                 }
             };
-            settingsUI.add(applyButton);
-
-            settingsUI.add(applyButtonSpace);
-
-            cancelButton = new SmallButton() {
-                protected void fireActionPerformed(ActionEvent e) {
-                    // TODO: clear changes
-                    settingsUI.setVisible(false);
-                }
-            };
-            settingsUI.add(cancelButton);
+            applyPanel.add(applyButton);
+            
+            settingsUI.add(applyPanel);
             
             ProfilerSession session = getSession();
             int state = session != null ? session.getState() :
                         NetBeansProfiler.PROFILING_INACTIVE;
             
             updateModeUI();
-            updateApplyCancel(state);
+            updateApply(state);
         }
         return settingsUI;
     }
     
     private void setMode(Mode m) {
-        if (mode == m) return;
-        mode = m;
+        if (currentMode == m) return;
+        currentMode = m;
         updateModeUI();
+        settingsChanged();
     }
     
     private String getModeName(Mode m) {
@@ -352,7 +368,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     }
     
     private void updateModeUI() {
-        modeButton.setText(getModeName(mode));
+        modeButton.setText(getModeName(currentMode));
         
         boolean instrumentation = isInstrumentation();
         instrSettingsSpace.setVisible(instrumentation);
@@ -363,7 +379,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         lifecycleCheckbox.setVisible(instrumentation);
         allocationsCheckbox.setVisible(instrumentation);
         
-        if (mode == Mode.INSTR_CLASS) {
+        if (currentMode == Mode.INSTR_CLASS) {
             int count = selectedClasses == null ? 0 : selectedClasses.length;
             if (count == 0) {
                 selectedLabel.setText("No class");
@@ -372,7 +388,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             } else {
                 selectedLabel.setText(count + " classes");
             }
-        } else if (mode == Mode.INSTR_SELECTED) {
+        } else if (currentMode == Mode.INSTR_SELECTED) {
             int count = selection.size();
             if (count == 0) {
                 selectedLabel.setText("No class");
@@ -382,23 +398,132 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 selectedLabel.setText(count + " classes");
             }
         }
+        
+        restoreSettings(settingsCache.get(currentMode));
     }
     
-    private void updateApplyCancel(int state) {
-        if (applyButton == null || cancelButton == null) return;
+    private void updateApply(int state) {
+        if (applyButton == null) return;
         
-        boolean changed = true; // TODO: settings changed?
-        boolean running = isRunning(state);
-        boolean progress = state != NetBeansProfiler.PROFILING_INACTIVE;
+        applyPanel.setVisible(state != NetBeansProfiler.PROFILING_INACTIVE);
         
-        applyButton.setVisible(progress);
-        applyButton.setEnabled(running && changed);
-        if (applyButton.isEnabled()) applyButton.setToolTipText("Apply changed settings to the currently running session");
-        else applyButton.setToolTipText(null);
-        
-        cancelButton.setText(running && changed ? "Cancel" : "Close");
-        cancelButton.setToolTipText(running && changed ? "Reset recent changes and hide the settings panel" :
-                                                         "Hide the settings panel");
+        if (applyPanel.isVisible())
+            applyButton.setEnabled(settingsValid() && pendingChanges());
+    }
+    
+    protected void fireChange() {
+        appliedMode = currentMode;
+        appliedSettings = new Properties();
+        appliedSettings.putAll(settingsCache.get(appliedMode));
+        super.fireChange();
+    }
+    
+    private boolean pendingChanges() {
+        if (appliedMode != currentMode) return true;
+        return !appliedSettings.equals(settingsCache.get(currentMode));
+    }
+    
+    private void updateCurrentSettings() {
+        Properties settings = settingsCache.get(currentMode);
+        switch (currentMode)  {
+            case SAMPLED_ALL:
+                break;
+                
+            case SAMPLED_PROJECT:
+                break;
+                
+            case INSTR_CLASS:
+                int count = selectedClasses == null ? 0 : selectedClasses.length;
+                settings.put("selectionSize", Integer.toString(count));
+                for (int i = 0; i < count; i++)
+                    settings.put("selection" + Integer.toString(i), selectedClasses[i]);
+                
+                boolean lifecycle = lifecycleCheckbox.isSelected();
+                settings.put("lifecycle", Boolean.toString(lifecycle));
+                
+                boolean allocations = allocationsCheckbox.isSelected();
+                settings.put("allocations", Boolean.toString(allocations));
+                
+                break;
+                
+            case INSTR_SELECTED:
+                count = selection == null ? 0 : selection.size();
+                settings.put("selectionSize", Integer.toString(count));
+                Iterator<String> it = count == 0 ? null : selection.iterator();
+                for (int i = 0; i < count; i++)
+                    settings.put("selection" + Integer.toString(i), it.next());
+                
+                lifecycle = lifecycleCheckbox.isSelected();
+                settings.put("lifecycle", Boolean.toString(lifecycle));
+                
+                allocations = allocationsCheckbox.isSelected();
+                settings.put("allocations", Boolean.toString(allocations));
+                
+                break;
+        }
+    }
+    
+    private void restoreSettings(Properties settings) {
+//        setMode(m);
+        switch (currentMode)  {
+            case SAMPLED_ALL:
+                break;
+                
+            case SAMPLED_PROJECT:
+                break;
+                
+            case INSTR_CLASS:
+//                String _count = settings.getProperty("selectionSize");
+//                int count = _count == null ? 0 : Integer.parseInt(_count);
+//                selectedClasses = new ClientUtils.SourceCodeSelection[count];
+//                for (int i = 0; i < count; i++) {
+//                    String sel = settings.getProperty("selection" + Integer.toString(i));
+//                    selectedClasses[i] = ClientUtils.stringToSelection(sel);
+//                }
+                String _lifecycle = settings.getProperty("lifecycle", "false");
+                lifecycleCheckbox.setSelected(Boolean.parseBoolean(_lifecycle));
+                
+                String _allocations = settings.getProperty("allocations", "false");
+                allocationsCheckbox.setSelected(Boolean.parseBoolean(_allocations));
+                
+                break;
+                
+            case INSTR_SELECTED:
+//                selection.clear();
+//                _count = settings.getProperty("selectionSize");
+//                count = _count == null ? 0 : Integer.parseInt(_count);
+//                for (int i = 0; i < count; i++) {
+//                    String sel = settings.getProperty("selection" + Integer.toString(i));
+//                    selection.add(ClientUtils.stringToSelection(sel));
+//                }
+                
+                _lifecycle = settings.getProperty("lifecycle", "false");
+                lifecycleCheckbox.setSelected(Boolean.parseBoolean(_lifecycle));
+                
+                _allocations = settings.getProperty("allocations", "false");
+                allocationsCheckbox.setSelected(Boolean.parseBoolean(_allocations));
+                
+                break;
+        }
+    }
+    
+    public boolean settingsValid() {
+        switch (currentMode) {
+            case SAMPLED_ALL:
+                return true;
+                
+            case SAMPLED_PROJECT:
+                return true;
+                
+            case INSTR_CLASS:
+                return selectedClasses != null && selectedClasses.length > 0;
+                
+            case INSTR_SELECTED:
+                return selection != null && !selection.isEmpty();
+                
+            default:
+                return false;
+        }
     }
     
     public ProfilerToolbar getToolbar() {
@@ -483,6 +608,14 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         return toolbar;
     }
     
+    private void settingsChanged() {
+        updateCurrentSettings();
+        ProfilerSession session = getSession();
+        if (session == null || !session.inProgress()) fireChange();
+        updateApply(session != null ? session.getState() :
+                    NetBeansProfiler.PROFILING_INACTIVE);
+    }
+    
     public boolean supportsSettings(ProfilingSettings settings) {
         return !ProfilingSettings.isCPUSettings(settings);
     }
@@ -493,7 +626,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
 //        
 //        ProfilingSettings settings = null;
         
-        switch (mode)  {
+        switch (currentMode)  {
             case SAMPLED_ALL:
                 settings.setProfilingType(ProfilingSettings.PROFILE_MEMORY_SAMPLING);
                 break;
@@ -519,7 +652,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 settings.setAllocStackTraceLimit(stackLimit);
                 
                 StringBuilder b = new StringBuilder();
-                String[] selections = mode == Mode.INSTR_CLASS ? selectedClasses : selection.toArray(new String[selection.size()]);
+                String[] selections = currentMode == Mode.INSTR_CLASS ? selectedClasses : selection.toArray(new String[selection.size()]);
                 for (int i = 0; i < selections.length; i++) {
                     b.append(selections[i]);
                     if (i < selections.length - 1) b.append(", "); // NOI18N
@@ -586,13 +719,13 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         } else if (newState == NetBeansProfiler.PROFILING_STARTED) {
             resetResults();
         }
-        updateApplyCancel(newState);
+        updateApply(newState);
         refreshToolbar(newState);
     }
     
     private boolean isInstrumentation() {
-        return mode == Mode.INSTR_CLASS ||
-               mode == Mode.INSTR_SELECTED;
+        return currentMode == Mode.INSTR_CLASS ||
+               currentMode == Mode.INSTR_SELECTED;
     }
     
     private boolean isRunning(int state) {

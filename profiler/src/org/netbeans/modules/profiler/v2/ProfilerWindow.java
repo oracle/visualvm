@@ -211,13 +211,11 @@ class ProfilerWindow extends ProfilerTopComponent {
         featuresView = new FeaturesView(welcomePanel);
         container.add(featuresView, BorderLayout.CENTER);
         
-        features.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                updateFeatures(e.getSource() instanceof ProfilerFeature ?
-                               (ProfilerFeature)e.getSource() : null);
-            }
+        features.addListener(new ProfilerFeatures.Listener() {
+            void featuresChanged(ProfilerFeature changed) { updateFeatures(changed); }
+            void settingsChanged(boolean valid) { updateSettings(valid); }
         });
-        updateFeatures(null);
+        updateSettings(features.settingsValid());
         
         featuresView.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -254,10 +252,8 @@ class ProfilerWindow extends ProfilerTopComponent {
     
     
     private void updateFeatures(ProfilerFeature changed) {
-        ProfilingSettings settings = features.getSettings();
-        start.setEnabled(settings != null);
-        
         // TODO: optimize!
+        // TODO: restore focused component if possible
         ProfilerFeature restore = featuresView.getSelectedFeature();
         featuresView.removeFeatures();
         Set<ProfilerFeature> selected = features.getSelected();
@@ -265,10 +261,12 @@ class ProfilerWindow extends ProfilerTopComponent {
         if (selected.contains(changed)) featuresView.selectFeature(changed);
         else featuresView.selectFeature(restore);
         featuresView.repaint();
-        
-        if (session.inProgress()) session.doModify(__currentSettings());
     }
     
+    private void updateSettings(boolean valid) {
+        start.setEnabled(valid);
+        if (session.inProgress()) session.doModify(__currentSettings());
+    }
     
     private ProfilingSettings __currentSettings() {
         ProfilingSettings settings = features.getSettings();
@@ -299,8 +297,8 @@ class ProfilerWindow extends ProfilerTopComponent {
         final List<ToggleButtonMenuItem> _items = new ArrayList();
         
         // --- Features listener ---
-        final ChangeListener listener = new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
+        final ProfilerFeatures.Listener listener = new ProfilerFeatures.Listener() {
+            void featuresChanged(ProfilerFeature changed) {
                 int index = 0;
                 for (ProfilerFeature feature : _features) {
                     ToggleButtonMenuItem item = _items.get(index++);
@@ -308,13 +306,14 @@ class ProfilerWindow extends ProfilerTopComponent {
                     item.setPressed(_selected.contains(feature));
                 }
             }
+            void settingsChanged(boolean valid) {}
         };
         
         // --- Popup menu ---
         final StayOpenPopupMenu popup = new StayOpenPopupMenu() {
             public void setVisible(boolean visible) {
-                if (visible) features.addChangeListener(listener);
-                else features.removeChangeListener(listener);
+                if (visible) features.addListener(listener);
+                else features.removeListener(listener);
                 super.setVisible(visible);
             }
         };

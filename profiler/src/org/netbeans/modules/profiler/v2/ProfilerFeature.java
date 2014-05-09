@@ -86,6 +86,8 @@ public abstract class ProfilerFeature {
     
     public abstract void configureSettings(ProfilingSettings settings);
     
+    public abstract boolean settingsValid();
+    
     
     public abstract boolean supportsConfiguration(Lookup configuration);
     
@@ -131,6 +133,8 @@ public abstract class ProfilerFeature {
         public JPanel getSettingsUI() { return null; }
         
         public ProfilerToolbar getToolbar() { return null; }
+        
+        public boolean settingsValid() { return true; }
         
         public boolean supportsConfiguration(Lookup configuration) { return false; }
     
