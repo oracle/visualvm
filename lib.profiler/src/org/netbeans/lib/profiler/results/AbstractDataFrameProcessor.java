@@ -73,6 +73,7 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     protected volatile ProfilerClient client = null;
+    protected volatile boolean collectingTwoTimeStamps; 
     private final Set listeners = new CopyOnWriteArraySet();
 
     // @GuardedBy this
@@ -130,6 +131,7 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
             processorLives = true;
             this.client = client;
         }
+        collectingTwoTimeStamps = (client != null) ? client.getStatus().collectingTwoTimeStamps() : false;
     }
 
     protected void addListener(final ProfilingResultListener listener) {
