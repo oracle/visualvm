@@ -1096,6 +1096,8 @@ public class ProfilerInterface implements CommonConstants {
     }
 
     private static int firstTimeVMObjectAlloc(String className, int classLoaderId) {
+        GetClassIdResponse resp;
+
         if (internalClassName(className)) {
             return -1;
         }
@@ -1110,17 +1112,20 @@ public class ProfilerInterface implements CommonConstants {
 
             GetClassIdCommand cmd = new GetClassIdCommand(className, classLoaderId);
             profilerServer.sendComplexCmdToClient(cmd);
-
-            GetClassIdResponse resp = (GetClassIdResponse) profilerServer.getLastResponse();
-
-            if (resp.isOK()) {
-                return resp.getClassId();
-            }
-
-            return -1;
-        } finally {
+            resp = (GetClassIdResponse) profilerServer.getLastResponse();
+        }  finally {
             serialClientOperationsLock.endTrans();
         }
+        if (resp.isOK()) {
+            int classId = resp.getClassId();
+            int instrClasses = classId+1;
+            if (instrClasses > status.getNInstrClasses()) {
+                status.updateAllocatedInstancesCountInfoInServer(instrClasses);
+                ProfilerRuntimeMemory.setAllocatedInstancesCountArray(status.getAllocatedInstancesCount());
+            }
+            return classId;
+        }
+        return -1;
     }
 
     private static void handleFakeInitRecursiveInstrumentationCommand() {
