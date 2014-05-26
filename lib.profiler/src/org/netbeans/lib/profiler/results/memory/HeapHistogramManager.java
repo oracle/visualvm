@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.wireprotocol.HeapHistogramResponse;
 
 /**
@@ -55,7 +56,12 @@ import org.netbeans.lib.profiler.wireprotocol.HeapHistogramResponse;
  */
 public class HeapHistogramManager {
 
-    Map<Integer, String> classesIdMap = new HashMap(8000);
+    private Map<Integer, String> classesIdMap = new HashMap(8000);
+    private final InstrumentationFilter classFilter;
+
+    public HeapHistogramManager(InstrumentationFilter filter) {
+        classFilter = filter;
+    }
 
     public HeapHistogram getHistogram(HeapHistogramResponse resp) {
         String[] newNames = resp.getNewNames();
@@ -69,8 +75,12 @@ public class HeapHistogramManager {
         long bytes[] = resp.getBytes();
         HeapHistogramImpl histogram = new HeapHistogramImpl(resp.getTime());
         for (int i = 0; i < ids.length; i++) {
-            ClassInfoImpl ci = new ClassInfoImpl(classesIdMap.get(ids[i]), instances[i], bytes[i]);
-            histogram.addClassInfo(ci, false);
+            String className = classesIdMap.get(ids[i]);
+            
+            if (classFilter.passesFilter(className.replace(".", "/"))) {
+                ClassInfoImpl ci = new ClassInfoImpl(className, instances[i], bytes[i]);
+                histogram.addClassInfo(ci, false);
+            }
         }
         return histogram;
     }
