@@ -43,9 +43,9 @@ import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnection;
 import com.sun.tools.visualvm.tools.jmx.CachedMBeanServerConnectionFactory;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
 import com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
-import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModel;
 import com.sun.tools.visualvm.tools.jvmstat.JvmJvmstatModelFactory;
+import com.sun.tools.visualvm.tools.jvmstat.JvmstatModel;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.beans.PropertyChangeEvent;
@@ -53,6 +53,7 @@ import java.beans.PropertyChangeListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationHandler;
@@ -83,6 +84,7 @@ import org.openide.NotifyDescriptor;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
+import sun.tools.attach.HotSpotVirtualMachine;
 
 /**
  * This class encapsulates the JMX functionality of the target Java application.
@@ -684,6 +686,8 @@ class JmxModelImpl extends JmxModel {
 
     private static class LocalVirtualMachine {
 
+        private static final String ENABLE_LOCAL_AGENT_JCMD = "ManagementAgent.start_local";  // NOI18N
+        
         private int vmid;
         private boolean isAttachSupported;
         private String javaHome;
@@ -736,7 +740,6 @@ class JmxModelImpl extends JmxModel {
         private static final String LOCAL_CONNECTOR_ADDRESS_PROP =
                 "com.sun.management.jmxremote.localConnectorAddress";   // NOI18N
 
-        // load the management agent into the target VM
         private synchronized void loadManagementAgent() throws IOException {
             VirtualMachine vm = null;
             String name = String.valueOf(vmid);
@@ -745,6 +748,20 @@ class JmxModelImpl extends JmxModel {
             } catch (AttachNotSupportedException x) {
                 throw new IOException(x);
             }
+            // try to enable local JMX via jcmd command
+            if (!loadManagementAgentViaJcmd(vm)) {
+                // load the management agent into the target VM
+                loadManagementAgentViaJar(vm);
+            }
+
+            // get the connector address
+            Properties agentProps = vm.getAgentProperties();
+            address = (String) agentProps.get(LOCAL_CONNECTOR_ADDRESS_PROP);
+
+            vm.detach();
+        }
+
+        private void loadManagementAgentViaJar(VirtualMachine vm) throws IOException {
             // Normally in ${java.home}/jre/lib/management-agent.jar but might
             // be in ${java.home}/lib in build environments.
 
@@ -768,12 +785,34 @@ class JmxModelImpl extends JmxModel {
             } catch (AgentInitializationException x) {
                 throw new IOException(x);
             }
+        }
 
-            // get the connector address
-            Properties agentProps = vm.getAgentProperties();
-            address = (String) agentProps.get(LOCAL_CONNECTOR_ADDRESS_PROP);
-
-            vm.detach();
+        private boolean loadManagementAgentViaJcmd(VirtualMachine vm) throws IOException {
+            if (vm instanceof HotSpotVirtualMachine) {
+                HotSpotVirtualMachine hsvm = (HotSpotVirtualMachine) vm;
+                InputStream in = null;
+                try {
+                    byte b[] = new byte[256];
+                    int n;
+                    
+                    in = hsvm.executeJCmd(ENABLE_LOCAL_AGENT_JCMD);
+                    do {
+                        n = in.read(b);
+                        if (n > 0) {
+                            String s = new String(b, 0, n, "UTF-8");    // NOI18N
+                            System.out.print(s);
+                        }
+                    } while (n > 0);
+                    return true;
+                } catch (IOException ex) {
+                    LOGGER.log(Level.INFO, "jcmd command \""+ENABLE_LOCAL_AGENT_JCMD+"\" for PID "+vmid+" failed", ex); // NOI18N
+                } finally {
+                    if (in != null) {
+                        in.close();
+                    }
+                }
+            }
+            return false;
         }
     }
 }
