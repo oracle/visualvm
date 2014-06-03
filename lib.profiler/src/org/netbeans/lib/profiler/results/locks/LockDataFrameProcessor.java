@@ -56,7 +56,7 @@ public class LockDataFrameProcessor extends AbstractLockDataFrameProcessor {
 
         while (buffer.hasRemaining()) {
             if (LOGGER.isLoggable(Level.FINEST)) {
-                LOGGER.finest("Command start offset "+buffer.arrayOffset()); // NOI18N
+                LOGGER.finest("Command start offset "+buffer.position()); // NOI18N
             }
             byte eventType = buffer.get();
 
@@ -140,7 +140,7 @@ public class LockDataFrameProcessor extends AbstractLockDataFrameProcessor {
                 }
                 case CommonConstants.ADJUST_TIME: {
                     long timeStamp0 = getTimeStamp(buffer);
-                    long timeStamp1 = getTimeStamp(buffer);
+                    long timeStamp1 = collectingTwoTimeStamps ? getTimeStamp(buffer) : 0;
                     if (LOGGER.isLoggable(Level.FINEST)) {
                         LOGGER.log(Level.FINEST, "Adjust time , tId={0}", currentThreadId); // NOI18N
                     }
@@ -159,11 +159,11 @@ public class LockDataFrameProcessor extends AbstractLockDataFrameProcessor {
                 }
             }
             if (LOGGER.isLoggable(Level.FINEST)) {
-                    LOGGER.finest("Command end offset "+buffer.arrayOffset()); // NOI18N
+                    LOGGER.finest("Command end offset "+buffer.position()); // NOI18N
             }
         }
         if (LOGGER.isLoggable(Level.FINEST)) {
-                LOGGER.finest("Buffer end offset "+buffer.arrayOffset()); // NOI18N
+                LOGGER.finest("Buffer end offset "+buffer.position()); // NOI18N
         }
 
     }
