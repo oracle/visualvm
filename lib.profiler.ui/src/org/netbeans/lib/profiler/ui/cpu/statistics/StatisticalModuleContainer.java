@@ -43,20 +43,22 @@
 
 package org.netbeans.lib.profiler.ui.cpu.statistics;
 
-import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
-import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import org.netbeans.lib.profiler.results.RuntimeCCTNode;
+import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
+import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
+import org.openide.util.lookup.ServiceProvider;
 
 
 /**
  *
  * @author Jaroslav Bachorik
  */
+@ServiceProvider(service=CPUCCTProvider.Listener.class)
 public class StatisticalModuleContainer implements CPUCCTProvider.Listener {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 

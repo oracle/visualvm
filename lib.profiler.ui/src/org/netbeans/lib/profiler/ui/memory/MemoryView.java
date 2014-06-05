@@ -47,6 +47,8 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -54,15 +56,21 @@ import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
+import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.memory.HeapHistogram;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
 import org.netbeans.lib.profiler.utils.StringUtils;
+import org.openide.util.Lookup;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 public abstract class MemoryView extends JPanel {
+    
+    private static final int MIN_UPDATE_DIFF = 900;
+    private static final int MAX_UPDATE_DIFF = 1400;
     
     private final ProfilerClient client;
     private final boolean showSourceSupported;
@@ -72,20 +80,48 @@ public abstract class MemoryView extends JPanel {
     private LivenessTableView livenessView;
     
     private JPanel currentView;
+    private long lastupdate;
     
     private final Set<String> selection;
+    private final ResultsMonitor rm;
     
     
+    @ServiceProvider(service=MemoryCCTProvider.Listener.class)
+    public static final class ResultsMonitor implements MemoryCCTProvider.Listener {
+
+        private MemoryView view;
+        
+        @Override
+        public void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
+            if (view != null && !empty) {
+                try {
+                    view.refreshData(appRootNode);
+                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                    Logger.getLogger(MemoryView.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        @Override
+        public void cctReset() {
+            if (view != null) {
+                view.resetData();
+            }
+        }
+    }
+       
     public MemoryView(ProfilerClient client, Set<String> selection, boolean showSourceSupported) {
         this.client = client;
         this.selection = selection;
         this.showSourceSupported = showSourceSupported;
         
         initUI();
+        rm = Lookup.getDefault().lookup(ResultsMonitor.class);
+        rm.view = this;
     }
     
-    
-    public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
+    private void refreshData(RuntimeCCTNode appRootNode) throws ClientUtils.TargetAppOrVMTerminated {
+        if (lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis()) return;
         JPanel newView = getView();
         if (newView != currentView) {
             removeAll();
@@ -95,16 +131,11 @@ public abstract class MemoryView extends JPanel {
             revalidate();
             repaint();
         }
-        
-        if (currentView == sampledView) {
-            HeapHistogram histogram = client.getHeapHistogram();
-            if (histogram != null) sampledView.setData(histogram);
-        } else if (currentView == allocView) {
-            client.forceObtainedResultsDump(true);
-            ProfilingSessionStatus status = client.getStatus();
+        if (currentView == allocView) {
             MemoryCCTProvider oacgb = client.getMemoryCCTProvider();
             if (oacgb == null) throw new ClientUtils.TargetAppOrVMTerminated(ClientUtils.TargetAppOrVMTerminated.VM);
             if (oacgb.getObjectsSizePerClass() != null) {
+                ProfilingSessionStatus status = client.getStatus();
                 int _nTrackedItems = status.getNInstrClasses();
                 int[] _nTotalAllocObjects = client.getAllocatedObjectsCountResults();
                 long[] _totalAllocObjectsSize = oacgb.getAllocObjectNumbers();
@@ -122,7 +153,6 @@ public abstract class MemoryView extends JPanel {
                                   _totalAllocObjectsSize);
             }
         } else if (currentView == livenessView) {
-            client.forceObtainedResultsDump(true);
             ProfilingSessionStatus status = client.getStatus();
             MemoryCCTProvider olcgb = client.getMemoryCCTProvider();
             if (olcgb == null) throw new ClientUtils.TargetAppOrVMTerminated(ClientUtils.TargetAppOrVMTerminated.VM);
@@ -158,6 +188,27 @@ public abstract class MemoryView extends JPanel {
                 livenessView.setData(_nTrackedItems, _classNames, _nTrackedLiveObjects,
                                      _trackedLiveObjectsSize, _nTrackedAllocObjects,
                                      _avgObjectAge, _maxSurvGen, _nTotalAllocObjects);
+            }
+        }
+        lastupdate = System.currentTimeMillis();
+    }    
+
+    public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
+        if (currentView == sampledView) {
+            JPanel newView = getView();
+            if (newView != currentView) {
+                removeAll();
+                resetData();
+                currentView = newView;
+                add(currentView, BorderLayout.CENTER);
+                revalidate();
+                repaint();
+            }
+            HeapHistogram histogram = client.getHeapHistogram();
+            if (histogram != null) sampledView.setData(histogram);
+        } else if (currentView == allocView || currentView == livenessView) {
+            if (lastupdate + MAX_UPDATE_DIFF < System.currentTimeMillis()) {
+                client.forceObtainedResultsDump(true);
             }
         }
     }

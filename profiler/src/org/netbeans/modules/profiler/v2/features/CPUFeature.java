@@ -81,6 +81,7 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.CPUView;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.RunGCAction;
@@ -644,12 +645,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
             pdSnapshotButton.setHideActionText(true);
             pdSnapshotButton.setText(Bundle.CPUFeature_snapshot());
             
-            pdResetResultsButton = new JButton(ResetResultsAction.getInstance()) {
-                protected void fireActionPerformed(ActionEvent e) {
-                    resetResults();
-                    super.fireActionPerformed(e);
-                }
-            };
+            pdResetResultsButton = new JButton(ResetResultsAction.getInstance());
             pdResetResultsButton.setHideActionText(true);
             
             apLabel = new GrayLabel(Bundle.CPUFeature_apLabel());
@@ -915,7 +911,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 if (running) {
                     try {
                         if (!paused || forceRefresh)
-                            if (cpuView != null) cpuView.refreshData();
+                            if (cpuView != null && ResultsManager.getDefault().resultsAvailable()) cpuView.refreshData();
                         
                         if (!forceRefresh) refreshResults(1500);
                         else forceRefresh = false;

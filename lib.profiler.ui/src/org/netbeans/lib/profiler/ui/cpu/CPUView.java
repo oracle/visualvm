@@ -50,6 +50,8 @@ import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -60,24 +62,57 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.results.RuntimeCCTNode;
+import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
+import org.netbeans.lib.profiler.ui.memory.MemoryView;
 import org.netbeans.lib.profiler.utils.Wildcards;
+import org.openide.util.Lookup;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 public abstract class CPUView extends JPanel {
+
+    private static final int MIN_UPDATE_DIFF = 900;
+    private static final int MAX_UPDATE_DIFF = 1400;
     
     private final ProfilerClient client;
     private final boolean showSourceSupported;
+    private final ResultsMonitor rm;
     
     private CPUTableView tableView;
     private CPUTreeTableView treeTableView;
+    private long lastupdate;
     
+    @ServiceProvider(service=CPUCCTProvider.Listener.class)
+    public static final class ResultsMonitor implements CPUCCTProvider.Listener {
+
+        private CPUView view;
+        
+        @Override
+        public void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
+            if (view != null && !empty) {
+                try {
+                    view.refreshData(appRootNode);
+                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                    Logger.getLogger(MemoryView.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        @Override
+        public void cctReset() {
+            if (view != null) {
+                view.resetData();
+            }
+        }
+    }
     
     public CPUView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection,
                    boolean showSourceSupported) {
@@ -85,6 +120,8 @@ public abstract class CPUView extends JPanel {
         this.showSourceSupported = showSourceSupported;
         
         initUI(selection);
+        rm = Lookup.getDefault().lookup(ResultsMonitor.class);
+        rm.view = this;
     }
     
     
@@ -93,10 +130,8 @@ public abstract class CPUView extends JPanel {
         tableView.setVisible(hotSpots);
     }
     
-    
-    public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
-        client.forceObtainedResultsDump(true);
-        
+    private void refreshData(RuntimeCCTNode appRootNode) throws ClientUtils.TargetAppOrVMTerminated {
+        if (lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis()) return;
         try {
             CPUResultsSnapshot snapshotData =
                     client.getStatus().getInstrMethodClasses() == null ?
@@ -112,6 +147,7 @@ public abstract class CPUView extends JPanel {
 
                 treeTableView.setData(snapshotData, idMap);
                 tableView.setData(flatData, idMap);
+                lastupdate = System.currentTimeMillis();
 
             }
         } catch (CPUResultsSnapshot.NoDataAvailableException e) {
@@ -119,10 +155,15 @@ public abstract class CPUView extends JPanel {
             if (t instanceof ClientUtils.TargetAppOrVMTerminated) {
                 throw ((ClientUtils.TargetAppOrVMTerminated)t);
             } else {
-                System.err.println(">>> " + t.getMessage());
-                t.printStackTrace(System.err);
+                Logger.getLogger(CPUView.class.getName()).log(Level.SEVERE, null, t);
             }
         }
+    }
+    
+    public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
+        if (lastupdate + MAX_UPDATE_DIFF < System.currentTimeMillis()) {
+            client.forceObtainedResultsDump(true);
+        }        
     }
     
     public void resetData() {

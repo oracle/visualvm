@@ -77,6 +77,7 @@ import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.memory.MemoryView;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.RunGCAction;
@@ -572,12 +573,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             pdSnapshotButton.setHideActionText(true);
             pdSnapshotButton.setText(Bundle.CPUFeature_snapshot());
             
-            pdResetResultsButton = new JButton(ResetResultsAction.getInstance()) {
-                protected void fireActionPerformed(ActionEvent e) {
-                    resetResults();
-                    super.fireActionPerformed(e);
-                }
-            };
+            pdResetResultsButton = new JButton(ResetResultsAction.getInstance());
             pdResetResultsButton.setHideActionText(true);
             
             apLabel = new GrayLabel(Bundle.MemoryFeature_apLabel());
@@ -773,7 +769,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 if (running) {
                     try {
                         if (!paused || forceRefresh)
-                            if (memoryView != null) memoryView.refreshData();
+                            if (memoryView != null && ResultsManager.getDefault().resultsAvailable()) memoryView.refreshData();
 
                         if (!forceRefresh) refreshResults(1500);
                         else forceRefresh = false;
