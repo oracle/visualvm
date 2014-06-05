@@ -44,7 +44,10 @@
 package org.netbeans.modules.profiler.v2.ui;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JLabel;
+import javax.swing.Timer;
 import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
@@ -61,6 +64,7 @@ public class ProfilerStatus {
     private final JLabel status;
     private final FixedWidthLabel label;
     private final ProfilerToolbar toolbar;
+    private final Timer refreshTimer;
     
     public ProfilerStatus(final ProfilerSession session) {
         toolbar = ProfilerToolbar.create(false);
@@ -80,12 +84,18 @@ public class ProfilerStatus {
         
         toolbar.addSpace(3);
         
+        refreshTimer = new Timer(1500, new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateStatus(session);
+            }
+        });
+        refreshTimer.setRepeats(false);
         // TODO: listener leaks, unregister!
         session.addListener(new SimpleProfilingStateAdapter() {
             public void update() { updateStatus(session); }
         });
-        
-        updateStatus(session);
     }
     
     public ProfilerToolbar getToolbar() {
@@ -126,11 +136,13 @@ public class ProfilerStatus {
             case CommonConstants.INSTR_RECURSIVE_SAMPLED:
                 int m = pss.getNInstrMethods();
                 label.setDetailedText("Running, " + m + " methods instrumented");
+                refreshTimer.start();
                 break;
             case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
             case CommonConstants.INSTR_OBJECT_LIVENESS:
                 int c = pss.getNInstrClasses();
                 label.setDetailedText("Running, " + c + " classes instrumented");
+                refreshTimer.start();
                 break;
             default:
                 label.setText("Running");
