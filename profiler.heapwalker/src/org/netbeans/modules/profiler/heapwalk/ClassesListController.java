@@ -576,7 +576,7 @@ public class ClassesListController extends AbstractController {
         HashSet subclasses = new HashSet();
 
         for (int i = 0; i < filterStrings.length; i++) {
-            String escapedClassName = filterStrings[i].replace(".", "\\.").replace("$", "\\$");
+            String escapedClassName = "\\Q"+filterStrings[i]+"\\E";
             Collection<JavaClass> jClasses = heap.getJavaClassesByRegExp(escapedClassName);
 
             for (JavaClass jClass : jClasses) {
