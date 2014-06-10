@@ -622,7 +622,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
             
             lrPauseButton = new JToggleButton(Icons.getIcon(GeneralIcons.PAUSE)) {
                 protected void fireItemStateChanged(ItemEvent event) {
-                    paused = isSelected();
+                    boolean paused = isSelected();
+                    cpuView.setPaused(paused);
                     if (!paused) refreshResults();
                     refreshToolbar(getSessionState());
                 }
@@ -895,9 +896,6 @@ final class CPUFeature extends ProfilerFeature.Basic {
     }
    
     private volatile boolean running;
-    private volatile boolean paused;
-    private volatile boolean forceRefresh;
-    
     private Runnable refresher;
     
     private void startResults() {
@@ -909,26 +907,35 @@ final class CPUFeature extends ProfilerFeature.Basic {
         refresher = new Runnable() {
             public void run() {
                 if (running) {
-                    try {
-                        if (!paused || forceRefresh)
-                            if (cpuView != null && ResultsManager.getDefault().resultsAvailable()) cpuView.refreshData();
-                        
-                        if (!forceRefresh) refreshResults(1500);
-                        else forceRefresh = false;
-                    } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                        stopResults();
-                    }
+                    if (cpuView != null) refreshView();
+                    refreshResults(1500);
+
                 }
             }
         };
         
-        forceRefresh = false;
         refreshResults(1000);
+    }
+
+    private void refreshView() {
+        try {
+            if (ResultsManager.getDefault().resultsAvailable()) cpuView.refreshData();
+        } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+            stopResults();
+        }
     }
     
     private void refreshResults() {
-        forceRefresh = true;
-        refreshResults(0);
+        if (running) ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+
+            @Override
+            public void run() {
+                if (cpuView != null) {
+                    cpuView.setForceRefresh(true);
+                    refreshView();
+                }
+            }
+        });
     }
     
     private void refreshResults(int delay) {

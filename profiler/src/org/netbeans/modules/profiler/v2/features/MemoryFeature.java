@@ -554,8 +554,8 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             
             lrPauseButton = new JToggleButton(Icons.getIcon(GeneralIcons.PAUSE)) {
                 protected void fireItemStateChanged(ItemEvent event) {
-                    paused = isSelected();
-                    if (!paused) refreshResults();
+                    boolean paused = isSelected();
+                    memoryView.setPaused(paused);
                     refreshToolbar(getSessionState());
                 }
             };
@@ -753,8 +753,6 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     }
     
     private volatile boolean running;
-    private volatile boolean paused;
-    private volatile boolean forceRefresh;
     
     private Runnable refresher;
     
@@ -767,26 +765,34 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         refresher = new Runnable() {
             public void run() {
                 if (running) {
-                    try {
-                        if (!paused || forceRefresh)
-                            if (memoryView != null && ResultsManager.getDefault().resultsAvailable()) memoryView.refreshData();
-
-                        if (!forceRefresh) refreshResults(1500);
-                        else forceRefresh = false;
-                    } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                        stopResults();
-                    }
+                    if (memoryView != null) refreshView();
+                    refreshResults(1500);
                 }
             }
         };
         
-        forceRefresh = false;
         refreshResults(1000);
+    }
+
+    private void refreshView() {
+        try {
+            if (ResultsManager.getDefault().resultsAvailable()) memoryView.refreshData();
+        } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+            stopResults();
+        }
     }
     
     private void refreshResults() {
-        forceRefresh = true;
-        refreshResults(0);
+        if (running) ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+
+            @Override
+            public void run() {
+                if (memoryView != null) {
+                    memoryView.setForceRefresh(true);
+                    refreshView();
+                }
+            }
+        });
     }
     
     private void refreshResults(int delay) {

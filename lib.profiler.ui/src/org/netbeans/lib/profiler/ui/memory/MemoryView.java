@@ -81,6 +81,8 @@ public abstract class MemoryView extends JPanel {
     
     private JPanel currentView;
     private long lastupdate;
+    private volatile boolean paused;
+    private volatile boolean forceRefresh;
     
     private final Set<String> selection;
     private final ResultsMonitor rm;
@@ -121,7 +123,7 @@ public abstract class MemoryView extends JPanel {
     }
     
     private void refreshData(RuntimeCCTNode appRootNode) throws ClientUtils.TargetAppOrVMTerminated {
-        if (lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis()) return;
+        if ((lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis() || paused) && !forceRefresh) return;
         JPanel newView = getView();
         if (newView != currentView) {
             removeAll();
@@ -191,9 +193,11 @@ public abstract class MemoryView extends JPanel {
             }
         }
         lastupdate = System.currentTimeMillis();
+        forceRefresh = false;
     }    
 
     public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
+        if (paused && !forceRefresh) return;
         if (currentView == sampledView) {
             JPanel newView = getView();
             if (newView != currentView) {
@@ -223,6 +227,14 @@ public abstract class MemoryView extends JPanel {
         } else if (currentView == livenessView) {
             livenessView.resetData();
         }
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
+
+    public void setForceRefresh(boolean forceRefresh) {
+        this.forceRefresh = forceRefresh;
     }
     
     

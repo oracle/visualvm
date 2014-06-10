@@ -89,6 +89,8 @@ public abstract class CPUView extends JPanel {
     private CPUTableView tableView;
     private CPUTreeTableView treeTableView;
     private long lastupdate;
+    private volatile boolean paused;
+    private volatile boolean forceRefresh;
     
     @ServiceProvider(service=CPUCCTProvider.Listener.class)
     public static final class ResultsMonitor implements CPUCCTProvider.Listener {
@@ -130,8 +132,16 @@ public abstract class CPUView extends JPanel {
         tableView.setVisible(hotSpots);
     }
     
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
+
+    public void setForceRefresh(boolean forceRefresh) {
+        this.forceRefresh = forceRefresh;
+    }
+
     private void refreshData(RuntimeCCTNode appRootNode) throws ClientUtils.TargetAppOrVMTerminated {
-        if (lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis()) return;
+        if ((lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis() || paused) && !forceRefresh) return;
         try {
             CPUResultsSnapshot snapshotData =
                     client.getStatus().getInstrMethodClasses() == null ?
@@ -150,6 +160,7 @@ public abstract class CPUView extends JPanel {
                 lastupdate = System.currentTimeMillis();
 
             }
+            forceRefresh = false;
         } catch (CPUResultsSnapshot.NoDataAvailableException e) {
         } catch (Throwable t) {
             if (t instanceof ClientUtils.TargetAppOrVMTerminated) {
@@ -161,7 +172,7 @@ public abstract class CPUView extends JPanel {
     }
     
     public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
-        if (lastupdate + MAX_UPDATE_DIFF < System.currentTimeMillis()) {
+        if ((lastupdate + MAX_UPDATE_DIFF < System.currentTimeMillis() && !paused) || forceRefresh) {
             client.forceObtainedResultsDump(true);
         }        
     }
