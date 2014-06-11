@@ -54,7 +54,7 @@ public interface HeapSummary {
 
     /**
      * the time when the memory heap dump occurred.
-     * @return the time when the memory heap dump occurred in miliseconds since 0:00 GMT 1/1/1970
+     * @return the time when the memory heap dump occurred in milliseconds since 0:00 GMT 1/1/1970
      */
     long getTime();
 
