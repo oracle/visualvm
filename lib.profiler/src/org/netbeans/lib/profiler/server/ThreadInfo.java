@@ -119,7 +119,7 @@ public class ThreadInfo {
     }
 
     static boolean isProfilerServerMonitor(Object monitor) {
-        return monitor == threadInfosLock;
+        return monitor == threadInfosLock || monitor == ProfilerRuntimeMemory.classIdMapLock;
     }
     
     public static boolean isCurrentThreadProfilerServerThread() {
