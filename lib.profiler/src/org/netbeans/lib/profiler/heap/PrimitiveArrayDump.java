@@ -43,7 +43,6 @@
 
 package org.netbeans.lib.profiler.heap;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
