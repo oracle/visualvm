@@ -85,6 +85,15 @@ public class XYAxisComponent extends AxisComponent {
         g.setPaint(VERTICAL_MESH_COLOR);
         g.setStroke(Utils.forceSpeed() ? VERTICAL_MESH_STROKE_PERF :
                                          VERTICAL_MESH_STROKE);
+        
+        int x1 = chartMask.x;
+        int x2 = x1 + chartMask.width;
+        
+        // #VISUALVM-595 correctly align the origin to have stable offset for dotted stroke
+        if (x1 % 2 == 1) {
+            x1 -= 1;
+            x2 += 2;
+        }
 
         while (marks.hasNext()) {
             AxisMark mark = marks.next();
@@ -94,7 +103,7 @@ public class XYAxisComponent extends AxisComponent {
                 // Workaround for a bug on OpenJDK - when tooltip is displayed
                 // over the chart on mouseMove 'java.lang.ArithmeticException: / by zero'
                 // at 'sun.java2d.pisces.Dasher.lineTo' exception is thrown.
-                g.drawLine(chartMask.x, y, chartMask.x + chartMask.width, y);
+                g.drawLine(x1, y, x2, y);
             } catch (ArithmeticException e) {
                 WORKAROUND_OPENJDK_BUG = true;
                 System.err.println("'java.lang.ArithmeticException: / by zero' detected in XYAxisComponent.paintVerticalMesh, applying workaround"); // NOI18N
