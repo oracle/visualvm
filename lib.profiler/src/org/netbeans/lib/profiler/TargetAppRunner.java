@@ -339,12 +339,13 @@ public class TargetAppRunner implements CommonConstants {
     }
 
     public boolean hasSupportedJDKForHeapDump() {
-        // not supported for JDK other than 1.8 & 1.7 & 1.6 & 1.5.0_12 and up
+        // not supported for JDK other than 1.9 & 1.8 & 1.7 & 1.6 & 1.5.0_12 and up
         String jdkVersion = getProfilerEngineSettings().getTargetJDKVersionString();
 
         if (CommonConstants.JDK_16_STRING.equals(jdkVersion)
            || CommonConstants.JDK_17_STRING.equals(jdkVersion)
-           || CommonConstants.JDK_18_STRING.equals(jdkVersion)) {
+           || CommonConstants.JDK_18_STRING.equals(jdkVersion)
+           || CommonConstants.JDK_19_STRING.equals(jdkVersion)) {
             return true;
         }
 
@@ -701,7 +702,8 @@ public class TargetAppRunner implements CommonConstants {
 
         if (jdkVer.equals(JDK_16_STRING)
             || jdkVer.equals(JDK_17_STRING)
-            || jdkVer.equals(JDK_18_STRING)) {
+            || jdkVer.equals(JDK_18_STRING)
+            || jdkVer.equals(JDK_19_STRING)) {
             // for now the 1.6 and 1.7 and 1.8 profiling uses the same agent as 1.5
             jdkVer = JDK_15_STRING;
         }
@@ -755,7 +757,8 @@ public class TargetAppRunner implements CommonConstants {
         if (settings.getTargetJDKVersionString().equals(Platform.JDK_15_STRING)
                 || settings.getTargetJDKVersionString().equals(Platform.JDK_16_STRING)
                 || settings.getTargetJDKVersionString().equals(Platform.JDK_17_STRING)
-                || settings.getTargetJDKVersionString().equals(Platform.JDK_18_STRING)) {
+                || settings.getTargetJDKVersionString().equals(Platform.JDK_18_STRING)
+                || settings.getTargetJDKVersionString().equals(Platform.JDK_19_STRING)) {
             String jfNativeLibFullName = Platform.getAgentNativeLibFullName(settings.getJFluidRootDirName(), false,
                                                                             settings.getTargetJDKVersionString(),
                                                                             settings.getSystemArchitecture());

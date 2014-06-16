@@ -47,12 +47,10 @@ import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.classfile.BaseClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassLoaderTable;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
-import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection;
 import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.lib.profiler.wireprotocol.*;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -116,6 +114,9 @@ public class Instrumentor implements CommonConstants {
             }
 
             clazz = ClassRepository.lookupSpecialClass(className);
+            if (clazz.getInstrClassId() == -1) {
+                clazz.setInstrClassId(oms.getNextClassId(className));
+            }
         } else {
             clazz = ClassRepository.lookupClassOrCreatePlaceholder(className, classLoaderId);
         }
@@ -127,6 +128,9 @@ public class Instrumentor implements CommonConstants {
             return -1;
         }
 
+        if (clazz.getInstrClassId() == -1) {
+            System.err.println("Warning: " + clazz.getNameAndLoader() + " does not have instrClassId");            
+        }
         return clazz.getInstrClassId();
     }
 
