@@ -64,8 +64,6 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void doProcessDataFrame(ByteBuffer buffer) {
-        boolean collectingTwoTimeStamps = (client != null) ? client.getStatus().collectingTwoTimeStamps() : false;
-
         try {
             while (buffer.hasRemaining()) {
                 byte eventType = buffer.get();

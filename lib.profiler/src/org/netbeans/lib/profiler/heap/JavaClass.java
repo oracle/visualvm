@@ -61,10 +61,10 @@ public interface JavaClass extends Type {
      * <br>
      * Speed: normal
      * @param name the name of the field
-     * @return @return the value for the specified static field in this class.
+     * @return the value for the specified static field in this class.
      * If a static field with the specified name is not found <CODE>null</CODE> is returned.
      * If the field.getType() is {@link Type} object {@link Instance} is returned as field value,
-     * for primitive types its corresponding object wapper (Boolean, Integer, Float, etc.) is returned.
+     * for primitive types its corresponding object wrapper (Boolean, Integer, Float, etc.) is returned.
      */
     public Object getValueOfStaticField(String name);
 
@@ -79,7 +79,7 @@ public interface JavaClass extends Type {
     long getAllInstancesSize();
 
     /**
-     * returns true if this JavaClass represents array (for examle: java.lang.String[]).
+     * returns true if this JavaClass represents array (for example: java.lang.String[]).
      * <br>
      * Speed: fast
      * @return <CODE>true</CODE> if this class represents array, <CODE>false</CODE> otherwise
@@ -176,7 +176,7 @@ public interface JavaClass extends Type {
     List /*<FieldValue>*/ getStaticFieldValues();
 
     /**
-     * returns all subclasses of this class. This method works recursivelly
+     * returns all subclasses of this class. This method works recursively
      * so it returns also subclasses of subclasses etc.
      * <br>
      * Speed: slow
