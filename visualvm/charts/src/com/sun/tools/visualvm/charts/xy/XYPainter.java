@@ -47,12 +47,25 @@ import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemPainter;
  * @author Jiri Sedlacek
  */
 public class XYPainter extends SynchronousXYItemPainter {
-
+    
     private static final int HOVER_RADIUS = 2; // Not used
+    
+    private final int mode;
 
     private final Color fillColor2;
     private boolean painting;
 
+    
+    // --- Initializer ---------------------------------------------------------
+    
+    {
+        String _mode = System.getProperty("visualvm.charts.defaultMode", "minmax").toLowerCase(); // NOI18N
+        if ("fast".equals(_mode)) { // NOI18N
+            mode = 0;
+        } else {
+            mode = 1;
+        }
+    }
 
     // --- Constructor ---------------------------------------------------------
 
@@ -137,18 +150,18 @@ public class XYPainter extends SynchronousXYItemPainter {
     protected void paint(XYItem item, List<ItemSelection> highlighted,
                        List<ItemSelection> selected, Graphics2D g,
                        Rectangle dirtyArea, SynchronousXYChartContext context) {
-
+        
         if (!isPainting()) return;
         if (item.getValuesCount() < 2) return;
         if (context.getViewWidth() == 0 || context.getViewHeight() == 0) return;
 
-        int[][] points = createPoints(item, dirtyArea, context, type, maxValueOffset);
+        int[][] points = getPoints(item, dirtyArea, context, type, maxValueOffset);
         if (points == null) return;
 
         int[] xPoints  = points[0];
         int[] yPoints  = points[1];
-        int npoints = xPoints.length;
-
+        int npoints = points[2][0];
+        
         if (fillColor != null) {
             int zeroY = Utils.checkedInt(context.getViewY(context.getDataOffsetY()));
             zeroY = Math.max(Utils.checkedInt(context.getViewportOffsetY()), zeroY);
@@ -158,11 +171,11 @@ public class XYPainter extends SynchronousXYItemPainter {
             Polygon polygon = new Polygon();
             polygon.xpoints = xPoints;
             polygon.ypoints = yPoints;
-            polygon.npoints = npoints;
-            polygon.xpoints[npoints - 2] = xPoints[npoints - 3];
-            polygon.ypoints[npoints - 2] = zeroY;
-            polygon.xpoints[npoints - 1] = xPoints[0];
-            polygon.ypoints[npoints - 1] = zeroY;
+            polygon.npoints = npoints + 2;
+            polygon.xpoints[npoints] = xPoints[npoints - 1];
+            polygon.ypoints[npoints] = zeroY;
+            polygon.xpoints[npoints + 1] = xPoints[0];
+            polygon.ypoints[npoints + 1] = zeroY;
             
             if (fillColor2 == null || Utils.forceSpeed()) g.setPaint(fillColor);
             else g.setPaint(new GradientPaint(0, context.getViewportOffsetY(),
@@ -174,14 +187,24 @@ public class XYPainter extends SynchronousXYItemPainter {
         if (lineColor != null) {
             g.setPaint(lineColor);
             g.setStroke(lineStroke);
-            g.drawPolyline(xPoints, yPoints, npoints - 2);
+            g.drawPolyline(xPoints, yPoints, npoints);
         }
 
     }
-
-    private static int[][] createPoints(XYItem item, Rectangle dirtyArea,
-                                 SynchronousXYChartContext context,
-                                 int type, int maxValueOffset) {
+    
+    
+    private int[][] getPoints(XYItem item, Rectangle dirtyArea,
+                              SynchronousXYChartContext context,
+                              int type, int maxValueOffset) {
+        
+        if (mode == 1) return getMinMaxPoints(item, dirtyArea, context, type, maxValueOffset);
+        else if (mode == 0) return getFastPoints(item, dirtyArea, context, type, maxValueOffset);
+        else return null;
+    }
+    
+    private static int[][] getFastPoints(XYItem item, Rectangle dirtyArea,
+                                         SynchronousXYChartContext context,
+                                         int type, int maxValueOffset) {
 
         int valuesCount = item.getValuesCount();
         int[][] visibleBounds = context.getVisibleBounds(dirtyArea);
@@ -229,7 +252,90 @@ public class XYPainter extends SynchronousXYItemPainter {
                          type, context, itemValueFactor)));
         }
 
-        return new int[][] { xPoints, yPoints };
+        return new int[][] { xPoints, yPoints, { xPoints.length - 2 } };
+    }
+    
+    private static int[][] getMinMaxPoints(XYItem item, Rectangle dirtyArea,
+                                           SynchronousXYChartContext context,
+                                           int type, int maxValueOffset) {
+        
+        if (dirtyArea.isEmpty()) return null;
+        
+        int[][] visibleBounds = context.getVisibleBounds(dirtyArea);
+        
+        int firstFirst = visibleBounds[0][0];
+        int firstIndex = firstFirst;
+        if (firstIndex == -1) firstIndex = visibleBounds[0][1];
+        if (firstIndex == -1) return null;
+        if (firstFirst != -1 && firstIndex > 0) firstIndex -= 1;
+        
+        int valuesCount = item.getValuesCount();
+        int lastFirst = visibleBounds[1][0];
+        int lastIndex = lastFirst;
+        if (lastIndex == -1) lastIndex = visibleBounds[1][1];
+        if (lastIndex == -1) lastIndex = valuesCount - 1;
+        if (lastFirst != -1 && lastIndex < valuesCount - 1) lastIndex += 1;
+        
+        
+        double itemValueFactor = type == TYPE_RELATIVE ? getItemValueFactor(context,
+                                 maxValueOffset, item.getBounds().height) : 0;
+        
+        int maxPoints = Math.max(dirtyArea.width, (lastIndex - firstIndex + 1) * 3);
+        
+        int[] xPoints = new int[maxPoints + 2];
+        int[] yPoints = new int[maxPoints + 2];
+        
+        int nPoints = 0;
+        for (int index = firstFirst; index <= lastIndex; index++) {
+            int x = Utils.checkedInt(Math.ceil(context.getViewX(
+                                     item.getXValue(index))));
+            int y = Utils.checkedInt(Math.ceil(getYValue(item, index,
+                                     type, context, itemValueFactor)));
+            
+            if (nPoints == 0) { // First point
+                xPoints[nPoints] = x;
+                yPoints[nPoints] = y;
+                nPoints++;
+            } else { // Other than first point
+                int x_1 = xPoints[nPoints - 1];
+                
+                if (x_1 != x) { // New point
+                    xPoints[nPoints] = x;
+                    yPoints[nPoints] = y;
+                    nPoints++;
+                } else { // Existing point
+                    int y_1 = yPoints[nPoints - 1];
+                    
+                    if (nPoints > 1 && xPoints[nPoints - 2] == x_1) { // Existing point with two values
+                        int y_2 = yPoints[nPoints - 2];
+                        
+                        int minY = Math.min(y, y_1);
+                        int maxY = Math.max(y, y_2);
+                        
+                        yPoints[nPoints - 3] = minY;
+                        yPoints[nPoints - 2] = maxY;
+                        yPoints[nPoints - 1] = minY;
+                    } else { // Existing point with one value
+                        if (y_1 != y) { // Creating second value
+                            int minY = Math.min(y, y_1);
+                            int maxY = Math.max(y, y_1);
+                            
+                            yPoints[nPoints - 1] = minY;
+                            
+                            xPoints[nPoints] = x;
+                            yPoints[nPoints] = maxY;
+                            nPoints++;
+                            
+                            xPoints[nPoints] = x;
+                            yPoints[nPoints] = minY;
+                            nPoints++;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return new int[][] { xPoints, yPoints, { nPoints } };
     }
 
     private LongRect getViewBoundsRelative(LongRect dataBounds, XYItem item,
