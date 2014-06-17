@@ -621,11 +621,11 @@ public class InstancesListController extends AbstractController {
                 case 1:
                     return Long.compare(instance1.getInstanceId(),instance2.getInstanceId());
                 case 2:
-                    return Integer.compare(instance1.getSize(),instance2.getSize());
+                    return Long.compare(instance1.getSize(),instance2.getSize());
                 case 3:
-                    return Integer.compare(instance1.getRetainedSize(),instance2.getRetainedSize());
+                    return Long.compare(instance1.getRetainedSize(),instance2.getRetainedSize());
                 case 4:
-                    return Integer.compare(instance1.getReachableSize(),instance2.getReachableSize());
+                    return Long.compare(instance1.getReachableSize(),instance2.getReachableSize());
                 default:
                     throw new RuntimeException("Unsupported compare operation for " + o1 + ", " + o2); // NOI18N
             }
@@ -676,15 +676,15 @@ public class InstancesListController extends AbstractController {
             return -1;
         }
 
-        public int getSize() {
+        public long getSize() {
             return -1;
         }
 
-        public int getRetainedSize() {
+        public long getRetainedSize() {
             return -1;
         }
 
-        public int getReachableSize() {
+        public long getReachableSize() {
             return -1;
         }
 

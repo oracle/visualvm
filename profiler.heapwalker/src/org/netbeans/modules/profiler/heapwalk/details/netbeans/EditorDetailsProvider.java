@@ -151,7 +151,7 @@ public class EditorDetailsProvider  extends DetailsProvider.Basic {
         }
 
         @Override
-        public int getReachableSize() {
+        public long getReachableSize() {
             throw new UnsupportedOperationException("Not supported yet."); // NOI18N
         }
 
@@ -161,12 +161,12 @@ public class EditorDetailsProvider  extends DetailsProvider.Basic {
         }
 
         @Override
-        public int getRetainedSize() {
+        public long getRetainedSize() {
             throw new UnsupportedOperationException("Not supported yet."); // NOI18N
         }
 
         @Override
-        public int getSize() {
+        public long getSize() {
             throw new UnsupportedOperationException("Not supported yet."); // NOI18N
         }
 
