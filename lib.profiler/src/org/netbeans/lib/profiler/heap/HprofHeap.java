@@ -320,7 +320,7 @@ class HprofHeap implements Heap {
         return allInstanceDumpBounds;
     }
     
-    int getRetainedSize(Instance instance) {
+    long getRetainedSize(Instance instance) {
         computeRetainedSize();
         return idToOffsetMap.get(instance.getInstanceId()).getRetainedSize();
     }
@@ -593,16 +593,16 @@ class HprofHeap implements Heap {
             LongMap.Entry instanceEntry = idToOffsetMap.get(instanceId);
             long idom = domTree.getIdomId(instanceId,instanceEntry);
             boolean isTreeObj = instanceEntry.isTreeObj();
-            int instSize = 0;
+            long instSize = 0;
             
             if (!isTreeObj && (instanceEntry.getNearestGCRootPointer() != 0 || getGCRoot(new Long(instanceId)) != null)) {
-                int origSize = instanceEntry.getRetainedSize();
+                long origSize = instanceEntry.getRetainedSize();
                 if (origSize < 0) origSize = 0;
                 instSize = getInstanceByID(instanceId).getSize();
                 instanceEntry.setRetainedSize(origSize + instSize);
             }
             if (idom != 0) {
-                int size;
+                long size;
                 LongMap.Entry entry;
                 
                 if (isTreeObj) {
@@ -616,7 +616,7 @@ class HprofHeap implements Heap {
                     if (entry.isTreeObj()) {
                         break;
                     }
-                    int retainedSize = entry.getRetainedSize();
+                    long retainedSize = entry.getRetainedSize();
                     if (retainedSize < 0) retainedSize = 0;
                     entry.setRetainedSize(retainedSize+size);
                 }
@@ -665,7 +665,7 @@ class HprofHeap implements Heap {
     int readDumpTag(long[] offset) {
         long position = offset[0];
         int dumpTag = dumpBuffer.get(position++);
-        int size = 0;
+        long size = 0;
         long tagOffset = position;
         int idSize = dumpBuffer.getIDSize();
 
@@ -847,7 +847,7 @@ class HprofHeap implements Heap {
                 break;
             }
             case OBJECT_ARRAY_DUMP: {
-                int elements;
+                long elements;
 
                 if (DEBUG) {
                     System.out.println("Tag OBJECT_ARRAY_DUMP"); // NOI18N
@@ -882,7 +882,7 @@ class HprofHeap implements Heap {
                 break;
             }
             case PRIMITIVE_ARRAY_DUMP: {
-                int elements;
+                long elements;
                 byte type;
 
                 if (DEBUG) {

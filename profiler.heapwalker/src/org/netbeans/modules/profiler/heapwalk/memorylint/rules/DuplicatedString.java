@@ -82,7 +82,7 @@ public class DuplicatedString extends IteratingRule {
 
         if (val != null) { // already known, histogram the rest.
 
-            int strSize = in.getSize();
+            long strSize = in.getSize();
             Instance arr = fldValue.getRefValue(in);
 
             if (arr != null) {
