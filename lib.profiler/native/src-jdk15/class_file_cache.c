@@ -70,8 +70,6 @@
 #define FALSE 0
 #endif
 
-static jobject _system_loader = NULL;
-
 /** A hash table that maps class name/loader to class file bytes */
 #define _CTABLE_INIT_SIZE  19
 static char   **_ctable_classnames = NULL;
@@ -107,55 +105,6 @@ static unsigned char BOGUS_CLASSFILE[] = "HAHA";
 #define END_CLASS_NAME "org/netbeans/lib/profiler/server/ProfilerInterface$InitiateInstThread"
 
 
-/*------------------------------- Classloader related routines ------------------------------------*/
-
-/** Should be called only if _system_loader == NULL */
-void set_system_loader(JNIEnv *env, jvmtiEnv *jvmti_env) {
-    jvmtiPhase phase;
-    jclass object_class;
-  
-    (*jvmti_env)->GetPhase(jvmti_env, &phase);
-    if (phase >= JVMTI_PHASE_LIVE) {  /* Call ProfilerInterface.getSystemClassLoader() */
-        jthrowable ex;
-        jclass profiler_interface_clazz = (*env)->FindClass(env, "org/netbeans/lib/profiler/server/ProfilerInterface");
-        jmethodID get_system_loader_method = (*env)->GetStaticMethodID(env, profiler_interface_clazz, "getSystemClassLoader", "()Ljava/lang/ClassLoader;");
-        
-        _system_loader = (*env)->CallStaticObjectMethod(env, profiler_interface_clazz, get_system_loader_method);
-        ex = (*env)->ExceptionOccurred(env);
-        if (ex != NULL) {            
-            (*env)->ExceptionClear(env);
-            fprintf(stderr, "Profiler Agent Error: Exception from ProfilerInterface.getSystemClassLoader()\n");
-            _system_loader = NULL;
-            return;
-        }
-        _system_loader = (*env)->NewGlobalRef(env, _system_loader);
-        
-        /* Create a lock object used to synchronize access to _ctable */
-        object_class = (*env)->FindClass(env, "java/lang/Object");
-        _ctable_lock = (*env)->AllocObject(env, object_class);
-        _ctable_lock = (*env)->NewGlobalRef(env, _ctable_lock);
-    }
-}
-
-
-/**
- * Checks whether the supplied loader (which should be non-NULL) is a system loader.
- * Note that this can be called early, when system loader just doesn't exist.
- */
-int loader_is_system_loader(JNIEnv *jni_env, jvmtiEnv *jvmti_env, jobject loader) {
-    if (_system_loader == NULL) {
-        set_system_loader(jni_env, jvmti_env);
-    }
-    if (_system_loader == NULL) {
-        return 1;
-    }
-    if ((*jni_env)->IsSameObject(jni_env, loader, _system_loader)) {
-        return 1;
-    }
-  
-    return 0;
-}
-
 void cache_loaded_classes(jvmtiEnv *jvmti_env,jclass *classes,jint class_count) {
 #ifdef JNI_VERSION_1_6
        //fprintf(stderr,"cache_loade_classes, classes %d\n",(int)class_count);
@@ -170,6 +119,12 @@ void cache_loaded_classes(jvmtiEnv *jvmti_env,jclass *classes,jint class_count) 
            fprintf(stderr,"Profiler Agent Warning: Retransform failed with status %d\n",res);
        }
 #endif
+}
+
+jboolean isSameObject(JNIEnv *env, jobject obj1, jobject obj2) {
+    if (obj1 == NULL && obj2 == NULL) return JNI_TRUE;
+    if (obj1 == NULL || obj2 == NULL) return JNI_FALSE;
+    return (*env)->IsSameObject(env, obj1, obj2);
 }
 
 /*--------------------------------  Class hashtable management -------------------------------------*/
@@ -244,7 +199,7 @@ void save_class_file_bytes(JNIEnv *env, const char* name, jobject loader,
   
     pos = hash(name, loader) % _ctable_size;
     while (_ctable_classnames[pos] != NULL) {
-        if (strcmp(name, _ctable_classnames[pos]) == 0 && (*env)->IsSameObject(env, loader, _ctable_loaders[pos])) { /* do not save class' bytecode if it is already saved */
+        if (strcmp(name, _ctable_classnames[pos]) == 0 && isSameObject(env, loader, _ctable_loaders[pos])) { /* do not save class' bytecode if it is already saved */
             (*env)->MonitorExit(env, _ctable_lock);
             return;
         } else {
@@ -254,7 +209,11 @@ void save_class_file_bytes(JNIEnv *env, const char* name, jobject loader,
   
     _ctable_classnames[pos] = malloc(strlen(name) + 1);
     strcpy(_ctable_classnames[pos], name);
-    _ctable_loaders[pos] = (*env)->NewWeakGlobalRef(env, loader);
+    if (loader != NULL) {
+        _ctable_loaders[pos] = (*env)->NewWeakGlobalRef(env, loader);
+    } else {
+        _ctable_loaders[pos] = NULL;
+    }
     _ctable_classdata[pos] = malloc(class_data_len);
     memcpy(_ctable_classdata[pos], class_data, class_data_len);
     _ctable_classdata_lens[pos] = class_data_len;
@@ -282,7 +241,7 @@ void get_saved_class_file_bytes(JNIEnv *env, char *name, jobject loader, jint *c
     pos = hash(name, loader) % _ctable_size;
   
     while (_ctable_classnames[pos] != NULL) {
-        if (strcmp(name, _ctable_classnames[pos]) == 0 && (*env)->IsSameObject(env, loader, _ctable_loaders[pos])) {
+        if (strcmp(name, _ctable_classnames[pos]) == 0 && isSameObject(env, loader, _ctable_loaders[pos])) {
             break;
         } else {
             pos = (pos + 1) % _ctable_size;
@@ -355,21 +314,30 @@ void JNICALL class_file_load_hook(
         return;
     }
     if (loader == NULL) {
-        /* Bootstrap loader - no need to save such classes */
         if (retransformIsRunning && strcmp(name,END_CLASS_NAME) == 0) {
             /* Hack which will prevent unchanged classes to be redefined */ 
             res=(*jvmti_env)->Allocate(jvmti_env,sizeof(BOGUS_CLASSFILE), new_class_data);
             assert(res == JVMTI_ERROR_NONE);
             memcpy(*new_class_data,BOGUS_CLASSFILE,sizeof(BOGUS_CLASSFILE));
             *new_class_data_len = sizeof(BOGUS_CLASSFILE);
+            return; 
         }
-        return; 
     }
-    if (loader_is_system_loader(jni_env, jvmti_env, loader)) {
-        /* Check if the class is being loaded by non-system classloader */
-        return;
+    if (_ctable_lock == NULL) {
+        jvmtiPhase phase;
+
+        (*jvmti_env)->GetPhase(jvmti_env, &phase);
+        if (phase >= JVMTI_PHASE_LIVE) {
+            jclass object_class;
+
+            /* Create a lock object used to synchronize access to _ctable */
+            object_class = (*jni_env)->FindClass(jni_env, "java/lang/Object");
+            _ctable_lock = (*jni_env)->AllocObject(jni_env, object_class);
+            _ctable_lock = (*jni_env)->NewGlobalRef(jni_env, _ctable_lock);
+        } else {
+            return;
+        }
     }
-  
     save_class_file_bytes(jni_env, name, loader, class_data_len, class_data);
 }
 
