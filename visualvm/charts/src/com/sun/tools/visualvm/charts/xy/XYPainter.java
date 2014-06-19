@@ -137,14 +137,18 @@ public class XYPainter extends SynchronousXYItemPainter {
     public XYItemSelection getClosestSelection(ChartItem item, int viewX,
                                                int viewY, ChartContext context) {
 
-        SynchronousXYChartContext contx = (SynchronousXYChartContext)context;
-
-        int nearestTimestampIndex = contx.getNearestTimestampIndex(viewX, viewY);
-        if (nearestTimestampIndex == -1) return null; // item not visible
-
-        SynchronousXYItem xyItem = (SynchronousXYItem)item;
-        return new XYItemSelection.Default(xyItem, nearestTimestampIndex,
-                                           ItemSelection.DISTANCE_UNKNOWN);
+        if (mode == 1) return getMinMaxClosestSelection(item, viewX, viewY, context);
+        else if (mode == 0) return getFastClosestSelection(item, viewX, viewY, context);
+        else return null;
+    }
+    
+    private int[][] getPoints(XYItem item, Rectangle dirtyArea,
+                              SynchronousXYChartContext context,
+                              int type, int maxValueOffset) {
+        
+        if (mode == 1) return getMinMaxPoints(item, dirtyArea, context, type, maxValueOffset);
+        else if (mode == 0) return getFastPoints(item, dirtyArea, context, type, maxValueOffset);
+        else return null;
     }
 
     protected void paint(XYItem item, List<ItemSelection> highlighted,
@@ -193,13 +197,67 @@ public class XYPainter extends SynchronousXYItemPainter {
     }
     
     
-    private int[][] getPoints(XYItem item, Rectangle dirtyArea,
-                              SynchronousXYChartContext context,
-                              int type, int maxValueOffset) {
+    private XYItemSelection getFastClosestSelection(ChartItem item, int viewX,
+                                                    int viewY, ChartContext context) {
+
+        SynchronousXYChartContext contx = (SynchronousXYChartContext)context;
+
+        int nearestTimestampIndex = contx.getNearestTimestampIndex(viewX, viewY);
+        if (nearestTimestampIndex == -1) return null; // item not visible
+
+        SynchronousXYItem xyItem = (SynchronousXYItem)item;
+        return new XYItemSelection.Default(xyItem, nearestTimestampIndex,
+                                           ItemSelection.DISTANCE_UNKNOWN);
+    }
+    
+    private XYItemSelection getMinMaxClosestSelection(ChartItem item, int viewX,
+                                                     int viewY, ChartContext context) {
+
+        SynchronousXYItem xyItem = (SynchronousXYItem)item;
+        if (xyItem.getValuesCount() == 0) return null;
         
-        if (mode == 1) return getMinMaxPoints(item, dirtyArea, context, type, maxValueOffset);
-        else if (mode == 0) return getFastPoints(item, dirtyArea, context, type, maxValueOffset);
-        else return null;
+        SynchronousXYChartContext contx = (SynchronousXYChartContext)context;
+        Rectangle bounds = new Rectangle(0, 0, contx.getViewportWidth(), contx.getViewportHeight());
+        if (bounds.isEmpty()) return null;
+        
+        int[][] visibleBounds = contx.getVisibleBounds(bounds);
+
+        int firstVisible = visibleBounds[0][0];
+        if (firstVisible == -1) firstVisible = visibleBounds[0][1];
+        if (firstVisible == -1) return null;
+
+        int lastVisible = visibleBounds[1][0];
+        if (lastVisible == -1) lastVisible = visibleBounds[1][1];
+        if (lastVisible == -1) return null;
+        
+        int idx = firstVisible;
+        int x = Utils.checkedInt(Math.ceil(context.getViewX(xyItem.getXValue(idx))));
+        int dist = Math.abs(viewX - x);
+        
+        while (++idx <= lastVisible) {
+            int newX = Utils.checkedInt(Math.ceil(context.getViewX(xyItem.getXValue(idx))));
+            int newDist = Math.abs(viewX - newX);
+            if (newDist > dist) {
+                idx--;
+                break;
+            } else {
+                x = newX;
+                dist = newDist;
+            }
+        }
+        
+        long maxVal = xyItem.getYValue(idx);
+        int maxIdx = idx;
+        
+        while (--idx >= firstVisible && Utils.checkedInt(Math.ceil(context.getViewX(xyItem.getXValue(idx)))) == x) {
+            long y = xyItem.getYValue(idx);
+            if (y > maxVal) {
+                maxVal = y;
+                maxIdx = idx;
+            }
+        }
+        
+        return new XYItemSelection.Default(xyItem, maxIdx, dist);
     }
     
     private static int[][] getFastPoints(XYItem item, Rectangle dirtyArea,
