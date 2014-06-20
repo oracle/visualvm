@@ -109,7 +109,7 @@ public final class ProfilerSupport {
     }
     
     public boolean hasSupportedJavaPlatforms() {
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             String code = "jdk1" + (5 + i); // NOI18N
             if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) return true;
         }
@@ -119,7 +119,7 @@ public final class ProfilerSupport {
     public String[][] getSupportedJavaPlatforms() {
         List<String> codesl = new ArrayList();
         
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             String code = "jdk1" + (5 + i); // NOI18N
             if (supportsProfiling(code, 32) || supportsProfiling(code, 64)) codesl.add(code);
         }
