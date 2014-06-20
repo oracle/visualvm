@@ -430,8 +430,8 @@ public abstract class TransformableCanvasComponent extends BufferedCanvasCompone
             dataBoundsChanged(dataOffsetX, dataOffsetY, dataWidth, dataHeight,
                               oldDataOffsetX, oldDataOffsetY, oldDataWidth, oldDataHeight);
 
-            dx = dxx + (oldContentsOffsetX - contentsOffsetX) - (offsetX - oldOffsetX);
-            dy = dyy + (oldContentsOffsetY - contentsOffsetY) - (offsetY - oldOffsetY);
+            dx = fitsWidth ? 0 : dxx + (oldContentsOffsetX - contentsOffsetX) - (offsetX - oldOffsetX);
+            dy = fitsHeight ? 0 : dyy + (oldContentsOffsetY - contentsOffsetY) - (offsetY - oldOffsetY);
 
             oldScaleX = scaleX;
             oldScaleY = scaleY;

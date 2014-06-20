@@ -88,7 +88,7 @@ class ClassDumpInstance implements Instance {
         return classDump.getHprof().getNearestGCRootPointer(this);
     }
 
-    public int getReachableSize() {
+    public long getReachableSize() {
         return 0;
     }
 
@@ -96,11 +96,11 @@ class ClassDumpInstance implements Instance {
         return classDump.getReferences();
     }
 
-    public int getRetainedSize() {
+    public long getRetainedSize() {
         return classDump.getHprof().getRetainedSize(this);
     }
 
-    public int getSize() {
+    public long getSize() {
         return getJavaClass().getInstanceSize();
     }
 

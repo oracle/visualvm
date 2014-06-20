@@ -60,7 +60,7 @@ import java.util.TreeSet;
  *                            - bit 1 set - has GC root
  *                            - bit 2 set - tree object
  *  - ID/offset (long/int) - ID if reference flag bit 0 is set, otherwise offset to reference list file
- *  - retained size
+ *  - retained size (long/int) 
  *
  * @author Tomas Hurka
  */
@@ -188,12 +188,19 @@ class LongMap extends AbstractLongMap {
             return getFoffset(offset + KEY_SIZE);
         }
 
-        void setRetainedSize(int size) {
-            dumpBuffer.putInt(offset + KEY_SIZE + FOFFSET_SIZE + 4 + 1 + ID_SIZE, size);
+        void setRetainedSize(long size) {
+            if (FOFFSET_SIZE == 4) {
+                dumpBuffer.putInt(offset + KEY_SIZE + FOFFSET_SIZE + 4 + 1 + ID_SIZE, (int)size);
+            } else {
+                dumpBuffer.putLong(offset + KEY_SIZE + FOFFSET_SIZE + 4 + 1 + ID_SIZE, size);
+            }
         }
 
-        int getRetainedSize() {
-            return dumpBuffer.getInt(offset + KEY_SIZE + FOFFSET_SIZE + 4 + 1 + ID_SIZE);
+        long getRetainedSize() {
+            if (FOFFSET_SIZE == 4) {
+                return dumpBuffer.getInt(offset + KEY_SIZE + FOFFSET_SIZE + 4 + 1 + ID_SIZE);
+            }
+            return dumpBuffer.getLong(offset + KEY_SIZE + FOFFSET_SIZE + 4 + 1 + ID_SIZE);            
         }
 
         private void setReferencesPointer(long instanceId) {
@@ -215,25 +222,20 @@ class LongMap extends AbstractLongMap {
 
     private static class RetainedSizeEntry implements Comparable {
         private final long instanceId;
-        private final int retainedSize;
+        private final long retainedSize;
         
-        private RetainedSizeEntry(long id,int size) {
+        private RetainedSizeEntry(long id,long size) {
             instanceId = id;
             retainedSize = size;
         }
 
         public int compareTo(Object o) {
             RetainedSizeEntry other = (RetainedSizeEntry) o;
-            int diff = other.retainedSize - retainedSize;
+            // bigger object are at beginning
+            int diff = Long.compare(other.retainedSize, retainedSize);
             if (diff == 0) {
                 // sizes are the same, compare ids
-                long idDiff = other.instanceId - instanceId;
-                if (idDiff < 0) {
-                    return -1;
-                } else if (idDiff > 0) {
-                    return 1;
-                }
-                return 0;
+                return Long.compare(instanceId, other.instanceId);
             }
             return diff;
         }
@@ -247,10 +249,7 @@ class LongMap extends AbstractLongMap {
                 return false;
             }
             final RetainedSizeEntry other = (RetainedSizeEntry) obj;
-            if (this.instanceId != other.instanceId) {
-                return false;
-            }
-            return true;
+            return this.instanceId == other.instanceId;
         }
 
         @Override
@@ -264,7 +263,7 @@ class LongMap extends AbstractLongMap {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     LongMap(int size,int idSize,int foffsetSize) throws FileNotFoundException, IOException {
-        super(size,idSize,foffsetSize,foffsetSize + 4 + 1 + idSize + 4);
+        super(size,idSize,foffsetSize,foffsetSize + 4 + 1 + idSize + foffsetSize);
         referenceList = new NumberList(ID_SIZE);
     }
 
@@ -293,11 +292,11 @@ class LongMap extends AbstractLongMap {
     long[] getBiggestObjectsByRetainedSize(int number) {
         SortedSet bigObjects = new TreeSet();
         long[] bigIds = new long[number];
-        int min = 0;
+        long min = 0;
         for (long index=0;index<fileSize;index+=ENTRY_SIZE) {
             long id = getID(index);
             if (id != 0) {
-                int retainedSize = createEntry(index).getRetainedSize();
+                long retainedSize = createEntry(index).getRetainedSize();
                 if (bigObjects.size()<number) {
                     bigObjects.add(new RetainedSizeEntry(id,retainedSize));
                     min = ((RetainedSizeEntry)bigObjects.last()).retainedSize;
