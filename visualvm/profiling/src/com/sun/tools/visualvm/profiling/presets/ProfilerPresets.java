@@ -255,8 +255,11 @@ public final class ProfilerPresets {
         if (application == null) return NbBundle.getMessage(
                 ProfilerPresets.class, "HINT_Define_roots"); // NOI18N
         String mainClass = getMainClass(application);
+        if ("".equals(mainClass)) { // unknown main class
+            return NbBundle.getMessage(ProfilerPresets.class, "HINT_Define_roots"); // NOI18N
+        }
         int dotIndex = mainClass.lastIndexOf("."); // NOI18N
-        if (dotIndex == -1) return ""; // NOI18N
+        if (dotIndex == -1) return mainClass;  // default package
         else return mainClass.substring(0, dotIndex + 1) + "**"; // NOI18N
     }
 
