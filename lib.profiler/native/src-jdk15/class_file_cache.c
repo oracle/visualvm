@@ -121,7 +121,7 @@ void cache_loaded_classes(jvmtiEnv *jvmti_env,jclass *classes,jint class_count) 
 #endif
 }
 
-jboolean isSameObject(JNIEnv *env, jobject obj1, jobject obj2) {
+static jboolean isSameObject(JNIEnv *env, jobject obj1, jobject obj2) {
     if (obj1 == NULL && obj2 == NULL) return JNI_TRUE;
     if (obj1 == NULL || obj2 == NULL) return JNI_FALSE;
     return (*env)->IsSameObject(env, obj1, obj2);
@@ -130,7 +130,7 @@ jboolean isSameObject(JNIEnv *env, jobject obj1, jobject obj2) {
 /*--------------------------------  Class hashtable management -------------------------------------*/
 
 /** Currently doesn't take into account loader, though ideally it should. */
-int hash(const char *name, jobject loader) {
+static int hash(const char *name, jobject loader) {
     int i, code = 0;
     int len = strlen(name);
     for (i = 0; i < len; i++) {
@@ -144,7 +144,7 @@ int hash(const char *name, jobject loader) {
 }
 
 
-void grow_ctable() {
+static void grow_ctable() {
     int i;
     int old_size = _ctable_size;
     char **old_classnames = _ctable_classnames;
@@ -187,7 +187,7 @@ void grow_ctable() {
 
 
 /** For the given class with non-NULL, non-system loader, save the supplied class file bytes permanently */
-void save_class_file_bytes(JNIEnv *env, const char* name, jobject loader,
+static void save_class_file_bytes(JNIEnv *env, const char* name, jobject loader,
                            jint class_data_len, const unsigned char* class_data) {
     int pos;
     /*printf("!!! Gonna save classfilebytes for class %s\n", name);*/
@@ -270,7 +270,7 @@ void get_saved_class_file_bytes(JNIEnv *env, char *name, jobject loader, jint *c
 void try_removing_bytes_for_unloaded_classes(JNIEnv *env) {
 }
 
-jthread getOwner(jvmtiEnv *jvmti_env, jobject object) {
+static jthread getOwner(jvmtiEnv *jvmti_env, jobject object) {
     jvmtiMonitorUsage usage;
     jvmtiError res;
     
@@ -341,7 +341,7 @@ void JNICALL class_file_load_hook(
     save_class_file_bytes(jni_env, name, loader, class_data_len, class_data);
 }
 
-void initializeMethods (JNIEnv *env) {
+static void initializeMethods (JNIEnv *env) {
 
     jclass localProfilerRuntimeID;
     jclass localProfilerRuntimeMemoryID;  

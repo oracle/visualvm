@@ -80,7 +80,7 @@
 #define OFFSET_MASK ((1L<<NO_OF_MASK_BITS)-1)
 #define BASE_ADDRESS_MASK (~OFFSET_MASK)
 
-#define MAX_FRAMES 100
+#define MAX_FRAMES 16384
 
 static jvmtiFrameInfo *_stack_frames_buffer = NULL;
 static jint *_stack_id_buffer = NULL;
