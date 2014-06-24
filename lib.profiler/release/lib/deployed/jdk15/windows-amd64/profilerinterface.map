@@ -1,6 +1,6 @@
  profilerinterface
 
- Timestamp is 539b00d0 (Fri Jun 13 15:46:56 2014)
+ Timestamp is 53a7ec62 (Mon Jun 23 10:59:14 2014)
 
  Preferred load address is 0000000010000000
 
@@ -26,8 +26,8 @@
 
   Address         Publics by Value              Rva+Base             Lib:Object
 
- 0000:00000000       ___safe_se_handler_count   0000000000000000     <absolute>
  0000:00000000       ___safe_se_handler_table   0000000000000000     <absolute>
+ 0000:00000000       ___safe_se_handler_count   0000000000000000     <absolute>
  0001:00000000       Java_org_netbeans_lib_profiler_server_system_Classes_getAllLoadedClasses 0000000010001000 f   Classes.obj
  0001:000001f0       Java_org_netbeans_lib_profiler_server_system_Classes_cacheLoadedClasses 00000000100011f0 f   Classes.obj
  0001:000002b0       Java_org_netbeans_lib_profiler_server_system_Classes_getCachedClassFileBytes 00000000100012b0 f   Classes.obj
@@ -72,17 +72,11 @@
  0001:00002bc0       Java_org_netbeans_lib_profiler_server_system_Stacks_createNativeStackFrameBuffer 0000000010003bc0 f   Stacks.obj
  0001:00002c20       get_nano_time              0000000010003c20 f   common_functions.obj
  0001:00002c50       report_usage               0000000010003c50 f   common_functions.obj
- 0001:00002cb0       initializeJVMTI            0000000010003cb0 f   common_functions.obj
  0001:00002ee0       JNI_OnLoad                 0000000010003ee0 f   common_functions.obj
  0001:00002f40       Agent_OnLoad               0000000010003f40 f   common_functions.obj
  0001:000030c0       cache_loaded_classes       00000000100040c0 f   class_file_cache.obj
- 0001:000030d0       isSameObject               00000000100040d0 f   class_file_cache.obj
- 0001:00003100       hash                       0000000010004100 f   class_file_cache.obj
- 0001:00003170       grow_ctable                0000000010004170 f   class_file_cache.obj
  0001:000033f0       get_saved_class_file_bytes 00000000100043f0 f   class_file_cache.obj
  0001:000035e0       try_removing_bytes_for_unloaded_classes 00000000100045e0 f   class_file_cache.obj
- 0001:000035f0       getOwner                   00000000100045f0 f   class_file_cache.obj
- 0001:00003660       initializeMethods          0000000010004660 f   class_file_cache.obj
  0001:00003a30       waitInterceptor            0000000010004a30 f   class_file_cache.obj
  0001:00003b10       sleepInterceptor           0000000010004b10 f   class_file_cache.obj
  0001:00003bf0       parkInterceptor            0000000010004bf0 f   class_file_cache.obj
@@ -94,11 +88,9 @@
  0001:00003f50       Java_org_netbeans_lib_profiler_server_system_Classes_setWaitTrackingEnabled 0000000010004f50 f   class_file_cache.obj
  0001:00003fc0       Java_org_netbeans_lib_profiler_server_system_Classes_setSleepTrackingEnabled 0000000010004fc0 f   class_file_cache.obj
  0001:00004020       Java_org_netbeans_lib_profiler_server_system_Classes_setVMObjectAllocEnabled 0000000010005020 f   class_file_cache.obj
- 0001:00004070       save_class_file_bytes      0000000010005070 f   class_file_cache.obj
  0001:00004300       class_file_load_hook       0000000010005300 f   class_file_cache.obj
  0001:000044b0       native_method_bind_hook    00000000100054b0 f   class_file_cache.obj
  0001:00004860       parse_options_and_extract_params 0000000010005860 f   attach.obj
- 0001:00004a30       setupAndCallProfilerRuntimeActivate 0000000010005a30 f   attach.obj
  0001:00004c00       vm_init_hook               0000000010005c00 f   attach.obj
  0001:00004c0e       malloc                     0000000010005c0e f   MSVCRT:msvcrt.dll
  0001:00004c14       memcpy                     0000000010005c14 f   MSVCRT:msvcrt.dll
@@ -154,3 +146,11 @@
  0001:00001ed0       convert_jint_to_jmethodID  0000000010002ed0 f   Stacks.obj
  0001:000020d0       copy_into_data_array       00000000100030d0 f   Stacks.obj
  0001:000021d0       copy_dummy_names_into_data_array 00000000100031d0 f   Stacks.obj
+ 0001:00002cb0       initializeJVMTI            0000000010003cb0 f   common_functions.obj
+ 0001:000030d0       isSameObject               00000000100040d0 f   class_file_cache.obj
+ 0001:00003100       hash                       0000000010004100 f   class_file_cache.obj
+ 0001:00003170       grow_ctable                0000000010004170 f   class_file_cache.obj
+ 0001:000035f0       getOwner                   00000000100045f0 f   class_file_cache.obj
+ 0001:00003660       initializeMethods          0000000010004660 f   class_file_cache.obj
+ 0001:00004070       save_class_file_bytes      0000000010005070 f   class_file_cache.obj
+ 0001:00004a30       setupAndCallProfilerRuntimeActivate 0000000010005a30 f   attach.obj
