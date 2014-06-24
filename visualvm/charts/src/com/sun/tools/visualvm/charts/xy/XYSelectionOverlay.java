@@ -57,8 +57,8 @@ public class XYSelectionOverlay extends ChartOverlay {
 
     private int selectionExtent;
 
-    private ConfigurationListener configurationListener;
-    private SelectionListener selectionListener;
+    private final ConfigurationListener configurationListener;
+    private final SelectionListener selectionListener;
     private final Set<Point> selectedValues;
 
     private Paint markPaint;
@@ -181,8 +181,6 @@ public class XYSelectionOverlay extends ChartOverlay {
                                     long lastOffsetX, long lastOffsetY,
                                     double lastScaleX, double lastScaleY,
                                     int shiftX, int shiftY) {
-            if (selectedValues.isEmpty()) return;
-            if (scaleX != lastScaleX || scaleY != lastScaleY || shiftX != 0)
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         Set<Point> oldSelectedValues = new HashSet(selectedValues);

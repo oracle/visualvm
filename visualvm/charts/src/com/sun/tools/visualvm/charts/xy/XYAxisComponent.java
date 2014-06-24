@@ -60,6 +60,7 @@ public class XYAxisComponent extends AxisComponent {
     private static boolean WORKAROUND_OPENJDK_BUG = false;
 
 
+    private final ChartComponent chart;
     private final AxisMarksComputer marksComputer;
 
 
@@ -68,6 +69,7 @@ public class XYAxisComponent extends AxisComponent {
         
         super(chart, marksComputer, marksPainter, location, mesh);
 
+        this.chart = chart;
         this.marksComputer = marksComputer;
 
         setForeground(AXIS_LINE_COLOR);
@@ -90,7 +92,7 @@ public class XYAxisComponent extends AxisComponent {
         int x2 = x1 + chartMask.width;
         
         // #VISUALVM-595 correctly align the origin to have stable offset for dotted stroke
-        if (x1 % 2 == 1) {
+        if (x1 % 2 != chart.getOffsetX() % 2) {
             x1 -= 1;
             x2 += 2;
         }
@@ -111,5 +113,5 @@ public class XYAxisComponent extends AxisComponent {
             }
         }
     }
-
+    
 }

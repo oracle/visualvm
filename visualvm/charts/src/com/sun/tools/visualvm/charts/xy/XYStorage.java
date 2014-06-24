@@ -45,8 +45,8 @@ public class XYStorage implements Timeline {
 
     public static final long NO_VALUE = Long.MIN_VALUE - 1;
 
-    private int valuesLimit;
-    private int bufferStep;
+    private final int valuesLimit;
+    private final int bufferStep;
 
     private int valuesCount;
     private long[] timestamps;
@@ -194,6 +194,10 @@ public class XYStorage implements Timeline {
         return values[itemIndex][getIndex(valueIndex)];
     }
 
+    
+    boolean isFull() {
+        return valuesCount == valuesLimit;
+    }
 
     private void updateStorage() {
         int bufferSize = timestamps.length;
@@ -203,7 +207,7 @@ public class XYStorage implements Timeline {
             for (int i = 0; i < values.length; i++)
                 values[i] = extendArray(values[i], extent);
             cycleIndex = 0;
-        } else if (valuesCount == valuesLimit) {
+        } else if (isFull()) {
             cycleIndex++;
             if (cycleIndex == valuesLimit) cycleIndex = 0;
         }

@@ -38,6 +38,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -48,6 +49,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.LabelUI;
 import org.netbeans.lib.profiler.charts.ChartItem;
+import org.netbeans.lib.profiler.charts.ChartItemChange;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.ItemPainter;
 import org.netbeans.lib.profiler.charts.ItemsModel;
@@ -170,7 +172,13 @@ public class SimpleXYChartUtils {
                                            XYPaintersModel paintersModel) {
 
         // Chart
-        SynchronousXYChart chart = new SynchronousXYChart(itemsModel, paintersModel);
+        final XYStorage _storage = storage;
+        SynchronousXYChart chart = new SynchronousXYChart(itemsModel, paintersModel) {
+            protected void itemsChanged(List<ChartItemChange> itemChanges) {
+                if (_storage.isFull()) updateChart(); // full repaint to handle removed items
+                else super.itemsChanged(itemChanges);
+            }
+        };
 
         chart.setFitsHeight(true);
         chart.setFitsWidth(true);
@@ -178,7 +186,7 @@ public class SimpleXYChartUtils {
         chart.setViewInsets(new Insets(10, 0, 0, 0));
         chart.setInitialDataBounds(new LongRect(System.currentTimeMillis(), 0,
                                        2500, initialYMargin));
-
+        
         chart.addPreDecorator(new XYBackground());
 
         // Horizontal axis

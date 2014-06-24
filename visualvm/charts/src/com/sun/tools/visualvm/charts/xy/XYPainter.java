@@ -48,8 +48,6 @@ import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemPainter;
  */
 public class XYPainter extends SynchronousXYItemPainter {
     
-    private static final int HOVER_RADIUS = 2; // Not used
-    
     private final int mode;
 
     private final Color fillColor2;
@@ -110,14 +108,6 @@ public class XYPainter extends SynchronousXYItemPainter {
 
 
     // --- ItemPainter implementation ------------------------------------------
-
-    public boolean supportsHovering(ChartItem item) {
-        return true;
-    }
-
-    public boolean supportsSelecting(ChartItem item) {
-        return true;
-    }
 
     public LongRect getSelectionBounds(ItemSelection selection, ChartContext context) {
 
@@ -211,7 +201,7 @@ public class XYPainter extends SynchronousXYItemPainter {
     }
     
     private XYItemSelection getMinMaxClosestSelection(ChartItem item, int viewX,
-                                                     int viewY, ChartContext context) {
+                                                      int viewY, ChartContext context) {
 
         SynchronousXYItem xyItem = (SynchronousXYItem)item;
         if (xyItem.getValuesCount() == 0) return null;
@@ -228,14 +218,14 @@ public class XYPainter extends SynchronousXYItemPainter {
 
         int lastVisible = visibleBounds[1][0];
         if (lastVisible == -1) lastVisible = visibleBounds[1][1];
-        if (lastVisible == -1) return null;
+        if (lastVisible == -1) lastVisible = xyItem.getValuesCount() - 1;
         
         int idx = firstVisible;
-        int x = Utils.checkedInt(Math.ceil(context.getViewX(xyItem.getXValue(idx))));
+        int x = getViewX(contx, xyItem, idx);
         int dist = Math.abs(viewX - x);
         
         while (++idx <= lastVisible) {
-            int newX = Utils.checkedInt(Math.ceil(context.getViewX(xyItem.getXValue(idx))));
+            int newX = getViewX(contx, xyItem, idx);
             int newDist = Math.abs(viewX - newX);
             if (newDist > dist) {
                 idx--;
@@ -246,10 +236,12 @@ public class XYPainter extends SynchronousXYItemPainter {
             }
         }
         
+        if (idx > lastVisible) idx = lastVisible;
+        
         long maxVal = xyItem.getYValue(idx);
         int maxIdx = idx;
         
-        while (--idx >= firstVisible && Utils.checkedInt(Math.ceil(context.getViewX(xyItem.getXValue(idx)))) == x) {
+        while (--idx >= firstVisible && getViewX(contx, xyItem, idx) == x) {
             long y = xyItem.getYValue(idx);
             if (y > maxVal) {
                 maxVal = y;
@@ -260,9 +252,9 @@ public class XYPainter extends SynchronousXYItemPainter {
         return new XYItemSelection.Default(xyItem, maxIdx, dist);
     }
     
-    private static int[][] getFastPoints(XYItem item, Rectangle dirtyArea,
-                                         SynchronousXYChartContext context,
-                                         int type, int maxValueOffset) {
+    private int[][] getFastPoints(XYItem item, Rectangle dirtyArea,
+                                  SynchronousXYChartContext context,
+                                  int type, int maxValueOffset) {
 
         int valuesCount = item.getValuesCount();
         int[][] visibleBounds = context.getVisibleBounds(dirtyArea);
@@ -313,27 +305,33 @@ public class XYPainter extends SynchronousXYItemPainter {
         return new int[][] { xPoints, yPoints, { xPoints.length - 2 } };
     }
     
-    private static int[][] getMinMaxPoints(XYItem item, Rectangle dirtyArea,
-                                           SynchronousXYChartContext context,
-                                           int type, int maxValueOffset) {
+    private int[][] getMinMaxPoints(XYItem item, Rectangle dirtyArea,
+                                    SynchronousXYChartContext context,
+                                    int type, int maxValueOffset) {
         
         if (dirtyArea.isEmpty()) return null;
         
+        dirtyArea.grow(lineWidth, lineWidth);
         int[][] visibleBounds = context.getVisibleBounds(dirtyArea);
         
         int firstFirst = visibleBounds[0][0];
         int firstIndex = firstFirst;
         if (firstIndex == -1) firstIndex = visibleBounds[0][1];
         if (firstIndex == -1) return null;
-        if (firstFirst != -1 && firstIndex > 0) firstIndex -= 1;
         
         int valuesCount = item.getValuesCount();
         int lastFirst = visibleBounds[1][0];
         int lastIndex = lastFirst;
         if (lastIndex == -1) lastIndex = visibleBounds[1][1];
         if (lastIndex == -1) lastIndex = valuesCount - 1;
-        if (lastFirst != -1 && lastIndex < valuesCount - 1) lastIndex += 1;
         
+        int firstX = getViewX(context, item, firstIndex);
+        while (firstIndex > 0 && getViewX(context, item, firstIndex) >= firstX - lineWidth)
+            firstIndex--;
+        
+        int lastX = getViewX(context, item, lastIndex);
+        while (lastIndex < valuesCount - 1 && getViewX(context, item, lastIndex) <= lastX + lineWidth)
+            lastIndex++;
         
         double itemValueFactor = type == TYPE_RELATIVE ? getItemValueFactor(context,
                                  maxValueOffset, item.getBounds().height) : 0;
@@ -344,9 +342,8 @@ public class XYPainter extends SynchronousXYItemPainter {
         int[] yPoints = new int[maxPoints + 2];
         
         int nPoints = 0;
-        for (int index = firstFirst; index <= lastIndex; index++) {
-            int x = Utils.checkedInt(Math.ceil(context.getViewX(
-                                     item.getXValue(index))));
+        for (int index = firstIndex; index <= lastIndex; index++) {
+            int x = getViewX(context, item, index);
             int y = Utils.checkedInt(Math.ceil(getYValue(item, index,
                                      type, context, itemValueFactor)));
             
@@ -395,6 +392,10 @@ public class XYPainter extends SynchronousXYItemPainter {
         
         return new int[][] { xPoints, yPoints, { nPoints } };
     }
+    
+    private static int getViewX(SynchronousXYChartContext context, XYItem item, int index) {
+        return Utils.checkedInt(Math.ceil(context.getViewX(item.getXValue(index))));
+    }
 
     private LongRect getViewBoundsRelative(LongRect dataBounds, XYItem item,
                                            ChartContext context) {
@@ -420,7 +421,7 @@ public class XYPainter extends SynchronousXYItemPainter {
         if (!context.isBottomBased()) viewY2 -= viewHeight;
 
         LongRect viewBounds =  new LongRect(viewX, viewY2, viewWidth, viewHeight);
-        LongRect.addBorder(viewBounds, HOVER_RADIUS);
+        LongRect.addBorder(viewBounds, lineWidth);
 
         return viewBounds;
     }
@@ -453,7 +454,7 @@ public class XYPainter extends SynchronousXYItemPainter {
         } else {
 
             LongRect viewBounds = context.getViewRect(dataBounds);
-            LongRect.addBorder(viewBounds, HOVER_RADIUS);
+            LongRect.addBorder(viewBounds, lineWidth);
             return viewBounds;
 
         }
