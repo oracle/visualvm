@@ -76,7 +76,7 @@ void report_usage() {
     fprintf(stderr, "Profiler Agent: java -agentpath:/mypath/profilerinterface=/home/me/nb-profiler-server/profiler-ea-libs,5140\n");
 }
 
-void initializeJVMTI(JavaVM *jvm) {
+static void initializeJVMTI(JavaVM *jvm) {
     jvmtiError err;
     jvmtiCapabilities capas;
     jint res;
