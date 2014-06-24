@@ -66,6 +66,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     private Refresher heapRefresher;
     private MemoryView heapView;
     
+    private final boolean hasPermGenHisto;
     private Timer permgenTimer;
     private Refresher permgenRefresher;
     private MemoryView permgenView;
@@ -76,9 +77,9 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     
     private DataViewComponent.DetailsView[] detailsViews;
     
-    public MemorySamplerSupport(Jvm jvm, ThreadsMemory mem, MemoryMXBean memoryBean, 
-                                SnapshotDumper snapshotDumper, HeapDumper heapDumper) {
+    public MemorySamplerSupport(Jvm jvm, boolean hasPermGen, ThreadsMemory mem, MemoryMXBean memoryBean, SnapshotDumper snapshotDumper, HeapDumper heapDumper) {
         this.jvm = jvm;
+        hasPermGenHisto = hasPermGen;
         threadsMemory = mem;
         this.memoryBean = memoryBean;
         this.heapDumper = heapDumper;
@@ -92,7 +93,7 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
             detailsViews = createViews();
         }
         heapView.initSession();
-        permgenView.initSession();
+        if (permgenView != null) permgenView.initSession();
         return detailsViews.clone();
     }
     
@@ -100,21 +101,28 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
 //        heapTimer.start();
 //        permgenTimer.start();
         heapRefresher.setRefreshRate(samplingRate);
-        permgenRefresher.setRefreshRate(samplingRate);
+        if (permgenRefresher != null)
+            permgenRefresher.setRefreshRate(samplingRate);
         if (threadAllocRefresher != null)
             threadAllocRefresher.setRefreshRate(samplingRate);
-        if (heapView != null && permgenView != null)
-            doRefreshImpl(heapTimer, heapView, permgenView);
+        if (heapView != null) {
+            if (permgenView != null) doRefreshImpl(heapTimer, heapView, permgenView);
+            else doRefreshImpl(heapTimer, heapView);
+        }
         return true;
     }
     
     public synchronized void stopSampling() {
         heapTimer.stop();
-        permgenTimer.stop();
+        if (permgenTimer != null) {
+            permgenTimer.stop();
+        }
         if (threadAllocTimer != null)
             threadAllocTimer.stop();
-        if (heapView != null && permgenView != null)
-            doRefreshImplImpl(snapshotDumper.lastHistogram, heapView, permgenView);
+        if (heapView != null) {
+            if (permgenView != null) doRefreshImplImpl(snapshotDumper.lastHistogram, heapView, permgenView);
+            else doRefreshImplImpl(snapshotDumper.lastHistogram, heapView);
+        }
     }
     
     public synchronized void terminate() {
@@ -136,13 +144,13 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         heapRefresher = new Refresher() {
             public final boolean checkRefresh() {
                 if (!heapTimer.isRunning()) return false;
-                return (heapView.isShowing() || (permgenTimer.getDelay() ==
+                return (heapView.isShowing() || (permgenTimer != null && permgenTimer.getDelay() ==
                         heapTimer.getDelay() && permgenView.isShowing()));
             }
             public final void doRefresh() {
                 if (heapView.isShowing()) {
                     doRefreshImpl(heapTimer, heapView);
-                } else if (permgenTimer.getDelay() == heapTimer.getDelay() &&
+                } else if (permgenTimer != null && permgenTimer.getDelay() == heapTimer.getDelay() &&
                            permgenView.isShowing()) {
                     doRefreshImpl(heapTimer, permgenView);
                 }
@@ -157,29 +165,31 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
             }
         };
         
-        permgenTimer = new Timer(defaultRefresh, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                permgenRefresher.refresh();
-            }
-        });
-        permgenRefresher = new Refresher() {
-            public final boolean checkRefresh() {
-                if (!permgenTimer.isRunning()) return false;
-                if (permgenTimer.getDelay() == heapTimer.getDelay()) return false;
-                return (permgenView.isShowing());
-            }
-            public final void doRefresh() {
-                doRefreshImpl(permgenTimer, permgenView);
-            }
-            public final void setRefreshRate(int refreshRate) {
-                permgenTimer.setDelay(refreshRate);
-                permgenTimer.setInitialDelay(refreshRate);
-                permgenTimer.restart();
-            }
-            public final int getRefreshRate() {
-                return permgenTimer.getDelay();
-            }
-        };
+        if (hasPermGenHisto) {
+            permgenTimer = new Timer(defaultRefresh, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    permgenRefresher.refresh();
+                }
+            });
+            permgenRefresher = new Refresher() {
+                public final boolean checkRefresh() {
+                    if (!permgenTimer.isRunning()) return false;
+                    if (permgenTimer.getDelay() == heapTimer.getDelay()) return false;
+                    return (permgenView.isShowing());
+                }
+                public final void doRefresh() {
+                    doRefreshImpl(permgenTimer, permgenView);
+                }
+                public final void setRefreshRate(int refreshRate) {
+                    permgenTimer.setDelay(refreshRate);
+                    permgenTimer.setInitialDelay(refreshRate);
+                    permgenTimer.restart();
+                }
+                public final int getRefreshRate() {
+                    return permgenTimer.getDelay();
+                }
+            };
+        }
         
         if (threadsMemory != null) {
             threadAllocTimer = new Timer(defaultRefresh, new ActionListener() {
@@ -208,19 +218,25 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     }
     
     private DataViewComponent.DetailsView[] createViews() {
-        DataViewComponent.DetailsView[] details = new DataViewComponent.DetailsView[threadAllocRefresher != null ? 3:2];
+        int detailIndex = 0;
+        int detailsCount = 1;
+        if (hasPermGenHisto) detailsCount++;
+        if (threadAllocRefresher != null) detailsCount++;
+        DataViewComponent.DetailsView[] details = new DataViewComponent.DetailsView[detailsCount];
         
         heapView = new MemoryView(heapRefresher, MemoryView.MODE_HEAP, memoryBean, snapshotDumper, heapDumper);
-        details[0] = new DataViewComponent.DetailsView(
+        details[detailIndex++] = new DataViewComponent.DetailsView(
                     NbBundle.getMessage(MemorySamplerSupport.class, "LBL_Heap_histogram"), // NOI18N
                     null, 10, heapView, null);
-        permgenView = new MemoryView(permgenRefresher, MemoryView.MODE_PERMGEN, memoryBean, null, heapDumper);
-        details[1] = new DataViewComponent.DetailsView(
-                    NbBundle.getMessage(MemorySamplerSupport.class, "LBL_PermGen_histogram"), // NOI18N
-                    null, 20, permgenView, null);
+        if (hasPermGenHisto) {
+            permgenView = new MemoryView(permgenRefresher, MemoryView.MODE_PERMGEN, memoryBean, null, heapDumper);
+            details[detailIndex++] = new DataViewComponent.DetailsView(
+                        NbBundle.getMessage(MemorySamplerSupport.class, "LBL_PermGen_histogram"), // NOI18N
+                        null, 20, permgenView, null);
+        }
         if (threadAllocRefresher != null) {
             threadAllocView = new ThreadsMemoryView(threadAllocRefresher, memoryBean, heapDumper);
-            details[2] = new DataViewComponent.DetailsView(
+            details[detailIndex++] = new DataViewComponent.DetailsView(
                     NbBundle.getMessage(MemorySamplerSupport.class, "LBL_ThreadAlloc"), // NOI18N
                     null, 30, threadAllocView, null);
         }

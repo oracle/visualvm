@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.sampler.cpu.ThreadsCPU;
 import com.sun.tools.visualvm.sampler.memory.MemorySettingsSupport;
 import com.sun.tools.visualvm.sampler.cpu.CPUSettingsSupport;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.jvm.HeapHistogram;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
@@ -586,8 +587,10 @@ final class SamplerImpl {
                     return;
                 }
                 final Jvm jvm = JvmFactory.getJVMFor(application);
+                boolean hasPermGenHisto;
                 try {
-                    if (jvm.takeHeapHistogram() == null) {
+                    HeapHistogram histogram = jvm.takeHeapHistogram();
+                    if (histogram == null) {
                         if (!application.isLocalApplication()) {
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
@@ -630,6 +633,7 @@ final class SamplerImpl {
                         LOGGER.log(Level.WARNING, "attachModel.takeHeapHistogram() returns null for " + application); // NOI18N
                         return;
                     }
+                    hasPermGenHisto = !histogram.getPermGenHistogram().isEmpty();
                 } catch (Throwable t) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
@@ -719,7 +723,7 @@ final class SamplerImpl {
                             else hds.takeRemoteHeapDump(application, null, openView);
                         }
                     };
-                memorySampler = new MemorySamplerSupport(jvm, threadsMemory, memoryBean, snapshotDumper, heapDumper) {
+                memorySampler = new MemorySamplerSupport(jvm, hasPermGenHisto, threadsMemory, memoryBean, snapshotDumper, heapDumper) {
                     protected Timer getTimer() { return SamplerImpl.this.getTimer(); }
                 };
                 SwingUtilities.invokeLater(new Runnable() {
