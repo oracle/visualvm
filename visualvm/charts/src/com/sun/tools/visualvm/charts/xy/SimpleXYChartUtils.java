@@ -27,7 +27,9 @@ package com.sun.tools.visualvm.charts.xy;
 
 import com.sun.tools.visualvm.charts.swing.RotateLabelUI;
 import com.sun.tools.visualvm.uisupport.HTMLTextArea;
+import com.sun.tools.visualvm.uisupport.TransparentToolBar;
 import com.sun.tools.visualvm.uisupport.UISupport;
+import com.sun.tools.visualvm.uisupport.VerticalLayout;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
@@ -40,12 +42,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.LabelUI;
 import org.netbeans.lib.profiler.charts.ChartItem;
@@ -64,7 +68,6 @@ import org.netbeans.lib.profiler.charts.swing.LongRect;
 import org.netbeans.lib.profiler.charts.xy.BytesXYItemMarksComputer;
 import org.netbeans.lib.profiler.charts.xy.DecimalXYItemMarksComputer;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYChart;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
 import org.openide.util.NbBundle;
@@ -167,16 +170,28 @@ public class SimpleXYChartUtils {
                                            String yAxisDescription, int chartType,
                                            Color[] itemColors, long initialYMargin,
                                            boolean hideItems, boolean legendVisible,
-                                           double chartFactor, XYStorage storage,
+                                           boolean supportsZooming, double chartFactor, XYStorage storage,
                                            SynchronousXYItemsModel itemsModel,
                                            XYPaintersModel paintersModel) {
 
         // Chart
+        final boolean hasAxisLabel = xAxisDescription != null || yAxisDescription != null;
+        
         final XYStorage _storage = storage;
-        SynchronousXYChart chart = new SynchronousXYChart(itemsModel, paintersModel) {
+        SimpleXYChart chart = new SimpleXYChart(itemsModel, paintersModel) {
             protected void itemsChanged(List<ChartItemChange> itemChanges) {
                 if (_storage.isFull()) updateChart(); // full repaint to handle removed items
                 else super.itemsChanged(itemChanges);
+            }
+            public void setBounds(int x, int y, int w, int h) {
+                super.setBounds(x, y, w, h);
+                
+                JScrollBar scroller = (JScrollBar)getClientProperty("scroller"); // NOI18N
+                if (scroller != null) {
+                    int xpos = getX() - 1;
+                    if (hasAxisLabel) xpos += getParent().getX();
+                    scroller.setBounds(xpos, 0, getWidth() + 1, scroller.getHeight());
+                }
             }
         };
 
@@ -188,7 +203,7 @@ public class SimpleXYChartUtils {
                                        2500, initialYMargin));
         
         chart.addPreDecorator(new XYBackground());
-
+        
         // Horizontal axis
         TimelineMarksComputer hComputer = new TimelineMarksComputer(storage,
                          chart.getChartContext(), SwingConstants.HORIZONTAL) {
@@ -251,7 +266,7 @@ public class SimpleXYChartUtils {
         chart.addOverlayComponent(selectionOverlay);
         selectionOverlay.registerChart(chart);
         chart.getSelectionModel().setMoveMode(ChartSelectionModel.SELECTION_LINE_V);
-
+        
         // Chart panel
         JPanel chartPanel = new JPanel(new CrossBorderLayout());
         chartPanel.add(chart, new Integer[] { SwingConstants.CENTER });
@@ -261,7 +276,6 @@ public class SimpleXYChartUtils {
                                               SwingConstants.SOUTH_WEST });
 
         // Chart container
-        boolean hasAxisLabel = xAxisDescription != null || yAxisDescription != null;
         JPanel chartContainer = hasAxisLabel ? new JPanel(new BorderLayout()) :
                                                chartPanel;
 
@@ -277,26 +291,58 @@ public class SimpleXYChartUtils {
         }
 
         chartContainer.setBackground(BACKGROUND_COLOR);
-        chartContainer.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
 
         // Caption panel
         JPanel captionPanel = new JPanel(new BorderLayout());
         captionPanel.setBackground(BACKGROUND_COLOR);
         if (chartTitle != null) captionPanel.add(createTitleLabel(chartTitle),
                                                  BorderLayout.NORTH);
+        
+        // Side panel
+        JPanel sidePanel = new JPanel(new VerticalLayout(false));
+        sidePanel.setOpaque(false);
+        sidePanel.setBorder(BorderFactory.createEmptyBorder(10, 5, 0, 10));
 
         // Legend panel
         JComponent legendPanel = createLegendPanel(itemColors, hideItems,
                                                    itemsModel, paintersModel);
         legendPanel.setVisible(legendVisible);
-
+        
+        // Scroller panel
+        JPanel scrollerPanel = new JPanel(null) {
+            public Dimension getPreferredSize() {
+                Component c = getComponentCount() > 0 ? getComponent(0) : null;
+                if (c != null && c.isVisible()) {
+                    Dimension size = c.getSize();
+                    size.width += c.getX();
+                    return size;
+                } else {
+                    return new Dimension();
+                }
+            }
+        };
+        scrollerPanel.setOpaque(false);
+        
+        // Bottom panel
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.setOpaque(false);
+        bottomPanel.add(scrollerPanel, BorderLayout.NORTH);
+        bottomPanel.add(legendPanel, BorderLayout.SOUTH);
+        
         // Chart view
-        // Update alse setLegendVisible() if changing this code
         JPanel chartView = new JPanel(new BorderLayout());
         chartView.setBackground(BACKGROUND_COLOR);
         chartView.add(captionPanel, BorderLayout.NORTH);
         chartView.add(chartContainer, BorderLayout.CENTER);
-        chartView.add(legendPanel, BorderLayout.SOUTH);
+        chartView.add(sidePanel, BorderLayout.EAST);
+        chartView.add(bottomPanel, BorderLayout.SOUTH);
+        
+        chartView.putClientProperty("chart", chart); // NOI18N
+        chartView.putClientProperty("sidePanel", sidePanel); // NOI18N
+        chartView.putClientProperty("legendPanel", legendPanel); // NOI18N
+        chartView.putClientProperty("scrollerPanel", scrollerPanel); // NOI18N
+        
+        if (supportsZooming) setZoomingEnabled(chartView, supportsZooming);
 
         return chartView;
     }
@@ -314,14 +360,14 @@ public class SimpleXYChartUtils {
 
         final JComponent containerCenter = (JComponent)containerLayout.
                                            getLayoutComponent(BorderLayout.CENTER);
-        containerCenter.setBorder(BorderFactory.createEmptyBorder(6, 10, 0, 10));
+        containerCenter.setBorder(BorderFactory.createEmptyBorder(6, 10, 0, 0));
 
         chartContainer.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
                 boolean visible = e.getComponent().getHeight() > DETAILS_HEIGHT_THRESHOLD;
                 detailsArea.setVisible(visible);
                 containerCenter.setBorder(BorderFactory.createEmptyBorder(
-                                          visible ? 6 : 10, 10, 0, 10));
+                                          visible ? 6 : 10, 10, 0, 0));
             }
         });
 
@@ -386,9 +432,42 @@ public class SimpleXYChartUtils {
         return legendContainer;
     }
     
+    public static void setZoomingEnabled(JComponent chartUI, boolean enabled) {
+        SimpleXYChart chart = (SimpleXYChart)chartUI.getClientProperty("chart"); // NOI18N
+        
+        if (chart.isZoomingEnabled() == enabled) return;
+        else chart.setZoomingEnabled(enabled);
+        
+        JPanel sidePanel = (JPanel)chartUI.getClientProperty("sidePanel"); // NOI18N
+        JPanel scrollerPanel = (JPanel)chartUI.getClientProperty("scrollerPanel"); // NOI18N
+        
+        if (enabled) {
+            TransparentToolBar toolbar = new TransparentToolBar(false);
+            for (Action action : chart.getActions()) toolbar.addItem(action);
+            sidePanel.add(toolbar);
+            
+            JScrollBar scroller = chart.getScroller();
+            scroller.setSize(scroller.getPreferredSize());
+            scrollerPanel.add(scroller);
+            chart.putClientProperty("scroller", scroller); // NOI18N
+        } else {
+            sidePanel.removeAll();
+            scrollerPanel.removeAll();
+            chart.putClientProperty("scroller", null); // NOI18N
+        }
+        
+        sidePanel.setVisible(enabled);
+        
+        chartUI.doLayout();
+        chartUI.repaint();
+    }
+    
     public static void setLegendVisible(JComponent chartUI, boolean visible) {
-        BorderLayout layout = (BorderLayout)chartUI.getLayout();
-        layout.getLayoutComponent(BorderLayout.SOUTH).setVisible(visible);
+        JPanel legendPanel = (JPanel)chartUI.getClientProperty("legendPanel"); // NOI18N
+        legendPanel.setVisible(visible);
+        
+        chartUI.doLayout();
+        chartUI.repaint();
     }
 
     public static XYTooltipModel createTooltipModel(final int chartType,

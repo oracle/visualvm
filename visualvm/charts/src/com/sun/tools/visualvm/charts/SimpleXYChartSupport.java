@@ -74,6 +74,7 @@ public final class SimpleXYChartSupport {
     private JComponent chartUI;
     private SimpleXYChartUtils.DetailsHandle detailsHandle;
     private boolean legendVisible;
+    private boolean zoomingEnabled;
     
 
     // --- Public interface ----------------------------------------------------
@@ -90,7 +91,7 @@ public final class SimpleXYChartSupport {
                                                      yAxisDescription, chartType,
                                                      itemColors, initialYMargin,
                                                      hideItems, legendVisible,
-                                                     chartFactor, storage,
+                                                     zoomingEnabled, chartFactor, storage,
                                                      itemsModel, paintersModel);
             if (detailsItems != null)
                 detailsHandle = SimpleXYChartUtils.createDetailsArea(detailsItems,
@@ -198,6 +199,42 @@ public final class SimpleXYChartSupport {
     public boolean isLegendVisible() {
         return legendVisible;
     }
+    
+    
+    /**
+     * Enables or disables zooming the chart data.
+     * <br><br><b>Note:</b> This method can be called from any thread.
+     * <br><br><b>Warning:</b> Displaying live data by a zoomed chart may result
+     * in incorrect appearance once the data buffer starts dropping oldest values.
+     *
+     * @param zooming true if zooming is enabled, false otherwise
+     * 
+     * @since VisualVM 1.3.8
+     */
+    public void setZoomingEnabled(final boolean zooming) {
+        Runnable visibilityUpdater = new Runnable() {
+            public void run() {
+                if (zoomingEnabled == zooming) return;
+                zoomingEnabled = zooming;
+                if (chartUI != null)
+                    SimpleXYChartUtils.setZoomingEnabled(chartUI, zoomingEnabled);
+            }
+        };
+        if (SwingUtilities.isEventDispatchThread()) visibilityUpdater.run();
+        else SwingUtilities.invokeLater(visibilityUpdater);
+    }
+    
+    /**
+     * Returns true if charts zooming is enabled, false otherwise.
+     * <br><br><b>Note:</b> This method must be called in the Event Dispatch Thread.
+     *
+     * @return true if charts zooming is enabled, false otherwise
+     * 
+     * @since VisualVM 1.3.8
+     */
+    public boolean isZoomingEnabled() {
+        return zoomingEnabled;
+    }
 
 
     /**
@@ -281,6 +318,7 @@ public final class SimpleXYChartSupport {
                                             fillColors1, fillColors2, itemsModel);
         
         legendVisible = true;
+        zoomingEnabled = false;
     }
 
 }

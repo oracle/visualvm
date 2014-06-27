@@ -56,6 +56,7 @@ import javax.swing.plaf.basic.BasicComboBoxEditor;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 /**
+ * 1.3.8 - added initial support for vertical toolbar, not fully implemented
  *
  * @author Jiri Sedlacek
  */
@@ -68,19 +69,28 @@ public final class TransparentToolBar extends JPanel {
     
     private final JToolBar toolbar;
     private final ItemListener listener = new ItemListener();
+    
+    private final boolean horizontal;
 
     
     public TransparentToolBar() {
+        this(true);
+    }
+    
+    public TransparentToolBar(boolean horizontal) {
+        this.horizontal = horizontal;
+        
         setOpaque(false);
-        setBorder(createToolBarBorder());
+        setBorder(createToolBarBorder(horizontal));
         
         if (needsPanel()) {
             // Toolbar is a JPanel (GTK)
             toolbar = null;
-            setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+            setLayout(new BoxLayout(this, horizontal ? BoxLayout.X_AXIS :
+                                                       BoxLayout.Y_AXIS));
         } else {
             // Toolbar is a JToolBar (default)
-            toolbar = createToolBar();
+            toolbar = createToolBar(horizontal);
             toolbar.setBorder(BorderFactory.createEmptyBorder());
             setLayout(new BorderLayout());
             add(toolbar, BorderLayout.CENTER);
@@ -104,25 +114,27 @@ public final class TransparentToolBar extends JPanel {
     
     public Dimension getPreferredSize() {
         Dimension dim = getPreferredSizeSuper();
-        if (PREFERRED_HEIGHT == -1) {
-            TransparentToolBar tb = new TransparentToolBar();
-            Icon icon = new Icon() {
-                public int getIconWidth() { return 16; }
-                public int getIconHeight() { return 16; }
-                public void paintIcon(Component c, Graphics g, int x, int y) {}
-            };
-            JButton b = new JButton("Button", icon); // NOI18N
-            tb.addItem(b);
-            JToggleButton t = new JToggleButton("Button", icon); // NOI18N
-            tb.addItem(t);
-            JComboBox c = new JComboBox();
-            c.setEditor(new BasicComboBoxEditor());
-            c.setRenderer(new BasicComboBoxRenderer());
-            tb.addItem(c);
-            tb.addSeparator();
-            PREFERRED_HEIGHT = tb.getPreferredSizeSuper().height;
+        if (horizontal) {
+            if (PREFERRED_HEIGHT == -1) {
+                TransparentToolBar tb = new TransparentToolBar();
+                Icon icon = new Icon() {
+                    public int getIconWidth() { return 16; }
+                    public int getIconHeight() { return 16; }
+                    public void paintIcon(Component c, Graphics g, int x, int y) {}
+                };
+                JButton b = new JButton("Button", icon); // NOI18N
+                tb.addItem(b);
+                JToggleButton t = new JToggleButton("Button", icon); // NOI18N
+                tb.addItem(t);
+                JComboBox c = new JComboBox();
+                c.setEditor(new BasicComboBoxEditor());
+                c.setRenderer(new BasicComboBoxRenderer());
+                tb.addItem(c);
+                tb.addSeparator();
+                PREFERRED_HEIGHT = tb.getPreferredSizeSuper().height;
+            }
+            dim.height = Math.max(dim.height, PREFERRED_HEIGHT);
         }
-        dim.height = Math.max(dim.height, PREFERRED_HEIGHT);
         return dim;
     }
     
@@ -198,13 +210,16 @@ public final class TransparentToolBar extends JPanel {
     
     public void addSeparator() {
         JToolBar.Separator separator = new JToolBar.Separator();
-        separator.setOrientation(JToolBar.Separator.VERTICAL);
+        separator.setOrientation(horizontal ? JToolBar.Separator.VERTICAL :
+                                              JToolBar.Separator.HORIZONTAL);
         addItem(separator);
     }
     
     public void addSpace(int width) {
-        JToolBar.Separator separator = new JToolBar.Separator(new Dimension(width, 0));
-        separator.setOrientation(JToolBar.Separator.VERTICAL);
+        Dimension dim = horizontal ? new Dimension(width, 0) : new Dimension(0, width);
+        JToolBar.Separator separator = new JToolBar.Separator(dim);
+        separator.setOrientation(horizontal ? JToolBar.Separator.VERTICAL :
+                                              JToolBar.Separator.HORIZONTAL);
         addItem(separator);
     }
     
@@ -221,7 +236,8 @@ public final class TransparentToolBar extends JPanel {
         JPanel panel = new JPanel(new BorderLayout(0, 0));
         panel.setOpaque(false);
         panel.add(toolbar, BorderLayout.CENTER);
-        panel.add(new SeparatorLine(true), BorderLayout.SOUTH);
+        panel.add(new SeparatorLine(true), toolbar.horizontal ? BorderLayout.SOUTH :
+                                                                BorderLayout.EAST);
         return panel;
     }
     
@@ -238,26 +254,29 @@ public final class TransparentToolBar extends JPanel {
         return b;
     }
     
-    private static JToolBar createToolBar() {
-        JToolBar tb = new JToolBar() {
+    private static JToolBar createToolBar(final boolean horizontal) {
+        JToolBar tb = new JToolBar(horizontal ? JToolBar.HORIZONTAL : JToolBar.VERTICAL) {
             public void layout() {
                 super.layout();
-                if (BUTTON_HEIGHT == -1)
-                    BUTTON_HEIGHT = getButtonHeight();
-                Insets i = getInsets();
-                int height = getHeight() - i.top - i.bottom;
-                for (Component comp : getComponents()) {
-                    if (comp.isVisible() && (comp instanceof JButton || comp instanceof JToggleButton)) {
-                        Rectangle b = comp.getBounds();
-                        b.height = BUTTON_HEIGHT;
-                        b.y = i.top + (height - b.height) / 2;
-                        comp.setBounds(b);
+                if (horizontal) {
+                    if (BUTTON_HEIGHT == -1)
+                        BUTTON_HEIGHT = getButtonHeight();
+                    Insets i = getInsets();
+                    int height = getHeight() - i.top - i.bottom;
+                    for (Component comp : getComponents()) {
+                        if (comp.isVisible() && (comp instanceof JButton || comp instanceof JToggleButton)) {
+                            Rectangle b = comp.getBounds();
+                            b.height = BUTTON_HEIGHT;
+                            b.y = i.top + (height - b.height) / 2;
+                            comp.setBounds(b);
+                        }
                     }
                 }
             }
         };
         if (UISupport.isNimbusLookAndFeel())
-            tb.setLayout(new BoxLayout(tb, BoxLayout.LINE_AXIS));
+            tb.setLayout(new BoxLayout(tb, horizontal ? BoxLayout.X_AXIS :
+                                                        BoxLayout.Y_AXIS));
         tb.setBorderPainted(false);
         tb.setFloatable(false);
         tb.setRollover(true);
@@ -265,13 +284,21 @@ public final class TransparentToolBar extends JPanel {
         return tb;
     }
     
-    private static Border createToolBarBorder() {
-        if (UISupport.isAquaLookAndFeel()) {
-            return BorderFactory.createEmptyBorder(-1, 2, -1, 2);
-        } else if (UISupport.isNimbusLookAndFeel()) {
-            return BorderFactory.createEmptyBorder(1, 2, 1, 2);
+    private static Border createToolBarBorder(boolean horizontal) {
+        if (horizontal) {
+            if (UISupport.isAquaLookAndFeel()) {
+                return BorderFactory.createEmptyBorder(-1, 2, -1, 2);
+            } else if (UISupport.isNimbusLookAndFeel()) {
+                return BorderFactory.createEmptyBorder(1, 2, 1, 2);
+            } else {
+                return BorderFactory.createEmptyBorder(2, 2, 2, 2);
+            }
         } else {
-            return BorderFactory.createEmptyBorder(2, 2, 2, 2);
+            if (UISupport.isAquaLookAndFeel()) {
+                return BorderFactory.createEmptyBorder(-1, 0, -1, 0);
+            } else {
+                return BorderFactory.createEmptyBorder();
+            }
         }
     }
     

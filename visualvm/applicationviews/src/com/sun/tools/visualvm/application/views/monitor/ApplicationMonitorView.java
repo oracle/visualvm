@@ -363,6 +363,8 @@ class ApplicationMonitorView extends DataSourceView {
 
             chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
             model.registerCpuChartSupport(chartSupport);
+            
+            chartSupport.setZoomingEnabled(!liveModel);
         }
 
         private void initComponents(ApplicationMonitorModel model) {
@@ -432,6 +434,8 @@ class ApplicationMonitorView extends DataSourceView {
 
             chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
             model.registerHeapChartSupport(chartSupport);
+            
+            chartSupport.setZoomingEnabled(!liveModel);
         }
 
         private void initComponents(ApplicationMonitorModel model) {
@@ -502,6 +506,8 @@ class ApplicationMonitorView extends DataSourceView {
 
             chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
             model.registerPermGenChartSupport(chartSupport);
+            
+            chartSupport.setZoomingEnabled(!liveModel);
         }
 
         private void initComponents(ApplicationMonitorModel model) {
@@ -574,6 +580,8 @@ class ApplicationMonitorView extends DataSourceView {
 
             chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
             model.registerClassesChartSupport(chartSupport);
+            
+            chartSupport.setZoomingEnabled(!liveModel);
         }
 
         private void initComponents(ApplicationMonitorModel model) {
@@ -646,6 +654,8 @@ class ApplicationMonitorView extends DataSourceView {
 
             chartSupport = ChartFactory.createSimpleXYChart(chartDescriptor);
             model.registerThreadsChartSupport(chartSupport);
+            
+            chartSupport.setZoomingEnabled(!liveModel);
         }
 
         private void initComponents(ApplicationMonitorModel model) {
