@@ -1,0 +1,289 @@
+package net.java.btrace.visualvm.tracer.jvm.resources;
+
+import com.sun.btrace.annotations.*;
+import static com.sun.btrace.BTraceUtils.*;
+
+@BTrace(name="JavaIOStats") public class JavaIOTracer {
+    // <fragment name="files">
+    private static long fileWriteBytes = 0;
+    private static long fileReadBytes = 0;
+    @Property volatile private static long fileWriteRate = 0;
+    @Property volatile private static long fileReadRate = 0;
+
+    @OnMethod(
+        clazz="/java.io.(FileInputStream|RandomAccessFile)/",
+        method="read",
+        type="int(byte[])",
+        location=@Location(value=Kind.RETURN)
+    )
+    public static void onRead(@Return int bytes) {
+        fileReadBytes += bytes > -1 ? bytes : 0;
+    }
+
+    @OnMethod(
+        clazz="/java.io.(FileInputStream|RandomAccessFile)/",
+        method="read",
+        type="int(byte[], int, int)",
+        location=@Location(value=Kind.RETURN)
+    )
+    public static void onRead1(@Return int bytes) {
+        fileReadBytes += bytes > -1 ? bytes : 0;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="/read(Boolean|Byte|UnsignedByte)/"
+    )
+    public static void onReadByte() {
+        fileReadBytes++;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="/read(Short|UnsignedShort|Char)/"
+    )
+    public static void onReadWord() {
+        fileReadBytes += 2;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="/read(Int|Float)/"
+    )
+    public static void onReadDWord() {
+        fileReadBytes += 4;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="/read(Long|Double)/"
+    )
+    public static void onReadQWord() {
+        fileReadBytes += 8;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="readLine",
+        location=@Location(value=Kind.RETURN)
+    )
+    public static void onReadLine(@Return String line) {
+        fileReadBytes += length(line);
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="readUTF",
+        location=@Location(value=Kind.RETURN)
+    )
+    public static void onReadUTF(@Return String text) {
+        fileReadBytes += (length(text) * 2);
+    }
+
+    @OnMethod(
+        clazz="/java.io.(FileOutputStream|RandomAccessFile)/",
+        method="write"
+    )
+    public static void onWrite1(byte[] data) {
+        fileWriteBytes += data.length;
+    }
+
+    @OnMethod(
+        clazz="/java.io.(FileOutputStream|RandomAccessFile)/",
+        method="write"
+    )
+    public static void onWrite(byte[] data, int offset, int len) {
+        fileWriteBytes += len;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="/write(Boolean|Byte|UnsignedByte)/"
+    )
+    public static void onWriteByte() {
+        fileWriteBytes++;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="/write(Short|UnsignedShort|Char)/"
+    )
+    public static void onWriteWord() {
+        fileWriteBytes += 2;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="/write(Int|Float)/"
+    )
+    public static void onWriteDWord() {
+        fileWriteBytes += 4;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="/write(Long|Double)/"
+    )
+    public static void onWriteQWord() {
+        fileWriteBytes += 8;
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="writeChars"
+    )
+    public static void onWriteChars(String txt) {
+        fileWriteBytes += length(txt);
+    }
+
+    @OnMethod(
+        clazz="java.io.RandomAccessFile",
+        method="writeUTF"
+    )
+    public static void onWriteUTF(String txt) {
+        fileWriteBytes += (length(txt) * 2);
+    }
+    // </fragment>
+
+    // <fragment name="nio">
+    private static long nioReadData = 0;
+    @Property volatile private static long nioReadRate = 0;
+
+    @OnMethod(
+        clazz="+java.nio.ByteBuffer",
+        method="getChar"
+    )
+    public static void onGetChar() {
+        nioReadData++;
+    }
+
+    @OnMethod(
+        clazz="+java.nio.ByteBuffer",
+        method="/get(Long|Double)/"
+    )
+    public static void onRead8() {
+        nioReadData += 8;
+    }
+
+    @OnMethod(
+        clazz="+java.nio.ByteBuffer",
+        method="/get(Int|Float)/"
+    )
+    public static void onRead4() {
+        nioReadData += 4;
+    }
+
+    @OnMethod(
+        clazz="+java.nio.ByteBuffer",
+        method="getShort"
+    )
+    public static void onGetShort() {
+        nioReadData += 2;
+    }
+
+    @OnMethod(
+        clazz="+java.nio.ByteBuffer",
+        method="get"
+    )
+    public static void onGetByte() {
+        nioReadData++;
+    }
+
+    @OnMethod(
+        clazz="+java.nio.ByteBuffer",
+        method="get"
+    )
+    public static void onGetByteArr(byte[] data, int offset, int len) {
+        nioReadData += len;
+    }
+
+    private static long nioWriteData = 0;
+    @Property volatile private static long nioWriteRate = 0;
+
+    @OnMethod(
+        clazz="+java.nio.ByteBuffer",
+        method="putChar"
+    )
+    public static void onPutChar() {
+        nioWriteData++;
+    }
+
+    @OnMethod(
+        clazz="+java.nio.ByteBuffer",
+        method="/put(Long|Double)/"
+    )
+    public static void onPut8() {
+        nioWriteData += 8;
+    }
+
+    @OnMethod(
+        clazz="+java.nio.ByteBuffer",
+        method="/put(Int|Float)/"
+    )
+    public static void onPut4() {
+        nioWriteData += 4;
+    }
+
+    @OnMethod(
+        clazz="+java.nio.ByteBuffer",
+        method="putShort"
+    )
+    public static void onPutShort() {
+        nioWriteData += 2;
+    }
+
+    @OnMethod(
+        clazz="+java.nio.ByteBuffer",
+        method="put",
+        type="java.nio.ByteBuffer(byte)"
+    )
+    public static void onPutByte() {
+        nioWriteData++;
+    }
+
+    @OnMethod(
+        clazz="+java.nio.ByteBuffer",
+        method="put",
+        type="java.nio.ByteBuffer(byte[])"
+    )
+    public static void onPutByteArr(byte[] data) {
+        nioWriteData += data.length;
+    }
+
+    @OnMethod(
+        clazz="+java.nio.ByteBuffer",
+        method="put",
+        type="java.nio.ByteBuffer(byte[], int, int)"
+    )
+    public static void onPutByteArrLen(byte[] data, int offset, int len) {
+        nioWriteData += len;
+    }
+
+    @OnMethod(
+        clazz="+java.nio.ByteBuffer",
+        method="put",
+        type="java.nio.ByteBuffer(java.nio.ByteBuffer)"
+    )
+    public static void onPutByte(java.nio.ByteBuffer buffer) {
+        int cap = unbox((Integer)get(field("java.nio.Buffer", "capacity"), buffer));
+        nioWriteData += cap;
+    }
+    // </fragment>
+
+    @OnTimer(value=1000)
+    public static void calcRates() {
+        // <fragment name="files">
+        fileReadRate = fileReadBytes;
+        fileWriteRate = fileWriteBytes;
+        fileReadBytes = 0;
+        fileWriteBytes = 0;
+        // </fragment>
+
+       // <fragment name="nio">
+       nioReadRate = nioReadData;
+       nioWriteRate = nioWriteData;
+       nioReadData = 0;
+       nioWriteData = 0;
+       // </fragment>
+    }
+}

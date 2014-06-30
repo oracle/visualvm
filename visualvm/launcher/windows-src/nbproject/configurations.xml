@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="90">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>cmdargs.h</itemPath>
+      <itemPath>o.n.bootstrap/utilsfuncs.h</itemPath>
+      <itemPath>version.h</itemPath>
+      <itemPath>visualvmlauncher.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+      <itemPath>version.rc</itemPath>
+      <itemPath>visualvm.exe.manifest</itemPath>
+      <itemPath>visualvm.rc</itemPath>
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>o.n.bootstrap/utilsfuncs.cpp</itemPath>
+      <itemPath>visualvm.cpp</itemPath>
+      <itemPath>visualvmlauncher.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="visualvm.exe" type="1">
+      <toolsSet>
+        <compilerSet>Cygwin|Cygwin</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+          <stripSymbols>true</stripSymbols>
+          <architecture>1</architecture>
+          <commandLine>-mno-cygwin</commandLine>
+          <preprocessorList>
+            <Elem>ARCHITECTURE=32</Elem>
+            <Elem>NBEXEC_DLL="/lib/nbexec.dll"</Elem>
+          </preprocessorList>
+        </ccTool>
+        <linkerTool>
+          <output>visualvm.exe</output>
+          <linkerLibItems>
+            <linkerOptionItem>visualvm.res</linkerOptionItem>
+          </linkerLibItems>
+          <commandLine>-mwindows -Wl,--nxcompat -Wl,--dynamicbase -Wl,--no-seh</commandLine>
+        </linkerTool>
+      </compileType>
+      <item path="cmdargs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="o.n.bootstrap/utilsfuncs.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="o.n.bootstrap/utilsfuncs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="version.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="version.rc" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="visualvm.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="visualvm.exe.manifest" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="visualvm.rc" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="visualvmlauncher.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="visualvmlauncher.h" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+    <conf name="visualvm64.exe" type="1">
+      <toolsSet>
+        <compilerSet>Cygwin64|Cygwin</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+          <stripSymbols>true</stripSymbols>
+          <architecture>2</architecture>
+          <commandLine>-mno-cygwin -static-libgcc -static-libstdc++</commandLine>
+          <preprocessorList>
+            <Elem>ARCHITECTURE=64</Elem>
+            <Elem>NBEXEC_DLL="/lib/nbexec64.dll"</Elem>
+          </preprocessorList>
+        </ccTool>
+        <linkerTool>
+          <output>visualvm64.exe</output>
+          <linkerLibItems>
+            <linkerOptionItem>visualvm64.res</linkerOptionItem>
+          </linkerLibItems>
+          <commandLine>-mwindows</commandLine>
+        </linkerTool>
+      </compileType>
+      <item path="cmdargs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="o.n.bootstrap/utilsfuncs.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="o.n.bootstrap/utilsfuncs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="version.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="version.rc" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="visualvm.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="visualvm.exe.manifest" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="visualvm.rc" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="visualvmlauncher.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="visualvmlauncher.h" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

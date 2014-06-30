@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- You may freely edit this file. See harness/README in the NetBeans platform -->
+<!-- for some information on what you could do (e.g. targets to override). -->
+<!-- If you delete this file and reopen the project it will be recreated. -->
+<project name="visualvm" basedir=".">
+    <description>Builds the module suite visualvm.</description>
+    <import file="nbproject/build-impl.xml"/>
+    <target name="create-platform" depends="build-zip">
+        <mkdir dir="${visualvm-platform}"/>
+        <unzip src="dist/${app.name}.zip" dest="${visualvm-platform}"/>
+    </target>
+    <target name="build-launchers" depends="build-launchers.shadow"/>
+    <target name="build-launchers.shadow" depends="-init">
+        <fail unless="app.name">Must have set at least an application name ('app.name')
+        </fail>
+        <pathconvert property="zip.platform.update.tracking">
+            <path>
+                <fileset dir="${netbeans.dest.dir}">
+                    <include name="**/update_tracking/*.xml"/>
+                </fileset>
+            </path>
+        </pathconvert>
+        <selector id="zip.platform.included.files">
+            <custom classpath="${harness.dir}/tasks.jar" classname="org.netbeans.nbbuild.ModuleSelector">
+                <param name="excludeModules" value="${disabled.modules}"/>
+                <param name="includeClusters" value="${enabled.clusters}"/>
+                <param name="excludeClusters" value="${disabled.clusters}"/>
+                <param name="updateTrackingFiles" value="${zip.platform.update.tracking}"/>
+            </custom>
+        </selector>
+        <pathconvert property="zip.platform.clusters.duplicates" pathsep=",">
+            <path>
+                <fileset dir="${netbeans.dest.dir}">
+                    <selector refid="zip.platform.included.files"/>
+                </fileset>
+            </path>
+            <mapper type="regexp" from="[/\\]([^/\\]+)[/\\]config[/\\]Modules[/\\]" to="\1"/> <!-- #71849 -->
+        </pathconvert>
+        <dirset id="zip.platform.clusters" dir="${netbeans.dest.dir}" includes="${zip.platform.clusters.duplicates}" excludes="platform*"/>
+        <pathconvert property="zip.platform.clusters.bare" pathsep="&#10;"> <!-- #71128: \n OK on Win but \r\n bad on Unix -->
+            <path>
+                <dirset refid="zip.platform.clusters"/>
+            </path>
+            <mapper type="regexp" from="[/\\]([^/\\]+)[/\\]?$" to="\1"/> <!-- #71849 -->
+        </pathconvert>
+        <property name="build.launcher.dir" location="build/launcher"/>
+        <mkdir dir="${build.launcher.dir}/etc"/>
+        <mkdir dir="${build.launcher.dir}/bin"/>
+        <copy file="launcher/visualvm.exe" todir="${build.launcher.dir}/bin/"/>
+        <copy file="launcher/visualvm" todir="${build.launcher.dir}/bin/"/>
+        <copy file="launcher/visualvm.conf" todir="${build.launcher.dir}/etc/"/>
+        <copy file="launcher/visualvm.icns" todir="${build.launcher.dir}/etc/"/>
+        <echo message="${app.name}" file="${build.launcher.dir}/etc/${app.name}.clusters"/>
+        <echo message="&#10;" file="${build.launcher.dir}/etc/${app.name}.clusters" append="true"/>
+        <echo message="${zip.platform.clusters.bare}" file="${build.launcher.dir}/etc/${app.name}.clusters" append="true"/>
+        <echo message="&#10;" file="${build.launcher.dir}/etc/${app.name}.clusters" append="true"/>
+    </target>
+
+    <target name="build" depends="-init,branding,release" description="Build all modules in the suite.">
+        <subant target="netbeans" buildpath="${modules.sorted}" inheritrefs="false" inheritall="false"/>
+        <mkdir dir="${cluster}/config/Modules"/>
+        <createmodulexml xmldir="${cluster}/config/Modules">
+            <hidden dir="${netbeans.dest.dir}">
+                <selector>
+                    <and>
+                        <custom classpath="${harness.dir}/tasks.jar" classname="org.netbeans.nbbuild.ModuleSelector">
+                            <param name="excludeModules" value="${disabled.modules}"/>
+                            <param name="excluded" value="true"/>
+                        </custom>
+                        <filename name="**/platform*/modules/**/*.jar"/>
+                    </and>
+                </selector>
+            </hidden>
+        </createmodulexml>
+    </target>
+
+    <target name="build-zip" depends="build,build-launchers" description="Builds a ZIP distribution of the suite, launchers, and selected modules from the platform.">
+        <mkdir dir="dist"/>
+        <zip destfile="dist/${app.name}.zip" >
+            <zipfileset dir="${build.launcher.dir}/bin/" filemode="755" prefix="${app.name}/bin"/>
+            <zipfileset dir="${build.launcher.dir}/etc/" prefix="${app.name}/etc"/>
+            <zipfileset dir="${netbeans.dest.dir}" filemode="755" prefix="${app.name}">
+                <include name="**/lib/nbexec*"/>
+                <include name="profiler*/lib/deployed/**/hpux*/lib*.sl"/>
+                <include name="profiler*/lib/deployed/**/lib*.so"/>
+            </zipfileset>
+
+            <zipfileset dir="${netbeans.dest.dir}" prefix="${app.name}">
+                <and>
+                    <not>
+                        <filename name="**/lib/nbexec*"/>
+                    </not>
+                    <not>
+                	<filename name="profiler*/lib/deployed/**/hpux*/lib*.sl"/>
+                    </not>
+                    <not>
+                	<filename name="profiler*/lib/deployed/**/lib*.so"/>
+                    </not>
+                    <selector refid="zip.platform.included.files"/>
+                    <not>
+                        <filename name="DISTRIBUTION.txt"/>
+                    </not>
+                    <not>
+                        <filename name="LICENSE.txt"/>
+                    </not>
+                </and>
+            </zipfileset>
+
+            <zipfileset dir="startup/src/com/sun/tools/visualvm/modules/startup/" includes="LICENSE.txt" prefix="${app.name}"/>
+
+            <!-- Yes, the doubled app.name is a bit ugly, but better than the alternative; cf. #66441: -->
+            <zipfileset dir="${cluster}" prefix="${app.name}/${app.name}">
+                <!--
+                <exclude name="config/Modules/*.xml_hidden"/>
+                -->
+            </zipfileset>
+        </zip>
+    </target>
+
+    <target name="javadoc" depends="-init,branding">
+        <delete dir="build/javadoc"/>
+
+        <javadoc destdir="build/javadoc" author="true" version="true" use="true" encoding="UTF-8" windowtitle="${app.title} API">
+            
+            <!--group title="VisualVM-Application" packages="com.sun.tools.visualvm.application*"/-->
+            <fileset dir="application/src" defaultexcludes="yes">
+                <include name="**/*.java"/>
+                <exclude name="com/sun/tools/visualvm/application/options/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-Application Views" packages="com.sun.tools.visualvm.application.views*"/-->
+            <fileset dir="applicationviews/src" defaultexcludes="yes">
+                <include name="*com/sun/tools/visualvm/application/views/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-Charts" packages="ccom.sun.tools.visualvm.charts*"/-->
+            <fileset dir="charts/src" defaultexcludes="yes">
+                <include name="**/*.java"/>
+                <exclude name="com/sun/tools/visualvm/charts/swing/*.java"/>
+                <exclude name="com/sun/tools/visualvm/charts/xy/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-Core" packages="com.sun.tools.visualvm.core*"/-->
+            <fileset dir="core/src" defaultexcludes="yes">
+                <include name="**/*.java"/>
+                <exclude name="com/sun/tools/visualvm/core/*.java"/>
+                <exclude name="com/sun/tools/visualvm/core/snapshot/options/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-CoreDump" packages="com.sun.tools.visualvm.coredump*"/-->
+            <fileset dir="coredump/src" defaultexcludes="yes">
+                <include name="com/sun/tools/visualvm/coredump/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-HeapDump" packages="com.sun.tools.visualvm.heapdump*"/-->
+            <fileset dir="heapdump/src" defaultexcludes="yes">
+                <include name="com/sun/tools/visualvm/heapdump/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-Host" packages="com.sun.tools.visualvm.host*"/-->
+            <fileset dir="host/src" defaultexcludes="yes">
+                <include name="**/*.java"/>
+                <exclude name="com/sun/tools/visualvm/host/impl/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-Host Views" packages="com.sun.tools.visualvm.host.views*"/-->
+            <fileset dir="hostviews/src" defaultexcludes="yes">
+                <include name="*com/sun/tools/visualvm/host/views/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-JMX" packages="com.sun.tools.visualvm.jmx*"/-->
+            <fileset dir="jmx/src" defaultexcludes="yes">
+                <include name="*com/sun/tools/visualvm/jmx/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-ThreadDump" packages="com.sun.tools.visualvm.threaddump*"/-->
+            <fileset dir="threaddump/src" defaultexcludes="yes">
+                <include name="com/sun/tools/visualvm/threaddump/*.java"/>
+            </fileset>
+
+            <!--group title="VisualVM-Tools" packages="com.sun.tools.visualvm.tools*"/-->
+            <fileset dir="tools/src" defaultexcludes="yes">
+                <include name="**/*.java"/>
+                <exclude name="com/sun/tools/visualvm/tools/*.java"/>
+            </fileset>
+
+            <classpath>
+                <pathelement location="netbeans/platform/lib/org-openide-util-lookup.jar"/>
+                <pathelement location="netbeans/platform/lib/org-openide-util.jar"/>
+                <pathelement location="netbeans/platform/modules/org-openide-windows.jar"/>
+                <pathelement location="netbeans/platform/modules/org-openide-awt.jar"/>
+                <pathelement location="netbeans/platform/lib/org-openide-modules.jar"/>
+                <pathelement location="netbeans/platform/core/org-openide-filesystems.jar"/>
+                <pathelement location="netbeans/platform/modules/org-openide-dialogs.jar"/>
+                <pathelement location="netbeans/platform/modules/org-netbeans-api-progress.jar"/>
+                <pathelement location="netbeans/platform/modules/org-netbeans-modules-options-api.jar"/>
+                <pathelement location="netbeans/platform/modules/org-openide-loaders.jar"/>
+                <pathelement location="netbeans/platform/modules/org-openide-nodes.jar"/>
+                <pathelement location="netbeans/profiler/modules/org-netbeans-lib-profiler-charts.jar"/>
+                <pathelement location="netbeans/profiler/modules/org-netbeans-modules-profiler-api.jar"/>
+                <pathelement location="uisupport/build/classes/"/>
+                <pathelement location="applicationviews/build/classes/"/>
+                <pathelement location="charts/build/classes/"/>
+                <pathelement location="coredump/build/classes/"/>
+                <pathelement location="threaddump/build/classes/"/>
+                <pathelement location="heapdump/build/classes/"/>
+                <pathelement location="jmx/build/classes/"/>
+                <pathelement location="host/build/classes/"/>
+                <pathelement location="hostviews/build/classes/"/>
+            </classpath>
+
+            <link href="http://docs.oracle.com/javase/7/docs/api/"/>
+
+
+            <doctitle><![CDATA[<h1>${app.title} API Specification</h1><p align="left">This document is the API specification for ${app.title}. See the <a href="https://visualvm.java.net/api-quickstart.html">Getting Started Extending VisualVM</a> document for information about developing plugins for VisualVM.</p><br/>]]></doctitle>
+            <header><![CDATA[<b>${app.title} API<br>Specification</b>]]></header>
+
+        </javadoc>
+
+        <nbbrowse file="build/javadoc/index.html"/>
+    </target>
+
+    <target name="l10n-kit">
+    	<mkdir dir="build/antclasses"/>
+	<javac srcdir="antsrc" destdir="build/antclasses" deprecation="true" debug="true" source="1.5" target="1.5">
+        	<classpath>
+		<pathelement location="${ant.core.lib}"/>
+		</classpath>
+		<compilerarg line="-Xlint -Xlint:-serial"/>
+	</javac>
+	<jar jarfile="nbantext.jar">
+		<fileset dir="build/antclasses"/>
+	</jar>
+        <taskdef name="l10n" classname="org.netbeans.nbbuild.L10nTask"
+             classpath="nbantext.jar"/>
+	<mkdir dir="build"/>
+	<property name="l10n.kit" location="build/l10n.zip"/>
+	<property name="nbms.location" location="build/updates"/>
+	<l10n nbmsdir="${nbms.location}" tmpdir="tmp" patternsFile="l10n.patterns" kitFile="${l10n.kit}"/>
+    </target>
+
+</project>
