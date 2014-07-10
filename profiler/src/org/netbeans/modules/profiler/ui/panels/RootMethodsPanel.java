@@ -140,37 +140,36 @@ public final class RootMethodsPanel extends JPanel implements ActionListener, Li
     public void actionPerformed(final ActionEvent e) {
         if (e.getSource() == addFromJarButton) {
             addFromJarButton.setEnabled(false);
+            FileChooserBuilder b = new FileChooserBuilder(RootMethodsPanel.class);
+            final File jar = b.setFileFilter(new FileFilter() {
+
+                @Override
+                public boolean accept(File f) {
+                    if (f.isDirectory()) {
+                        return true;
+                    }
+                    String ext = null;
+                    String n = f.getName();
+                    int index = n.lastIndexOf("."); // NOI18N
+                    if (index > -1) {
+                        ext = n.substring(index + 1);
+                    }
+                    return ext != null && ext.equalsIgnoreCase("jar"); // NOI18N
+                }
+
+                @Override
+                public String getDescription() {
+                    return Bundle.RootMethodsPanel_FoldersJarsFileFilter();
+                }
+            }).showOpenDialog();
+
+            if (jar == null) {
+                return;
+            }
             RequestProcessor.getDefault().post(new Runnable() {
 
                 public void run() {
                     try {
-                        FileChooserBuilder b = new FileChooserBuilder(RootMethodsPanel.class);
-                        File jar = b.setFileFilter(new FileFilter() {
-
-                            @Override
-                            public boolean accept(File f) {
-                                if (f.isDirectory()) {
-                                    return true;
-                                }
-                                String ext = null;
-                                String n = f.getName();
-                                int index = n.lastIndexOf("."); // NOI18N
-                                if (index > -1) {
-                                    ext = n.substring(index + 1);
-                                }
-                                return ext != null && ext.equalsIgnoreCase("jar"); // NOI18N
-                            }
-
-                            @Override
-                            public String getDescription() {
-                                return Bundle.RootMethodsPanel_FoldersJarsFileFilter();
-                            }
-                        }).showOpenDialog();
-
-                        if (jar == null) {
-                            return;
-                        }
-
                         final ClientUtils.SourceCodeSelection[] sel = FileSelectRootMethodsPanel.getDefault().getRootMethods(FileUtil.toFileObject(jar),
                                 (ClientUtils.SourceCodeSelection[]) selectedRoots.toArray(new ClientUtils.SourceCodeSelection[]{}));
 
