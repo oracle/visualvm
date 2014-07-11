@@ -82,6 +82,8 @@
 
 #define MAX_FRAMES 16384
 
+#define PACKEDARR_ITEMS 4
+
 static jvmtiFrameInfo *_stack_frames_buffer = NULL;
 static jint *_stack_id_buffer = NULL;
 static jclass threadType = NULL;
@@ -231,6 +233,7 @@ static void copy_dummy_names_into_data_array() {
     copy_into_data_array("<unknown class>");
     copy_into_data_array("<unknown method>");
     copy_into_data_array("()V");
+    copy_into_data_array("0");
 }
 
 
@@ -250,8 +253,8 @@ JNIEXPORT jbyteArray JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks
     // fprintf (stderr, "1");
     methodIds = (jint*) malloc(sizeof(jint) * nMethods);
     (*env)->GetIntArrayRegion(env, jmethodIds, 0, nMethods, methodIds);
-    strOffsets = (jint*) malloc(sizeof(jint) * nMethods * 3);
-    byteDataLen = nMethods * 3 * 10;  /* The initial size for the packed strings array */
+    strOffsets = (jint*) malloc(sizeof(jint) * nMethods * PACKEDARR_ITEMS);
+    byteDataLen = nMethods * PACKEDARR_ITEMS * 10;  /* The initial size for the packed strings array */
     byteData = (jbyte*) malloc(byteDataLen);
 
     // fprintf (stderr, "2");
@@ -260,6 +263,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks
     for (i = 0; i < nMethods; i++) {
         jclass declaringClass;
         char *className, *genericSignature, *methodName, *methodSig, *genericMethodSig;
+        jboolean native = JNI_FALSE;
         jmethodID methodID = convert_jint_to_jmethodID(methodIds[i]);
 
         //fprintf (stderr, "Going to call GetMethodDeclaringClass for methodId = %d\n", *(int*)methodID);
@@ -298,7 +302,15 @@ JNIEXPORT jbyteArray JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks
             continue;
         }
 
-        // fprintf (stderr, "Going to copy results, last res = %d, method name: %s, sig: %s, genSig: %s\n", res, methodName, methodSig, genericMethodSig);
+        // fprintf (stderr, "Going to call IsMethodNative for methodId = %d, last res = %d, signature: %s\n", *(int*)methodID, res, genericSignature);
+        
+        res = (*_jvmti)->IsMethodNative(_jvmti, methodID, &native);
+        
+        if (res != JVMTI_ERROR_NONE) {
+            fprintf(stderr, "Profiler Agent Warning: Couldn't obtain native flag for methodID = %p\n", methodID);
+        }
+
+        // fprintf (stderr, "Going to copy results, last res = %d, method name: %s, sig: %s, genSig: %s, native %d\n", res, methodName, methodSig, genericMethodSig, native);
 
         len = strlen(className);
         if (className[0] == 'L' && className[len-1] == ';') {
@@ -310,6 +322,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks
 
         copy_into_data_array(methodName);
         copy_into_data_array(methodSig);
+        copy_into_data_array(native?"1":"0");
 
         (*_jvmti)->Deallocate(_jvmti, (void*)className);
 
@@ -329,7 +342,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_netbeans_lib_profiler_server_system_Stacks
 
     ret = (*env)->NewByteArray(env, dataOfs);
     (*env)->SetByteArrayRegion(env, ret, 0, dataOfs, byteData);
-    (*env)->SetIntArrayRegion(env, packedArrayOffsets, 0, nMethods*3, strOffsets);
+    (*env)->SetIntArrayRegion(env, packedArrayOffsets, 0, nMethods*PACKEDARR_ITEMS, strOffsets);
 
     // fprintf (stderr, "4");
     free(strOffsets);

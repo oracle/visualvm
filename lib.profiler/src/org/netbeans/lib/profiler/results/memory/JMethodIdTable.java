@@ -64,6 +64,7 @@ public class JMethodIdTable {
         public String className;
         public String methodName;
         public String methodSig;
+        public boolean isNative;
         int methodId;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
@@ -106,7 +107,7 @@ public class JMethodIdTable {
             JMethodIdTableEntry entry = otherTable.entries[i];
             
             if (entry != null) {
-                addEntry(entry.methodId, entry.className, entry.methodName, entry.methodSig);
+                addEntry(entry.methodId, entry.className, entry.methodName, entry.methodSig, entry.isNative);
             }
         }
     }
@@ -149,8 +150,9 @@ public class JMethodIdTable {
             String className = in.readUTF();
             String methodName = in.readUTF();
             String methodSig = in.readUTF();
+            boolean isNative = in.readBoolean();
 
-            addEntry(methodId, className, methodName, methodSig);
+            addEntry(methodId, className, methodName, methodSig, isNative);
         }
     }
 
@@ -175,6 +177,7 @@ public class JMethodIdTable {
                 out.writeUTF(entries[i].className);
                 out.writeUTF(entries[i].methodName);
                 out.writeUTF(entries[i].methodSig);
+                out.writeBoolean(entries[i].isNative);
             }
         }
     }
@@ -216,15 +219,15 @@ public class JMethodIdTable {
 
         for (int i = 0; i < missingNameMethodIds.length; i++) {
             completeEntry(missingNameMethodIds[i], methodClassNameAndSig[0][i], methodClassNameAndSig[1][i],
-                          methodClassNameAndSig[2][i]);
+                          methodClassNameAndSig[2][i], getBoolean(methodClassNameAndSig[3][i]));
         }
 
         incompleteEntries = 0;
     }
 
-    void addEntry(int methodId, String className, String methodName, String methodSig) {
+    void addEntry(int methodId, String className, String methodName, String methodSig, boolean isNative) {
         checkMethodId(methodId);
-        completeEntry(methodId, className, methodName, methodSig);
+        completeEntry(methodId, className, methodName, methodSig, isNative);
     }
 
     synchronized public void checkMethodId(int methodId) {
@@ -250,7 +253,7 @@ public class JMethodIdTable {
         }
     }
 
-    synchronized private void completeEntry(int methodId, String className, String methodName, String methodSig) {
+    synchronized private void completeEntry(int methodId, String className, String methodName, String methodSig, boolean isNative) {
         int pos = hash(methodId) % size;
 
         while (entries[pos].methodId != methodId) {
@@ -260,6 +263,7 @@ public class JMethodIdTable {
         entries[pos].className = className;
         entries[pos].methodName = methodName;
         entries[pos].methodSig = methodSig;
+        entries[pos].isNative = isNative;
     }
 
     private void growTable() {
@@ -283,5 +287,9 @@ public class JMethodIdTable {
 
     private int hash(int x) {
         return ((x >> 2) * 123457) & 0xFFFFFFF;
+    }
+    
+    private boolean getBoolean(String boolStr) {
+        return "1".equals(boolStr);       // NOI18N
     }
 }
