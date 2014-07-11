@@ -672,11 +672,12 @@ public class ProfilerClient implements CommonConstants {
      * Assumption is that jMethodId is never reused inside the JVM.
      *
      * @param methodIds array of jMethodIds that we do not have names for
-     * @return the 3xn array, containing triplets of {class name, method name, method signature} strings for
+     * @return the 4xn array, containing quadruplets of {class name, method name, method signature, native flag} strings for
      *         given jmethodIds
      */
     public synchronized String[][] getMethodNamesForJMethodIds(int[] methodIds)
         throws ClientUtils.TargetAppOrVMTerminated {
+        final int PACKEDARR_ITEMS = 4; // must match PACKEDARR_ITEMS in Stacks.c
         checkForTargetVMAlive();
 
         GetMethodNamesForJMethodIdsCommand cmd = new GetMethodNamesForJMethodIdsCommand(methodIds);
@@ -684,7 +685,7 @@ public class ProfilerClient implements CommonConstants {
 
         MethodNamesResponse resp = (MethodNamesResponse) getAndCheckLastResponse("Unknown problem when trying to get method names for jmethodIds"); // NOI18N
 
-        return StringUtils.convertPackedStringsIntoStringArrays(resp.getPackedData(), resp.getPackedArrayOffsets(), 3);
+        return StringUtils.convertPackedStringsIntoStringArrays(resp.getPackedData(), resp.getPackedArrayOffsets(), PACKEDARR_ITEMS);
     }
 
     public synchronized HeapHistogram getHeapHistogram() throws ClientUtils.TargetAppOrVMTerminated {

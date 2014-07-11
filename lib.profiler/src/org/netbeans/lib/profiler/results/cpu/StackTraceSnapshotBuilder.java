@@ -64,39 +64,40 @@ import org.netbeans.lib.profiler.results.RuntimeCCTNode;
  */
 public class StackTraceSnapshotBuilder {
     
+    static final char NAME_SIG_SPLITTER = '|';
     private static final StackTraceElement[] NO_STACK_TRACE = new StackTraceElement[0];
     private static final boolean COLLECT_TWO_TIMESTAMPS = true;
     private static final List<MethodInfo> knownBLockingMethods = Arrays.asList(new MethodInfo[] {
         new MethodInfo("java.net.PlainSocketImpl", "socketAccept[native]"), // NOI18N
-        new MethodInfo("java.net.PlainSocketImpl", "socketAccept(java.net.SocketImpl) : void"), // NOI18N
+        new MethodInfo("java.net.PlainSocketImpl", "socketAccept[native](java.net.SocketImpl) : void"), // NOI18N
         new MethodInfo("sun.awt.windows.WToolkit", "eventLoop[native]"), // NOI18N
-        new MethodInfo("sun.awt.windows.WToolkit", "eventLoop() : void"), // NOI18N
+        new MethodInfo("sun.awt.windows.WToolkit", "eventLoop[native]() : void"), // NOI18N
         new MethodInfo("java.lang.UNIXProcess", "waitForProcessExit[native]"), // NOI18N
-        new MethodInfo("java.lang.UNIXProcess", "waitForProcessExit(int) : int"), // NOI18N
+        new MethodInfo("java.lang.UNIXProcess", "waitForProcessExit[native](int) : int"), // NOI18N
         new MethodInfo("sun.awt.X11.XToolkit", "waitForEvents[native]"), // NOI18N
-        new MethodInfo("sun.awt.X11.XToolkit", "waitForEvents(long) : void"), // NOI18N
+        new MethodInfo("sun.awt.X11.XToolkit", "waitForEvents[native](long) : void"), // NOI18N
         new MethodInfo("apple.awt.CToolkit", "doAWTRunLoop[native]"), // NOI18N
-        new MethodInfo("apple.awt.CToolkit", "doAWTRunLoop(long, boolean, boolean) : void"), // NOI18N
+        new MethodInfo("apple.awt.CToolkit", "doAWTRunLoop[native](long, boolean, boolean) : void"), // NOI18N
         new MethodInfo("java.lang.Object", "wait[native]"), // NOI18N
-        new MethodInfo("java.lang.Object", "wait(long) : void"), // NOI18N
+        new MethodInfo("java.lang.Object", "wait[native](long) : void"), // NOI18N
         new MethodInfo("java.lang.Thread", "sleep[native]"), // NOI18N
-        new MethodInfo("java.lang.Thread", "sleep(long) : void"), // NOI18N
+        new MethodInfo("java.lang.Thread", "sleep[native](long) : void"), // NOI18N
         new MethodInfo("sun.net.dns.ResolverConfigurationImpl","notifyAddrChange0[native]"), // NOI18N
-        new MethodInfo("sun.net.dns.ResolverConfigurationImpl","notifyAddrChange0() : int"), // NOI18N
+        new MethodInfo("sun.net.dns.ResolverConfigurationImpl","notifyAddrChange0[native]() : int"), // NOI18N
         new MethodInfo("java.lang.ProcessImpl","waitFor[native]"), // NOI18N
-        new MethodInfo("java.lang.ProcessImpl","waitFor() : int"), // NOI18N
+        new MethodInfo("java.lang.ProcessImpl","waitFor[native]() : int"), // NOI18N
         new MethodInfo("sun.nio.ch.EPollArrayWrapper","epollWait[native]"), // NOI18N
-        new MethodInfo("sun.nio.ch.EPollArrayWrapper","epollWait(long, int, long, int) : int"), // NOI18N
+        new MethodInfo("sun.nio.ch.EPollArrayWrapper","epollWait[native](long, int, long, int) : int"), // NOI18N
         new MethodInfo("java.net.DualStackPlainSocketImpl","accept0[native]"), // NOI18N
-        new MethodInfo("java.net.DualStackPlainSocketImpl","accept0(int, java.net.InetSocketAddress[]) : int"), // NOI18N
+        new MethodInfo("java.net.DualStackPlainSocketImpl","accept0[native](int, java.net.InetSocketAddress[]) : int"), // NOI18N
         new MethodInfo("java.lang.ProcessImpl","waitForInterruptibly[native]"), // NOI18N
-        new MethodInfo("java.lang.ProcessImpl","waitForInterruptibly(long) : void"), // NOI18N
+        new MethodInfo("java.lang.ProcessImpl","waitForInterruptibly[native](long) : void"), // NOI18N
         new MethodInfo("sun.print.Win32PrintServiceLookup","notifyPrinterChange[native]"), // NOI18N
-        new MethodInfo("sun.print.Win32PrintServiceLookup","notifyPrinterChange(long) : int"), // NOI18N
+        new MethodInfo("sun.print.Win32PrintServiceLookup","notifyPrinterChange[native](long) : int"), // NOI18N
         new MethodInfo("java.net.DualStackPlainSocketImpl","waitForConnect[native]"), // NOI18N
-        new MethodInfo("java.net.DualStackPlainSocketImpl","waitForConnect(int, int) : void"), // NOI18N
+        new MethodInfo("java.net.DualStackPlainSocketImpl","waitForConnect[native](int, int) : void"), // NOI18N
         new MethodInfo("sun.nio.ch.KQueueArrayWrapper","kevent0[native]"), // NOI18N
-        new MethodInfo("sun.nio.ch.KQueueArrayWrapper","kevent0(int, long, int, long) : int"), // NOI18N
+        new MethodInfo("sun.nio.ch.KQueueArrayWrapper","kevent0[native](int, long, int, long) : int"), // NOI18N
     });
 
     private InstrumentationFilter filter;
@@ -106,22 +107,39 @@ public class StackTraceSnapshotBuilder {
         final String className;
         final String methodName;
         final String signature;
+        final boolean isNative;
         
         MethodInfo(String className, String methodName) {
             this.className = className;
             this.methodName = methodName;
             signature = "";
+            isNative = false;
         }
         
         MethodInfo(StackTraceElement element) {
-            String sig = "";
-            className = element.getClassName();
-            methodName = element.getMethodName() + (element.isNativeMethod() ? "[native]" : ""); // NOI18N
-            if (element.getLineNumber() == -1) {
-                sig = element.getFileName();
-                if (sig == null) sig = ""; // NOI18N
+            isNative = element.isNativeMethod();
+            final String nativeSuffix = "[native]"; // NOI18N
+            String methodAndSigName = element.getMethodName();
+            String method;
+            int index = methodAndSigName.indexOf(NAME_SIG_SPLITTER);
+            if (index > 0) {
+                method = methodAndSigName.substring(0, index);
+                signature = methodAndSigName.substring(index+1);
+            } else {
+                method = methodAndSigName;
+                signature = "";
             }
-            signature = sig;
+            if (isNative) {
+                index = method.indexOf('(');    // NOI18N
+                if (index > 0) {
+                    methodName = new StringBuilder(method).insert(index, nativeSuffix).toString();
+                } else {
+                    methodName = method + nativeSuffix;
+                }
+            } else {
+                methodName = method;
+            }
+            className = element.getClassName();
         }
         
         @Override
