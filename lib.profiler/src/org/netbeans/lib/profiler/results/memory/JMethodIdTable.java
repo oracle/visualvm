@@ -95,18 +95,6 @@ public class JMethodIdTable {
         entries = new JMethodIdTableEntry[size];
     }
 
-    JMethodIdTable(int[] methodIds, String[][] methodNamesAndSigs) {
-        staticTable = true;
-        size = methodIds.length * 2; // TODO: check this
-        threshold = (size * 3) / 4;
-        nElements = 0;
-        entries = new JMethodIdTableEntry[size];
-
-        for (int i = 0; i < methodIds.length; i++) {
-            addEntry(methodIds[i], methodNamesAndSigs[0][i], methodNamesAndSigs[1][i], methodNamesAndSigs[2][i]);
-        }
-    }
-    
     JMethodIdTable(JMethodIdTable otherTable) {
         staticTable = true;
         threshold = otherTable.nElements + 1;
