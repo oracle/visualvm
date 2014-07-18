@@ -105,7 +105,7 @@ import org.openide.util.NbBundle;
  */
 @NbBundle.Messages({
     "MemoryFeature_name=Objects",
-    "MemoryFeature_description=Profile size and count of allocated objects, including allocation trees",
+    "MemoryFeature_description=Profile size and count of allocated objects, including allocation paths",
     "MemoryFeature_lrLabel=Live results:",
     "MemoryFeature_pdLabel=Profiling data:", 
     "MemoryFeature_snapshot=Snapshot", 

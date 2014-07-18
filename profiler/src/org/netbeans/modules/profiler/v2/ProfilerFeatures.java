@@ -53,6 +53,7 @@ import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.modules.profiler.v2.ProfilerFeature.Provider;
 import org.openide.util.Lookup;
+import org.openide.util.RequestProcessor;
 
 /**
  * Note: all methods excluding constructor and getAvailable() to be called in EDT.
@@ -60,6 +61,10 @@ import org.openide.util.Lookup;
  * @author Jiri Sedlacek
  */
 final class ProfilerFeatures {
+    
+    private static final String FLAG_SINGLE_FEATURE = "SINGLE_FEATURE";
+    private static final String FLAG_SELECTED_FEATURES = "SELECTED_FEATURES";
+    private static final String FLAG_PROFILING_POINTS = "PROFILING_POINTS";
     
     private static final Comparator<ProfilerFeature> FEATURES_COMPARATOR =
         new Comparator<ProfilerFeature>() {
@@ -79,15 +84,15 @@ final class ProfilerFeatures {
     };
     
     private boolean singleFeature;
-    
     private boolean ppoints;
     
     
     ProfilerFeatures(ProfilerSession session) {
         this.session = session;
         
-        singleFeature = true; // TODO: read last state
-        ppoints = true; // TODO: read last state
+        SessionStorage storage = session.getStorage();
+        singleFeature = Boolean.parseBoolean(storage.loadFlag(FLAG_SINGLE_FEATURE, "true"));
+        ppoints = Boolean.parseBoolean(storage.loadFlag(FLAG_PROFILING_POINTS, "true"));
         
         features = new TreeSet(FEATURES_COMPARATOR);
         selected = new TreeSet(FEATURES_COMPARATOR);
@@ -96,6 +101,8 @@ final class ProfilerFeatures {
         
         for (Provider provider : Lookup.getDefault().lookupAll(Provider.class))
             features.addAll(provider.getFeatures(session.getProject()));
+        
+        loadSelectedFeatures();
     }
     
     
@@ -125,6 +132,7 @@ final class ProfilerFeatures {
             feature.addChangeListener(listener);
             feature.attachedToSession(session);
             fireFeaturesChanged(feature);
+            saveSelectedFeatures();
         } else {
             if (selected.add(feature)) {
                 ProfilingSettings ps = new ProfilingSettings();
@@ -139,6 +147,7 @@ final class ProfilerFeatures {
                 feature.addChangeListener(listener);
                 feature.attachedToSession(session);
                 fireFeaturesChanged(feature);
+                saveSelectedFeatures();
             }
         }
     }
@@ -149,6 +158,7 @@ final class ProfilerFeatures {
             feature.detachedFromSession(session);
             feature.removeChangeListener(listener);
             fireFeaturesChanged(feature);
+            saveSelectedFeatures();
         }
     }
     
@@ -157,11 +167,41 @@ final class ProfilerFeatures {
         else selectFeature(feature);
     }
     
+    private boolean loading;
+    
+    private void loadSelectedFeatures() {
+        loading = true;
+        String _selected = session.getStorage().loadFlag(FLAG_SELECTED_FEATURES, "");
+        for (ProfilerFeature feature : features)
+            if (_selected.contains("#" + feature.getClass().getName() + "@"))
+                selectFeature(feature);
+        loading = false;
+    }
+    
+    private void saveSelectedFeatures() {
+        if (loading) return;
+        final Set<ProfilerFeature> _selected = new HashSet(selected);
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                SessionStorage storage = session.getStorage();
+                if (_selected.isEmpty()) {
+                    storage.saveFlag(FLAG_SELECTED_FEATURES, null);
+                } else {
+                    StringBuilder b = new StringBuilder();
+                    for (ProfilerFeature feature : _selected)
+                        b.append("#" + feature.getClass().getName() + "@");
+                    storage.saveFlag(FLAG_SELECTED_FEATURES, b.toString());
+                }
+            }
+        });
+    }
+    
     
     void setSingleFeatureSelection(boolean single) {
         singleFeature = single;
         if (singleFeature && !selected.isEmpty())
             selectFeature(selected.iterator().next());
+        session.getStorage().saveFlag(FLAG_SINGLE_FEATURE, Boolean.toString(singleFeature));
     }
     
     boolean isSingleFeatureSelection() {
@@ -171,6 +211,7 @@ final class ProfilerFeatures {
     
     void setUseProfilingPoints(boolean use) {
         ppoints = use;
+        session.getStorage().saveFlag(FLAG_PROFILING_POINTS, Boolean.toString(use));
     }
     
     boolean getUseProfilingPoints() {

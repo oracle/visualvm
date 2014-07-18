@@ -296,6 +296,7 @@ made subject to such option by the copyright holder.
                 <package>org.netbeans.modules.profiler</package>
                 <package>org.netbeans.modules.profiler.actions</package>
                 <package>org.netbeans.modules.profiler.ui</package>
+                <package>org.netbeans.modules.profiler.ui.panels</package>
                 <package>org.netbeans.modules.profiler.utils</package>
                 <package>org.netbeans.modules.profiler.v2</package>
             </friend-packages>

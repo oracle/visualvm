@@ -44,14 +44,17 @@
 package org.netbeans.modules.profiler.v2.ui;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.Set;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -74,10 +77,10 @@ public abstract class WelcomePanel extends JPanel {
         
         int y = 0;
         
-        HTMLTextArea a1 = new HTMLTextArea("<font size='+1'>Configure Profiling Session</font>");
-        a1.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, a1.getForeground()));
-        a1.setBackground(background);
-        if (UIUtils.isNimbus()) a1.setOpaque(false);
+        HTMLTextArea header = new HTMLTextArea("<font size='+1'>How To Configure Profiling Session</font>");
+        header.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, header.getForeground()));
+        header.setBackground(background);
+        if (UIUtils.isNimbus()) header.setOpaque(false);
         GridBagConstraints c = new GridBagConstraints();
         c.gridy = y++;
         c.weightx = 1;
@@ -85,14 +88,12 @@ public abstract class WelcomePanel extends JPanel {
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(20, 20, 0, 20);
-        pp.add(a1, c);
+        c.insets = new Insets(5, 20, 0, 20);
+        pp.add(header, c);
         
-        HTMLTextArea a2 = new HTMLTextArea("Choose the feature to be profiled using the <b><a href='#'>Profile</a></b> dropdown in the above toolbar:") {
-            protected void showURL(URL url) { showDropdown(); }
-        };
-        a2.setBackground(background);
-        if (UIUtils.isNimbus()) a2.setOpaque(false);
+        HTMLTextArea caption1 = new HTMLTextArea("<b>Access the profiling settings:</b>");
+        caption1.setBackground(background);
+        if (UIUtils.isNimbus()) caption1.setOpaque(false);
         c = new GridBagConstraints();
         c.gridy = y++;
         c.weightx = 1;
@@ -100,21 +101,116 @@ public abstract class WelcomePanel extends JPanel {
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(20, 20, 10, 20);
-        pp.add(a2, c);
+        c.insets = new Insets(20, 20, 3, 20);
+        pp.add(caption1, c);
+        
+        HTMLTextArea hint1 = new HTMLTextArea("Click the <b><a href='#'>Profile</a></b> dropdown arrow in the above toolbar to access the profiling settings.") {
+            protected void showURL(URL url) { highlightItem(null); }
+        };
+        hint1.setBackground(background);
+        if (UIUtils.isNimbus()) hint1.setOpaque(false);
+        c = new GridBagConstraints();
+        c.gridy = y++;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(0, 40, 0, 20);
+        pp.add(hint1, c);
+        
+        HTMLTextArea caption2 = new HTMLTextArea("<b>Define how the profiling session will be started:</b>");
+        caption2.setBackground(background);
+        if (UIUtils.isNimbus()) caption2.setOpaque(false);
+        c = new GridBagConstraints();
+        c.gridy = y++;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(20, 20, 3, 20);
+        pp.add(caption2, c);
+
+        Link lk1 = new Link("Run project", null);
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = y;
+        c.gridwidth = 1;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.NONE;
+        c.insets = new Insets(0, 40, 0, 10);
+        pp.add(lk1, c);
+
+        JLabel lx2 = new JLabel("Start the project with the profiler automatically connected");
+        lx2.setEnabled(false);
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = y++;
+        c.gridwidth = 1;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(3, 0, 3, 20);
+        pp.add(lx2, c);
+
+        Link lk2 = new Link("Attach to project", null);
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = y;
+        c.gridwidth = 1;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.NONE;
+        c.insets = new Insets(0, 40, 0, 10);
+        pp.add(lk2, c);
+
+        JLabel lxx2 = new JLabel("Connect to a project process already running or waiting for the profiler");
+        lxx2.setEnabled(false);
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = y++;
+        c.gridwidth = 1;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(3, 0, 3, 20);
+        pp.add(lxx2, c);
+            
+        HTMLTextArea hint2 = new HTMLTextArea("To define or review the attach settings, invoke <b>Attach to project | Setup...</b> once selected.");
+        hint2.setBackground(background);
+        if (UIUtils.isNimbus()) caption2.setOpaque(false);
+        c = new GridBagConstraints();
+        c.gridy = y++;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(3, 20, 0, 20);
+        pp.add(hint2, c);
+        
+        HTMLTextArea caption3 = new HTMLTextArea("<b>Select what features will be used to analyze the application:</b>");
+        caption3.setBackground(background);
+        if (UIUtils.isNimbus()) caption3.setOpaque(false);
+        c = new GridBagConstraints();
+        c.gridy = y++;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(20, 20, 3, 20);
+        pp.add(caption3, c);        
         
         for (ProfilerFeature feature : features) {
         
-            JLabel l1 = new JLabel(feature.getName(), feature.getIcon(), JLabel.LEADING);
-            l1.setFont(l1.getFont().deriveFont(Font.BOLD));
+            Link l = new Link(feature.getName(), feature.getIcon());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y;
             c.gridwidth = 1;
             c.anchor = GridBagConstraints.WEST;
-            c.fill = GridBagConstraints.HORIZONTAL;
-            c.insets = new Insets(3, 40, 10, 10);
-            pp.add(l1, c);
+            c.fill = GridBagConstraints.NONE;
+            c.insets = new Insets(0, 40, 0, 10);
+            pp.add(l, c);
 
             JLabel l2 = new JLabel(feature.getDescription());
             l2.setEnabled(false);
@@ -124,14 +220,14 @@ public abstract class WelcomePanel extends JPanel {
             c.gridwidth = 1;
             c.anchor = GridBagConstraints.WEST;
             c.fill = GridBagConstraints.HORIZONTAL;
-            c.insets = new Insets(3, 0, 10, 20);
+            c.insets = new Insets(3, 0, 3, 20);
             pp.add(l2, c);
         
         }
         
-        HTMLTextArea a3 = new HTMLTextArea("To profile multiple features simultaneously, select the <b>Profile multiple features</b> choice. Note that profiling <b>Methods</b> and <b>Objects</b> is mutually exclusive.");
-        a3.setBackground(background);
-        if (UIUtils.isNimbus()) a3.setOpaque(false);
+        HTMLTextArea hint3 = new HTMLTextArea("To profile multiple features simultaneously, select the <b>Profile multiple features</b> choice. Note that profiling <b>Methods</b> and <b>Objects</b> is mutually exclusive.");
+        hint3.setBackground(background);
+        if (UIUtils.isNimbus()) hint3.setOpaque(false);
         c = new GridBagConstraints();
         c.gridy = y++;
         c.weightx = 1;
@@ -139,52 +235,31 @@ public abstract class WelcomePanel extends JPanel {
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(10, 20, 0, 20);
-        pp.add(a3, c);
-        
-        HTMLTextArea a4 = new HTMLTextArea("Some of the features can be configured using their settings toolbar. Selected features and their settings will be remembered for successive profiling sessions.");
-        a4.setBackground(background);
-        if (UIUtils.isNimbus()) a4.setOpaque(false);
-        c = new GridBagConstraints();
-        c.gridy = y++;
-        c.weightx = 1;
-        c.weighty = 1;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        c.anchor = GridBagConstraints.NORTHWEST;
-        c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(10, 20, 0, 20);
-        pp.add(a4, c);
-        
-        HTMLTextArea a5 = new HTMLTextArea("To start a new profiling session immediately on invoking <b>Profile Project</b>, select the <b>Start profiling immediately</b> option in <b>Tools | Options | Java | Profiler</b>.");
-        a5.setBackground(background);
-        if (UIUtils.isNimbus()) a5.setOpaque(false);
-        c = new GridBagConstraints();
-        c.gridy = y++;
-        c.weightx = 1;
-        c.weighty = 1;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        c.anchor = GridBagConstraints.NORTHWEST;
-        c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(10, 20, 20, 20);
-        pp.add(a5, c);
+        c.insets = new Insets(3, 20, 5, 20);
+        pp.add(hint3, c);
         
         int w = pp.getMinimumSize().width;
         
-        a1.setSize(w, Integer.MAX_VALUE);
-        a1.setPreferredSize(new Dimension(w, a1.getPreferredSize().height));
+        header.setSize(w, Integer.MAX_VALUE);
+        header.setPreferredSize(new Dimension(w, header.getPreferredSize().height));
         
-        a2.setSize(w, Integer.MAX_VALUE);
-        a2.setPreferredSize(new Dimension(w, a2.getPreferredSize().height));
+        caption1.setSize(w, Integer.MAX_VALUE);
+        caption1.setPreferredSize(new Dimension(w, caption1.getPreferredSize().height));
         
-        a3.setSize(w, Integer.MAX_VALUE);
-        a3.setPreferredSize(new Dimension(w, a3.getPreferredSize().height));
+        caption2.setSize(w, Integer.MAX_VALUE);
+        caption2.setPreferredSize(new Dimension(w, caption2.getPreferredSize().height));
         
-        a4.setSize(w, Integer.MAX_VALUE);
-        a4.setPreferredSize(new Dimension(w, a4.getPreferredSize().height));
+        caption3.setSize(w, Integer.MAX_VALUE);
+        caption3.setPreferredSize(new Dimension(w, caption3.getPreferredSize().height));
         
-        a5.setSize(w, Integer.MAX_VALUE);
-        a5.setPreferredSize(new Dimension(w, a5.getPreferredSize().height));
+        hint1.setSize(w, Integer.MAX_VALUE);
+        hint1.setPreferredSize(new Dimension(w, hint1.getPreferredSize().height));
         
+        hint2.setSize(w, Integer.MAX_VALUE);
+        hint2.setPreferredSize(new Dimension(w, hint2.getPreferredSize().height));
+        
+        hint3.setSize(w, Integer.MAX_VALUE);
+        hint3.setPreferredSize(new Dimension(w, hint3.getPreferredSize().height));
         
         setLayout(new GridBagLayout());
         setOpaque(true);
@@ -199,6 +274,32 @@ public abstract class WelcomePanel extends JPanel {
         
     }
     
-    public abstract void showDropdown();
+    public abstract void highlightItem(String text);
+    
+    
+    private class Link extends JButton {
+        
+        private final String text;
+        
+        Link(String text, Icon icon) {
+            super("<html><nobr><b><a href='#'>" + text + "</a></b></nobr></html>"); // NOI18N
+            this.text = text;
+            
+            setIcon(icon);
+            
+            setOpaque(false);
+            setMargin(new Insets(0, 0, 0, 0));
+            setBorder(BorderFactory.createEmptyBorder(3, 4, 3, 4));
+            setBorderPainted(false);
+            setContentAreaFilled(false);
+            
+            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        }
+        
+        protected void fireActionPerformed(ActionEvent e) {
+            highlightItem(text);
+        }
+        
+    }
     
 }

@@ -46,6 +46,7 @@ package org.netbeans.modules.profiler.actions;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.awt.ActionID;
@@ -90,14 +91,15 @@ public final class AttachAction extends AbstractAction {
      * Invoked when an action occurs.
      */
     public void actionPerformed(final ActionEvent e) {
-        RequestProcessor.getDefault().post(new Runnable() {
-            public void run() {
-                // 1. if there is profiling in progress, ask the user and possibly cancel
-                if (ProfilingSupport.getDefault().checkProfilingInProgress()) return;
-
-                //2. start attaching
-                ProfilingSupport.getDefault().doAttach();
-            }
-        });
+        ProfilerDialogs.displayInfo("\n[TODO]\n\nWill be replaced by Profile External Process action");
+//        RequestProcessor.getDefault().post(new Runnable() {
+//            public void run() {
+//                // 1. if there is profiling in progress, ask the user and possibly cancel
+//                if (ProfilingSupport.getDefault().checkProfilingInProgress()) return;
+//
+//                //2. start attaching
+//                ProfilingSupport.getDefault().doAttach();
+//            }
+//        });
     }
 }

@@ -44,6 +44,7 @@ package org.netbeans.modules.profiler.v2.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
@@ -52,6 +53,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
@@ -77,8 +79,20 @@ public class FeaturesView extends JPanel {
         setBorder(BorderFactory.createEmptyBorder());
         setLayout(new BorderLayout(0, 0));
         
-        this.defaultView = defaultView;
-        if (defaultView != null) add(defaultView, BorderLayout.CENTER);
+        if (defaultView != null) {
+            JScrollPane sp = new JScrollPane(defaultView, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER) {
+                public Dimension getMinimumSize() {
+                    return getPreferredSize();
+                }
+            };
+            sp.setBorder(null);
+            sp.setViewportBorder(null);
+
+            this.defaultView = sp;
+            add(this.defaultView, BorderLayout.CENTER);
+        } else {
+            this.defaultView = null;
+        }
     }
     
     

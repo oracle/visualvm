@@ -167,6 +167,14 @@ public class DropdownButton extends JPanel {
         return button == null ? false : button.isEnabled();
     }
     
+    public void setPopupEnabled(boolean enabled) {
+        if (popup != null) popup.setEnabled(enabled);
+    }
+    
+    public boolean isPopupEnabled() {
+        return popup == null ? false : popup.isEnabled();
+    }
+    
     public void setPushed(boolean p) {
         pushed = p;
         repaint();

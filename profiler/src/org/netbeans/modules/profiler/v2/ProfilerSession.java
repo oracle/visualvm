@@ -142,6 +142,11 @@ public abstract class ProfilerSession {
     
     protected abstract void terminate();
     
+    
+    public abstract Lookup.Provider getProject();
+    
+    public abstract FileObject getFile();
+    
     // --- API -----------------------------------------------------------------
     
     private final NetBeansProfiler profiler;
@@ -150,21 +155,23 @@ public abstract class ProfilerSession {
     private ProfilingSettings profilingSettings;
     private AttachSettings attachSettings;
     
+    private boolean isAttach;
     
-    public final NetBeansProfiler getProfiler() { return profiler; }
     
-    public abstract Lookup.Provider getProject();
+    public final void setAttach(boolean attach) { isAttach = attach; }
     
-    public abstract FileObject getFile();
+    // Set when configuring profiling session, not a persistent storage!
+    public final boolean isAttach() { return isAttach; }
     
+    
+    public final NetBeansProfiler getProfiler() { return profiler; }    
+    
+    // Set when starting/modifying profiling session, not a persistent storage!
     public final ProfilingSettings getProfilingSettings() { return profilingSettings; }
     
+    // Set when starting profiling session, not a persistent storage!
     public final AttachSettings getAttachSettings() { return attachSettings; }
     
-    public final void setAttach(boolean attach) {
-        if (!attach) clearAttachSettings();
-        else initAttachSettings();
-    }
     
     public final void requestActive() {
         UIUtils.runInEventDispatchThread(new Runnable() {
@@ -208,6 +215,7 @@ public abstract class ProfilerSession {
     // --- Internal API --------------------------------------------------------
     
     private ProfilerFeatures features;
+    private SessionStorage storage;
     
     
     final void doStart(ProfilingSettings pSettings, AttachSettings aSettings) {
@@ -233,6 +241,11 @@ public abstract class ProfilerSession {
         }
         
         return features;
+    }
+    
+    final synchronized SessionStorage getStorage() {
+        if (storage == null) storage = new SessionStorage(getProject());
+        return storage;
     }
     
     // --- Implementation ------------------------------------------------------
@@ -289,20 +302,6 @@ public abstract class ProfilerSession {
                 }
             });
         }
-    }
-    
-    private void initAttachSettings() {
-        if (attachSettings != null) return;
-        
-        attachSettings = new AttachSettings();
-        // TODO: load attach settings
-    }
-    
-    private void clearAttachSettings() {
-        if (attachSettings == null) return;
-        
-        // TODO: save attach settings
-        attachSettings = null;
     }
     
     private void cleanup() {
