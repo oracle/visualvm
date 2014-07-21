@@ -48,6 +48,8 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.Properties;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
@@ -59,6 +61,8 @@ import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
 
 /**
+ * TODO: IMPLEMENT SOME LEVEL OF LAZYNESS, CURRENTLY SAVED ON EACH CHANGE !!!
+ *       maybe change to save on demand?
  *
  * @author Jiri Sedlacek
  */
@@ -69,8 +73,6 @@ final class SessionStorage {
     
     private Properties properties;
     private final Lookup.Provider project;
-    
-    private RequestProcessor processor;
     
     
     SessionStorage(Lookup.Provider project) {
@@ -84,8 +86,7 @@ final class SessionStorage {
         if (value != null) properties.put(flag, value);
         else properties.remove(flag);
         
-        if (processor == null) processor = new RequestProcessor("SessionStorage Processor");
-        processor.post(new Runnable() {
+        processor().post(new Runnable() {
             public void run() { saveProperties(); }
         });
     }
@@ -156,6 +157,22 @@ final class SessionStorage {
                 e.printStackTrace();
             }
         }
+    }
+    
+    
+    // --- Processor -----------------------------------------------------------
+    
+    private static Reference<RequestProcessor> PROCESSOR;
+    
+    private static synchronized RequestProcessor processor() {
+        RequestProcessor p = PROCESSOR != null ? PROCESSOR.get() : null;
+        
+        if (p == null) {
+            p = new RequestProcessor("Profiler Storage Processor");
+            PROCESSOR = new WeakReference(p);
+        }
+        
+        return p;
     }
     
 }

@@ -229,7 +229,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         container = new JPanel(new BorderLayout(0, 0));
         add(container, BorderLayout.CENTER);
         
-        JPanel welcomePanel = new WelcomePanel(features.getAvailable()) {
+        JPanel welcomePanel = new WelcomePanel(session.getProject() != null, features.getAvailable()) {
             public void highlightItem(final String text) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -343,20 +343,30 @@ class ProfilerWindow extends ProfilerTopComponent {
     private void performStartImpl() {
         start.setPushed(true);
         
-        if (session.isAttach() && attachSettings == null) {
-            configureAttachSettings();
-            if (attachSettings == null) {
-                start.setPushed(false);
-                return;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (session.isAttach() && attachSettings == null) {
+                    configureAttachSettings();
+                    if (attachSettings == null) {
+                        start.setPushed(false);
+                        return;
+                    }
+                }
+
+                if (!session.doStart(__profilingSettings(), __attachSettings()))
+                    start.setPushed(false);
             }
-        }
-        
-        session.doStart(__profilingSettings(), __attachSettings());
+        });
     }
     
     private void performStopImpl() {
         stop.setEnabled(false);
-        session.terminate();
+        
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (!session.doTerminate()) stop.setEnabled(true);
+            }
+        });
     }
     
     
@@ -436,43 +446,55 @@ class ProfilerWindow extends ProfilerTopComponent {
             }
         };
         
-        final String nameX = _project ? "Attach to project" :
-                                        "Attach to process";
-        
-        final JRadioButtonMenuItem attachProject = new StayOpenPopupMenu.RadioButtonItem(nameX) {
-            private boolean extendedAction;
-            {
-                setEnabled(!session.inProgress());
-            }
-            protected void fireItemStateChanged(ItemEvent e) {
-                super.fireItemStateChanged(e);
-                
-                if (isSelected()) {
-                    if (!session.isAttach()) {
-                        session.setAttach(true);
-                        session.getStorage().saveFlag(FLAG_ATTACH, "true");
-                    }
+        JMenuItem attachProject = null;
+        if (_project) {
+            final String nameX = _project ? "Attach to project" :
+                                            "Attach to process";
+
+            attachProject = new StayOpenPopupMenu.RadioButtonItem(nameX) {
+                private boolean extendedAction;
+                {
+                    setEnabled(!session.inProgress());
                 }
-                
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        extendedAction = isSelected();
-                        setText(nameX + (extendedAction ? " | Setup..." : ""));
-                        repaint();
+                protected void fireItemStateChanged(ItemEvent e) {
+                    super.fireItemStateChanged(e);
+
+                    if (isSelected()) {
+                        if (!session.isAttach()) {
+                            session.setAttach(true);
+                            session.getStorage().saveFlag(FLAG_ATTACH, "true");
+                        }
                     }
-                });
-            }
-            public void actionPerformed(ActionEvent event) {
-                if (extendedAction) configureAttachSettings();
-            }
-        };
-        
-        ButtonGroup grp = new ButtonGroup();
-        grp.add(startProject);
-        grp.add(attachProject);
-        
-        if (_project && !_attach) startProject.setSelected(true);
-        else attachProject.setSelected(true);
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            extendedAction = isSelected();
+                            setText(nameX + (extendedAction ? " | Setup..." : ""));
+                            repaint();
+                        }
+                    });
+                }
+                public void actionPerformed(ActionEvent event) {
+                    if (extendedAction) configureAttachSettings();
+                }
+            };
+
+            ButtonGroup grp = new ButtonGroup();
+            grp.add(startProject);
+            grp.add(attachProject);
+
+            if (_project && !_attach) startProject.setSelected(true);
+            else attachProject.setSelected(true);
+        } else {
+            attachProject = new JMenuItem("Setup attach to process...") {
+                {
+                    setEnabled(!session.inProgress());
+                }
+                protected void fireActionPerformed(ActionEvent event) {
+                    configureAttachSettings();
+                }
+            };
+        }
         
         JCheckBoxMenuItem singleFeature = new StayOpenPopupMenu.CheckBoxItem("Profile multiple features") {
             { setSelected(!features.isSingleFeatureSelection()); }

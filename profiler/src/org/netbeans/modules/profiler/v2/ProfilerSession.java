@@ -136,11 +136,14 @@ public abstract class ProfilerSession {
     
     // --- SPI -----------------------------------------------------------------
     
-    protected abstract void start();
+    // Called in EDT, return false for start failure
+    protected abstract boolean start();
     
-    protected abstract void modify();
+    // Called in EDT, return false for modify failure
+    protected abstract boolean modify();
     
-    protected abstract void terminate();
+    // Called in EDT, return false for termination failure
+    protected abstract boolean terminate();
     
     
     public abstract Lookup.Provider getProject();
@@ -218,19 +221,19 @@ public abstract class ProfilerSession {
     private SessionStorage storage;
     
     
-    final void doStart(ProfilingSettings pSettings, AttachSettings aSettings) {
+    final boolean doStart(ProfilingSettings pSettings, AttachSettings aSettings) {
         profilingSettings = pSettings;
         attachSettings = aSettings;
-        start();
+        return start();
     }
     
-    final void doModify(ProfilingSettings pSettings) {
+    final boolean doModify(ProfilingSettings pSettings) {
         profilingSettings = pSettings;
-        modify();
+        return modify();
     }
     
-    final void doTerminate() {
-        terminate();
+    final boolean doTerminate() {
+        return terminate();
     }
     
     final ProfilerFeatures getFeatures() {
