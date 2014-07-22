@@ -54,13 +54,13 @@ import org.netbeans.lib.profiler.ProfilerEngineSettings;
  *
  * @author ehucka
  */
-public class BasicTest extends ProfilingPointsTestCase {
+//public class BasicTest extends ProfilingPointsTestCase {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /** Creates a new instance of BasicTest */
-    public BasicTest(String name) {
-        super(name);
-    }
+//    public BasicTest(String name) {
+//        super(name);
+//    }
 
     //    public static Test suite() {
     //        TestSuite suite = new TestSuite(org.netbeans.lib.profiler.tests.jfluid.profilingpoints.BasicTest.class);
@@ -107,4 +107,4 @@ public class BasicTest extends ProfilingPointsTestCase {
            ProfilerEngineSettings settings = initPPTest("j2se-simple", "simple.cpu.WaitingTest", null);
            startPPStopwatchTest(settings, new StopWatchPP[] {new StopWatchPP("simple.cpu.WaitingTest", 17, 40, 20)});
        }*/
-}
+//}
