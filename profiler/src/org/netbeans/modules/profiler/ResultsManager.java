@@ -712,6 +712,26 @@ public final class ResultsManager {
         }
     }
 
+    public boolean hasSnapshotsFor(Lookup.Provider project) {
+        try {
+            FileObject snapshotsFolder = ProjectStorage.getSettingsFolder(project, false);
+            FileObject[] children;
+            
+            if (snapshotsFolder == null) {
+                return false;
+            }
+            snapshotsFolder.refresh();
+            children = snapshotsFolder.getChildren();
+            for (FileObject child : children) {
+                if (child.getExt().equalsIgnoreCase(SNAPSHOT_EXTENSION)) return true;
+                if (checkHprofFile(FileUtil.toFile(child))) return true;
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, Bundle.ResultsManager_ObtainSavedSnapshotsFailedMsg(e.getMessage()), e);            
+        }
+        return false;
+    }
+    
     public LoadedSnapshot loadSnapshot(FileObject selectedFile) {
         try {
             return loadSnapshotImpl(selectedFile);
