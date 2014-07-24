@@ -1296,6 +1296,8 @@ public class ProfilerInterface implements CommonConstants {
                                                      // we try to profile PetStore with eager instrumentation scheme on Sun ONE AS 7. This makes the problem go away,
                                                      // but its root cause is still unclear to me.
                || name.equals("com.sun.enterprise.J2EESecurityManager") // NOI18N
+               // do not instrument classes created by Unsafe.defineAnonymousClass() 
+               || name.contains("/") // NOI18N   
         );
     }
 
