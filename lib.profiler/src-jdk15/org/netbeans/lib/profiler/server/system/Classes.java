@@ -142,7 +142,7 @@ public class Classes {
             }
 
             if (newClassFileBytes[i] == null) {
-                throw new RedefineException("null input data: newClassFileBytes at " + i); // NOI18N
+                throw new RedefineException("null input data: newClassFileBytes at " + i + " for class "+classes[i].getName()); // NOI18N
             }
         }
 
