@@ -44,17 +44,6 @@
 package org.netbeans.modules.profiler.heapwalk.ui;
 
 import java.awt.BorderLayout;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.Document;
-import javax.swing.text.html.HTML;
-import javax.swing.text.html.HTMLDocument;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.ui.UIConstants;
-import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.lib.profiler.ui.components.JTitledPanel;
-import org.netbeans.modules.profiler.heapwalk.OverviewController;
-import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import java.net.URL;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -62,10 +51,24 @@ import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Segment;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.netbeans.lib.profiler.ui.components.JTitledPanel;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.heapwalk.OverviewController;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -181,6 +184,7 @@ public class OverviewControllerUI extends JTitledPanel {
                 }
             }
         };
+        dataArea.setEditorKit(new CustomHtmlEditorKit());
         dataArea.setSelectionColor(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
         JScrollPane dataAreaScrollPane = new JScrollPane(dataArea,
                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -203,6 +207,60 @@ public class OverviewControllerUI extends JTitledPanel {
         
         // UI tweaks
         setBackground(dataArea.getBackground());
+    }
+
+    private class CustomHtmlEditorKit extends HTMLEditorKit {
+
+        @Override
+        public Document createDefaultDocument() {
+            StyleSheet styles = getStyleSheet();
+            StyleSheet ss = new StyleSheet();
+
+            ss.addStyleSheet(styles);
+
+            HTMLDocument doc = new CustomHTMLDocument(ss);
+            doc.setParser(getParser());
+            doc.setAsynchronousLoadPriority(4);
+            doc.setTokenThreshold(100);
+            return doc;
+        }
+    }
+    
+    private class CustomHTMLDocument extends HTMLDocument {
+        private static final int CACHE_BOUNDARY = 1000;
+        private char[] segArray;
+        private int segOffset;
+        private int segCount;
+        private boolean segPartialReturn;
+        private int lastOffset;
+        private int lastLength;
+        
+        private CustomHTMLDocument(StyleSheet ss) {
+            super(ss);
+            lastOffset = -1;
+            lastLength = -1;
+            putProperty("multiByte", Boolean.TRUE);      // NOI18N
+        }
+
+        @Override
+        public void getText(int offset, int length, Segment txt) throws BadLocationException {
+            if (lastOffset == offset && lastLength == length) {
+                txt.array = segArray;
+                txt.offset = segOffset;
+                txt.count = segCount;
+                txt.setPartialReturn(segPartialReturn);
+                return;
+            }
+            super.getText(offset, length, txt);
+            if (length > CACHE_BOUNDARY || lastLength <= CACHE_BOUNDARY) {
+                segArray = txt.array;
+                segOffset = txt.offset;
+                segCount = txt.count;
+                segPartialReturn = txt.isPartialReturn();
+                lastOffset = offset;
+                lastLength = length;
+            }
+        }
     }
 
 }
