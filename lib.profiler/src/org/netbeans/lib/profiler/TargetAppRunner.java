@@ -366,7 +366,7 @@ public class TargetAppRunner implements CommonConstants {
      * @param attachMode 0 = no attach; 1 = direct; 2 = dynamic
      * @param calibrationOnlyRun
      * @param cancel shared cancel flag
-     * @return Returns TRUE if the connection to the profiler agent has been successfuly established
+     * @return Returns TRUE if the connection to the profiler agent has been successfully established
      */
     public boolean initiateSession(int attachMode, boolean calibrationOnlyRun, AtomicBoolean cancel) {
         if (targetJVMIsAlive()) {
@@ -380,14 +380,14 @@ public class TargetAppRunner implements CommonConstants {
      *  Initiates profiling session
      * @param attachMode 0 = no attach; 1 = direct; 2 = dynamic
      * @param calibrationOnlyRun
-     * @return Returns TRUE if the connection to the profiler agent has been successfuly established
+     * @return Returns TRUE if the connection to the profiler agent has been successfully established
      */
     public boolean initiateSession(int attachMode, boolean calibrationOnlyRun) {
         return initiateSession(attachMode, calibrationOnlyRun, new AtomicBoolean(false));
     }
 
     /**
-     * @return true if the calibration data was read succesfully, false otherwise
+     * @return true if the calibration data was read successfully, false otherwise
      */
     public boolean readSavedCalibrationData() {
         status.targetJDKVersionString = settings.getTargetJDKVersionString();

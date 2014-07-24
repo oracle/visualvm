@@ -495,7 +495,7 @@ public class OverviewController extends AbstractController {
                                 } else {
                                     stackElHref = stackElementText;
                                 }
-                                sb.append("\tat ").append(stackElHref).append("<br>");  // NOI18N
+                                sb.append("    at ").append(stackElHref).append("<br>");  // NOI18N
                                 if (localsMap != null) {
                                     List<JavaFrameGCRoot> locals = localsMap.get(Integer.valueOf(i));
                                     
@@ -504,9 +504,9 @@ public class OverviewController extends AbstractController {
                                             Instance localInstance = localVar.getInstance();
                                             
                                             if (localInstance != null) {
-                                                sb.append("\t   Local Variable: ").append(printInstance(localInstance)).append("<br>"); // NOI18N
+                                                sb.append("       Local Variable: ").append(printInstance(localInstance)).append("<br>"); // NOI18N
                                             } else {
-                                                sb.append("\t   Unknown Local Variable<br>"); // NOI18N                                                
+                                                sb.append("       Unknown Local Variable<br>"); // NOI18N                                                
                                             }
                                         }
                                     }
