@@ -1180,7 +1180,8 @@ public class ProfilerInterface implements CommonConstants {
                             // to server
                             if (instrClassLoaders[i] == 0) {
                                 b[k] = ClassBytesLoader.getClassFileBytes(instrClassNames[i]);
-                            } else {
+                            }
+                            if (b[k] == null) {
                                 b[k] = getCachedClassFileBytes(clazzes[k]);
                             }
                         }
