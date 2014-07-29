@@ -215,6 +215,8 @@ public class Command {
                 return "STILL_ALIVE"; // NOI18N
             case PREPARE_DETACH:
                 return "PREPARE_DETACH"; // NOI18N
+            case GET_HEAP_HISTOGRAM:
+                return "GET_HEAP_HISTOGRAM"; // NOI18N
         }
 
         return "Unknown command"; // NOI18N
