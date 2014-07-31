@@ -55,6 +55,7 @@ import org.netbeans.lib.profiler.ui.monitor.MonitorView;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.RunGCAction;
+import org.netbeans.modules.profiler.actions.TakeThreadDumpAction;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -118,8 +119,9 @@ final class MonitorFeature extends ProfilerFeature.Basic {
             
             apLabel = new GrayLabel(Bundle.MonitorFeature_application());
             
-            apThreadDumpButton = new JButton(Bundle.MonitorFeature_threadDump(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
-            apThreadDumpButton.setEnabled(false);
+            apThreadDumpButton = new JButton(TakeThreadDumpAction.getInstance());
+            apThreadDumpButton.setHideActionText(true);
+            apThreadDumpButton.setText(Bundle.MonitorFeature_threadDump());
             
             apHeapDumpButton = new JButton(HeapDumpAction.getInstance());
             apHeapDumpButton.setHideActionText(true);

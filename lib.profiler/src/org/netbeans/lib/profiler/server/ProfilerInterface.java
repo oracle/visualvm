@@ -512,12 +512,14 @@ public class ProfilerInterface implements CommonConstants {
      * is the only thread that we can reliably characterize as the profiler's own.
      */
     public static void initProfilerInterface(ProfilingSessionStatus status, Thread specialThread) {
+        boolean jdk15 = Platform.getJDKVersionNumber() == Platform.JDK_15;
         Timers.initialize();
         Classes.initialize();
         GC.initialize();
         Stacks.initialize();
         Threads.initialize();
-        HeapDump.initialize(Platform.getJDKVersionNumber() == Platform.JDK_15);
+        HeapDump.initialize(jdk15);
+        ThreadDump.initialize(jdk15);
         ClassLoaderManager.initialize(profilerServer);
         ClassLoaderManager.addLoader(ClassLoader.getSystemClassLoader());
         reflectMethods = new WeakHashMap();

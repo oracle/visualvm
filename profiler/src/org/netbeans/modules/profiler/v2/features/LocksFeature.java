@@ -57,6 +57,7 @@ import org.netbeans.lib.profiler.ui.locks.LockContentionPanel;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.RunGCAction;
+import org.netbeans.modules.profiler.actions.TakeThreadDumpAction;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.v2.ui.GrayLabel;
@@ -114,8 +115,9 @@ final class LocksFeature extends ProfilerFeature.Basic {
             
             apLabel = new GrayLabel(Bundle.LocksFeature_application());
             
-            apThreadDumpButton = new JButton(Bundle.LocksFeature_threadDump(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
-            apThreadDumpButton.setEnabled(false);
+            apThreadDumpButton = new JButton(TakeThreadDumpAction.getInstance());
+            apThreadDumpButton.setHideActionText(true);
+            apThreadDumpButton.setText(Bundle.LocksFeature_threadDump());
             
             apHeapDumpButton = new JButton(HeapDumpAction.getInstance());
             apHeapDumpButton.setHideActionText(true);

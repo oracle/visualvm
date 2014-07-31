@@ -305,6 +305,6 @@ public interface CommonConstants {
     public static final int AGENT_VERSION_73 = 13;
     public static final int AGENT_VERSION_74 = 14;
     public static final int AGENT_VERSION_80 = 15;
-    public static final int AGENT_VERSION_801 = 16;
-    public static final int CURRENT_AGENT_VERSION = AGENT_VERSION_801;
+    public static final int AGENT_VERSION_81 = 16;
+    public static final int CURRENT_AGENT_VERSION = AGENT_VERSION_81;
 }

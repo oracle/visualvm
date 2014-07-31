@@ -86,6 +86,7 @@ import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.RunGCAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
+import org.netbeans.modules.profiler.actions.TakeThreadDumpAction;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
@@ -651,8 +652,9 @@ final class CPUFeature extends ProfilerFeature.Basic {
             
             apLabel = new GrayLabel(Bundle.CPUFeature_apLabel());
             
-            apThreadDumpButton = new JButton(Bundle.CPUFeature_threadDump(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
-            apThreadDumpButton.setEnabled(false);
+            apThreadDumpButton = new JButton(TakeThreadDumpAction.getInstance());
+            apThreadDumpButton.setHideActionText(true);
+            apThreadDumpButton.setText(Bundle.CPUFeature_threadDump());
             
             apHeapDumpButton = new JButton(HeapDumpAction.getInstance());
             apHeapDumpButton.setHideActionText(true);

@@ -58,6 +58,7 @@ import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.RunGCAction;
+import org.netbeans.modules.profiler.actions.TakeThreadDumpAction;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
@@ -132,8 +133,9 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
             
             apLabel = new GrayLabel(Bundle.ThreadsFeature_application());
             
-            apThreadDumpButton = new JButton(Bundle.ThreadsFeature_threadDump(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
-            apThreadDumpButton.setEnabled(false);
+            apThreadDumpButton = new JButton(TakeThreadDumpAction.getInstance());
+            apThreadDumpButton.setHideActionText(true);
+            apThreadDumpButton.setText(Bundle.ThreadsFeature_threadDump());
             
             apHeapDumpButton = new JButton(HeapDumpAction.getInstance());
             apHeapDumpButton.setHideActionText(true);
