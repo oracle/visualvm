@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.ui;
+package org.netbeans.modules.profiler.v2.impl;
 
 import java.awt.Color;
 import java.awt.Cursor;

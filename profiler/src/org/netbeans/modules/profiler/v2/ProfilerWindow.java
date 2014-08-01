@@ -86,11 +86,11 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.attach.AttachWizard;
-import org.netbeans.modules.profiler.v2.ui.FeaturesView;
+import org.netbeans.modules.profiler.v2.impl.FeaturesView;
 import org.netbeans.modules.profiler.v2.ui.ProfilerStatus;
 import org.netbeans.modules.profiler.v2.ui.StayOpenPopupMenu;
 import org.netbeans.modules.profiler.v2.ui.ToggleButtonMenuItem;
-import org.netbeans.modules.profiler.v2.ui.WelcomePanel;
+import org.netbeans.modules.profiler.v2.impl.WelcomePanel;
 import org.netbeans.modules.profiler.v2.ui.DropdownButton;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -668,6 +668,16 @@ class ProfilerWindow extends ProfilerTopComponent {
             if (mode != null) mode.dockInto(this);
         }
         super.open();
+    }
+    
+    protected void componentShowing() {
+        super.componentShowing();
+        SnapshotsWindow.instance().sessionActivated(session);
+    }
+    
+    protected void componentHidden() {
+        super.componentHidden();
+        SnapshotsWindow.instance().sessionDeactivated(session);
     }
     
     public int getPersistenceType() {

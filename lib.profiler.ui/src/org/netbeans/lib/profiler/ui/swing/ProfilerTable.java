@@ -577,7 +577,8 @@ public class ProfilerTable extends JTable {
         }
         
         return alignment == SwingConstants.LEADING ||
-               alignment == SwingConstants.LEFT;
+               alignment == SwingConstants.LEFT ||
+               alignment == SwingConstants.CENTER;
     }
     
     
