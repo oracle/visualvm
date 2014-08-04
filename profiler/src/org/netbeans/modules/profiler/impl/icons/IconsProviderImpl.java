@@ -127,6 +127,7 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(ProfilerIcons.PROFILE_RUNNING, "profileRunning.png");
         cache.put(ProfilerIcons.RESET_RESULTS, "resetResults.png");
         cache.put(ProfilerIcons.RUN_GC, "runGC.png");
+        cache.put(ProfilerIcons.SNAPSHOT_THREADS, "threadsSnapshot.png");
         cache.put(ProfilerIcons.SNAPSHOT_HEAP, "heapSnapshot.png");
         cache.put(ProfilerIcons.CONTROL_PANEL, "controlPanel.gif");
         cache.put(ProfilerIcons.LIVE_RESULTS, "liveResults.png");

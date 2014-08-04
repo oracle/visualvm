@@ -87,8 +87,8 @@ public class TakeThreadDumpAction extends ProfilingAwareAction {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     public TakeThreadDumpAction() {
-        setIcon(Icons.getIcon(ProfilerIcons.THREAD));
-        putValue("iconBase", Icons.getResource(ProfilerIcons.THREAD)); // NOI18N
+        setIcon(Icons.getIcon(ProfilerIcons.SNAPSHOT_THREADS));
+        putValue("iconBase", Icons.getResource(ProfilerIcons.SNAPSHOT_THREADS)); // NOI18N
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
