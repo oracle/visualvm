@@ -105,8 +105,8 @@ import org.openide.util.RequestProcessor;
     "MSG_CalibrationFailed=Calibration failed.\nPlease check your setup and run the calibration again."
 })
 @ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.RunCalibrationAction")
-@ActionRegistration(displayName="#LBL_RunCalibrationAction")
-@ActionReference(path="Menu/Profile/Advanced", position=100)
+//@ActionRegistration(displayName="#LBL_RunCalibrationAction")
+//@ActionReference(path="Menu/Profile/Advanced", position=100)
 public final class RunCalibrationAction extends AbstractAction {
     
     private static final HelpCtx HELP_CTX = new HelpCtx("ManageCalibration.HelpCtx"); // NOI18N

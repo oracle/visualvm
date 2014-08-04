@@ -80,7 +80,7 @@ public class TakeThreadDumpAction extends ProfilingAwareAction {
     @ActionRegistration(displayName = "#LBL_TakeThreadDumpAction")
     @ActionReferences(value = {
         //        @ActionReference(path = "Shortcuts", name = "C-F3"),
-        @ActionReference(path = "Menu/Profile", position = 1250)})
+        @ActionReference(path = "Menu/Profile", position = 500)})
     public static TakeThreadDumpAction getInstance() {
         return Singleton.INSTANCE;
     }

@@ -60,10 +60,10 @@ made subject to such option by the copyright holder.
             <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#Menu/Profile"/>
             <attr name="position" intvalue="850"/>
             
-            <folder name="Advanced">
+            <!--folder name="Advanced">
                 <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#Menu/Profile/Advanced"/>
                 <attr name="position" intvalue="1800"/>
-            </folder>
+            </folder-->
         </folder>
     </folder>
 

@@ -322,7 +322,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
     @ActionID(id = "org.netbeans.modules.profiler.actions.HeapDumpAction", category = "Profile")
     @ActionRegistration(displayName = "#HeapDumpAction_ActionName", lazy=false)
-    @ActionReference(path = "Menu/Profile", position = 1300)
+    @ActionReference(path = "Menu/Profile", position = 600)
     public static HeapDumpAction getInstance() {
         return Singleton.INSTANCE;
     }
