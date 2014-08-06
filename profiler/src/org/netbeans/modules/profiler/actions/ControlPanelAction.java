@@ -64,8 +64,8 @@ import org.openide.awt.ActionRegistration;
     "HINT_ControlPanelAction=Show Profiler Control Panel"
 })
 @ActionID(category="Profile", id="org.netbeans.modules.profiles.actions.ControlPanelAction")
-@ActionRegistration(displayName="#LBL_ControlPanelAction", iconBase="org/netbeans/modules/profiler/impl/icons/controlPanel.gif")
-@ActionReference(path="Menu/Window/Profile", position=100)
+//@ActionRegistration(displayName="#LBL_ControlPanelAction", iconBase="org/netbeans/modules/profiler/impl/icons/controlPanel.gif")
+//@ActionReference(path="Menu/Window/Profile", position=100)
 public final class ControlPanelAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------    
     public ControlPanelAction() {

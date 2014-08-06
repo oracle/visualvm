@@ -64,8 +64,8 @@ import org.openide.awt.ActionRegistration;
     "HINT_ShowTelemetryViewAction=Show VM Telemetry View"
 })
 @ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.ShowTelemetryViewAction")
-@ActionRegistration(displayName="#LBL_ShowTelemetryViewAction", iconBase="org/netbeans/modules/profiler/impl/icons/telemetryWindow.png")
-@ActionReference(path="Menu/Window/Profile", position=400)
+//@ActionRegistration(displayName="#LBL_ShowTelemetryViewAction", iconBase="org/netbeans/modules/profiler/impl/icons/telemetryWindow.png")
+//@ActionReference(path="Menu/Window/Profile", position=400)
 public final class ShowTelemetryViewAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
