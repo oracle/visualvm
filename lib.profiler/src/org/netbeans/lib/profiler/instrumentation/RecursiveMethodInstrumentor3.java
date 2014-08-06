@@ -115,7 +115,10 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
 
             if (tryMainMethodInstrumentation(clazz)) {
                 isRootClass = true;
-                mainMethodInstrumented = true;
+                // allow to instrument two main classes if one of them is from sun.launcher package
+                if (!clazz.getName().startsWith("sun/launcher/Launcher")) {     // NOI18N
+                    mainMethodInstrumented = true;
+                }
             }
         }
 
