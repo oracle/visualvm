@@ -508,7 +508,7 @@ public final class SnapshotsWindowUI extends TopComponent {
                 }
             } else {
                 renderer.setText("External process");
-                renderer.setIcon(Icons.getIcon(GeneralIcons.BUTTON_RUN));
+                renderer.setIcon(Icons.getIcon(GeneralIcons.JAVA_PROCESS));
             }
 
             return renderer;

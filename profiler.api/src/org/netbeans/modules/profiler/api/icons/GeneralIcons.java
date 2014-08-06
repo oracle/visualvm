@@ -99,5 +99,6 @@ public interface GeneralIcons extends Icons.Keys {
     public static final String FORWARD = "GeneralIcons.Forward"; // NOI18N
     public static final String BACK = "GeneralIcons.Back"; // NOI18N
     public static final String SETTINGS = "GeneralIcons.Settings"; // NOI18N
+    public static final String JAVA_PROCESS = "GeneralIcons.JavaProcess"; // NOI18N
     
 }
