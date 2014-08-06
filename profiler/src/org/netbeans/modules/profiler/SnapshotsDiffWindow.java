@@ -97,8 +97,8 @@ public final class SnapshotsDiffWindow extends ProfilerTopComponent {
      * This constructor cannot be called, instances of this window cannot be persisted.
      */
     public SnapshotsDiffWindow() {
-        throw new InternalError("This constructor should never be called");
-    } // NOI18N
+        throw new InternalError("This constructor should never be called"); // NOI18N
+    }
 
     /**
      * Creates a new SnapshotsDiffWindow for provided diff. The content of this window will vary depending on
