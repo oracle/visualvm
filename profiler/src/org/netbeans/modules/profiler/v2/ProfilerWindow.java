@@ -199,7 +199,8 @@ class ProfilerWindow extends ProfilerTopComponent {
         
         SessionStorage storage = session.getStorage();
         
-        session.setAttach(Boolean.parseBoolean(storage.loadFlag(FLAG_ATTACH, "false")));
+        session.setAttach(session.getProject() == null ? true :
+                          Boolean.parseBoolean(storage.loadFlag(FLAG_ATTACH, "false")));
     }
     
     private void popupulateUI() {  
