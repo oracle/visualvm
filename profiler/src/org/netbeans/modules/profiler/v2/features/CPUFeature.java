@@ -81,6 +81,7 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.CPUView;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
@@ -104,6 +105,7 @@ import org.netbeans.modules.profiler.v2.ui.SmallButton;
 import org.netbeans.modules.profiler.v2.ui.TitledMenuSeparator;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -909,7 +911,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
         refresher = new Runnable() {
             public void run() {
                 if (running) {
-                    if (cpuView != null) refreshView();
+                    refreshView();
                     refreshResults(1500);
 
                 }
@@ -920,7 +922,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
     }
 
     private void refreshView() {
-        try {
+        if (cpuView != null) try {
             if (ResultsManager.getDefault().resultsAvailable()) cpuView.refreshData();
         } catch (ClientUtils.TargetAppOrVMTerminated ex) {
             stopResults();
@@ -957,14 +959,36 @@ final class CPUFeature extends ProfilerFeature.Basic {
         }
     }
     
+    private CpuResetter resetter;
+    
     public void attachedToSession(ProfilerSession session) {
         super.attachedToSession(session);
         resetResults();
+        resetter = Lookup.getDefault().lookup(CpuResetter.class);
+        resetter.controller = this;
     }
     
     public void detachedFromSession(ProfilerSession session) {
         super.detachedFromSession(session);
         resetResults();
+        resetter.controller = null;
+        resetter = null;
+    }
+    
+    
+    @ServiceProvider(service=ResultsListener.class)
+    public static final class CpuResetter implements ResultsListener {
+        
+        private CPUFeature controller;
+
+        public void resultsAvailable() {
+//            if (controller != null) controller.refreshView();
+        }
+
+        public void resultsReset() {
+            if (controller != null) controller.resetResults();
+        }
+        
     }
     
 }

@@ -77,6 +77,7 @@ import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.memory.MemoryView;
 import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
@@ -99,6 +100,7 @@ import org.netbeans.modules.profiler.v2.ui.SmallButton;
 import org.netbeans.modules.profiler.v2.ui.TitledMenuSeparator;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -814,14 +816,36 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         }
     }
     
+    private MemoryResetter resetter;
+    
     public void attachedToSession(ProfilerSession session) {
         super.attachedToSession(session);
-        if (memoryView != null) resetResults();
+        resetResults();
+        resetter = Lookup.getDefault().lookup(MemoryResetter.class);
+        resetter.controller = this;
     }
     
     public void detachedFromSession(ProfilerSession session) {
         super.detachedFromSession(session);
-        if (memoryView != null) resetResults();
+        resetResults();
+        resetter.controller = null;
+        resetter = null;
+    }
+    
+    
+    @ServiceProvider(service=ResultsListener.class)
+    public static final class MemoryResetter implements ResultsListener {
+        
+        private MemoryFeature controller;
+
+        public void resultsAvailable() {
+//            if (controller != null) controller.refreshView();
+        }
+
+        public void resultsReset() {
+            if (controller != null) controller.resetResults();
+        }
+        
     }
     
 }
