@@ -85,6 +85,9 @@ abstract class CPUTreeTableView extends JPanel {
     private Map<Integer, ClientUtils.SourceCodeSelection> idMap;
     private final Set<ClientUtils.SourceCodeSelection> selection;
     
+    private boolean sampled = true;
+    private boolean twoTimeStamps;
+    
     
     public CPUTreeTableView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection) {
         this.client = client;
@@ -94,20 +97,29 @@ abstract class CPUTreeTableView extends JPanel {
     }
     
     
-    void setData(final CPUResultsSnapshot newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap) {
+    void setData(final CPUResultsSnapshot newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final boolean _sampled) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                boolean structureChange = sampled != _sampled;
+                sampled = _sampled;
+                twoTimeStamps = newData == null ? false : newData.isCollectingTwoTimeStamps();
                 idMap = newIdMap;
                 if (treeTableModel != null) {
                     treeTableModel.setRoot(newData == null ? PrestimeCPUCCTNode.EMPTY :
                                            newData.getRootNode(CPUResultsSnapshot.METHOD_LEVEL_VIEW));
+                }
+                if (structureChange) {
+                    int col = treeTable.convertColumnIndexToView(4);
+                    String colN = treeTableModel.getColumnName(4);
+                    treeTable.getColumnModel().getColumn(col).setHeaderValue(colN);
+                    repaint();
                 }
             }
         });
     }
     
     public void resetData() {
-        setData(null, null);
+        setData(null, null, sampled);
     }
     
     
@@ -218,7 +230,11 @@ abstract class CPUTreeTableView extends JPanel {
         treeTable.setDefaultColumnWidth(0, w + 15);
         treeTable.setDefaultColumnWidth(2, renderers[0].getOptimalWidth());
         treeTable.setDefaultColumnWidth(3, renderers[1].getMaxNoBarWidth());
+        
+        sampled = !sampled;
         w = new JLabel(treeTable.getColumnName(4)).getPreferredSize().width;
+        sampled = !sampled;
+        w = Math.max(w, new JLabel(treeTable.getColumnName(4)).getPreferredSize().width);
         treeTable.setDefaultColumnWidth(4, Math.max(renderers[2].getNoBarWidth(), w + 15));
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(treeTable, false, null);
@@ -276,7 +292,7 @@ abstract class CPUTreeTableView extends JPanel {
             } else if (columnIndex == 3) {
                 return "Total Time (CPU)";
             } else if (columnIndex == 4) {
-                return "Samples";
+                return sampled ? "Hits" : "Invocations";
             } else if (columnIndex == 0) {
                 return "Selected";
             }
@@ -307,7 +323,7 @@ abstract class CPUTreeTableView extends JPanel {
             } else if (columnIndex == 2) {
                 return cpuNode.getTotalTime0();
             } else if (columnIndex == 3) {
-                return cpuNode.getTotalTime1();
+                return twoTimeStamps ? cpuNode.getTotalTime1() : 0;
             } else if (columnIndex == 4) {
                 return cpuNode.getNCalls();
             } else if (columnIndex == 0) {

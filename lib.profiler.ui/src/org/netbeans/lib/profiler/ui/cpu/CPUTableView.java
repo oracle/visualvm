@@ -83,6 +83,9 @@ abstract class CPUTableView extends JPanel {
     private Map<Integer, ClientUtils.SourceCodeSelection> idMap;
     private final Set<ClientUtils.SourceCodeSelection> selection;
     
+    private boolean sampled = true;
+    private boolean twoTimeStamps;
+    
     
     public CPUTableView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection) {
         this.client = client;
@@ -92,9 +95,12 @@ abstract class CPUTableView extends JPanel {
     }
     
     
-    void setData(final FlatProfileContainer newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap) {
+    void setData(final FlatProfileContainer newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final boolean _sampled) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                boolean structureChange = sampled != _sampled;
+                sampled = _sampled;
+                twoTimeStamps = newData == null ? false : newData.isCollectingTwoTimeStamps();
                 idMap = newIdMap;
                 if (tableModel != null) {
                     data = newData;
@@ -103,9 +109,9 @@ abstract class CPUTableView extends JPanel {
                     int maxInvocations = 0;
                     for (int row = 0; row < tableModel.getRowCount(); row++) {
                         maxTimes[0] += data.getTimeInMcs0AtRow(row);
-                        maxTimes[1] += data.getTimeInMcs1AtRow(row);
+                        if (twoTimeStamps) maxTimes[1] += data.getTimeInMcs1AtRow(row);
                         maxTimes[2] += data.getTotalTimeInMcs0AtRow(row);
-                        maxTimes[3] += data.getTotalTimeInMcs1AtRow(row);
+                        if (twoTimeStamps) maxTimes[3] += data.getTotalTimeInMcs1AtRow(row);
                         maxInvocations += data.getNInvocationsAtRow(row);
                     }
                     
@@ -117,12 +123,18 @@ abstract class CPUTableView extends JPanel {
                     
                     tableModel.fireTableDataChanged();
                 }
+                if (structureChange) {
+                    int col = table.convertColumnIndexToView(6);
+                    String colN = tableModel.getColumnName(6);
+                    table.getColumnModel().getColumn(col).setHeaderValue(colN);
+                    repaint();
+                }
             }
         });
     }
     
     public void resetData() {
-        setData(null, null);
+        setData(null, null, sampled);
     }
     
     
@@ -213,7 +225,11 @@ abstract class CPUTableView extends JPanel {
         table.setDefaultColumnWidth(3, renderers[1].getOptimalWidth());
         table.setDefaultColumnWidth(4, renderers[2].getMaxNoBarWidth());
         table.setDefaultColumnWidth(5, renderers[3].getMaxNoBarWidth());
+        
+        sampled = !sampled;
         w = new JLabel(table.getColumnName(6)).getPreferredSize().width;
+        sampled = !sampled;
+        w = Math.max(w, new JLabel(table.getColumnName(6)).getPreferredSize().width);
         table.setDefaultColumnWidth(6, Math.max(renderers[4].getNoBarWidth(), w + 15));
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(table, false, null);
@@ -258,7 +274,7 @@ abstract class CPUTableView extends JPanel {
             } else if (columnIndex == 5) {
                 return "Total Time (CPU)";
             } else if (columnIndex == 6) {
-                return "Samples";
+                return sampled ? "Hits" : "Invocations";
             } else if (columnIndex == 0) {
                 return "Selected";
             }
@@ -293,11 +309,11 @@ abstract class CPUTableView extends JPanel {
             } else if (columnIndex == 2) {
                 return data.getTimeInMcs0AtRow(rowIndex);
             } else if (columnIndex == 3) {
-                return data.getTimeInMcs1AtRow(rowIndex);
+                return twoTimeStamps ? data.getTimeInMcs1AtRow(rowIndex) : 0;
             } else if (columnIndex == 4) {
                 return data.getTotalTimeInMcs0AtRow(rowIndex);
             } else if (columnIndex == 5) {
-                return data.getTotalTimeInMcs1AtRow(rowIndex);
+                return twoTimeStamps ? data.getTotalTimeInMcs1AtRow(rowIndex) : 0;
             } else if (columnIndex == 6) {
                 return data.getNInvocationsAtRow(rowIndex);
             } else if (columnIndex == 0) {

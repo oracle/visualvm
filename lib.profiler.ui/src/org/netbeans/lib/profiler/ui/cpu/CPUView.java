@@ -155,8 +155,9 @@ public abstract class CPUView extends JPanel {
                 for (int i = 0; i < flatData.getNRows(); i++) // TODO: getNRows is filtered, may not work for tree data!
                     idMap.put(flatData.getMethodIdAtRow(i), flatData.getSourceCodeSelectionAtRow(i));
 
-                treeTableView.setData(snapshotData, idMap);
-                tableView.setData(flatData, idMap);
+                boolean sampled = client.getCurrentInstrType() == ProfilerClient.INSTR_NONE_SAMPLING;
+                treeTableView.setData(snapshotData, idMap, sampled);
+                tableView.setData(flatData, idMap, sampled);
                 lastupdate = System.currentTimeMillis();
 
             }
