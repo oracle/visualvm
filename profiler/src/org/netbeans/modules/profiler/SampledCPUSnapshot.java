@@ -265,7 +265,7 @@ public final class SampledCPUSnapshot {
 
     private void getSample(final int sampleIndex) throws IllegalArgumentException, IOException {
         if (currentIndex > sampleIndex || currentIndex+1 < sampleIndex ) {
-            throw new IllegalArgumentException("current sample "+currentIndex+" requestd sample "+sampleIndex);
+            throw new IllegalArgumentException("current sample "+currentIndex+" requested sample "+sampleIndex); // NOI18N
         }
         if (currentIndex+1 == sampleIndex) {
             currentIndex++;
