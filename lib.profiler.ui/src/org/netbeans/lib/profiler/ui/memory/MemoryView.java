@@ -52,6 +52,7 @@ import java.util.logging.Logger;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.global.CommonConstants;
@@ -124,74 +125,103 @@ public abstract class MemoryView extends JPanel {
     
     private void refreshData(RuntimeCCTNode appRootNode) throws ClientUtils.TargetAppOrVMTerminated {
         if ((lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis() || paused) && !forceRefresh) return;
-        JPanel newView = getView();
-        if (newView != currentView) {
-            removeAll();
-            resetData();
-            currentView = newView;
-            add(currentView, BorderLayout.CENTER);
-            revalidate();
-            repaint();
-        }
-        if (currentView == allocView) {
-            MemoryCCTProvider oacgb = client.getMemoryCCTProvider();
-            if (oacgb == null) throw new ClientUtils.TargetAppOrVMTerminated(ClientUtils.TargetAppOrVMTerminated.VM);
-            if (oacgb.getObjectsSizePerClass() != null) {
+        Runnable updateDataInAWT = null;
+        
+        switch (client.getCurrentInstrType()) {
+            case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
+                MemoryCCTProvider oacgb = client.getMemoryCCTProvider();
+                if (oacgb == null) throw new ClientUtils.TargetAppOrVMTerminated(ClientUtils.TargetAppOrVMTerminated.VM);
+                if (oacgb.getObjectsSizePerClass() != null) {
+                    ProfilingSessionStatus status = client.getStatus();
+                    int _nTrackedItems = status.getNInstrClasses();
+                    final int[] _nTotalAllocObjects = client.getAllocatedObjectsCountResults();
+                    final long[] _totalAllocObjectsSize = oacgb.getAllocObjectNumbers();
+
+                    if (_nTrackedItems > _nTotalAllocObjects.length)
+                        _nTrackedItems = _nTotalAllocObjects.length;
+                    if (_nTrackedItems > _totalAllocObjectsSize.length)
+                        _nTrackedItems = _totalAllocObjectsSize.length;
+
+                    final int nTrackedItems = _nTrackedItems;
+                    final String[] _classNames = status.getClassNames();
+                    for (int i = 0; i < _classNames.length; i++)
+                        _classNames[i] = StringUtils.userFormClassName(_classNames[i]);
+                    
+                    updateDataInAWT = new Runnable() {
+
+                        @Override
+                        public void run() {
+                            allocView.setData(nTrackedItems, _classNames, _nTotalAllocObjects,
+                                              _totalAllocObjectsSize);
+                        }
+                    };
+                }
+                break;
+            case CommonConstants.INSTR_OBJECT_LIVENESS: 
                 ProfilingSessionStatus status = client.getStatus();
-                int _nTrackedItems = status.getNInstrClasses();
-                int[] _nTotalAllocObjects = client.getAllocatedObjectsCountResults();
-                long[] _totalAllocObjectsSize = oacgb.getAllocObjectNumbers();
+                MemoryCCTProvider olcgb = client.getMemoryCCTProvider();
+                if (olcgb == null) throw new ClientUtils.TargetAppOrVMTerminated(ClientUtils.TargetAppOrVMTerminated.VM);
+                if (olcgb.getObjectsSizePerClass() != null) {
+                    MemoryCCTProvider.ObjectNumbersContainer onc = olcgb.getLivenessObjectNumbers();
+                    final long[] _nTrackedAllocObjects = onc.nTrackedAllocObjects;
+                    final int[] _nTrackedLiveObjects = onc.nTrackedLiveObjects;
+                    final long[] _trackedLiveObjectsSize = onc.trackedLiveObjectsSize;
+                    final float[] _avgObjectAge = onc.avgObjectAge;
+                    final int[] _maxSurvGen = onc.maxSurvGen;
+                    int _nInstrClasses = onc.nInstrClasses;
 
-                if (_nTrackedItems > _nTotalAllocObjects.length)
-                    _nTrackedItems = _nTotalAllocObjects.length;
-                if (_nTrackedItems > _totalAllocObjectsSize.length)
-                    _nTrackedItems = _totalAllocObjectsSize.length;
-                
-                String[] _classNames = status.getClassNames();
-                for (int i = 0; i < _classNames.length; i++)
-                    _classNames[i] = StringUtils.userFormClassName(_classNames[i]);
+                    if (((_nTrackedLiveObjects == null) && (_nTrackedAllocObjects == null)) ||
+                         (_avgObjectAge == null) || (_maxSurvGen == null)) return;
 
-                allocView.setData(_nTrackedItems, _classNames, _nTotalAllocObjects,
-                                  _totalAllocObjectsSize);
-            }
-        } else if (currentView == livenessView) {
-            ProfilingSessionStatus status = client.getStatus();
-            MemoryCCTProvider olcgb = client.getMemoryCCTProvider();
-            if (olcgb == null) throw new ClientUtils.TargetAppOrVMTerminated(ClientUtils.TargetAppOrVMTerminated.VM);
-            if (olcgb.getObjectsSizePerClass() != null) {
-                MemoryCCTProvider.ObjectNumbersContainer onc = olcgb.getLivenessObjectNumbers();
-                long[] _nTrackedAllocObjects = onc.nTrackedAllocObjects;
-                int[] _nTrackedLiveObjects = onc.nTrackedLiveObjects;
-                long[] _trackedLiveObjectsSize = onc.trackedLiveObjectsSize;
-                float[] _avgObjectAge = onc.avgObjectAge;
-                int[] _maxSurvGen = onc.maxSurvGen;
-                int _nInstrClasses = onc.nInstrClasses;
+                    final int[] _nTotalAllocObjects = client.getAllocatedObjectsCountResults();
 
-                if (((_nTrackedLiveObjects == null) && (_nTrackedAllocObjects == null)) ||
-                     (_avgObjectAge == null) || (_maxSurvGen == null)) return;
+                    int _nTrackedItems = Math.min(_nTrackedAllocObjects.length, _nTrackedLiveObjects.length);
+                    _nTrackedItems = Math.min(_nTrackedItems, _trackedLiveObjectsSize.length);
+                    _nTrackedItems = Math.min(_nTrackedItems, _avgObjectAge.length);
+                    _nTrackedItems = Math.min(_nTrackedItems, _maxSurvGen.length);
+                    _nTrackedItems = Math.min(_nTrackedItems, _nInstrClasses);
+                    _nTrackedItems = Math.min(_nTrackedItems, _nTotalAllocObjects.length);
 
-                int[] _nTotalAllocObjects = client.getAllocatedObjectsCountResults();
+                    for (int i = 0; i < _nTrackedItems; i++)
+                        if (_nTrackedAllocObjects[i] == -1)
+                            _nTotalAllocObjects[i] = 0;
 
-                int _nTrackedItems = Math.min(_nTrackedAllocObjects.length, _nTrackedLiveObjects.length);
-                _nTrackedItems = Math.min(_nTrackedItems, _trackedLiveObjectsSize.length);
-                _nTrackedItems = Math.min(_nTrackedItems, _avgObjectAge.length);
-                _nTrackedItems = Math.min(_nTrackedItems, _maxSurvGen.length);
-                _nTrackedItems = Math.min(_nTrackedItems, _nInstrClasses);
-                _nTrackedItems = Math.min(_nTrackedItems, _nTotalAllocObjects.length);
+                    final String[] _classNames = status.getClassNames();
+                    for (int i = 0; i < _classNames.length; i++)
+                        _classNames[i] = StringUtils.userFormClassName(_classNames[i]);
+                    final int nTrackedItems = _nTrackedItems;
+                    
+                    updateDataInAWT = new Runnable() {
 
-                for (int i = 0; i < _nTrackedItems; i++)
-                    if (_nTrackedAllocObjects[i] == -1)
-                        _nTotalAllocObjects[i] = 0;
-                
-                String[] _classNames = status.getClassNames();
-                for (int i = 0; i < _classNames.length; i++)
-                    _classNames[i] = StringUtils.userFormClassName(_classNames[i]);
-
-                livenessView.setData(_nTrackedItems, _classNames, _nTrackedLiveObjects,
-                                     _trackedLiveObjectsSize, _nTrackedAllocObjects,
-                                     _avgObjectAge, _maxSurvGen, _nTotalAllocObjects);
-            }
+                        @Override
+                        public void run() {
+                            livenessView.setData(nTrackedItems, _classNames, _nTrackedLiveObjects,
+                                                 _trackedLiveObjectsSize, _nTrackedAllocObjects,
+                                                 _avgObjectAge, _maxSurvGen, _nTotalAllocObjects);
+                        }
+                    };
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid profiling instr. type: "+client.getCurrentInstrType());
         }
+        final Runnable updateDataInAWTFinal = updateDataInAWT;
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                JPanel newView = getView();
+                if (newView != currentView) {
+                    removeAll();
+                    resetData();
+                    currentView = newView;
+                    add(currentView, BorderLayout.CENTER);
+                    revalidate();
+                    repaint();
+                }
+                if (updateDataInAWTFinal != null) updateDataInAWTFinal.run();
+            }
+        });
         lastupdate = System.currentTimeMillis();
         forceRefresh = false;
     }    

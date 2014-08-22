@@ -58,6 +58,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.netbeans.lib.profiler.ProfilerClient;
@@ -143,21 +144,27 @@ public abstract class CPUView extends JPanel {
     private void refreshData(RuntimeCCTNode appRootNode) throws ClientUtils.TargetAppOrVMTerminated {
         if ((lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis() || paused) && !forceRefresh) return;
         try {
-            CPUResultsSnapshot snapshotData =
+            final CPUResultsSnapshot snapshotData =
                     client.getStatus().getInstrMethodClasses() == null ?
                     null : client.getCPUProfilingResultsSnapshot(false);
 
             if (snapshotData != null) {
-                FlatProfileContainer flatData = snapshotData.getFlatProfile(
+                final FlatProfileContainer flatData = snapshotData.getFlatProfile(
                         -1, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
                 
-                Map<Integer, ClientUtils.SourceCodeSelection> idMap = new HashMap();
+                final Map<Integer, ClientUtils.SourceCodeSelection> idMap = new HashMap();
                 for (int i = 0; i < flatData.getNRows(); i++) // TODO: getNRows is filtered, may not work for tree data!
                     idMap.put(flatData.getMethodIdAtRow(i), flatData.getSourceCodeSelectionAtRow(i));
 
-                boolean sampled = client.getCurrentInstrType() == ProfilerClient.INSTR_NONE_SAMPLING;
-                treeTableView.setData(snapshotData, idMap, sampled);
-                tableView.setData(flatData, idMap, sampled);
+                final boolean sampled = client.getCurrentInstrType() == ProfilerClient.INSTR_NONE_SAMPLING;
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        treeTableView.setData(snapshotData, idMap, sampled);
+                        tableView.setData(flatData, idMap, sampled);
+                    }
+                });
                 lastupdate = System.currentTimeMillis();
 
             }
