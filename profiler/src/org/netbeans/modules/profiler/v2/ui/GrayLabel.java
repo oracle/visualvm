@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.v2.ui;
 
-import java.awt.Color;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import org.netbeans.lib.profiler.ui.UIUtils;

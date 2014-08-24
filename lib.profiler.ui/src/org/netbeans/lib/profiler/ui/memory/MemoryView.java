@@ -85,7 +85,7 @@ public abstract class MemoryView extends JPanel {
     private volatile boolean paused;
     private volatile boolean forceRefresh;
     
-    private final Set<String> selection;
+    private final Set<ClientUtils.SourceCodeSelection> selection;
     private final ResultsMonitor rm;
     
     
@@ -113,7 +113,7 @@ public abstract class MemoryView extends JPanel {
         }
     }
        
-    public MemoryView(ProfilerClient client, Set<String> selection, boolean showSourceSupported) {
+    public MemoryView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection, boolean showSourceSupported) {
         this.client = client;
         this.selection = selection;
         this.showSourceSupported = showSourceSupported;
@@ -309,11 +309,11 @@ public abstract class MemoryView extends JPanel {
     }
     
     
-    public abstract void showSource(String value);
+    public abstract void showSource(ClientUtils.SourceCodeSelection value);
     
-    public abstract void profileSingle(String value);
+    public abstract void profileSingle(ClientUtils.SourceCodeSelection value);
     
-    public abstract void selectForProfiling(String[] value);
+    public abstract void selectForProfiling(ClientUtils.SourceCodeSelection[] value);
     
     public void popupShowing() {};
     
@@ -327,10 +327,10 @@ public abstract class MemoryView extends JPanel {
 //                return sampledView;
             case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
                 if (allocView == null) allocView = new AllocTableView(selection) {
-                    protected void performDefaultAction(String value) {
+                    protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
                         if (showSourceSupported) showSource(value);
                     }
-                    protected void populatePopup(JPopupMenu popup, String value) {
+                    protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
                         MemoryView.this.populatePopup(popup, value);
                     }
                     protected void popupShowing() { MemoryView.this.popupShowing(); }
@@ -339,10 +339,10 @@ public abstract class MemoryView extends JPanel {
                 return allocView;
             case CommonConstants.INSTR_OBJECT_LIVENESS:
                 if (livenessView == null) livenessView = new LivenessTableView(selection) {
-                    protected void performDefaultAction(String value) {
+                    protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
                         if (showSourceSupported) showSource(value);
                     }
-                    protected void populatePopup(JPopupMenu popup, String value) {
+                    protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
                         MemoryView.this.populatePopup(popup, value);
                     }
                     protected void popupShowing() { MemoryView.this.popupShowing(); }
@@ -351,10 +351,10 @@ public abstract class MemoryView extends JPanel {
                 return livenessView;
             default:
                 if (sampledView == null) sampledView = new SampledTableView(selection) {
-                    protected void performDefaultAction(String value) {
+                    protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
                         if (showSourceSupported) showSource(value);
                     }
-                    protected void populatePopup(JPopupMenu popup, String value) {
+                    protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
                         MemoryView.this.populatePopup(popup, value);
                     }
                     protected void popupShowing() { MemoryView.this.popupShowing(); }
@@ -365,7 +365,7 @@ public abstract class MemoryView extends JPanel {
         }
     }
     
-    private void populatePopup(JPopupMenu popup, final String value) {
+    private void populatePopup(JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
         if (showSourceSupported) {
             popup.add(new JMenuItem("Go to Source") {
                 { setEnabled(value != null); setFont(getFont().deriveFont(Font.BOLD)); }
@@ -379,10 +379,9 @@ public abstract class MemoryView extends JPanel {
             protected void fireActionPerformed(ActionEvent e) { profileSingle(value); }
         });
         
-        popup.addSeparator();
         popup.add(new JMenuItem("Select for Profiling") {
             { setEnabled(value != null); }
-            protected void fireActionPerformed(ActionEvent e) { selectForProfiling(new String[] { value }); }
+            protected void fireActionPerformed(ActionEvent e) { selectForProfiling(new ClientUtils.SourceCodeSelection[] { value }); }
         });
     }
     

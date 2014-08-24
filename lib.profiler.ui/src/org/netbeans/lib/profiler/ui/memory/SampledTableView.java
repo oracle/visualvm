@@ -53,6 +53,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.memory.HeapHistogram;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
@@ -61,6 +62,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
+import org.netbeans.lib.profiler.utils.Wildcards;
 
 /**
  *
@@ -72,11 +74,12 @@ abstract class SampledTableView extends JPanel {
     private ProfilerTable table;
     
     private HeapHistogram.ClassInfo[] data;
+    private ClientUtils.SourceCodeSelection[] classNames;
     
-    private final Set<String> selection;
+    private final Set<ClientUtils.SourceCodeSelection> selection;
     
     
-    public SampledTableView(Set<String> selection) {
+    public SampledTableView(Set<ClientUtils.SourceCodeSelection> selection) {
         this.selection = selection;
         
         initUI();
@@ -91,6 +94,9 @@ abstract class SampledTableView extends JPanel {
                                                  histogram.getHeapHistogram();
                     data = classes == null ? null :
                            classes.toArray(new HeapHistogram.ClassInfo[classes.size()]);
+                    classNames = new ClientUtils.SourceCodeSelection[data == null ? 0 : data.length];
+                    for (int i = 0; i < classNames.length; i++)
+                        classNames[i] = new ClientUtils.SourceCodeSelection(data[i].getName(), Wildcards.ALLWILDCARD, null);
                     
                     renderers[0].setMaxValue(histogram == null ? 0 : histogram.getTotalHeapBytes());
                     renderers[1].setMaxValue(histogram == null ? 0 : histogram.getTotalHeapInstances());
@@ -115,9 +121,9 @@ abstract class SampledTableView extends JPanel {
     }
     
     
-    protected abstract void performDefaultAction(String value);
+    protected abstract void performDefaultAction(ClientUtils.SourceCodeSelection value);
     
-    protected abstract void populatePopup(JPopupMenu popup, String value);
+    protected abstract void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value);
     
     protected abstract void popupShowing();
     
@@ -130,11 +136,11 @@ abstract class SampledTableView extends JPanel {
         tableModel = new MemoryTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null) {
-            protected String getValueForPopup(int row) {
+            protected ClientUtils.SourceCodeSelection getValueForPopup(int row) {
                 return valueForRow(row);
             }
             protected void populatePopup(JPopupMenu popup, Object value) {
-                SampledTableView.this.populatePopup(popup, (String)value);
+                SampledTableView.this.populatePopup(popup, (ClientUtils.SourceCodeSelection)value);
             }
             protected void popupShowing() {
                 SampledTableView.this.popupShowing();
@@ -148,7 +154,7 @@ abstract class SampledTableView extends JPanel {
         table.setDefaultAction(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 int row = table.getSelectedRow();
-                String value = valueForRow(row);
+                ClientUtils.SourceCodeSelection value = valueForRow(row);
                 if (value != null) performDefaultAction(value);
             }
         });
@@ -185,10 +191,10 @@ abstract class SampledTableView extends JPanel {
     }
     
     
-    private String valueForRow(int row) {
+    private ClientUtils.SourceCodeSelection valueForRow(int row) {
         if (data == null || row == -1) return null;
         if (row >= tableModel.getRowCount()) return null; // #239936
-        return data[table.convertRowIndexToModel(row)].getName();
+        return classNames[table.convertRowIndexToModel(row)];
     }
     
     
@@ -236,7 +242,7 @@ abstract class SampledTableView extends JPanel {
                 return data[rowIndex].getInstancesCount();
             } else if (columnIndex == 0) {
                 if (selection.isEmpty()) return Boolean.FALSE;
-                return selection.contains(data[rowIndex].getName());
+                return selection.contains(classNames[rowIndex]);
             }
 
             return null;
@@ -244,8 +250,8 @@ abstract class SampledTableView extends JPanel {
 
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
             if (columnIndex == 0) {
-                if (Boolean.FALSE.equals(aValue)) selection.remove(data[rowIndex].getName());
-                else selection.add(data[rowIndex].getName());
+                if (Boolean.FALSE.equals(aValue)) selection.remove(classNames[rowIndex]);
+                else selection.add(classNames[rowIndex]);
             }
         }
 

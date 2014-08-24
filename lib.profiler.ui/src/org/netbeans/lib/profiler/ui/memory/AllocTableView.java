@@ -54,6 +54,7 @@ import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
@@ -61,6 +62,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
+import org.netbeans.lib.profiler.utils.Wildcards;
 
 /**
  *
@@ -72,14 +74,14 @@ abstract class AllocTableView extends JPanel {
     private ProfilerTable table;
     
     private int nTrackedItems;
-    private String[] classNames;
+    private ClientUtils.SourceCodeSelection[] classNames;
     private int[] nTotalAllocObjects;
     private long[] totalAllocObjectsSize;
     
-    private final Set<String> selection;
+    private final Set<ClientUtils.SourceCodeSelection> selection;
     
     
-    public AllocTableView(Set<String> selection) {
+    public AllocTableView(Set<ClientUtils.SourceCodeSelection> selection) {
         this.selection = selection;
         
         initUI();
@@ -92,7 +94,9 @@ abstract class AllocTableView extends JPanel {
             public void run() {
                 if (tableModel != null) {
                     nTrackedItems = _nTrackedItems;
-                    classNames = _classNames;
+                    classNames = new ClientUtils.SourceCodeSelection[_classNames.length];
+                    for (int i = 0; i < classNames.length; i++)
+                        classNames[i] = new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null);
                     nTotalAllocObjects = _nTotalAllocObjects;
                     totalAllocObjectsSize = _totalAllocObjectsSize;
                     
@@ -134,9 +138,9 @@ abstract class AllocTableView extends JPanel {
     }
     
     
-    protected abstract void performDefaultAction(String value);
+    protected abstract void performDefaultAction(ClientUtils.SourceCodeSelection value);
     
-    protected abstract void populatePopup(JPopupMenu popup, String value);
+    protected abstract void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value);
     
     protected abstract void popupShowing();
     
@@ -149,11 +153,11 @@ abstract class AllocTableView extends JPanel {
         tableModel = new MemoryTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null) {
-            protected String getValueForPopup(int row) {
+            protected ClientUtils.SourceCodeSelection getValueForPopup(int row) {
                 return valueForRow(row);
             }
             protected void populatePopup(JPopupMenu popup, Object value) {
-                AllocTableView.this.populatePopup(popup, (String)value);
+                AllocTableView.this.populatePopup(popup, (ClientUtils.SourceCodeSelection)value);
             }
             protected void popupShowing() {
                 AllocTableView.this.popupShowing();
@@ -167,7 +171,7 @@ abstract class AllocTableView extends JPanel {
         table.setDefaultAction(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 int row = table.getSelectedRow();
-                String value = valueForRow(row);
+                ClientUtils.SourceCodeSelection value = valueForRow(row);
                 if (value != null) performDefaultAction(value);
             }
         });
@@ -211,7 +215,7 @@ abstract class AllocTableView extends JPanel {
     }
     
     
-    private String valueForRow(int row) {
+    private ClientUtils.SourceCodeSelection valueForRow(int row) {
         if (nTrackedItems == 0 || row == -1) return null;
         if (row >= tableModel.getRowCount()) return null; // #239936
         return classNames[table.convertRowIndexToModel(row)];
@@ -258,7 +262,7 @@ abstract class AllocTableView extends JPanel {
             if (nTrackedItems == 0) return null;
             
             if (columnIndex == 1) {
-                return classNames[rowIndex];
+                return classNames[rowIndex].getClassName();
             } else if (columnIndex == 2) {
                 return totalAllocObjectsSize[rowIndex];
             } else if (columnIndex == 3) {

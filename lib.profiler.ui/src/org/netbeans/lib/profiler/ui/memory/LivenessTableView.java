@@ -54,6 +54,7 @@ import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
@@ -62,6 +63,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
+import org.netbeans.lib.profiler.utils.Wildcards;
 
 /**
  *
@@ -73,7 +75,7 @@ abstract class LivenessTableView extends JPanel {
     private ProfilerTable table;
     
     private int nTrackedItems;
-    private String[] classNames;
+    private ClientUtils.SourceCodeSelection[] classNames;
     private int[] nTrackedLiveObjects;
     private long[] trackedLiveObjectsSize;
     private long[] nTrackedAllocObjects;
@@ -81,10 +83,10 @@ abstract class LivenessTableView extends JPanel {
     private int[] maxSurvGen;
     private int[] nTotalAllocObjects;
     
-    private final Set<String> selection;
+    private final Set<ClientUtils.SourceCodeSelection> selection;
     
     
-    public LivenessTableView(Set<String> selection) {
+    public LivenessTableView(Set<ClientUtils.SourceCodeSelection> selection) {
         this.selection = selection;
         
         initUI();
@@ -99,7 +101,9 @@ abstract class LivenessTableView extends JPanel {
             public void run() {
                 if (tableModel != null) {
                     nTrackedItems = _nTrackedItems;
-                    classNames = _classNames;
+                    classNames = new ClientUtils.SourceCodeSelection[_classNames.length];
+                    for (int i = 0; i < classNames.length; i++)
+                        classNames[i] = new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null);
                     nTrackedLiveObjects = _nTrackedLiveObjects;
                     trackedLiveObjectsSize = _trackedLiveObjectsSize;
                     nTrackedAllocObjects = _nTrackedAllocObjects;
@@ -155,9 +159,9 @@ abstract class LivenessTableView extends JPanel {
     }
     
     
-    protected abstract void performDefaultAction(String value);
+    protected abstract void performDefaultAction(ClientUtils.SourceCodeSelection value);
     
-    protected abstract void populatePopup(JPopupMenu popup, String value);
+    protected abstract void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value);
     
     protected abstract void popupShowing();
     
@@ -170,11 +174,11 @@ abstract class LivenessTableView extends JPanel {
         tableModel = new MemoryTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null) {
-            protected String getValueForPopup(int row) {
+            protected ClientUtils.SourceCodeSelection getValueForPopup(int row) {
                 return valueForRow(row);
             }
             protected void populatePopup(JPopupMenu popup, Object value) {
-                LivenessTableView.this.populatePopup(popup, (String)value);
+                LivenessTableView.this.populatePopup(popup, (ClientUtils.SourceCodeSelection)value);
             }
             protected void popupShowing() {
                 LivenessTableView.this.popupShowing();
@@ -188,7 +192,7 @@ abstract class LivenessTableView extends JPanel {
         table.setDefaultAction(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 int row = table.getSelectedRow();
-                String value = valueForRow(row);
+                ClientUtils.SourceCodeSelection value = valueForRow(row);
                 if (value != null) performDefaultAction(value);
             }
         });
@@ -246,7 +250,7 @@ abstract class LivenessTableView extends JPanel {
     }
     
     
-    private String valueForRow(int row) {
+    private ClientUtils.SourceCodeSelection valueForRow(int row) {
         if (nTrackedItems == 0 || row == -1) return null;
         if (row >= tableModel.getRowCount()) return null; // #239936
         return classNames[table.convertRowIndexToModel(row)];
@@ -309,7 +313,7 @@ abstract class LivenessTableView extends JPanel {
             if (nTrackedItems == 0) return null;
             
             if (columnIndex == 1) {
-                return classNames[rowIndex];
+                return classNames[rowIndex].getClassName();
             } else if (columnIndex == 2) {
                 return trackedLiveObjectsSize[rowIndex];
             } else if (columnIndex == 3) {

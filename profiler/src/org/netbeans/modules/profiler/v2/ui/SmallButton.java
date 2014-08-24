@@ -67,7 +67,7 @@ public class SmallButton extends JButton {
     
     {
         setDefaultCapable(false);
-        setOpaque(false);
+        if (UIUtils.isWindowsLookAndFeel()) setOpaque(false);
     }
     
     

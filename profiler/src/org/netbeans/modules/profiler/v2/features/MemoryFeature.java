@@ -66,7 +66,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JProgressBar;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
@@ -76,6 +75,7 @@ import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.memory.MemoryView;
+import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
@@ -85,7 +85,6 @@ import org.netbeans.modules.profiler.actions.RunGCAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
 import org.netbeans.modules.profiler.actions.TakeThreadDumpAction;
 import org.netbeans.modules.profiler.api.GoToSource;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -94,6 +93,8 @@ import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
+import org.netbeans.modules.profiler.v2.impl.ClassMethodList;
+import org.netbeans.modules.profiler.v2.impl.ClassMethodSelector;
 import org.netbeans.modules.profiler.v2.ui.GrayLabel;
 import org.netbeans.modules.profiler.v2.ui.PopupButton;
 import org.netbeans.modules.profiler.v2.ui.SmallButton;
@@ -118,7 +119,7 @@ import org.openide.util.lookup.ServiceProvider;
 })
 final class MemoryFeature extends ProfilerFeature.Basic {
     
-    private static enum Mode { SAMPLED_ALL, SAMPLED_PROJECT, INSTR_CLASS, INSTR_SELECTED }
+    private static enum Mode { SAMPLED_ALL, SAMPLED_PROJECT, INSTR_CLASSES }
     
     private final Map<Mode, Properties> settingsCache = new HashMap();
     private Mode appliedMode;
@@ -139,28 +140,21 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private JButton apGCButton;
     
     private ProfilerToolbar toolbar;
+    
     private JPanel settingsUI;
+    private ModeSelector modeSelector;
+    private SettingsApplier settingsApplier;
     
-    private JPanel applyPanel;
-    private JButton applyButton;
-    
-    private PopupButton modeButton;
-    
-    private Component instrSettingsSpace;
-    private JButton selectedLabel;
-    private Component selectedSpace1;
-    private Component selectedSeparator;
-    private Component selectedSpace2;
-    private JCheckBox lifecycleCheckbox;
-    private JCheckBox allocationsCheckbox;
+    private JPanel settingsContent;
+    private SampledAllSettings sampledAllSettings;
+    private SampledProjectSettings sampledProjectSettings;
+    private InstrSelectedSettings instrSelectedSettings;
     
     private MemoryView memoryView;
     
     private boolean popupPause;
     
-    private String[] selectedClasses;
-    
-    private final Set<String> selection;
+    private final Set<ClientUtils.SourceCodeSelection> selection;
     
     
     MemoryFeature() {
@@ -192,8 +186,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private void loadSettings() {
         settingsCache.put(Mode.SAMPLED_ALL, new Properties());
         settingsCache.put(Mode.SAMPLED_PROJECT, new Properties());
-        settingsCache.put(Mode.INSTR_CLASS, new Properties());
-        settingsCache.put(Mode.INSTR_SELECTED, new Properties());
+        settingsCache.put(Mode.INSTR_CLASSES, new Properties());
     }
     
     
@@ -203,21 +196,19 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     
     public void configure(Lookup configuration) {
         SourceClassInfo classInfo = configuration.lookup(SourceClassInfo.class);
-        if (classInfo != null) profileSingle(classInfo.getQualifiedName());
+        if (classInfo != null) profileSingle(new ClientUtils.SourceCodeSelection(
+                               classInfo.getQualifiedName(), Wildcards.ALLWILDCARD, null));
     }
     
     
-    private void profileSingle(String selection) {
-        selectedClasses = new String[] { selection };
-        setMode(Mode.INSTR_CLASS);
-        updateModeUI();
-        getSettingsUI().setVisible(true);
-        settingsChanged();
+    private void profileSingle(ClientUtils.SourceCodeSelection selection) {
+        this.selection.clear();
+        selectForProfiling(new ClientUtils.SourceCodeSelection[] { selection });
     }
     
-    private void selectForProfiling(String[] selection) {
+    private void selectForProfiling(ClientUtils.SourceCodeSelection[] selection) {
         this.selection.addAll(Arrays.asList(selection));
-        setMode(Mode.INSTR_SELECTED);
+        setMode(Mode.INSTR_CLASSES);
         updateModeUI();
         memoryView.showSelectionColumn();
         getSettingsUI().setVisible(true);
@@ -237,19 +228,56 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         return memoryView;
     }
     
+    
     public JPanel getSettingsUI() {
         if (settingsUI == null) {
             settingsUI = new JPanel();
             settingsUI.setOpaque(false);
             settingsUI.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             settingsUI.setLayout(new BoxLayout(settingsUI, BoxLayout.LINE_AXIS));
-            
             settingsUI.setVisible(false); // TODO: should restore last state
-
-            settingsUI.add(new JLabel("Profile:"));
-
-            settingsUI.add(Box.createHorizontalStrut(5));
-
+            
+            modeSelector = new ModeSelector();
+            settingsUI.add(modeSelector);
+            
+            settingsContent = new JPanel();
+            settingsContent.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+            settingsContent.setLayout(new BoxLayout(settingsContent, BoxLayout.LINE_AXIS));
+            settingsContent.setOpaque(false);
+            settingsUI.add(settingsContent);
+            
+            sampledAllSettings = new SampledAllSettings();
+            sampledProjectSettings = new SampledProjectSettings();
+            instrSelectedSettings = new InstrSelectedSettings();
+            
+            settingsUI.add(Box.createHorizontalGlue());
+            
+            settingsApplier = new SettingsApplier();
+            settingsUI.add(settingsApplier);
+            
+            ProfilerSession session = getSession();
+            int state = session != null ? session.getState() :
+                        NetBeansProfiler.PROFILING_INACTIVE;
+            
+            updateModeUI();
+            updateApply(state);
+        }
+        return settingsUI;
+    }
+    
+    
+    private class ModeSelector extends JPanel {
+        
+        PopupButton modeButton;
+        
+        ModeSelector() {
+            setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+            setOpaque(false);
+            
+            add(new JLabel("Profile:"));
+            
+            add(Box.createHorizontalStrut(5));
+            
             modeButton = new PopupButton("All classes") {
                 protected void populatePopup(JPopupMenu popup) {
                     popup.add(new TitledMenuSeparator("General (sampled)"));
@@ -261,98 +289,23 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                     });
                     
                     popup.add(new TitledMenuSeparator("Focused (instrumented)"));
-                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_CLASS), currentMode == Mode.INSTR_CLASS) {
-                        protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_CLASS); }
-                    });
-                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_SELECTED), currentMode == Mode.INSTR_SELECTED) {
-//                        { setEnabled(memoryView.hasSelection()); }
-                        protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_SELECTED); }
+                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.INSTR_CLASSES), currentMode == Mode.INSTR_CLASSES) {
+                        protected void fireActionPerformed(ActionEvent e) { setMode(Mode.INSTR_CLASSES); }
                     });
                 }
             };
-            settingsUI.add(modeButton);
-
-            instrSettingsSpace = settingsUI.add(Box.createHorizontalStrut(8));
-            
-            selectedLabel = new JButton() {
-                public void setText(String text) {
-                    super.setText("<html>" + text + ", <a href='#'>edit</a></html>");
-                }
-                protected void fireActionPerformed(ActionEvent e) {
-                    ProfilerDialogs.displayInfo("\n[TODO]\n\nWill open a dialog for editing classes to profile.");
-                }
-                public Dimension getMinimumSize() {
-                    return getPreferredSize();
-                }
-                public Dimension getMaximumSize() {
-                    return getPreferredSize();
-                }
-            };
-            selectedLabel.setContentAreaFilled(false);
-            selectedLabel.setBorderPainted(true);
-            selectedLabel.setMargin(new Insets(0, 0, 0, 0));
-            selectedLabel.setBorder(BorderFactory.createEmptyBorder());
-            selectedLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            settingsUI.add(selectedLabel);
-            
-            selectedSpace1 = settingsUI.add(Box.createHorizontalStrut(8));
-            
-            selectedSeparator = Box.createHorizontalStrut(1);
-            selectedSeparator.setBackground(Color.GRAY);
-            if (selectedSeparator instanceof JComponent) ((JComponent)selectedSeparator).setOpaque(true);
-            Dimension d = selectedSeparator.getMaximumSize();
-            d.height = 20;
-            selectedSeparator.setMaximumSize(d);
-            settingsUI.add(selectedSeparator);
-            
-            selectedSpace2 = settingsUI.add(Box.createHorizontalStrut(8));
-            
-            lifecycleCheckbox = new JCheckBox("Record full lifecycle") {
-                protected void fireStateChanged() { settingsChanged(); super.fireStateChanged(); }
-            };
-            lifecycleCheckbox.setOpaque(false);
-            settingsUI.add(lifecycleCheckbox);
-            
-            allocationsCheckbox = new JCheckBox("Record allocations") {
-                protected void fireStateChanged() { settingsChanged(); super.fireStateChanged(); }
-            };
-            allocationsCheckbox.setOpaque(false);
-            settingsUI.add(allocationsCheckbox);
-
-
-            settingsUI.add(Box.createGlue());
-
-
-            settingsUI.add(new JLabel("Overhead:"));
-
-            settingsUI.add(Box.createHorizontalStrut(5));
-
-            settingsUI.add(new JProgressBar() {
-                public Dimension getPreferredSize() {
-                    Dimension d = super.getPreferredSize();
-                    d.width = 80;
-                    return d;
-                }
-                public Dimension getMaximumSize() {
-                    return getPreferredSize();
-                }
-            });
-
-            applyPanel = new JPanel();
-            applyPanel.setOpaque(false);
-            applyPanel.setLayout(new BoxLayout(applyPanel, BoxLayout.LINE_AXIS));
-            
-            applyPanel.add(Box.createHorizontalStrut(8));
-
-            Component sep1 = Box.createHorizontalStrut(1);
-            sep1.setBackground(Color.GRAY);
-            if (sep1 instanceof JComponent) ((JComponent)sep1).setOpaque(true);
-            Dimension dd = sep1.getMaximumSize();
-            dd.height = 20;
-            sep1.setMaximumSize(dd);
-            applyPanel.add(sep1);
-
-            applyPanel.add(Box.createHorizontalStrut(8));
+            add(modeButton);
+        }
+        
+    }
+    
+    private class SettingsApplier extends JPanel {
+        
+        JButton applyButton;
+        
+        SettingsApplier() {
+            setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+            setOpaque(false);
             
             applyButton = new SmallButton("Apply") {
                 protected void fireActionPerformed(ActionEvent e) {
@@ -361,19 +314,153 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                     fireChange();
                 }
             };
-            applyPanel.add(applyButton);
-            
-            settingsUI.add(applyPanel);
-            
-            ProfilerSession session = getSession();
-            int state = session != null ? session.getState() :
-                        NetBeansProfiler.PROFILING_INACTIVE;
-            
-            updateModeUI();
-            updateApply(state);
+            add(applyButton);
         }
-        return settingsUI;
+        
+    }   
+    
+    private class SampledAllSettings extends JPanel {
+        
+        SampledAllSettings() {
+            setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+            setOpaque(false);
+        }
+        
     }
+    
+    private class SampledProjectSettings extends JPanel {
+        
+//        LazyComboBox<Lookup.Provider> projectSelect;
+        
+        SampledProjectSettings() {
+            setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+            setOpaque(false);
+        }
+        
+//        public Dimension getMaximumSize() {
+//            return getPreferredSize();
+//        }
+        
+    }
+    
+    private class InstrSelectedSettings extends JPanel {
+        
+        final JCheckBox lifecycleCheckbox;
+        final JCheckBox allocationsCheckbox;
+        
+        private final JPanel selectionContent;
+        private final JPanel noSelectionContent;
+        
+        private final JButton addSelectionButton;
+        private final JButton editSelectionLink;
+        
+        InstrSelectedSettings() {
+            setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+            setOpaque(false);
+            
+            selectionContent = new JPanel();
+            selectionContent.setLayout(new BoxLayout(selectionContent, BoxLayout.LINE_AXIS));
+            selectionContent.setOpaque(false);
+            
+            editSelectionLink = new JButton() {
+                public void setText(String text) {
+                    super.setText("<html><a href='#'>" + text + ", edit</a></html>");
+                }
+                protected void fireActionPerformed(ActionEvent e) {
+                    ClassMethodList.showClasses(getSession().getProject(), selection, editSelectionLink);
+                }
+                public Dimension getMinimumSize() {
+                    return getPreferredSize();
+                }
+                public Dimension getMaximumSize() {
+                    return getPreferredSize();
+                }
+            };
+            editSelectionLink.setContentAreaFilled(false);
+            editSelectionLink.setBorderPainted(true);
+            editSelectionLink.setMargin(new Insets(0, 0, 0, 0));
+            editSelectionLink.setBorder(BorderFactory.createEmptyBorder());
+            editSelectionLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            selectionContent.add(editSelectionLink);
+            
+            selectionContent.add(Box.createHorizontalStrut(8));
+            
+            Component separator = Box.createHorizontalStrut(1);
+            separator.setBackground(Color.GRAY);
+            if (separator instanceof JComponent) ((JComponent)separator).setOpaque(true);
+            Dimension d = separator.getMaximumSize();
+            d.height = 20;
+            separator.setMaximumSize(d);
+            selectionContent.add(separator);
+            
+            selectionContent.add(Box.createHorizontalStrut(8));
+            
+            lifecycleCheckbox = new JCheckBox("Record full lifecycle") {
+                protected void fireStateChanged() { settingsChanged(); super.fireStateChanged(); }
+            };
+            lifecycleCheckbox.setOpaque(false);
+            selectionContent.add(lifecycleCheckbox);
+            
+            allocationsCheckbox = new JCheckBox("Record allocations") {
+                protected void fireStateChanged() { settingsChanged(); super.fireStateChanged(); }
+            };
+            allocationsCheckbox.setOpaque(false);
+            selectionContent.add(allocationsCheckbox);
+            
+            noSelectionContent = new JPanel();
+            noSelectionContent.setLayout(new BoxLayout(noSelectionContent, BoxLayout.LINE_AXIS));
+            noSelectionContent.setOpaque(false);
+            
+            GrayLabel noSelectionHint = new GrayLabel("No classes selected, use Profile Class action in editor or results or click the Add button:");
+            noSelectionHint.setEnabled(false);
+            noSelectionContent.add(noSelectionHint);
+            
+            noSelectionContent.add(Box.createHorizontalStrut(5));
+            
+            addSelectionButton = new SmallButton("+") {
+                protected void fireActionPerformed(ActionEvent e) {
+                    SourceClassInfo classInfo = ClassMethodSelector.selectClass(getSession().getProject());
+                    if (classInfo != null) profileSingle(new ClientUtils.SourceCodeSelection(classInfo.
+                                                         getQualifiedName(), Wildcards.ALLWILDCARD, null));
+                }
+                public Dimension getMinimumSize() {
+                    return getPreferredSize();
+                }
+                public Dimension getMaximumSize() {
+                    return getPreferredSize();
+                }
+            };
+            noSelectionContent.add(addSelectionButton);
+        }
+        
+        void updateSelection(int count) {
+            removeAll();
+            if (count == 0) {
+                add(noSelectionContent);
+            } else {
+                editSelectionLink.setText(count == 1 ? "Selected 1 class" : "Selected " + count + " classes");
+                add(selectionContent);
+            }
+        }
+        
+    }
+    
+//    // --- ProjectNameRenderer -------------------------------------------------
+//    
+//    private static final class ProjectNameRenderer extends DefaultListCellRenderer {
+//
+//        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+//                                                      boolean cellHasFocus) {
+//            JLabel renderer = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+//            
+//            Lookup.Provider p = (Lookup.Provider) value;
+//            renderer.setText(ProjectUtilities.getDisplayName(p));
+//            renderer.setIcon(ProjectUtilities.getIcon(p));
+//
+//            return renderer;
+//        }
+//        
+//    }
     
     private void setMode(Mode m) {
         if (currentMode == m) return;
@@ -386,54 +473,38 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         switch (m) {
             case SAMPLED_ALL: return "All classes";
             case SAMPLED_PROJECT: return "Project classes";
-            case INSTR_CLASS: return "Single class";
-            case INSTR_SELECTED: return "Selected classes";
+            case INSTR_CLASSES: return "Selected classes";
         }
         return null;
     }
     
     private void updateModeUI() {
-        modeButton.setText(getModeName(currentMode));
+        modeSelector.modeButton.setText(getModeName(currentMode));
         
-        boolean instrumentation = isInstrumentation();
-        instrSettingsSpace.setVisible(instrumentation);
-        selectedLabel.setVisible(instrumentation);
-        selectedSpace1.setVisible(instrumentation);
-        selectedSeparator.setVisible(instrumentation);
-        selectedSpace2.setVisible(instrumentation);
-        lifecycleCheckbox.setVisible(instrumentation);
-        allocationsCheckbox.setVisible(instrumentation);
+        settingsContent.removeAll();
         
-        if (currentMode == Mode.INSTR_CLASS) {
-            int count = selectedClasses == null ? 0 : selectedClasses.length;
-            if (count == 0) {
-                selectedLabel.setText("No class");
-            } else if (count == 1) {
-                selectedLabel.setText(selectedClasses[0]);
-            } else {
-                selectedLabel.setText(count + " classes");
-            }
-        } else if (currentMode == Mode.INSTR_SELECTED) {
-            int count = selection.size();
-            if (count == 0) {
-                selectedLabel.setText("No class");
-            } else if (count == 1) {
-                selectedLabel.setText(selection.iterator().next());
-            } else {
-                selectedLabel.setText(count + " classes");
-            }
+        if (currentMode == Mode.SAMPLED_ALL) {
+            settingsContent.add(sampledAllSettings);
+        } else if (currentMode == Mode.SAMPLED_PROJECT) {
+            settingsContent.add(sampledProjectSettings);
+        } else if (currentMode == Mode.INSTR_CLASSES) {
+            instrSelectedSettings.updateSelection(selection.size());
+            settingsContent.add(instrSelectedSettings);
         }
+        
+        settingsContent.doLayout();
+        settingsContent.repaint();
         
         restoreSettings(settingsCache.get(currentMode));
     }
     
     private void updateApply(int state) {
-        if (applyButton == null) return;
+        if (settingsApplier == null) return;
         
-        applyPanel.setVisible(state != NetBeansProfiler.PROFILING_INACTIVE);
+        settingsApplier.setVisible(state != NetBeansProfiler.PROFILING_INACTIVE);
         
-        if (applyPanel.isVisible())
-            applyButton.setEnabled(settingsValid() && pendingChanges());
+        if (settingsApplier.isVisible())
+            settingsApplier.applyButton.setEnabled(settingsValid() && pendingChanges());
     }
     
     protected void fireChange() {
@@ -457,31 +528,17 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             case SAMPLED_PROJECT:
                 break;
                 
-            case INSTR_CLASS:
-                int count = selectedClasses == null ? 0 : selectedClasses.length;
+            case INSTR_CLASSES:
+                int count = selection.size();
                 settings.put("selectionSize", Integer.toString(count));
+                Iterator<ClientUtils.SourceCodeSelection> it = selection.iterator();
                 for (int i = 0; i < count; i++)
-                    settings.put("selection" + Integer.toString(i), selectedClasses[i]);
+                    settings.put("selection" + Integer.toString(i), ClientUtils.selectionToString(it.next()));
                 
-                boolean lifecycle = lifecycleCheckbox.isSelected();
+                boolean lifecycle = instrSelectedSettings.lifecycleCheckbox.isSelected();
                 settings.put("lifecycle", Boolean.toString(lifecycle));
                 
-                boolean allocations = allocationsCheckbox.isSelected();
-                settings.put("allocations", Boolean.toString(allocations));
-                
-                break;
-                
-            case INSTR_SELECTED:
-                count = selection == null ? 0 : selection.size();
-                settings.put("selectionSize", Integer.toString(count));
-                Iterator<String> it = count == 0 ? null : selection.iterator();
-                for (int i = 0; i < count; i++)
-                    settings.put("selection" + Integer.toString(i), it.next());
-                
-                lifecycle = lifecycleCheckbox.isSelected();
-                settings.put("lifecycle", Boolean.toString(lifecycle));
-                
-                allocations = allocationsCheckbox.isSelected();
+                boolean allocations = instrSelectedSettings.allocationsCheckbox.isSelected();
                 settings.put("allocations", Boolean.toString(allocations));
                 
                 break;
@@ -497,7 +554,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             case SAMPLED_PROJECT:
                 break;
                 
-            case INSTR_CLASS:
+            case INSTR_CLASSES:
 //                String _count = settings.getProperty("selectionSize");
 //                int count = _count == null ? 0 : Integer.parseInt(_count);
 //                selectedClasses = new ClientUtils.SourceCodeSelection[count];
@@ -506,27 +563,10 @@ final class MemoryFeature extends ProfilerFeature.Basic {
 //                    selectedClasses[i] = ClientUtils.stringToSelection(sel);
 //                }
                 String _lifecycle = settings.getProperty("lifecycle", "false");
-                lifecycleCheckbox.setSelected(Boolean.parseBoolean(_lifecycle));
+                instrSelectedSettings.lifecycleCheckbox.setSelected(Boolean.parseBoolean(_lifecycle));
                 
                 String _allocations = settings.getProperty("allocations", "false");
-                allocationsCheckbox.setSelected(Boolean.parseBoolean(_allocations));
-                
-                break;
-                
-            case INSTR_SELECTED:
-//                selection.clear();
-//                _count = settings.getProperty("selectionSize");
-//                count = _count == null ? 0 : Integer.parseInt(_count);
-//                for (int i = 0; i < count; i++) {
-//                    String sel = settings.getProperty("selection" + Integer.toString(i));
-//                    selection.add(ClientUtils.stringToSelection(sel));
-//                }
-                
-                _lifecycle = settings.getProperty("lifecycle", "false");
-                lifecycleCheckbox.setSelected(Boolean.parseBoolean(_lifecycle));
-                
-                _allocations = settings.getProperty("allocations", "false");
-                allocationsCheckbox.setSelected(Boolean.parseBoolean(_allocations));
+                instrSelectedSettings.allocationsCheckbox.setSelected(Boolean.parseBoolean(_allocations));
                 
                 break;
         }
@@ -540,10 +580,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             case SAMPLED_PROJECT:
                 return true;
                 
-            case INSTR_CLASS:
-                return selectedClasses != null && selectedClasses.length > 0;
-                
-            case INSTR_SELECTED:
+            case INSTR_CLASSES:
                 return selection != null && !selection.isEmpty();
                 
             default:
@@ -650,6 +687,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         switch (currentMode)  {
             case SAMPLED_ALL:
                 settings.setProfilingType(ProfilingSettings.PROFILE_MEMORY_SAMPLING);
+                settings.setSelectedInstrumentationFilter(null);
                 break;
                 
             case SAMPLED_PROJECT:
@@ -663,20 +701,19 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 }
                 break;
                 
-            case INSTR_CLASS:
-            case INSTR_SELECTED:
-                int type = lifecycleCheckbox.isSelected() ? ProfilingSettings.PROFILE_MEMORY_LIVENESS :
+            case INSTR_CLASSES:
+                int type = instrSelectedSettings.lifecycleCheckbox.isSelected() ? ProfilingSettings.PROFILE_MEMORY_LIVENESS :
                                                             ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS;
                 settings.setProfilingType(type);
                 
-                int stackLimit = allocationsCheckbox.isSelected() ? -1 : 0;
+                int stackLimit = instrSelectedSettings.allocationsCheckbox.isSelected() ? -1 : 0;
                 settings.setAllocStackTraceLimit(stackLimit);
                 
                 StringBuilder b = new StringBuilder();
-                String[] selections = currentMode == Mode.INSTR_CLASS ? selectedClasses : selection.toArray(new String[selection.size()]);
-                for (int i = 0; i < selections.length; i++) {
-                    b.append(selections[i]);
-                    if (i < selections.length - 1) b.append(", "); // NOI18N
+                ClientUtils.SourceCodeSelection[] classes = selection.toArray(new ClientUtils.SourceCodeSelection[selection.size()]);
+                for (int i = 0; i < classes.length; i++) {
+                    b.append(classes[i].getClassName());
+                    if (i < classes.length - 1) b.append(", "); // NOI18N
                 }
                 
                 SimpleFilter ff = new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT, b.toString()); // NOI18N
@@ -692,14 +729,15 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     private void initResultsUI() {
         TargetAppRunner runner = getSession().getProfiler().getTargetAppRunner();
         memoryView = new MemoryView(runner.getProfilerClient(), selection, GoToSource.isAvailable()) {
-            public void showSource(String value) {
+            public void showSource(ClientUtils.SourceCodeSelection value) {
                 Lookup.Provider project = getSession().getProject();
-                GoToSource.openSource(project, value, "", ""); // NOI18N
+                String className = value.getClassName();
+                GoToSource.openSource(project, className, "", ""); // NOI18N
             }
-            public void profileSingle(String value) {
+            public void profileSingle(ClientUtils.SourceCodeSelection value) {
                 MemoryFeature.this.profileSingle(value);
             }
-            public void selectForProfiling(String[] value) {
+            public void selectForProfiling(ClientUtils.SourceCodeSelection[] value) {
                 MemoryFeature.this.selectForProfiling(value);
             }
             public void popupShowing() {
@@ -744,10 +782,9 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         refreshToolbar(newState);
     }
     
-    private boolean isInstrumentation() {
-        return currentMode == Mode.INSTR_CLASS ||
-               currentMode == Mode.INSTR_SELECTED;
-    }
+//    private boolean isInstrumentation() {
+//        return currentMode == Mode.INSTR_CLASSES;
+//    }
     
     private boolean isRunning(int state) {
         if (state != NetBeansProfiler.PROFILING_RUNNING) return false;
