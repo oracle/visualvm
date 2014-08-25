@@ -43,7 +43,7 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.modules.profiler.TelemetryWindow;
+//import org.netbeans.modules.profiler.TelemetryWindow;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
@@ -82,7 +82,7 @@ public final class ShowTelemetryViewAction extends AbstractAction {
      * Invoked when an action occurs.
      */
     public void actionPerformed(final ActionEvent e) {
-        TelemetryWindow.getDefault().open();
-        TelemetryWindow.getDefault().requestActive();
+//        TelemetryWindow.getDefault().open();
+//        TelemetryWindow.getDefault().requestActive();
     }
 }

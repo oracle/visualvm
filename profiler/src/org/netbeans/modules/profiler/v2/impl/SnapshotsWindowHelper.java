@@ -47,7 +47,9 @@ import java.io.File;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import org.netbeans.modules.profiler.LoadedSnapshot;
+import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.SnapshotsListener;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.v2.SnapshotsWindow;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -61,7 +63,22 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service=SnapshotsListener.class)
 public final class SnapshotsWindowHelper implements SnapshotsListener {
     
-    public void snapshotTaken(LoadedSnapshot snapshot) {}
+    public void snapshotTaken(LoadedSnapshot snapshot) {
+        if (ProfilerIDESettings.getInstance().getAutoOpenSnapshot()) {
+//            int sortingColumn = LiveResultsWindow.hasDefault() ? LiveResultsWindow.getDefault().getSortingColumn()
+//                                                               : CommonConstants.SORTING_COLUMN_DEFAULT;
+//            boolean sortingOrder = LiveResultsWindow.hasDefault() ? LiveResultsWindow.getDefault().getSortingOrder() : false;
+//            ResultsManager.getDefault().openSnapshot(ls, sortingColumn, sortingOrder);
+
+            ResultsManager.getDefault().openSnapshot(snapshot);
+        }
+
+        if (ProfilerIDESettings.getInstance().getAutoSaveSnapshot()) {
+            ResultsManager.getDefault().saveSnapshot(snapshot);
+            if (!ProfilerIDESettings.getInstance().getAutoOpenSnapshot())
+                ResultsManager.getDefault().closeSnapshot(snapshot);
+        }
+    }
 
     public void snapshotLoaded(LoadedSnapshot snapshot) {}
 

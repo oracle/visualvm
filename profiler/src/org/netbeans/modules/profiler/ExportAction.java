@@ -343,7 +343,8 @@ public final class ExportAction extends AbstractAction {
             return;
         }
 
-        final LiveResultsWindow lrw = (exportProvider instanceof LiveResultsWindow) ? (LiveResultsWindow) exportProvider : null;
+        final LiveResultsWindow lrw = null;
+//        final LiveResultsWindow lrw = (exportProvider instanceof LiveResultsWindow) ? (LiveResultsWindow) exportProvider : null;
         final AppStatusHandler statusHandler = Profiler.getDefault().getTargetAppRunner().getAppStatusHandler();
 
         if (lrw != null) {

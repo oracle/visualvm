@@ -188,7 +188,7 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
      * The enclosing instance will use the FQN registration to obtain the shared instance
      * of the listener implementation and inject itself as a delegate into the listener.
      */
-    @ServiceProvider(service=SnapshotsListener.class)
+//    @ServiceProvider(service=SnapshotsListener.class)
     public static final class Listener extends Delegate<ProfilerControlPanel2> implements SnapshotsListener, ResultsListener {
         @Override
         public void resultsAvailable() {
@@ -1956,14 +1956,14 @@ public final class ProfilerControlPanel2 extends ProfilerTopComponent {
         scrollPane.getHorizontalScrollBar().setUnitIncrement(50);
         add(scrollPane, BorderLayout.CENTER);
         
-        Profiler.getDefault().addProfilingStateListener(new SimpleProfilingStateAdapter() {
-
-            @Override
-            protected void update() {
-                updateStatus();
-            }
-
-        });
+//        Profiler.getDefault().addProfilingStateListener(new SimpleProfilingStateAdapter() {
+//
+//            @Override
+//            protected void update() {
+//                updateStatus();
+//            }
+//
+//        });
 
         addComponentListener(new ComponentAdapter() {
                 public void componentResized(ComponentEvent e) {

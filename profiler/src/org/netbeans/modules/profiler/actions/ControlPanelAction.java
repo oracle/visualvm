@@ -43,7 +43,7 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.modules.profiler.ProfilerControlPanel2;
+//import org.netbeans.modules.profiler.ProfilerControlPanel2;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
@@ -78,8 +78,8 @@ public final class ControlPanelAction extends AbstractAction {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void actionPerformed(final ActionEvent e) {
-        final ProfilerControlPanel2 pcp = ProfilerControlPanel2.getDefault();
-        pcp.open();
-        pcp.requestActive();
+//        final ProfilerControlPanel2 pcp = ProfilerControlPanel2.getDefault();
+//        pcp.open();
+//        pcp.requestActive();
     }
 }

@@ -43,7 +43,7 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.modules.profiler.ThreadsWindow;
+//import org.netbeans.modules.profiler.ThreadsWindow;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
@@ -82,7 +82,7 @@ public final class ShowThreadsViewAction extends AbstractAction {
      * Invoked when an action occurs.
      */
     public void actionPerformed(final ActionEvent e) {
-        ThreadsWindow.getDefault().open();
-        ThreadsWindow.getDefault().requestActive();
+//        ThreadsWindow.getDefault().open();
+//        ThreadsWindow.getDefault().requestActive();
     }
 }

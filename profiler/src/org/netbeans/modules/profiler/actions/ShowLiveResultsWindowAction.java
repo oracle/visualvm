@@ -43,7 +43,7 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.modules.profiler.LiveResultsWindow;
+//import org.netbeans.modules.profiler.LiveResultsWindow;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
@@ -82,7 +82,7 @@ public final class ShowLiveResultsWindowAction extends AbstractAction {
      * Invoked when an action occurs.
      */
     public void actionPerformed(final ActionEvent e) {
-        LiveResultsWindow.getDefault().open();
-        LiveResultsWindow.getDefault().requestActive();
+//        LiveResultsWindow.getDefault().open();
+//        LiveResultsWindow.getDefault().requestActive();
     }
 }
