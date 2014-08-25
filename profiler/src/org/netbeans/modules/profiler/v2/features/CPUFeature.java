@@ -985,7 +985,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
     private void initResultsUI() {
         TargetAppRunner runner = getSession().getProfiler().getTargetAppRunner();
         
-        cpuView = new CPUView(runner.getProfilerClient(), classesSelection, GoToSource.isAvailable()) {
+        cpuView = new CPUView(runner.getProfilerClient(), methodsSelection, GoToSource.isAvailable()) {
             public void showSource(ClientUtils.SourceCodeSelection value) {
                 Lookup.Provider project = getSession().getProject();
                 String className = value.getClassName();
