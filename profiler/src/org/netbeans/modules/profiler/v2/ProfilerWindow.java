@@ -128,7 +128,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         String windowName = project == null ? Bundle.ProfilerWindow_caption() :
                                        ProjectUtilities.getDisplayName(project);
         setDisplayName(windowName);
-        updateIcon();
+        updateWindowIcon();
         
         createUI();
     }
@@ -201,6 +201,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         
         session.setAttach(session.getProject() == null ? true :
                           Boolean.parseBoolean(storage.loadFlag(FLAG_ATTACH, "false")));
+        updateProfileIcon();
     }
     
     private void popupulateUI() {  
@@ -211,6 +212,7 @@ class ProfilerWindow extends ProfilerTopComponent {
             public void displayPopup() { displayPopupImpl(); }
             protected void performAction() { performStartImpl(); }
         };
+        updateProfileIcon();
         toolbar.add(start);
         
         stop = new JButton(Icons.getIcon(GeneralIcons.STOP)) {
@@ -259,7 +261,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         
         session.addListener(new SimpleProfilingStateAdapter() {
             public void update() {
-                updateIcon();
+                updateWindowIcon();
                 updateButtons();
             }
         });
@@ -267,9 +269,24 @@ class ProfilerWindow extends ProfilerTopComponent {
     }
     
     
-    private void updateIcon() {
-        if (session.inProgress()) setIcon(Icons.getImage(ProfilerIcons.PROFILE_RUNNING));
-        else setIcon(Icons.getImage(ProfilerIcons.PROFILE_INACTIVE));
+    private void updateWindowIcon() {
+        Runnable updater = new Runnable() {
+            public void run() {
+                if (session.inProgress()) setIcon(Icons.getImage(ProfilerIcons.PROFILE_RUNNING));
+                else setIcon(Icons.getImage(ProfilerIcons.PROFILE_INACTIVE));
+            }
+        };
+        UIUtils.runInEventDispatchThread(updater);
+    }
+    
+    private void updateProfileIcon() {
+        Runnable updater = new Runnable() {
+            public void run() {
+                if (start != null) start.setIcon(Icons.getIcon(
+                        session.isAttach() ? GeneralIcons.BUTTON_ATTACH : GeneralIcons.START));
+            }
+        };
+        UIUtils.runInEventDispatchThread(updater);
     }
     
     private void updateButtons() {
@@ -441,6 +458,7 @@ class ProfilerWindow extends ProfilerTopComponent {
                 if (isSelected()) {
                     if (session.isAttach()) {
                         session.setAttach(false);
+                        updateProfileIcon();
                         session.getStorage().saveFlag(FLAG_ATTACH, "false");
                     }
                 }
@@ -463,6 +481,7 @@ class ProfilerWindow extends ProfilerTopComponent {
                     if (isSelected()) {
                         if (!session.isAttach()) {
                             session.setAttach(true);
+                            updateProfileIcon();
                             session.getStorage().saveFlag(FLAG_ATTACH, "true");
                         }
                     }
