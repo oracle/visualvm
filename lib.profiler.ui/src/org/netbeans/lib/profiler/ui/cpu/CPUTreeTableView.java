@@ -59,7 +59,6 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
@@ -77,7 +76,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
  */
 abstract class CPUTreeTableView extends JPanel {
     
-    private final ProfilerClient client;
+//    private final ProfilerClient client;
     
     private CPUTreeTableModel treeTableModel;
     private ProfilerTreeTable treeTable;
@@ -90,7 +89,7 @@ abstract class CPUTreeTableView extends JPanel {
     
     
     public CPUTreeTableView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection) {
-        this.client = client;
+//        this.client = client;
         this.selection = selection;
         
         initUI();
@@ -207,10 +206,9 @@ abstract class CPUTreeTableView extends JPanel {
         treeTable.setColumnRenderer(0, new CheckBoxRenderer() {
             private boolean visible;
             public void setValue(Object value, int row) {
-                super.setValue(value, row);
                 TreePath path = treeTable.getPathForRow(row);
-                PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)path.getLastPathComponent();
-                visible = !node.isThreadNode() && !node.isSelfTimeNode() && !node.isFilteredNode();
+                visible = isSelectable((PrestimeCPUCCTNode)path.getLastPathComponent());
+                if (visible) super.setValue(value, row);
             }
             public void paint(Graphics g) {
                 if (visible) {
@@ -261,20 +259,31 @@ abstract class CPUTreeTableView extends JPanel {
         PrestimeCPUCCTNode node = nodeAtRow(row);
         if (node == null) return null;
         else if (node.isThreadNode() || node.isFilteredNode() || node.isSelfTimeNode()) return null;
-        else return selectionForId(node.getMethodId());
+//        else return selectionForId(node.getMethodId());
+        else return idMap.get(node.getMethodId());
     }
     
-    private ClientUtils.SourceCodeSelection selectionForId(int methodId) {
-        ProfilingSessionStatus sessionStatus = client.getStatus();
-        sessionStatus.beginTrans(false);
-        try {
-            String className = sessionStatus.getInstrMethodClasses()[methodId];
-            String methodName = sessionStatus.getInstrMethodNames()[methodId];
-            String methodSig = sessionStatus.getInstrMethodSignatures()[methodId];
-            return new ClientUtils.SourceCodeSelection(className, methodName, methodSig);
-        } finally {
-            sessionStatus.endTrans();
-        }
+//    private ClientUtils.SourceCodeSelection selectionForId(int methodId) {
+//        ProfilingSessionStatus sessionStatus = client.getStatus();
+//        sessionStatus.beginTrans(false);
+//        try {
+//            String className = sessionStatus.getInstrMethodClasses()[methodId];
+//            String methodName = sessionStatus.getInstrMethodNames()[methodId];
+//            String methodSig = sessionStatus.getInstrMethodSignatures()[methodId];
+//            return new ClientUtils.SourceCodeSelection(className, methodName, methodSig);
+//        } finally {
+//            sessionStatus.endTrans();
+//        }
+//    }
+    
+    private static boolean isSelectable(PrestimeCPUCCTNode node) {
+        if (node.isThreadNode() || node.isFilteredNode() || node.isSelfTimeNode()) return false;
+        if (node.getMethodClassNameAndSig()[1].endsWith("[native]")) return false; // NOI18N
+        return true;
+    }
+    
+    static boolean isSelectable(ClientUtils.SourceCodeSelection method) {
+        return !method.getMethodName().endsWith("[native]"); // NOI18N
     }
     
     
@@ -345,8 +354,7 @@ abstract class CPUTreeTableView extends JPanel {
 
         public boolean isCellEditable(TreeNode node, int columnIndex) {
             if (columnIndex != 0) return false;
-            PrestimeCPUCCTNode cpuNode = (PrestimeCPUCCTNode)node;
-            return !cpuNode.isThreadNode() && !cpuNode.isFilteredNode();
+            return (isSelectable((PrestimeCPUCCTNode)node));
         }
         
     }

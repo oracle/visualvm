@@ -235,7 +235,7 @@ public abstract class CPUView extends JPanel {
                 if (showSourceSupported) showSource(value);
             }
             protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                CPUView.this.populatePopup(popup, value);
+                CPUView.this.populatePopup(popup, value, value == null ? false : isSelectable(value));
             }
             protected void popupShowing() { CPUView.this.popupShowing(); }
             protected void popupHidden()  { CPUView.this.popupHidden(); }
@@ -246,7 +246,7 @@ public abstract class CPUView extends JPanel {
                 if (showSourceSupported) showSource(value);
             }
             protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                CPUView.this.populatePopup(popup, value);
+                CPUView.this.populatePopup(popup, value, value == null ? false : isSelectable(value));
             }
             protected void popupShowing() { CPUView.this.popupShowing(); }
             protected void popupHidden()  { CPUView.this.popupHidden(); }
@@ -277,7 +277,7 @@ public abstract class CPUView extends JPanel {
 //        setView(true, false);
     }
     
-    private void populatePopup(JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
+    private void populatePopup(JPopupMenu popup, final ClientUtils.SourceCodeSelection value, final boolean selectable) {
         if (showSourceSupported) {
             popup.add(new JMenuItem("Go to Source") {
                 { setEnabled(value != null); setFont(getFont().deriveFont(Font.BOLD)); }
@@ -287,7 +287,7 @@ public abstract class CPUView extends JPanel {
         }
         
         popup.add(new JMenuItem("Profile Method") {
-            { setEnabled(value != null); }
+            { setEnabled(value != null && selectable); }
             protected void fireActionPerformed(ActionEvent e) { profileMethod(value); }
         });
         
@@ -298,7 +298,7 @@ public abstract class CPUView extends JPanel {
         
         popup.addSeparator();
         popup.add(new JMenuItem("Select for Profiling") {
-            { setEnabled(value != null); }
+            { setEnabled(value != null && selectable); }
             protected void fireActionPerformed(ActionEvent e) { selectMethod(value); }
         });
     }

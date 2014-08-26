@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.ui.cpu;
 
 import java.awt.BorderLayout;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.util.Map;
 import java.util.Set;
@@ -56,7 +57,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
@@ -73,7 +73,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
  */
 abstract class CPUTableView extends JPanel {
     
-    private final ProfilerClient client;
+//    private final ProfilerClient client;
     
     private CPUTableModel tableModel;
     private ProfilerTable table;
@@ -88,7 +88,7 @@ abstract class CPUTableView extends JPanel {
     
     
     public CPUTableView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection) {
-        this.client = client;
+//        this.client = client;
         this.selection = selection;
         
         initUI();
@@ -211,7 +211,21 @@ abstract class CPUTableView extends JPanel {
         renderers[3].setMaxValue(refTime);
         renderers[4].setMaxValue(refTime);
         
-        table.setColumnRenderer(0, new CheckBoxRenderer());
+        table.setColumnRenderer(0, new CheckBoxRenderer() {
+            private boolean visible;
+            public void setValue(Object value, int row) {
+                visible = isSelectable(idMap.get(data.getMethodIdAtRow(row)));
+                if (visible) super.setValue(value, row);
+            }
+            public void paint(Graphics g) {
+                if (visible) {
+                    super.paint(g);
+                } else {
+                    g.setColor(getBackground());
+                    g.fillRect(0, 0, size.width, size.height);
+                }
+            }
+        });
         table.setColumnRenderer(1, new JavaNameRenderer());
         table.setColumnRenderer(2, renderers[0]);
         table.setColumnRenderer(3, renderers[1]);
@@ -243,20 +257,25 @@ abstract class CPUTableView extends JPanel {
         if (data == null || row == -1) return null;
         if (row >= tableModel.getRowCount()) return null; // #239936
         row = table.convertRowIndexToModel(row);
-        return selectionForId(data.getMethodIdAtRow(row));
+        return idMap.get(data.getMethodIdAtRow(row));
+//        return selectionForId(data.getMethodIdAtRow(row));
     }
     
-    private ClientUtils.SourceCodeSelection selectionForId(int methodId) {
-        ProfilingSessionStatus sessionStatus = client.getStatus();
-        sessionStatus.beginTrans(false);
-        try {
-            String className = sessionStatus.getInstrMethodClasses()[methodId];
-            String methodName = sessionStatus.getInstrMethodNames()[methodId];
-            String methodSig = sessionStatus.getInstrMethodSignatures()[methodId];
-            return new ClientUtils.SourceCodeSelection(className, methodName, methodSig);
-        } finally {
-            sessionStatus.endTrans();
-        }
+//    private ClientUtils.SourceCodeSelection selectionForId(int methodId) {
+//        ProfilingSessionStatus sessionStatus = client.getStatus();
+//        sessionStatus.beginTrans(false);
+//        try {
+//            String className = sessionStatus.getInstrMethodClasses()[methodId];
+//            String methodName = sessionStatus.getInstrMethodNames()[methodId];
+//            String methodSig = sessionStatus.getInstrMethodSignatures()[methodId];
+//            return new ClientUtils.SourceCodeSelection(className, methodName, methodSig);
+//        } finally {
+//            sessionStatus.endTrans();
+//        }
+//    }
+    
+    static boolean isSelectable(ClientUtils.SourceCodeSelection method) {
+        return !method.getMethodName().endsWith("[native]"); // NOI18N
     }
     
     
@@ -333,7 +352,8 @@ abstract class CPUTableView extends JPanel {
         }
 
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return columnIndex == 0;
+            if (columnIndex != 0) return false;
+            return isSelectable(idMap.get(data.getMethodIdAtRow(rowIndex)));
         }
         
     }
