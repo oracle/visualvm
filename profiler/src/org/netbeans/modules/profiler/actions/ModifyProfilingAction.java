@@ -77,8 +77,8 @@ public final class ModifyProfilingAction extends ProfilingAwareAction {
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     @ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.ModifyProfilingAction")
-    @ActionRegistration(displayName="#LBL_ModifyProfilingAction", iconBase="org/netbeans/modules/profiler/impl/icons/modifyProfiling.png", lazy=false)
-    @ActionReference(path="Menu/Profile", position=600)
+//    @ActionRegistration(displayName="#LBL_ModifyProfilingAction", iconBase="org/netbeans/modules/profiler/impl/icons/modifyProfiling.png", lazy=false)
+//    @ActionReference(path="Menu/Profile", position=600)
     public static ModifyProfilingAction getInstance() {
         return Singleton.INSTANCE;
     }

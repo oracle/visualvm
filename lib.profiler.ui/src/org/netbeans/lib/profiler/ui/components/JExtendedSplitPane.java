@@ -248,6 +248,8 @@ public class JExtendedSplitPane extends JSplitPane {
                                                                                                                  - dividerSize);
                 }
             }
+            dividerLocation = Math.max(0, dividerLocation);
+            dividerLocation = Math.min(1, dividerLocation);
         }
     }
 
@@ -270,6 +272,8 @@ public class JExtendedSplitPane extends JSplitPane {
                                                                                                                                    - dividerSize);
                 }
             }
+            dividerLocation = Math.max(0, dividerLocation);
+            dividerLocation = Math.min(1, dividerLocation);
         }
     }
 

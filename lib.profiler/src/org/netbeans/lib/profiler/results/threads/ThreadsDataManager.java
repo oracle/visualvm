@@ -234,6 +234,18 @@ public class ThreadsDataManager extends DataManager {
         idToIndex.clear();
         fireDataReset(); // all listeners are notified about threadData change
     }
+    
+    /**
+     * Resets the collected data during a running profiling session.
+     */
+    public synchronized void resetStates() {
+        if (threadData != null) {
+            startTime = 0;
+            endTime = 0;
+            for (ThreadData data : threadData) data.clearStates();
+            fireDataReset(); // all listeners are notified about threadData change
+        }
+    }
 
     public synchronized boolean supportsSleepingStateMonitoring() {
         return supportsSleepingState;

@@ -62,7 +62,8 @@ import org.openide.util.Lookup;
 @MIMEResolver.Registration(
     displayName="org.netbeans.modules.profiler.Bundle#HprofResolver",
     position=99900,
-    resource="../DummyHprofResolver.xml"
+    resource="../DummyHprofResolver.xml",
+    showInFileChooser = { "#LBL_ProfilerFiles" }
 )
 @DataObject.Registration(
     iconBase = "org/netbeans/modules/profiler/impl/icons/snapshotDataObject.png",

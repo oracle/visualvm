@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.results.cpu;
 
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
@@ -96,8 +97,31 @@ public class FlatProfileContainerFree extends FlatProfileContainer {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public String getMethodNameAtRow(int row) {
+        ClientUtils.SourceCodeSelection sel = getSourceCodeSelectionAtRow(row);
+        return MethodNameFormatterFactory.getDefault().getFormatter()
+                                         .formatMethodName(sel.getClassName(), sel.getMethodName(),
+                                                           sel.getMethodSignature()).toFormatted();
+        
+//        int methodId = methodIds[row];
+//        MethodNameFormatter formatter = MethodNameFormatterFactory.getDefault().getFormatter(null);
+//
+//        status.beginTrans(false);
+//
+//        try {
+//            String[] classes = status.getInstrMethodClasses();
+//            String[] methods = status.getInstrMethodNames();
+//            String[] signatures = status.getInstrMethodSignatures();
+//
+//            return formatter.formatMethodName((classes != null && classes.length > methodId) ? classes[methodId] : null,
+//                                              (methods != null && methods.length > methodId) ? methods[methodId] : null,
+//                                              (signatures != null && signatures.length > methodId) ? signatures[methodId] : null).toFormatted();
+//        } finally {
+//            status.endTrans();
+//        }
+    }
+    
+    public ClientUtils.SourceCodeSelection getSourceCodeSelectionAtRow(int row) {
         int methodId = methodIds[row];
-        MethodNameFormatter formatter = MethodNameFormatterFactory.getDefault().getFormatter(null);
 
         status.beginTrans(false);
 
@@ -105,10 +129,12 @@ public class FlatProfileContainerFree extends FlatProfileContainer {
             String[] classes = status.getInstrMethodClasses();
             String[] methods = status.getInstrMethodNames();
             String[] signatures = status.getInstrMethodSignatures();
+            
+            String _class = classes != null && classes.length > methodId ? classes[methodId] : null;
+            String _method = methods != null && methods.length > methodId ? methods[methodId] : null;
+            String _signature = signatures != null && signatures.length > methodId ? signatures[methodId] : null;
 
-            return formatter.formatMethodName((classes != null && classes.length > methodId) ? classes[methodId] : null,
-                                              (methods != null && methods.length > methodId) ? methods[methodId] : null,
-                                              (signatures != null && signatures.length > methodId) ? signatures[methodId] : null).toFormatted();
+            return new ClientUtils.SourceCodeSelection(_class, _method, _signature);
         } finally {
             status.endTrans();
         }

@@ -51,28 +51,25 @@ import org.netbeans.lib.profiler.ui.Formatters;
  *
  * @author Jiri Sedlacek
  */
-public class NumberRenderer extends LabelRenderer {
+public class NumberRenderer extends FormattedLabelRenderer {
     
-    private final Format customFormat;
+    private final Format outputFormat;
     
     public NumberRenderer() {
         this(null);
     }
     
-    public NumberRenderer(Format customFormat) {
-        this.customFormat = customFormat;
+    public NumberRenderer(Format outputFormat) {
+        super(Formatters.numberFormat());
+        
+        this.outputFormat = outputFormat;
         
         setHorizontalAlignment(SwingConstants.TRAILING);
     }
     
-    public void setValue(Object value, int row) {
-        Number valueN = (Number)value;
-        super.setValue(getValueString(valueN.longValue(), customFormat), row);
-    }
-    
-    protected String getValueString(long value, Format format) {
-        String string = Formatters.numberFormat().format(value);
-        return format == null ? string : format.format(new Object[] { string });
+    protected String getValueString(Object value, int row, Format format) {
+        String string = super.getValueString(value, row, format);
+        return outputFormat == null ? string : formatImpl(outputFormat, string);
     }
     
 }

@@ -109,7 +109,7 @@ public final class TakeSnapshotAction extends ProfilingAwareAction {
     @ActionRegistration(displayName = "#LBL_TakeSnapshotAction")
     @ActionReferences(value = {
         @ActionReference(path = "Shortcuts", name = "C-F2"),
-        @ActionReference(path = "Menu/Profile", position = 1200)})
+        @ActionReference(path = "Menu/Profile", position = 900)})
     public static TakeSnapshotAction getInstance() {
         return Singleton.INSTANCE;
     }

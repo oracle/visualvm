@@ -43,7 +43,7 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.modules.profiler.TelemetryOverviewPanel;
+//import org.netbeans.modules.profiler.TelemetryOverviewPanel;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
@@ -70,8 +70,8 @@ public final class TelemetryOverviewAction extends AbstractAction {
     }
     
     @ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.TelemetryOverviewAction")
-    @ActionRegistration(displayName="#LBL_TelemetryOverviewAction", iconBase="org/netbeans/modules/profiler/impl/icons/telemetryOverviewWindow.png")
-    @ActionReference(path="Menu/Window/Profile", position=500)
+//    @ActionRegistration(displayName="#LBL_TelemetryOverviewAction", iconBase="org/netbeans/modules/profiler/impl/icons/telemetryOverviewWindow.png")
+//    @ActionReference(path="Menu/Window/Profile", position=500)
     public static TelemetryOverviewAction getInstance() {
         return Singleton.INSTANCE;
     }
@@ -88,8 +88,8 @@ public final class TelemetryOverviewAction extends AbstractAction {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void actionPerformed(final ActionEvent e) {
-        final TelemetryOverviewPanel top = TelemetryOverviewPanel.getDefault();
-        top.open();
-        top.requestActive();
+//        final TelemetryOverviewPanel top = TelemetryOverviewPanel.getDefault();
+//        top.open();
+//        top.requestActive();
     }
 }

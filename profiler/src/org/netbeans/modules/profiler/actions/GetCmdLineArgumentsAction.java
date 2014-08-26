@@ -81,8 +81,8 @@ import org.openide.util.HelpCtx;
     "MSG_NotAvailableNow=Not available at this time: {0}"
 })
 @ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.GetCmdLineArgumentsAction")
-@ActionRegistration(displayName="#LBL_GetCmdLineArgumentsAction")
-@ActionReference(path="Menu/Profile/Advanced", position=200)
+//@ActionRegistration(displayName="#LBL_GetCmdLineArgumentsAction")
+//@ActionReference(path="Menu/Profile/Advanced", position=200)
 public final class GetCmdLineArgumentsAction extends ProfilingAwareAction {
     final private static int[] enabledStates = new int[]{Profiler.PROFILING_RUNNING};
     
