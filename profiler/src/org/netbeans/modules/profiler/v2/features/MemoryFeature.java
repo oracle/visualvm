@@ -284,7 +284,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                     popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_ALL), currentMode == Mode.SAMPLED_ALL) {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.SAMPLED_ALL); }
                     });
-                    popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_PROJECT), currentMode == Mode.SAMPLED_PROJECT) {
+                    if (getSession().getProject() != null) popup.add(new JRadioButtonMenuItem(getModeName(Mode.SAMPLED_PROJECT), currentMode == Mode.SAMPLED_PROJECT) {
                         protected void fireActionPerformed(ActionEvent e) { setMode(Mode.SAMPLED_PROJECT); }
                     });
                     
