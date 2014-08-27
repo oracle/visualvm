@@ -47,11 +47,14 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -63,6 +66,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
@@ -111,8 +116,18 @@ public final class ClassMethodSelector {
     
     
     private static Collection<SourcePackageInfo> getPackages(Lookup.Provider project) {
-        // TODO: return all packages containing at least one class
-        return ProfilerTypeUtils.getPackages(false, SourcePackageInfo.Scope.SOURCE, project);
+        // TODO: optimize
+        Set<SourcePackageInfo> packages = new HashSet();
+        Collection<SourcePackageInfo> _packages = ProfilerTypeUtils.getPackages(false, SourcePackageInfo.Scope.SOURCE, project);
+        
+        while (!_packages.isEmpty()) {
+            SourcePackageInfo pkg = _packages.iterator().next();
+            _packages.remove(pkg);
+            if (!pkg.getClasses().isEmpty()) packages.add(pkg);
+            _packages.addAll(pkg.getSubpackages());
+        }
+        
+        return packages;
     }
     
     private static Collection<SourceClassInfo> getClasses(SourcePackageInfo pkg, boolean inner, boolean anonymous) {
@@ -174,6 +189,22 @@ public final class ClassMethodSelector {
             
             final int listWidth = 200;
             
+            class HintRenderer extends LabelRenderer {
+                
+                HintRenderer() {
+                    super(true);
+                    setHorizontalAlignment(CENTER);
+                    setForeground(UIUtils.getDisabledLineColor());
+                }
+                
+                void setup(boolean mode, Dimension size) {
+                    setText(mode ? "No selection" : "Computing...");
+                    setSize(size);
+                }
+                
+            }
+            final HintRenderer listHint = new HintRenderer();
+            
             projectListModel = new DefaultListModel();
             projectList = new JList(projectListModel) {
                 public Dimension getPreferredScrollableViewportSize() {
@@ -209,6 +240,14 @@ public final class ClassMethodSelector {
                     dim.width = listWidth;
                     return dim;
                 }
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    
+                    if (packageListModel.isEmpty()) {
+                        listHint.setup(isEnabled(), getSize());
+                        listHint.paint(g);
+                    }
+                }
             };
             packageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             packageList.setCellRenderer(new DefaultListCellRenderer() {
@@ -236,6 +275,14 @@ public final class ClassMethodSelector {
                     Dimension dim = super.getPreferredScrollableViewportSize();
                     dim.width = listWidth;
                     return dim;
+                }
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    
+                    if (classesListModel.isEmpty()) {
+                        listHint.setup(isEnabled(), getSize());
+                        listHint.paint(g);
+                    }
                 }
             };
             classesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -265,6 +312,15 @@ public final class ClassMethodSelector {
                         Dimension dim = super.getPreferredScrollableViewportSize();
                         dim.width = listWidth;
                         return dim;
+                    }
+                    protected void paintComponent(Graphics g) {
+                        super.paintComponent(g);
+
+                        if (methodsListModel.isEmpty()) {
+                            listHint.setup(isEnabled(), getSize());
+                            listHint.paint(g);
+                            listHint.paint(g);
+                        }
                     }
                 };
                 methodsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -308,6 +364,8 @@ public final class ClassMethodSelector {
         
         private void projectSelected(final Lookup.Provider project) {
             packageListModel.clear();
+            packageList.setEnabled(project == null);
+            
             classesListModel.clear();
             if (methodsListModel != null) methodsListModel.clear();
             
@@ -318,6 +376,7 @@ public final class ClassMethodSelector {
                         final Collection<SourcePackageInfo> packages = getPackages(project);
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
+                                packageList.setEnabled(true);
                                 for (SourcePackageInfo pkg : packages)
                                    packageListModel.addElement(pkg); 
                             }
@@ -329,12 +388,15 @@ public final class ClassMethodSelector {
         
         private void packageSelected(final SourcePackageInfo pkg) {
             classesListModel.clear();
+            classesList.setEnabled(pkg == null);
+            
             if (methodsListModel != null) methodsListModel.clear();
             
             if (pkg != null) {
                 // TODO: display progress label for classes list
                 processor().post(new Runnable() {
                     public void run() {
+                        classesList.setEnabled(true);
                         final Collection<SourceClassInfo> classes = getClasses(pkg, true, true);
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
@@ -352,11 +414,13 @@ public final class ClassMethodSelector {
                 okButton.setEnabled(cls != null);
             } else {
                 methodsListModel.clear();
+                methodsList.setEnabled(cls == null);
             
                 if (cls != null) {
                     // TODO: display progress label for methods list
                     processor().post(new Runnable() {
                         public void run() {
+                            methodsList.setEnabled(true);
                             final Collection<SourceMethodInfo> methods = getMethods(cls, true);
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
