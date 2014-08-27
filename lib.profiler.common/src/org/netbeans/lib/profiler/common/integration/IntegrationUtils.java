@@ -275,12 +275,13 @@ public class IntegrationUtils {
         return null;
     }
     
-    public static String getPlatformByOSAndArch(int platform, int dataModel, String arch, String JVMTarget) {
+    public static String getPlatformByOSAndArch(int platform, int dataModel, String arch, String archAbi) {
         switch (dataModel) {
             case Platform.ARCH_32:
                 if (platform == Platform.OS_LINUX) {
                     if (arch.startsWith("arm")) {   //NOI18N
-                        if (JVMTarget.contains("hflt")) {
+                        if (archAbi != null &&
+                              archAbi.toLowerCase().contains("abihf")) {   //NOI18N
                             return PLATFORM_LINUX_ARM_VFP_HFLT_OS;
                         } 
                         return PLATFORM_LINUX_ARM_OS;

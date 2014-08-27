@@ -100,11 +100,11 @@ public class ClassesListController extends AbstractController {
                     return jClass1.getName().compareTo(jClass2.getName());
                 case 1:
                 case 2:
-                    return Integer.valueOf(jClass1.getInstancesCount()).compareTo(Integer.valueOf(jClass2.getInstancesCount()));
+                    return Integer.compare(jClass1.getInstancesCount(),jClass2.getInstancesCount());
                 case 3:
-                    return Long.valueOf(jClass1.getAllInstancesSize()).compareTo(jClass2.getAllInstancesSize());
+                    return Long.compare(jClass1.getAllInstancesSize(),jClass2.getAllInstancesSize());
                 case 4:
-                    return Long.valueOf(jClass1.getRetainedSizeByClass()).compareTo(jClass2.getRetainedSizeByClass());
+                    return Long.compare(jClass1.getRetainedSizeByClass(),jClass2.getRetainedSizeByClass());
                 default:
                     throw new RuntimeException("Unsupported compare operation for " + o1 + ", " + o2); // NOI18N
             }
@@ -576,7 +576,7 @@ public class ClassesListController extends AbstractController {
         HashSet subclasses = new HashSet();
 
         for (int i = 0; i < filterStrings.length; i++) {
-            String escapedClassName = filterStrings[i].replace(".", "\\.").replace("$", "\\$");
+            String escapedClassName = "\\Q"+filterStrings[i]+"\\E";
             Collection<JavaClass> jClasses = heap.getJavaClassesByRegExp(escapedClassName);
 
             for (JavaClass jClass : jClasses) {

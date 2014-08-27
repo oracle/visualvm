@@ -335,7 +335,7 @@ class NearestGCRoot {
         writeBuffer.writeLong(instanceId);
     }
 
-    private void writeLeaf(long instanceId, int size) throws IOException {
+    private void writeLeaf(long instanceId, long size) throws IOException {
         LongMap.Entry entry = heap.idToOffsetMap.get(instanceId);
         
         entry.setTreeObj();

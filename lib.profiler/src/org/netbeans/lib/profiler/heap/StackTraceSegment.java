@@ -43,9 +43,6 @@
 
 package org.netbeans.lib.profiler.heap;
 
-import java.util.Map;
-
-
 /**
  *
  * @author Tomas Hurka

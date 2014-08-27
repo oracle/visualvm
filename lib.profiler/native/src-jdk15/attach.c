@@ -120,7 +120,7 @@ void parse_options_and_extract_params(char *options) {
  * The activateCode parameter signals the type of attachment to the ProfilerServer:
  *   0 - dynamic attachment (not used so far), 1 - attach on startup
  */
-jint setupAndCallProfilerRuntimeActivate(JNIEnv *env, jint activateCode) {
+static jint setupAndCallProfilerRuntimeActivate(JNIEnv *env, jint activateCode) {
     jmethodID activateMethodID;
     jclass profilerServerClass;
     jstring jfluidDir;

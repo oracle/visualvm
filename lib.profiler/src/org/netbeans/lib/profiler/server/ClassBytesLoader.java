@@ -69,24 +69,27 @@ public class ClassBytesLoader {
     private static Map jarCache = new HashMap();
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public static byte[] getClassFileBytes(String className) {
+    public static URL getClassFileURL(String className) {
         String resourceName = className.replace('.', '/') + ".class"; // NOI18N
-        URL classUrl = ClassLoader.getSystemResource(resourceName);
+        URL classUrl =  ClassLoader.getSystemResource(resourceName);
         // in case the classname is a synthetic class there is no resource defining its bytecode
         if (classUrl == null) {
-            if (Platform.getJDKVersionNumber() == Platform.JDK_CVM) {
-                // No room on device to do this
-                return null;
-            }
-            System.err.println("***Profiler agent warning: could not get .class file for a synthetic class " + className
-                               + " in ClassBytesLoader.getClassFileBytes"); // NOI18N
-            return null;
+            System.err.println("***Profer debug: could not get .class file URL for a synthetic class " + className  // NOI18N
+                               + " in ClassBytesLoader.getClassFileURL"); // NOI18N
         }
+        return classUrl;
+    }
+    
+    public static byte[] getClassFileBytes(String className) {
+        return getClassFileBytes(getClassFileURL(className));
+    }
+    
+    public static byte[] getClassFileBytes(URL classUrl) {
+        if (classUrl == null) return null;
         String proto = classUrl.getProtocol();
 
         if (proto == null) { // Should not happen, this is a critical error message
-            System.err.println("***Profiler agent critical error: could not get .class file for class " + className
+            System.err.println("***Profiler agent critical error: could not get .class file for class " + classUrl.toExternalForm()
                                + " in ClassBytesLoader.getClassFileBytes"); // NOI18N
 
             return null;

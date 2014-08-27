@@ -108,7 +108,7 @@ class InstanceDump extends HprofObject implements Instance {
         return getHprof().getNearestGCRootPointer(this);
     }
 
-    public int getReachableSize() {
+    public long getReachableSize() {
         return 0;
     }
 
@@ -116,11 +116,11 @@ class InstanceDump extends HprofObject implements Instance {
         return getHprof().findReferencesFor(getInstanceId());
     }
 
-    public int getRetainedSize() {
+    public long getRetainedSize() {
         return getHprof().getRetainedSize(this);
     }
 
-    public int getSize() {
+    public long getSize() {
         return dumpClass.getInstanceSize();
     }
 

@@ -51,8 +51,11 @@ import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
@@ -162,8 +165,10 @@ public class HeapWalkerManager {
         if (hw == null) {
             try {
                 hw = new HeapWalker(heapDump);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 ProfilerDialogs.displayError(Bundle.HeapWalkerManager_CannotOpenHeapWalkerMsg(e.getLocalizedMessage()));
+            } catch (Exception e) {
+                Logger.getLogger(HeapWalkerManager.class.getName()).log(Level.SEVERE, null, e);
             }
         }
 

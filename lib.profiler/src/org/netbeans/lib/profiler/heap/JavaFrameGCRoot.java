@@ -46,7 +46,7 @@ package org.netbeans.lib.profiler.heap;
 
 /**
  * This represents one Java Frame GC root. It has kind ({@link GCRoot#JAVA_FRAME}) and also corresponding
- * {@link Instance}, which is actual GC root and represends a local varibale held on the stack. 
+ * {@link Instance}, which is actual GC root and represent a local variable held on the stack. 
  * @author Tomas Hurka
  */
 public interface JavaFrameGCRoot extends GCRoot {
