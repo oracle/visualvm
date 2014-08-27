@@ -127,7 +127,8 @@ public class ProfilerTableContainer extends JPanel {
                     return d;
                 }
             };
-            scrollersPanel.setOpaque(false);
+            scrollersPanel.setOpaque(true);
+            scrollersPanel.setBackground(UIUtils.getProfilerResultsBackground());
 
             for (final Integer column : scrollableColumns) {
                 final JScrollBar scroller = new JScrollBar(JScrollBar.HORIZONTAL) {
