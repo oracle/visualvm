@@ -210,15 +210,7 @@ public abstract class MemoryView extends JPanel {
 
             @Override
             public void run() {
-                JPanel newView = getView();
-                if (newView != currentView) {
-                    removeAll();
-                    resetData();
-                    currentView = newView;
-                    add(currentView, BorderLayout.CENTER);
-                    revalidate();
-                    repaint();
-                }
+                updateCurrentView();
                 if (updateDataInAWTFinal != null) updateDataInAWTFinal.run();
             }
         });
@@ -228,22 +220,27 @@ public abstract class MemoryView extends JPanel {
 
     public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
         if (paused && !forceRefresh) return;
-        if (currentView == sampledView) {
-            JPanel newView = getView();
-            if (newView != currentView) {
-                removeAll();
-                resetData();
-                currentView = newView;
-                add(currentView, BorderLayout.CENTER);
-                revalidate();
-                repaint();
-            }
-            HeapHistogram histogram = client.getHeapHistogram();
-            if (histogram != null) sampledView.setData(histogram);
-        } else if (currentView == allocView || currentView == livenessView) {
-            if (lastupdate + MAX_UPDATE_DIFF < System.currentTimeMillis()) {
-                client.forceObtainedResultsDump(true);
-            }
+        switch (client.getCurrentInstrType()) {
+            case CommonConstants.INSTR_NONE_MEMORY_SAMPLING:
+                final HeapHistogram histogram = client.getHeapHistogram();
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        updateCurrentView();
+                        if (histogram != null) sampledView.setData(histogram);
+                    }
+
+                });
+                break;
+            case CommonConstants.INSTR_OBJECT_LIVENESS:
+            case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
+                if (lastupdate + MAX_UPDATE_DIFF < System.currentTimeMillis()) {
+                    client.forceObtainedResultsDump(true);
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid profiling instr. type: "+client.getCurrentInstrType());
         }
     }
     
@@ -362,6 +359,18 @@ public abstract class MemoryView extends JPanel {
                 };
                 return sampledView;
 //                return null;
+        }
+    }
+
+    private void updateCurrentView() {
+        JPanel newView = getView();
+        if (newView != currentView) {
+            removeAll();
+            resetData();
+            currentView = newView;
+            add(currentView, BorderLayout.CENTER);
+            revalidate();
+            repaint();
         }
     }
     
