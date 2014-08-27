@@ -503,8 +503,9 @@ class ProfilerWindow extends ProfilerTopComponent {
             grp.add(startProject);
             grp.add(attachProject);
 
-            if (_project && !_attach) startProject.setSelected(true);
+            if (_project && (!_attach || _file)) startProject.setSelected(true);
             else attachProject.setSelected(true);
+            if (_file) attachProject.setEnabled(false);
         } else {
             attachProject = new JMenuItem("Setup attach to process...") {
                 {
