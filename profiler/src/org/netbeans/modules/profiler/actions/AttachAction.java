@@ -43,15 +43,16 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
-import org.openide.util.RequestProcessor;
+import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -60,8 +61,8 @@ import org.openide.util.RequestProcessor;
  * @author Ian Formanek
  */
 @NbBundle.Messages({
-    "LBL_AttachMainProjectAction=&Attach Profiler...",
-    "HINT_AttachMainProjectAction=Attach Profiler..."
+    "LBL_AttachMainProjectAction=Profile &External Process",
+    "HINT_AttachMainProjectAction=Profile External Process"
 })
 public final class AttachAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -90,14 +91,7 @@ public final class AttachAction extends AbstractAction {
      * Invoked when an action occurs.
      */
     public void actionPerformed(final ActionEvent e) {
-        RequestProcessor.getDefault().post(new Runnable() {
-            public void run() {
-                // 1. if there is profiling in progress, ask the user and possibly cancel
-                if (ProfilingSupport.getDefault().checkProfilingInProgress()) return;
-
-                //2. start attaching
-                ProfilingSupport.getDefault().doAttach();
-            }
-        });
+        ProfilerSession session = ProfilerSession.forContext(Lookup.EMPTY);
+        if (session != null) session.requestActive();
     }
 }

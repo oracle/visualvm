@@ -128,6 +128,9 @@ public class Instrumentor implements CommonConstants {
             return -1;
         }
 
+        if (!settings.getInstrumentationFilter().passesFilter(className.replace(".", "/"))) {
+            return -1;
+        }
         if (clazz.getInstrClassId() == -1) {
             System.err.println("Warning: " + clazz.getNameAndLoader() + " does not have instrClassId");            
         }

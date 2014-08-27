@@ -70,8 +70,8 @@ import org.openide.util.HelpCtx;
     "CAPTION_InternalStatisticsInstrHotswap=Internal Statistics of Instrumentation and Hotswapping Operations"
 })
 @ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.InternalStatsAction")
-@ActionRegistration(displayName="#LBL_InternalStatsAction")
-@ActionReference(path="Menu/Profile/Advanced", position=300, separatorAfter=400)
+//@ActionRegistration(displayName="#LBL_InternalStatsAction")
+//@ActionReference(path="Menu/Profile/Advanced", position=300, separatorAfter=400)
 public final class InternalStatsAction extends ProfilingAwareAction {
     final private static int[] enabledStates = new int[]{Profiler.PROFILING_RUNNING};
             

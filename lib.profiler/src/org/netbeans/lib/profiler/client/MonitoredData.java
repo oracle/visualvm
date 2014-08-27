@@ -180,6 +180,19 @@ public class MonitoredData {
     }
 
     /**
+     * Returns the approximate accumulated process CPU elapsed time
+     * in nanoseconds. Note that the time is normalized to one processor.
+     * This method returns <tt>-1</tt> if the collection
+     * elapsed time is undefined for this collector.
+     *
+     * @return the approximate accumulated process CPU elapsed time
+     * in nanoseconds.
+     */
+    public long getProcessCpuTime() {
+        return generalMNumbers[MonitoredNumbersResponse.CPU_TIME_IDX];
+    }
+
+    /**
      * With mresp, the same instance is reused all the time to save memory. However, with MonitoredData we
      * generally can't afford that, so here we create a new object every time and copy data into it.
      */

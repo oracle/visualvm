@@ -274,7 +274,8 @@ public class ProfilerInterface implements CommonConstants {
     private static String INTERNAL_ERROR_MSG = "Internal error:\nExpected InstrumentMethodGroupResponse, got response of class {0},\nvalue = {1}\nAll instrumentation will be removed"; // NOI18N
     private static String UNEXPECTED_EXCEPTION_MSG = "Unexpected exception caught when trying to instrument classes.\nOriginal exception:\n{0}\nStack trace:\n\n{1}"; // NOI18N
     private static String INSTRUMENTATION_SUCCESSFUL_MSG = "Deferred instrumentation performed successfully"; // NOI18N
-                                                                                                              // -----
+    private static String HISTOGRAM_NOT_AVAILABLE_MSG = "Histogram is not available."; // NOI18N
+    // -----
 
     static {
         ResourceBundle messages = ProfilerServer.getProfilerServerResourceBundle();
@@ -283,6 +284,7 @@ public class ProfilerInterface implements CommonConstants {
             INTERNAL_ERROR_MSG = messages.getString("ProfilerInterface_InternalErrorMsg"); // NOI18N
             UNEXPECTED_EXCEPTION_MSG = messages.getString("ProfilerInterface_UnexpectedExceptionMsg"); // NOI18N
             INSTRUMENTATION_SUCCESSFUL_MSG = messages.getString("ProfilerInterface_InstrumentationSuccessfulMsg"); // NOI18N
+            HISTOGRAM_NOT_AVAILABLE_MSG = messages.getString("ProfilerInterface_HistogramNotAvailableMsg");     // NOI18N
         }
     }
 
@@ -510,12 +512,14 @@ public class ProfilerInterface implements CommonConstants {
      * is the only thread that we can reliably characterize as the profiler's own.
      */
     public static void initProfilerInterface(ProfilingSessionStatus status, Thread specialThread) {
+        boolean jdk15 = Platform.getJDKVersionNumber() == Platform.JDK_15;
         Timers.initialize();
         Classes.initialize();
         GC.initialize();
         Stacks.initialize();
         Threads.initialize();
-        HeapDump.initialize(Platform.getJDKVersionNumber() == Platform.JDK_15);
+        HeapDump.initialize(jdk15);
+        ThreadDump.initialize(jdk15);
         ClassLoaderManager.initialize(profilerServer);
         ClassLoaderManager.addLoader(ClassLoader.getSystemClassLoader());
         reflectMethods = new WeakHashMap();
@@ -678,8 +682,17 @@ public class ProfilerInterface implements CommonConstants {
         return detachStarted;
     }
         
-    static HeapHistogramResponse computeHistogram() {
-        return heapHistgramManager.computeHistogram(Histogram.getRawHistogram());
+    static Response computeHistogram() {
+        Response resp = null;
+        
+        if (Histogram.isAvailable()) {
+            resp = heapHistgramManager.computeHistogram(Histogram.getRawHistogram());
+        }
+        if (resp == null) {
+            resp = new Response(HISTOGRAM_NOT_AVAILABLE_MSG);
+            
+        }
+        return resp;
     }
 
     private static boolean getAndInstrumentClasses(boolean rootClassInstrumentation) {

@@ -92,7 +92,7 @@ public final class StopAction extends ProfilingAwareAction {
     @ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.StopAction")
     @ActionRegistration(displayName="#LBL_StopAction")
     @ActionReferences({
-        @ActionReference(path="Menu/Profile", position=700, separatorAfter=800),
+        @ActionReference(path="Menu/Profile", position=300, separatorAfter=400),
         @ActionReference(path="Shortcuts", name="S-F2")
     })
     public static StopAction getInstance() {

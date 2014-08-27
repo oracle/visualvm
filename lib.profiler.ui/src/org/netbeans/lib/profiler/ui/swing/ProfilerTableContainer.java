@@ -82,6 +82,7 @@ public class ProfilerTableContainer extends JPanel {
     public ProfilerTableContainer(final ProfilerTable table, boolean decorated,
                                   ColumnChangeAdapter adapter) {
         super(new BorderLayout());
+        setOpaque(false);
         
         this.table = table;
         
@@ -126,6 +127,7 @@ public class ProfilerTableContainer extends JPanel {
                     return d;
                 }
             };
+            scrollersPanel.setOpaque(false);
 
             for (final Integer column : scrollableColumns) {
                 final JScrollBar scroller = new JScrollBar(JScrollBar.HORIZONTAL) {
@@ -256,8 +258,9 @@ public class ProfilerTableContainer extends JPanel {
         if (event.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
             int direction = event.getUnitsToScroll() < 0 ? -1 : 1;
             int increment = scroller.getUnitIncrement(direction);
+            int amount = event.getScrollAmount();
             int oldValue = scroller.getValue();
-            int newValue = oldValue + increment * direction;
+            int newValue = oldValue + increment * amount * direction;
             if (oldValue != newValue) scroller.setValue(newValue);
             event.consume();
         }

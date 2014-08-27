@@ -86,6 +86,43 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
         return fitWidthColumn != -1;
     }
     
+    // --- Column resize -------------------------------------------------------
+    
+    private int refWidth = -1;
+    
+    void setResizingColumn(TableColumn column) {
+        refWidth = -1;
+    }
+    
+    TableColumn createTableColumn(int columnIndex) {
+        return new TableColumn(columnIndex) {
+            public void setWidth(int width) {
+                if (getMaxWidth() == 0 && getWidth() == 0) {
+                    TableColumn c = getPreviousVisibleColumn(this);
+                    if (refWidth == -1) refWidth = c.getWidth();
+                    c.setWidth(refWidth + width);
+                } else {
+                    super.setWidth(width);
+                }
+            }                
+        };
+    }
+    
+    public void addColumn(final TableColumn column) {
+        super.addColumn(column);
+        
+        final int index = column.getModelIndex();
+        column.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (PROP_COLUMN_WIDTH.equals(evt.getPropertyName())) {
+                    int oldWidth = ((Integer)evt.getOldValue()).intValue();
+                    int newWidth = ((Integer)evt.getNewValue()).intValue();
+                    fireColumnWidthChanged(index, oldWidth, newWidth);
+                }
+            }
+        });
+    }
+    
     // --- Column offset & width -----------------------------------------------
     
     private Map<Integer, Integer> columnOffsets;
@@ -146,8 +183,12 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
     void setDefaultColumnWidth(int column, int width) {
         if (defaultColumnWidths == null) defaultColumnWidths = new HashMap();
         defaultColumnWidths.put(column, width);
-        TableColumn c = getModelColumn(column);
-        if (c != null) c.setWidth(width);
+        if (isColumnVisible(column)) {
+            TableColumn c = getModelColumn(column);
+            if (c != null) c.setWidth(width);
+        } else {
+            hiddenColumnWidths.put(column, width);
+        }
     }
     
     int getDefaultColumnWidth(int column) {
@@ -227,10 +268,22 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
                getPreviousVisibleColumn(lastColumn);
     }
     
+    TableColumn getNextVisibleColumn(TableColumn column) {
+        int columnIndex = tableColumns.indexOf(column);
+        int nextIndex = getNextVisibleColumn(columnIndex);
+        return getColumn(nextIndex);
+    }
+    
     int getNextVisibleColumn(int column) {
         do { column = getNextColumn(column); }
         while (!isColumnVisible(getColumn(column)));
         return column;
+    }
+    
+    TableColumn getPreviousVisibleColumn(TableColumn column) {
+        int columnIndex = tableColumns.indexOf(column);
+        int previousIndex = getPreviousVisibleColumn(columnIndex);
+        return getColumn(previousIndex);
     }
     
     int getPreviousVisibleColumn(int column) {
@@ -272,21 +325,6 @@ class ProfilerColumnModel extends DefaultTableColumnModel {
     // --- Listener ------------------------------------------------------------
     
     private Set<Listener> columnListeners;
-    
-    public void addColumn(TableColumn column) {
-        super.addColumn(column);
-        
-        final int index = column.getModelIndex();
-        column.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (PROP_COLUMN_WIDTH.equals(evt.getPropertyName())) {
-                    int oldWidth = ((Integer)evt.getOldValue()).intValue();
-                    int newWidth = ((Integer)evt.getNewValue()).intValue();
-                    fireColumnWidthChanged(index, oldWidth, newWidth);
-                }
-            }
-        });
-    }
     
     void addColumnChangeListener(Listener listener) {
         if (columnListeners == null) columnListeners = new HashSet();

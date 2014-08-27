@@ -59,6 +59,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
     private static final boolean DEBUG = false;
     private static int nProfiledThreadsLimit;
     protected static int nProfiledThreadsAllowed;
+    protected static int stackDepthLimit = Integer.MAX_VALUE;
     protected static boolean enableFirstTimeMethodInvoke;
 
     // The following flag is used to prevent deadlock inside getThreadInfo() by forcing immediate return from methodEntry() etc.
@@ -104,6 +105,10 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
 
     public static void setNProfiledThreadsLimit(int num) {
         nProfiledThreadsLimit = nProfiledThreadsAllowed = num;
+    }
+
+    public static void setStackDepthLimit(int num) {
+        stackDepthLimit = num;
     }
 
     public static void setWaitAndSleepTracking(boolean waitTracking, boolean sleepTracking) {

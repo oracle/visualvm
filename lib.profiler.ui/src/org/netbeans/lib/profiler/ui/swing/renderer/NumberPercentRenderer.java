@@ -43,47 +43,89 @@
 
 package org.netbeans.lib.profiler.ui.swing.renderer;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.text.Format;
-import org.netbeans.lib.profiler.ui.Formatters;
+import javax.swing.SwingConstants;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class NumberPercentRenderer extends BaseDetailsRenderer {
+public class NumberPercentRenderer extends MultiRenderer {
     
-    private static final String NUL = Formatters.percentFormat().format(0);
-    private static final String NAN = NUL.replace("0", "-"); // NOI18N
+    private final ProfilerRenderer valueRenderer;
+    private final PercentRenderer percentRenderer;
     
-    private long basis;
+    private final ProfilerRenderer[] renderers;
+    
+    private Dimension percentSize;
+    
     
     public NumberPercentRenderer() {
-        this(null);
+        this((Format)null);
     }
     
     public NumberPercentRenderer(Format customFormat) {
-        super(new NumberRenderer(customFormat), getPercentString(999.9f, 100), 0);
+        this(createNumberRenderer(customFormat));
     }
     
-    public void setBasis(long basis) {
-        this.basis = basis;
+    public NumberPercentRenderer(ProfilerRenderer renderer) {
+        valueRenderer = renderer;
+        
+        percentRenderer = new PercentRenderer() {
+            public void setForeground(Color foreground) {
+                if (foreground == null) foreground = Color.BLACK;
+                super.setForeground(UIUtils.getDisabledForeground(foreground));
+            }
+            public Dimension getPreferredSize() {
+                if (percentSize == null) percentSize = super.getPreferredSize();
+                return percentSize;
+            }
+        };
+        percentRenderer.changeFontSize(-1);
+        percentRenderer.setMargin(3, 0, 3, 3);
+        percentRenderer.setHorizontalAlignment(SwingConstants.TRAILING);
+        
+        percentRenderer.setMaxValue(100);
+        percentRenderer.setValue(9999, -1);
+        int fixedWidth = percentRenderer.getPreferredSize().width;
+        percentSize.width = fixedWidth;
+        
+        renderers = new ProfilerRenderer[] { valueRenderer, percentRenderer };
+        
+        setOpaque(true);
+        setHorizontalAlignment(SwingConstants.TRAILING);
+    }
+    
+    
+    protected ProfilerRenderer[] valueRenderers() {
+        return renderers;
+    }
+    
+    
+    public void setMaxValue(long maxValue) {
+        percentRenderer.setMaxValue(maxValue);
     }
     
     public void setValue(Object value, int row) {
-        setValues(value, getPercentString((Number)value, basis), row);
+        valueRenderer.setValue(value, row);
+        percentRenderer.setValue(value, row);
     }
     
-    private static String getPercentString(Number value, long basis) {
-        String string = "("; // NOI18N
-        
-        if (basis == 0) {
-            string += NAN;
-        } else {
-            string += value.longValue() == 0 ? NUL : Formatters.percentFormat().
-                                               format(value.doubleValue() / basis);
-        }
-        
-        return string + ")"; // NOI18N
+    
+    public Dimension getPreferredSize() {
+        Dimension dim = valueRenderer.getComponent().getPreferredSize();
+        dim.width += percentRenderer.getPreferredSize().width;
+        return sharedDimension(dim);
+    }
+    
+    
+    private static ProfilerRenderer createNumberRenderer(Format customFormat) {
+        NumberRenderer numberRenderer = new NumberRenderer(customFormat);
+        numberRenderer.setMargin(3, 3, 3, 0);
+        return numberRenderer;
     }
     
 }

@@ -43,13 +43,15 @@
 
 package org.netbeans.lib.profiler.results;
 
+import javax.swing.tree.TreeNode;
+
 
 /**
  * This interface must be implemented by every CCT node.
  *
  * @author Jiri Sedlacek
  */
-public interface CCTNode {
+public interface CCTNode extends TreeNode {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public CCTNode getChild(int index);

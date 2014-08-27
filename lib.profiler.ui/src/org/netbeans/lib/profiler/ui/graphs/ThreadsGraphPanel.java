@@ -46,6 +46,7 @@ package org.netbeans.lib.profiler.ui.graphs;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -91,6 +92,9 @@ import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
  * @author Jiri Sedlacek
  */
 public final class ThreadsGraphPanel extends GraphPanel {
+    
+    private final Color THREADS_COLOR = ColorFactory.getPredefinedColor(0);
+    private final Color CLASSES_COLOR = ColorFactory.getPredefinedColor(1);
 
     private ProfilerXYChart chart;
     private Action[] chartActions;
@@ -191,7 +195,7 @@ public final class ThreadsGraphPanel extends GraphPanel {
         XYItem threadsItem = models.threadsItemsModel().getItem(0);
         XYItemPainter threadsPainter = (XYItemPainter)paintersModel.getPainter(threadsItem);
         SimpleLongMarksPainter threadsMarksPainter = new SimpleLongMarksPainter();
-        threadsMarksPainter.setForeground(GraphsUI.THREADS_PAINTER_LINE_COLOR);
+        threadsMarksPainter.setForeground(THREADS_COLOR);
         AxisComponent tAxis =
                 new AxisComponent(chart, new DecimalXYItemMarksComputer(
                          threadsItem, threadsPainter, chart.getChartContext(),
@@ -203,7 +207,7 @@ public final class ThreadsGraphPanel extends GraphPanel {
         XYItem classesItem = models.threadsItemsModel().getItem(1);
         XYItemPainter classesPainter = (XYItemPainter)paintersModel.getPainter(classesItem);
         SimpleLongMarksPainter classesMarksPainter = new SimpleLongMarksPainter();
-        classesMarksPainter.setForeground(GraphsUI.LOADED_CLASSES_PAINTER_LINE_COLOR);
+        classesMarksPainter.setForeground(CLASSES_COLOR);
         AxisComponent cAxis =
                 new AxisComponent(chart, new DecimalXYItemMarksComputer(
                          classesItem, classesPainter, chart.getChartContext(),
@@ -228,53 +232,53 @@ public final class ThreadsGraphPanel extends GraphPanel {
         // Small panel UI
         if (smallPanel) {
 
-            // Customize chart
-            chart.setMouseZoomingEnabled(false);
-            chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_NONE);
-
-            // Heap Size
-            JLabel heapSizeSmall = new JLabel(GraphsUI.THREADS_NAME,
-                                              new ColorIcon(GraphsUI.
-                                              THREADS_PAINTER_LINE_COLOR, null,
-                                              8, 8), SwingConstants.LEADING);
-            heapSizeSmall.setFont(getFont().deriveFont((float)(getFont().getSize()) - 1));
-            heapSizeSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-
-            // Used heap
-            JLabel usedHeapSmall = new JLabel(GraphsUI.LOADED_CLASSES_NAME,
-                                              new ColorIcon(GraphsUI.
-                                              LOADED_CLASSES_PAINTER_LINE_COLOR, null,
-                                              8, 8), SwingConstants.LEADING);
-            usedHeapSmall.setFont(getFont().deriveFont((float) (getFont().getSize()) - 1));
-            usedHeapSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-
-            // Legend container
-            JPanel smallLegendPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 1));
-            smallLegendPanel.setBackground(GraphsUI.SMALL_LEGEND_BACKGROUND_COLOR);
-            smallLegendPanel.setBorder(new LineBorder(GraphsUI.SMALL_LEGEND_BORDER_COLOR, 1));
-            smallLegendPanel.add(heapSizeSmall);
-            smallLegendPanel.add(usedHeapSmall);
-            JPanel smallLegendContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
-            smallLegendContainer.setBackground(GraphsUI.SMALL_LEGEND_BACKGROUND_COLOR);
-            smallLegendContainer.add(smallLegendPanel);
-
-            // Master UI
-            setLayout(new BorderLayout());
-            add(chartPanel, BorderLayout.CENTER);
-            add(smallLegendContainer, BorderLayout.SOUTH);
-
-
-            // Doubleclick action
-            chart.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent e) {
-                    if (SwingUtilities.isLeftMouseButton(e) &&
-                        e.getClickCount() == 2)
-                            chartAction.actionPerformed(null);
-                }
-            });
-
-            // Toolbar actions
-            chartActions = new Action[] {};
+//            // Customize chart
+//            chart.setMouseZoomingEnabled(false);
+//            chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_NONE);
+//
+//            // Heap Size
+//            JLabel heapSizeSmall = new JLabel(GraphsUI.THREADS_NAME,
+//                                              new ColorIcon(GraphsUI.
+//                                              THREADS_PAINTER_LINE_COLOR, null,
+//                                              8, 8), SwingConstants.LEADING);
+//            heapSizeSmall.setFont(getFont().deriveFont((float)(getFont().getSize()) - 1));
+//            heapSizeSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+//
+//            // Used heap
+//            JLabel usedHeapSmall = new JLabel(GraphsUI.LOADED_CLASSES_NAME,
+//                                              new ColorIcon(GraphsUI.
+//                                              LOADED_CLASSES_PAINTER_LINE_COLOR, null,
+//                                              8, 8), SwingConstants.LEADING);
+//            usedHeapSmall.setFont(getFont().deriveFont((float) (getFont().getSize()) - 1));
+//            usedHeapSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+//
+//            // Legend container
+//            JPanel smallLegendPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 1));
+//            smallLegendPanel.setBackground(GraphsUI.SMALL_LEGEND_BACKGROUND_COLOR);
+//            smallLegendPanel.setBorder(new LineBorder(GraphsUI.SMALL_LEGEND_BORDER_COLOR, 1));
+//            smallLegendPanel.add(heapSizeSmall);
+//            smallLegendPanel.add(usedHeapSmall);
+//            JPanel smallLegendContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+//            smallLegendContainer.setBackground(GraphsUI.SMALL_LEGEND_BACKGROUND_COLOR);
+//            smallLegendContainer.add(smallLegendPanel);
+//
+//            // Master UI
+//            setLayout(new BorderLayout());
+//            add(chartPanel, BorderLayout.CENTER);
+//            add(smallLegendContainer, BorderLayout.SOUTH);
+//
+//
+//            // Doubleclick action
+//            chart.addMouseListener(new MouseAdapter() {
+//                public void mouseClicked(MouseEvent e) {
+//                    if (SwingUtilities.isLeftMouseButton(e) &&
+//                        e.getClickCount() == 2)
+//                            chartAction.actionPerformed(null);
+//                }
+//            });
+//
+//            // Toolbar actions
+//            chartActions = new Action[] {};
 
         // Big panel UI
         } else {
@@ -298,35 +302,42 @@ public final class ThreadsGraphPanel extends GraphPanel {
             JPanel chartContainer = new JPanel(new BorderLayout());
             chartContainer.setBorder(BorderFactory.createEmptyBorder());
             chartContainer.add(chartPanel, BorderLayout.CENTER);
-            chartContainer.add(hScrollBar, BorderLayout.SOUTH);
+//            chartContainer.add(hScrollBar, BorderLayout.SOUTH);
 
             // Heap Size
             JLabel heapSizeBig = new JLabel(GraphsUI.THREADS_NAME,
-                                            new ColorIcon(GraphsUI.
-                                            THREADS_PAINTER_LINE_COLOR, Color.
+                                            new ColorIcon(THREADS_COLOR, Color.
                                             BLACK, 18, 9), SwingConstants.LEADING);
             heapSizeBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
             // Used heap
             JLabel usedHeapBig = new JLabel(GraphsUI.LOADED_CLASSES_NAME,
-                                            new ColorIcon(GraphsUI.
-                                            LOADED_CLASSES_PAINTER_LINE_COLOR, Color.
+                                            new ColorIcon(CLASSES_COLOR, Color.
                                             BLACK, 18, 9), SwingConstants.LEADING);
             usedHeapBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
             // Legend container
-            JPanel bigLegendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 7, 8));
+            JPanel bigLegendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 7, 0));
+            bigLegendPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 15));
             bigLegendPanel.setOpaque(false);
             bigLegendPanel.add(heapSizeBig);
             bigLegendPanel.add(usedHeapBig);
             
             JPanel legendContainer = new JPanel(new BorderLayout(0, 0));
-            UIUtils.decorateProfilerPanel(legendContainer);
-            legendContainer.add(UIUtils.createHorizontalLine(legendContainer.getBackground()), BorderLayout.NORTH);
+            legendContainer.setOpaque(true);
+            legendContainer.setBackground(UIUtils.getProfilerResultsBackground());
+//            UIUtils.decorateProfilerPanel(legendContainer);
+//            legendContainer.add(UIUtils.createHorizontalLine(legendContainer.getBackground()), BorderLayout.NORTH);
             legendContainer.add(bigLegendPanel, BorderLayout.CENTER);
 
             // Master UI
             setLayout(new BorderLayout());
+            JLabel caption = new JLabel("Threads and Classes", JLabel.CENTER);
+            caption.setFont(caption.getFont().deriveFont(Font.BOLD));
+            caption.setBorder(BorderFactory.createEmptyBorder(20, 0, 5, 0));
+            caption.setOpaque(true);
+            caption.setBackground(UIUtils.getProfilerResultsBackground());
+            add(caption, BorderLayout.NORTH);
             add(chartContainer, BorderLayout.CENTER);
             add(legendContainer, BorderLayout.SOUTH);
 
@@ -409,34 +420,36 @@ public final class ThreadsGraphPanel extends GraphPanel {
         // Threads
         SynchronousXYItemPainter threadsPainter =
                 SynchronousXYItemPainter.absolutePainter(GraphsUI.THREADS_PAINTER_LINE_WIDTH,
-                                                      GraphsUI.THREADS_PAINTER_LINE_COLOR,
-                                                      GraphsUI.THREADS_PAINTER_FILL_COLOR);
-        SynchronousXYItemMarker threadsMarker =
-                 SynchronousXYItemMarker.absolutePainter(GraphsUI.THREADS_MARKER_RADIUS,
-                                                      GraphsUI.THREADS_MARKER_LINE1_WIDTH,
-                                                      GraphsUI.THREADS_MARKER_LINE1_COLOR,
-                                                      GraphsUI.THREADS_MARKER_LINE2_WIDTH,
-                                                      GraphsUI.THREADS_MARKER_LINE2_COLOR,
-                                                      GraphsUI.THREADS_MARKER_FILL_COLOR);
-        XYItemPainter thp = new CompoundXYItemPainter(threadsPainter,
-                                                      threadsMarker);
+                                                      THREADS_COLOR,
+                                                      null);
+//        SynchronousXYItemMarker threadsMarker =
+//                 SynchronousXYItemMarker.absolutePainter(GraphsUI.THREADS_MARKER_RADIUS,
+//                                                      GraphsUI.THREADS_MARKER_LINE1_WIDTH,
+//                                                      GraphsUI.THREADS_MARKER_LINE1_COLOR,
+//                                                      GraphsUI.THREADS_MARKER_LINE2_WIDTH,
+//                                                      GraphsUI.THREADS_MARKER_LINE2_COLOR,
+//                                                      GraphsUI.THREADS_MARKER_FILL_COLOR);
+//        XYItemPainter thp = new CompoundXYItemPainter(threadsPainter,
+//                                                      threadsMarker);
+        XYItemPainter thp = threadsPainter;
 
         // Loaded classes
         SynchronousXYItemPainter loadedClassesPainter =
                 SynchronousXYItemPainter.relativePainter(GraphsUI.LOADED_CLASSES_PAINTER_LINE_WIDTH,
-                                                      GraphsUI.LOADED_CLASSES_PAINTER_LINE_COLOR,
-                                                      GraphsUI.LOADED_CLASSES_PAINTER_FILL_COLOR,
+                                                      CLASSES_COLOR,
+                                                      null,
                                                       10);
-        SynchronousXYItemMarker loadedClassesMarker =
-                 SynchronousXYItemMarker.relativePainter(GraphsUI.LOADED_CLASSES_MARKER_RADIUS,
-                                                      GraphsUI.LOADED_CLASSES_MARKER_LINE1_WIDTH,
-                                                      GraphsUI.LOADED_CLASSES_MARKER_LINE1_COLOR,
-                                                      GraphsUI.LOADED_CLASSES_MARKER_LINE2_WIDTH,
-                                                      GraphsUI.LOADED_CLASSES_MARKER_LINE2_COLOR,
-                                                      GraphsUI.LOADED_CLASSES_MARKER_FILL_COLOR,
-                                                      10);
-        XYItemPainter lcp = new CompoundXYItemPainter(loadedClassesPainter,
-                                                      loadedClassesMarker);
+//        SynchronousXYItemMarker loadedClassesMarker =
+//                 SynchronousXYItemMarker.relativePainter(GraphsUI.LOADED_CLASSES_MARKER_RADIUS,
+//                                                      GraphsUI.LOADED_CLASSES_MARKER_LINE1_WIDTH,
+//                                                      GraphsUI.LOADED_CLASSES_MARKER_LINE1_COLOR,
+//                                                      GraphsUI.LOADED_CLASSES_MARKER_LINE2_WIDTH,
+//                                                      GraphsUI.LOADED_CLASSES_MARKER_LINE2_COLOR,
+//                                                      GraphsUI.LOADED_CLASSES_MARKER_FILL_COLOR,
+//                                                      10);
+//        XYItemPainter lcp = new CompoundXYItemPainter(loadedClassesPainter,
+//                                                      loadedClassesMarker);
+        XYItemPainter lcp = loadedClassesPainter;
 
         // Model
         ItemsModel items = models.threadsItemsModel();
