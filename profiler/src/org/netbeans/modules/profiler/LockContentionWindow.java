@@ -117,14 +117,14 @@ public final class LockContentionWindow extends ProfilerTopComponent {
 
         lockView.addChangeListener(new Listener());
         locksPanel.addLockContentionListener(new LockContentionListener());
-        Profiler.getDefault().addProfilingStateListener(new ProfilingStateAdapter() {
-            public void profilingStateChanged(final ProfilingStateEvent e) {
-                LockContentionWindow.this.profilingStateChanged(e.getNewState());
-            }
-            public void lockContentionMonitoringChanged() {
-                updateLocksView();
-            }
-        });
+//        Profiler.getDefault().addProfilingStateListener(new ProfilingStateAdapter() {
+//            public void profilingStateChanged(final ProfilingStateEvent e) {
+//                LockContentionWindow.this.profilingStateChanged(e.getNewState());
+//            }
+//            public void lockContentionMonitoringChanged() {
+//                updateLocksView();
+//            }
+//        });
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

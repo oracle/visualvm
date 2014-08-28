@@ -58,6 +58,7 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.spi.SessionListener;
+import org.netbeans.modules.profiler.v2.SnapshotsWindow;
 import org.openide.util.Lookup;
 import org.openide.util.Lookup.Provider;
 import org.openide.util.lookup.ServiceProvider;
@@ -165,16 +166,18 @@ public class HeapDumpWatch extends SessionListener.Adapter {
             return; // custom heapdump
         }
 
-        if (ProfilerControlPanel2.hasDefault())
-            ProfilerControlPanel2.getDefault().refreshSnapshotsList(); // refresh list of snapshots
+        SnapshotsWindow.instance().refreshFolder(heapDump.getParent(), true);
+//        if (ProfilerControlPanel2.hasDefault())
+//            ProfilerControlPanel2.getDefault().refreshSnapshotsList(); // refresh list of snapshots
 
         try {
             if (ProfilerDialogs.displayConfirmation(Bundle.HeapDumpWatch_OOME_PROTECTION_OPEN_HEAPDUMP())) {
                 ResultsManager.getDefault().openSnapshot(heapDump);
             } else if (ProfilerDialogs.displayConfirmation(Bundle.HeapDumpWatch_OOME_PROTECTION_REMOVE_HEAPDUMP())) {
                 heapDump.delete();
-                if (ProfilerControlPanel2.hasDefault())
-                    ProfilerControlPanel2.getDefault().refreshSnapshotsList();
+                SnapshotsWindow.instance().refreshFolder(heapDump.getParent(), true);
+//                if (ProfilerControlPanel2.hasDefault())
+//                    ProfilerControlPanel2.getDefault().refreshSnapshotsList();
             }
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();

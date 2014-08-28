@@ -45,23 +45,24 @@ package org.netbeans.lib.profiler.ui.threads;
 
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import org.netbeans.lib.profiler.ui.Formatters;
+import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class ThreadTimeRelRenderer extends NumberPercentRenderer {
+public class ThreadTimeRelRenderer extends HideableBarRenderer {
     
     private final ThreadsDataManager manager;
     
     public ThreadTimeRelRenderer(ThreadsDataManager manager) {
-        super(Formatters.millisecondsFormat());
+        super(new NumberPercentRenderer(Formatters.millisecondsFormat()));
         this.manager = manager;
     }
     
     public void setValue(Object value, int row) {
-        if (row > -1) setBasis(manager.getThreadData(row).getTotalTime(manager.getEndTime()));
+        if (row > -1) setMaxValue(manager.getThreadData(row).getTotalTime(manager.getEndTime()));
         super.setValue(value, row);
     }
     

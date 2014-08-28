@@ -48,7 +48,10 @@ import org.netbeans.lib.profiler.classfile.BaseClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.utils.MiscUtils;
+import org.netbeans.lib.profiler.utils.StringUtils;
+import org.netbeans.lib.profiler.utils.VMUtils;
 
 
 /**
@@ -75,136 +78,159 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     protected boolean[] allUnprofiledClassStatusArray;
+    private final InstrumentationFilter instrFilter;
+    private final boolean trackAllAllocations;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public ObjLivenessInstrCallsInjector(DynamicClassInfo clazz, int baseCPoolCount, int methodIdx,
-                                         boolean[] allUnprofiledClassStatusArray) {
+                                         boolean[] allUnprofiledClassStatusArray, InstrumentationFilter instrFilter,
+                                         boolean trackAllAllocations) {
         super(clazz, methodIdx);
         this.baseCPoolCount = baseCPoolCount;
         this.allUnprofiledClassStatusArray = allUnprofiledClassStatusArray;
+        this.instrFilter = instrFilter;
+        this.trackAllAllocations = trackAllAllocations;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public byte[] instrumentMethod() {
-        int loaderId = clazz.getLoaderId();
-        int bc;
         int bci = 0;
         int nInjections = 0;
 
-        // Instrument all opc_new, opc_anewarray and opc_newarray instructions, for which allUnprofiledClassStatusArray[classId] != true
-        int opcNewCount = 0;
+        if (ObjLivenessMethodInstrumentor.isObjectConstructor(clazz, methodIdx)) {
+            injectTraceObjAllocObjCtor(bci);
+            nInjections++;
+        } else {
+            int loaderId = clazz.getLoaderId();
+            int bc;
 
-        // Instrument all opc_new, opc_anewarray and opc_newarray instructions, for which allUnprofiledClassStatusArray[classId] != true
-        int opcNewToInstr = 0;
+            // Instrument all opc_new, opc_anewarray and opc_newarray instructions, for which allUnprofiledClassStatusArray[classId] != true
+            int opcNewCount = 0;
 
-        do {
-            opcNewToInstr = opcNewCount + 1;
-            bci = 0;
+            // Instrument all opc_new, opc_anewarray and opc_newarray instructions, for which allUnprofiledClassStatusArray[classId] != true
+            int opcNewToInstr = 0;
 
-            while (bci < bytecodesLength && bytecodesLength + injectedCodeLen < 65535) {
-                bc = (bytecodes[bci] & 0xFF);
+            do {
+                opcNewToInstr = opcNewCount + 1;
+                bci = 0;
 
-                if ((bc == opc_new) || (bc == opc_anewarray) || (bc == opc_newarray) || (bc == opc_multianewarray)) {
-                    opcNewToInstr--;
+                while (bci < bytecodesLength && bytecodesLength + injectedCodeLen < 65535) {
+                    bc = (bytecodes[bci] & 0xFF);
 
-                    if (opcNewToInstr == 0) {
-                        opcNewCount++;
+                    if ((bc == opc_new && !trackAllAllocations) || (bc == opc_anewarray) || (bc == opc_newarray) || (bc == opc_multianewarray)) {
+                        opcNewToInstr--;
 
-                        BaseClassInfo refClazz;
+                        if (opcNewToInstr == 0) {
+                            opcNewCount++;
 
-                        if ((bc == opc_new) || (bc == opc_anewarray) || (bc == opc_multianewarray)) {
-                            int classCPIdx = getU2(bci + 1);
-                            String refClassName = clazz.getRefClassName(classCPIdx);
+                            BaseClassInfo refClazz;
 
-                            if (bc == opc_new) {
-                                refClazz = ClassManager.javaClassOrPlaceholderForName(refClassName, loaderId);
-                            } else if (bc == opc_anewarray) {
-                                refClazz = ClassManager.javaClassForObjectArrayType(refClassName);
-                            } else {
-                                refClazz = ClassRepository.lookupSpecialClass(refClassName);
-                            }
+                            if ((bc == opc_new) || (bc == opc_anewarray) || (bc == opc_multianewarray)) {
+                                int classCPIdx = getU2(bci + 1);
+                                String refClassName = clazz.getRefClassName(classCPIdx);
 
-                            if (refClazz == null) {
-                                continue; // Warning already issued
-                            }
-
-                            int classId = refClazz.getInstrClassId();
-
-                            if ((allUnprofiledClassStatusArray != null) && (allUnprofiledClassStatusArray.length > classId)
-                                    && allUnprofiledClassStatusArray[classId]) {
-                                continue;
-                            }
-
-                            if ((bc == opc_anewarray) || (bc == opc_multianewarray)) { // Simply inject the call after the bytecode instruction
-                                injectTraceObjAlloc(classId, bci + opcodeLength(bci));
-                                nInjections++;
-                            } else { // opc_new - we can only inject the call after the corresponding constructor call
-                                bci += opcodeLength(bci);
-                                bc = (bytecodes[bci] & 0xFF);
-
-                                if ((bc != opc_dup) && (bc != opc_dup_x1) && (bc != opc_dup_x2)) {
-                                    // see issue http://www.netbeans.org/issues/show_bug.cgi?id=59085
-                                    // the JBoss JSP compiler generates bytecode that uses opc_dup_x1 in some cases,
-                                    // something javac would not generate
-                                    // in this case, injecting extra dup would corrupt the stack, so we cannot perform it
-                                    // same is expected for opc_dup_x2
-
-                                    // No standard 'dup' after 'new'. Can happen if there is a line like 'new Foo()', with no assignment of reference to the new object.
-                                    // This seems to be a rare case - javac apparently always adds 'dup' to 'new' (it would add 'pop' after it if the object is not used).
-                                    // We assume that if there is no 'dup' directly after 'new', there is also no 'dup' for this same object later.
-
-                                    //System.err.println("*** Gonna inject dup at bci = " + bci + " in method = " + clazz.getName() + "." + clazz.getMethodName(methodIdx) + " , idx = " + methodIdx);
-                                    injectDup(bci);
-
-                                    //System.out.println("*** For " + clazz.getName() + "." + clazz.getMethodName(methodIdx) + " gonna locateConstructor from bci = " + bci);
-                                    bci = locateConstructorCallForNewOp(bci, bytecodesLength, refClassName);
-
-                                    // [fixme]
-                                    //
-                                    // unfortunately deinjecting the dump here is not straightforward if bci = -1
-                                    // as an indication of failure to figure out the correct constructor call
-                                    // So far this is not happening, the issue that happens with Hibernate goes through the other branch
-                                    // without injecting dup
-                                    // see http://www.netbeans.org/issues/show_bug.cgi?id=67346
-                                    injectTraceObjAllocNoDup(classId, bci);
-                                    nInjections++;
+                                if (bc == opc_new) {
+                                    if (!instrFilter.passesFilter(refClassName)) {
+                                        break;
+                                    }
+                                    refClazz = ClassManager.javaClassOrPlaceholderForName(refClassName, loaderId);
+                                } else if (bc == opc_anewarray) {
+                                    if (!instrFilter.passesFilter(refClassName.concat("[]"))) {    // NOI18N
+                                        break;
+                                    }
+                                    refClazz = ClassManager.javaClassForObjectArrayType(refClassName);
                                 } else {
-                                    bci = locateConstructorCallForNewOp(bci, bytecodesLength, refClassName);
+                                    if (!instrFilter.passesFilter(getMultiArrayClassName(refClassName))) {
+                                        break;
+                                    }
+                                    refClazz = ClassRepository.lookupSpecialClass(refClassName);
+                                }
 
-                                    if (bci != -1) {
-                                        injectTraceObjAlloc(classId, bci);
+                                if (refClazz == null) {
+                                    break; // Warning already issued
+                                }
+
+                                int classId = refClazz.getInstrClassId();
+
+                                if ((allUnprofiledClassStatusArray != null) && (allUnprofiledClassStatusArray.length > classId)
+                                        && allUnprofiledClassStatusArray[classId]) {
+                                    break;
+                                }
+
+                                if ((bc == opc_anewarray) || (bc == opc_multianewarray)) { // Simply inject the call after the bytecode instruction
+                                    injectTraceObjAlloc(classId, bci + opcodeLength(bci));
+                                    nInjections++;
+                                } else { // opc_new - we can only inject the call after the corresponding constructor call
+                                    bci += opcodeLength(bci);
+                                    bc = (bytecodes[bci] & 0xFF);
+
+                                    if ((bc != opc_dup) && (bc != opc_dup_x1) && (bc != opc_dup_x2)) {
+                                        // see issue http://www.netbeans.org/issues/show_bug.cgi?id=59085
+                                        // the JBoss JSP compiler generates bytecode that uses opc_dup_x1 in some cases,
+                                        // something javac would not generate
+                                        // in this case, injecting extra dup would corrupt the stack, so we cannot perform it
+                                        // same is expected for opc_dup_x2
+
+                                        // No standard 'dup' after 'new'. Can happen if there is a line like 'new Foo()', with no assignment of reference to the new object.
+                                        // This seems to be a rare case - javac apparently always adds 'dup' to 'new' (it would add 'pop' after it if the object is not used).
+                                        // We assume that if there is no 'dup' directly after 'new', there is also no 'dup' for this same object later.
+
+                                        //System.err.println("*** Gonna inject dup at bci = " + bci + " in method = " + clazz.getName() + "." + clazz.getMethodName(methodIdx) + " , idx = " + methodIdx);
+                                        injectDup(bci);
+
+                                        //System.out.println("*** For " + clazz.getName() + "." + clazz.getMethodName(methodIdx) + " gonna locateConstructor from bci = " + bci);
+                                        bci = locateConstructorCallForNewOp(bci, bytecodesLength, refClassName);
+
+                                        // [fixme]
+                                        //
+                                        // unfortunately deinjecting the dump here is not straightforward if bci = -1
+                                        // as an indication of failure to figure out the correct constructor call
+                                        // So far this is not happening, the issue that happens with Hibernate goes through the other branch
+                                        // without injecting dup
+                                        // see http://www.netbeans.org/issues/show_bug.cgi?id=67346
+                                        injectTraceObjAllocNoDup(classId, bci);
                                         nInjections++;
+                                    } else {
+                                        bci = locateConstructorCallForNewOp(bci, bytecodesLength, refClassName);
+
+                                        if (bci != -1) {
+                                            injectTraceObjAlloc(classId, bci);
+                                            nInjections++;
+                                        }
                                     }
                                 }
+                            } else { // opc_newarray - primitive array allocation
+
+                                int arrayClassId = getByte(bci + 1);
+                                refClazz = ClassManager.javaClassForPrimitiveArrayType(arrayClassId);
+
+                                int classId = refClazz.getInstrClassId();
+                                String className = StringUtils.userFormClassName(refClazz.getName());
+
+                                if (!instrFilter.passesFilter(className)) {
+                                    continue;
+                                }
+                                if ((allUnprofiledClassStatusArray == null) || !allUnprofiledClassStatusArray[classId]) {
+                                    injectTraceObjAlloc(classId, bci + 2);
+                                    nInjections++;
+                                }
                             }
-                        } else { // opc_newarray - primitive array allocation
 
-                            int arrayClassId = getByte(bci + 1);
-                            refClazz = ClassManager.javaClassForPrimitiveArrayType(arrayClassId);
-
-                            int classId = refClazz.getInstrClassId();
-
-                            if ((allUnprofiledClassStatusArray == null) || !allUnprofiledClassStatusArray[classId]) {
-                                injectTraceObjAlloc(classId, bci + 2);
-                                nInjections++;
-                            }
+                            break;
                         }
-
-                        break;
                     }
+
+                    bci += opcodeLength(bci);
                 }
-
-                bci += opcodeLength(bci);
+            } while (opcNewToInstr == 0);
+            if (bci < bytecodesLength) {
+                // method was not fully instrumented -> issue warnining
+                String methodFQN = clazz.getName()+"."+clazz.getMethodName(methodIdx)+clazz.getMethodSignature(methodIdx);  // NOI18N
+                MiscUtils.printWarningMessage("Method "+methodFQN+" is too big to be fully instrumented.");  // NOI18N
             }
-        } while (opcNewToInstr == 0);
-        if (bci < bytecodesLength) {
-            // method was not fully instrumented -> issue warnining
-            String methodFQN = clazz.getName()+"."+clazz.getMethodName(methodIdx)+clazz.getMethodSignature(methodIdx);  // NOI18N
-            MiscUtils.printWarningMessage("Method "+methodFQN+" is too big to be fully instrumented.");  // NOI18N
         }
-
         if (nInjections == 0) {
             ((DynamicClassInfo) clazz).unsetMethodInstrumented(methodIdx);
         } else {
@@ -213,6 +239,23 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
         }
 
         return createPackedMethodInfo();
+    }
+
+    private static String getMultiArrayClassName(String refClassName) {
+        int dimension = refClassName.lastIndexOf('[');
+        String baseClass = refClassName.substring(dimension+1);
+
+        if (VMUtils.isVMPrimitiveType(baseClass)) {
+            return StringUtils.userFormClassName(refClassName);
+        } else {
+            StringBuilder arrayClass = new StringBuilder(refClassName.length()+dimension+1);
+            arrayClass.append(refClassName.substring(dimension+1));
+            
+            for (int i = 0; i <= dimension; i++) {
+                arrayClass.append("[]");        // NOI18N
+            }
+            return arrayClass.toString();
+        }
     }
 
     private static void initializeInjectedCode() {
@@ -253,6 +296,18 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
         putU2(injectedCode, injectedCodeClassIdPos, classId);
 
         injectCodeAndRewrite(injectedCode, injectedCodeLen, bci, false);
+        injectedCode[0] = (byte) opc_dup; // Restore dup
+    }
+
+    private void injectTraceObjAllocObjCtor(int bci) {
+        injectedCode[0] = (byte) opc_aload_0; // Insert aload_0
+        // Prepare the traceObjAlloc(Object obj, 0) code packet that is to be injected
+
+        int targetMethodIdx = CPExtensionsRepository.memoryProfContents_TraceObjAllocMethodIdx + baseCPoolCount;
+        putU2(injectedCode, injectedCodeMethodIdxPos, targetMethodIdx);
+        putU2(injectedCode, injectedCodeClassIdPos, 0);
+
+        injectCodeAndRewrite(injectedCode, injectedCodeLen, bci, true);
         injectedCode[0] = (byte) opc_dup; // Restore dup
     }
 

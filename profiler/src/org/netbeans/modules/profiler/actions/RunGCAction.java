@@ -77,7 +77,7 @@ public final class RunGCAction extends ProfilingAwareAction {
     
     @ActionID(id = "org.netbeans.modules.profiler.actions.RunGCAction", category = "Profile")
     @ActionRegistration(displayName = "#LBL_RunGCAction", lazy=false)
-    @ActionReference(path = "Menu/Profile", position = 1000, separatorAfter=1100)    
+    @ActionReference(path = "Menu/Profile", position = 700, separatorAfter=800)    
     public static RunGCAction getInstance() {
         return Singleton.INSTANCE;
     }

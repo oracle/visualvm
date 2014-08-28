@@ -116,17 +116,17 @@ public final class ThreadsWindow extends ProfilerTopComponent implements ActionL
         setFocusable(true);
         setRequestFocusEnabled(true);
 
-        Profiler.getDefault().addProfilingStateListener(new ProfilingStateAdapter(){
-            @Override
-            public void profilingStateChanged(final ProfilingStateEvent e) {
-                ThreadsWindow.this.profilingStateChanged(e.getNewState());
-            }
-
-            @Override
-            public void threadsMonitoringChanged() {
-                updateThreadsView();
-            }
-        });
+//        Profiler.getDefault().addProfilingStateListener(new ProfilingStateAdapter(){
+//            @Override
+//            public void profilingStateChanged(final ProfilingStateEvent e) {
+//                ThreadsWindow.this.profilingStateChanged(e.getNewState());
+//            }
+//
+//            @Override
+//            public void threadsMonitoringChanged() {
+//                updateThreadsView();
+//            }
+//        });
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

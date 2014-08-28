@@ -147,7 +147,7 @@ public interface GraphsUI {
 
     // --- VM Telemetry graphs -------------------------------------------------
 
-    public static final float  HEAP_SIZE_PAINTER_LINE_WIDTH = 0f;
+    public static final float  HEAP_SIZE_PAINTER_LINE_WIDTH = 3f;
     public static final Color  HEAP_SIZE_PAINTER_LINE_COLOR = null;
     public static final Color  HEAP_SIZE_PAINTER_FILL_COLOR = PROFILER_RED;
     public static final int    HEAP_SIZE_MARKER_RADIUS = 5;
@@ -158,7 +158,7 @@ public interface GraphsUI {
     public static final Color  HEAP_SIZE_MARKER_FILL_COLOR = PROFILER_RED;
     public static final long   HEAP_SIZE_INITIAL_VALUE = 5177344l;
 
-    public static final float  USED_HEAP_PAINTER_LINE_WIDTH = 0f;
+    public static final float  USED_HEAP_PAINTER_LINE_WIDTH = 3f;
     public static final Color  USED_HEAP_PAINTER_LINE_COLOR = null;
     public static final Color  USED_HEAP_PAINTER_FILL_COLOR = PROFILER_BLUE;
     public static final int    USED_HEAP_MARKER_RADIUS = 5;

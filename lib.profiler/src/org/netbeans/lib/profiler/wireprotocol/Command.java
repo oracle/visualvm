@@ -104,6 +104,7 @@ public class Command {
     public static final int STILL_ALIVE = 43;
     public static final int PREPARE_DETACH = 44;
     public static final int GET_HEAP_HISTOGRAM = 45;
+    public static final int TAKE_THREAD_DUMP = 46;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -217,6 +218,8 @@ public class Command {
                 return "PREPARE_DETACH"; // NOI18N
             case GET_HEAP_HISTOGRAM:
                 return "GET_HEAP_HISTOGRAM"; // NOI18N
+            case TAKE_THREAD_DUMP:
+                return "TAKE_THREAD_DUMP"; // NOI18N
         }
 
         return "Unknown command"; // NOI18N

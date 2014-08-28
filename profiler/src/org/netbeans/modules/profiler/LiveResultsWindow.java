@@ -159,7 +159,7 @@ public final class LiveResultsWindow extends ProfilerTopComponent
      * The enclosing instance will use the FQN registration to obtain the shared instance
      * of the listener implementation and inject itself as a delegate into the listener.
      */
-    @ServiceProvider(service=ResultsListener.class)
+//    @ServiceProvider(service=ResultsListener.class)
     public static class Listener extends Delegate<LiveResultsWindow> implements ResultsListener {
 
         private boolean callResultsAvailable;
@@ -248,7 +248,7 @@ public final class LiveResultsWindow extends ProfilerTopComponent
         }
     }
     
-    @ServiceProviders({@ServiceProvider(service=CPUCCTProvider.Listener.class), @ServiceProvider(service=MemoryCCTProvider.Listener.class)})
+//    @ServiceProviders({@ServiceProvider(service=CPUCCTProvider.Listener.class), @ServiceProvider(service=MemoryCCTProvider.Listener.class)})
     public static final class ResultsMonitor implements CPUCCTProvider.Listener, MemoryCCTProvider.Listener {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
@@ -520,13 +520,13 @@ public final class LiveResultsWindow extends ProfilerTopComponent
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public LiveResultsWindow() {
-        CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
-            public void run() {
-                initUI();
-                listener = Lookup.getDefault().lookup(Listener.class);
-                listener.setDelegate(LiveResultsWindow.this);
-            }
-        });
+//        CommonUtils.runInEventDispatchThreadAndWait(new Runnable() {
+//            public void run() {
+//                initUI();
+//                listener = Lookup.getDefault().lookup(Listener.class);
+//                listener.setDelegate(LiveResultsWindow.this);
+//            }
+//        });
     }
     
     private void initUI() {
@@ -599,28 +599,28 @@ public final class LiveResultsWindow extends ProfilerTopComponent
         setFocusable(true);
         setRequestFocusEnabled(true);
 
-        Profiler.getDefault().addProfilingStateListener(new ProfilingStateAdapter() {
-            @Override
-            public void instrumentationChanged(int oldInstrType, int currentInstrType) {
-                requestProfilingDataUpdate(false);
-            }
-
-            @Override
-            public void profilingStateChanged(ProfilingStateEvent e) {
-                updateActions(e.getNewState());
-
-                switch (e.getNewState()) {
-                    case Profiler.PROFILING_INACTIVE:
-                        handleShutdown();
-
-                        break;
-                    case Profiler.PROFILING_RUNNING:
-                        handleStartup();
-
-                        break;
-                }
-            }
-        });
+//        Profiler.getDefault().addProfilingStateListener(new ProfilingStateAdapter() {
+//            @Override
+//            public void instrumentationChanged(int oldInstrType, int currentInstrType) {
+//                requestProfilingDataUpdate(false);
+//            }
+//
+//            @Override
+//            public void profilingStateChanged(ProfilingStateEvent e) {
+//                updateActions(e.getNewState());
+//
+//                switch (e.getNewState()) {
+//                    case Profiler.PROFILING_INACTIVE:
+//                        handleShutdown();
+//
+//                        break;
+//                    case Profiler.PROFILING_RUNNING:
+//                        handleStartup();
+//
+//                        break;
+//                }
+//            }
+//        });
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -851,22 +851,22 @@ public final class LiveResultsWindow extends ProfilerTopComponent
     /**
      * Called when the topcomponent has been just open
      */
-    protected void componentOpened() {
-        super.componentOpened();
-
-        //    Profiler.getDefault().addProfilingStateListener(this);
-    }
-
-    protected void componentShowing() {
-        super.componentShowing();
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                updateResultsDisplay();
-            }
-        });
-    }
+//    protected void componentOpened() {
+//        super.componentOpened();
+//
+//        //    Profiler.getDefault().addProfilingStateListener(this);
+//    }
+//
+//    protected void componentShowing() {
+//        super.componentShowing();
+//        SwingUtilities.invokeLater(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                updateResultsDisplay();
+//            }
+//        });
+//    }
 
     /**
      * Subclasses are encouraged to override this method to provide preferred value

@@ -93,7 +93,8 @@ class ProfilerTableHover {
     private final ProfilerTable table;
     
     private Popup popup;
-    private Rectangle popupRect;
+    private Point popupLocation; // topleft popup corner, table coords
+    private Rectangle popupRect; // visible cell rect, screeen coords
     
     private AWT awt;
     private Mouse mouse;
@@ -112,7 +113,6 @@ class ProfilerTableHover {
         mouse.install();
     }
     
-    
     private void showPopup(Painter p, Rectangle rect) {
         mouse.deinstall();
         
@@ -120,9 +120,10 @@ class ProfilerTableHover {
         
         rect.translate(l.x, l.y);
         popupRect = rect;
+        popupLocation = new Point(l.x + p.getX(), l.y + p.getY());
         
         PopupFactory popupFactory = PopupFactory.getSharedInstance();
-        popup = popupFactory.getPopup(table, p, l.x + p.getX(), l.y + p.getY());
+        popup = popupFactory.getPopup(table, p, popupLocation.x, popupLocation.y);
         popup.show();
         
         paranoid = new Paranoid(p);
@@ -145,6 +146,7 @@ class ProfilerTableHover {
         
         popup.hide();
         popupRect = null;
+        popupLocation = null;
         popup = null;
         
         // Make sure lightweight popups are cleared correctly when mouse-wheeling
@@ -205,9 +207,9 @@ class ProfilerTableHover {
                 hidePopup();
             } else if (isForwardEvent(me)) {
                 // Mouse event on popup, to be forwarded to table
-                Rectangle lastPopupRect = popupRect;
+                Point popupPoint = popupLocation;
                 hidePopup();
-                forwardEvent(me, lastPopupRect);
+                forwardEvent(me, popupPoint);
             }
         }
         
@@ -231,9 +233,9 @@ class ProfilerTableHover {
                    eventID == MouseEvent.MOUSE_WHEEL;
         }
         
-        private void forwardEvent(MouseEvent e, Rectangle lastPopupRect) {
+        private void forwardEvent(MouseEvent e, Point popupPoint) {
             Point p = e.getPoint();
-            p.translate(lastPopupRect.x, lastPopupRect.y);
+            p.translate(popupPoint.x, popupPoint.y);
             SwingUtilities.convertPointFromScreen(p, table);
             forwardPoint = new Point(p.x - 1, p.y - 1);
             
@@ -388,6 +390,8 @@ class ProfilerTableHover {
         }
         
         boolean valueChanged() {
+            if (table.getRowCount() <= row) return true;
+            if (table.getColumnCount() <= column) return true;
             Object v = table.getValueAt(row, column);
             if (v == null && value == null) return false;
             if (v != null && value != null) return !v.equals(value);

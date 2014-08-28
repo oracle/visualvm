@@ -68,6 +68,11 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     static class MethodScanerForNewOpcodes extends SingleMethodScaner {
+        
+        MethodScanerForNewOpcodes(ClassInfo clazz, int methodIdx) {
+            super(clazz, methodIdx);
+        }
+        
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         boolean hasNewArrayOpcodes(MemoryProfMethodInstrumentor minstr, boolean checkForOpcNew) {
@@ -124,7 +129,6 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     protected ArrayList instrClasses = new ArrayList();
-    MethodScanerForNewOpcodes msfno;
     protected String[] instantiatableClasses;
     protected int injType;
     protected int instrClassId;
@@ -139,7 +143,6 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
         this.status = status;
         instantiatableClasses = new String[100];
         this.injType = injType;
-        msfno = new MethodScanerForNewOpcodes();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -153,10 +156,6 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
         storeClassFileBytesForCustomLoaderClasses(loadedClasses, loadedClassLoaderIds, cachedClassFileBytes);
 
         for (int i = 0; i < loadedClasses.length; i++) {
-            if (loadedClasses[i].equals("java.lang.Object")) { // NOI18N
-                continue;
-            }
-
             findAndMarkMethodsToInstrumentInClass(loadedClasses[i], loadedClassLoaderIds[i]);
         }
 
@@ -239,7 +238,7 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
     }
 
     protected boolean hasNewOpcodes(ClassInfo clazz, int methodIdx, boolean checkForOpcNew) {
-        msfno.setClassAndMethod(clazz, methodIdx);
+        MethodScanerForNewOpcodes msfno = new MethodScanerForNewOpcodes(clazz, methodIdx);
 
         return msfno.hasNewArrayOpcodes(this, checkForOpcNew);
     }

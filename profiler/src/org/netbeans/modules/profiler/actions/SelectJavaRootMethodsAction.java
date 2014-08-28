@@ -56,9 +56,9 @@ import org.openide.util.NbBundle;
 @NbBundle.Messages({
     "LBL_SelectRootMethodsAction1=Select Profiling Root Methods..."
 })
-@ActionID(id = "org.netbeans.modules.profiler.actions.SelectJavaRootMethodsAction", category = "Profile")
-@ActionRegistration(displayName = "#LBL_SelectRootMethodsAction1")
-@ActionReference(path = "Editors/text/x-java/Popup/Profiling", name = "org-netbeans-modules-profiler-actions-SelectRootMethodsAction", position = 200)
+//@ActionID(id = "org.netbeans.modules.profiler.actions.SelectJavaRootMethodsAction", category = "Profile")
+//@ActionRegistration(displayName = "#LBL_SelectRootMethodsAction1")
+//@ActionReference(path = "Editors/text/x-java/Popup/Profile", name = "org-netbeans-modules-profiler-actions-SelectRootMethodsAction", position = 200)
 final public class SelectJavaRootMethodsAction extends BaseSelectRootMethodsAction {
 
     @Override

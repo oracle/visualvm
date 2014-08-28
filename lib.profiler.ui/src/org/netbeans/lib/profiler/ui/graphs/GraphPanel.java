@@ -140,6 +140,9 @@ public abstract class GraphPanel extends JPanel {
         } else {
             chart = new ProfilerXYChart(itemsModel, paintersModel);
         }
+        
+        chart.addPreDecorator(new XYBackground());
+        chart.setFitsWidth(true);
 
         chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_EACH_NEAREST);
         return chart;
