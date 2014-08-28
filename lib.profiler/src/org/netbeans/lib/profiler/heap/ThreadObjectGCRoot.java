@@ -45,7 +45,7 @@ package org.netbeans.lib.profiler.heap;
 
 
 /**
- * This represents one Thred Object GC root. It has kind ({@link GCRoot#THREAD_OBJECT}) and also corresponding
+ * This represents one Thread Object GC root. It has kind ({@link GCRoot#THREAD_OBJECT}) and also corresponding
  * {@link Instance}, which is actual GC root.
  * @author Tomas Hurka
  */

@@ -483,7 +483,7 @@ public class OQLEngineTest {
         instance.executeQuery("select sizeof(o) from [I o", new ObjectVisitor() {
 
             public boolean visit(Object o) {
-                if (o instanceof Integer) counter[0]++;
+                if (o instanceof Number) counter[0]++;
                 return false;
             }
         });

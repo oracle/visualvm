@@ -160,8 +160,8 @@ public class TimelineMarksComputer extends AxisMarksComputer.Abstract {
                                        dataStart + iterIndex[0] * step;
                 iterIndex[0]++;
                 int position = horizontal ?
-                               Utils.checkedInt(context.getViewX(value)) :
-                               Utils.checkedInt(context.getViewY(value));
+                               Utils.checkedInt(Math.ceil(context.getViewX(value))) :
+                               Utils.checkedInt(Math.ceil(context.getViewY(value)));
                 return new TimeMark(value, position, format);
             }
 

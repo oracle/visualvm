@@ -66,7 +66,7 @@ public class HashMapHistogram extends IteratingRule {
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
-        HashmapEntry(int size, int hmeCount, int strCount) {
+        HashmapEntry(long size, int hmeCount, int strCount) {
             super(size);
             this.hmeCount = hmeCount;
             this.strCount = strCount;
@@ -148,14 +148,14 @@ public class HashMapHistogram extends IteratingRule {
         return true;
     }
 
-    private int sizeIfNewString(Instance obj) {
+    private long sizeIfNewString(Instance obj) {
         if (obj == null) {
             return 0;
         }
 
         if ("java.lang.String".equals(obj.getJavaClass().getName())) { // NOI18N
             if (add(obj)) {
-                int sz = obj.getSize();
+                long sz = obj.getSize();
                 Instance arr = fldSValue.getRefValue(obj);
 
                 if ((arr != null) && add(arr)) {
@@ -171,7 +171,7 @@ public class HashMapHistogram extends IteratingRule {
 
     private HashmapEntry sizeOfHashmap(Instance hm) {
         ObjectArrayInstance table = (ObjectArrayInstance) fldHMTable.getRefValue(hm);
-        int sum = hm.getSize() + table.getSize();
+        long sum = hm.getSize() + table.getSize();
         int hmeCount = 0;
         int strCount = 0;
 
@@ -182,7 +182,7 @@ public class HashMapHistogram extends IteratingRule {
                 hmeCount++;
                 sum += entry.getSize(); // size of entry
 
-                int sz = sizeIfNewString(fldHMEKey.getRefValue(entry));
+                long sz = sizeIfNewString(fldHMEKey.getRefValue(entry));
 
                 if (sz != 0) {
                     strCount++;

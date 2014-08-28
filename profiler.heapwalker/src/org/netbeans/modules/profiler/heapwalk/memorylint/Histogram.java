@@ -66,7 +66,7 @@ public final class Histogram<T extends Histogram.Entry> {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         private int count;
-        private int size;
+        private long size;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ public final class Histogram<T extends Histogram.Entry> {
          * Creates an entry with given size and count=1
          * @param size the size this entry represent.
          */
-        public Entry(int size) {
+        public Entry(long size) {
             this.count = 1;
             this.size = size;
         }
@@ -85,7 +85,7 @@ public final class Histogram<T extends Histogram.Entry> {
             return count;
         }
 
-        public final int getSize() {
+        public final long getSize() {
             return size;
         }
 
@@ -136,7 +136,7 @@ public final class Histogram<T extends Histogram.Entry> {
     public static final Comparator<Entry> sortBySize() {
         return new Comparator<Entry>() {
                 public int compare(Entry o1, Entry o2) {
-                    return o2.size - o1.size;
+                    return Long.compare(o2.size,o1.size);
                 }
             };
     }
@@ -172,12 +172,12 @@ public final class Histogram<T extends Histogram.Entry> {
 
     public String toString(int treshold) {
         StringBuilder result = new StringBuilder();
-        int totalSize = 0;
+        long totalSize = 0;
         int totalCount = 0;
         SortedMap<String, T> bySize = getResults(sortBySize());
 
         for (Map.Entry<String, T> entry : bySize.entrySet()) {
-            int size = entry.getValue().getSize();
+            long size = entry.getValue().getSize();
 
             if (size > treshold) {
                 result.append(entry.getKey()).append(": ").append(entry.getValue()).append("<br>"); // NOI18N

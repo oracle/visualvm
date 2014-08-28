@@ -43,20 +43,21 @@
 
 package org.netbeans.lib.profiler.server;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.text.MessageFormat;
+import java.util.LinkedHashMap;
+import java.util.ResourceBundle;
+import java.util.WeakHashMap;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.global.TransactionalSupport;
 import org.netbeans.lib.profiler.server.system.*;
 import org.netbeans.lib.profiler.wireprotocol.*;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.text.MessageFormat;
-import java.util.LinkedHashMap;
-import java.util.ResourceBundle;
-import java.util.WeakHashMap;
 
 
 /**
@@ -294,7 +295,6 @@ public class ProfilerInterface implements CommonConstants {
     private static ProfilerServer profilerServer;
     private static ProfilingSessionStatus status;
     private static EventBufferManager evBufManager;
-    private static ClassLoader scl;
     private static Class[] loadedClassesArray; // Temporary array, used to send all loaded class names to client
                                                // on instrumentation initiation.
     private static int[] loadedClassesLoaders; // Ditto, for loaders
@@ -377,8 +377,9 @@ public class ProfilerInterface implements CommonConstants {
     }
 
     public static MethodNamesResponse getMethodNamesForJMethodIds(int[] methodIds) {
+        final int PACKEDARR_ITEMS = 4; // must match PACKEDARR_ITEMS in Stacks.c
         int nMethods = methodIds.length;
-        int len = nMethods * 3;
+        int len = nMethods * PACKEDARR_ITEMS;
         packedArrayOffsets = new int[len];
 
         byte[] packedData = Stacks.getMethodNamesForJMethodIds(nMethods, methodIds, packedArrayOffsets);
@@ -516,8 +517,7 @@ public class ProfilerInterface implements CommonConstants {
         Threads.initialize();
         HeapDump.initialize(Platform.getJDKVersionNumber() == Platform.JDK_15);
         ClassLoaderManager.initialize(profilerServer);
-        scl = ClassLoader.getSystemClassLoader();
-        ClassLoaderManager.addLoader(scl);
+        ClassLoaderManager.addLoader(ClassLoader.getSystemClassLoader());
         reflectMethods = new WeakHashMap();
 
         evBufManager = new EventBufferManager(profilerServer);
@@ -966,23 +966,7 @@ public class ProfilerInterface implements CommonConstants {
                             resumeTimer = true; // resume blackout period at the end
                         }
 
-                        // Get cached class file bytes if they are available, i.e. if the class is loaded by a custom classloader
-                        // If remote profiling is used, get these class file bytes from system classpath
-                        // classLoaderId = 0 means that it is a system or bootstrap classloader
-                        byte[] classFileBytes = null;
-                        if (classLoaderId > 0) {
-                            classFileBytes = Classes.getCachedClassFileBytes(clazz);
-                            if (classFileBytes == null) {
-                                if (DEBUG) {
-                                    System.err.println("Cannot get classbytes for "+clazz.getName()+" loader "+classLoaderId);
-                                }
-                                cacheLoadedClass(clazz);
-                                classFileBytes = getCachedClassFileBytes(clazz);
-                            }
-                        } else if (status.remoteProfiling) {
-                            classFileBytes = ClassBytesLoader.getClassFileBytes(className);
-                        }
-
+                        byte[] classFileBytes = getClassFileBytes(clazz, classLoaderId);
                         // send request to tool to instrument the bytecode
                         ClassLoadedCommand cmd = new ClassLoadedCommand(className,
                                                                         ClassLoaderManager.getThisAndParentLoaderData(classLoaderId),
@@ -1096,6 +1080,8 @@ public class ProfilerInterface implements CommonConstants {
     }
 
     private static int firstTimeVMObjectAlloc(String className, int classLoaderId) {
+        GetClassIdResponse resp;
+
         if (internalClassName(className)) {
             return -1;
         }
@@ -1110,17 +1096,20 @@ public class ProfilerInterface implements CommonConstants {
 
             GetClassIdCommand cmd = new GetClassIdCommand(className, classLoaderId);
             profilerServer.sendComplexCmdToClient(cmd);
-
-            GetClassIdResponse resp = (GetClassIdResponse) profilerServer.getLastResponse();
-
-            if (resp.isOK()) {
-                return resp.getClassId();
-            }
-
-            return -1;
-        } finally {
+            resp = (GetClassIdResponse) profilerServer.getLastResponse();
+        }  finally {
             serialClientOperationsLock.endTrans();
         }
+        if (resp.isOK()) {
+            int classId = resp.getClassId();
+            int instrClasses = classId+1;
+            if (instrClasses > status.getNInstrClasses()) {
+                status.updateAllocatedInstancesCountInfoInServer(instrClasses);
+                ProfilerRuntimeMemory.setAllocatedInstancesCountArray(status.getAllocatedInstancesCount());
+            }
+            return classId;
+        }
+        return -1;
     }
 
     private static void handleFakeInitRecursiveInstrumentationCommand() {
@@ -1180,7 +1169,8 @@ public class ProfilerInterface implements CommonConstants {
                             // to server
                             if (instrClassLoaders[i] == 0) {
                                 b[k] = ClassBytesLoader.getClassFileBytes(instrClassNames[i]);
-                            } else {
+                            }
+                            if (b[k] == null) {
                                 b[k] = getCachedClassFileBytes(clazzes[k]);
                             }
                         }
@@ -1296,6 +1286,8 @@ public class ProfilerInterface implements CommonConstants {
                                                      // we try to profile PetStore with eager instrumentation scheme on Sun ONE AS 7. This makes the problem go away,
                                                      // but its root cause is still unclear to me.
                || name.equals("com.sun.enterprise.J2EESecurityManager") // NOI18N
+               // do not instrument classes created by Unsafe.defineAnonymousClass() 
+               || name.contains("/") // NOI18N   
         );
     }
 
@@ -1384,6 +1376,35 @@ public class ProfilerInterface implements CommonConstants {
         Classes.cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
     }
 
+    /* Get class file bytes if they are available, i.e. if the class is loaded by a custom classloader
+    * If remote profiling is used, get these class file bytes from system classpath
+    * classLoaderId = 0 means that it is a system or bootstrap classloader
+    */
+    private static byte[] getClassFileBytes(Class clazz, int classLoaderId) {
+        byte[] classFileBytes = null;
+        URL classURL = null;
+        
+        if (classLoaderId > 0 || (classURL = ClassBytesLoader.getClassFileURL(clazz.getName())) == null) {
+            classFileBytes = Classes.getCachedClassFileBytes(clazz);
+            if (classFileBytes == null) {
+                if (DEBUG) {
+                    System.err.println("Cannot get classbytes for "+clazz.getName()+" loader "+classLoaderId);
+                }
+                cacheLoadedClass(clazz);
+                classFileBytes = getCachedClassFileBytes(clazz);
+                if (classFileBytes == null) {
+                    if (Platform.getJDKVersionNumber() != Platform.JDK_CVM) {
+                        System.err.println("***Profiler agent warning: could not get .class file for a synthetic class " + clazz.getName()
+                                           + " in ProfilerInterface.getClassFileBytes"); // NOI18N
+                    }
+                }
+            }
+        } else if (status.remoteProfiling) {
+            classFileBytes = ClassBytesLoader.getClassFileBytes(classURL);
+        }
+        return classFileBytes;
+    }
+    
     private static void sendRootClassLoadedCommand(boolean doGetLoadedClasses) {
         if (doGetLoadedClasses) {
             getLoadedClasses(); // Otherwise we know loadedClassesArray has already been initialized
@@ -1404,13 +1425,7 @@ public class ProfilerInterface implements CommonConstants {
 
             loadedClassNames[idx] = name;
             loaders[idx] = loadedClassesLoaders[i];
-
-            if (loaders[idx] > 0) {
-                cachedClassFileBytes[idx] = getCachedClassFileBytes(loadedClassesArray[i]);
-            } else if (status.remoteProfiling) { // When we profile remotely, we need to send all available classes to the tool
-                cachedClassFileBytes[idx] = ClassBytesLoader.getClassFileBytes(loadedClassesArray[i].getName());
-            }
-
+            cachedClassFileBytes[idx] = getClassFileBytes(loadedClassesArray[i], loaders[idx]);
             idx++;
         }
         RootClassLoadedCommand cmd = new RootClassLoadedCommand(loadedClassNames, loaders, cachedClassFileBytes, idx,
@@ -1442,9 +1457,5 @@ public class ProfilerInterface implements CommonConstants {
         } finally {
             status.endTrans();
         }
-    }
-    
-    public static ClassLoader getSystemClassLoader() {
-        return scl;
     }
 }

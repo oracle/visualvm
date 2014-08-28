@@ -104,7 +104,7 @@ public interface Instance {
      */
     Instance getNearestGCRootPointer();
 
-    int getReachableSize();
+    long getReachableSize();
 
     /**
      * returns the list of references to this instance. The references can be of two kinds.
@@ -115,7 +115,7 @@ public interface Instance {
      */
     List /*<Value>*/ getReferences();
 
-    int getRetainedSize();
+    long getRetainedSize();
 
     /**
      * returns the size of the {@link Instance} in bytes. If the instance is not
@@ -125,7 +125,7 @@ public interface Instance {
      * Speed: fast
      * @return size of this {@link Instance}
      */
-    int getSize();
+    long getSize();
 
     /**
      * returns the list of static field values.
@@ -144,10 +144,10 @@ public interface Instance {
      * <br>
      * Speed: normal
      * @param name the name of the field
-     * @return @return the value for the specified static field in this class.
+     * @return the value for the specified static field in this class.
      * If a field with the specified name is not found <CODE>null</CODE> is returned.
      * If the field.getType() is {@link Type} object {@link Instance} is returned as a field value,
-     * for primitive types its corresponding object wapper (Boolean, Integer, Float, etc.) is returned.
+     * for primitive types its corresponding object wrapper (Boolean, Integer, Float, etc.) is returned.
      */
     Object getValueOfField(String name);
 }
