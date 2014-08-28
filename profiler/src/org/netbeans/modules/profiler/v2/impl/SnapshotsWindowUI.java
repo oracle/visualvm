@@ -123,7 +123,10 @@ public final class SnapshotsWindowUI extends TopComponent {
     // --- Internal API --------------------------------------------------------
     
     public void refreshFolder(FileObject folder, boolean fullRefresh) {
-        if (Objects.equals(folder, currentFolder)) {
+        // Converting to Files as comparing FileObjects doesn't work for global storage
+        File f1 = folder == null ? null : FileUtil.toFile(folder);
+        File f2 = currentFolder == null ? null : FileUtil.toFile(currentFolder);
+        if (Objects.equals(f1, f2)) {
             if (fullRefresh) refreshSnapshots();
             else repaintSnapshots();
         }
