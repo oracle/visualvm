@@ -43,9 +43,6 @@
 
 package org.netbeans.lib.profiler.server;
 
-import org.netbeans.lib.profiler.server.system.Timers;
-
-
 /**
  * This class contains the actual methods for full instrumentation recursive CPU profiling, calls to which are injected
  * into the target application (TA) bytecodes when they are instrumented.
@@ -101,21 +98,23 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
             ti.inCallGraph = true;
         }
 
-        // when methodId > 64K/2 is passed here using our instrumentation's sipush command at the call site, 
-        // it's treated here as a signed integer. Thus without
-        // the below fix we can get e.g. an ArrayIndexOutOfBoundsException(-32768) when methodId == 32768 (***)
-        int methodIdInt = methodId&0xff;
-        methodIdInt |= methodId&0xff00;
-            
-        if (!instrMethodInvoked[methodIdInt]) {
-            instrMethodInvoked[methodIdInt] = true; // Mark this method as invoked
-            if (ti.rootMethodStackDepth > 0) { // marker method under root method - perform instrumentation of nearest callees
-                firstTimeMethodInvoke(ti, methodId);
-            }
-        }
+        if (ti.stackDepth <= stackDepthLimit) {
+            // when methodId > 64K/2 is passed here using our instrumentation's sipush command at the call site, 
+            // it's treated here as a signed integer. Thus without
+            // the below fix we can get e.g. an ArrayIndexOutOfBoundsException(-32768) when methodId == 32768 (***)
+            int methodIdInt = methodId&0xff;
+            methodIdInt |= methodId&0xff00;
 
+            if (!instrMethodInvoked[methodIdInt]) {
+                instrMethodInvoked[methodIdInt] = true; // Mark this method as invoked
+                if (ti.rootMethodStackDepth > 0) { // marker method under root method - perform instrumentation of nearest callees
+                    firstTimeMethodInvoke(ti, methodId);
+                }
+            }
+
+            writeTimeStampedEvent(MARKER_ENTRY, ti, methodId);
+        }
         ti.stackDepth++; //= 1;  // This is the logical stack depth
-        writeTimeStampedEvent(MARKER_ENTRY, ti, methodId);
         ti.inProfilingRuntimeMethod--;
     }
 
@@ -141,8 +140,9 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
             if (ti.stackDepth < 1) {
                 ti.inCallGraph = false; // We are exiting the marker method of our call subgraph
             }
-
-            writeTimeStampedEvent(MARKER_EXIT, ti, methodId);
+            if (ti.stackDepth <= stackDepthLimit) {
+                writeTimeStampedEvent(MARKER_EXIT, ti, methodId);
+            }
             ti.inProfilingRuntimeMethod--;
         }
     }
@@ -163,19 +163,20 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
             ti.inProfilingRuntimeMethod++;
             //System.out.println("++++++methodEntry, depth = " + ti.stackDepth + ", id = " + (int) methodId);
 
-            // See comment marked with (***)
-            int methodIdInt = methodId&0xff;
-            methodIdInt |= methodId&0xff00;
-            
-            // Now check if it's the first invocation of this method, and if so, perform instrumentation of nearest callees
-            if (!instrMethodInvoked[methodIdInt]) {
-                instrMethodInvoked[methodIdInt] = true; // Mark this method as invoked
-                firstTimeMethodInvoke(ti, methodId);
+            if (ti.stackDepth <= stackDepthLimit) {
+                // See comment marked with (***)
+                int methodIdInt = methodId&0xff;
+                methodIdInt |= methodId&0xff00;
+
+                // Now check if it's the first invocation of this method, and if so, perform instrumentation of nearest callees
+                if (!instrMethodInvoked[methodIdInt]) {
+                    instrMethodInvoked[methodIdInt] = true; // Mark this method as invoked
+                    firstTimeMethodInvoke(ti, methodId);
+                }
+
+                writeTimeStampedEvent(METHOD_ENTRY, ti, methodId);
             }
-
             ti.stackDepth++;
-            writeTimeStampedEvent(METHOD_ENTRY, ti, methodId);
-
             ti.inProfilingRuntimeMethod--;
         }
     }
@@ -208,7 +209,7 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
                 writeTimeStampedEvent(ROOT_EXIT, ti, methodId);
             } else if (ti.rootMethodStackDepth == 0) { // We are exiting the root method, which was under marker method
                 writeTimeStampedEvent(ROOT_EXIT, ti, methodId);
-            } else {
+            } else if (ti.stackDepth <= stackDepthLimit) {
                 writeTimeStampedEvent(METHOD_EXIT, ti, methodId);
             }
 

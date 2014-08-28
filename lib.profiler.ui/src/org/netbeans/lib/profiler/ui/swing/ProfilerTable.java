@@ -42,7 +42,6 @@
  */
 package org.netbeans.lib.profiler.ui.swing;
 
-import org.netbeans.lib.profiler.ui.swing.renderer.Movable;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -55,8 +54,8 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -75,15 +74,19 @@ import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -91,6 +94,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.swing.renderer.Movable;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -124,14 +128,27 @@ public class ProfilerTable extends JTable {
         if (sortable) setRowSorter(createRowSorter());
     }
     
+    public void createDefaultColumnsFromModel() {
+        TableModel m = getModel();
+        if (m != null) {
+            // Remove any current columns
+            ProfilerColumnModel cm = _getColumnModel();
+            while (cm.getColumnCount() > 0)
+                cm.removeColumn(cm.getColumn(0));
+
+            // Create new columns from the data model info
+            for (int i = 0; i < m.getColumnCount(); i++)
+                addColumn(cm.createTableColumn(i));
+        }
+    }
+    
     // --- UI tweaks -----------------------------------------------------------
     
     protected void setupAppearance() {
+        setAutoResizeMode(AUTO_RESIZE_NEXT_COLUMN);
         setRowSelectionAllowed(true);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         setGridColor(UIConstants.TABLE_VERTICAL_GRID_COLOR);
-        setSelectionBackground(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
-        setSelectionForeground(UIConstants.TABLE_SELECTION_FOREGROUND_COLOR);
         setShowHorizontalLines(UIConstants.SHOW_TABLE_HORIZONTAL_GRID);
         setShowVerticalLines(UIConstants.SHOW_TABLE_VERTICAL_GRID);
         setRowMargin(UIConstants.TABLE_ROW_MARGIN);
@@ -146,12 +163,6 @@ public class ProfilerTable extends JTable {
         getActionMap().put("DEFAULT_ACTION", new AbstractAction() { // NOI18N
                     public void actionPerformed(ActionEvent e) { performDefaultAction(); }
                 });
-        addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
-                    performDefaultAction();
-            }
-        });
         
         addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) { ProfilerTable.this.focusGained(); }
@@ -168,16 +179,16 @@ public class ProfilerTable extends JTable {
     }
     
     public void setDefaultRenderer(Class<?> columnClass, ProfilerRenderer renderer) {
-        super.setDefaultRenderer(columnClass, createCellRenderer(renderer));
+        super.setDefaultRenderer(columnClass, createTableCellRenderer(renderer));
     }
     
     public void setColumnRenderer(int column, ProfilerRenderer renderer) {
         int _column = convertColumnIndexToModel(column);
         TableColumn tColumn = getColumnModel().getColumn(_column);
-        tColumn.setCellRenderer(createCellRenderer(renderer));
+        tColumn.setCellRenderer(createTableCellRenderer(renderer));
     }
     
-    public static TableCellRenderer createCellRenderer(final ProfilerRenderer renderer) {
+    public static TableCellRenderer createTableCellRenderer(final ProfilerRenderer renderer) {
         return new TableCellRenderer() {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 renderer.setValue(value, table.convertRowIndexToModel(row));
@@ -213,6 +224,15 @@ public class ProfilerTable extends JTable {
         } else {
             return c;
         }
+    }
+    
+    public Component prepareEditor(TableCellEditor editor, int row, int column) {
+        Component c = super.prepareEditor(editor, row, column);
+        
+        c.setForeground(getSelectionForeground());
+        c.setBackground(getSelectionBackground());
+        
+        return c;
     }
     
     private ScrollableRenderer _renderer;
@@ -295,10 +315,6 @@ public class ProfilerTable extends JTable {
         return !isCustomRendering() && super.isFocusOwner();
     }
     
-    public boolean isCellEditable(int row, int column) {
-        return false;
-    }
-    
     public void setVisibleRows(int rows) {
         Dimension size = super.getPreferredScrollableViewportSize();
         size.height = rows * getRowHeight();
@@ -327,25 +343,60 @@ public class ProfilerTable extends JTable {
     
     private boolean shadeUnfocusedSelection = false;
     
+    private boolean internal;
+    private Object selection;
+    private ListSelectionListener selectionListener;
+    
+    public void setSelectionModel(ListSelectionModel newModel) {
+        ListSelectionModel oldModel = getSelectionModel();
+        if (oldModel != null && selectionListener != null)
+            oldModel.removeListSelectionListener(selectionListener);
+        
+        super.setSelectionModel(newModel);
+        
+        if (newModel != null) {
+            if (selectionListener == null) selectionListener = new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent e) { if (!internal) saveSelection(); }
+            };
+            newModel.addListSelectionListener(selectionListener);
+        }
+    }
+    
+    protected void saveSelection() {
+        selection = getSelectedValue(mainColumn);
+    }
+    
+    protected void restoreSelection() {
+        if (selection != null) selection = selectValue(selection, mainColumn, false);
+    }
+    
     public void selectRow(int row, boolean scrollToVisible) {
-        setRowSelectionInterval(row, row);
+        internal = true;
+        try { setRowSelectionInterval(row, row); }
+        finally { internal = false; }
         if (scrollToVisible) scrollRectToVisible(getCellRect(row, getSelectedColumn(), true));
     }
     
     public void selectColumn(int column, boolean scrollToVisible) {
-        setColumnSelectionInterval(column, column);
+        internal = true;
+        try { setColumnSelectionInterval(column, column); }
+        finally { internal = false; }
         if (scrollToVisible) scrollRectToVisible(getCellRect(getSelectedRow(), column, true));
     }
     
-    public void selectValue(Object value, int column, boolean scrollToVisible) {
-        if (value == null) return;
+    public Object selectValue(Object value, int column, boolean scrollToVisible) {
+        if (value == null) return null;
         
         int _column = convertColumnIndexToView(column);
-        for (int row = 0; row < getRowCount(); row++)
-            if (value.equals(getValueAt(row, _column))) {
+        for (int row = 0; row < getRowCount(); row++) {
+            Object _value = getValueAt(row, _column);
+            if (value.equals(_value)) {
                 selectRow(row, scrollToVisible);
-                break;
+                return _value;
             }
+        }
+        
+        return null;
     }
     
     public Object getSelectedValue(int column) {
@@ -356,9 +407,10 @@ public class ProfilerTable extends JTable {
     }
     
     public void tableChanged(TableModelEvent e) {
-        Object selected = getSelectedValue(mainColumn);
-        super.tableChanged(e);
-        if (selected != null) selectValue(selected, mainColumn, false);
+        internal = true;
+        try { super.tableChanged(e); }
+        finally { internal = false; }
+        restoreSelection();
     }
     
     public final void setShadeUnfocusedSelection(boolean shade) {
@@ -429,12 +481,14 @@ public class ProfilerTable extends JTable {
         return _getColumnModel().getColumnOffset(column);
     }
     
-    private void updateColumnsPreferredWidth() {
+    protected void updateColumnsPreferredWidth() {
+        if (scrolling || scrollableColumns == null || getRowCount() == 0) return;
+        
         Rectangle visible = getVisibleRect();
         if (visible.isEmpty()) return;
         
         Point visibleP = visible.getLocation();
-        int first = rowAtPoint(visible.getLocation());
+        int first = rowAtPoint(visibleP);
         visibleP.translate(0, visible.height - 1);
         int last = rowAtPoint(visibleP);
         
@@ -495,7 +549,10 @@ public class ProfilerTable extends JTable {
         } else {
             getModel().addTableModelListener(new TableModelListener() {
                 public void tableChanged(TableModelEvent e) {
-                    updateColumnsPreferredWidth();
+                    // Must invoke later, JTree.getRowCount() not ready yet
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() { updateColumnsPreferredWidth(); }
+                    });
                 }
             }); 
         }
@@ -520,13 +577,15 @@ public class ProfilerTable extends JTable {
         }
         
         return alignment == SwingConstants.LEADING ||
-               alignment == SwingConstants.LEFT;
+               alignment == SwingConstants.LEFT ||
+               alignment == SwingConstants.CENTER;
     }
     
     
     // --- Columns hiding & layout ---------------------------------------------
     
     private final boolean hideableColums;
+    private boolean scrolling;
     
     protected void configureEnclosingScrollPane() {
         super.configureEnclosingScrollPane();
@@ -541,7 +600,7 @@ public class ProfilerTable extends JTable {
             };
             HeaderComponent corner = !hideable ? new HeaderComponent(chooser) :
                                                  new HeaderComponent(chooser) {
-                private Icon icon = Icons.getIcon(GeneralIcons.SORT_DESCENDING);
+                private Icon icon = Icons.getIcon(GeneralIcons.POPUP_ARROW);
                 protected void paintComponent(Graphics g) {
                     super.paintComponent(g);
                     int x = (getWidth() - icon.getIconWidth()) / 2 - 1;
@@ -554,7 +613,8 @@ public class ProfilerTable extends JTable {
             if (scrollableColumns != null && !scrollableColumns.isEmpty())
                 scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
                     public void adjustmentValueChanged(AdjustmentEvent e) {
-                        if (!e.getValueIsAdjusting()) updateColumnsPreferredWidth();
+                        scrolling = e.getValueIsAdjusting();
+                        updateColumnsPreferredWidth();
                     }
                 });
         }
@@ -582,7 +642,7 @@ public class ProfilerTable extends JTable {
         for (final TableColumn c : columns)
             popup.add(new JCheckBoxMenuItem(c.getHeaderValue().toString(), c.getWidth() > 0) {
                 {
-                    setEnabled(c.getModelIndex() != 0);
+                    setEnabled(c.getModelIndex() != mainColumn);
 //                    setToolTipText(cModel.getColumnToolTip(c.getModelIndex()));
                 }
                 protected void fireActionPerformed(ActionEvent e) {
@@ -598,28 +658,42 @@ public class ProfilerTable extends JTable {
     
     public void doLayout() {
         ProfilerColumnModel cModel = _getColumnModel();
-        int toResizeIndex = cModel.getFitWidthColumn();
-        JTableHeader header = toResizeIndex != -1 ? getTableHeader() : null;
-        boolean resizing = header == null ? false : header.getResizingColumn() != null;
-        if (resizing || toResizeIndex == -1) {
-            super.doLayout();
-        } else {
-            Enumeration<TableColumn> columns = cModel.getColumns();
-            TableColumn toResizeColumn = null;
-            int columnsWidth = 0;
-            while (columns.hasMoreElements()) {
-                TableColumn column = columns.nextElement();
-                if (column.getModelIndex() == toResizeIndex) {
-                    if (!cModel.isColumnVisible(column)) {
-                        super.doLayout();
-                        return;
-                    }
-                    toResizeColumn = column;
-                } else {
-                    columnsWidth += column.getWidth();
-                }
+        TableColumn res = getTableHeader().getResizingColumn();
+        if (res != null) {
+            // Resizing column
+            int delta = getWidth() - cModel.getTotalColumnWidth();
+            TableColumn next = cModel.getNextVisibleColumn(res);
+            if (res == next) {
+                res.setWidth(res.getWidth() + delta);
+            } else {
+                next.setWidth(next.getWidth() + delta);
             }
-            if (toResizeColumn != null) toResizeColumn.setWidth(getWidth() - columnsWidth);
+        } else {
+            // Resizing table
+            int toResizeIndex = cModel.getFitWidthColumn();
+            if (toResizeIndex == -1) {
+                super.doLayout();
+            } else {
+                Enumeration<TableColumn> columns = cModel.getColumns();
+                TableColumn toResizeColumn = null;
+                int columnsWidth = 0;
+                while (columns.hasMoreElements()) {
+                    TableColumn column = columns.nextElement();
+                    if (column.getModelIndex() == toResizeIndex) {
+                        if (!cModel.isColumnVisible(column)) {
+                            super.doLayout();
+                            return;
+                        }
+                        toResizeColumn = column;
+                    } else {
+                        columnsWidth += column.getWidth();
+                    }
+                }
+                if (toResizeColumn != null) toResizeColumn.setWidth(getWidth() - columnsWidth);
+
+                // instead of super.doLayout()
+                layout();
+            }
         }
     }
     
@@ -636,7 +710,6 @@ public class ProfilerTable extends JTable {
     protected TableRowSorter createRowSorter() {
         ProfilerRowSorter s = new ProfilerRowSorter(getModel());
         s.setDefaultSortOrder(SortOrder.DESCENDING);
-        s.setDefaultSortOrder(0, SortOrder.ASCENDING);
         s.setSortColumn(0);
         return s;
     }
@@ -656,6 +729,16 @@ public class ProfilerTable extends JTable {
         if (isSortable()) _getRowSorter().setDefaultSortOrder(column, sortOrder);
     }
     
+    // --- Row filter ----------------------------------------------------------
+    
+    public void setRowFilter(RowFilter filter) {
+        _getRowSorter().setRowFilter(filter);
+    }
+    
+    public RowFilter getRowFilter() {
+        return _getRowSorter().getRowFilter();
+    }
+    
     // --- Default action ------------------------------------------------------
     
     private Action defaultAction;
@@ -666,6 +749,128 @@ public class ProfilerTable extends JTable {
     
     public void performDefaultAction() {
         if (defaultAction != null) defaultAction.actionPerformed(null);
+    }
+    
+    // --- Popup menu ----------------------------------------------------------
+    
+    private long pressedWhen;
+    private Point pressedPoint;
+    private boolean providesPopupMenu;
+    
+    public final void providePopupMenu(boolean provide) {
+        providesPopupMenu = provide;
+    }
+    
+    public final boolean providesPopupMenu() {
+        return providesPopupMenu;
+    }
+    
+    protected void populatePopup(JPopupMenu popup, Object value) {
+        // Implementation here
+    }
+    
+    protected void popupShowing() {}
+    
+    protected void popupHidden() {}
+    
+    protected Object getValueForPopup(int row) {
+        if (row == -1) return null;
+        if (row >= getModel().getRowCount()) return null; // #239936
+        return getValueAt(row, convertColumnIndexToView(mainColumn));
+    }
+    
+    protected void processMouseEvent(MouseEvent e) {
+        // --- Resolve CellTips/MouseEvent incompatibilities -------------------
+        //     TBD: doesn't work for heavyweight popups (RELEASED / CLICKED)
+        MouseEvent generatedClick = null;
+        if (e.getID() == MouseEvent.MOUSE_PRESSED) {
+            pressedWhen = e.getWhen();
+            pressedPoint = null;
+        } else if (e.getID() == MouseEvent.MOUSE_RELEASED) {
+            if (e.getWhen() - pressedWhen == 1) {
+                // #241878 dispatch MOUSE_RELEASED after forwarding MOUSE_PRESSED
+                pressedPoint = e.getPoint();
+                super.processMouseEvent(e);
+                return;
+            } else if (e.getPoint().equals(pressedPoint)) {
+                pressedPoint = null;
+                generatedClick = new MouseEvent(e.getComponent(), MouseEvent.MOUSE_CLICKED,
+                                                e.getWhen() + 1, e.getModifiers(),
+                                                e.getX(), e.getY(), e.getClickCount(),
+                                                e.isPopupTrigger(), e.getButton());
+            }
+            pressedWhen = 0;
+        }
+        // ---------------------------------------------------------------------
+        
+        boolean popupEvent = providesPopupMenu && SwingUtilities.isRightMouseButton(e);
+        boolean clickEvent = e.getID() == MouseEvent.MOUSE_CLICKED && SwingUtilities.isLeftMouseButton(e);
+        int row = rowAtPoint(e.getPoint());
+        
+        // Do not process doubleclick in editable cell (checkbox)
+        if (clickEvent && row != -1 && e.getClickCount() > 1) {
+            if (isCellEditable(row, columnAtPoint(e.getPoint())))
+                e = clearClicks(e);
+        }
+        
+        // Right-press selects row for popup
+        if (popupEvent && e.getID() == MouseEvent.MOUSE_PRESSED && row != -1)
+            selectRow(row, true);
+        
+        super.processMouseEvent(e);
+        
+        // Right-click selects row and opens popup
+        if (popupEvent && e.getID() == MouseEvent.MOUSE_CLICKED && row != -1) {
+            selectRow(row, true);
+            final MouseEvent me = e;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() { showPopupMenu(me); };
+            });
+        }
+        
+        // Only perform default action if not already processed (expand tree)
+        if (!e.isConsumed() && clickEvent && e.getClickCount() == 2) performDefaultAction();
+        
+        if (generatedClick != null) processMouseEvent(generatedClick);
+    }
+    
+    protected void processKeyEvent(KeyEvent e) {
+        int code = e.getKeyCode();
+        if (code == KeyEvent.VK_CONTEXT_MENU ||
+           (code == KeyEvent.VK_F10 && e.getModifiers() == InputEvent.SHIFT_MASK)) {
+            e.consume();
+            showPopupMenu(null);
+        }
+        
+        super.processKeyEvent(e);
+    }
+    
+    private void showPopupMenu(MouseEvent e) {
+        JPopupMenu popup = new JPopupMenu() {
+            public void setVisible(boolean visible) {
+                if (visible) popupShowing();
+                super.setVisible(visible);
+                if (!visible) popupHidden();
+            }
+        };
+        
+        int row = getSelectedRow();
+        Object value = getValueForPopup(row);
+        populatePopup(popup, value);
+        
+        if (popup.getComponentCount() > 0) {
+            if (e == null) {
+                boolean b = row == -1;
+                int c = b ? -1 : convertColumnIndexToView(mainColumn);
+                Rectangle t = b ? getVisibleRect() : getCellRect(row, c, false);
+                Dimension s = popup.getPreferredSize();
+                int x = t.x + (t.width - s.width) / 2;
+                int y = t.y + (b ? (t.height - s.height) / 2 : getRowHeight() - 4);
+                popup.show(this, Math.max(x, 0), Math.max(y, 0));
+            } else {
+                popup.show(this, e.getX(), e.getY());
+            }
+        }
     }
     
     // --- Persistence ---------------------------------------------------------
@@ -697,15 +902,18 @@ public class ProfilerTable extends JTable {
                     chooseColumns((Component)e.getSource(), e.getPoint());
                 super.processMouseEvent(e.getClickCount() > 1 ? clearClicks(e) : e);
             }
+            public void setResizingColumn(TableColumn aColumn) {
+                _getColumnModel().setResizingColumn(aColumn);
+                super.setResizingColumn(aColumn);
+            }
         };
     }
     
-    private MouseEvent clearClicks(MouseEvent e) {
-        // Clears doubleclicks to prevent misses when switching sort order
-        MouseEvent ee = new MouseEvent((Component)e.getSource(), e.getID(), e.getWhen(),
-                                       e.getModifiers(), e.getX(), e.getY(),
-                                       1, e.isPopupTrigger(), e.getButton());
-        return ee;
+    protected static MouseEvent clearClicks(MouseEvent e) {
+        // Clear unwanted doubleclicks
+        return new MouseEvent((Component)e.getSource(), e.getID(), e.getWhen(),
+                              e.getModifiers(), e.getX(), e.getY(),
+                              1, e.isPopupTrigger(), e.getButton());
     }
     
 }

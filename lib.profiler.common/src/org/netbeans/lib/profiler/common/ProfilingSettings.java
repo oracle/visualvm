@@ -107,6 +107,7 @@ public class ProfilingSettings {
     public static final String PROP_INSTRUMENT_METHOD_INVOKE = "profiler.settings.instrument.method.invoke"; //NOI18N
     public static final String PROP_INSTRUMENT_SPAWNED_THREADS = "profiler.settings.instrument.spawned.threads"; //NOI18N
     public static final String PROP_N_PROFILED_THREADS_LIMIT = "profiler.settings.n.profiled.threads.limit"; //NOI18N
+    public static final String PROP_STACK_DEPTH_LIMIT = "profiler.settings.stack.depth.limit"; //NOI18N
     public static final String PROP_SORT_RESULTS_BY_THREAD_CPU_TIME = "profiler.settings.sort.results.by.thread.cpu.time"; //NOI18N
     public static final String PROP_SAMPLING_INTERVAL = "profiler.settings.sampling.interval"; //NOI18N
     public static final String PROP_INSTRUMENTATION_ROOT_METHODS_SIZE = "profiler.settings.instrumentation.root.methods.size"; //NOI18N
@@ -170,7 +171,8 @@ public class ProfilingSettings {
     private int cpuProfilingType = CommonConstants.CPU_INSTR_FULL;
     private int instrScheme = CommonConstants.INSTRSCHEME_LAZY;
     private int nProfiledThreadsLimit = 32;
-    private int profilingType = PROFILE_CPU_SAMPLING;
+    private int stackDepthLimit = Integer.MAX_VALUE;
+    private int profilingType = PROFILE_MONITOR;
 
     // CPU Profiling: Sampled
     private int samplingInterval = 10; // hybrid
@@ -413,6 +415,14 @@ public class ProfilingSettings {
         return nProfiledThreadsLimit;
     }
 
+    public void setStackDepthLimit(int num) {
+        stackDepthLimit = num;
+    }
+
+    public int getStackDepthLimit() {
+        return stackDepthLimit;
+    }
+
     public void setOverrideGlobalSettings(final boolean override) {
         overrideGlobalSettings = override;
     }
@@ -583,6 +593,7 @@ public class ProfilingSettings {
             settings.setNProfiledThreadsLimit(Integer.MAX_VALUE); // zero or negative value means we do not limit it, just remember value for the UI
         }
 
+        settings.setStackDepthLimit(getStackDepthLimit());
         settings.setSortResultsByThreadCPUTime(getSortResultsByThreadCPUTime());
 
         settings.setSamplingInterval(getSamplingInterval());
@@ -611,8 +622,7 @@ public class ProfilingSettings {
 
         // No filter
         if (getSelectedInstrumentationFilter().equals(FilterUtils.NONE_FILTER)) {
-            instrumentationFilter.setFilterType(InstrumentationFilter.INSTR_FILTER_NONE);
-            instrumentationFilter.setFilterStrings(""); //NOI18N
+            instrumentationFilter.clearFilter();
 
             return;
         }
@@ -621,14 +631,11 @@ public class ProfilingSettings {
         if (getSelectedInstrumentationFilter().equals(quickFilter)) {
             if (quickFilter.getFilterValue().length() > 0) {
                 // Quick Filter defined
-                instrumentationFilter.setFilterType((quickFilter.getFilterType() == SimpleFilter.SIMPLE_FILTER_EXCLUSIVE)
-                                                    ? InstrumentationFilter.INSTR_FILTER_EXCLUSIVE
-                                                    : InstrumentationFilter.INSTR_FILTER_INCLUSIVE);
+                instrumentationFilter.setFilterType(getInstrumentationFilterType(quickFilter));
                 instrumentationFilter.setFilterStrings(quickFilter.getFilterValue());
             } else {
                 // Quick Filter cancelled and no previous filter defined => filterType=INSTR_FILTER_NONE
-                instrumentationFilter.setFilterType(InstrumentationFilter.INSTR_FILTER_NONE);
-                instrumentationFilter.setFilterStrings(""); //NOI18N
+                instrumentationFilter.clearFilter();
             }
 
             return;
@@ -637,9 +644,7 @@ public class ProfilingSettings {
         // Filter defined by ProjectTypeProfiler
         if (getSelectedInstrumentationFilter() instanceof SimpleFilter) {
             SimpleFilter ptpFilter = (SimpleFilter) getSelectedInstrumentationFilter();
-            instrumentationFilter.setFilterType((ptpFilter.getFilterType() == SimpleFilter.SIMPLE_FILTER_EXCLUSIVE)
-                                                ? InstrumentationFilter.INSTR_FILTER_EXCLUSIVE
-                                                : InstrumentationFilter.INSTR_FILTER_INCLUSIVE);
+            instrumentationFilter.setFilterType(getInstrumentationFilterType(ptpFilter));
             instrumentationFilter.setFilterStrings(ptpFilter.getFilterValue());
 
             return;
@@ -674,8 +679,7 @@ public class ProfilingSettings {
         }
 
         // Unknown or no filter
-        instrumentationFilter.setFilterType(InstrumentationFilter.INSTR_FILTER_NONE);
-        instrumentationFilter.setFilterStrings(""); //NOI18N
+        instrumentationFilter.clearFilter();
     }
 
     // -- Settings duplication -------------------------------------------------------------------------------------------
@@ -707,6 +711,7 @@ public class ProfilingSettings {
         settings.setInstrumentMethodInvoke(getInstrumentMethodInvoke());
         settings.setInstrumentSpawnedThreads(getInstrumentSpawnedThreads());
         settings.setNProfiledThreadsLimit(getNProfiledThreadsLimit());
+        settings.setStackDepthLimit(getStackDepthLimit());
         settings.setSortResultsByThreadCPUTime(getSortResultsByThreadCPUTime());
 
         settings.setSamplingInterval(getSamplingInterval());
@@ -767,6 +772,8 @@ public class ProfilingSettings {
         sb.append("instrumentSpawnedThreads: ").append(getInstrumentSpawnedThreads()); //NOI18N
         sb.append('\n'); //NOI18N
         sb.append("nProfiledThreadsLimit: ").append(getNProfiledThreadsLimit()); //NOI18N
+        sb.append('\n'); //NOI18N
+        sb.append("stackDepthLimit: ").append(getStackDepthLimit()); //NOI18N
         sb.append('\n'); //NOI18N
         sb.append("sortResultsByThreadCPUTime: ").append(getSortResultsByThreadCPUTime()); //NOI18N
         sb.append('\n'); //NOI18N
@@ -837,6 +844,7 @@ public class ProfilingSettings {
         setInstrumentSpawnedThreads(Boolean.valueOf(getProperty(props, prefix + PROP_INSTRUMENT_SPAWNED_THREADS, "false"))
                                            .booleanValue()); //NOI18N
         setNProfiledThreadsLimit(Integer.parseInt(getProperty(props, prefix + PROP_N_PROFILED_THREADS_LIMIT, "32"))); //NOI18N
+        setStackDepthLimit(Integer.parseInt(getProperty(props, prefix + PROP_STACK_DEPTH_LIMIT, String.valueOf(Integer.MAX_VALUE))));
         setSortResultsByThreadCPUTime(Boolean.valueOf(getProperty(props, prefix + PROP_SORT_RESULTS_BY_THREAD_CPU_TIME, "false"))
                                              .booleanValue()); //NOI18N
         setProfileUnderlyingFramework(Boolean.valueOf(getProperty(props, prefix + PROP_PROFILE_UNDERLYING_FRAMEWORK, "false"))
@@ -1011,5 +1019,20 @@ public class ProfilingSettings {
         final Object ret = props.get(key);
 
         return (ret != null) ? (String) ret : defaultValue;
+    }
+    
+    private static int getInstrumentationFilterType(SimpleFilter simpleFiler) {        
+        switch (simpleFiler.getFilterType()) {
+            case SimpleFilter.SIMPLE_FILTER_NONE:
+                return InstrumentationFilter.INSTR_FILTER_NONE;
+            case SimpleFilter.SIMPLE_FILTER_EXCLUSIVE:
+                return InstrumentationFilter.INSTR_FILTER_EXCLUSIVE;
+            case SimpleFilter.SIMPLE_FILTER_INCLUSIVE:
+                return InstrumentationFilter.INSTR_FILTER_INCLUSIVE;
+            case SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT:
+                return InstrumentationFilter.INSTR_FILTER_INCLUSIVE_EXACT;
+            default:
+                throw new IllegalArgumentException("Illegal Simple filter type:"+simpleFiler.getFilterType());
+        }
     }
 }

@@ -694,6 +694,7 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
         map.put("profiler.settings.instrument.method.invoke", Boolean.toString(settings.getInstrumentMethodInvoke()));
         map.put("profiler.settings.instrument.spawned.threads", Boolean.toString(settings.getInstrumentSpawnedThreads()));
         map.put("profiler.settings.n.profiled.threads.limit", Integer.toString(settings.getNProfiledThreadsLimit()));
+        map.put("profiler.settings.stack.depth.limit", Integer.toString(settings.getStackDepthLimit())); 
         map.put("profiler.settings.sort.results.by.thread.cpu.time", Boolean.toString(settings.getSortResultsByThreadCPUTime()));
         map.put("profiler.settings.sampling.interval", Integer.toString(settings.getSamplingInterval()));
         map.put("profiler.settings.code.region.cpu.res.buf.size", Integer.toString(settings.getCodeRegionCPUResBufSize()));

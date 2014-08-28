@@ -126,32 +126,32 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
             ti.inCallGraph = true;
         }
 
-        // when methodId > 64K/2 is passed here using our instrumentation's sipush command at the call site, 
-        // it's treated here as a signed integer. Thus without
-        // the below fix we can get e.g. an ArrayIndexOutOfBoundsException(-32768) when methodId == 32768 (***)
-        int methodIdInt = methodId&0xff;
-        methodIdInt |= methodId&0xff00;
-            
-        if (!instrMethodInvoked[methodIdInt]) {
-            instrMethodInvoked[methodIdInt] = true; // Mark this method as invoked
-            if (ti.rootMethodStackDepth > 0) { // marker method under root method - perform instrumentation of nearest callees
-                firstTimeMethodInvoke(ti, methodId);
+        if (ti.stackDepth <= stackDepthLimit) {
+            // when methodId > 64K/2 is passed here using our instrumentation's sipush command at the call site, 
+            // it's treated here as a signed integer. Thus without
+            // the below fix we can get e.g. an ArrayIndexOutOfBoundsException(-32768) when methodId == 32768 (***)
+            int methodIdInt = methodId&0xff;
+            methodIdInt |= methodId&0xff00;
+
+            if (!instrMethodInvoked[methodIdInt]) {
+                instrMethodInvoked[methodIdInt] = true; // Mark this method as invoked
+                if (ti.rootMethodStackDepth > 0) { // marker method under root method - perform instrumentation of nearest callees
+                    firstTimeMethodInvoke(ti, methodId);
+                }
             }
-        }
 
-        ti.stackDepth++; //= 1;  // This is the logical stack depth
-
-        if (ti.stackDepth > 1) {
-            if (!ti.sampleDue) {
-                writeUnstampedEvent(MARKER_ENTRY_UNSTAMPED, ti, methodId);
+            if (ti.stackDepth > 0) {
+                if (!ti.sampleDue) {
+                    writeUnstampedEvent(MARKER_ENTRY_UNSTAMPED, ti, methodId);
+                } else {
+                    writeTimeStampedEvent(MARKER_ENTRY, ti, methodId);
+                    ti.sampleDue = false;
+                }
             } else {
                 writeTimeStampedEvent(MARKER_ENTRY, ti, methodId);
-                ti.sampleDue = false;
             }
-        } else {
-            writeTimeStampedEvent(MARKER_ENTRY, ti, methodId);
         }
-
+        ti.stackDepth++; //= 1;  // This is the logical stack depth
         ti.inProfilingRuntimeMethod--;
     }
 
@@ -177,7 +177,7 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
             if (ti.stackDepth < 1) {
                 ti.inCallGraph = false; // We are exiting the marker method of our call subgraph
                 writeTimeStampedEvent(MARKER_EXIT, ti, methodId);
-            } else {
+            } else if (ti.stackDepth <= stackDepthLimit) {
                 if (!ti.sampleDue) {
                     writeUnstampedEvent(MARKER_EXIT_UNSTAMPED, ti, methodId);
                 } else {
@@ -206,29 +206,29 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
             ti.inProfilingRuntimeMethod++;
             //System.out.println("++++++methodEntry, depth = " + ti.stackDepth + ", id = " + (int) methodId);
 
-            // See comment marked with (***)
-            int methodIdInt = methodId&0xff;
-            methodIdInt |= methodId&0xff00;
-            
-            // Now check if it's the first invocation of this method, and if so, perform instrumentation of nearest callees
-            if (!instrMethodInvoked[methodIdInt]) {
-                instrMethodInvoked[methodIdInt] = true;
-                firstTimeMethodInvoke(ti, methodId);
-            }
+            if (ti.stackDepth <= stackDepthLimit) {
+                // See comment marked with (***)
+                int methodIdInt = methodId&0xff;
+                methodIdInt |= methodId&0xff00;
 
-            ti.stackDepth++;
-
-            if (!ti.sampleDue) {
-                if (methodId <= MAX_METHOD_ID_FOR_COMPACT_FORMAT) {
-                    writeCompactEvent(ti, (char) (METHOD_ENTRY_COMPACT_MASK | methodId));
-                } else {
-                    writeUnstampedEvent(METHOD_ENTRY_UNSTAMPED, ti, methodId);
+                // Now check if it's the first invocation of this method, and if so, perform instrumentation of nearest callees
+                if (!instrMethodInvoked[methodIdInt]) {
+                    instrMethodInvoked[methodIdInt] = true;
+                    firstTimeMethodInvoke(ti, methodId);
                 }
-            } else {
-                writeTimeStampedEvent(METHOD_ENTRY, ti, methodId);
-                ti.sampleDue = false;
-            }
 
+                if (!ti.sampleDue) {
+                    if (methodId <= MAX_METHOD_ID_FOR_COMPACT_FORMAT) {
+                        writeCompactEvent(ti, (char) (METHOD_ENTRY_COMPACT_MASK | methodId));
+                    } else {
+                        writeUnstampedEvent(METHOD_ENTRY_UNSTAMPED, ti, methodId);
+                    }
+                } else {
+                    writeTimeStampedEvent(METHOD_ENTRY, ti, methodId);
+                    ti.sampleDue = false;
+                }
+            }
+            ti.stackDepth++;
             ti.inProfilingRuntimeMethod--;
         }
     }
@@ -261,7 +261,7 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
                 writeTimeStampedEvent(ROOT_EXIT, ti, methodId);
             } else if (ti.rootMethodStackDepth == 0) { // We are exiting the root method, which was under marker method
                 writeTimeStampedEvent(ROOT_EXIT, ti, methodId);
-            } else {
+            } else if (ti.stackDepth <= stackDepthLimit) {
                 if (!ti.sampleDue) {
                     // short path: not taking time stamp
 

@@ -61,8 +61,11 @@ public interface ProfilerIcons extends Icons.Keys {
     public static final String SNAPSHOT_TAKE = "ProfilerIcons.SnapshotTake"; // NOI18N
     public static final String PROFILE = "ProfilerIcons.Profile"; // NOI18N
     public static final String PROFILE_24 = "ProfilerIcons.Profile24"; // NOI18N
+    public static final String PROFILE_INACTIVE = "ProfilerIcons.ProfileInactive"; // NOI18N
+    public static final String PROFILE_RUNNING = "ProfilerIcons.ProfileRunning"; // NOI18N
     public static final String RESET_RESULTS = "ProfilerIcons.ResetResults"; // NOI18N
     public static final String RUN_GC = "ProfilerIcons.RunGC"; // NOI18N
+    public static final String SNAPSHOT_THREADS = "ProfilerIcons.SnapshotThreads"; // NOI18N
     public static final String SNAPSHOT_HEAP = "ProfilerIcons.SnapshotHeap"; // NOI18N
     public static final String CONTROL_PANEL = "ProfilerIcons.ControlPanel"; // NOI18N
     public static final String LIVE_RESULTS = "ProfilerIcons.LiveResults"; // NOI18N

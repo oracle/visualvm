@@ -52,14 +52,15 @@ import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiDataObject;
 import org.openide.loaders.MultiFileLoader;
-import org.openide.nodes.Node;
 import org.openide.nodes.Children;
+import org.openide.nodes.Node;
 import org.openide.util.Lookup;
 
 @MIMEResolver.Registration(
     displayName="org.netbeans.modules.profiler.Bundle#NpsResolver",
     position=99500,
-    resource="../NpsResolver.xml"
+    resource="../NpsResolver.xml",
+    showInFileChooser = { "#LBL_ProfilerFiles" }
 )
 @DataObject.Registration(
     iconBase = "org/netbeans/modules/profiler/impl/icons/snapshotDataObject.png",

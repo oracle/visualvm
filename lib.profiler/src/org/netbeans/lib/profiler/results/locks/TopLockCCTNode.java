@@ -50,6 +50,7 @@ import org.netbeans.lib.profiler.results.CCTNode;
 class TopLockCCTNode extends LockCCTNode {
 
     private long totalTime;
+    private int totalWaits;
 
     TopLockCCTNode() {
         super(null);
@@ -89,7 +90,14 @@ class TopLockCCTNode extends LockCCTNode {
 
     @Override
     public long getWaits() {
-        throw new UnsupportedOperationException("Not supported");  //NOI18N
+        if (totalWaits == 0) {
+            for (CCTNode ch : getChildren()) {
+                if (ch instanceof LockCCTNode) {
+                    totalWaits += ((LockCCTNode) ch).getWaits();
+                }
+            }
+        }
+        return totalWaits;
     }
     
 }

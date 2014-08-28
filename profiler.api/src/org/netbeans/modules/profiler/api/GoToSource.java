@@ -43,7 +43,6 @@
 package org.netbeans.modules.profiler.api;
 
 import org.netbeans.modules.profiler.spi.java.GoToSourceProvider;
-import java.text.MessageFormat;
 import java.util.Collection;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.openide.awt.StatusDisplayer;
@@ -125,7 +124,10 @@ final public class GoToSource {
         "OpeningSourceMsg=Opening source for class {0}",
         "NoSourceFoundMessage=No source found for class {0}"
     })
-    private static void openSourceImpl(final Lookup.Provider project, final String className, final String methodName, final String signature, final int line) {
+    private static void openSourceImpl(Lookup.Provider project, String className, String methodName, String signature, int line) {
+        int idx = methodName == null ? -1 : methodName.indexOf("[native]"); // NOI18N
+        if (idx > -1) methodName = methodName.substring(0, idx);
+        
         // *** logging stuff ***
         ProfilerLogger.debug("Open Source: Project: " + project); // NOI18N
         ProfilerLogger.debug("Open Source: Class name: " + className); // NOI18N

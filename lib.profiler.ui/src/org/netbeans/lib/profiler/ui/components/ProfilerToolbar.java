@@ -67,6 +67,13 @@ public abstract class ProfilerToolbar {
     public abstract JComponent getComponent();
     
     
+    public Component add(ProfilerToolbar toolbar) { return toolbar.getComponent(); }
+    
+    public Component add(ProfilerToolbar toolbar, int index) { return toolbar.getComponent(); }
+    
+    public void remove(ProfilerToolbar toolbar) {}
+    
+    
     public abstract Component add(Action action);
     
     public abstract Component add(Component component);
@@ -97,7 +104,7 @@ public abstract class ProfilerToolbar {
     
     public static class Impl extends ProfilerToolbar {
         
-        protected static int preferredHeight = -1;
+        protected static int PREFERRED_HEIGHT = -1;
         
         protected final JComponent component;
         protected final JToolBar toolbar;
@@ -111,7 +118,7 @@ public abstract class ProfilerToolbar {
                 }
                 public Dimension getPreferredSize() {
                     Dimension dim = super.getPreferredSize();
-                    if (preferredHeight == -1) {
+                    if (PREFERRED_HEIGHT == -1) {
                         JToolBar tb = new JToolBar();
                         tb.setBorder(toolbar.getBorder());
                         tb.setBorderPainted(toolbar.isBorderPainted());
@@ -127,9 +134,10 @@ public abstract class ProfilerToolbar {
                         c.setRenderer(new BasicComboBoxRenderer());
                         tb.add(c);
                         tb.addSeparator();
-                        preferredHeight = tb.getPreferredSize().height;
+                        PREFERRED_HEIGHT = tb.getPreferredSize().height;
                     }
-                    dim.height = Math.max(dim.height, preferredHeight);
+                    dim.height = getParent() instanceof JToolBar ? 1 :
+                                 Math.max(dim.height, PREFERRED_HEIGHT);
                     return dim;
                 }
                 public void doLayout() {
@@ -164,12 +172,32 @@ public abstract class ProfilerToolbar {
             if (component instanceof JLabel) return false;
             if (component instanceof JPanel) return false;
             if (component instanceof JSeparator) return false;
+            if (component instanceof JToolBar) return false;
+            if (component instanceof Box.Filler) return false;
             return true;
         }
         
         @Override
         public JComponent getComponent() {
             return component;
+        }
+        
+        @Override
+        public Component add(ProfilerToolbar toolbar) {
+            return add(toolbar, getComponentCount());
+        }
+    
+        @Override
+        public Component add(ProfilerToolbar toolbar, int index) {
+            JToolBar implToolbar = ((Impl)toolbar).toolbar;
+            implToolbar.setBorder(BorderFactory.createEmptyBorder());
+            implToolbar.setOpaque(false);
+            return add(implToolbar, index);
+        }
+        
+        @Override
+        public void remove(ProfilerToolbar toolbar) {
+            remove(((Impl)toolbar).toolbar);
         }
 
         @Override
