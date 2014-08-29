@@ -125,7 +125,9 @@ class StringSegment extends TagBounds {
             while (offset[0] < endOffset) {
                 long start = offset[0];
                 long sID = readStringTag(offset);
-                stringIDMap.put(sID, start);
+                if (sID != 0) {
+                    stringIDMap.put(sID, start);
+                }
             }
         }
 
