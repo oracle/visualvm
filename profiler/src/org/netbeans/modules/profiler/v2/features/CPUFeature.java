@@ -229,46 +229,32 @@ final class CPUFeature extends ProfilerFeature.Basic {
     public void configure(Lookup configuration) {
         // Handle Profile Method action
         SourceMethodInfo methodInfo = configuration.lookup(SourceMethodInfo.class);
-        if (methodInfo != null) {
-            profileSingle(new ClientUtils.SourceCodeSelection(methodInfo.getClassName(),
-                              methodInfo.getName(), methodInfo.getSignature()));
-            return;
-        }
+        if (methodInfo != null) selectMethodForProfiling(methodInfo);
         
         // Handle Profile Class action
         SourceClassInfo classInfo = configuration.lookup(SourceClassInfo.class);
-        if (classInfo != null) {
-            profileSingle(new ClientUtils.SourceCodeSelection(classInfo.getQualifiedName(),
-                              Wildcards.ALLWILDCARD, null));
-            return;
-        }
+        if (classInfo != null) selectClassForProfiling(classInfo);
     }
     
     
-    private void profileSingle(ClientUtils.SourceCodeSelection sel) {
+    private void selectMethodForProfiling(SourceMethodInfo methodInfo) {
+        selectForProfiling(new ClientUtils.SourceCodeSelection(methodInfo.getClassName(),
+                           methodInfo.getName(), methodInfo.getSignature()));
+    }
+    
+    private void selectClassForProfiling(SourceClassInfo classInfo) {
+        selectForProfiling(new ClientUtils.SourceCodeSelection(classInfo.getQualifiedName(),
+                           Wildcards.ALLWILDCARD, null));
+    }
+    
+    private void selectForProfiling(ClientUtils.SourceCodeSelection sel) {
         if (Wildcards.ALLWILDCARD.equals(sel.getMethodName())) {
-            classesSelection.clear();
-            selectForProfiling(new ClientUtils.SourceCodeSelection[] { sel });
+            classesSelection.add(sel);
+            setMode(Mode.INSTR_CLASSES);
         } else {
-            methodsSelection.clear();
-            selectForProfiling(new ClientUtils.SourceCodeSelection[] { sel });
+            methodsSelection.add(sel);
+            setMode(Mode.INSTR_METHODS);
         }
-    }
-    
-    private void selectForProfiling(ClientUtils.SourceCodeSelection[] sel) {
-        boolean method = false;
-        
-        for (ClientUtils.SourceCodeSelection selected : sel) {
-            if (Wildcards.ALLWILDCARD.equals(selected.getMethodName())) {
-                classesSelection.add(selected);
-                method = false;
-            } else {
-                methodsSelection.add(selected);
-                method = true;
-            }
-        }
-        
-        setMode(method ? Mode.INSTR_METHODS : Mode.INSTR_CLASSES);
         updateModeUI();
         cpuView.showSelectionColumn();
         getSettingsUI().setVisible(true);
@@ -474,8 +460,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
             addSelectionButton = new SmallButton("+") {
                 protected void fireActionPerformed(ActionEvent e) {
                     SourceClassInfo classInfo = ClassMethodSelector.selectClass(getSession().getProject());
-                    if (classInfo != null) profileSingle(new ClientUtils.SourceCodeSelection(classInfo.
-                                                         getQualifiedName(), Wildcards.ALLWILDCARD, null));
+                    if (classInfo != null) selectClassForProfiling(classInfo);
                 }
                 public Dimension getMinimumSize() {
                     return getPreferredSize();
@@ -575,8 +560,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
             addSelectionButton = new SmallButton("+") {
                 protected void fireActionPerformed(ActionEvent e) {
                     SourceMethodInfo methodInfo = ClassMethodSelector.selectMethod(getSession().getProject());
-                    if (methodInfo != null) profileSingle(new ClientUtils.SourceCodeSelection(methodInfo.getClassName(),
-                                                          methodInfo.getName(), methodInfo.getSignature()));
+                    if (methodInfo != null) selectMethodForProfiling(methodInfo);
                 }
                 public Dimension getMinimumSize() {
                     return getPreferredSize();
@@ -995,10 +979,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
                 String methodSig = value.getMethodSignature();
                 GoToSource.openSource(project, className, methodName, methodSig);
             }
-            public void profileSingle(ClientUtils.SourceCodeSelection value) {
-                CPUFeature.this.profileSingle(value);
-            }
-            public void selectForProfiling(ClientUtils.SourceCodeSelection[] value) {
+            public void selectForProfiling(ClientUtils.SourceCodeSelection value) {
                 CPUFeature.this.selectForProfiling(value);
             }
             public void popupShowing() {
