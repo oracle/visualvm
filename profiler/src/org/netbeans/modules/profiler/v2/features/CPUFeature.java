@@ -173,7 +173,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
               Bundle.CPUFeature_description(), 12);
         
         loadSettings();
-        fireChange(); // updates last mode & settings
+//        fireChange(); // updates last mode & settings
+        confirmSettings();
         
         classesSelection = new HashSet() {
             public boolean add(Object value) {
@@ -649,11 +650,10 @@ final class CPUFeature extends ProfilerFeature.Basic {
             settingsApplier.applyButton.setEnabled(settingsValid() && pendingChanges());
     }
     
-    protected void fireChange() {
+    private void confirmSettings() {
         appliedMode = currentMode;
         appliedSettings = new Properties();
         appliedSettings.putAll(settingsCache.get(appliedMode));
-        super.fireChange();
     }
     
     private boolean pendingChanges() {
@@ -921,6 +921,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
 //                settings.setStackDepthLimit(((Number)outgoingSpinner.getValue()).intValue());
 //                break;
         }
+        
+        confirmSettings();
         
 //        if (settings == null) settings = ProfilingSettingsPresets.createCPUPreset();
 //        return settings;

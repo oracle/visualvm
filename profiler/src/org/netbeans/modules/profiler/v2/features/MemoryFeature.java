@@ -162,7 +162,8 @@ final class MemoryFeature extends ProfilerFeature.Basic {
               Bundle.MemoryFeature_description(), 13);
         
         loadSettings();
-        fireChange(); // updates last mode & settings
+//        fireChange(); // updates last mode & settings
+        confirmSettings();
         
         selection = new HashSet() {
             public boolean add(Object value) {
@@ -507,11 +508,10 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             settingsApplier.applyButton.setEnabled(settingsValid() && pendingChanges());
     }
     
-    protected void fireChange() {
+    private void confirmSettings() {
         appliedMode = currentMode;
         appliedSettings = new Properties();
         appliedSettings.putAll(settingsCache.get(appliedMode));
-        super.fireChange();
     }
     
     private boolean pendingChanges() {
@@ -720,6 +720,8 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 settings.setSelectedInstrumentationFilter(ff);
                 break;
         }
+        
+        confirmSettings();
         
 //        if (settings == null) settings = ProfilingSettingsPresets.createMemoryPreset();
 //        return settings;
