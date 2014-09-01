@@ -204,9 +204,7 @@ public abstract class CPUView extends JPanel {
     
     public abstract void showSource(ClientUtils.SourceCodeSelection value);
     
-    public abstract void profileSingle(ClientUtils.SourceCodeSelection value);
-    
-    public abstract void selectForProfiling(ClientUtils.SourceCodeSelection[] value);
+    public abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
     
     public void popupShowing() {};
     
@@ -214,16 +212,12 @@ public abstract class CPUView extends JPanel {
     
     
     private void profileMethod(ClientUtils.SourceCodeSelection value) {
-        profileSingle(value);
+        selectForProfiling(value);
     }
     
     private void profileClass(ClientUtils.SourceCodeSelection value) {
-        profileSingle(new ClientUtils.SourceCodeSelection(
-                value.getClassName(), Wildcards.ALLWILDCARD, null));
-    }
-    
-    private void selectMethod(ClientUtils.SourceCodeSelection value) {
-        selectForProfiling(new ClientUtils.SourceCodeSelection[] { value });
+        selectForProfiling(new ClientUtils.SourceCodeSelection(
+                           value.getClassName(), Wildcards.ALLWILDCARD, null));
     }
     
     
@@ -294,12 +288,6 @@ public abstract class CPUView extends JPanel {
         popup.add(new JMenuItem("Profile Class") {
             { setEnabled(value != null); }
             protected void fireActionPerformed(ActionEvent e) { profileClass(value); }
-        });
-        
-        popup.addSeparator();
-        popup.add(new JMenuItem("Select for Profiling") {
-            { setEnabled(value != null && selectable); }
-            protected void fireActionPerformed(ActionEvent e) { selectMethod(value); }
         });
     }
     
