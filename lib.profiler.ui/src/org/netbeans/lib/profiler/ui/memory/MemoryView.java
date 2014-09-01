@@ -308,9 +308,7 @@ public abstract class MemoryView extends JPanel {
     
     public abstract void showSource(ClientUtils.SourceCodeSelection value);
     
-    public abstract void profileSingle(ClientUtils.SourceCodeSelection value);
-    
-    public abstract void selectForProfiling(ClientUtils.SourceCodeSelection[] value);
+    public abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
     
     public void popupShowing() {};
     
@@ -385,12 +383,7 @@ public abstract class MemoryView extends JPanel {
         
         popup.add(new JMenuItem("Profile Class") {
             { setEnabled(value != null); }
-            protected void fireActionPerformed(ActionEvent e) { profileSingle(value); }
-        });
-        
-        popup.add(new JMenuItem("Select for Profiling") {
-            { setEnabled(value != null); }
-            protected void fireActionPerformed(ActionEvent e) { selectForProfiling(new ClientUtils.SourceCodeSelection[] { value }); }
+            protected void fireActionPerformed(ActionEvent e) { selectForProfiling(value); }
         });
     }
     

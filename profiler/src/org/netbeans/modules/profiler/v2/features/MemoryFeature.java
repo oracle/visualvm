@@ -50,7 +50,6 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -162,7 +161,8 @@ final class MemoryFeature extends ProfilerFeature.Basic {
               Bundle.MemoryFeature_description(), 13);
         
         loadSettings();
-        fireChange(); // updates last mode & settings
+//        fireChange(); // updates last mode & settings
+        confirmSettings();
         
         selection = new HashSet() {
             public boolean add(Object value) {
@@ -195,24 +195,24 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     }
     
     public void configure(Lookup configuration) {
+        // Handle Profile Class action
         SourceClassInfo classInfo = configuration.lookup(SourceClassInfo.class);
-        if (classInfo != null) profileSingle(new ClientUtils.SourceCodeSelection(
-                               classInfo.getQualifiedName(), Wildcards.ALLWILDCARD, null));
+        if (classInfo != null) selectClassForProfiling(classInfo);
     }
     
     
-    private void profileSingle(ClientUtils.SourceCodeSelection selection) {
-        this.selection.clear();
-        selectForProfiling(new ClientUtils.SourceCodeSelection[] { selection });
+    private void selectClassForProfiling(SourceClassInfo classInfo) {
+        selectForProfiling(new ClientUtils.SourceCodeSelection(classInfo.getQualifiedName(),
+                           Wildcards.ALLWILDCARD, null));
     }
     
-    private void selectForProfiling(ClientUtils.SourceCodeSelection[] selection) {
-        this.selection.addAll(Arrays.asList(selection));
+    private void selectForProfiling(ClientUtils.SourceCodeSelection sel) {
+        selection.add(sel);
         setMode(Mode.INSTR_CLASSES);
         updateModeUI();
         memoryView.showSelectionColumn();
         getSettingsUI().setVisible(true);
-        settingsChanged();
+//        settingsChanged();
     }
     
     
@@ -420,8 +420,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             addSelectionButton = new SmallButton("+") {
                 protected void fireActionPerformed(ActionEvent e) {
                     SourceClassInfo classInfo = ClassMethodSelector.selectClass(getSession().getProject());
-                    if (classInfo != null) profileSingle(new ClientUtils.SourceCodeSelection(classInfo.
-                                                         getQualifiedName(), Wildcards.ALLWILDCARD, null));
+                    if (classInfo != null) selectClassForProfiling(classInfo);
                 }
                 public Dimension getMinimumSize() {
                     return getPreferredSize();
@@ -507,11 +506,10 @@ final class MemoryFeature extends ProfilerFeature.Basic {
             settingsApplier.applyButton.setEnabled(settingsValid() && pendingChanges());
     }
     
-    protected void fireChange() {
+    private void confirmSettings() {
         appliedMode = currentMode;
         appliedSettings = new Properties();
         appliedSettings.putAll(settingsCache.get(appliedMode));
-        super.fireChange();
     }
     
     private boolean pendingChanges() {
@@ -721,6 +719,8 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 break;
         }
         
+        confirmSettings();
+        
 //        if (settings == null) settings = ProfilingSettingsPresets.createMemoryPreset();
 //        return settings;
     }
@@ -734,10 +734,7 @@ final class MemoryFeature extends ProfilerFeature.Basic {
                 String className = value.getClassName();
                 GoToSource.openSource(project, className, "", ""); // NOI18N
             }
-            public void profileSingle(ClientUtils.SourceCodeSelection value) {
-                MemoryFeature.this.profileSingle(value);
-            }
-            public void selectForProfiling(ClientUtils.SourceCodeSelection[] value) {
+            public void selectForProfiling(ClientUtils.SourceCodeSelection value) {
                 MemoryFeature.this.selectForProfiling(value);
             }
             public void popupShowing() {
