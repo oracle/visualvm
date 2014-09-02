@@ -43,9 +43,9 @@
  */
 package org.netbeans.test.profiler;
 
-import java.awt.Container;
+import java.awt.Component;
+import java.awt.event.KeyEvent;
 import java.util.logging.Level;
-import javax.swing.JCheckBox;
 import junit.framework.Test;
 import org.netbeans.jellytools.Bundle;
 import org.netbeans.jellytools.EditorOperator;
@@ -57,30 +57,26 @@ import org.netbeans.jellytools.NewJavaProjectNameLocationStepOperator;
 import org.netbeans.jellytools.NewProjectWizardOperator;
 import org.netbeans.jellytools.OptionsOperator;
 import org.netbeans.jellytools.OutputTabOperator;
-import org.netbeans.jellytools.ProjectsTabOperator;
 import org.netbeans.jellytools.TopComponentOperator;
 import org.netbeans.jellytools.actions.Action;
-import org.netbeans.jellytools.actions.ActionNoBlock;
 import org.netbeans.jellytools.actions.EditAction;
 import org.netbeans.jellytools.nodes.JavaProjectRootNode;
 import org.netbeans.jellytools.nodes.Node;
 import org.netbeans.jellytools.nodes.SourcePackagesNode;
+import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.EventTool;
 import org.netbeans.jemmy.JemmyException;
-import org.netbeans.jemmy.JemmyProperties;
-import org.netbeans.jemmy.TimeoutExpiredException;
 import org.netbeans.jemmy.Waitable;
 import org.netbeans.jemmy.Waiter;
+import org.netbeans.jemmy.operators.ContainerOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
-import org.netbeans.jemmy.operators.JCheckBoxOperator;
-import org.netbeans.jemmy.operators.JComboBoxOperator;
 import org.netbeans.jemmy.operators.JLabelOperator;
+import org.netbeans.jemmy.operators.JListOperator;
+import org.netbeans.jemmy.operators.JPopupMenuOperator;
+import org.netbeans.jemmy.operators.JSpinnerOperator;
 import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.netbeans.jemmy.operators.JTableOperator;
-import org.netbeans.jemmy.operators.JTreeOperator;
-import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.test.ide.WatchProjects;
 
 /**
  * Validation test of profiler.
@@ -90,9 +86,7 @@ import org.netbeans.test.ide.WatchProjects;
 public class ProfilerValidationTest extends JellyTestCase {
 
     //private static final String SAMPLE_PROJECT_NAME = "AnagramGame";
-    protected static final String PROFILER_ACTIONS_BUNDLE = "org.netbeans.modules.profiler.actions.Bundle";
-    protected static final String PROFILER_UI_PANELS_BUNDLE = "org.netbeans.modules.profiler.options.ui.Bundle";
-    protected static final String PROFILER_LIB_BUNDLE = "org.netbeans.lib.profiler.Bundle";
+    private static final String VISIBLE_TOKEN = "VISIBLE";
 
     /**
      * Default constructor.
@@ -109,14 +103,13 @@ public class ProfilerValidationTest extends JellyTestCase {
      * @return NbTestSuite instance
      */
     public static Test suite() {
-        NbModuleSuite.Configuration conf = NbModuleSuite.createConfiguration(
-                ProfilerValidationTest.class).clusters(".*").enableModules(".*").honorAutoloadEager(true).failOnException(Level.SEVERE).failOnMessage(Level.SEVERE);
-        conf = conf.addTest(
-                "testProfilerCalibration",
-                "testProfilerProperties",
-                "testProfilerMenus",
-                "testProfiler");
-        return conf.suite();
+        return emptyConfiguration().failOnException(Level.SEVERE).failOnMessage(Level.SEVERE)
+                .addTest(ProfilerValidationTest.class,
+                        "testCreateProject",
+                        "testMenus",
+                        "testOptions",
+                        "testProfiler")
+                .suite();
     }
 
     /**
@@ -128,102 +121,9 @@ public class ProfilerValidationTest extends JellyTestCase {
     }
 
     /**
-     * Test Profiler Menus.
+     * Test create sample project to be profiled
      */
-    public void testProfilerMenus() {
-        String ProfileMenu = org.netbeans.jellytools.Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE, "Menu/Profile"); //"Profile"
-        //Profile|Profile Project
-        new ActionNoBlock(ProfileMenu + "|" + Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE,
-                "LBL_ProfileMainProjectAction"), null).isEnabled();
-        //Profile|Attach Profiler...
-        new ActionNoBlock(ProfileMenu + "|" + Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE,
-                "LBL_AttachMainProjectAction"), null).isEnabled();
-        //Profile|Take Snapshot of Collected Results
-        new ActionNoBlock(ProfileMenu + "|" + Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE,
-                "LBL_TakeSnapshotAction"), null).isEnabled();
-        //Profile|Stop Profiling Session
-        new ActionNoBlock(ProfileMenu + "|" + Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE,
-                "LBL_StopAction"), null).isEnabled();
-
-    }
-
-    /**
-     * Test Profiler Properties.
-     */
-    public void testProfilerProperties() throws Exception {
-
-        OptionsOperator options = OptionsOperator.invoke();
-
-        options.selectJava(); // Changed to Java from Miscellaneous - see #200878
-
-        JTabbedPaneOperator tabbedPane = new JTabbedPaneOperator(options);
-        tabbedPane.selectPage(Bundle.getStringTrimmed("org.netbeans.modules.profiler.options.Bundle", "ProfilerOptionsCategory_Title")); //"Profiler"
-
-//        JLabelOperator javaPlatform = new JLabelOperator(options, Bundle.getStringTrimmed(PROFILER_UI_PANELS_BUNDLE,
-//                                                                "ProfilerOptionsPanel_JavaPlatformLabelText")); //"Profiler Java Platform"
-
-        JLabelOperator communicationPort = new JLabelOperator(options, Bundle.getStringTrimmed(PROFILER_UI_PANELS_BUNDLE,
-                "ProfilerOptionsPanel_CommPortLabelText"));//"Communication Port"
-
-        JLabelOperator openThreads = new JLabelOperator(options, Bundle.getStringTrimmed(PROFILER_UI_PANELS_BUNDLE,
-                "ProfilerOptionsPanel_ThreadsViewLabelText"));//"Open Threads View"
-        JCheckBoxOperator cpu = new JCheckBoxOperator(options, Bundle.getStringTrimmed(PROFILER_UI_PANELS_BUNDLE,
-                "ProfilerOptionsPanel_CpuChckBoxText"));//"CPU"
-        JCheckBoxOperator memory = new JCheckBoxOperator(options, Bundle.getStringTrimmed(PROFILER_UI_PANELS_BUNDLE,
-                "ProfilerOptionsPanel_MemoryChckBoxText"));//"Memory"
-
-        JComboBoxOperator openNewSnapshot = new JComboBoxOperator(options, Bundle.getStringTrimmed(PROFILER_UI_PANELS_BUNDLE,
-                "ProfilerOptionsPanel_OpenSnapshotRadioText"));//"Open New Snapshot"
-
-        JCheckBoxOperator enableHeapAnalisys = new JCheckBoxOperator(options, Bundle.getStringTrimmed(PROFILER_UI_PANELS_BUNDLE,
-                "ProfilerOptionsPanel_EnableAnalysisCheckbox")); //"Enable Rule-Based Heap Analysis"
-
-        JButtonOperator reset = new JButtonOperator(options, Bundle.getStringTrimmed(PROFILER_UI_PANELS_BUNDLE,
-                "ProfilerOptionsPanel_ResetButtonName")); //"Reset"
-
-        options.ok();
-        //java.util.logging.Logger.getLogger("global").log( java.util.logging.Level.SEVERE, "ok pushed" );
-    }
-
-    /**
-     * Test profiler calibration - run profiler calibration Profile|Advanced
-     * Commands|Manage Calibration Data - select default platform -
-     * start calibration - wait for calibration results and
-     * confirm information dialog
-     */
-    public void testProfilerCalibration() {
-        String ProfileMenu = Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE, "Menu/Profile");
-        String AdvansedCmds = Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE, "Menu/Profile/Advanced");
-        String manageCalibrationLabel = "Manage Calibration Data";
-
-        new ActionNoBlock(ProfileMenu + "|" + AdvansedCmds + "|" + manageCalibrationLabel, null).perform();
-        NbDialogOperator manageOper = new NbDialogOperator(manageCalibrationLabel);
-        JTableOperator platformsOper = new JTableOperator(manageOper);
-        platformsOper.selectCell(0, 0);
-        JButtonOperator calibrateButton = new JButtonOperator(manageOper, "Calibrate");
-        calibrateButton.pushNoBlock();
-        NbDialogOperator infoOper = new NbDialogOperator("Information");
-        infoOper.ok();
-        manageOper.closeByButton();
-    }
-
-    /**
-     * Test profiler
-     * - create sample project to be tested
-     * - call Profile|Profile Main Project
-     * - confirm changes in project when profiled for the first time
-     * - click Run in Profile AnagramGame dialog
-     * - wait for Profiler view
-     * - wait until text "Established local connection with the tool" appears in output window
-     * - wait until "Profile|Take Snapshot of Collected Results" is enabled
-     * - call Profile|Take Snapshot of Collected Results
-     * - maximize results view
-     * - save collected results
-     * - call "Profile|Stop Profiling Session"
-     */
-    public void testProfiler() throws Exception {
-        String ProfileMenu = org.netbeans.jellytools.Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE, "Menu/Profile"); //"Profile"
-        String anagramGamePrName; // will be get from New Project wizard
+    public void testCreateProject() {
         // create sample Anagram Game Java project
         NewProjectWizardOperator npwo = NewProjectWizardOperator.invoke();
         String samplesLbl = Bundle.getStringTrimmed("org.netbeans.modules.project.ui.Bundle", "Templates/Project/Samples"); // "Samples"
@@ -233,116 +133,132 @@ public class ProfilerValidationTest extends JellyTestCase {
                 "Templates/Project/Samples/Standard/anagrams.zip")); //"Anagram Game"
         npwo.next();
         NewJavaProjectNameLocationStepOperator npnlso = new NewJavaProjectNameLocationStepOperator();
-        anagramGamePrName = npnlso.txtProjectName().getText();
+        String anagramGamePrName = npnlso.txtProjectName().getText();
         npnlso.txtProjectLocation().setText(System.getProperty("netbeans.user")); // NOI18N
-        npnlso.finish();
-        //wait project appear in projects view
-        //wait 30 second
-        JemmyProperties.setCurrentTimeout("JTreeOperator.WaitNextNodeTimeout", 30000); // NOI18N
-
-        //disable the compile on save:
-        ProjectsTabOperator.invoke().getProjectRootNode(anagramGamePrName).properties();
-        // "Project Properties"
-        String projectPropertiesTitle = Bundle.getStringTrimmed("org.netbeans.modules.java.j2seproject.ui.customizer.Bundle", "LBL_Customizer_Title");
-        NbDialogOperator propertiesDialogOper = new NbDialogOperator(projectPropertiesTitle);
-        // select "Compile" category
-        String buildCategoryTitle = Bundle.getStringTrimmed("org.netbeans.modules.java.j2seproject.ui.customizer.Bundle", "LBL_Config_BuildCategory");
-        String compileCategoryTitle = Bundle.getStringTrimmed("org.netbeans.modules.java.j2seproject.ui.customizer.Bundle", "LBL_Config_Build");
-        new Node(new Node(new JTreeOperator(propertiesDialogOper), buildCategoryTitle), compileCategoryTitle).select();
-        // actually disable the quick run:
-        String compileOnSaveLabel = Bundle.getStringTrimmed("org.netbeans.modules.java.j2seproject.ui.customizer.Bundle", "CustomizerCompile.CompileOnSave");
-        JCheckBox cb = JCheckBoxOperator.waitJCheckBox((Container) propertiesDialogOper.getSource(), compileOnSaveLabel, true, true);
-        if (cb.isSelected()) {
-            cb.doClick();
-        }
-        // confirm properties dialog
-        propertiesDialogOper.ok();
-
+        npnlso.btFinish().pushNoBlock();
+        npnlso.getTimeouts().setTimeout("ComponentOperator.WaitStateTimeout", 120000);
+        npnlso.waitClosed();
+        // wait project appear in projects view
         JavaProjectRootNode projectNode = new JavaProjectsTabOperator().getJavaProjectRootNode(anagramGamePrName);
-        //wait classpath scanning finished
-        WatchProjects.waitScanFinished();
-        projectNode.buildProject();
-        MainWindowOperator.getDefault().waitStatusText(Bundle.getStringTrimmed("org.apache.tools.ant.module.run.Bundle", "FMT_finished_target_status")); // "Finished Building"
         // add log message to application to 
         Node anagramsNode = new Node(new SourcePackagesNode(projectNode), "ui|Anagrams.java");
         new EditAction().perform(anagramsNode);
-        String visibleToken = "VISIBLE";
-        new EditorOperator("Anagrams.java").replace("setVisible(true);", "setVisible(true);\nSystem.out.println(\"" + visibleToken + "\");");
-        // call Profile|Profile Main Project
-        new ActionNoBlock(ProfileMenu + "|" + Bundle.getStringTrimmed("org.netbeans.modules.profiler.actions.Bundle", "LBL_ProfileMainProjectAction"), null).perform();
-        // click Run in Profile AnagramGame dialog
-        NbDialogOperator profileOper = new NbDialogOperator(Bundle.getStringTrimmed("org.netbeans.modules.profiler.stp.Bundle",
-                "SelectProfilingTask_ProfileDialogCaption")); // "Profile "+anagramGamePrName
-        new JButtonOperator(profileOper, Bundle.getStringTrimmed("org.netbeans.modules.profiler.stp.Bundle",
-                "SelectProfilingTask_RunButtonText")).push(); //"Run"
-        profileOper.waitClosed();
-        waitProgressDialog(Bundle.getStringTrimmed("org.netbeans.modules.profiler.Bundle",
-                "NetBeansProfiler_ProgressDialogCaption"), 50000); // "Progress ..."
-        TopComponentOperator tco = new TopComponentOperator(Bundle.getStringTrimmed("org.netbeans.modules.profiler.Bundle",
-                "LAB_ControlPanelName")); // "Profiler"
-        // wait for application visible
-        OutputTabOperator oto = new OutputTabOperator("profile");
-        oto.getTimeouts().setTimeout("ComponentOperator.WaitStateTimeout", 120000);
-        oto.waitText(visibleToken);
-        new EventTool().waitNoEvent(1000);
-        Action takeSnapshotAction = new Action(ProfileMenu + "|" + Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE,
-                "LBL_TakeSnapshotAction"), null);
-        Waiter waiter = new Waiter(new Waitable() {
+        EditorOperator eo = new EditorOperator("Anagrams.java");
+        eo.replace("setVisible(true);", "setVisible(true);\nSystem.out.println(\"" + VISIBLE_TOKEN + "\");");
+        // build project
+        projectNode.buildProject();
+        MainWindowOperator.getDefault().waitStatusText(Bundle.getStringTrimmed("org.apache.tools.ant.module.run.Bundle", "FMT_finished_target_status")); // "Finished Building"
+        eo.closeDiscard();
+        waitScanFinished();
+    }
+
+    /**
+     * Test Profiler Menus.
+     */
+    public void testMenus() {
+        String item = "Profile|Profile Project";
+        assertTrue("Menu item in incorrect state: " + item, new Action(item, null).isEnabled());
+        item = "Profile|Profile external Process";
+        assertTrue("Menu item in incorrect state: " + item, new Action(item, null).isEnabled());
+        item = "Profile|Take Snapshot of Collected Results";
+        assertFalse("Menu item in incorrect state: " + item, new Action(item, null).isEnabled());
+        item = "Profile|Stop Profiling Session";
+        assertFalse("Menu item in incorrect state: " + item, new Action(item, null).isEnabled());
+        MainWindowOperator.getDefault().pushKey(KeyEvent.VK_ESCAPE);
+    }
+
+    /**
+     * Test Profiler options.
+     */
+    public void testOptions() {
+        OptionsOperator options = OptionsOperator.invoke();
+        options.selectJava();
+        JTabbedPaneOperator tabbedPane = new JTabbedPaneOperator(options);
+        tabbedPane.selectPage("Profiler");
+        JListOperator categoriesOper = new JListOperator(options);
+        // General category
+        assertEquals("Wrong profiling port.", 5140, new JSpinnerOperator(options).getValue());
+        // manage calibration data
+        new JButtonOperator(options, "Manage").pushNoBlock();
+        NbDialogOperator manageOper = new NbDialogOperator("Manage Calibration data");
+        JTableOperator platformsOper = new JTableOperator(manageOper);
+        platformsOper.selectCell(0, 0);
+        new JButtonOperator(manageOper, "Calibrate").pushNoBlock();
+        new NbDialogOperator("Information").ok();
+        manageOper.closeByButton();
+        // reset
+        new JButtonOperator(options, "Reset").push();
+        // Snapshots category
+        categoriesOper.selectItem("Snapshots");
+        JLabelOperator lblSnapshotOper = new JLabelOperator(options, "On Take Snapshot:");
+        // TODO assertEquals("Wrong value for " + lblSnapshotOper.getText(), "Open Snapshot", new JComboBoxOperator((JComboBox)lblSnapshotOper.getLabelFor()).getSelectedItem());
+        JLabelOperator lblOpenOper = new JLabelOperator(options, "Open automatically");
+        // TODO assertEquals("Wrong value for " + lblOpenOper.getText(), "Never", new JComboBoxOperator((JComboBox)lblOpenOper.getLabelFor()).getSelectedItem());
+        // Engine category
+        categoriesOper.selectItem("Engine");
+        JLabelOperator lblSamplingOper = new JLabelOperator(options, "Sampling frequency");
+        // TODO assertEquals("Wrong value for "+ lblSamplingOper.getText(), 10, new JSpinnerOperator((JSpinner)lblSamplingOper.getLabelFor()).getValue());
+        JLabelOperator lblTrackOper = new JLabelOperator(options, "Track every");
+        // TODO assertEquals("Wrong value for "+ lblTrackOper, 10, new JSpinnerOperator((JSpinner)lblTrackOper.getLabelFor()).getValue());
+        options.cancel();
+    }
+
+    /**
+     * Test profiler<br>
+     * - call Profile|Profile Project<br>
+     * - click arrow button in opened profiling TopComponent<br>
+     * - in opened popup click Methods<br>
+     * - click Profile button to start profiling<br>
+     * - wait until text token appears in output window<br>
+     * - click "Snapshot" button in tool bar<br>
+     * - wait for snapshot TopComponent<br>
+     * - save snapshot<br>
+     * - call "Profile|Stop Profiling Session"<br>
+     */
+    public void testProfiler() {
+        new Action("Profile|Profile Project", null).perform();
+        TopComponentOperator tcProfiler = new TopComponentOperator("AnagramGame");
+        JButtonOperator btnArrow = new JButtonOperator(tcProfiler, new ComponentChooser() {
+
             @Override
-            public Object actionProduced(Object takeSnapshotAction) {
-                MainWindowOperator.getDefault().toFront();
-                return ((Action) takeSnapshotAction).isEnabled() ? Boolean.TRUE : null;
+            public boolean checkComponent(Component comp) {
+                return comp.getClass().getName().endsWith("Popup");
             }
 
             @Override
             public String getDescription() {
-                return ("Wait menu item is enabled."); // NOI18N
+                return "org.netbeans.modules.profiler.v2.ui.DropdownButton$Popup";
             }
         });
-        waiter.getTimeouts().setTimeout("Waiter.WaitingTime", 60000);
-        waiter.waitAction(takeSnapshotAction);
+        //using doClick because btnArrow is unstandard component and btnArrow.push(); sometimes fails
+        btnArrow.doClick();
+        new JPopupMenuOperator().pushMenu("Methods");
+        new JButtonOperator(tcProfiler, "Profile").push();
+        // wait for application visible
+        OutputTabOperator oto = new OutputTabOperator("profile");
+        oto.getTimeouts().setTimeout("ComponentOperator.WaitStateTimeout", 120000);
+        oto.waitText(VISIBLE_TOKEN);
         new EventTool().waitNoEvent(1000);
-        takeSnapshotAction.perform();
-        TopComponentOperator collectedResults;
-        try {
-            collectedResults = new TopComponentOperator(Bundle.getStringTrimmed("org.netbeans.modules.profiler.Bundle",
-                    "ResultsManager_CpuSnapshotDisplayName")); //"CPU"
-        } catch (Exception e) {
-            issue144699Hack();
-            collectedResults = new TopComponentOperator(Bundle.getStringTrimmed("org.netbeans.modules.profiler.Bundle",
-                    "ResultsManager_CpuSnapshotDisplayName")); //"CPU"
-        }
-        collectedResults.save();
-        // call "Profile|Stop Profiling Session"
-        new Action(ProfileMenu + "|" + Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE,
-                "LBL_StopAction"), null).perform();
+        // create snapshot
+        new JButtonOperator(tcProfiler, "Snapshot").push();
+        TopComponentOperator tcSnapshot = new TopComponentOperator(new ContainerOperator(MainWindowOperator.getDefault(), new ComponentChooser() {
+
+            @Override
+            public boolean checkComponent(Component comp) {
+                return comp.getClass().getName().endsWith("SnapshotResultsWindow");
+            }
+
+            @Override
+            public String getDescription() {
+                return "org.netbeans.modules.profiler.SnapshotResultsWindow";
+            }
+        }));
+        tcSnapshot.save();
+        // stop profiler
+        new Action("Profile|Stop Profiling Session", null).perform();
         waitProfilerStopped();
     }
 
-    public void waitProgressDialog(String title, int milliseconds) {
-        try {
-            // wait at most 120 second until progress dialog dismiss
-            NbDialogOperator openingOper = new NbDialogOperator(title);
-            openingOper.getTimeouts().setTimeout("ComponentOperator.WaitStateTimeout", milliseconds);  // NOI18N
-            openingOper.waitClosed();
-        } catch (TimeoutExpiredException e) {
-            // ignore when progress dialog was closed before we started to wait for it
-        }
-    }
-
-    public void issue144699Hack() {
-        try {
-            NbDialogOperator errDlg = new NbDialogOperator(Bundle.getStringTrimmed("org.openide.Bundle",
-                    "NTF_ErrorTitle")); //"Error"
-            errDlg.ok();
-            String ProfileMenu = org.netbeans.jellytools.Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE, "Menu/Profile"); //"Profile"
-            new Action(ProfileMenu + "|" + Bundle.getStringTrimmed(PROFILER_ACTIONS_BUNDLE,
-                    "LBL_TakeSnapshotAction"), null).perform(); // "Take Snapshot of Collected Results"
-        } catch (TimeoutExpiredException e) {
-            // ignore when Error dialog did not appear (not 100% reproducible)
-        }
-    }
-    
     /**
      * Waits until profiler is not stopped.
      */
