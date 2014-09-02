@@ -772,8 +772,8 @@ public class ProfilerRuntime implements CommonConstants {
     }
 
     private static void initThreadInfo(ThreadInfo ti) {
-        if (ti.evBuf == null) {
-            if (!ti.isInitialized()) ti.initialize();
+        if (!ti.isInitialized()) {
+            ti.initialize();
             ti.useEventBuffer();
             writeThreadCreationEvent(ti);
         }
@@ -802,6 +802,7 @@ public class ProfilerRuntime implements CommonConstants {
     private static void doResetProfilerCollectors(int instrType) {
         ThreadInfo.resetThreadInfoTable();
         globalEvBufPos = 0;
+        knownMonitors = new HashSet();
 
         if (eventBuffer != null) {
             eventBuffer[globalEvBufPos++] = RESET_COLLECTORS;
