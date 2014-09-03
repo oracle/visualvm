@@ -151,7 +151,7 @@ class ProfilerWindow extends ProfilerTopComponent {
     
     private ProfilerToolbar toolbar;
     private ProfilerToolbar featureToolbar;
-    private ProfilerToolbar statusBar;
+//    private ProfilerToolbar statusBar;
     private JPanel container;
     private FeaturesView featuresView;
     
@@ -220,9 +220,9 @@ class ProfilerWindow extends ProfilerTopComponent {
         };
         toolbar.add(stop);
         
-        statusBar = new ProfilerStatus(session).getToolbar();
-        statusBar.getComponent().setVisible(false); // TODO: read last state
-        toolbar.add(statusBar);
+//        statusBar = new ProfilerStatus(session).getToolbar();
+//        statusBar.getComponent().setVisible(false); // TODO: read last state
+//        toolbar.add(statusBar);
         
         toolbar.addFiller();
         
@@ -319,7 +319,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         if (featureToolbar != null) toolbar.remove(featureToolbar);
         ProfilerFeature selected = featuresView.getSelectedFeature();
         featureToolbar = selected == null ? null : selected.getToolbar();
-        if (featureToolbar != null) toolbar.add(featureToolbar, 3);
+        if (featureToolbar != null) toolbar.add(featureToolbar, 2);
         settingsButton.setFeature(selected);
         doLayout();
         repaint();
