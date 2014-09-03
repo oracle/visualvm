@@ -626,11 +626,13 @@ class ProfilerWindow extends ProfilerTopComponent {
 //        c.fill = GridBagConstraints.HORIZONTAL;
 //        popup.add(ppointsL, c);
 
-        c = new GridBagConstraints();
-        c.gridy = y++;
-        c.insets = new Insets(0, left, 0, 5);
-        c.fill = GridBagConstraints.HORIZONTAL;
-        popup.add(usePPoints, c);
+        if (_project) {
+            c = new GridBagConstraints();
+            c.gridy = y++;
+            c.insets = new Insets(0, left, 0, 5);
+            c.fill = GridBagConstraints.HORIZONTAL;
+            popup.add(usePPoints, c);
+        }
 
         JPanel footer = new JPanel(null);
         footer.setOpaque(false);
