@@ -151,7 +151,7 @@ class ProfilerWindow extends ProfilerTopComponent {
     
     private ProfilerToolbar toolbar;
     private ProfilerToolbar featureToolbar;
-    private ProfilerToolbar statusBar;
+//    private ProfilerToolbar statusBar;
     private JPanel container;
     private FeaturesView featuresView;
     
@@ -220,9 +220,9 @@ class ProfilerWindow extends ProfilerTopComponent {
         };
         toolbar.add(stop);
         
-        statusBar = new ProfilerStatus(session).getToolbar();
-        statusBar.getComponent().setVisible(false); // TODO: read last state
-        toolbar.add(statusBar);
+//        statusBar = new ProfilerStatus(session).getToolbar();
+//        statusBar.getComponent().setVisible(false); // TODO: read last state
+//        toolbar.add(statusBar);
         
         toolbar.addFiller();
         
@@ -319,7 +319,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         if (featureToolbar != null) toolbar.remove(featureToolbar);
         ProfilerFeature selected = featuresView.getSelectedFeature();
         featureToolbar = selected == null ? null : selected.getToolbar();
-        if (featureToolbar != null) toolbar.add(featureToolbar, 3);
+        if (featureToolbar != null) toolbar.add(featureToolbar, 2);
         settingsButton.setFeature(selected);
         doLayout();
         repaint();
@@ -626,11 +626,13 @@ class ProfilerWindow extends ProfilerTopComponent {
 //        c.fill = GridBagConstraints.HORIZONTAL;
 //        popup.add(ppointsL, c);
 
-        c = new GridBagConstraints();
-        c.gridy = y++;
-        c.insets = new Insets(0, left, 0, 5);
-        c.fill = GridBagConstraints.HORIZONTAL;
-        popup.add(usePPoints, c);
+        if (_project) {
+            c = new GridBagConstraints();
+            c.gridy = y++;
+            c.insets = new Insets(0, left, 0, 5);
+            c.fill = GridBagConstraints.HORIZONTAL;
+            popup.add(usePPoints, c);
+        }
 
         JPanel footer = new JPanel(null);
         footer.setOpaque(false);

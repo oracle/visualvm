@@ -93,7 +93,6 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.FlatToolBar;
 //import org.netbeans.lib.profiler.ui.components.JTreeTable;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.components.table.CustomBarCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
@@ -101,13 +100,10 @@ import org.netbeans.lib.profiler.ui.components.tree.EnhancedTreeCellRenderer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
-import org.netbeans.lib.profiler.ui.swing.renderer.BarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.McsTimeRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
-//import org.netbeans.lib.profiler.ui.components.treetable.JTreeTablePanel;
-//import org.netbeans.lib.profiler.ui.components.treetable.TreeTableModel;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -617,6 +613,14 @@ public class LockContentionPanel extends ResultsPanel {
         enableLockContentionButton.setVisible(false);
         enableLockContentionLabel1.setVisible(false);
         enableLockContentionLabel2.setVisible(true);
+        if (cctListener != null) {
+            Collection<? extends LockCCTProvider> locksCCTProviders = Lookup.getDefault().lookupAll(LockCCTProvider.class);
+            assert !locksCCTProviders.isEmpty();
+            for (LockCCTProvider provider : locksCCTProviders) {
+                provider.removeListener(cctListener);
+            }
+            cctListener = null;
+        }
     }
 
     public void profilingSessionStarted() {

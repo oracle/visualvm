@@ -207,6 +207,8 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     }
     
     private void selectForProfiling(ClientUtils.SourceCodeSelection sel) {
+        getSettingsUI();
+        getResultsUI();
         selection.add(sel);
         setMode(Mode.INSTR_CLASSES);
         updateModeUI();
@@ -217,8 +219,8 @@ final class MemoryFeature extends ProfilerFeature.Basic {
     
     
     private void selectionChanged() {
-        memoryView.refreshSelection();
-        updateModeUI();
+            memoryView.refreshSelection();
+            updateModeUI();
         settingsChanged();
     }
 
