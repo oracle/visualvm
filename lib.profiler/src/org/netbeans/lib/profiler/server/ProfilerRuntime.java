@@ -776,6 +776,8 @@ public class ProfilerRuntime implements CommonConstants {
             ti.initialize();
             ti.useEventBuffer();
             writeThreadCreationEvent(ti);
+        } else if (ti.evBuf == null) {
+            ti.useEventBuffer();
         }
     }
 
