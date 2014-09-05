@@ -437,13 +437,14 @@ public class ProfilerInterface implements CommonConstants {
     public static void deactivateInjectedCode() {
         int instrType = getCurrentInstrType();
 
-        if (instrType == INSTR_NONE) {
-            return;
-        }
-
         disableProfilerHooks();
 
         switch (instrType) {
+            case INSTR_NONE:
+            case INSTR_NONE_MEMORY_SAMPLING:
+                ProfilerRuntime.clearDataStructures();
+                break;
+                
             case INSTR_NONE_SAMPLING:
                 ProfilerRuntimeSampler.shutdown();
                 break;

@@ -103,6 +103,9 @@ public class LockGraphBuilder extends BaseCallGraphBuilder implements LockProfil
 
     @Override
     protected void doReset() {
+        if (LOG.isLoggable(Level.FINEST)) {
+            LOG.log(Level.FINEST, "Do Reset called");
+        }
         boolean threadLocked = transaction.beginTrans(true, true);
 
         if (threadLocked) { // ignore request for reset received durin an ongoing active transaction

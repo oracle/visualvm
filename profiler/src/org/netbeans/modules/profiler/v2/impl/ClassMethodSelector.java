@@ -396,10 +396,10 @@ public final class ClassMethodSelector {
                 // TODO: display progress label for classes list
                 processor().post(new Runnable() {
                     public void run() {
-                        classesList.setEnabled(true);
                         final Collection<SourceClassInfo> classes = getClasses(pkg, true, true);
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
+                                classesList.setEnabled(true);
                                 for (SourceClassInfo clss : classes)
                                    classesListModel.addElement(clss); 
                             }
@@ -420,10 +420,10 @@ public final class ClassMethodSelector {
                     // TODO: display progress label for methods list
                     processor().post(new Runnable() {
                         public void run() {
-                            methodsList.setEnabled(true);
                             final Collection<SourceMethodInfo> methods = getMethods(cls, true);
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
+                                    methodsList.setEnabled(true);
                                     for (SourceMethodInfo mthd : methods)
                                        methodsListModel.addElement(mthd); 
                                 }
