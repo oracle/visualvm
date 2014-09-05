@@ -241,7 +241,7 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
         int valuesCount = count < 0 ? values.size() - offset :
                           Math.min(count, values.size() - offset);            
         int separatorLength = separator == null ? 0 : separator.length();
-        int estimatedSize = Math.min(valuesCount * (2 + separatorLength), MAX_PREVIEW_LENGTH + TRUNCATED.length());
+        int estimatedSize = (int)Math.min((long)valuesCount * (2 + separatorLength), MAX_PREVIEW_LENGTH + TRUNCATED.length());
         StringBuilder value = new StringBuilder(estimatedSize);
         int lastValue = offset + valuesCount - 1;
         for (int i = offset; i <= lastValue; i++) {

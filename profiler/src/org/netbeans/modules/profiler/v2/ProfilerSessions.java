@@ -43,10 +43,29 @@
 
 package org.netbeans.modules.profiler.v2;
 
+import java.awt.Component;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ItemEvent;
 import java.util.Set;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.components.JExtendedRadioButton;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
+import org.netbeans.modules.profiler.v2.ui.LazyComboBox;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
+import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -54,15 +73,268 @@ import org.openide.util.Lookup;
  */
 final class ProfilerSessions {
     
-    static void createAndConfigure(Lookup configuration, Lookup.Provider project) {
+    static void createAndConfigure(Lookup configuration, Lookup.Provider project, String actionName) {
         if (project == null) project = ProjectUtilities.getMainProject();
         
-        ProfilerDialogs.displayInfo("\n[TODO]\n\nWill open a dialog for selecting the project to profile\nand eventually to choose a feature to handle the action.\n\nPreselected project: " + ProjectUtilities.getDisplayName(project));
+        UI ui = UI.createAndConfigure(configuration, project);
+
+        String caption = actionName == null ? "Select Project and Feature" : actionName;
+        DialogDescriptor dd = new DialogDescriptor(ui, caption, true, new Object[]
+                                                 { DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION },
+                                                   DialogDescriptor.OK_OPTION, DialogDescriptor.BOTTOM_ALIGN,
+                                                   null, null);
+        Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+        d.setVisible(true);
+        
+        if (dd.getValue() == DialogDescriptor.OK_OPTION) {
+            ProfilerSession session = ui.selectedSession();
+            ProfilerFeature feature = ui.selectedFeature();
+            
+            session.getFeatures().selectFeature(feature);
+            feature.configure(configuration);
+            session.selectFeature(feature);
+            session.requestActive();
+        }
     }
     
-    static ProfilerFeature selectFeature(ProfilerSession session, Set<ProfilerFeature> features) {
-        ProfilerDialogs.displayInfo("\n[TODO]\n\nWill open a dialog to choose a feature to handle the action.\n\nPreselected feature: " + features.iterator().next().getName());
-        return features.iterator().next();
+    static ProfilerFeature selectFeature(Set<ProfilerFeature> features, String actionName) {
+        UI ui = UI.selectFeature(features);
+
+        String caption = actionName == null ? "Select Feature" : actionName;
+        DialogDescriptor dd = new DialogDescriptor(ui, caption, true, new Object[]
+                                                 { DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION },
+                                                   DialogDescriptor.OK_OPTION, DialogDescriptor.BOTTOM_ALIGN,
+                                                   null, null);
+        Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+        d.setVisible(true);
+        
+        return dd.getValue() == DialogDescriptor.OK_OPTION ? ui.selectedFeature() : null;
+    }
+    
+    
+    private static class UI extends JPanel {
+        
+        private ProfilerFeature selectedFeature;
+        private ProfilerSession selectedSession;
+        
+        static UI selectFeature(Set<ProfilerFeature> features) {
+            return new UI(features);
+        }
+        
+        static UI createAndConfigure(Lookup configuration, Lookup.Provider project) {
+            return new UI(configuration, project);
+        }
+        
+        
+        ProfilerFeature selectedFeature() {
+            return selectedFeature;
+        }
+        
+        ProfilerSession selectedSession() {
+            return selectedSession;
+        }
+        
+        
+        UI(Set<ProfilerFeature> features) {
+            super(new GridBagLayout());
+            
+            int y = 0;
+            GridBagConstraints c;
+            
+            JLabel l = new JLabel("Select the feature to handle the action:");
+            c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = y++;
+            c.anchor = GridBagConstraints.WEST;
+            c.insets = new Insets(10, 10, 10, 10);
+            add(l, c);
+            
+            ButtonGroup rbg = new ButtonGroup();
+            for (final ProfilerFeature f : features) {
+                JRadioButton rb = new JExtendedRadioButton(f.getName(), f.getIcon()) {
+                    protected void fireItemStateChanged(ItemEvent e) {
+                        if (e.getStateChange() == ItemEvent.SELECTED)
+                            selectedFeature = f;
+                    }
+                };
+                rbg.add(rb);
+                if (rbg.getSelection() == null) rb.setSelected(true);
+                c = new GridBagConstraints();
+                c.gridx = 0;
+                c.gridy = y++;
+                c.anchor = GridBagConstraints.WEST;
+                c.insets = new Insets(0, 20, 0, 10);
+                add(rb, c);
+            }
+            
+            c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = y++;
+            c.weightx = 1;
+            c.weighty = 1;
+            c.fill = GridBagConstraints.BOTH;
+            c.anchor = GridBagConstraints.NORTHWEST;
+            c.insets = new Insets(15, 0, 0, 300);
+            add(UIUtils.createFillerPanel(), c);
+        }
+        
+        private JPanel contents;
+        private void repaintContents() {
+            contents.invalidate();
+            contents.revalidate();
+            contents.repaint();
+        }
+        
+        UI(final Lookup configuration, final Lookup.Provider project) {
+            super(new GridBagLayout());
+            
+            int y = 0;
+            GridBagConstraints c;
+            
+            JLabel l = new JLabel("Select the project to profile:");
+            c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = y++;
+            c.anchor = GridBagConstraints.WEST;
+            c.insets = new Insets(10, 10, 10, 10);
+            add(l, c);
+            
+            contents = new JPanel(new GridBagLayout());
+            
+            // TODO: should also include External Process!
+            LazyComboBox<Lookup.Provider> selector = new LazyComboBox<Lookup.Provider>(new LazyComboBox.Populator<Lookup.Provider>() {
+                protected Lookup.Provider initial() {
+                    return project;
+                }
+                protected Lookup.Provider[] populate() {
+                    return ProjectUtilities.getSortedProjects(ProjectUtilities.getOpenedProjects());
+                }
+            }) {
+                protected void selectionChanged() {
+                    refreshFeatures(configuration, (Lookup.Provider)getSelectedItem());
+                }
+            };
+            selector.setRenderer(new ProjectNameRenderer());
+            c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = y++;
+            c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.insets = new Insets(0, 20, 10, 10);
+            add(selector, c);
+            
+            JLabel ll = new JLabel("Select the feature to handle the action:");
+            c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = y++;
+            c.anchor = GridBagConstraints.WEST;
+            c.insets = new Insets(10, 10, 10, 10);
+            add(ll, c);
+            
+            c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = y++;
+            c.anchor = GridBagConstraints.WEST;
+            c.insets = new Insets(0, 0, 0, 0);
+            add(contents, c);
+            
+            JRadioButton ref = new JExtendedRadioButton("XXX"); // NOI18N
+            final int refHeight = ref.getPreferredSize().height;
+            JPanel filler = new JPanel(null) {
+                public Dimension getPreferredSize() {
+                    return new Dimension(300, refHeight * 2);
+                }
+            };
+            filler.setOpaque(false);
+            c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = y++;
+            c.weightx = 1;
+            c.weighty = 1;
+            c.fill = GridBagConstraints.BOTH;
+            c.anchor = GridBagConstraints.NORTHWEST;
+            c.insets = new Insets(15, 0, 0, 0);
+            add(filler, c);
+            
+            refreshFeatures(configuration, (Lookup.Provider)selector.getSelectedItem());
+        }
+        
+        private void refreshFeatures(final Lookup configuration, final Lookup.Provider project) {
+            contents.removeAll();
+            
+            JLabel l = new JLabel("Loading project features...", JLabel.CENTER);
+            GridBagConstraints c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = 0;
+            c.weightx = 1;
+            c.weighty = 1;
+            c.fill = GridBagConstraints.BOTH;
+            c.anchor = GridBagConstraints.NORTHWEST;
+            c.insets = new Insets(0, 20, 0, 10);
+            contents.add(l, c);
+            
+            repaintContents();
+            
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    
+                    selectedSession = ProfilerSession.forProject(project);
+                    final ProfilerFeatures features = selectedSession.getFeatures();
+                    
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            
+                            contents.removeAll();
+                            
+                            int y = 0;
+                            GridBagConstraints c;
+                            
+                            ButtonGroup rbg = new ButtonGroup();
+                            for (final ProfilerFeature f : features.getAvailable()) {
+                                if (f.supportsConfiguration(configuration)) {
+                                    JRadioButton rb = new JExtendedRadioButton(f.getName(), f.getIcon()) {
+                                        protected void fireItemStateChanged(ItemEvent e) {
+                                            if (e.getStateChange() == ItemEvent.SELECTED)
+                                                selectedFeature = f;
+                                        }
+                                    };
+                                    rbg.add(rb);
+                                    if (rbg.getSelection() == null) rb.setSelected(true);
+                                    c = new GridBagConstraints();
+                                    c.gridx = 0;
+                                    c.gridy = y++;
+                                    c.anchor = GridBagConstraints.WEST;
+                                    c.insets = new Insets(0, 20, 0, 10);
+                                    contents.add(rb, c);
+                                }
+                            }
+                            
+                            repaintContents();
+                            
+                        }
+                    });
+                    
+                }
+            });
+        }
+        
+    }
+    
+    // --- ProjectNameRenderer -------------------------------------------------
+    
+    private static final class ProjectNameRenderer extends DefaultListCellRenderer {
+
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+                                                      boolean cellHasFocus) {
+            JLabel renderer = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            
+            Lookup.Provider p = (Lookup.Provider) value;
+            renderer.setText(ProjectUtilities.getDisplayName(p));
+            renderer.setIcon(ProjectUtilities.getIcon(p));
+
+            return renderer;
+        }
+        
     }
     
 }
