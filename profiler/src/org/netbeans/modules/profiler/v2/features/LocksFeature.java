@@ -214,7 +214,7 @@ final class LocksFeature extends ProfilerFeature.Basic {
     }
     
     protected void profilingStateChanged(int oldState, int newState) {
-        if (newState == NetBeansProfiler.PROFILING_INACTIVE) {
+        if (newState == NetBeansProfiler.PROFILING_INACTIVE || newState == NetBeansProfiler.PROFILING_IN_TRANSITION) {
             if (locksPanel != null) locksPanel.profilingSessionFinished();
         } else if (newState == NetBeansProfiler.PROFILING_RUNNING) {
             if (locksPanel != null) locksPanel.profilingSessionStarted();

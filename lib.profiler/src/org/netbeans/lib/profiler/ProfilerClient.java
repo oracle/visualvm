@@ -1147,10 +1147,6 @@ public class ProfilerClient implements CommonConstants {
     public void removeAllInstrumentation(boolean cleanupClient)
                                   throws InstrumentationException {
         synchronized (instrumentationLock) {
-            if (getCurrentInstrType() == INSTR_NONE) {
-                return;
-            }
-
             commandOnStartup = null;
 
             if (cleanupClient) {

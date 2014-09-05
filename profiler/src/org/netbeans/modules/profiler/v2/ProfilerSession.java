@@ -102,10 +102,10 @@ public abstract class ProfilerSession {
     }
     
     
-    public static void findAndConfigure(Lookup conf, Lookup.Provider project) {
+    public static void findAndConfigure(Lookup conf, Lookup.Provider project, String actionName) {
         final ProfilerSession current = currentSession();
-        if (current != null) current.configure(conf);
-        else ProfilerSessions.createAndConfigure(conf, project);
+        if (current != null) current.configure(conf, actionName);
+        else ProfilerSessions.createAndConfigure(conf, project, actionName);
     }
     
     // --- Constructor ---------------------------------------------------------
@@ -246,6 +246,13 @@ public abstract class ProfilerSession {
         return features;
     }
     
+    final void selectFeature(final ProfilerFeature feature) {
+        Runnable task = new Runnable() {
+            public void run() { getWindow().selectFeature(feature); }
+        };
+        UIUtils.runInEventDispatchThread(task);
+    }
+    
     final synchronized SessionStorage getStorage() {
         if (storage == null) storage = new SessionStorage(getProject());
         return storage;
@@ -267,7 +274,7 @@ public abstract class ProfilerSession {
         return window;
     }
     
-    private void configure(final Lookup conf) {
+    private void configure(final Lookup conf, final String actionName) {
         final ProfilerFeatures _features = getFeatures();
         final Set<ProfilerFeature> compatA = ProfilerFeatures.getCompatible(
                                              _features.getAvailable(), conf);
@@ -287,19 +294,19 @@ public abstract class ProfilerSession {
                         feature = compatS.iterator().next();
                     } else if (!compatS.isEmpty()) {
                         // Multiple selected features handle the action
-                        feature = ProfilerSessions.selectFeature(ProfilerSession.this, compatS);
+                        feature = ProfilerSessions.selectFeature(compatS, actionName);
                     } else if (compatA.size() == 1) {
                         // Exactly one available feature handles the action
                         feature = compatA.iterator().next();
                     } else {
                         // Multiple available features handle the action
-                        feature = ProfilerSessions.selectFeature(ProfilerSession.this, compatA);
+                        feature = ProfilerSessions.selectFeature(compatA, actionName);
                     }
 
                     if (feature != null) {
                         _features.selectFeature(feature);
                         feature.configure(conf);
-                        getWindow().selectFeature(feature);
+                        selectFeature(feature);
                         requestActive();
                     }
                 }

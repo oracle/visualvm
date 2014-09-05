@@ -248,6 +248,8 @@ final class CPUFeature extends ProfilerFeature.Basic {
     }
     
     private void selectForProfiling(ClientUtils.SourceCodeSelection sel) {
+        getSettingsUI();
+        getResultsUI();
         if (Wildcards.ALLWILDCARD.equals(sel.getMethodName())) {
             classesSelection.add(sel);
             setMode(Mode.INSTR_CLASSES);
