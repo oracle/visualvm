@@ -391,6 +391,11 @@ public final class UIUtils {
 
         return ((xpThemeActiveOS) && (!xpThemeDisabled));
     }
+    
+    public static boolean isOracleLookAndFeel() {
+        // is current L&F some kind of WindowsLookAndFeel?
+        return UIManager.getLookAndFeel().getID().contains("Oracle"); //NOI18N
+    }
 
     /** Checks give TreePath for the last node, and if it ends with a node with just one child,
      * it keeps expanding further.

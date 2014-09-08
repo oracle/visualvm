@@ -417,7 +417,7 @@ class ProfilerWindow extends ProfilerTopComponent {
             }
         };
         popup.setLayout(new GridBagLayout());
-        if (!UIUtils.isAquaLookAndFeel()) {
+        if (!UIUtils.isAquaLookAndFeel() && !UIUtils.isOracleLookAndFeel()) {
             popup.setForceBackground(true);
             Color background = UIUtils.getProfilerResultsBackground();
             popup.setBackground(new Color(background.getRGB())); // JPopupMenu doesn't seem to follow ColorUIResource
