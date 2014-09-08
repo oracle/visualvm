@@ -327,21 +327,21 @@ class ProfilerWindow extends ProfilerTopComponent {
     
     private ProfilingSettings __profilingSettings() {
         ProfilingSettings settings = features.getSettings();
-        System.err.println();
-        System.err.println("=================================================");
-        System.err.print(settings == null ? "no settings" : settings.debug());
-        System.err.println("=================================================");
-        System.err.println();
+//        System.err.println();
+//        System.err.println("=================================================");
+//        System.err.print(settings == null ? "no settings" : settings.debug());
+//        System.err.println("=================================================");
+//        System.err.println();
         return settings;
     }
     
     private AttachSettings __attachSettings() {
         if (!session.isAttach()) return null;
-        System.err.println();
-        System.err.println("=================================================");
-        System.err.print(attachSettings == null ? "no settings" : attachSettings.debug());
-        System.err.println("=================================================");
-        System.err.println();
+//        System.err.println();
+//        System.err.println("=================================================");
+//        System.err.print(attachSettings == null ? "no settings" : attachSettings.debug());
+//        System.err.println("=================================================");
+//        System.err.println();
         return attachSettings;
     }
     
