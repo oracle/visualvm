@@ -641,7 +641,7 @@ final class CPUFeature extends ProfilerFeature.Basic {
         appliedSettings = new Properties();
         appliedSettings.putAll(settingsCache.get(appliedMode));
         
-//        if (lrPauseButton != null) lrPauseButton.setSelected(false);
+        if (lrPauseButton != null) lrPauseButton.setSelected(false);
     }
     
     private boolean pendingChanges() {
