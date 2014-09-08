@@ -512,6 +512,8 @@ final class MemoryFeature extends ProfilerFeature.Basic {
         appliedMode = currentMode;
         appliedSettings = new Properties();
         appliedSettings.putAll(settingsCache.get(appliedMode));
+        
+//        if (lrPauseButton != null) lrPauseButton.setSelected(false);
     }
     
     private boolean pendingChanges() {
