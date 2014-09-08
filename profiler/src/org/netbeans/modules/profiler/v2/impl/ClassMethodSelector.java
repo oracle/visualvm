@@ -52,9 +52,11 @@ import java.awt.GridLayout;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -127,17 +129,41 @@ public final class ClassMethodSelector {
             _packages.addAll(pkg.getSubpackages());
         }
         
-        return packages;
+        Set<SourcePackageInfo> sortedPackages = new TreeSet<SourcePackageInfo>(
+            new Comparator<SourcePackageInfo>() {
+                public int compare(SourcePackageInfo p1, SourcePackageInfo p2) {
+                    return p1.getBinaryName().compareTo(p2.getBinaryName());
+                }
+            }
+        );
+        sortedPackages.addAll(packages);
+        return sortedPackages;
     }
     
     private static Collection<SourceClassInfo> getClasses(SourcePackageInfo pkg, boolean inner, boolean anonymous) {
         // TODO: add all inner & anonymous classes based on the parameters
-        return pkg.getClasses();
+        Set<SourceClassInfo> sortedClasses = new TreeSet<SourceClassInfo>(
+            new Comparator<SourceClassInfo>() {
+                public int compare(SourceClassInfo c1, SourceClassInfo c2) {
+                    return c1.getSimpleName().compareTo(c2.getSimpleName());
+                }
+            }
+        );
+        sortedClasses.addAll(pkg.getClasses());
+        return sortedClasses;
     }
     
     private static Collection<SourceMethodInfo> getMethods(SourceClassInfo cls, boolean inherited) {
         // TODO: hide inherited methods based on the parameter
-        return cls.getMethods(true);
+        Set<SourceMethodInfo> sortedMethods = new TreeSet<SourceMethodInfo>(
+            new Comparator<SourceMethodInfo>() {
+                public int compare(SourceMethodInfo m1, SourceMethodInfo m2) {
+                    return m1.getName().compareTo(m2.getName());
+                }
+            }
+        );
+        sortedMethods.addAll(cls.getMethods(true));
+        return sortedMethods;
     }
     
     
@@ -254,7 +280,7 @@ public final class ClassMethodSelector {
                 public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                     DefaultListCellRenderer c = (DefaultListCellRenderer)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                     SourcePackageInfo val = (SourcePackageInfo)value;
-                    c.setText(val.getSimpleName());
+                    c.setText(val.getBinaryName());
                     c.setIcon(Icons.getIcon(LanguageIcons.PACKAGE));
                     return c;
                 }
@@ -357,8 +383,9 @@ public final class ClassMethodSelector {
             // TODO: add possibility to not show other projects
             // TODO: add possibility to include custom jar/folder
             // TODO: add possibility to read classes (histogram) from live app
-            for (Lookup.Provider prj : ProjectUtilities.getOpenedProjects())
-                projectListModel.addElement(prj);
+            Lookup.Provider[] projects = ProjectUtilities.getSortedProjects(
+                                         ProjectUtilities.getOpenedProjects());
+            for (Lookup.Provider prj : projects) projectListModel.addElement(prj);
             if (project != null) projectList.setSelectedValue(project, true);
         }
         

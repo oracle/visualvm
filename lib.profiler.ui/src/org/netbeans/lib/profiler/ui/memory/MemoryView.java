@@ -232,6 +232,7 @@ public abstract class MemoryView extends JPanel {
                     }
 
                 });
+                forceRefresh = false;
                 break;
             case CommonConstants.INSTR_OBJECT_LIVENESS:
             case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
