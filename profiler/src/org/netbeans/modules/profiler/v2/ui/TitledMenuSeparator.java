@@ -49,6 +49,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Rectangle;
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -66,7 +67,7 @@ public class TitledMenuSeparator extends JPanel {
 
         JLabel l = new JLabel(text);
         l.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        if (UIUtils.isWindowsLookAndFeel() || UIUtils.isOracleLookAndFeel()) l.setOpaque(true);
+        if (UIUtils.isWindowsLookAndFeel()) l.setOpaque(true);
         l.setFont(l.getFont().deriveFont(Font.BOLD, l.getFont().getSize2D() - 1));
         if (UIUtils.isWindowsLookAndFeel()) l.setForeground(UIUtils.getDisabledLineColor());
         
@@ -75,7 +76,14 @@ public class TitledMenuSeparator extends JPanel {
         if (UIUtils.isGTKLookAndFeel()) {
             add(UIUtils.createHorizontalSeparator(), BorderLayout.CENTER);
         } else {
-            add(new JPopupMenu.Separator(), BorderLayout.CENTER);
+            JComponent sep = new JPopupMenu.Separator();
+            add(sep, BorderLayout.CENTER);
+            
+            if (UIUtils.isOracleLookAndFeel()) {
+                setOpaque(true);
+                setBackground(sep.getBackground());
+                l.setForeground(sep.getForeground());
+            }
         }
     }
     
