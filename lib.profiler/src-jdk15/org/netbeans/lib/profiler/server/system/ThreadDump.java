@@ -115,7 +115,7 @@ public class ThreadDump {
 
     private static ThreadInfo[] takeThreadDump15() {
         long[] tids = threadBean.getAllThreadIds();
-        return threadBean.getThreadInfo(tids);
+        return threadBean.getThreadInfo(tids, Integer.MAX_VALUE);
     }
 
     private static ThreadInfo[] takeThreadDump16() {

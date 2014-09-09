@@ -66,7 +66,7 @@ public class TitledMenuSeparator extends JPanel {
 
         JLabel l = new JLabel(text);
         l.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        if (UIUtils.isWindowsLookAndFeel()) l.setOpaque(true);
+        if (UIUtils.isWindowsLookAndFeel() || UIUtils.isOracleLookAndFeel()) l.setOpaque(true);
         l.setFont(l.getFont().deriveFont(Font.BOLD, l.getFont().getSize2D() - 1));
         if (UIUtils.isWindowsLookAndFeel()) l.setForeground(UIUtils.getDisabledLineColor());
         
