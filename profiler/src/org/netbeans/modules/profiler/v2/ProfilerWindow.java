@@ -87,7 +87,6 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.attach.AttachWizard;
 import org.netbeans.modules.profiler.v2.impl.FeaturesView;
-import org.netbeans.modules.profiler.v2.ui.ProfilerStatus;
 import org.netbeans.modules.profiler.v2.ui.StayOpenPopupMenu;
 import org.netbeans.modules.profiler.v2.ui.ToggleButtonMenuItem;
 import org.netbeans.modules.profiler.v2.impl.WelcomePanel;
@@ -417,7 +416,7 @@ class ProfilerWindow extends ProfilerTopComponent {
             }
         };
         popup.setLayout(new GridBagLayout());
-        if (!UIUtils.isAquaLookAndFeel() && !UIUtils.isOracleLookAndFeel()) {
+        if (!UIUtils.isAquaLookAndFeel()) {
             popup.setForceBackground(true);
             Color background = UIUtils.getProfilerResultsBackground();
             popup.setBackground(new Color(background.getRGB())); // JPopupMenu doesn't seem to follow ColorUIResource
