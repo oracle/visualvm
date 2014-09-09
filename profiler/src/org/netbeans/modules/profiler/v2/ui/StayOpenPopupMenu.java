@@ -61,6 +61,7 @@ import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.MenuElement;
 import javax.swing.MenuSelectionManager;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  * A JPopupMenu implementation optionally allowing to interact with JMenuItems
@@ -88,12 +89,12 @@ public class StayOpenPopupMenu extends JPopupMenu {
     // --- Tweaking UI ---------------------------------------------------------
     
     public JMenuItem add(JMenuItem menuItem) {
-        if (forceBackground) menuItem.setOpaque(false);
+        if (forceBackground && !UIUtils.isOracleLookAndFeel()) menuItem.setOpaque(false);
         return super.add(menuItem);
     }
     
     public void add(Component comp, Object constraints) {
-        if (forceBackground && comp instanceof JComponent)
+        if (forceBackground && !UIUtils.isOracleLookAndFeel() && comp instanceof JComponent)
             ((JComponent)comp).setOpaque(false);
         comp.setMinimumSize(comp.getPreferredSize());
         super.add(comp, constraints);
