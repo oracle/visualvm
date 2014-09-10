@@ -120,7 +120,7 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
             
             shLabel = new GrayLabel(Bundle.ThreadsFeature_show());
             
-            shFilter = new PopupButton() {
+            shFilter = new PopupButton(Bundle.ThreadsFeature_filterAll()) {
                 protected void populatePopup(JPopupMenu popup) { populateFilters(popup); }
             };
             

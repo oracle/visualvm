@@ -109,7 +109,7 @@ final class LocksFeature extends ProfilerFeature.Basic {
             
             shLabel = new GrayLabel(Bundle.LocksFeature_show());
             
-            shAggregation = new PopupButton() {
+            shAggregation = new PopupButton(Bundle.LocksFeature_aggregationByThreads()) {
                 protected void populatePopup(JPopupMenu popup) { populateFilters(popup); }
             };
             
