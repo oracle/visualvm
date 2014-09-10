@@ -81,10 +81,9 @@ public class FeaturesView extends JPanel {
         
         if (defaultView != null) {
             JScrollPane sp = new JScrollPane(defaultView, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER) {
-                public Dimension getMinimumSize() {
-                    return getPreferredSize();
-                }
+                public Dimension getMinimumSize() { return getPreferredSize(); }
             };
+            sp.getVerticalScrollBar().setUnitIncrement(20);
             sp.setBorder(null);
             sp.setViewportBorder(null);
 
