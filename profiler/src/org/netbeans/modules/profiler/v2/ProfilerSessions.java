@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.v2;
 
-import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -52,9 +51,7 @@ import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.util.Set;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.SwingUtilities;
@@ -62,7 +59,7 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedRadioButton;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
-import org.netbeans.modules.profiler.v2.ui.LazyComboBox;
+import org.netbeans.modules.profiler.v2.ui.ProjectSelector;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
@@ -245,19 +242,14 @@ final class ProfilerSessions {
             contents = new JPanel(new GridBagLayout());
             
             // TODO: should also include External Process!
-            LazyComboBox<Lookup.Provider> selector = new LazyComboBox<Lookup.Provider>(new LazyComboBox.Populator<Lookup.Provider>() {
-                protected Lookup.Provider initial() {
-                    return project;
-                }
-                protected Lookup.Provider[] populate() {
-                    return ProjectUtilities.getSortedProjects(ProjectUtilities.getOpenedProjects());
-                }
-            }) {
+            ProjectSelector.Populator populator = new ProjectSelector.Populator() {
+                protected Lookup.Provider initialProject() { return project; }
+            };
+            ProjectSelector selector = new ProjectSelector(populator) {
                 protected void selectionChanged() {
                     refreshFeatures(context, (Lookup.Provider)getSelectedItem());
                 }
             };
-            selector.setRenderer(new ProjectNameRenderer());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
@@ -360,23 +352,6 @@ final class ProfilerSessions {
                     
                 }
             });
-        }
-        
-    }
-    
-    // --- ProjectNameRenderer -------------------------------------------------
-    
-    private static final class ProjectNameRenderer extends DefaultListCellRenderer {
-
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
-                                                      boolean cellHasFocus) {
-            JLabel renderer = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            
-            Lookup.Provider p = (Lookup.Provider) value;
-            renderer.setText(ProjectUtilities.getDisplayName(p));
-            renderer.setIcon(ProjectUtilities.getIcon(p));
-
-            return renderer;
         }
         
     }
