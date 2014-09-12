@@ -272,7 +272,7 @@ public final class SnapshotsWindowUI extends TopComponent {
         final ProfilerTable snapshotsTable = new ProfilerTable(threadsTableModel, true, true, null);
         snapshotsTable.setMainColumn(1);
         snapshotsTable.setFitWidthColumn(1);
-        snapshotsTable.setDefaultColumnWidth(0, new JLabel("Type").getPreferredSize().width + 10);      
+        snapshotsTable.setDefaultColumnWidth(0, new JLabel("Type").getPreferredSize().width + 30);      
         snapshotsTable.setColumnRenderer(0, new LabelRenderer() {
             {
                 setHorizontalAlignment(CENTER);
