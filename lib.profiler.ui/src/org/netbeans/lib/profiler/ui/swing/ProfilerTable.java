@@ -98,6 +98,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.Movable;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -118,6 +119,8 @@ public class ProfilerTable extends JTable {
         
         if (scrollableColumns != null && scrollableColumns.length > 0)
             initScrollableColumns(scrollableColumns);
+        
+        tweak();
     }
     
     
@@ -143,6 +146,11 @@ public class ProfilerTable extends JTable {
     }
     
     // --- UI tweaks -----------------------------------------------------------
+    
+    private void tweak() {
+        for (Tweaker tweaker : Lookup.getDefault().lookupAll(Tweaker.class))
+            tweaker.tweak(this);
+    }
     
     protected void setupAppearance() {
         setAutoResizeMode(AUTO_RESIZE_NEXT_COLUMN);
@@ -915,5 +923,12 @@ public class ProfilerTable extends JTable {
                               e.getModifiers(), e.getX(), e.getY(),
                               1, e.isPopupTrigger(), e.getButton());
     }
+    
+    
+    public static interface Tweaker {
+        
+        public void tweak(ProfilerTable table);
+        
+    } 
     
 }
