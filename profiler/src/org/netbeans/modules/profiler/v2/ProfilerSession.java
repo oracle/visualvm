@@ -108,10 +108,7 @@ public abstract class ProfilerSession {
     
     private final void setContext(Lookup _context) {
         synchronized(this) { context = _context; }
-        
-        UIUtils.runInEventDispatchThread(new Runnable() {
-            public void run() { if (window != null) window.updateSession(); }
-        });
+        notifyWindow();
     }
     
     protected synchronized boolean isCompatibleContext(Lookup _context) {
@@ -145,10 +142,13 @@ public abstract class ProfilerSession {
     private boolean isAttach;
     
     
-    public final void setAttach(boolean attach) { isAttach = attach; }
+    public final void setAttach(boolean attach) {
+        synchronized(this) { isAttach = attach; }
+        notifyWindow();
+    }
     
     // Set when configuring profiling session, not a persistent storage!
-    public final boolean isAttach() { return isAttach; }
+    public synchronized final boolean isAttach() { return isAttach; }
     
     
     public final NetBeansProfiler getProfiler() { return profiler; }    
@@ -256,6 +256,12 @@ public abstract class ProfilerSession {
             };
         }
         return window;
+    }
+    
+    private void notifyWindow() {
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() { if (window != null) window.updateSession(); }
+        });
     }
     
     private void cleanup() {
