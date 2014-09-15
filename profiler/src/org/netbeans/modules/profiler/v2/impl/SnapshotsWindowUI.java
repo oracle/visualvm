@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler.v2.impl;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -53,15 +52,13 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.swing.AbstractAction;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
@@ -75,12 +72,11 @@ import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
-import org.netbeans.modules.profiler.v2.ui.LazyComboBox;
+import org.netbeans.modules.profiler.v2.ui.ProjectSelector;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Lookup;
@@ -102,10 +98,6 @@ import org.openide.windows.WindowManager;
 public final class SnapshotsWindowUI extends TopComponent {
     
     public static final String ID = "SnapshotsWindowUI"; // NOI18N
-    
-    private static final Lookup.Provider EXTERNAL_PROCESS = new Lookup.Provider() {
-        public Lookup getLookup() { return Lookup.EMPTY; }
-    };
     
     
     // --- Instance ------------------------------------------------------------
@@ -133,17 +125,17 @@ public final class SnapshotsWindowUI extends TopComponent {
     }
     
     public void setProject(Lookup.Provider project) {
-        selector.setSelectedItem(project == null ? EXTERNAL_PROCESS : project);
+        selector.setProject(project);
     }
     
     public void resetProject(Lookup.Provider project) {
-        if (selector.getSelectedItem() == project) selector.resetModel();
+        selector.resetProject(project);
     }
     
     
     // --- Implementation ------------------------------------------------------
     
-    private LazyComboBox<Lookup.Provider> selector;
+    private ProjectSelector selector;
     private ChangeListener openProjectsListener;
     
     private FileObject currentFolder;
@@ -193,19 +185,18 @@ public final class SnapshotsWindowUI extends TopComponent {
     
     
     void refreshSnapshots() {
-        Lookup.Provider project = (Lookup.Provider)selector.getSelectedItem();
-        final Lookup.Provider _project = project == EXTERNAL_PROCESS ? null : project;
+        final Lookup.Provider project = selector.getProject();
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 ResultsManager rm = ResultsManager.getDefault();
                 final List<Snapshot> _snapshots = new ArrayList();
-                for (FileObject fo : rm.listSavedSnapshots(_project, null))
+                for (FileObject fo : rm.listSavedSnapshots(project, null))
                     _snapshots.add(new Snapshot(fo));
-                for (FileObject fo : rm.listSavedHeapdumps(_project, null))
+                for (FileObject fo : rm.listSavedHeapdumps(project, null))
                     _snapshots.add(new Snapshot(fo));
                 FileObject __currentFolder = null;
                 try {
-                    __currentFolder = ProjectStorage.getSettingsFolder(_project, false);
+                    __currentFolder = ProjectStorage.getSettingsFolder(project, false);
                 } catch (IOException e) {}
                 final FileObject _currentFolder = __currentFolder;
                 SwingUtilities.invokeLater(new Runnable() {
@@ -244,35 +235,22 @@ public final class SnapshotsWindowUI extends TopComponent {
         c.insets = new Insets(10, 10, 0, 10);
         contents.add(projectSelectL, c);
         
-        selector = new LazyComboBox<Lookup.Provider>(new LazyComboBox.Populator<Lookup.Provider>() {
-            protected Lookup.Provider initial() {
+        ProjectSelector.Populator populator = new ProjectSelector.Populator() {
+            protected Lookup.Provider initialProject() {
                 ProfilerSession ps = ProfilerSession.currentSession();
-                Lookup.Provider lp = ps == null ? null : ps.getProject();
-                return lp == null ? EXTERNAL_PROCESS : lp;
+                return ps == null ? null : ps.getProject();
             }
-            protected Lookup.Provider[] populate() {
-                // Set of open & profiled projects
-                Set<Lookup.Provider> s = new HashSet();
-                // Add all open projects
-                for (Lookup.Provider p : ProjectUtilities.getOpenedProjects())
-                    s.add(p);
-                // Add currently profiled project (can be closed)
+            protected Collection<Lookup.Provider> additionalProjects() {
                 ProfilerSession ps = ProfilerSession.currentSession();
                 Lookup.Provider cp = ps == null ? null : ps.getProject();
-                if (cp != null) s.add(cp);
-                
-                List<Lookup.Provider> l = new ArrayList();
-                Lookup.Provider[] pa = s.toArray(new Lookup.Provider[s.size()]);
-                l.add(EXTERNAL_PROCESS);
-                l.addAll(Arrays.asList(ProjectUtilities.getSortedProjects(pa)));
-                return l.toArray(new Lookup.Provider[l.size()]);
-            }
-        }) {
-            protected void selectionChanged() {
-                refreshSnapshots();
+                if (cp != null) return Collections.singleton(cp);
+                else return super.additionalProjects();
             }
         };
-        selector.setRenderer(new ProjectNameRenderer());
+        
+        selector = new ProjectSelector(populator) {
+            protected void selectionChanged() { refreshSnapshots(); }
+        };
         
         c = new GridBagConstraints();
         c.gridy = y++;
@@ -294,7 +272,7 @@ public final class SnapshotsWindowUI extends TopComponent {
         final ProfilerTable snapshotsTable = new ProfilerTable(threadsTableModel, true, true, null);
         snapshotsTable.setMainColumn(1);
         snapshotsTable.setFitWidthColumn(1);
-        snapshotsTable.setDefaultColumnWidth(0, new JLabel("Type").getPreferredSize().width + 10);      
+        snapshotsTable.setDefaultColumnWidth(0, new JLabel("Type").getPreferredSize().width + 30);      
         snapshotsTable.setColumnRenderer(0, new LabelRenderer() {
             {
                 setHorizontalAlignment(CENTER);
@@ -477,51 +455,6 @@ public final class SnapshotsWindowUI extends TopComponent {
             Snapshot s = (Snapshot)o;
             return getDisplayName().compareTo(s.getDisplayName());
         }
-    }
-    
-    
-    // --- ProjectNameRenderer -------------------------------------------------
-    
-    private static final class ProjectNameRenderer extends DefaultListCellRenderer {
-
-        private Renderer renderer = new Renderer();
-        private boolean firstFontSet = false;
-
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
-                                                      boolean cellHasFocus) {
-            JLabel rendererOrig = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-            renderer.setComponentOrientation(rendererOrig.getComponentOrientation());
-            renderer.setFontEx(rendererOrig.getFont());
-            renderer.setOpaque(rendererOrig.isOpaque());
-            renderer.setForeground(rendererOrig.getForeground());
-            renderer.setBackground(rendererOrig.getBackground());
-            renderer.setEnabled(rendererOrig.isEnabled());
-            renderer.setBorder(rendererOrig.getBorder());
-
-            if (value != EXTERNAL_PROCESS) {
-                Lookup.Provider p = (Lookup.Provider) value;
-                renderer.setText(ProjectUtilities.getDisplayName(p));
-                renderer.setIcon(ProjectUtilities.getIcon(p));
-
-                if (ProjectUtilities.getMainProject() == value) {
-                    renderer.setFontEx(renderer.getFont().deriveFont(Font.BOLD)); // bold for main project
-                } else {
-                    renderer.setFontEx(renderer.getFont().deriveFont(Font.PLAIN));
-                }
-            } else {
-                renderer.setText("External process");
-                renderer.setIcon(Icons.getIcon(GeneralIcons.JAVA_PROCESS));
-            }
-
-            return renderer;
-        }
-        
-        private static class Renderer extends DefaultListCellRenderer {
-            public void setFont(Font font) {}
-            public void setFontEx(Font font) { super.setFont(font); }
-        }
-        
     }
     
 }
