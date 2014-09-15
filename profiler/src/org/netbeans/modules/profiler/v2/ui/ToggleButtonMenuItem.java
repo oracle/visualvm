@@ -162,6 +162,7 @@ public class ToggleButtonMenuItem extends StayOpenPopupMenu.Item {
         if (UIUtils.isAquaLookAndFeel()) return 26;
         if (UIUtils.isGTKLookAndFeel()) return 24;
         if (UIUtils.isNimbus()) return 25;
+        if (UIUtils.isOracleLookAndFeel()) return 20;
         return 22;
     }
 
