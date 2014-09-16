@@ -158,7 +158,7 @@ public class ProfilerValidationTest extends JellyTestCase {
     public void testMenus() {
         String item = "Profile|Profile Project";
         assertTrue("Menu item in incorrect state: " + item, new Action(item, null).isEnabled());
-        item = "Profile|Profile external Process";
+        item = "Profile|Attach to External Process";
         assertTrue("Menu item in incorrect state: " + item, new Action(item, null).isEnabled());
         item = "Profile|Take Snapshot of Collected Results";
         assertFalse("Menu item in incorrect state: " + item, new Action(item, null).isEnabled());
