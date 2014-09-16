@@ -61,8 +61,8 @@ import org.openide.util.NbBundle;
  * @author Ian Formanek
  */
 @NbBundle.Messages({
-    "LBL_AttachMainProjectAction=Profile &External Process",
-    "HINT_AttachMainProjectAction=Profile External Process"
+    "LBL_AttachMainProjectAction=Attach to &External Process",
+    "HINT_AttachMainProjectAction=Attach to External Process"
 })
 public final class AttachAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -92,6 +92,9 @@ public final class AttachAction extends AbstractAction {
      */
     public void actionPerformed(final ActionEvent e) {
         ProfilerSession session = ProfilerSession.forContext(Lookup.EMPTY);
-        if (session != null) session.requestActive();
+        if (session != null) {
+            session.setAttach(true);
+            session.requestActive();
+        }
     }
 }

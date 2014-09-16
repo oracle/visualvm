@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.v2;
 
-import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -52,20 +51,20 @@ import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.util.Set;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedRadioButton;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
-import org.netbeans.modules.profiler.v2.ui.LazyComboBox;
+import org.netbeans.modules.profiler.v2.ui.ProjectSelector;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
+import org.openide.util.lookup.Lookups;
 
 /**
  *
@@ -73,10 +72,51 @@ import org.openide.util.RequestProcessor;
  */
 final class ProfilerSessions {
     
-    static void createAndConfigure(Lookup configuration, Lookup.Provider project, String actionName) {
+    static void configure(final ProfilerSession session, final Lookup context, final String actionName) {
+        final ProfilerFeatures _features = session.getFeatures();
+        final Set<ProfilerFeature> compatA = ProfilerFeatures.getCompatible(
+                                             _features.getAvailable(), context);
+        if (compatA.isEmpty()) {
+            // TODO: might offer creating a new profiling session if the current is not in progress
+            ProfilerDialogs.displayInfo("Action not supported by the current profiling session.");
+        } else {
+            // Resolving selected features in only supported in EDT
+            UIUtils.runInEventDispatchThread(new Runnable() {
+                public void run() {
+                    Set<ProfilerFeature> compatS = ProfilerFeatures.getCompatible(
+                                                   _features.getSelected(), context);
+
+                    ProfilerFeature feature;
+                    if (compatS.size() == 1) {
+                        // Exactly one selected feature handles the action
+                        feature = compatS.iterator().next();
+                    } else if (!compatS.isEmpty()) {
+                        // Multiple selected features handle the action
+                        feature = selectFeature(compatS, actionName);
+                    } else if (compatA.size() == 1) {
+                        // Exactly one available feature handles the action
+                        feature = compatA.iterator().next();
+                    } else {
+                        // Multiple available features handle the action
+                        feature = selectFeature(compatA, actionName);
+                    }
+
+                    if (feature != null) {
+                        _features.selectFeature(feature);
+                        feature.configure(context);
+                        session.selectFeature(feature);
+                        session.requestActive();
+                    }
+                }
+            });
+        }
+    }
+    
+    static void createAndConfigure(Lookup context, String actionName) {
+        Lookup.Provider project = context.lookup(Lookup.Provider.class);
         if (project == null) project = ProjectUtilities.getMainProject();
         
-        UI ui = UI.createAndConfigure(configuration, project);
+        UI ui = UI.createAndConfigure(context, project);
 
         String caption = actionName == null ? "Select Project and Feature" : actionName;
         DialogDescriptor dd = new DialogDescriptor(ui, caption, true, new Object[]
@@ -91,13 +131,13 @@ final class ProfilerSessions {
             ProfilerFeature feature = ui.selectedFeature();
             
             session.getFeatures().selectFeature(feature);
-            feature.configure(configuration);
+            feature.configure(context);
             session.selectFeature(feature);
             session.requestActive();
         }
     }
     
-    static ProfilerFeature selectFeature(Set<ProfilerFeature> features, String actionName) {
+    private static ProfilerFeature selectFeature(Set<ProfilerFeature> features, String actionName) {
         UI ui = UI.selectFeature(features);
 
         String caption = actionName == null ? "Select Feature" : actionName;
@@ -121,8 +161,8 @@ final class ProfilerSessions {
             return new UI(features);
         }
         
-        static UI createAndConfigure(Lookup configuration, Lookup.Provider project) {
-            return new UI(configuration, project);
+        static UI createAndConfigure(Lookup context, Lookup.Provider project) {
+            return new UI(context, project);
         }
         
         
@@ -185,7 +225,7 @@ final class ProfilerSessions {
             contents.repaint();
         }
         
-        UI(final Lookup configuration, final Lookup.Provider project) {
+        UI(final Lookup context, final Lookup.Provider project) {
             super(new GridBagLayout());
             
             int y = 0;
@@ -202,19 +242,14 @@ final class ProfilerSessions {
             contents = new JPanel(new GridBagLayout());
             
             // TODO: should also include External Process!
-            LazyComboBox<Lookup.Provider> selector = new LazyComboBox<Lookup.Provider>(new LazyComboBox.Populator<Lookup.Provider>() {
-                protected Lookup.Provider initial() {
-                    return project;
-                }
-                protected Lookup.Provider[] populate() {
-                    return ProjectUtilities.getSortedProjects(ProjectUtilities.getOpenedProjects());
-                }
-            }) {
+            ProjectSelector.Populator populator = new ProjectSelector.Populator() {
+                protected Lookup.Provider initialProject() { return project; }
+            };
+            ProjectSelector selector = new ProjectSelector(populator) {
                 protected void selectionChanged() {
-                    refreshFeatures(configuration, (Lookup.Provider)getSelectedItem());
+                    refreshFeatures(context, (Lookup.Provider)getSelectedItem());
                 }
             };
-            selector.setRenderer(new ProjectNameRenderer());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
@@ -256,10 +291,10 @@ final class ProfilerSessions {
             c.insets = new Insets(15, 0, 0, 0);
             add(filler, c);
             
-            refreshFeatures(configuration, (Lookup.Provider)selector.getSelectedItem());
+            refreshFeatures(context, (Lookup.Provider)selector.getSelectedItem());
         }
         
-        private void refreshFeatures(final Lookup configuration, final Lookup.Provider project) {
+        private void refreshFeatures(final Lookup context, final Lookup.Provider project) {
             contents.removeAll();
             
             JLabel l = new JLabel("Loading project features...", JLabel.CENTER);
@@ -278,7 +313,8 @@ final class ProfilerSessions {
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
                     
-                    selectedSession = ProfilerSession.forProject(project);
+                    Lookup projectContext = Lookups.fixed(project);
+                    selectedSession = ProfilerSession.forContext(projectContext);
                     final ProfilerFeatures features = selectedSession.getFeatures();
                     
                     SwingUtilities.invokeLater(new Runnable() {
@@ -291,7 +327,7 @@ final class ProfilerSessions {
                             
                             ButtonGroup rbg = new ButtonGroup();
                             for (final ProfilerFeature f : features.getAvailable()) {
-                                if (f.supportsConfiguration(configuration)) {
+                                if (f.supportsConfiguration(context)) {
                                     JRadioButton rb = new JExtendedRadioButton(f.getName(), f.getIcon()) {
                                         protected void fireItemStateChanged(ItemEvent e) {
                                             if (e.getStateChange() == ItemEvent.SELECTED)
@@ -316,23 +352,6 @@ final class ProfilerSessions {
                     
                 }
             });
-        }
-        
-    }
-    
-    // --- ProjectNameRenderer -------------------------------------------------
-    
-    private static final class ProjectNameRenderer extends DefaultListCellRenderer {
-
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
-                                                      boolean cellHasFocus) {
-            JLabel renderer = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            
-            Lookup.Provider p = (Lookup.Provider) value;
-            renderer.setText(ProjectUtilities.getDisplayName(p));
-            renderer.setIcon(ProjectUtilities.getIcon(p));
-
-            return renderer;
         }
         
     }

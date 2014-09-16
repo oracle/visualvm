@@ -44,17 +44,14 @@
 package org.netbeans.modules.profiler.v2;
 
 import java.util.Objects;
-import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
-import org.openide.util.lookup.Lookups;
 
 /**
  *
@@ -67,6 +64,12 @@ public abstract class ProfilerSession {
     private static ProfilerSession CURRENT_SESSION;
     private static final Object CURRENT_SESSION_LOCK = new Object();
     
+    
+    public static ProfilerSession currentSession() {
+        synchronized(CURRENT_SESSION_LOCK) {
+            return CURRENT_SESSION;
+        }
+    }
     
     public static ProfilerSession forContext(Lookup context) {
         // Try to reuse the active session first
@@ -82,30 +85,11 @@ public abstract class ProfilerSession {
         return provider == null ? null : provider.getSession(context);
     };
     
-    public static ProfilerSession forProject(Lookup.Provider project) {
-        // Try to reuse the active session first
-        synchronized(CURRENT_SESSION_LOCK) {
-            if (CURRENT_SESSION != null && Objects.equals(project, CURRENT_SESSION.getProject())) {
-                return CURRENT_SESSION;
-            }
-        }
-        
-        // Create a new session, will eliminate another session when showing UI
-        Provider provider = Lookup.getDefault().lookup(Provider.class);
-        return provider == null ? null : provider.getSession(Lookups.fixed(project));
-    };
     
-    public static ProfilerSession currentSession() {
-        synchronized(CURRENT_SESSION_LOCK) {
-            return CURRENT_SESSION;
-        }
-    }
-    
-    
-    public static void findAndConfigure(Lookup conf, Lookup.Provider project, String actionName) {
-        final ProfilerSession current = currentSession();
-        if (current != null) current.configure(conf, actionName);
-        else ProfilerSessions.createAndConfigure(conf, project, actionName);
+    public static void findAndConfigure(Lookup context, String actionName) {
+        ProfilerSession current = currentSession();
+        if (current != null) ProfilerSessions.configure(current, context, actionName);
+        else ProfilerSessions.createAndConfigure(context, actionName);
     }
     
     // --- Constructor ---------------------------------------------------------
@@ -124,10 +108,7 @@ public abstract class ProfilerSession {
     
     private final void setContext(Lookup _context) {
         synchronized(this) { context = _context; }
-        
-        UIUtils.runInEventDispatchThread(new Runnable() {
-            public void run() { if (window != null) window.updateSession(); }
-        });
+        notifyWindow();
     }
     
     protected synchronized boolean isCompatibleContext(Lookup _context) {
@@ -161,10 +142,13 @@ public abstract class ProfilerSession {
     private boolean isAttach;
     
     
-    public final void setAttach(boolean attach) { isAttach = attach; }
+    public final void setAttach(boolean attach) {
+        synchronized(this) { isAttach = attach; }
+        notifyWindow();
+    }
     
     // Set when configuring profiling session, not a persistent storage!
-    public final boolean isAttach() { return isAttach; }
+    public synchronized final boolean isAttach() { return isAttach; }
     
     
     public final NetBeansProfiler getProfiler() { return profiler; }    
@@ -274,44 +258,10 @@ public abstract class ProfilerSession {
         return window;
     }
     
-    private void configure(final Lookup conf, final String actionName) {
-        final ProfilerFeatures _features = getFeatures();
-        final Set<ProfilerFeature> compatA = ProfilerFeatures.getCompatible(
-                                             _features.getAvailable(), conf);
-        if (compatA.isEmpty()) {
-            // TODO: might offer creating a new profiling session if the current is not in progress
-            ProfilerDialogs.displayInfo("Action not supported by the current profiling session.");
-        } else {
-            // Resolving selected features in only supported in EDT
-            UIUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    Set<ProfilerFeature> compatS = ProfilerFeatures.getCompatible(
-                                                   _features.getSelected(), conf);
-
-                    ProfilerFeature feature;
-                    if (compatS.size() == 1) {
-                        // Exactly one selected feature handles the action
-                        feature = compatS.iterator().next();
-                    } else if (!compatS.isEmpty()) {
-                        // Multiple selected features handle the action
-                        feature = ProfilerSessions.selectFeature(compatS, actionName);
-                    } else if (compatA.size() == 1) {
-                        // Exactly one available feature handles the action
-                        feature = compatA.iterator().next();
-                    } else {
-                        // Multiple available features handle the action
-                        feature = ProfilerSessions.selectFeature(compatA, actionName);
-                    }
-
-                    if (feature != null) {
-                        _features.selectFeature(feature);
-                        feature.configure(conf);
-                        selectFeature(feature);
-                        requestActive();
-                    }
-                }
-            });
-        }
+    private void notifyWindow() {
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() { if (window != null) window.updateSession(); }
+        });
     }
     
     private void cleanup() {
