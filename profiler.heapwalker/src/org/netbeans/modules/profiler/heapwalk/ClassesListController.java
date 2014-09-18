@@ -240,18 +240,13 @@ public class ClassesListController extends AbstractController {
             name = jc.getName();
             
             if (realClass) {
-                instancesCount = jc.getInstancesCount();
-                instanceSize = jc.getInstanceSize();
-                allInstancesSize = jc.getAllInstancesSize();
-                retainedSizeByClass = compareRetained ? jc.getRetainedSizeByClass() : -1;
+                retainedSizeByClass = compareRetained ? 0 : -1;
                 real = jc;
             } else {
-                instancesCount = -jc.getInstancesCount();
-                instanceSize = -jc.getInstanceSize();
-                allInstancesSize = -jc.getAllInstancesSize();
-                retainedSizeByClass = compareRetained ? -jc.getRetainedSizeByClass() : -1;
+                retainedSizeByClass = compareRetained ? 0 : -1;
                 real = null;
             }
+            add(jc);
         }
         
         static String createID(JavaClass jc) {
@@ -286,6 +281,20 @@ public class ClassesListController extends AbstractController {
             allInstancesSize += djc.allInstancesSize;
             retainedSizeByClass += djc.retainedSizeByClass;
             real = djc.real;
+        }
+     
+        private void add(JavaClass jc) {
+            if (real != null) {
+                instancesCount += jc.getInstancesCount();
+                instanceSize += jc.getInstanceSize();
+                allInstancesSize += jc.getAllInstancesSize();
+                retainedSizeByClass += retainedSizeByClass != -1 ? jc.getRetainedSizeByClass() : 0;
+            } else {
+                instancesCount -= jc.getInstancesCount();
+                instanceSize -= jc.getInstanceSize();
+                allInstancesSize -= jc.getAllInstancesSize();
+                retainedSizeByClass -= retainedSizeByClass != -1 ? jc.getRetainedSizeByClass() : 0;
+            }
         }
         
         public boolean equals(Object o) {
@@ -484,8 +493,13 @@ public class ClassesListController extends AbstractController {
         List<JavaClass> classes1 = h1.getAllClasses();
         for (JavaClass jc1 : classes1) {
             String id1 = DiffJavaClass.createID(jc1);
-            DiffJavaClass djc1 = DiffJavaClass.createExternal(jc1, compareRetained);
-            classes.put(id1, djc1);
+            DiffJavaClass djc1 = classes.get(id1);
+            if (djc1 == null) {
+                djc1 = DiffJavaClass.createExternal(jc1, compareRetained);
+                classes.put(id1, djc1);
+            } else {
+                djc1.add(jc1);
+            }
         }
         
         List<JavaClass> classes2 = h2.getAllClasses();

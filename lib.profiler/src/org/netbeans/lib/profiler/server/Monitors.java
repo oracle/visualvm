@@ -187,6 +187,7 @@ public class Monitors implements CommonConstants {
                 } catch (Exception ex) {
                 }
             }
+            ThreadInfo.removeProfilerServerThread(this);
         }
 
         synchronized void updateGCStartFinishData() {

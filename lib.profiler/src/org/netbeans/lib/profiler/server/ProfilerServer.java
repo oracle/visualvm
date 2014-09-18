@@ -293,6 +293,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                     }
 
                     if (stopped) {
+                        ThreadInfo.removeProfilerServerThread(this);
                         return;
                     }
 
@@ -692,6 +693,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
         } else {
             preemptExit = false;
         }
+        ThreadInfo.removeProfilerServerThread(this);
     }
 
     public void sendClassLoaderUnloadingCommand() {
