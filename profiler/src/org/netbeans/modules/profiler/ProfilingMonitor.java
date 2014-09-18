@@ -169,11 +169,7 @@ public final class ProfilingMonitor {
                                     }
                                 });
                         } else {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        NetBeansProfiler.getDefaultNB().checkAndUpdateState();
-                                    }
-                                });
+                            NetBeansProfiler.getDefaultNB().checkAndUpdateState();
                             runner = null; // stop monitoring, the TA must have terminated
                         }
                     }

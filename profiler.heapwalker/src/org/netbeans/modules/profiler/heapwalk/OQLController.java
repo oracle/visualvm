@@ -217,7 +217,9 @@ public class OQLController extends AbstractTopLevelController
                             });
 
                             if (counter.get() == 0) {
-                                sb.append("<tr><td><h4>Too many results. Please, refine your query.</h4></td></tr>" );
+                                sb.append("<tr><td><h4>");  // NOI18N
+                                sb.append(NbBundle.getMessage(OQLController.class, "OQL_TOO_MANY_RESULTS_MSG"));      // NOI18N
+                                sb.append("</h4></td></tr>");   // NOI18N
                             } else if (counter.get() == RESULTS_LIMIT) {
                                 sb.append("<tr><td><h4>"); // NOI18N
                                 sb.append(NbBundle.getMessage(OQLController.class, "OQL_NO_RESULTS_MSG")); // NOI18N
@@ -403,9 +405,13 @@ public class OQLController extends AbstractTopLevelController
         
 
         return "<a href='file://instance/" + className + "@" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>" + // NOI18N
-                (details != null ? " - " + details : ""); // NOI18N
+                (details != null ? " - " + htmlize(details) : ""); // NOI18N
 //        return "<a href='file://instance/" + className + "/" + in.getInstanceNumber() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
 //        return in.getJavaClass().getName() + '@' + Long.toHexString(in.getInstanceId()) + '#' + in.getInstanceNumber();
+    }
+
+    private static String htmlize(String value) {
+            return value.replace(">", "&gt;").replace("<", "&lt;");     // NOI18N
     }
 
 

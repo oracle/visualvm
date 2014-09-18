@@ -125,6 +125,7 @@ abstract class SamplingThread extends Thread {
             long time = ((Timers.getCurrentTimeInCounts() - startTime) * 1000) / Timers.getNoOfCountsInSecond();
             System.out.println("JFluid sampling thread: elapsed time: " + time + " ms, avg interval: " + (((double) time) / count) + "ms, adjusted interval: " + adjustedSamplingInterval + " OS units"); // NOI18N
         }
+        ThreadInfo.removeProfilerServerThread(this);
     }
 
     abstract void sample();
