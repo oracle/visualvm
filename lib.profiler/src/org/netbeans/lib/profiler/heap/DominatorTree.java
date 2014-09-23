@@ -64,6 +64,7 @@ class DominatorTree {
     
     private static final int BUFFER_SIZE = (64 * 1024) / 8;
     private static final int ADDITIONAL_IDS_THRESHOLD = 30;
+    private static final int ADDITIONAL_IDS_THRESHOLD_DIRTYSET_SAME_SIZE = 5;
     
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
     
@@ -73,6 +74,7 @@ class DominatorTree {
     private LongBuffer currentMultipleParents;
     private Map<Long,Long> map;
     private Set dirtySet = Collections.EMPTY_SET;
+    private int dirtySetSameSize;
     private Map canContainItself;
     private Map nearestGCRootCache = new NearestGCRootCache(400000);
 
@@ -166,7 +168,7 @@ class DominatorTree {
                     newDirtySet.add(oldIdomObj);
                     newDirtySet.add(newIdomIdObj);
                     map.put(instanceIdObj,newIdomIdObj);
-                    if (dirtySet.size() < ADDITIONAL_IDS_THRESHOLD) {
+                    if (dirtySet.size() < ADDITIONAL_IDS_THRESHOLD || dirtySetSameSize >= ADDITIONAL_IDS_THRESHOLD_DIRTYSET_SAME_SIZE) {
                         updateAdditionalIds(instanceId, additionalIds);
                     }
                     changed = true;
@@ -177,6 +179,11 @@ class DominatorTree {
 //newDomIds.add(newIdomIdObj);
                 }
             }
+        }
+        if (dirtySet.size() != newDirtySet.size()) {
+            dirtySetSameSize = 0;
+        } else {
+            dirtySetSameSize++;
         }
         dirtySet = newDirtySet;
 //System.out.println("Processed: "+processedId);
