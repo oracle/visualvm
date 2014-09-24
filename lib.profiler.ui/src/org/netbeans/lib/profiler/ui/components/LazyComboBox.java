@@ -68,16 +68,16 @@ public class LazyComboBox<E> extends JComboBox<E> {
         super.setModel(model);
     }
 
-    public final LazyComboBoxModel<E> getModel() {
+    private LazyComboBoxModel<E> _getModel() {
         return (LazyComboBoxModel<E>)super.getModel();
     }
 
     public final int getSelectedIndex() {
-        return getModel().isPopulated() ? super.getSelectedIndex() : -1;
+        return _getModel().isPopulated() ? super.getSelectedIndex() : -1;
     }
     
     public final void setSelectedItem(Object newSelected) {
-        LazyComboBoxModel m = getModel();
+        LazyComboBoxModel m = _getModel();
         Object oldSelected = m.getSelectedItem();
         
         m.setSelectedItem(newSelected);
@@ -97,10 +97,10 @@ public class LazyComboBox<E> extends JComboBox<E> {
     protected void selectionChanged() {}
     
     public final void resetModel() {
-        LazyComboBoxModel m = getModel();
+        LazyComboBoxModel m = _getModel();
         Object oldSelected = m.getSelectedItem();
         
-        getModel().reset(true);
+        m.reset(true);
         
         if (!Objects.equals(oldSelected, m.getSelectedItem())) {
             repaint();
@@ -109,8 +109,8 @@ public class LazyComboBox<E> extends JComboBox<E> {
     }
     
     public final Dimension getPreferredSize() {
-        if (getPrototypeDisplayValue() != null || getModel().isPopulated()) return super.getPreferredSize();
-        else return new JComboBox(new Object[] { getModel().getSelectedItem() }).getPreferredSize();
+        if (getPrototypeDisplayValue() != null || _getModel().isPopulated()) return super.getPreferredSize();
+        else return new JComboBox(new Object[] { _getModel().getSelectedItem() }).getPreferredSize();
     }
     
     public final Dimension getMinimumSize() {
