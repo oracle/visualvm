@@ -64,7 +64,7 @@ public class JMethodIdTable {
         public String className;
         public String methodName;
         public String methodSig;
-        public boolean isNative;
+        public transient boolean isNative;
         int methodId;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
@@ -150,9 +150,8 @@ public class JMethodIdTable {
             String className = in.readUTF();
             String methodName = in.readUTF();
             String methodSig = in.readUTF();
-            boolean isNative = in.readBoolean();
 
-            addEntry(methodId, className, methodName, methodSig, isNative);
+            addEntry(methodId, className, methodName, methodSig, false);
         }
     }
 
@@ -177,7 +176,6 @@ public class JMethodIdTable {
                 out.writeUTF(entries[i].className);
                 out.writeUTF(entries[i].methodName);
                 out.writeUTF(entries[i].methodSig);
-                out.writeBoolean(entries[i].isNative);
             }
         }
     }
