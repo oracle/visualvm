@@ -63,6 +63,7 @@ import org.netbeans.modules.profiler.v2.ui.ProjectSelector;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.Lookups;
 
@@ -70,6 +71,14 @@ import org.openide.util.lookup.Lookups;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ProfilerSessions_actionNotSupported=Action not supported by the current profiling session.",
+    "ProfilerSessions_loadingFeatures=Loading project features...",
+    "ProfilerSessions_selectProject=Select the project to profile:",
+    "ProfilerSessions_selectFeature=Select Feature",
+    "ProfilerSessions_selectHandlingFeature=Select the feature to handle the action:",
+    "ProfilerSessions_selectProjectAndFeature=Select Project and Feature"
+})
 final class ProfilerSessions {
     
     static void configure(final ProfilerSession session, final Lookup context, final String actionName) {
@@ -78,13 +87,13 @@ final class ProfilerSessions {
                                              _features.getAvailable(), context);
         if (compatA.isEmpty()) {
             // TODO: might offer creating a new profiling session if the current is not in progress
-            ProfilerDialogs.displayInfo("Action not supported by the current profiling session.");
+            ProfilerDialogs.displayInfo(Bundle.ProfilerSessions_actionNotSupported());
         } else {
             // Resolving selected features in only supported in EDT
             UIUtils.runInEventDispatchThread(new Runnable() {
                 public void run() {
                     Set<ProfilerFeature> compatS = ProfilerFeatures.getCompatible(
-                                                   _features.getSelected(), context);
+                                                   _features.getActivated(), context);
 
                     ProfilerFeature feature;
                     if (compatS.size() == 1) {
@@ -102,7 +111,7 @@ final class ProfilerSessions {
                     }
 
                     if (feature != null) {
-                        _features.selectFeature(feature);
+                        _features.activateFeature(feature);
                         feature.configure(context);
                         session.selectFeature(feature);
                         session.requestActive();
@@ -112,35 +121,49 @@ final class ProfilerSessions {
         }
     }
     
-    static void createAndConfigure(Lookup context, String actionName) {
+    static void createAndConfigure(final Lookup context, final String actionName) {
         Lookup.Provider project = context.lookup(Lookup.Provider.class);
         if (project == null) project = ProjectUtilities.getMainProject();
+        final Lookup.Provider _project = project;
         
-        UI ui = UI.createAndConfigure(context, project);
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                UI ui = UI.createAndConfigure(context, _project);
 
-        String caption = actionName == null ? "Select Project and Feature" : actionName;
-        DialogDescriptor dd = new DialogDescriptor(ui, caption, true, new Object[]
-                                                 { DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION },
-                                                   DialogDescriptor.OK_OPTION, DialogDescriptor.BOTTOM_ALIGN,
-                                                   null, null);
-        Dialog d = DialogDisplayer.getDefault().createDialog(dd);
-        d.setVisible(true);
-        
-        if (dd.getValue() == DialogDescriptor.OK_OPTION) {
-            ProfilerSession session = ui.selectedSession();
-            ProfilerFeature feature = ui.selectedFeature();
-            
-            session.getFeatures().selectFeature(feature);
-            feature.configure(context);
-            session.selectFeature(feature);
-            session.requestActive();
-        }
+                String caption = actionName == null ? Bundle.ProfilerSessions_selectProjectAndFeature() : actionName;
+                DialogDescriptor dd = new DialogDescriptor(ui, caption, true, new Object[]
+                                                         { DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION },
+                                                           DialogDescriptor.OK_OPTION, DialogDescriptor.BOTTOM_ALIGN,
+                                                           null, null);
+                Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+                d.setVisible(true);
+
+                if (dd.getValue() == DialogDescriptor.OK_OPTION) {
+                    final ProfilerSession session = ui.selectedSession();
+                    final ProfilerFeature feature = ui.selectedFeature();
+
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            final ProfilerFeatures features = session.getFeatures();
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    features.activateFeature(feature);
+                                    feature.configure(context);
+                                    session.selectFeature(feature);
+                                    session.requestActive();
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        });
     }
     
     private static ProfilerFeature selectFeature(Set<ProfilerFeature> features, String actionName) {
         UI ui = UI.selectFeature(features);
 
-        String caption = actionName == null ? "Select Feature" : actionName;
+        String caption = actionName == null ? Bundle.ProfilerSessions_selectFeature() : actionName;
         DialogDescriptor dd = new DialogDescriptor(ui, caption, true, new Object[]
                                                  { DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION },
                                                    DialogDescriptor.OK_OPTION, DialogDescriptor.BOTTOM_ALIGN,
@@ -181,7 +204,7 @@ final class ProfilerSessions {
             int y = 0;
             GridBagConstraints c;
             
-            JLabel l = new JLabel("Select the feature to handle the action:");
+            JLabel l = new JLabel(Bundle.ProfilerSessions_selectHandlingFeature());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
@@ -231,7 +254,7 @@ final class ProfilerSessions {
             int y = 0;
             GridBagConstraints c;
             
-            JLabel l = new JLabel("Select the project to profile:");
+            JLabel l = new JLabel(Bundle.ProfilerSessions_selectProject());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
@@ -258,7 +281,7 @@ final class ProfilerSessions {
             c.insets = new Insets(0, 20, 10, 10);
             add(selector, c);
             
-            JLabel ll = new JLabel("Select the feature to handle the action:");
+            JLabel ll = new JLabel(Bundle.ProfilerSessions_selectHandlingFeature());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
@@ -297,7 +320,7 @@ final class ProfilerSessions {
         private void refreshFeatures(final Lookup context, final Lookup.Provider project) {
             contents.removeAll();
             
-            JLabel l = new JLabel("Loading project features...", JLabel.CENTER);
+            JLabel l = new JLabel(Bundle.ProfilerSessions_loadingFeatures(), JLabel.CENTER);
             GridBagConstraints c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = 0;

@@ -43,98 +43,109 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.monitor.MonitorView;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.v2.ProfilerFeature;
-import org.netbeans.modules.profiler.v2.ProfilerSession;
+import org.netbeans.modules.profiler.v2.ui.GrayLabel;
 import org.openide.util.NbBundle;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "ThreadsFeature_name=Threads",
-    "ThreadsFeature_description=Monitor thread states and times"
+    "MonitorFeatureUI_graphs=Graphs:"
 })
-final class ThreadsFeature extends ProfilerFeature.Basic {
+abstract class MonitorFeatureUI extends FeatureUI {
     
-    private ThreadsFeature(ProfilerSession session) {
-        super(Icons.getIcon(ProfilerIcons.WINDOW_THREADS), Bundle.ThreadsFeature_name(),
-              Bundle.ThreadsFeature_description(), 15, session);
+    private ProfilerToolbar toolbar;
+    private MonitorView monitorView;
+    
+    
+    // --- External implementation ---------------------------------------------
+    
+    abstract Profiler getProfiler();
+    
+    
+    // --- API implementation --------------------------------------------------
+    
+    ProfilerToolbar getToolbar() {
+        if (toolbar == null) initUI();
+        return toolbar;
+    }
+
+    JPanel getResultsUI() {
+        if (monitorView == null) initUI();
+        return monitorView;
     }
     
     
-    // --- Settings ------------------------------------------------------------
-    
-    public void configureSettings(ProfilingSettings settings) {
-        settings.setThreadsMonitoringEnabled(true);
-        settings.setThreadsSamplingEnabled(false);
+    void sessionStateChanged(int sessionState) {
+        refreshToolbar(sessionState);
     }
     
     
-    // --- Toolbar & Results UI ------------------------------------------------
+    // --- UI ------------------------------------------------------------------
     
-    private ThreadsFeatureUI ui;
+    private JLabel grLabel;
+    private JButton grZoomInButton;
+    private JButton grZoomOutButton;
+    private JToggleButton grFitWidthButton;
     
-    public JPanel getResultsUI() {
-        return getUI().getResultsUI();
+    
+    private void initUI() {
+        
+        assert SwingUtilities.isEventDispatchThread();
+        
+        // --- Results ---------------------------------------------------------
+        
+        monitorView = new MonitorView(getProfiler().getVMTelemetryManager());
+        
+        
+        // --- Toolbar ---------------------------------------------------------
+        
+        grLabel = new GrayLabel(Bundle.MonitorFeatureUI_graphs());
+            
+        grZoomInButton = new JButton(Icons.getIcon(GeneralIcons.ZOOM_IN));
+        grZoomInButton.setEnabled(false);
+
+        grZoomOutButton = new JButton(Icons.getIcon(GeneralIcons.ZOOM_OUT));
+        grZoomOutButton.setEnabled(false);
+
+        grFitWidthButton = new JToggleButton(Icons.getIcon(GeneralIcons.SCALE_TO_FIT));
+        grFitWidthButton.setEnabled(false);
+
+        toolbar = ProfilerToolbar.create(true);
+
+        toolbar.addSpace(2);
+        toolbar.addSeparator();
+        toolbar.addSpace(5);
+
+        toolbar.add(grLabel);
+        toolbar.addSpace(2);
+        toolbar.add(grZoomInButton);
+        toolbar.add(grZoomOutButton);
+        toolbar.add(grFitWidthButton);
+        
+        
+        // --- Sync UI ---------------------------------------------------------
+        
+        sessionStateChanged(getSessionState());
+        
     }
     
-    public ProfilerToolbar getToolbar() {
-        return getUI().getToolbar();
-    }
-    
-    private ThreadsFeatureUI getUI() {
-        if (ui == null) ui = new ThreadsFeatureUI() {
-            int getSessionState() {
-                return ThreadsFeature.this.getSessionState();
-            }
-            Profiler getProfiler() {
-                return ThreadsFeature.this.getSession().getProfiler();
-            }
-        };
-        return ui;
-    }
-    
-    
-    // --- Session lifecycle ---------------------------------------------------
-    
-    public void notifyActivated() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                getSession().getProfiler().getVMTelemetryManager().reset();
-            }
-        });
-    }
-    
-    public void notifyDeactivated() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                getSession().getProfiler().getVMTelemetryManager().reset();
-            }
-        });
-    }
-    
-    
-    protected void profilingStateChanged(int oldState, int newState) {
-        if (ui != null) ui.sessionStateChanged(getSessionState());
-    }
-    
-    
-    // --- Provider ------------------------------------------------------------
-    
-    @ServiceProvider(service=ProfilerFeature.Provider.class)
-    public static final class Provider extends ProfilerFeature.Provider {
-        public ProfilerFeature getFeature(ProfilerSession session) {
-            return new ThreadsFeature(session);
-        }
+    private void refreshToolbar(final int state) {
+//        if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
+//            public void run() {
+//            }
+//        });
     }
     
 }

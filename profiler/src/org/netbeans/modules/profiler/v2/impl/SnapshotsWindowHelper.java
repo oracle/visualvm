@@ -44,8 +44,6 @@
 package org.netbeans.modules.profiler.v2.impl;
 
 import java.io.File;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.SnapshotsListener;
@@ -53,7 +51,6 @@ import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.v2.SnapshotsWindow;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -62,6 +59,8 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service=SnapshotsListener.class)
 public final class SnapshotsWindowHelper implements SnapshotsListener {
+    
+    private static final WeakProcessor PROCESSOR = new WeakProcessor("Snapshots Window Helper Processor"); // NOI18N
     
     public void snapshotTaken(LoadedSnapshot snapshot) {
         if (ProfilerIDESettings.getInstance().getAutoOpenSnapshot()) {
@@ -91,7 +90,7 @@ public final class SnapshotsWindowHelper implements SnapshotsListener {
     }
 
     private void refreshSnapshots(final LoadedSnapshot snapshot) {
-        processor().post(new Runnable() {
+        PROCESSOR.post(new Runnable() {
             public void run() {
                 File f = snapshot.getFile();
                 File p = f == null ? null : f.getParentFile();
@@ -99,22 +98,6 @@ public final class SnapshotsWindowHelper implements SnapshotsListener {
                 if (fo != null) SnapshotsWindow.instance().refreshFolder(fo, true);
             }
         });
-    }
-    
-    
-    // --- Processor -----------------------------------------------------------
-    
-    private static Reference<RequestProcessor> PROCESSOR;
-    
-    private static synchronized RequestProcessor processor() {
-        RequestProcessor p = PROCESSOR != null ? PROCESSOR.get() : null;
-        
-        if (p == null) {
-            p = new RequestProcessor("Snapshots Window Helper Processor");
-            PROCESSOR = new WeakReference(p);
-        }
-        
-        return p;
     }
     
 }

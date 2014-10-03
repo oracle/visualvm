@@ -42,6 +42,7 @@
 package org.netbeans.modules.profiler.actions;
 
 import java.util.concurrent.ExecutionException;
+import javax.swing.Action;
 import javax.swing.SwingWorker;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerLogger;
@@ -65,7 +66,7 @@ import org.openide.util.NbBundle;
  */
 @NbBundle.Messages({
     "LBL_TakeThreadDumpAction=&Take Thread Dump",
-    "HINT_TakeThreadDumpAction=Take Thread Dump"
+    "HINT_TakeThreadDumpAction=Take thread dump from the profiled application"
 })
 public class TakeThreadDumpAction extends ProfilingAwareAction {
 
@@ -89,6 +90,7 @@ public class TakeThreadDumpAction extends ProfilingAwareAction {
     public TakeThreadDumpAction() {
         setIcon(Icons.getIcon(ProfilerIcons.SNAPSHOT_THREADS));
         putValue("iconBase", Icons.getResource(ProfilerIcons.SNAPSHOT_THREADS)); // NOI18N
+        putProperty(Action.SHORT_DESCRIPTION, Bundle.HINT_TakeThreadDumpAction());
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
