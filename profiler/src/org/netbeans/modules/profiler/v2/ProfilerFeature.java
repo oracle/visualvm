@@ -43,18 +43,18 @@
 
 package org.netbeans.modules.profiler.v2;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.util.Lookup;
 
 /**
@@ -84,19 +84,22 @@ public abstract class ProfilerFeature {
     
     public abstract boolean supportsSettings(ProfilingSettings settings);
     
+    // To be called in EDT
     public abstract void configureSettings(ProfilingSettings settings);
     
-    public abstract boolean settingsValid();
+    // To be called in EDT
+    public abstract boolean currentSettingsValid();
     
     
     public abstract boolean supportsConfiguration(Lookup configuration);
     
+    // To be called in EDT
     public abstract void configure(Lookup configuration);
     
     
-    protected void attachedToSession(ProfilerSession session) {}
+    protected void activatedInSession() {}
     
-    protected void detachedFromSession(ProfilerSession session) {}
+    protected void deactivatedInSession() {}
     
     
     public abstract void addChangeListener(ChangeListener listener);
@@ -113,76 +116,127 @@ public abstract class ProfilerFeature {
         private final String description;
         private final int position;
         
-        private ProfilerSession attachedSession;
+        private final ProfilerSession session;
         
-        public Basic(Icon icon, String name, String description, int position) {
+        private volatile boolean isActive;
+        
+        
+        public Basic(Icon icon, String name, String description, int position, ProfilerSession session) {
             this.icon = icon;
             this.name = name;
             this.description = description;
             this.position = position;
+            
+            this.session = session;
         }
         
-        public Icon getIcon() { return icon; }
+        public final Icon getIcon() { return icon; }
         
-        public String getName() { return name; }
+        public final String getName() { return name; }
     
-        public String getDescription() { return description; }
+        public final String getDescription() { return description; }
         
-        public int getPosition() { return position; }
+        public final int getPosition() { return position; }
+        
+        
+        protected final ProfilerSession getSession() { return session; }
+        
         
         public JPanel getSettingsUI() { return null; }
         
+        public boolean supportsSettings(ProfilingSettings settings) { return true; }
+        
+        public boolean currentSettingsValid() { return true; }
+        
+        
         public ProfilerToolbar getToolbar() { return null; }
         
-        public boolean settingsValid() { return true; }
         
         public boolean supportsConfiguration(Lookup configuration) { return false; }
     
         public void configure(Lookup configuration) {}
         
-        protected void attachedToSession(ProfilerSession session) {
-            attachedSession = session;
-            attachedSession.addListener(getListener());
-            profilingStateChanged(-1, getSessionState());
+        
+        protected void notifyActivated() {}
+        
+        protected void notifyDeactivated() {}
+        
+        protected final boolean isActivated() { return isActive; }
+        
+        
+        protected final void activatedInSession() {
+            isActive = true;
+            
+            notifyActivated();
+            
+            session.addListener(getListener());
+            
+            final int state = session.getState();
+            Runnable notifier = new Runnable() {
+                public void run() { profilingStateChanged(-1, state); }
+            };
+            UIUtils.runInEventDispatchThread(notifier);
         }
     
-        protected void detachedFromSession(ProfilerSession session) {
-            attachedSession.removeListener(getListener());
-            attachedSession = null;
-            profilingStateChanged(-1, getSessionState());
+        protected final void deactivatedInSession() {
+            isActive = false;
+            
+            notifyDeactivated();
+            
+            session.removeListener(getListener());
+            listener = null;
+            
+            final int state = Profiler.PROFILING_INACTIVE;
+            Runnable notifier = new Runnable() {
+                public void run() { profilingStateChanged(-1, state); }
+            };
+            UIUtils.runInEventDispatchThread(notifier);
         }
         
-        protected ProfilerSession getSession() {
-            return attachedSession;
+        protected final int getSessionState() {
+            return isActive ? session.getState() : Profiler.PROFILING_INACTIVE;
         }
         
-        protected int getSessionState() {
-            return attachedSession == null ? NetBeansProfiler.PROFILING_INACTIVE :
-                                             attachedSession.getState();
+        
+        protected final String readFlag(String flag, String defaultValue) {
+            String id = getClass().getName();
+            return session.getStorage().readFlag(id + "_" + flag, defaultValue); // NOI18N
+        }
+        
+        protected final void storeFlag(String flag, String value) {
+            String id = getClass().getName();
+            session.getStorage().storeFlag(id + "_" + flag, value); // NOI18N
         }
         
         
         private ProfilingStateListener listener;
         private ProfilingStateListener getListener() {
             if (listener == null) listener = new ProfilingStateListener() {
+                public void serverStateChanged(int serverState, int serverProgress) {
+                    if (!isActive) return;
+                    Basic.this.serverStateChanged(serverState, serverProgress);
+                }
                 public void instrumentationChanged(int oldType, int newType) {
+                    if (!isActive) return;
                     Basic.this.instrumentationChanged(oldType, newType);
                 }
                 public void profilingStateChanged(ProfilingStateEvent e) {
+                    if (!isActive) return;
                     Basic.this.profilingStateChanged(e.getOldState(), e.getNewState());
                 }
                 public void threadsMonitoringChanged() {
+                    if (!isActive) return;
                     Basic.this.threadsMonitoringChanged();
                 }
                 public void lockContentionMonitoringChanged() {
+                    if (!isActive) return;
                     Basic.this.lockContentionMonitoringChanged();
-                }
-                public void serverStateChanged(int serverState, int serverProgress) {
-                    Basic.this.serverStateChanged(serverState, serverProgress);
                 }
             };
             return listener;
         }
+        
+        protected void serverStateChanged(int serverState, int serverProgress) {}
         
         protected void instrumentationChanged(int oldType, int newType) {}
 
@@ -191,20 +245,18 @@ public abstract class ProfilerFeature {
         protected void threadsMonitoringChanged() {}
 
         protected void lockContentionMonitoringChanged() {}
-
-        protected void serverStateChanged(int serverState, int serverProgress) {}
         
         
-        public void addChangeListener(ChangeListener listener) {
+        public synchronized final void addChangeListener(ChangeListener listener) {
             if (listeners == null) listeners = new HashSet();
             listeners.add(listener);
         }
     
-        public void removeChangeListener(ChangeListener listener) {
+        public synchronized final void removeChangeListener(ChangeListener listener) {
             if (listeners != null) listeners.remove(listener);
         }
         
-        protected void fireChange() {
+        protected synchronized final void fireChange() {
             if (listeners == null) return;
             ChangeEvent e = new ChangeEvent(this);
             for (ChangeListener listener : listeners) listener.stateChanged(e);
@@ -216,7 +268,7 @@ public abstract class ProfilerFeature {
     
     public static abstract class Provider {
         
-        public abstract Collection<ProfilerFeature> getFeatures(Lookup.Provider project);
+        public abstract ProfilerFeature getFeature(ProfilerSession session);
         
     }
     

@@ -46,10 +46,10 @@ package org.netbeans.modules.profiler.v2;
 import java.util.Objects;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.AttachSettings;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
@@ -92,12 +92,14 @@ public abstract class ProfilerSession {
         else ProfilerSessions.createAndConfigure(context, actionName);
     }
     
+    
     // --- Constructor ---------------------------------------------------------
     
-    protected ProfilerSession(NetBeansProfiler _profiler, Lookup context) {
+    protected ProfilerSession(Profiler _profiler, Lookup context) {
         profiler = _profiler;
         setContext(context);
     }
+    
     
     // --- Context -------------------------------------------------------------
     
@@ -115,6 +117,7 @@ public abstract class ProfilerSession {
         return Objects.equals(getProject(), _context.lookup(Lookup.Provider.class));
     }
     
+    
     // --- SPI -----------------------------------------------------------------
     
     // Called in EDT, return false for start failure
@@ -131,15 +134,18 @@ public abstract class ProfilerSession {
     
     public abstract FileObject getFile();
     
+    
     // --- API -----------------------------------------------------------------
     
-    private final NetBeansProfiler profiler;
+    private final Profiler profiler;
     private ProfilerWindow window;
     
     private ProfilingSettings profilingSettings;
     private AttachSettings attachSettings;
     
     private boolean isAttach;
+    
+    private SessionStorage storage;
     
     
     public final void setAttach(boolean attach) {
@@ -151,7 +157,7 @@ public abstract class ProfilerSession {
     public synchronized final boolean isAttach() { return isAttach; }
     
     
-    public final NetBeansProfiler getProfiler() { return profiler; }    
+    public final Profiler getProfiler() { return profiler; }    
     
     // Set when starting/modifying profiling session, not a persistent storage!
     public final ProfilingSettings getProfilingSettings() { return profilingSettings; }
@@ -181,6 +187,7 @@ public abstract class ProfilerSession {
         });
     };
     
+    
     // --- Profiler API bridge -------------------------------------------------
     
     public final int getState() {
@@ -188,7 +195,7 @@ public abstract class ProfilerSession {
     }
     
     public final boolean inProgress() {
-        return getState() != NetBeansProfiler.PROFILING_INACTIVE;
+        return getState() != Profiler.PROFILING_INACTIVE;
     }
     
     public final void addListener(ProfilingStateListener listener) {
@@ -199,11 +206,10 @@ public abstract class ProfilerSession {
         profiler.removeProfilingStateListener(listener);
     }
     
+    
     // --- Internal API --------------------------------------------------------
     
     private ProfilerFeatures features;
-    private SessionStorage storage;
-    
     
     final boolean doStart(ProfilingSettings pSettings, AttachSettings aSettings) {
         profilingSettings = pSettings;
@@ -242,6 +248,11 @@ public abstract class ProfilerSession {
         return storage;
     }
     
+    final synchronized void persistStorage() {
+        if (storage != null) storage.persist();
+    }
+    
+    
     // --- Implementation ------------------------------------------------------
     
     private ProfilerWindow getWindow() {
@@ -269,8 +280,11 @@ public abstract class ProfilerSession {
             if (CURRENT_SESSION == this) CURRENT_SESSION = null;
         }
         
+        persistStorage();
+        
         // TODO: unregister listeners (this.addListener) to prevent memory leaks
     }
+    
     
     // --- Provider ------------------------------------------------------------
     

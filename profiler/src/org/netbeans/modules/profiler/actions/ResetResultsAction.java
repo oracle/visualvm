@@ -71,7 +71,7 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @NbBundle.Messages({
     "LBL_ResetResultsAction=R&eset Collected Results",
-    "HINT_ResetResultsAction=Reset Collected Results Buffer"
+    "HINT_ResetResultsAction=Reset collected results"
 })
 public final class ResetResultsAction extends CallableSystemAction {
     
