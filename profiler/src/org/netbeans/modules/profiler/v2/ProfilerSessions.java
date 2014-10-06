@@ -43,18 +43,30 @@
 
 package org.netbeans.modules.profiler.v2;
 
+import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.util.Set;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.border.EmptyBorder;
+import org.netbeans.lib.profiler.common.Profiler;
+import org.netbeans.lib.profiler.common.event.ProfilingStateAdapter;
+import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
+import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedRadioButton;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
@@ -66,6 +78,7 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.Lookups;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -77,9 +90,14 @@ import org.openide.util.lookup.Lookups;
     "ProfilerSessions_selectProject=Select the project to profile:",
     "ProfilerSessions_selectFeature=Select Feature",
     "ProfilerSessions_selectHandlingFeature=Select the feature to handle the action:",
-    "ProfilerSessions_selectProjectAndFeature=Select Project and Feature"
+    "ProfilerSessions_selectProjectAndFeature=Select Project and Feature",
+    "ProfilerSessions_finishingSession=Finishing previous session...",
+    "ProfilerSessions_finishSessionCaption=Profile",
+    "ProfilerSessions_cancel=Cancel"
 })
 final class ProfilerSessions {
+    
+    // --- Find and configure session ------------------------------------------
     
     static void configure(final ProfilerSession session, final Lookup context, final String actionName) {
         final ProfilerFeatures _features = session.getFeatures();
@@ -114,7 +132,7 @@ final class ProfilerSessions {
                         _features.activateFeature(feature);
                         feature.configure(context);
                         session.selectFeature(feature);
-                        session.requestActive();
+                        session.open();
                     }
                 }
             });
@@ -150,7 +168,7 @@ final class ProfilerSessions {
                                     features.activateFeature(feature);
                                     feature.configure(context);
                                     session.selectFeature(feature);
-                                    session.requestActive();
+                                    session.open();
                                 }
                             });
                         }
@@ -377,6 +395,94 @@ final class ProfilerSessions {
             });
         }
         
+    }
+    
+    
+    // --- Wait for profiler ---------------------------------------------------
+    
+    private static final int MIN_WAIT_WIDTH = 350;
+    private static final int ENABLE_CANCEL_MS = 5000;
+    private static volatile boolean waitingCancelled;
+    
+    
+    static boolean waitForProfiler() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            waitingCancelled = blockingWaitDialog(null);
+        } else {
+            final Object lock = new Object();
+            synchronized(lock) { 
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { waitingCancelled = blockingWaitDialog(lock); }
+                });
+                try { lock.wait(); }
+                catch (InterruptedException ex) {}
+            }
+        }
+        
+        return !waitingCancelled;
+    }
+    
+    private static boolean blockingWaitDialog(Object lock) {
+        try {
+            Profiler profiler = Profiler.getDefault();
+            if (profiler.getProfilingState() == Profiler.PROFILING_INACTIVE) return false;
+            
+            JPanel panel = new JPanel(new BorderLayout(5, 5));
+            panel.setBorder(new EmptyBorder(15, 15, 15, 10));
+            panel.add(new JLabel(Bundle.ProfilerSessions_finishingSession()), BorderLayout.NORTH);
+
+            JProgressBar progress = new JProgressBar();
+            progress.setIndeterminate(true);
+            panel.add(progress, BorderLayout.SOUTH);
+            
+            Dimension ps = panel.getPreferredSize();
+            panel.setPreferredSize(new Dimension(Math.max(ps.width, MIN_WAIT_WIDTH), ps.height));
+            
+            final JButton cancel = new JButton(Bundle.ProfilerSessions_cancel());
+            cancel.setVisible(false);
+
+            DialogDescriptor dd = new DialogDescriptor(panel, Bundle.ProfilerSessions_finishSessionCaption(),
+                                      true, new Object[] { cancel }, null,
+                                      DialogDescriptor.DEFAULT_ALIGN, null, null);
+            final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+            final JDialog jd = d instanceof JDialog ? (JDialog)d : null;
+
+            final ProfilingStateListener listener = new ProfilingStateAdapter() {
+                public void profilingStateChanged(ProfilingStateEvent e) {
+                    if (e.getNewState() == Profiler.PROFILING_INACTIVE) { d.setVisible(false); }
+                }
+            };
+            profiler.addProfilingStateListener(listener);
+            
+            int closeOp = -1;
+            if (jd != null) {
+                closeOp = jd.getDefaultCloseOperation();
+                jd.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+            }
+            
+            final int _closeOp = closeOp;
+            Timer timer = new Timer(ENABLE_CANCEL_MS, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (jd != null) jd.setDefaultCloseOperation(_closeOp);
+                    cancel.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) { d.setVisible(false); }
+                    });
+                    cancel.setVisible(true);
+                    d.pack();
+                }
+            });
+            timer.setRepeats(false);
+            timer.start();
+            
+            d.setLocationRelativeTo(WindowManager.getDefault().getMainWindow());
+            d.setVisible(true);
+            
+            profiler.removeProfilingStateListener(listener);
+            
+            return dd.getValue() != null;
+        } finally {
+            if (lock != null) synchronized(lock) { lock.notifyAll(); }
+        }
     }
     
 }

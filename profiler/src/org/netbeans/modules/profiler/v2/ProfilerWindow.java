@@ -441,7 +441,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                if (!session.doTerminate()) stop.setEnabled(true);
+                if (!session.doStop()) stop.setEnabled(true);
             }
         });
     }
@@ -735,17 +735,12 @@ class ProfilerWindow extends ProfilerTopComponent {
     
     // --- TopComponent --------------------------------------------------------
     
+    boolean closing = false;
+    
     public boolean canClose() {
+        if (closing) return true;
         if (!super.canClose()) return false;
-        if (!session.inProgress()) return true;
-        
-        if (ProfilerDialogs.displayConfirmation(Bundle.ProfilerWindow_terminateMsg(),
-                                                Bundle.ProfilerWindow_terminateCaption())) {
-            session.terminate();
-            return true;
-        } else {
-            return false;
-        }
+        return session.close();
     }
     
     public void open() {

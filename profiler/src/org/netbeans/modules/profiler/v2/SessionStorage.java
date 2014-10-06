@@ -69,6 +69,7 @@ final class SessionStorage {
     
     private static final WeakProcessor PROCESSOR = new WeakProcessor("Profiler Storage Processor"); // NOI18N
     
+    private boolean dirty;
     private Properties properties;
     private final Lookup.Provider project;
     
@@ -83,6 +84,8 @@ final class SessionStorage {
         
         if (value != null) properties.put(flag, value);
         else properties.remove(flag);
+        
+        dirty = true;
     }
     
     synchronized String readFlag(String flag, String defaultValue) {
@@ -93,7 +96,7 @@ final class SessionStorage {
     
     
     synchronized void persist() {
-        if (properties != null) {
+        if (dirty) {
             final Properties _properties = new Properties(properties);
             PROCESSOR.post(new Runnable() {
                 public void run() { saveProperties(_properties); }

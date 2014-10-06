@@ -50,6 +50,7 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
@@ -72,17 +73,29 @@ public abstract class ProfilerSession {
     }
     
     public static ProfilerSession forContext(Lookup context) {
-        // Try to reuse the active session first
         synchronized(CURRENT_SESSION_LOCK) {
-            if (CURRENT_SESSION != null && CURRENT_SESSION.isCompatibleContext(context)) {
-                CURRENT_SESSION.setContext(context);
-                return CURRENT_SESSION;
+            if (CURRENT_SESSION != null) {
+                if (CURRENT_SESSION.isCompatibleContext(context)) {
+                    // Reuse the compatible active session
+                    CURRENT_SESSION.setContext(context);
+                    return CURRENT_SESSION;
+                } else {
+                    // Close the incompatible active session
+                    if (!CURRENT_SESSION.close()) return null;
+                }
             }
         }
         
+        if (!ProfilerSessions.waitForProfiler()) return null;
+
         // Create a new session, will eliminate another session when showing UI
         Provider provider = Lookup.getDefault().lookup(Provider.class);
-        return provider == null ? null : provider.getSession(context);
+        ProfilerSession session = provider == null ? null : provider.getSession(context);
+
+        synchronized(CURRENT_SESSION_LOCK) { CURRENT_SESSION = session; }
+
+        return session;
+        
     };
     
     
@@ -127,7 +140,7 @@ public abstract class ProfilerSession {
     protected abstract boolean modify();
     
     // Called in EDT, return false for termination failure
-    protected abstract boolean terminate();
+    protected abstract boolean stop();
     
     
     public abstract Lookup.Provider getProject();
@@ -166,23 +179,12 @@ public abstract class ProfilerSession {
     public final AttachSettings getAttachSettings() { return attachSettings; }
     
     
-    public final void requestActive() {
+    public final void open() {
         UIUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
-                synchronized(CURRENT_SESSION_LOCK) {
-                    if (CURRENT_SESSION != null && CURRENT_SESSION != ProfilerSession.this) {
-                        ProfilerWindow w = CURRENT_SESSION.window;
-                        if (w != null && !w.close()) return;
-                    }
-                }
-
                 ProfilerWindow w = getWindow();
                 w.open();
                 w.requestActive();
-
-                synchronized(CURRENT_SESSION_LOCK) {
-                    CURRENT_SESSION = ProfilerSession.this;
-                }
             }
         });
     };
@@ -222,8 +224,34 @@ public abstract class ProfilerSession {
         return modify();
     }
     
-    final boolean doTerminate() {
-        return terminate();
+    final boolean doStop() {
+        return stop();
+    }
+    
+    final boolean close() {
+        if (inProgress()) {
+            if (!ProfilerDialogs.displayConfirmation(Bundle.ProfilerWindow_terminateMsg(),
+                                                Bundle.ProfilerWindow_terminateCaption()))
+                return false;
+            if (!doStop()) return false;
+        }
+        
+        synchronized(CURRENT_SESSION_LOCK) {
+            if (CURRENT_SESSION == this) CURRENT_SESSION = null;
+        }
+        
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                if (window != null && window.isOpened()) {
+                    window.closing = true;
+                    window.close(); // calls session.cleanup()
+                } else {
+                    cleanup();
+                }
+            }
+        });
+        
+        return true;
     }
     
     final ProfilerFeatures getFeatures() {
@@ -262,6 +290,7 @@ public abstract class ProfilerSession {
             window = new ProfilerWindow(ProfilerSession.this) {
                 protected void componentClosed() {
                     super.componentClosed();
+                    window = null;
                     cleanup();
                 }
             };
@@ -275,11 +304,7 @@ public abstract class ProfilerSession {
         });
     }
     
-    private void cleanup() {
-        synchronized(CURRENT_SESSION_LOCK) {
-            if (CURRENT_SESSION == this) CURRENT_SESSION = null;
-        }
-        
+    private void cleanup() {        
         persistStorage();
         
         // TODO: unregister listeners (this.addListener) to prevent memory leaks
