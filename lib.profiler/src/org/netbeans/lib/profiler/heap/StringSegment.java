@@ -115,8 +115,6 @@ class StringSegment extends TagBounds {
     }
 
     private synchronized long getStringOffsetByID(long stringID) {
-        long startLong;
-
         if (stringIDMap == null) {
             stringIDMap = new LongHashMap(32768);
 
@@ -130,14 +128,10 @@ class StringSegment extends TagBounds {
                 }
             }
         }
-
-        startLong = stringIDMap.get(stringID);
-
-        if (startLong == 0) {
-            return -1;
+        if (stringID == 0) {
+            return -1; // string not found
         }
-
-        return startLong;
+        return stringIDMap.get(stringID);
     }
 
     private HprofByteBuffer getDumpBuffer() {

@@ -222,7 +222,7 @@ class LongHashMap {
             if (item == k)
                 return tab[i + 1];
             if (item == 0)
-                return 0;
+                return -1;
             i = nextKeyIndex(i, len);
         }
     }
@@ -309,6 +309,7 @@ class LongHashMap {
      */
     long put(long key, long value) {
         assert key != 0;
+        assert value != -1;
         long k = key;
         long[] tab = table;
         int len = tab.length;
@@ -329,7 +330,7 @@ class LongHashMap {
         tab[i + 1] = value;
         if (++size >= threshold)
             resize(len); // len == 2 * current capacity.
-        return 0;
+        return -1;
     }
 
     /**
