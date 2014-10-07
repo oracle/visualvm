@@ -41,39 +41,28 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.ui;
+package org.netbeans.modules.profiler.v2.features;
 
-import java.awt.Color;
-import javax.swing.Icon;
-import javax.swing.JLabel;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import javax.swing.JPanel;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class GrayLabel extends JLabel {
+abstract class FeatureUI {
     
-    public GrayLabel() { super(); }
+    // --- API -----------------------------------------------------------------
     
-    public GrayLabel(Icon icon) { super(icon); }
+    abstract ProfilerToolbar getToolbar();
     
-    public GrayLabel(String text) { super(text); }
+    abstract JPanel getResultsUI();
     
-    public GrayLabel(Icon icon, int alignment) { super(icon, alignment); }
-    
-    public GrayLabel(String text, int alignment) { super(text, alignment); }
-    
-    public GrayLabel(String text, Icon icon, int alignment) { super(text, icon, alignment); }
+    abstract void sessionStateChanged(int sessionState);
     
     
-    public Color getForeground() {
-        return UIUtils.getDisabledLineColor();
-    }
+    // --- External implementation ---------------------------------------------
     
-    
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(true); // To workaround the 3D look on some LaFs
-    }
+    abstract int getSessionState();
     
 }

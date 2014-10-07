@@ -41,19 +41,20 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.ui;
+package org.netbeans.modules.profiler.v2.impl;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JLabel;
 import javax.swing.Timer;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
+import org.netbeans.modules.profiler.v2.ui.GrayLabel;
 
 /**
  *
@@ -106,27 +107,27 @@ public class ProfilerStatus {
         int state = session.getState();
         
         switch (state) {
-            case NetBeansProfiler.PROFILING_INACTIVE:
+            case Profiler.PROFILING_INACTIVE:
                 label.setText("Inactive");
                 break;
-            case NetBeansProfiler.PROFILING_PAUSED:
+            case Profiler.PROFILING_PAUSED:
                 label.setText("Paused");
                 break;
-            case NetBeansProfiler.PROFILING_STARTED:
+            case Profiler.PROFILING_STARTED:
                 label.setText("Starting");
                 break;
-            case NetBeansProfiler.PROFILING_STOPPED:
+            case Profiler.PROFILING_STOPPED:
                 label.setText("Stopped");
                 break;
-            case NetBeansProfiler.PROFILING_IN_TRANSITION:
+            case Profiler.PROFILING_IN_TRANSITION:
                 label.setText("Changing");
                 break;
-            case NetBeansProfiler.PROFILING_RUNNING:
+            case Profiler.PROFILING_RUNNING:
                 updateRunningStatus(session);
                 break;
         }
         
-        status.setEnabled(state != NetBeansProfiler.PROFILING_INACTIVE);
+        status.setEnabled(state != Profiler.PROFILING_INACTIVE);
     }
     
     private void updateRunningStatus(ProfilerSession session) {
