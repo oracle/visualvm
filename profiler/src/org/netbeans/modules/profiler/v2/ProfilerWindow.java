@@ -81,7 +81,6 @@ import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.RunGCAction;
 import org.netbeans.modules.profiler.actions.TakeThreadDumpAction;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -740,7 +739,9 @@ class ProfilerWindow extends ProfilerTopComponent {
     public boolean canClose() {
         if (closing) return true;
         if (!super.canClose()) return false;
-        return session.close();
+        closing = true;
+        closing = session.close();
+        return closing;
     }
     
     public void open() {

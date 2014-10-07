@@ -44,9 +44,10 @@
 package org.netbeans.modules.profiler.v2.features;
 
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.v2.ProfilerFeature;
@@ -107,23 +108,21 @@ final class LocksFeature extends ProfilerFeature.Basic {
     // --- Session lifecycle ---------------------------------------------------
     
     public void notifyActivated() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                getSession().getProfiler().getVMTelemetryManager().reset();
-            }
-        });
+        // TODO: reset only the Locks data!
+        ResultsManager.getDefault().reset();
     }
     
     public void notifyDeactivated() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                getSession().getProfiler().getVMTelemetryManager().reset();
-            }
-        });
+        // TODO: reset only the Locks data!
+        ResultsManager.getDefault().reset();
     }
     
     
     protected void profilingStateChanged(int oldState, int newState) {
+        // TODO: reset only the Locks data!
+        if (newState == Profiler.PROFILING_STARTED)
+            ResultsManager.getDefault().reset();
+        
         if (ui != null) ui.sessionStateChanged(getSessionState());
     }
     
