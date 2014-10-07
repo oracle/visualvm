@@ -468,8 +468,6 @@ final class MethodsFeature extends ProfilerFeature.Basic {
         if (running) return;
         running = true;
         
-        resetResults();
-        
         refresher = new Runnable() {
             public void run() {
                 if (running) {
