@@ -43,18 +43,30 @@
 
 package org.netbeans.modules.profiler.v2;
 
+import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.util.Set;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.border.EmptyBorder;
+import org.netbeans.lib.profiler.common.Profiler;
+import org.netbeans.lib.profiler.common.event.ProfilingStateAdapter;
+import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
+import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedRadioButton;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
@@ -63,14 +75,29 @@ import org.netbeans.modules.profiler.v2.ui.ProjectSelector;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.Lookups;
+import org.openide.windows.WindowManager;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ProfilerSessions_actionNotSupported=Action not supported by the current profiling session.",
+    "ProfilerSessions_loadingFeatures=Loading project features...",
+    "ProfilerSessions_selectProject=Select the project to profile:",
+    "ProfilerSessions_selectFeature=Select Feature",
+    "ProfilerSessions_selectHandlingFeature=Select the feature to handle the action:",
+    "ProfilerSessions_selectProjectAndFeature=Select Project and Feature",
+    "ProfilerSessions_finishingSession=Finishing previous session...",
+    "ProfilerSessions_finishSessionCaption=Profile",
+    "ProfilerSessions_cancel=Cancel"
+})
 final class ProfilerSessions {
+    
+    // --- Find and configure session ------------------------------------------
     
     static void configure(final ProfilerSession session, final Lookup context, final String actionName) {
         final ProfilerFeatures _features = session.getFeatures();
@@ -78,13 +105,13 @@ final class ProfilerSessions {
                                              _features.getAvailable(), context);
         if (compatA.isEmpty()) {
             // TODO: might offer creating a new profiling session if the current is not in progress
-            ProfilerDialogs.displayInfo("Action not supported by the current profiling session.");
+            ProfilerDialogs.displayInfo(Bundle.ProfilerSessions_actionNotSupported());
         } else {
             // Resolving selected features in only supported in EDT
             UIUtils.runInEventDispatchThread(new Runnable() {
                 public void run() {
                     Set<ProfilerFeature> compatS = ProfilerFeatures.getCompatible(
-                                                   _features.getSelected(), context);
+                                                   _features.getActivated(), context);
 
                     ProfilerFeature feature;
                     if (compatS.size() == 1) {
@@ -102,45 +129,59 @@ final class ProfilerSessions {
                     }
 
                     if (feature != null) {
-                        _features.selectFeature(feature);
+                        _features.activateFeature(feature);
                         feature.configure(context);
                         session.selectFeature(feature);
-                        session.requestActive();
+                        session.open();
                     }
                 }
             });
         }
     }
     
-    static void createAndConfigure(Lookup context, String actionName) {
+    static void createAndConfigure(final Lookup context, final String actionName) {
         Lookup.Provider project = context.lookup(Lookup.Provider.class);
         if (project == null) project = ProjectUtilities.getMainProject();
+        final Lookup.Provider _project = project;
         
-        UI ui = UI.createAndConfigure(context, project);
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                UI ui = UI.createAndConfigure(context, _project);
 
-        String caption = actionName == null ? "Select Project and Feature" : actionName;
-        DialogDescriptor dd = new DialogDescriptor(ui, caption, true, new Object[]
-                                                 { DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION },
-                                                   DialogDescriptor.OK_OPTION, DialogDescriptor.BOTTOM_ALIGN,
-                                                   null, null);
-        Dialog d = DialogDisplayer.getDefault().createDialog(dd);
-        d.setVisible(true);
-        
-        if (dd.getValue() == DialogDescriptor.OK_OPTION) {
-            ProfilerSession session = ui.selectedSession();
-            ProfilerFeature feature = ui.selectedFeature();
-            
-            session.getFeatures().selectFeature(feature);
-            feature.configure(context);
-            session.selectFeature(feature);
-            session.requestActive();
-        }
+                String caption = actionName == null ? Bundle.ProfilerSessions_selectProjectAndFeature() : actionName;
+                DialogDescriptor dd = new DialogDescriptor(ui, caption, true, new Object[]
+                                                         { DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION },
+                                                           DialogDescriptor.OK_OPTION, DialogDescriptor.BOTTOM_ALIGN,
+                                                           null, null);
+                Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+                d.setVisible(true);
+
+                if (dd.getValue() == DialogDescriptor.OK_OPTION) {
+                    final ProfilerSession session = ui.selectedSession();
+                    final ProfilerFeature feature = ui.selectedFeature();
+
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            final ProfilerFeatures features = session.getFeatures();
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    features.activateFeature(feature);
+                                    feature.configure(context);
+                                    session.selectFeature(feature);
+                                    session.open();
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        });
     }
     
     private static ProfilerFeature selectFeature(Set<ProfilerFeature> features, String actionName) {
         UI ui = UI.selectFeature(features);
 
-        String caption = actionName == null ? "Select Feature" : actionName;
+        String caption = actionName == null ? Bundle.ProfilerSessions_selectFeature() : actionName;
         DialogDescriptor dd = new DialogDescriptor(ui, caption, true, new Object[]
                                                  { DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION },
                                                    DialogDescriptor.OK_OPTION, DialogDescriptor.BOTTOM_ALIGN,
@@ -181,7 +222,7 @@ final class ProfilerSessions {
             int y = 0;
             GridBagConstraints c;
             
-            JLabel l = new JLabel("Select the feature to handle the action:");
+            JLabel l = new JLabel(Bundle.ProfilerSessions_selectHandlingFeature());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
@@ -231,7 +272,7 @@ final class ProfilerSessions {
             int y = 0;
             GridBagConstraints c;
             
-            JLabel l = new JLabel("Select the project to profile:");
+            JLabel l = new JLabel(Bundle.ProfilerSessions_selectProject());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
@@ -258,7 +299,7 @@ final class ProfilerSessions {
             c.insets = new Insets(0, 20, 10, 10);
             add(selector, c);
             
-            JLabel ll = new JLabel("Select the feature to handle the action:");
+            JLabel ll = new JLabel(Bundle.ProfilerSessions_selectHandlingFeature());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
@@ -297,7 +338,7 @@ final class ProfilerSessions {
         private void refreshFeatures(final Lookup context, final Lookup.Provider project) {
             contents.removeAll();
             
-            JLabel l = new JLabel("Loading project features...", JLabel.CENTER);
+            JLabel l = new JLabel(Bundle.ProfilerSessions_loadingFeatures(), JLabel.CENTER);
             GridBagConstraints c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = 0;
@@ -354,6 +395,94 @@ final class ProfilerSessions {
             });
         }
         
+    }
+    
+    
+    // --- Wait for profiler ---------------------------------------------------
+    
+    private static final int MIN_WAIT_WIDTH = 350;
+    private static final int ENABLE_CANCEL_MS = 5000;
+    private static volatile boolean waitingCancelled;
+    
+    
+    static boolean waitForProfiler() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            waitingCancelled = blockingWaitDialog(null);
+        } else {
+            final Object lock = new Object();
+            synchronized(lock) { 
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { waitingCancelled = blockingWaitDialog(lock); }
+                });
+                try { lock.wait(); }
+                catch (InterruptedException ex) {}
+            }
+        }
+        
+        return !waitingCancelled;
+    }
+    
+    private static boolean blockingWaitDialog(Object lock) {
+        try {
+            Profiler profiler = Profiler.getDefault();
+            if (profiler.getProfilingState() == Profiler.PROFILING_INACTIVE) return false;
+            
+            JPanel panel = new JPanel(new BorderLayout(5, 5));
+            panel.setBorder(new EmptyBorder(15, 15, 15, 10));
+            panel.add(new JLabel(Bundle.ProfilerSessions_finishingSession()), BorderLayout.NORTH);
+
+            JProgressBar progress = new JProgressBar();
+            progress.setIndeterminate(true);
+            panel.add(progress, BorderLayout.SOUTH);
+            
+            Dimension ps = panel.getPreferredSize();
+            panel.setPreferredSize(new Dimension(Math.max(ps.width, MIN_WAIT_WIDTH), ps.height));
+            
+            final JButton cancel = new JButton(Bundle.ProfilerSessions_cancel());
+            cancel.setVisible(false);
+
+            DialogDescriptor dd = new DialogDescriptor(panel, Bundle.ProfilerSessions_finishSessionCaption(),
+                                      true, new Object[] { cancel }, null,
+                                      DialogDescriptor.DEFAULT_ALIGN, null, null);
+            final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+            final JDialog jd = d instanceof JDialog ? (JDialog)d : null;
+
+            final ProfilingStateListener listener = new ProfilingStateAdapter() {
+                public void profilingStateChanged(ProfilingStateEvent e) {
+                    if (e.getNewState() == Profiler.PROFILING_INACTIVE) { d.setVisible(false); }
+                }
+            };
+            profiler.addProfilingStateListener(listener);
+            
+            int closeOp = -1;
+            if (jd != null) {
+                closeOp = jd.getDefaultCloseOperation();
+                jd.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+            }
+            
+            final int _closeOp = closeOp;
+            Timer timer = new Timer(ENABLE_CANCEL_MS, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (jd != null) jd.setDefaultCloseOperation(_closeOp);
+                    cancel.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) { d.setVisible(false); }
+                    });
+                    cancel.setVisible(true);
+                    d.pack();
+                }
+            });
+            timer.setRepeats(false);
+            timer.start();
+            
+            d.setLocationRelativeTo(WindowManager.getDefault().getMainWindow());
+            d.setVisible(true);
+            
+            profiler.removeProfilingStateListener(listener);
+            
+            return dd.getValue() != null;
+        } finally {
+            if (lock != null) synchronized(lock) { lock.notifyAll(); }
+        }
     }
     
 }

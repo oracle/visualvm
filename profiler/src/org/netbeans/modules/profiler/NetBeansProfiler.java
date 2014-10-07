@@ -1038,20 +1038,23 @@ public abstract class NetBeansProfiler extends Profiler {
     }
     
     public void detachFromApp() {
-        setTransitionState();
+        TargetAppRunner runner = getTargetAppRunner();
+        if (runner == null || !runner.targetJVMIsAlive()) return;
+        
+        changeStateTo(PROFILING_IN_TRANSITION);
 
-        getTargetAppRunner().prepareDetachFromTargetJVM();
+        runner.prepareDetachFromTargetJVM();
 
-        if (getTargetAppRunner().getProfilingSessionStatus().currentInstrType != CommonConstants.INSTR_NONE) {
+        if (runner.getProfilingSessionStatus().currentInstrType != CommonConstants.INSTR_NONE) {
             //      if (LiveResultsWindow.hasDefault()) LiveResultsWindow.getDefault().reset(); // see issue http://www.netbeans.org/issues/show_bug.cgi?id=68213
             try {
-                getTargetAppRunner().getProfilerClient().removeAllInstrumentation(false); // remove only the server side instrumentation
+                runner.getProfilerClient().removeAllInstrumentation(false); // remove only the server side instrumentation
             } catch (InstrumentationException e) {
                 ProfilerDialogs.displayError(e.getMessage());
             }
         }
 
-        getTargetAppRunner().detachFromTargetJVM();
+        runner.detachFromTargetJVM();
 
         //    targetAppRunner.getProfilerClient().resetClientData();
         // TODO reset all profilingresultslisteners
@@ -1558,8 +1561,11 @@ public abstract class NetBeansProfiler extends Profiler {
     }
 
     public void stopApp() {
-        setTransitionState();
-        getTargetAppRunner().terminateTargetJVM();
+        TargetAppRunner runner = getTargetAppRunner();
+        if (runner == null || !runner.targetJVMIsAlive()) return;
+        
+        changeStateTo(PROFILING_IN_TRANSITION);
+        runner.terminateTargetJVM();
     }
 
     private Properties getAgentProperties(int port) {
@@ -1607,10 +1613,6 @@ public abstract class NetBeansProfiler extends Profiler {
     // checks if there is a profiling session currently in progress communicating over specified port
     private boolean isProfilingRunningOnPort(int port) {
         return (profilingState == PROFILING_RUNNING) && (port == getTargetAppRunner().getProfilerEngineSettings().getPortNo());
-    }
-
-    private void setTransitionState() {
-        changeStateTo(PROFILING_IN_TRANSITION);
     }
 
     private void changeStateTo(int newState) {

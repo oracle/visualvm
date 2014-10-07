@@ -157,8 +157,7 @@ class TreeObject {
             if (entry.hasOnlyOneReference()) {
                 long gcRootPointer = entry.getNearestGCRootPointer();
                 if (gcRootPointer != 0) {
-                    if (!unique.contains(gcRootPointer)) {
-                        unique.add(gcRootPointer);
+                    if (unique.add(gcRootPointer)) {
                         writeLong(gcRootPointer);
                     }
                 }
