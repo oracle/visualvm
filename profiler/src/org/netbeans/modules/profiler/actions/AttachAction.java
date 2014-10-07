@@ -53,6 +53,7 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 
 
 /**
@@ -91,10 +92,14 @@ public final class AttachAction extends AbstractAction {
      * Invoked when an action occurs.
      */
     public void actionPerformed(final ActionEvent e) {
-        ProfilerSession session = ProfilerSession.forContext(Lookup.EMPTY);
-        if (session != null) {
-            session.setAttach(true);
-            session.requestActive();
-        }
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                ProfilerSession session = ProfilerSession.forContext(Lookup.EMPTY);
+                if (session != null) {
+                    session.setAttach(true);
+                    session.open();
+                }
+            }
+        });
     }
 }

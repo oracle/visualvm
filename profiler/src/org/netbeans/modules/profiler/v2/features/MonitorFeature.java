@@ -43,25 +43,17 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
-import org.netbeans.modules.profiler.v2.ProfilerFeature;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.monitor.MonitorView;
-import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.actions.HeapDumpAction;
-import org.netbeans.modules.profiler.actions.RunGCAction;
-import org.netbeans.modules.profiler.actions.TakeThreadDumpAction;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
-import org.netbeans.modules.profiler.v2.ui.GrayLabel;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -69,146 +61,77 @@ import org.openide.util.NbBundle;
  */
 @NbBundle.Messages({
     "MonitorFeature_name=Telemetry",
-    "MonitorFeature_description=Monitor CPU and Memory usage, number of threads and loaded classes",
-    "MonitorFeature_graphs=Graphs:",
-    "MonitorFeature_application=Application:",
-    "MonitorFeature_threadDump=Thread Dump",
-    "MonitorFeature_heapDump=Heap Dump",
-    "MonitorFeature_gc=GC"
+    "MonitorFeature_description=Monitor CPU and Memory usage, number of threads and loaded classes"
 })
 final class MonitorFeature extends ProfilerFeature.Basic {
     
-    private JLabel grLabel;
-    private JButton grZoomInButton;
-    private JButton grZoomOutButton;
-    private JToggleButton grFitWidthButton;
-    
-    private JLabel apLabel;
-    private JButton apThreadDumpButton;
-    private JButton apHeapDumpButton;
-    private JButton apGCButton;
-    
-    private ProfilerToolbar toolbar;
-    
-    private MonitorView monitorView;
-    
-    
-    MonitorFeature() {
+    private MonitorFeature(ProfilerSession session) {
         super(Icons.getIcon(ProfilerIcons.MONITORING), Bundle.MonitorFeature_name(),
-              Bundle.MonitorFeature_description(), 10);
+              Bundle.MonitorFeature_description(), 10, session);
     }
-
+    
+    
+    // --- Settings ------------------------------------------------------------
+    
+    public void configureSettings(ProfilingSettings settings) {}
+    
+    
+    // --- Toolbar & Results UI ------------------------------------------------
+    
+    private MonitorFeatureUI ui;
     
     public JPanel getResultsUI() {
-        if (monitorView == null) initResultsUI();
-        return monitorView;
+        return getUI().getResultsUI();
     }
     
     public ProfilerToolbar getToolbar() {
-        if (toolbar == null) {
-            grLabel = new GrayLabel(Bundle.MonitorFeature_graphs());
-            
-            grZoomInButton = new JButton(Icons.getIcon(GeneralIcons.ZOOM_IN));
-            grZoomInButton.setEnabled(false);
-            
-            grZoomOutButton = new JButton(Icons.getIcon(GeneralIcons.ZOOM_OUT));
-            grZoomOutButton.setEnabled(false);
-            
-            grFitWidthButton = new JToggleButton(Icons.getIcon(GeneralIcons.SCALE_TO_FIT));
-            grFitWidthButton.setEnabled(false);
-            
-            apLabel = new GrayLabel(Bundle.MonitorFeature_application());
-            
-            apThreadDumpButton = new JButton(TakeThreadDumpAction.getInstance());
-            apThreadDumpButton.setHideActionText(true);
-            apThreadDumpButton.setText(Bundle.MonitorFeature_threadDump());
-            
-            apHeapDumpButton = new JButton(HeapDumpAction.getInstance());
-            apHeapDumpButton.setHideActionText(true);
-            apHeapDumpButton.setText(Bundle.MemoryFeature_heapDump());
-            
-            apGCButton = new JButton(RunGCAction.getInstance());
-            apGCButton.setHideActionText(true);
-            apGCButton.setText(Bundle.MemoryFeature_gc());
-            
-            toolbar = ProfilerToolbar.create(true);
-            
-            toolbar.addSpace(2);
-            toolbar.addSeparator();
-            toolbar.addSpace(5);
-            
-            toolbar.add(grLabel);
-            toolbar.addSpace(2);
-            toolbar.add(grZoomInButton);
-            toolbar.add(grZoomOutButton);
-            toolbar.add(grFitWidthButton);
-            
-            toolbar.addSpace(2);
-            toolbar.addSeparator();
-            toolbar.addSpace(5);
-            
-            toolbar.add(apLabel);
-            toolbar.addSpace(2);
-            toolbar.add(apThreadDumpButton);
-            toolbar.add(apHeapDumpButton);
-            toolbar.add(apGCButton);
-            
-            refreshToolbar(getSessionState());
-        }
-        
-        return toolbar;
+        return getUI().getToolbar();
     }
     
-    public boolean supportsSettings(ProfilingSettings settings) {
-        return true;
+    private MonitorFeatureUI getUI() {
+        if (ui == null) ui = new MonitorFeatureUI() {
+            int getSessionState() {
+                return MonitorFeature.this.getSessionState();
+            }
+            Profiler getProfiler() {
+                return MonitorFeature.this.getSession().getProfiler();
+            }
+        };
+        return ui;
     }
     
-    public void configureSettings(ProfilingSettings settings) {
-    }
     
-    private void initResultsUI() {
-        monitorView = new MonitorView(getSession().getProfiler().getVMTelemetryManager());
-    }
+    // --- Session lifecycle ---------------------------------------------------
     
-//    private void refreshToolbar() {
-//        ProjectSession session = getSession();
-//        refreshToolbar(session == null ? null : session.getState());
-//    }
-    
-   private void refreshToolbar(int state) {
-        final boolean inactive = state == NetBeansProfiler.PROFILING_INACTIVE;
-        if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
+    public void notifyActivated() {
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-//                boolean running = state == ProjectSession.State.RUNNING;
-//                lrPauseButton.setEnabled(running);
-//                lrRefreshButton.setEnabled(running && lrPauseButton.isSelected());
-                
-                grLabel.setEnabled(!inactive);
-                apLabel.setEnabled(!inactive);
+                getSession().getProfiler().getVMTelemetryManager().reset();
             }
         });
     }
+    
+    public void notifyDeactivated() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                getSession().getProfiler().getVMTelemetryManager().reset();
+            }
+        });
+    }
+    
     
     protected void profilingStateChanged(int oldState, int newState) {
-        refreshToolbar(newState);
+        if (ui != null) ui.sessionStateChanged(getSessionState());
     }
     
-    public void attachedToSession(final ProfilerSession session) {
-        super.attachedToSession(session);
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                session.getProfiler().getVMTelemetryManager().reset();
-            }
-        });
-    }
     
-    public void detachedFromSession(final ProfilerSession session) {
-        super.detachedFromSession(session);
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                session.getProfiler().getVMTelemetryManager().reset();
-            }
-        });
+    // --- Provider ------------------------------------------------------------
+    
+    @ServiceProvider(service=ProfilerFeature.Provider.class)
+    public static final class Provider extends ProfilerFeature.Provider {
+        public ProfilerFeature getFeature(ProfilerSession session) {
+            return new MonitorFeature(session);
+        }
     }
     
 }

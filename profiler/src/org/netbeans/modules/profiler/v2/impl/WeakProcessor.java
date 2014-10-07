@@ -41,32 +41,45 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.features;
+package org.netbeans.modules.profiler.v2.impl;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import org.netbeans.modules.profiler.v2.ProfilerFeature;
-import org.openide.util.Lookup;
-import org.openide.util.lookup.ServiceProvider;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import org.openide.util.RequestProcessor;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@ServiceProvider(service=ProfilerFeature.Provider.class)
-public final class BasicFeatures extends ProfilerFeature.Provider {
-
-    public Collection<ProfilerFeature> getFeatures(Lookup.Provider project) {
-        Set<ProfilerFeature> features = new HashSet();
+public final class WeakProcessor {
+    
+    private Reference<RequestProcessor> processor;
+    
+    private final String name;
+    private final int throughput;
+    
+    public WeakProcessor(String name) {
+        this(name, 1);
+    }
+    
+    public WeakProcessor(String name, int throughput) {
+        this.name = name;
+        this.throughput = throughput;
+    }
+    
+    public void post(Runnable task) {
+        processor().post(task);
+    }
+    
+    private synchronized RequestProcessor processor() {
+        RequestProcessor p = processor != null ? processor.get() : null;
         
-        features.add(new CPUFeature());
-        features.add(new MemoryFeature());
-        features.add(new MonitorFeature());
-        features.add(new ThreadsFeature());
-        features.add(new LocksFeature());
+        if (p == null) {
+            p = new RequestProcessor(name, throughput);
+            processor = new WeakReference(p);
+        }
         
-        return features;
+        return p;
     }
     
 }
