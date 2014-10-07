@@ -111,6 +111,10 @@ abstract class ObjectsFeatureUI extends FeatureUI {
     }
     
     
+    void resetPause() {
+        if (lrPauseButton != null) lrPauseButton.setSelected(false);
+    }
+    
     void setForceRefresh() {
         if (memoryView != null) memoryView.setForceRefresh(true);
     }

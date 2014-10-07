@@ -242,7 +242,7 @@ public abstract class ProfilerSession {
         
         UIUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
-                if (window != null && window.isOpened()) {
+                if (window != null && !window.closing && window.isOpened()) {
                     window.closing = true;
                     window.close(); // calls session.cleanup()
                 } else {
@@ -257,9 +257,7 @@ public abstract class ProfilerSession {
     final ProfilerFeatures getFeatures() {
         assert !SwingUtilities.isEventDispatchThread();
         
-        synchronized(this) {
-            if (features == null) features = new ProfilerFeatures(this);
-        }
+        synchronized(this) { if (features == null) features = new ProfilerFeatures(this); }
         
         return features;
     }
@@ -304,7 +302,9 @@ public abstract class ProfilerSession {
         });
     }
     
-    private void cleanup() {        
+    private void cleanup() {
+        synchronized(this) { if (features != null) features.sessionFinished(); }
+        
         persistStorage();
         
         // TODO: unregister listeners (this.addListener) to prevent memory leaks

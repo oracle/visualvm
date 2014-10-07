@@ -121,6 +121,10 @@ abstract class MethodsFeatureUI extends FeatureUI {
     }
     
     
+    void resetPause() {
+        if (lrPauseButton != null) lrPauseButton.setSelected(false);
+    }
+    
     void setForceRefresh() {
         if (cpuView != null) cpuView.setForceRefresh(true);
     }

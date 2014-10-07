@@ -260,7 +260,7 @@ final class MethodsFeature extends ProfilerFeature.Basic {
     // --- Settings ------------------------------------------------------------
     
     public boolean supportsSettings(ProfilingSettings psettings) {
-        return !ProfilingSettings.isCPUSettings(psettings);
+        return !ProfilingSettings.isMemorySettings(psettings);
     }
 
     public void configureSettings(ProfilingSettings psettings) {
@@ -385,6 +385,7 @@ final class MethodsFeature extends ProfilerFeature.Basic {
                 stopResults();
                 resetResults();
                 submitChanges();
+                unpauseResults();
             }
         };
         settingsUI.add(applyButton);
@@ -505,6 +506,7 @@ final class MethodsFeature extends ProfilerFeature.Basic {
     
     private void resetResults() {
         if (ui != null) ui.resetData();
+        ResultsManager.getDefault().reset();
     }
     
     private void stopResults() {
@@ -514,6 +516,10 @@ final class MethodsFeature extends ProfilerFeature.Basic {
         }
     }
     
+    private void unpauseResults() {
+        if (ui != null) ui.resetPause();
+    }
+    
     
     // --- Session lifecycle ---------------------------------------------------
     
@@ -521,14 +527,18 @@ final class MethodsFeature extends ProfilerFeature.Basic {
     
     public void notifyActivated() {
         resetResults();
+        
         resetter = Lookup.getDefault().lookup(MethodsResetter.class);
         resetter.controller = this;
     }
     
     public void notifyDeactivated() {
         resetResults();
-        resetter.controller = null;
-        resetter = null;
+        
+        if (resetter != null) {
+            resetter.controller = null;
+            resetter = null;
+        }
     }
     
     
@@ -539,6 +549,7 @@ final class MethodsFeature extends ProfilerFeature.Basic {
             startResults();
         } else if (newState == Profiler.PROFILING_STARTED) {
             resetResults();
+            unpauseResults();
         }
         
         if (ui != null) ui.sessionStateChanged(getSessionState());
@@ -551,7 +562,7 @@ final class MethodsFeature extends ProfilerFeature.Basic {
     public static final class MethodsResetter implements ResultsListener {
         private MethodsFeature controller;
         public void resultsAvailable() { /*if (controller != null) controller.refreshView();*/ }
-        public void resultsReset() { if (controller != null) controller.resetResults(); }
+        public void resultsReset() { if (controller != null && controller.ui != null) controller.ui.resetData(); }
     }
     
     
