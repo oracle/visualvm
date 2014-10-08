@@ -59,6 +59,7 @@ public class InstrumentationFilter implements Cloneable {
     public static final int INSTR_FILTER_NONE = 0;
     public static final int INSTR_FILTER_EXCLUSIVE = 10;
     public static final int INSTR_FILTER_INCLUSIVE = 20;
+    public static final int INSTR_FILTER_INCLUSIVE_EXACT = 40;
     private static InstrumentationFilter defaultInstance;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -163,6 +164,9 @@ public class InstrumentationFilter implements Cloneable {
             case INSTR_FILTER_INCLUSIVE:
                 filterStringsBuffer.append("  Filter type: Inclusive\n"); // NOI18N
                 break;
+            case INSTR_FILTER_INCLUSIVE_EXACT:
+                filterStringsBuffer.append("  Filter type: Inclusive exact\n"); // NOI18N
+                break;
         }
 
         filterStringsBuffer.append("  Filter value: "); // NOI18N
@@ -191,6 +195,9 @@ public class InstrumentationFilter implements Cloneable {
             case INSTR_FILTER_INCLUSIVE:
                 System.err.println("  Filter type: Inclusive"); // NOI18N
                 break;
+            case INSTR_FILTER_INCLUSIVE_EXACT:
+                System.err.println("  Filter type: Inclusive exact"); // NOI18N
+                break;
         }
 
         StringBuffer filterStringsBuffer = new StringBuffer();
@@ -214,17 +221,25 @@ public class InstrumentationFilter implements Cloneable {
             return true;
         }
 
-        boolean filterInclusive = (instrFilterType == INSTR_FILTER_INCLUSIVE);
+        boolean filterInclusive = (instrFilterType == INSTR_FILTER_INCLUSIVE || instrFilterType == INSTR_FILTER_INCLUSIVE_EXACT);
 
         for (int i = 0; i < instrFilterStrings.length; i++) {
-            if (matches(string, instrFilterStrings[i])) {
+            if (matches(instrFilterType, string, instrFilterStrings[i])) {
                 return filterInclusive;
             }
         }
         return !filterInclusive;
     }
 
-    private static boolean matches(String string, String filter) {
-        return string.startsWith(filter);
+    private static boolean matches(int type, String string, String filter) {
+        switch (type) {
+            case INSTR_FILTER_EXCLUSIVE:
+            case INSTR_FILTER_INCLUSIVE:
+                return string.startsWith(filter);
+            case INSTR_FILTER_INCLUSIVE_EXACT:
+                return string.equals(filter);
+            default:
+                throw new IllegalArgumentException("Illegal filter type:"+type);
+        }
     }
 }

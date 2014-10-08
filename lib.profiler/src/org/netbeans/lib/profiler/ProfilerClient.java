@@ -43,6 +43,15 @@
 
 package org.netbeans.lib.profiler;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.lang.management.ThreadInfo;
+import java.net.ConnectException;
+import java.net.Socket;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -64,17 +73,10 @@ import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
 import org.netbeans.lib.profiler.results.memory.*;
+import org.netbeans.lib.profiler.results.threads.ThreadDump;
 import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.wireprotocol.*;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.ConnectException;
-import java.net.Socket;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -436,7 +438,7 @@ public class ProfilerClient implements CommonConstants {
         appStatusHandler = ash;
         serverCommandHandler = sch;
         instrumentor = new Instrumentor(status, settings);
-        histogramManager = new HeapHistogramManager();
+        histogramManager = new HeapHistogramManager(settings.getInstrumentationFilter());
         EventBufferProcessor.initialize(this);
         EventBufferResultsProvider.getDefault().addDispatcher(ProfilingResultsDispatcher.getDefault());
     }
@@ -697,6 +699,15 @@ public class ProfilerClient implements CommonConstants {
         return histogramManager.getHistogram(resp);
     }
     
+    public synchronized ThreadDump takeThreadDump() throws ClientUtils.TargetAppOrVMTerminated {
+        ThreadDumpResponse resp;
+        
+        checkForTargetVMAlive();
+        sendSimpleCmdToServer(Command.TAKE_THREAD_DUMP);
+        resp = (ThreadDumpResponse) getAndCheckLastResponse("Unknown problem when trying to take thread dump"); // NOI18N
+        return new ThreadDump(resp.isJDK15(), resp.getTime(), resp.getThreads());
+    }
+
     public synchronized MonitoredData getMonitoredData() {
         try {
             checkForTargetVMAlive();
@@ -1136,10 +1147,6 @@ public class ProfilerClient implements CommonConstants {
     public void removeAllInstrumentation(boolean cleanupClient)
                                   throws InstrumentationException {
         synchronized (instrumentationLock) {
-            if (getCurrentInstrType() == INSTR_NONE) {
-                return;
-            }
-
             commandOnStartup = null;
 
             if (cleanupClient) {
@@ -1201,6 +1208,7 @@ public class ProfilerClient implements CommonConstants {
                                          throws ClientUtils.TargetAppOrVMTerminated {
         SetChangeableInstrParamsCommand cmd = new SetChangeableInstrParamsCommand(settings.isLockContentionMonitoringEnabled(),
                                                                                   settings.getNProfiledThreadsLimit(),
+                                                                                  settings.getStackDepthLimit(),
                                                                                   settings.getSamplingInterval(),
                                                                                   settings.getAllocTrackEvery(),
                                                                                   settings.getAllocStackTraceLimit(),

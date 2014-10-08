@@ -187,8 +187,11 @@ public class StringUtils {
         return otherFormat.format(date);
     }
 
+    private static final String MCS_ZERO = "0" + SEPARATOR + "0"; // NOI18N
     /** Represent time (given in microsecond) in milliseconds, with roughly the same number of meaningful digits */
     public static String mcsTimeToString(long t) {
+        if (t == 0) return MCS_ZERO;
+        
         StringBuilder tmpBuf = new StringBuilder();
         
         if (t < 0) tmpBuf.append("-"); // NOI18N

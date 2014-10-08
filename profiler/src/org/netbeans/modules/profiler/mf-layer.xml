@@ -60,10 +60,10 @@ made subject to such option by the copyright holder.
             <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#Menu/Profile"/>
             <attr name="position" intvalue="850"/>
             
-            <folder name="Advanced">
+            <!--folder name="Advanced">
                 <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#Menu/Profile/Advanced"/>
                 <attr name="position" intvalue="1800"/>
-            </folder>
+            </folder-->
         </folder>
     </folder>
 
@@ -78,35 +78,12 @@ made subject to such option by the copyright holder.
         <folder name="text">
             <folder name="x-java">
                 <folder name="Popup">
-                    <folder name="Profiling">
-                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#Editors/text/x-java/Popup/Profiling"/>
+                    <folder name="Profile">
+                        <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#Editors/text/x-java/Popup/Profile"/>
                         <attr name="position" intvalue="1920"/>
-                        <attr boolvalue="true" name="org-netbeans-modules-profiler-actions-AddRootMethodAction.shadow"/>
                     </folder>
                 </folder>
             </folder>
-        </folder>
-    </folder>
-
-    <folder name="Windows2">
-        <folder name="Components">
-            <file name="profiler_cp.settings" url="profiler_cp.settings"/>
-            <file name="profiler_to.settings" url="profiler_to.settings"/>
-        </folder>
-        <folder name="Modes">
-            <folder name="explorer">
-                <file name="profiler_cp.wstcref" url="profiler_cp.wstcref">
-                    <attr name="position" intvalue="800"/>
-                </file>
-            </folder>
-            <folder name="output">
-                <file name="profiler_to.wstcref" url="profiler_to.wstcref">
-                    <attr name="position" intvalue="1500"/>
-                </file>
-            </folder>
-        </folder>
-        <folder name="Groups">
-            <file name="LiveResultsGroup.wsgrp" url="LiveResultsGroupWsgrp.xml"/>
         </folder>
     </folder>
 

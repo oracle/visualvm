@@ -43,7 +43,7 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.modules.profiler.LiveResultsWindow;
+//import org.netbeans.modules.profiler.LiveResultsWindow;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
@@ -64,8 +64,8 @@ import org.openide.awt.ActionRegistration;
     "HINT_ShowLiveResultsWindowAction=Show Live Results Window"
 })
 @ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.ShowLiveResultsWindowAction")
-@ActionRegistration(displayName="#LBL_ShowLiveResultsWindowAction", iconBase="org/netbeans/modules/profiler/impl/icons/liveResultsWindow.png")
-@ActionReference(path="Menu/Window/Profile", position=200)
+//@ActionRegistration(displayName="#LBL_ShowLiveResultsWindowAction", iconBase="org/netbeans/modules/profiler/impl/icons/liveResultsWindow.png")
+//@ActionReference(path="Menu/Window/Profile", position=200)
 public final class ShowLiveResultsWindowAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -82,7 +82,7 @@ public final class ShowLiveResultsWindowAction extends AbstractAction {
      * Invoked when an action occurs.
      */
     public void actionPerformed(final ActionEvent e) {
-        LiveResultsWindow.getDefault().open();
-        LiveResultsWindow.getDefault().requestActive();
+//        LiveResultsWindow.getDefault().open();
+//        LiveResultsWindow.getDefault().requestActive();
     }
 }

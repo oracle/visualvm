@@ -243,16 +243,17 @@ public final class ResultsManager {
         } else {
             displayName = fileName;
         }
-        switch (snapshotType) {
-            case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
-                return Bundle.ResultsManager_CpuSnapshotDisplayName(displayName);
-            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
-            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
-            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_SAMPLED:
-                return Bundle.ResultsManager_MemorySnapshotDisplayName(displayName);
-            default:
-                return displayName;
-        }
+//        switch (snapshotType) {
+//            case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
+//                return Bundle.ResultsManager_CpuSnapshotDisplayName(displayName);
+//            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
+//            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+//            case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_SAMPLED:
+//                return Bundle.ResultsManager_MemorySnapshotDisplayName(displayName);
+//            default:
+//                return displayName;
+//        }
+        return displayName;
     }
     
     public String getDefaultHeapDumpFileName(long time) {
@@ -278,7 +279,9 @@ public final class ResultsManager {
         } else {
             displayName = fileName;
         }
-        return Bundle.ResultsManager_HeapSnapshotDisplayName(displayName);
+        
+        return displayName;
+//        return Bundle.ResultsManager_HeapSnapshotDisplayName(displayName);
     }
 
     public LoadedSnapshot[] getLoadedSnapshots() {
@@ -712,6 +715,26 @@ public final class ResultsManager {
         }
     }
 
+    public boolean hasSnapshotsFor(Lookup.Provider project) {
+        try {
+            FileObject snapshotsFolder = ProjectStorage.getSettingsFolder(project, false);
+            FileObject[] children;
+            
+            if (snapshotsFolder == null) {
+                return false;
+            }
+            snapshotsFolder.refresh();
+            children = snapshotsFolder.getChildren();
+            for (FileObject child : children) {
+                if (child.getExt().equalsIgnoreCase(SNAPSHOT_EXTENSION)) return true;
+                if (checkHprofFile(FileUtil.toFile(child))) return true;
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, Bundle.ResultsManager_ObtainSavedSnapshotsFailedMsg(e.getMessage()), e);            
+        }
+        return false;
+    }
+    
     public LoadedSnapshot loadSnapshot(FileObject selectedFile) {
         try {
             return loadSnapshotImpl(selectedFile);

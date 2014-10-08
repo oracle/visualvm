@@ -84,6 +84,7 @@ import org.openide.util.RequestProcessor;
     "SnapshotInfoPanel_ExcludeSleepWaitString=Exclude time spent in Thread.sleep() and Object.wait():",
     "SnapshotInfoPanel_BufferSizeString=Buffer Size:",
     "SnapshotInfoPanel_LimitProfiledThreadsString=Limit number of profiled threads:",
+    "SnapshotInfoPanel_StackDepthLimitString=Stack depth limit:",
     "SnapshotInfoPanel_UnlimitedString=Unlimited",
     "SnapshotInfoPanel_CpuSamplingString=CPU Profiling (Sampling Application)",
     "SnapshotInfoPanel_CpuEntireString=CPU Profiling (Entire Application)",
@@ -360,7 +361,7 @@ public class SnapshotInfoPanel extends JPanel {
                 if (ps.getNProfiledThreadsLimit() < 0) {
                     htmlText.append(Bundle.SnapshotInfoPanel_UnlimitedString());
                 } else {
-                    htmlText.append("").append(ps.getNProfiledThreadsLimit()); // NOI18N
+                    htmlText.append(ps.getNProfiledThreadsLimit());
                 }
 
                 htmlText.append("<br>"); // NOI18N
@@ -493,7 +494,17 @@ public class SnapshotInfoPanel extends JPanel {
             if (ps.getNProfiledThreadsLimit() < 0) {
                 htmlText.append(Bundle.SnapshotInfoPanel_UnlimitedString());
             } else {
-                htmlText.append("").append(ps.getNProfiledThreadsLimit()); // NOI18N
+                htmlText.append(ps.getNProfiledThreadsLimit());
+            }
+
+            htmlText.append("<br>"); // NOI18N
+            htmlText.append("<strong>"); // NOI18N
+            htmlText.append(Bundle.SnapshotInfoPanel_StackDepthLimitString()).append(" "); // NOI18N
+            htmlText.append("</strong>"); // NOI18N
+            if (ps.getStackDepthLimit() == Integer.MAX_VALUE) {
+                htmlText.append(Bundle.SnapshotInfoPanel_UnlimitedString());
+            } else {
+                htmlText.append(ps.getStackDepthLimit());
             }
 
             htmlText.append("<br>"); // NOI18N

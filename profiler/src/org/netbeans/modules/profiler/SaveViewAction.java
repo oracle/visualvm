@@ -158,7 +158,8 @@ class SaveViewAction extends AbstractAction {
             return;
         }
 
-        final LiveResultsWindow lrw = (viewProvider instanceof LiveResultsWindow) ? (LiveResultsWindow) viewProvider : null;
+        final LiveResultsWindow lrw = null;
+//        final LiveResultsWindow lrw = (viewProvider instanceof LiveResultsWindow) ? (LiveResultsWindow) viewProvider : null;
         final AppStatusHandler statusHandler = Profiler.getDefault().getTargetAppRunner().getAppStatusHandler();
 
         if (lrw != null) {
