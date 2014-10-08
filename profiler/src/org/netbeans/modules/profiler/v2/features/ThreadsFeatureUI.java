@@ -164,7 +164,7 @@ abstract class ThreadsFeatureUI extends FeatureUI {
         
         // --- Sync UI ---------------------------------------------------------
 
-        setFilter(ThreadsPanel.Filter.ALL);
+        setFilter(ThreadsPanel.Filter.LIVE);
         sessionStateChanged(getSessionState());
         
     }

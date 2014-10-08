@@ -52,6 +52,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
 
@@ -274,6 +275,16 @@ final class ProfilerFeatures {
         settings.setUseProfilingPoints(ppoints);
         
         return settings;
+    }
+    
+    
+    void sessionFinished() {
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                for (ProfilerFeature activated : getActivated())
+                    activated.deactivatedInSession();
+            }
+        });
     }
     
     
