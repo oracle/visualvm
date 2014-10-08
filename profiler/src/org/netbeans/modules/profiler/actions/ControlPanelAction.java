@@ -43,7 +43,7 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.modules.profiler.ProfilerControlPanel2;
+//import org.netbeans.modules.profiler.ProfilerControlPanel2;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
@@ -64,8 +64,8 @@ import org.openide.awt.ActionRegistration;
     "HINT_ControlPanelAction=Show Profiler Control Panel"
 })
 @ActionID(category="Profile", id="org.netbeans.modules.profiles.actions.ControlPanelAction")
-@ActionRegistration(displayName="#LBL_ControlPanelAction", iconBase="org/netbeans/modules/profiler/impl/icons/controlPanel.gif")
-@ActionReference(path="Menu/Window/Profile", position=100)
+//@ActionRegistration(displayName="#LBL_ControlPanelAction", iconBase="org/netbeans/modules/profiler/impl/icons/controlPanel.gif")
+//@ActionReference(path="Menu/Window/Profile", position=100)
 public final class ControlPanelAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------    
     public ControlPanelAction() {
@@ -78,8 +78,8 @@ public final class ControlPanelAction extends AbstractAction {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void actionPerformed(final ActionEvent e) {
-        final ProfilerControlPanel2 pcp = ProfilerControlPanel2.getDefault();
-        pcp.open();
-        pcp.requestActive();
+//        final ProfilerControlPanel2 pcp = ProfilerControlPanel2.getDefault();
+//        pcp.open();
+//        pcp.requestActive();
     }
 }

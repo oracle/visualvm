@@ -63,6 +63,7 @@ public final class VMTelemetryModels {
     private final VMTelemetryDataManager dataManager;
 
     private final Timeline timeline;
+    private final SynchronousXYItemsModel cpuItemsModel;
     private final SynchronousXYItemsModel memoryItemsModel;
     private final SynchronousXYItemsModel generationsItemsModel;
     private final SynchronousXYItemsModel threadsItemsModel;
@@ -74,6 +75,7 @@ public final class VMTelemetryModels {
         this.dataManager = dataManager;
 
         timeline = createTimeline();
+        cpuItemsModel = createCPUItemsModel(timeline);
         memoryItemsModel = createMemoryItemsModel(timeline);
         generationsItemsModel = createGenerationsItemsModel(timeline);
         threadsItemsModel = createThreadsItemsModel(timeline);
@@ -89,6 +91,10 @@ public final class VMTelemetryModels {
 
     public VMTelemetryDataManager getDataManager() {
         return dataManager;
+    }
+    
+    public SynchronousXYItemsModel cpuItemsModel() {
+        return cpuItemsModel;
     }
 
     public SynchronousXYItemsModel memoryItemsModel() {
@@ -107,12 +113,14 @@ public final class VMTelemetryModels {
     // --- DataManagerListener implementation ----------------------------------
 
     private void dataChangedImpl() {
+        cpuItemsModel.valuesAdded();
         memoryItemsModel.valuesAdded();
         generationsItemsModel.valuesAdded();
         threadsItemsModel.valuesAdded();
     }
 
     private void dataResetImpl() {
+        cpuItemsModel.valuesReset();
         memoryItemsModel.valuesReset();
         generationsItemsModel.valuesReset();
         threadsItemsModel.valuesReset();
@@ -126,6 +134,30 @@ public final class VMTelemetryModels {
             public int getTimestampsCount() { return dataManager.getItemCount(); }
             public long getTimestamp(int index) { return dataManager.timeStamps[index]; }
         };
+    }
+    
+    private SynchronousXYItemsModel createCPUItemsModel(Timeline timeline) {
+        // CPU
+        SynchronousXYItem cpuTimeItem = new SynchronousXYItem("CPU Time", 0, 1000) {
+            public long getYValue(int index) {
+                return dataManager.processCPUTimeInPromile[index];
+            }
+        };
+        cpuTimeItem.setInitialBounds(new LongRect(0, 0, 0, 1000));
+        
+        // Relative time spent in GC
+        SynchronousXYItem gcTimeItem = new SynchronousXYItem(GraphsUI.GC_TIME_NAME, 0, 1000) {
+            public long getYValue(int index) {
+                return dataManager.relativeGCTimeInPerMil[index];
+            }
+        };
+        gcTimeItem.setInitialBounds(new LongRect(0, 0, 0, 1000));
+
+        // Model
+        SynchronousXYItemsModel model = new SynchronousXYItemsModel(timeline,
+                           new SynchronousXYItem[] { cpuTimeItem, gcTimeItem });
+
+        return model;
     }
 
     private SynchronousXYItemsModel createMemoryItemsModel(Timeline timeline) {
@@ -161,13 +193,13 @@ public final class VMTelemetryModels {
         };
         survivingGenerationsItem.setInitialBounds(new LongRect(0, 0, 0, GraphsUI.SURVGEN_INITIAL_VALUE));
 
-        // Relative time spent in GC
-        SynchronousXYItem gcTimeItem = new SynchronousXYItem(GraphsUI.GC_TIME_NAME, 0, 1000) {
-            public long getYValue(int index) {
-                return dataManager.relativeGCTimeInPerMil[index];
-            }
-        };
-        gcTimeItem.setInitialBounds(new LongRect(0, 0, 0, 1000));
+//        // Relative time spent in GC
+//        SynchronousXYItem gcTimeItem = new SynchronousXYItem(GraphsUI.GC_TIME_NAME, 0, 1000) {
+//            public long getYValue(int index) {
+//                return dataManager.relativeGCTimeInPerMil[index];
+//            }
+//        };
+//        gcTimeItem.setInitialBounds(new LongRect(0, 0, 0, 1000));
 
         // GC intervals
         ProfilerGCXYItem gcIntervalsItem = new ProfilerGCXYItem("") { // NOI18N
@@ -185,8 +217,7 @@ public final class VMTelemetryModels {
         // Model
         SynchronousXYItemsModel model = new SynchronousXYItemsModel(timeline,
                  new SynchronousXYItem[] { gcIntervalsItem,
-                                        survivingGenerationsItem,
-                                        gcTimeItem });
+                                        survivingGenerationsItem });
 
         return model;
     }

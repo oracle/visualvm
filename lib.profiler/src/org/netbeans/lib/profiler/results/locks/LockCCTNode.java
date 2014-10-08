@@ -44,9 +44,9 @@ package org.netbeans.lib.profiler.results.locks;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.List;
+import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.results.CCTNode;
 
 /**
@@ -54,11 +54,11 @@ import org.netbeans.lib.profiler.results.CCTNode;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
-public abstract class LockCCTNode implements CCTNode {
+public abstract class LockCCTNode implements CCTNode, TreeNode {
     
-    public static final int SORT_BY_NAME = 1;
-    public static final int SORT_BY_TIME = 2;
-    public static final int SORT_BY_WAITS = 3;
+//    public static final int SORT_BY_NAME = 1;
+//    public static final int SORT_BY_TIME = 2;
+//    public static final int SORT_BY_WAITS = 3;
     
     public static final LockCCTNode EMPTY = new LockCCTNode(null) {
         public LockCCTNode getChild(int index) { return null; }
@@ -74,12 +74,50 @@ public abstract class LockCCTNode implements CCTNode {
     private List<LockCCTNode> children;
     private final LockCCTNode parent;
     
-    private int sortBy;
-    private boolean sortOrder;
+//    private int sortBy;
+//    private boolean sortOrder;
 
     LockCCTNode(LockCCTNode p) {
         parent = p;
     }
+    
+    
+    //--- TreeNode adapter ---
+    public Enumeration<LockCCTNode> children() {
+        return new Enumeration<LockCCTNode>() {
+            private int index = 0;
+            
+            public boolean hasMoreElements() {
+                return getChildren() != null && index < getChildren().length;
+            }
+
+            public LockCCTNode nextElement() {
+                return getChildren()[index++];
+            }
+        };
+    }
+    
+    public boolean isLeaf() {
+        return getChildCount() == 0;
+    }
+    
+    public boolean getAllowsChildren() {
+        return true;
+    }
+    
+    public int getIndex(TreeNode node) {
+        return getIndexOfChild(node);
+    }
+    
+    public int getChildCount() {
+        return getNChildren();
+    }
+    
+    public TreeNode getChildAt(int index) {
+        return getChild(index);
+    }
+    //---
+    
 
     @Override
     public LockCCTNode getChild(int index) {
@@ -131,7 +169,7 @@ public abstract class LockCCTNode implements CCTNode {
     
     private void computeChildrenImpl() {
         computeChildren();
-        sortChildren(sortBy, sortOrder);
+//        sortChildren(sortBy, sortOrder);
     }
 
     public double getTimeInPerCent() {
@@ -152,60 +190,60 @@ public abstract class LockCCTNode implements CCTNode {
     public boolean isMonitorNode() { return false; }
     
     
-    public void sortChildren(int sortBy, boolean sortOrder) {
-        this.sortBy = sortBy;
-        this.sortOrder = sortOrder;
-        
-        if (children == null || getNChildren() < 2) return;
-        
-        doSortChildren(sortBy, sortOrder);
-    }
-    
-    protected void doSortChildren(int sortBy, boolean sortOrder) {
-        switch (sortBy) {
-            case SORT_BY_NAME:
-                sortChildrenByName(sortOrder);
-                break;
-            case SORT_BY_TIME:
-                sortChildrenByTime(sortOrder);
-                break;
-            case SORT_BY_WAITS:
-                sortChildrenByWaits(sortOrder);
-                break;
-        }
-        
-        for (LockCCTNode child : children) child.sortChildren(sortBy, sortOrder);
-    }
-
-    protected void sortChildrenByName(final boolean sortOrder) {
-        Collections.sort(children, new Comparator<LockCCTNode>() {
-            public int compare(LockCCTNode n1, LockCCTNode n2) {
-                return sortOrder ?
-                       n1.getNodeName().toLowerCase().compareTo(n2.getNodeName().toLowerCase()) :
-                       n2.getNodeName().toLowerCase().compareTo(n1.getNodeName().toLowerCase());
-            }
-        });
-    }
-
-    protected void sortChildrenByTime(final boolean sortOrder) {
-        Collections.sort(children, new Comparator<LockCCTNode>() {
-            public int compare(LockCCTNode n1, LockCCTNode n2) {
-                long result = sortOrder ? n1.getTime() - n2.getTime() :
-                                          n2.getTime() - n1.getTime();
-                return result == 0 ? 0 : (result > 0 ? 1 : -1);
-            }
-        });
-    }
-    
-    protected void sortChildrenByWaits(final boolean sortOrder) {
-        Collections.sort(children, new Comparator<LockCCTNode>() {
-            public int compare(LockCCTNode n1, LockCCTNode n2) {
-                long result = sortOrder ? n1.getWaits() - n2.getWaits() :
-                                          n2.getWaits() - n1.getWaits();
-                return result == 0 ? 0 : (result > 0 ? 1 : -1);
-            }
-        });
-    }
+//    public void sortChildren(int sortBy, boolean sortOrder) {
+//        this.sortBy = sortBy;
+//        this.sortOrder = sortOrder;
+//        
+//        if (children == null || getNChildren() < 2) return;
+//        
+//        doSortChildren(sortBy, sortOrder);
+//    }
+//    
+//    protected void doSortChildren(int sortBy, boolean sortOrder) {
+//        switch (sortBy) {
+//            case SORT_BY_NAME:
+//                sortChildrenByName(sortOrder);
+//                break;
+//            case SORT_BY_TIME:
+//                sortChildrenByTime(sortOrder);
+//                break;
+//            case SORT_BY_WAITS:
+//                sortChildrenByWaits(sortOrder);
+//                break;
+//        }
+//        
+//        for (LockCCTNode child : children) child.sortChildren(sortBy, sortOrder);
+//    }
+//
+//    protected void sortChildrenByName(final boolean sortOrder) {
+//        Collections.sort(children, new Comparator<LockCCTNode>() {
+//            public int compare(LockCCTNode n1, LockCCTNode n2) {
+//                return sortOrder ?
+//                       n1.getNodeName().toLowerCase().compareTo(n2.getNodeName().toLowerCase()) :
+//                       n2.getNodeName().toLowerCase().compareTo(n1.getNodeName().toLowerCase());
+//            }
+//        });
+//    }
+//
+//    protected void sortChildrenByTime(final boolean sortOrder) {
+//        Collections.sort(children, new Comparator<LockCCTNode>() {
+//            public int compare(LockCCTNode n1, LockCCTNode n2) {
+//                long result = sortOrder ? n1.getTime() - n2.getTime() :
+//                                          n2.getTime() - n1.getTime();
+//                return result == 0 ? 0 : (result > 0 ? 1 : -1);
+//            }
+//        });
+//    }
+//    
+//    protected void sortChildrenByWaits(final boolean sortOrder) {
+//        Collections.sort(children, new Comparator<LockCCTNode>() {
+//            public int compare(LockCCTNode n1, LockCCTNode n2) {
+//                long result = sortOrder ? n1.getWaits() - n2.getWaits() :
+//                                          n2.getWaits() - n1.getWaits();
+//                return result == 0 ? 0 : (result > 0 ? 1 : -1);
+//            }
+//        });
+//    }
     
 
     public void debug() {

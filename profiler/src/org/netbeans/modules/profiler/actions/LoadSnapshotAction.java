@@ -78,8 +78,8 @@ import org.openide.windows.WindowManager;
     "LoadSnapshotAction_No_Snapshot_Selected=Not a .nps snapshot file"
 })
 @ActionID(id = "org.netbeans.modules.profiler.actions.LoadSnapshotAction", category = "Profile")
-@ActionRegistration(iconInMenu = true, displayName = "#LoadSnapshotAction_ActionName", iconBase = "org/netbeans/modules/profiler/impl/icons/openSnapshot.png")
-@ActionReference(path = "Menu/Profile", position = 1400)
+//@ActionRegistration(iconInMenu = true, displayName = "#LoadSnapshotAction_ActionName", iconBase = "org/netbeans/modules/profiler/impl/icons/openSnapshot.png")
+//@ActionReference(path = "Menu/Profile", position = 1400)
 public final class LoadSnapshotAction extends AbstractAction {
     //~ Static fields/initializers ----------------------------------------------------------------------------------------------- 
     private static File importDir;

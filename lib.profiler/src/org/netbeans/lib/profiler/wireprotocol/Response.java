@@ -73,6 +73,7 @@ public class Response {
     public static final int CALIBRATION_DATA = 11;
     public static final int CLASSID_RESPONSE = 12;
     public static final int HEAP_HISTOGRAM = 13;
+    public static final int THREAD_DUMP = 14;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -175,6 +176,8 @@ public class Response {
                     return "CLASSID_RESPONSE"; // NOI18N
                 case HEAP_HISTOGRAM:
                     return "HEAP_HISTOGRAM"; // NOI18N
+                case THREAD_DUMP:
+                    return "THREAD_DUMP";   // NOI18N
                 default:
                     return "Unknown response"; // NOI18N
             }

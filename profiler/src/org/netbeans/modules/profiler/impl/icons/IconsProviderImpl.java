@@ -108,6 +108,8 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(GeneralIcons.DOWN, "down.png");
         cache.put(GeneralIcons.FORWARD, "forward.png");
         cache.put(GeneralIcons.BACK, "back.png");
+        cache.put(GeneralIcons.SETTINGS, "settings.png");
+        cache.put(GeneralIcons.JAVA_PROCESS, "javaProcess.png");
         
         cache.put(ProfilerIcons.NODE_FORWARD, "forwardNode.png");
         cache.put(ProfilerIcons.NODE_REVERSE, "reverseNode.png");
@@ -122,8 +124,11 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(ProfilerIcons.SNAPSHOT_TAKE, "takeSnapshot.png");
         cache.put(ProfilerIcons.PROFILE, "profile.png");
         cache.put(ProfilerIcons.PROFILE_24, "profile24.png");
+        cache.put(ProfilerIcons.PROFILE_INACTIVE, "profileInactive.png");
+        cache.put(ProfilerIcons.PROFILE_RUNNING, "profileRunning.png");
         cache.put(ProfilerIcons.RESET_RESULTS, "resetResults.png");
         cache.put(ProfilerIcons.RUN_GC, "runGC.png");
+        cache.put(ProfilerIcons.SNAPSHOT_THREADS, "threadsSnapshot.png");
         cache.put(ProfilerIcons.SNAPSHOT_HEAP, "heapSnapshot.png");
         cache.put(ProfilerIcons.CONTROL_PANEL, "controlPanel.gif");
         cache.put(ProfilerIcons.LIVE_RESULTS, "liveResults.png");

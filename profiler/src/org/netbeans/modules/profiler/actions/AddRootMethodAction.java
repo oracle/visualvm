@@ -80,9 +80,9 @@ import org.openide.util.Lookup;
     "MSG_CannotAddAbstractNativeProfilingRoot=Cannot add abstract or native method as profiling roots.",
     "MSG_ProblemAddingRootMethod=Cannot add selected method as a root method. This can happen for items placed in directory other than project sources directory (typically /src and /web). If so, please select appropriate item in project sources directory."
 })
-@ActionID(id = "org.netbeans.modules.profiler.actions.AddRootMethodAction", category = "Profile")
-@ActionRegistration(displayName = "#LBL_AddRootMethodAction")
-@ActionReference(path = "Editors/text/x-java/Popup/Profiling", position = 100)
+//@ActionID(id = "org.netbeans.modules.profiler.actions.AddRootMethodAction", category = "Profile")
+//@ActionRegistration(displayName = "#LBL_AddRootMethodAction")
+//@ActionReference(path = "Editors/text/x-java/Popup/Profile", position = 100)
 public final class AddRootMethodAction extends NodeAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

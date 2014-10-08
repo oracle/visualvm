@@ -67,7 +67,6 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
         private int[][] methodIds = new int[0][];        
         private Map arrayOffsetMap = new HashMap();
         private Map threadIdMap = new HashMap();
-        private int threadCount = 0;
         private volatile boolean resetData = false;
         private boolean sendDataAvailable = true;
         
@@ -114,8 +113,12 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
                                 }
                             } else if (status != CommonConstants.THREAD_STATUS_ZOMBIE && mids.length>0) { 
                                 // new thread with a stacktrace
-                                tid = new Integer(++threadCount);
-                                ProfilerRuntime.writeThreadCreationEvent(t,tid.intValue());
+                                ThreadInfo ti = ThreadInfo.getThreadInfo(t);
+                                tid = new Integer(ti.getThreadId());
+                                if (!ti.isInitialized()) {
+                                    ti.initialize();
+                                    ProfilerRuntime.writeThreadCreationEvent(t,tid.intValue());
+                                }
                                 writeThreadInfo(tid,status,mids);
                             } else { // new thread which is not started yet or it did not ever have stacktrace 
                                 continue; 
@@ -138,7 +141,6 @@ class ProfilerRuntimeSampler extends ProfilerRuntime {
             threadIdMap = new HashMap();
             states = new int[0];
             methodIds = new int[0][];        
-            threadCount = 0;    
         }
          
         private void writeThreadDumpStart(long absTimeStamp) {

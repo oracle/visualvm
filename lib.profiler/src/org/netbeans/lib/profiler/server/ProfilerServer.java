@@ -50,6 +50,7 @@ import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.server.system.Classes;
 import org.netbeans.lib.profiler.server.system.GC;
 import org.netbeans.lib.profiler.server.system.HeapDump;
+import org.netbeans.lib.profiler.server.system.ThreadDump;
 import org.netbeans.lib.profiler.server.system.Threads;
 import org.netbeans.lib.profiler.server.system.Timers;
 import org.netbeans.lib.profiler.wireprotocol.*;
@@ -292,6 +293,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                     }
 
                     if (stopped) {
+                        ThreadInfo.removeProfilerServerThread(this);
                         return;
                     }
 
@@ -691,6 +693,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
         } else {
             preemptExit = false;
         }
+        ThreadInfo.removeProfilerServerThread(this);
     }
 
     public void sendClassLoaderUnloadingCommand() {
@@ -1458,6 +1461,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 lockContentionMonitoring = scipCmd.isLockContentionMonitoringEnabled();
                 ProfilerRuntime.setLockContentionMonitoringEnabled(lockContentionMonitoring);
                 ProfilerRuntimeCPU.setNProfiledThreadsLimit(scipCmd.getNProfiledThreadsLimit());
+                ProfilerRuntimeCPU.setStackDepthLimit(scipCmd.getStackDepthLimit());
                 ProfilerRuntimeCPUSampledInstr.setSamplingInterval(scipCmd.getSamplingInterval());
                 ProfilerRuntimeSampler.setSamplngFrequency(scipCmd.getThreadsSamplingFrequency());
                 ProfilerRuntimeMemory.setSamplingInterval((short) scipCmd.getObjAllocStackSamplingInterval());
@@ -1660,8 +1664,13 @@ public class ProfilerServer extends Thread implements CommonConstants {
 
                 break;
             case Command.GET_HEAP_HISTOGRAM:
-                HeapHistogramResponse resp = ProfilerInterface.computeHistogram();
+                Response resp = ProfilerInterface.computeHistogram();
                 sendComplexResponseToClient(resp);
+                
+                break;
+            case Command.TAKE_THREAD_DUMP:
+                Response tdResp = new ThreadDumpResponse(ThreadDump.isJDK15(), new Date(), ThreadDump.takeThreadDump());
+                sendComplexResponseToClient(tdResp);
                 
                 break;
         }

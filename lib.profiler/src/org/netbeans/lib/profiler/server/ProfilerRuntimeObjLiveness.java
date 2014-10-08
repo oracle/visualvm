@@ -241,7 +241,9 @@ public class ProfilerRuntimeObjLiveness extends ProfilerRuntimeMemory {
             return;
         }
 
-        if (ThreadInfo.profilingSuspended() || ThreadInfo.isCurrentThreadProfilerServerThread()) {
+        if (ThreadInfo.profilingSuspended()
+            || ThreadInfo.isCurrentThreadProfilerServerThread()
+            || (classId == 0 && isInternalClass(object.getClass()))) {
             // Avoid counting objects allocated by our own agent threads, or by this method's callees
             return;
         }
@@ -258,9 +260,20 @@ public class ProfilerRuntimeObjLiveness extends ProfilerRuntimeMemory {
 
         ti.inProfilingRuntimeMethod++;
 
-        // See comment marked with (***) in ProfilerRuntimeCPUFullInstr
-        int classInt = classId&0xff;
-        classInt |= classId&0xff00;
+        int classInt;
+        
+        if (classId == 0) {
+            //System.out.println("traceObjAlloc(Object object, 0) "+ object.getClass());
+            classInt = getClassId(object.getClass());
+            if (classInt == -1) {
+                ti.inProfilingRuntimeMethod--;
+                return;
+            }
+        } else {
+            // See comment marked with (***) in ProfilerRuntimeCPUFullInstr
+            classInt = classId&0xff;
+            classInt |= classId&0xff00;
+        }
 
         int objCount = 0;
 
@@ -279,7 +292,7 @@ public class ProfilerRuntimeObjLiveness extends ProfilerRuntimeMemory {
 
             long objSize = getCachedObjectSize(classInt, object);
 
-            getAndSendCurrentStackTrace(classId, epoch, objCount, objSize);
+            getAndSendCurrentStackTrace(classInt, epoch, objCount, objSize);
 
             allocatedInstThreshold[classInt] = nextRandomizedInterval();
         }

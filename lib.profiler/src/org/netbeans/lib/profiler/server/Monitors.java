@@ -187,6 +187,7 @@ public class Monitors implements CommonConstants {
                 } catch (Exception ex) {
                 }
             }
+            ThreadInfo.removeProfilerServerThread(this);
         }
 
         synchronized void updateGCStartFinishData() {
@@ -781,6 +782,7 @@ public class Monitors implements CommonConstants {
         generalMNums[MonitoredNumbersResponse.GC_TIME_IDX] = gcRelTime[0];
         generalMNums[MonitoredNumbersResponse.GC_PAUSE_IDX] = gcRelTime[1];
         generalMNums[MonitoredNumbersResponse.LOADED_CLASSES_IDX] = Classes.getLoadedClassCount();
+        generalMNums[MonitoredNumbersResponse.CPU_TIME_IDX] = Timers.getProcessCpuTime();
         generalMNums[MonitoredNumbersResponse.TIMESTAMP_IDX] = System.currentTimeMillis();
 
         int serverState;

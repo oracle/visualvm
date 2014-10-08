@@ -343,9 +343,9 @@ public abstract class NetBeansProfiler extends Profiler {
             //            public void run() {
 
             // Asynchronously update live results if autorefresh is on
-            if (LiveResultsWindow.hasDefault()) {
-                LiveResultsWindow.getDefault().handleShutdown();
-            }
+//            if (LiveResultsWindow.hasDefault()) {
+//                LiveResultsWindow.getDefault().handleShutdown();
+//            }
 
             if ((getTargetAppRunner().getProfilerClient().getCurrentInstrType() == CommonConstants.INSTR_NONE)
                     || !ResultsManager.getDefault().resultsAvailable()) {
@@ -360,7 +360,7 @@ public abstract class NetBeansProfiler extends Profiler {
         }
 
         public void pauseLiveUpdates() {
-            LiveResultsWindow.setPaused(true);
+//            LiveResultsWindow.setPaused(true);
         }
 
         public void resultsAvailable() {
@@ -372,7 +372,7 @@ public abstract class NetBeansProfiler extends Profiler {
         }
 
         public void resumeLiveUpdates() {
-            LiveResultsWindow.setPaused(false);
+//            LiveResultsWindow.setPaused(false);
         }
 
         public void takeSnapshot() {
@@ -1113,13 +1113,13 @@ public abstract class NetBeansProfiler extends Profiler {
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
         setLockContentionMonitoringEnabled(profilingSettings.getLockContentionMonitoringEnabled());
 
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (LiveResultsWindow.hasDefault())
-                    LiveResultsWindow.getDefault().handleCleanupBeforeProfiling();
-            }
-        });
+//        SwingUtilities.invokeLater(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (LiveResultsWindow.hasDefault())
+//                    LiveResultsWindow.getDefault().handleCleanupBeforeProfiling();
+//            }
+//        });
 
         ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                 @Override
@@ -1370,13 +1370,13 @@ public abstract class NetBeansProfiler extends Profiler {
     public void setProfiledProject(Lookup.Provider project, FileObject singleFile) {
         profiledProject = project;
         profiledSingleFile = singleFile;
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (ProfilerControlPanel2.hasDefault())
-                    ProfilerControlPanel2.getDefault().setProfiledProject(profiledProject);
-            }
-        });
+//        SwingUtilities.invokeLater(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (ProfilerControlPanel2.hasDefault())
+//                    ProfilerControlPanel2.getDefault().setProfiledProject(profiledProject);
+//            }
+//        });
     }
 
     public Lookup.Provider getProfiledProject() {
@@ -1648,8 +1648,8 @@ public abstract class NetBeansProfiler extends Profiler {
             public void run() {
                 NetBeansProfiler.this.getThreadsManager().reset();
                 NetBeansProfiler.this.getVMTelemetryManager().reset();
-                if (LiveResultsWindow.hasDefault())
-                    LiveResultsWindow.getDefault().handleCleanupBeforeProfiling();
+//                if (LiveResultsWindow.hasDefault())
+//                    LiveResultsWindow.getDefault().handleCleanupBeforeProfiling();
             }
         });
         ResultsManager.getDefault().reset();
@@ -1718,55 +1718,55 @@ public abstract class NetBeansProfiler extends Profiler {
 
     // -- Private implementation -------------------------------------------------------------------------------------------
     private void openWindowsOnProfilingStart() {
-        int telemetryBehavior = ideSettings.getTelemetryOverviewBehavior();
-        int threadsBehavior = ideSettings.getThreadsViewBehavior();
-        int locksBehavior = ideSettings.getLockContentionViewBehavior();
-
-        boolean threadsEnabled = lastProfilingSettings.getThreadsMonitoringEnabled();
-        boolean lockContentionEnabled = lastProfilingSettings.getLockContentionMonitoringEnabled();
-        int type = lastProfilingSettings.getProfilingType();
-
-        // 1. Telemetry Overview
-        if ((telemetryBehavior == ProfilerIDESettings.OPEN_ALWAYS)
-                || ((telemetryBehavior == ProfilerIDESettings.OPEN_MONITORING) && (type == ProfilingSettings.PROFILE_MONITOR))) {
-            TelemetryOverviewPanel.getDefault().open();
-            TelemetryOverviewPanel.getDefault().requestVisible();
-        }
-
-        // 2. Threads view
-        if (threadsEnabled) {
-            if ((threadsBehavior == ProfilerIDESettings.OPEN_ALWAYS)
-                    || ((threadsBehavior == ProfilerIDESettings.OPEN_MONITORING) && (type == ProfilingSettings.PROFILE_MONITOR))) {
-                ThreadsWindow.getDefault().open();
-                ThreadsWindow.getDefault().requestVisible();
-            }
-        }
-        
-        // 3. Lock Contention view
-        if (lockContentionEnabled) {
-            if ((locksBehavior == ProfilerIDESettings.OPEN_ALWAYS)
-                    || ((locksBehavior == ProfilerIDESettings.OPEN_MONITORING) && (type == ProfilingSettings.PROFILE_MONITOR))) {
-                LockContentionWindow.getDefault().showView();
-            }
-        }
-
-        // 4. Live Results
-        if ((ideSettings.getDisplayLiveResultsCPU()
-                && ((type == ProfilingSettings.PROFILE_CPU_ENTIRE) || (type == ProfilingSettings.PROFILE_CPU_PART)
-                    || (type == ProfilingSettings.PROFILE_CPU_SAMPLING)))
-                || (ideSettings.getDisplayLiveResultsFragment() && (type == ProfilingSettings.PROFILE_CPU_STOPWATCH))
-                || (ideSettings.getDisplayLiveResultsMemory()
-                       && ((type == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS)
-                           || (type == ProfilingSettings.PROFILE_MEMORY_LIVENESS)
-                           || (type == ProfilingSettings.PROFILE_MEMORY_SAMPLING)))) {
-            LiveResultsWindow.getDefault().open();
-            LiveResultsWindow.getDefault().requestVisible();
-        }
-
-        // 5. Control Panel displayed always, and getting focus
-        final ProfilerControlPanel2 controlPanel2 = ProfilerControlPanel2.getDefault();
-        controlPanel2.open();
-        controlPanel2.requestActive();
+//        int telemetryBehavior = ideSettings.getTelemetryOverviewBehavior();
+//        int threadsBehavior = ideSettings.getThreadsViewBehavior();
+//        int locksBehavior = ideSettings.getLockContentionViewBehavior();
+//
+//        boolean threadsEnabled = lastProfilingSettings.getThreadsMonitoringEnabled();
+//        boolean lockContentionEnabled = lastProfilingSettings.getLockContentionMonitoringEnabled();
+//        int type = lastProfilingSettings.getProfilingType();
+//
+//        // 1. Telemetry Overview
+//        if ((telemetryBehavior == ProfilerIDESettings.OPEN_ALWAYS)
+//                || ((telemetryBehavior == ProfilerIDESettings.OPEN_MONITORING) && (type == ProfilingSettings.PROFILE_MONITOR))) {
+//            TelemetryOverviewPanel.getDefault().open();
+//            TelemetryOverviewPanel.getDefault().requestVisible();
+//        }
+//
+//        // 2. Threads view
+//        if (threadsEnabled) {
+//            if ((threadsBehavior == ProfilerIDESettings.OPEN_ALWAYS)
+//                    || ((threadsBehavior == ProfilerIDESettings.OPEN_MONITORING) && (type == ProfilingSettings.PROFILE_MONITOR))) {
+//                ThreadsWindow.getDefault().open();
+//                ThreadsWindow.getDefault().requestVisible();
+//            }
+//        }
+//        
+//        // 3. Lock Contention view
+//        if (lockContentionEnabled) {
+//            if ((locksBehavior == ProfilerIDESettings.OPEN_ALWAYS)
+//                    || ((locksBehavior == ProfilerIDESettings.OPEN_MONITORING) && (type == ProfilingSettings.PROFILE_MONITOR))) {
+//                LockContentionWindow.getDefault().showView();
+//            }
+//        }
+//
+//        // 4. Live Results
+//        if ((ideSettings.getDisplayLiveResultsCPU()
+//                && ((type == ProfilingSettings.PROFILE_CPU_ENTIRE) || (type == ProfilingSettings.PROFILE_CPU_PART)
+//                    || (type == ProfilingSettings.PROFILE_CPU_SAMPLING)))
+//                || (ideSettings.getDisplayLiveResultsFragment() && (type == ProfilingSettings.PROFILE_CPU_STOPWATCH))
+//                || (ideSettings.getDisplayLiveResultsMemory()
+//                       && ((type == ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS)
+//                           || (type == ProfilingSettings.PROFILE_MEMORY_LIVENESS)
+//                           || (type == ProfilingSettings.PROFILE_MEMORY_SAMPLING)))) {
+//            LiveResultsWindow.getDefault().open();
+//            LiveResultsWindow.getDefault().requestVisible();
+//        }
+//
+//        // 5. Control Panel displayed always, and getting focus
+//        final ProfilerControlPanel2 controlPanel2 = ProfilerControlPanel2.getDefault();
+//        controlPanel2.open();
+//        controlPanel2.requestActive();
     }
 
     @NbBundle.Messages({

@@ -99,4 +99,18 @@ public final class Formatters {
         return MILLISECONDS_FORMAT;
     }
     
+    private static Format BYTES_FORMAT;
+    /**
+     * Returns Format instance to post-process a formatted Bytes (B) value.
+     * By default adds a " B" suffix to a formatted long value.
+     * 
+     * @return Format instance to post-process a formatted Bytes value
+     */
+    public static Format bytesFormat() {
+        if (BYTES_FORMAT == null) {
+            BYTES_FORMAT = new MessageFormat(BUNDLE.getString("Formatters.BytesFormat")); // NOI18N
+        }
+        return BYTES_FORMAT;
+    }
+    
 }

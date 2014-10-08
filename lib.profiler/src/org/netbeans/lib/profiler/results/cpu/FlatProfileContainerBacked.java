@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.results.cpu;
 
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 
 
@@ -91,14 +92,25 @@ public class FlatProfileContainerBacked extends FlatProfileContainer {
     }
 
     public String getMethodNameAtRow(int row) {
-        int methodId = methodIds[row];
-        String[] methodClassNameAndSig = cctContainer.getMethodClassNameAndSig(methodId);
-
+        ClientUtils.SourceCodeSelection sel = getSourceCodeSelectionAtRow(row);
         return MethodNameFormatterFactory.getDefault().getFormatter()
-                                         .formatMethodName(methodClassNameAndSig[0], methodClassNameAndSig[1],
-                                                           methodClassNameAndSig[2]).toFormatted();
-
-        //    return format.getFormattedClassAndMethod();
+                                         .formatMethodName(sel.getClassName(), sel.getMethodName(),
+                                                           sel.getMethodSignature()).toFormatted();
+        
+//        int methodId = methodIds[row];
+//        String[] methodClassNameAndSig = cctContainer.getMethodClassNameAndSig(methodId);
+//
+//        return MethodNameFormatterFactory.getDefault().getFormatter()
+//                                         .formatMethodName(methodClassNameAndSig[0], methodClassNameAndSig[1],
+//                                                           methodClassNameAndSig[2]).toFormatted();
+//
+//        //    return format.getFormattedClassAndMethod();
+    }
+    
+    public ClientUtils.SourceCodeSelection getSourceCodeSelectionAtRow(int row) {
+        int methodId = methodIds[row];
+        String[] sel = cctContainer.getMethodClassNameAndSig(methodId);
+        return new ClientUtils.SourceCodeSelection(sel[0], sel[1], sel[2]);
     }
 
     public double getWholeGraphNetTime0() {
