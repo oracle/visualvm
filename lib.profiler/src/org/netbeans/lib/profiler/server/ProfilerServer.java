@@ -1677,7 +1677,16 @@ public class ProfilerServer extends Thread implements CommonConstants {
     }
 
     private void doExit() {
-        // try to call LifecycleManager in NetBeans first
+        // try to call Ide.quit in JDeveloper
+        try {
+            Class _class = Thread.currentThread().getContextClassLoader().loadClass("oracle.ide.Ide"); // NOI18N
+            Method _method = _class == null ? null : _class.getMethod("quit", new Class[0]); // NOI18N
+            if (_method != null) _method.invoke(_class, new Object[0]);
+        } catch (Exception ex) {
+            // ignore
+        }
+
+        // try to call LifecycleManager in NetBeans
         try {
             Class lookupClz = Thread.currentThread().getContextClassLoader().loadClass("org.openide.util.Lookup"); // NOI18N
             Method instMethod = lookupClz.getMethod("getDefault", new Class[0]); // NOI18N
@@ -1698,6 +1707,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
         } catch (Exception ex) {
             // ignore
         }
+        
         // fall through a general system exit
         System.exit(-1);
     }

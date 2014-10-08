@@ -82,10 +82,11 @@ final class SessionStorage {
     synchronized void storeFlag(String flag, String value) {
         if (properties == null) loadProperties();
         
-        if (value != null) properties.put(flag, value);
-        else properties.remove(flag);
+        boolean _dirty;
+        if (value != null) _dirty = !value.equals(properties.put(flag, value));
+        else _dirty = properties.remove(flag) != null;
         
-        dirty = true;
+        dirty |= _dirty;
     }
     
     synchronized String readFlag(String flag, String defaultValue) {
@@ -95,12 +96,17 @@ final class SessionStorage {
     }
     
     
-    synchronized void persist() {
+    synchronized void persist(boolean immediately) {
         if (dirty) {
-            final Properties _properties = new Properties(properties);
-            PROCESSOR.post(new Runnable() {
-                public void run() { saveProperties(_properties); }
-            });
+            if (immediately) {
+                synchronized(PROCESSOR) { saveProperties(properties); }
+            } else {
+                final Properties _properties = new Properties(properties);
+                PROCESSOR.post(new Runnable() {
+                    public void run() { synchronized(PROCESSOR) { saveProperties(_properties); } }
+                });
+            }
+            dirty = false;
         }
     }
     
