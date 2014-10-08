@@ -43,6 +43,7 @@
 package org.netbeans.modules.profiler.v2.impl;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -75,7 +76,12 @@ public class FeaturesView extends JPanel {
     
     
     public FeaturesView(Component defaultView) {
-        setOpaque(false);
+        if (UIUtils.isOracleLookAndFeel()) {
+            setOpaque(true);
+            setBackground(UIUtils.getProfilerResultsBackground());
+        } else {
+            setOpaque(false);
+        }
         setBorder(BorderFactory.createEmptyBorder());
         setLayout(new BorderLayout(0, 0));
         
