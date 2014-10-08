@@ -119,7 +119,7 @@ public class ThreadInfo {
     }
 
     static boolean isProfilerServerMonitor(Object monitor) {
-        return monitor == threadInfosLock;
+        return monitor == threadInfosLock || monitor == ProfilerRuntimeMemory.classIdMapLock;
     }
     
     public static boolean isCurrentThreadProfilerServerThread() {
@@ -177,11 +177,10 @@ public class ThreadInfo {
 
         for (int i = 0; i < nProfilerServerThreads; i++) {
             if (profilerServerThreads[i] == thread) {
-                if (i == (nProfilerServerThreads - 1)) {
-                    profilerServerThreads[i] = null;
-                } else {
+                if (i < (nProfilerServerThreads - 1)) {
                     System.arraycopy(profilerServerThreads, i + 1, profilerServerThreads, i, nProfilerServerThreads - i - 1);
                 }
+                profilerServerThreads[nProfilerServerThreads - 1] = null;
 
                 nProfilerServerThreads--;
 

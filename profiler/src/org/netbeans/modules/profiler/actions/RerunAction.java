@@ -68,10 +68,10 @@ import org.openide.awt.ActionRegistration;
     "MSG_ReRunOnAttach=Profiling session is currently in progress\nDo you want to detach from the target application and rerun the last profiling session?"
 })
 @ActionID(id = "org.netbeans.modules.profiler.actions.RerunAction", category = "Profile")
-@ActionRegistration(displayName = "#LBL_RerunAction", lazy=false, asynchronous=false)
-@ActionReferences(value = {
-    @ActionReference(path = "Shortcuts", name = "CS-F2"),
-    @ActionReference(path = "Menu/Profile", position = 500, separatorBefore=490)})
+//@ActionRegistration(displayName = "#LBL_RerunAction", lazy=false, asynchronous=false)
+//@ActionReferences(value = {
+//    @ActionReference(path = "Shortcuts", name = "CS-F2"),
+//    @ActionReference(path = "Menu/Profile", position = 500, separatorBefore=490)})
 public final class RerunAction extends ProfilingAwareAction {
     final private static int[] ENABLED_STATES = new int[]{Profiler.PROFILING_STOPPED, Profiler.PROFILING_PAUSED, Profiler.PROFILING_INACTIVE};    
 

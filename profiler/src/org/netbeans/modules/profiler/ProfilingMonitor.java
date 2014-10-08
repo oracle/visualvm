@@ -111,7 +111,7 @@ public final class ProfilingMonitor {
 
                 try {
                     if (runner != null) {
-                        ProfilerControlPanel2.getDefault().updateStatus(); // TODO: move elsewhere
+//                        ProfilerControlPanel2.getDefault().updateStatus(); // TODO: move elsewhere
 
                         final MonitoredData md = runner.getProfilerClient().getMonitoredData();
 
@@ -136,7 +136,7 @@ public final class ProfilingMonitor {
                                             if ((NetBeansProfiler.getDefaultNB().processesProfilingPoints() 
                                                     || instrType == ProfilerEngineSettings.INSTR_NONE_SAMPLING
                                                     || profiler.getLockContentionMonitoringEnabled())
-                                                && (!doUpdateLiveResults || !LiveResultsWindow.hasDefault())) {
+                                                && (!doUpdateLiveResults /*|| !LiveResultsWindow.hasDefault()*/)) {
                                                 ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                                                         public void run() {
                                                             try {
@@ -153,9 +153,9 @@ public final class ProfilingMonitor {
                                             // ---------------------------------------------------------
 
                                             // Let results updating happen every other cycle (i.e. every ~2.5 sec) to allow the user to understand something before it disappears :-)
-                                            if (doUpdateLiveResults && LiveResultsWindow.hasDefault()) {
-                                                LiveResultsWindow.getDefault().refreshLiveResults();
-                                            }
+//                                            if (doUpdateLiveResults && LiveResultsWindow.hasDefault()) {
+//                                                LiveResultsWindow.getDefault().refreshLiveResults();
+//                                            }
 
                                             doUpdateLiveResults = !doUpdateLiveResults;
                                         } catch (Exception e) {
@@ -169,11 +169,7 @@ public final class ProfilingMonitor {
                                     }
                                 });
                         } else {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        NetBeansProfiler.getDefaultNB().checkAndUpdateState();
-                                    }
-                                });
+                            NetBeansProfiler.getDefaultNB().checkAndUpdateState();
                             runner = null; // stop monitoring, the TA must have terminated
                         }
                     }

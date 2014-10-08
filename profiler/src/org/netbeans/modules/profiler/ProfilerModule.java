@@ -102,9 +102,9 @@ public final class ProfilerModule extends ModuleInstall {
         }
 
         // cleanup before exiting the IDE, always returns true
-        if (LiveResultsWindow.hasDefault()) {
-            LiveResultsWindow.getDefault().ideClosing();
-        }
+//        if (LiveResultsWindow.hasDefault()) {
+//            LiveResultsWindow.getDefault().ideClosing();
+//        }
 
         return true;
     }

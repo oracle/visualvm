@@ -170,10 +170,12 @@ public final class UIUtils {
     }
     
     public static Color getDisabledForeground(Color c) {
-        if (isNimbusLookAndFeel()) return UIManager.getColor("nimbusDisabledText").darker(); //NOI18N
+        Color b = c.brighter();
+        if (c.getRGB() == b.getRGB()) return b; // Selection foreground
+        else if (isNimbusLookAndFeel()) return UIManager.getColor("nimbusDisabledText").darker(); //NOI18N
         else if (isMetalLookAndFeel()) return UIManager.getColor("Label.disabledForeground"); //NOI18N
-        else if (Color.BLACK.equals(c)) return Color.GRAY;
-        else return c.brighter();
+        else if (Color.BLACK.getRGB() == c.getRGB()) return Color.GRAY;
+        else return b;
     }
 
     public static int getDefaultRowHeight() {
@@ -388,6 +390,11 @@ public final class UIUtils {
         boolean xpThemeDisabled = (System.getProperty("swing.noxp") != null); // NOI18N
 
         return ((xpThemeActiveOS) && (!xpThemeDisabled));
+    }
+    
+    public static boolean isOracleLookAndFeel() {
+        // is current L&F some kind of WindowsLookAndFeel?
+        return UIManager.getLookAndFeel().getID().contains("Oracle"); //NOI18N
     }
 
     /** Checks give TreePath for the last node, and if it ends with a node with just one child,

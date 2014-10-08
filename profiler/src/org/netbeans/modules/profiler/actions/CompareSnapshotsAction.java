@@ -107,8 +107,8 @@ import org.openide.windows.WindowManager;
     "CompareSnapshotsAction_SnapshotsListAccessDescr=List of comparable snapshots in current project"
 })
 @ActionID(id = "org.netbeans.modules.profiler.actions.CompareSnapshotsAction", category = "Profile")
-@ActionRegistration(iconInMenu = true, displayName = "#CompareSnapshotsAction_ActionName", iconBase = "org/netbeans/modules/profiler/impl/icons/compareSnapshots.png")
-@ActionReference(path = "Menu/Profile", position = 1600, separatorAfter=1700)
+//@ActionRegistration(iconInMenu = true, displayName = "#CompareSnapshotsAction_ActionName", iconBase = "org/netbeans/modules/profiler/impl/icons/compareSnapshots.png")
+//@ActionReference(path = "Menu/Profile", position = 1600, separatorAfter=1700)
 public class CompareSnapshotsAction extends AbstractAction {
     //~ Static fields/initializers -------------------------------------------------------------------------------------------
         private static final HelpCtx EXTERNAL_SNAPSHOT_HELP_CTX = new HelpCtx("SelectExternalSnapshotsPanel.HelpCtx"); // NOI18N

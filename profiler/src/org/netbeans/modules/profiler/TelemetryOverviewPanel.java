@@ -152,16 +152,16 @@ public final class TelemetryOverviewPanel extends ProfilerTopComponent {
     }
 
     public void open() {
-        if (needsDocking()) { // needs docking
-
-            Mode mode = WindowManager.getDefault().findMode(Bundle.TelemetryOverviewPanel_WindowMode());
-
-            if (mode != null) {
-                mode.dockInto(this);
-            }
-        }
-
-        super.open();
+//        if (needsDocking()) { // needs docking
+//
+//            Mode mode = WindowManager.getDefault().findMode(Bundle.TelemetryOverviewPanel_WindowMode());
+//
+//            if (mode != null) {
+//                mode.dockInto(this);
+//            }
+//        }
+//
+//        super.open();
     }
 
     /**

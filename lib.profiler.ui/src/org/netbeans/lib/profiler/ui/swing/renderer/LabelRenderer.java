@@ -156,8 +156,13 @@ public class LabelRenderer extends JLabel implements ProfilerRenderer {
         
         g.setFont(getFont());
         
-        if (getHorizontalAlignment() == LEADING) {
+        int hAlign = getHorizontalAlignment();
+        if (hAlign == LEADING) {
             xx += margin.left;
+        } else if (hAlign == CENTER) {
+            int w = size.width - textWidth - iconWidth;
+            if (textWidth > 0 && iconWidth > 0 ) w -= iconTextGap;
+            xx += Math.max(margin.left, w / 2);
         } else {
             xx += size.width - margin.right - textWidth;
             if (iconWidth > 0 ) xx += - iconWidth - iconTextGap;

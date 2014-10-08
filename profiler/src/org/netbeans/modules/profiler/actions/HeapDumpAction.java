@@ -43,20 +43,6 @@
 
 package org.netbeans.modules.profiler.actions;
 
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.TargetAppRunner;
-import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.ProfilerControlPanel2;
-import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.ResultsManager;
-import org.openide.DialogDescriptor;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
-import org.openide.util.HelpCtx;
-import org.openide.util.NbBundle;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -71,15 +57,29 @@ import java.io.IOException;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.netbeans.lib.profiler.ProfilerLogger;
+import org.netbeans.lib.profiler.TargetAppRunner;
+import org.netbeans.lib.profiler.common.Profiler;
+import org.netbeans.modules.profiler.NetBeansProfiler;
+import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
+import org.netbeans.modules.profiler.v2.SnapshotsWindow;
+import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
+import org.openide.util.HelpCtx;
+import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 
 
@@ -322,7 +322,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
     @ActionID(id = "org.netbeans.modules.profiler.actions.HeapDumpAction", category = "Profile")
     @ActionRegistration(displayName = "#HeapDumpAction_ActionName", lazy=false)
-    @ActionReference(path = "Menu/Profile", position = 1300)
+    @ActionReference(path = "Menu/Profile", position = 600)
     public static HeapDumpAction getInstance() {
         return Singleton.INSTANCE;
     }
@@ -505,18 +505,21 @@ public final class HeapDumpAction extends ProfilingAwareAction {
 
                         if (heapdumpTaken) {
                             // Refresh list of snapshots
-                            if (ProfilerControlPanel2.hasDefault())
-                                ProfilerControlPanel2.getDefault().refreshSnapshotsList();
+                            File file = new File(dumpFileName);
+                            FileObject folder = FileUtil.toFileObject(file.getParentFile());
+                            SnapshotsWindow.instance().refreshFolder(folder, true);
+//                            if (ProfilerControlPanel2.hasDefault())
+//                                ProfilerControlPanel2.getDefault().refreshSnapshotsList();
 
                             if (askForDestination) {
                                 // Heapdump saved, open in HeapWalker?
                                 if (ProfilerDialogs.displayConfirmationDNSA(Bundle.HeapDumpAction_SavedDialogText(),
                                         Bundle.HeapDumpAction_SavedDialogCaption(), null, "HeapDumpAction.heapdumpSaved", false)) { //NOI18N
-                                    ResultsManager.getDefault().openSnapshot(new File(dumpFileName));
+                                    ResultsManager.getDefault().openSnapshot(file);
                                 }
                             } else {
                                 if (ProfilerIDESettings.getInstance().getAutoOpenSnapshot()) {
-                                    ResultsManager.getDefault().openSnapshot(new File(dumpFileName));
+                                    ResultsManager.getDefault().openSnapshot(file);
                                 }
                             }
                         } else {

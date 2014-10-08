@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.results.memory;
 
+import java.util.Enumeration;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.CCTNode;
@@ -50,6 +51,7 @@ import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import java.util.ResourceBundle;
+import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.results.FilterSortSupport;
 
 
@@ -103,6 +105,42 @@ public class PresoObjAllocCCTNode implements CCTNode {
             totalObjSize += rtTermNode.totalObjSize;
         }
     }
+    
+    //--- TreeNode adapter ---
+    public Enumeration<PresoObjAllocCCTNode> children() {
+        return new Enumeration<PresoObjAllocCCTNode>() {
+            private int index = 0;
+            
+            public boolean hasMoreElements() {
+                return getChildren() != null && index < getChildren().length;
+            }
+
+            public PresoObjAllocCCTNode nextElement() {
+                return (PresoObjAllocCCTNode)getChildren()[index++];
+            }
+        };
+    }
+    
+    public boolean isLeaf() {
+        return getChildCount() == 0;
+    }
+    
+    public boolean getAllowsChildren() {
+        return true;
+    }
+    
+    public int getIndex(TreeNode node) {
+        return getIndexOfChild(node);
+    }
+    
+    public int getChildCount() {
+        return getNChildren();
+    }
+    
+    public TreeNode getChildAt(int index) {
+        return getChild(index);
+    }
+    //---
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 

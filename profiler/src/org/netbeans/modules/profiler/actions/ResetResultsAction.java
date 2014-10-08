@@ -117,7 +117,7 @@ public final class ResetResultsAction extends CallableSystemAction {
     @ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.ResetResultsAction")
     @ActionRegistration(displayName="#LBL_ResetResultsAction", lazy=false)
     @ActionReferences({
-        @ActionReference(path="Menu/Profile", position=900),
+        @ActionReference(path="Menu/Profile", position=1000, separatorAfter=1100),
         @ActionReference(path = "Shortcuts", name = "AS-F2")
     })
     public static ResetResultsAction getInstance() {

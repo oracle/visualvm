@@ -45,7 +45,6 @@ package org.netbeans.modules.profiler.heapwalk;
 
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.modules.profiler.ProfilerControlPanel2;
 import org.openide.ErrorManager;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -59,6 +58,9 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
+import org.netbeans.modules.profiler.v2.SnapshotsWindow;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 
 
 /**
@@ -119,8 +121,10 @@ public class HeapWalkerManager {
                     }
 
                     tc.close();
-                    if (ProfilerControlPanel2.hasDefault())
-                        ProfilerControlPanel2.getDefault().refreshSnapshotsList(); // Refresh to display closed HW using plain font
+                    FileObject folder = FileUtil.toFileObject(hw.getHeapDumpFile().getParentFile());
+                    SnapshotsWindow.instance().refreshFolder(folder, false);
+//                    if (ProfilerControlPanel2.hasDefault())
+//                        ProfilerControlPanel2.getDefault().refreshSnapshotsList(); // Refresh to display closed HW using plain font
                 }
             });
     }
@@ -199,8 +203,11 @@ public class HeapWalkerManager {
                     tc.open();
                     //        tc.requestActive(); // For some reason steals focus from Dump Heap button in ProfilerControlPanel2 and causes http://www.netbeans.org/issues/show_bug.cgi?id=92425
                     tc.requestVisible(); // Workaround for the above problem
-                    if (ProfilerControlPanel2.hasDefault())
-                        ProfilerControlPanel2.getDefault().refreshSnapshotsList(); // Refresh to display opened HW using bold font
+                    
+                    FileObject folder = FileUtil.toFileObject(hw.getHeapDumpFile().getParentFile());
+                    SnapshotsWindow.instance().refreshFolder(folder, false);
+//                    if (ProfilerControlPanel2.hasDefault())
+//                        ProfilerControlPanel2.getDefault().refreshSnapshotsList(); // Refresh to display opened HW using bold font
                 }
             });
     }
@@ -246,8 +253,10 @@ public class HeapWalkerManager {
                             ProfilerDialogs.displayError(Bundle.HeapWalkerManager_CannotDeleteHeapDumpMsg());
                         }
                     } else {
-                        if (ProfilerControlPanel2.hasDefault())
-                            ProfilerControlPanel2.getDefault().refreshSnapshotsList();
+                        FileObject folder = FileUtil.toFileObject(file.getParentFile());
+                        SnapshotsWindow.instance().refreshFolder(folder, true);
+//                        if (ProfilerControlPanel2.hasDefault())
+//                            ProfilerControlPanel2.getDefault().refreshSnapshotsList();
                     }
                 }
             });

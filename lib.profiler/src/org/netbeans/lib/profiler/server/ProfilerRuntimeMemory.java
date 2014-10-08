@@ -67,6 +67,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
     protected static char[] objectSize;
     protected static short samplingInterval;
     protected static int samplingDepth;
+    static final Object classIdMapLock = new Object();
     private static int stackDepth;
     private static int[] stackFrameIds;
     private static Map classIdMap;
@@ -152,11 +153,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
         }
 
         ThreadInfo ti = ThreadInfo.getThreadInfo();
-        String className;
-        String classNameId;
-        int classLoaderId;
-        Integer classIdInt;
-        char classId;
+        int classId;
         boolean isObjectLiveness;
 
         if (ti.inProfilingRuntimeMethod > 0) {
@@ -168,40 +165,58 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
         }
 
         ti.inProfilingRuntimeMethod++;
-        className = clazz.getName();
-        classLoaderId = ClassLoaderManager.registerLoader(clazz);
-        classNameId = new StringBuffer(className).append('#').append(classLoaderId).toString();
-        classIdInt = (Integer) classIdMap.get(classNameId);
+        classId = getClassId(clazz);
+        if (classId == -1) {
+            // System.err.println("*** JFluid warning: Invalid classId for class:"+classNameId);
+            ti.inProfilingRuntimeMethod--;
+
+            return;
+        }
+
+        isObjectLiveness = ProfilerInterface.getCurrentInstrType() == INSTR_OBJECT_LIVENESS;
+        ti.inProfilingRuntimeMethod--;
+
+        if (isObjectLiveness) {
+            ProfilerRuntimeObjLiveness.traceObjAlloc(instance, (char)classId);
+        } else {
+            ProfilerRuntimeObjAlloc.traceObjAlloc(instance, (char)classId);
+        }
+    }
+
+    static int getClassId(Class clazz) {
+        String className = clazz.getName();
+        int classLoaderId = ClassLoaderManager.registerLoader(clazz);
+        String classNameId = new StringBuffer(className).append('#').append(classLoaderId).toString();
+        Integer classIdInt;
+        
+        synchronized (classIdMapLock) {
+            classIdInt = (Integer) classIdMap.get(classNameId);
+        }
 
         if (classIdInt == null) {
             int newClassId = externalActionsHandler.handleFirstTimeVMObjectAlloc(className, classLoaderId);
 
-            if (newClassId != -1) {
-                classIdInt = new Integer(newClassId);
+            classIdInt = new Integer(newClassId);
+            synchronized (classIdMapLock) {
                 classIdMap.put(classNameId, classIdInt);
-            } else {
-                // System.err.println("*** JFluid warning: Invalid classId for class:"+classNameId);
-                ti.inProfilingRuntimeMethod--;
-
-                return;
+            }
+            if (newClassId == -1) {
+                System.err.println("*** JFluid warning: Invalid classId for class:"+classNameId);
+//                if (classNameId.startsWith("org.netbeans.lib.profiler")) Thread.dumpStack();
+//                if (classNameId.startsWith("[")) Thread.dumpStack();
             }
         }
-
-        isObjectLiveness = ProfilerInterface.getCurrentInstrType() == INSTR_OBJECT_LIVENESS;
-        classId = (char) classIdInt.intValue();
-        ti.inProfilingRuntimeMethod--;
-
-        if (isObjectLiveness) {
-            ProfilerRuntimeObjLiveness.traceObjAlloc(instance, classId);
-        } else {
-            ProfilerRuntimeObjAlloc.traceObjAlloc(instance, classId);
-        }
+        return classIdInt.intValue();
     }
-
+    
+    static boolean isInternalClass(Class clazz) {
+        return clazz == ThreadInfo.class || clazz == ThreadInfo[].class;
+    }
+    
     // ------------------------------------------ Stack trace obtaining -----------------------------------------------
 
     /** This is used in Object Allocation profiling mode */
-    protected static synchronized void getAndSendCurrentStackTrace(char classId, long objSize) {
+    protected static synchronized void getAndSendCurrentStackTrace(int classId, long objSize) {
         if (eventBuffer == null) {
             return; // Chances are that instrumentation has been removed while we were executing instrumentation code
         }
@@ -217,7 +232,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
     }
 
     /** This is used in Object Liveness profiling mode */
-    protected static synchronized void getAndSendCurrentStackTrace(char classId, char epoch, int objCount, long objSize) {
+    protected static synchronized void getAndSendCurrentStackTrace(int classId, char epoch, int objCount, long objSize) {
         if (eventBuffer == null) {
             return; // Chances are that instrumentation has been removed while we were executing instrumentation code
         }
@@ -324,7 +339,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
     // ---------------------------------------- Writing profiler events -----------------------------------------
 
     /** Note that there is no synchronized(eventBuffer) in this method, since synchronization is already required by its callers */
-    protected static void writeObjAllocStackTraceEvent(char classId, long objSize) {
+    protected static void writeObjAllocStackTraceEvent(int classId, long objSize) {
         if (eventBuffer == null) {
             return; // Instrumentation removal happened when we were in instrumentation 
         }
@@ -385,7 +400,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
     }
 
     /** Note that there is no synchronized(eventBuffer) in this method, since synchronization is already required by its callers */
-    protected static void writeObjLivenessStackTraceEvent(char classId, char epoch, int objCount, long objSize) {
+    protected static void writeObjLivenessStackTraceEvent(int classId, char epoch, int objCount, long objSize) {
         if (eventBuffer == null) {
             return; // Instrumentation removal happened when we were in instrumentation 
         }
