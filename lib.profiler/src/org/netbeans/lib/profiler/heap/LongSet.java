@@ -42,17 +42,20 @@
 package org.netbeans.lib.profiler.heap;
 
 import java.util.Arrays;
-import java.util.Map;
+import java.util.Set;
 
 /**
- * Map for longs. IdentityHashMap was used as template.
+ * Set for longs. IdentityHashMap was used as template.
  * Zero cannot be used as key. Load factor is 3/4.
  * @author Tomas Hurka
  */
-class LongHashMap {
+class LongSet
+{
     /**
      * The initial capacity used by the no-args constructor.
-     * MUST be a power of two.
+     * MUST be a power of two.  The value 32 corresponds to the
+     * (specified) expected maximum size of 21, given a load factor
+     * of 2/3.
      */
     private static final int DEFAULT_CAPACITY = 32;
 
@@ -69,7 +72,7 @@ class LongHashMap {
      * by either of the constructors with arguments.
      * MUST be a power of two <= 1<<29.
      */
-    private static final int MAXIMUM_CAPACITY = 1 << 29;
+    private static final int MAXIMUM_CAPACITY = 1 << 30;
 
     /**
      * The table, resized as necessary. Length MUST always be a power of two.
@@ -86,7 +89,7 @@ class LongHashMap {
     /**
      * The number of modifications, to support fast-fail iterators
      */
-    private transient int modCount;
+    private transient volatile int modCount;
 
     /**
      * The next size value at which to resize (capacity * load factor).
@@ -95,9 +98,9 @@ class LongHashMap {
 
     /**
      * Constructs a new, empty identity hash map with a default expected
-     * maximum size.
+     * maximum size (21).
      */
-    LongHashMap() {
+    LongSet() {
         init(DEFAULT_CAPACITY);
     }
 
@@ -110,7 +113,7 @@ class LongHashMap {
      * @param expectedMaxSize the expected maximum size of the map
      * @throws IllegalArgumentException if <tt>expectedMaxSize</tt> is negative
      */
-    LongHashMap(int expectedMaxSize) {
+    LongSet(int expectedMaxSize) {
         if (expectedMaxSize < 0)
             throw new IllegalArgumentException("expectedMaxSize is negative: "
                                                + expectedMaxSize);
@@ -147,12 +150,25 @@ class LongHashMap {
      * MINIMUM_CAPACITY and MAXIMUM_CAPACITY inclusive.
      */
     private void init(int initCapacity) {
-        assert (initCapacity & -initCapacity) == initCapacity; // power of 2
-        assert initCapacity >= MINIMUM_CAPACITY;
-        assert initCapacity <= MAXIMUM_CAPACITY;
+        // assert (initCapacity & -initCapacity) == initCapacity; // power of 2
+        // assert initCapacity >= MINIMUM_CAPACITY;
+        // assert initCapacity <= MAXIMUM_CAPACITY;
 
-        threshold = (initCapacity * 3)/ 4;
-        table = new long[2 * initCapacity];
+        threshold = (initCapacity * 3) / 4;
+        table = new long[initCapacity];
+    }
+
+    /**
+     * Constructs a new identity hash map containing the keys-value mappings
+     * in the specified map.
+     *
+     * @param m the map whose mappings are to be placed into this map
+     * @throws NullPointerException if the specified map is null
+     */
+    LongSet(Set<Long> m) {
+        // Allow for a bit of growth
+        this((int) ((1 + m.size()) * 1.1));
+        putAll(m);
     }
 
     /**
@@ -185,46 +201,14 @@ class LongHashMap {
         // number of collisions (approximately 8 at default load factor).
         h ^= (h >>> 20) ^ (h >>> 12);
         h ^= (h >>> 7) ^ (h >>> 4);
-        return (h) & (length - 2);
+        return (h) & (length - 1);
     }
 
     /**
      * Circularly traverses table of size len.
      */
     private static int nextKeyIndex(int i, int len) {
-        return (i + 2 < len ? i + 2 : 0);
-    }
-
-    /**
-     * Returns the value to which the specified key is mapped,
-     * or {@code null} if this map contains no mapping for the key.
-     *
-     * <p>More formally, if this map contains a mapping from a key
-     * {@code k} to a value {@code v} such that {@code (key == k)},
-     * then this method returns {@code v}; otherwise it returns
-     * {@code null}.  (There can be at most one such mapping.)
-     *
-     * <p>A return value of {@code null} does not <i>necessarily</i>
-     * indicate that the map contains no mapping for the key; it's also
-     * possible that the map explicitly maps the key to {@code null}.
-     * The {@link #containsKey containsKey} operation may be used to
-     * distinguish these two cases.
-     *
-     * @see #put(Object, Object)
-     */
-    long get(long key) {
-        long k = key;
-        long[] tab = table;
-        int len = tab.length;
-        int i = hash(k, len);
-        while (true) {
-            long item = tab[i];
-            if (item == k)
-                return tab[i + 1];
-            if (item == 0)
-                return -1;
-            i = nextKeyIndex(i, len);
-        }
+        return (i + 1 < len ? i + 1 : 0);
     }
 
     /**
@@ -236,56 +220,15 @@ class LongHashMap {
      *          in this map
      * @see     #containsValue(Object)
      */
-    boolean containsKey(long key) {
-        long k = key;
+    boolean contains(long key) {
+        assert key != 0;
         long[] tab = table;
         int len = tab.length;
-        int i = hash(k, len);
+        int i = hash(key, len);
         while (true) {
             long item = tab[i];
-            if (item == k)
+            if (item == key)
                 return true;
-            if (item == 0)
-                return false;
-            i = nextKeyIndex(i, len);
-        }
-    }
-
-    /**
-     * Tests whether the specified object reference is a value in this identity
-     * hash map.
-     *
-     * @param value value whose presence in this map is to be tested
-     * @return <tt>true</tt> if this map maps one or more keys to the
-     *         specified object reference
-     * @see     #containsKey(Object)
-     */
-    boolean containsValue(long value) {
-        long[] tab = table;
-        for (int i = 1; i < tab.length; i += 2)
-            if (tab[i] == value && tab[i - 1] != 0)
-                return true;
-
-        return false;
-    }
-
-    /**
-     * Tests if the specified key-value mapping is in the map.
-     *
-     * @param   key   possible key
-     * @param   value possible value
-     * @return  <code>true</code> if and only if the specified key-value
-     *          mapping is in the map
-     */
-    private boolean containsMapping(long key, long value) {
-        long k = key;
-        long[] tab = table;
-        int len = tab.length;
-        int i = hash(k, len);
-        while (true) {
-            long item = tab[i];
-            if (item == k)
-                return tab[i + 1] == value;
             if (item == 0)
                 return false;
             i = nextKeyIndex(i, len);
@@ -307,30 +250,25 @@ class LongHashMap {
      * @see     #get(Object)
      * @see     #containsKey(Object)
      */
-    long put(long key, long value) {
+    boolean add(long key) {
         assert key != 0;
-        assert value != -1;
-        long k = key;
         long[] tab = table;
         int len = tab.length;
-        int i = hash(k, len);
+        int i = hash(key, len);
 
         long item;
         while ( (item = tab[i]) != 0) {
-            if (item == k) {
-                long oldValue = tab[i + 1];
-                tab[i + 1] = value;
-                return oldValue;
+            if (item == key) {
+                return true;
             }
             i = nextKeyIndex(i, len);
         }
 
         modCount++;
-        tab[i] = k;
-        tab[i + 1] = value;
+        tab[i] = key;
         if (++size >= threshold)
-            resize(len); // len == 2 * current capacity.
-        return -1;
+            resize(2*len);
+        return false;
     }
 
     /**
@@ -340,11 +278,11 @@ class LongHashMap {
      */
     private void resize(int newCapacity) {
         // assert (newCapacity & -newCapacity) == newCapacity; // power of 2
-        int newLength = newCapacity * 2;
+        int newLength = newCapacity;
 
-        long[] oldTable = table;
+	long[] oldTable = table;
         int oldLength = oldTable.length;
-        if (oldLength == 2*MAXIMUM_CAPACITY) { // can't expand any further
+        if (oldLength == MAXIMUM_CAPACITY) { // can't expand any further
             if (threshold == MAXIMUM_CAPACITY-1)
                 throw new IllegalStateException("Capacity exhausted.");
             threshold = MAXIMUM_CAPACITY-1;  // Gigantic map!
@@ -353,18 +291,16 @@ class LongHashMap {
         if (oldLength >= newLength)
             return;
 
-        long[] newTable = new long[newLength];
-        threshold = (newCapacity * 3) / 4;
+	long[] newTable = new long[newLength];
+        threshold = (newLength * 3) / 4;
 
-        for (int j = 0; j < oldLength; j += 2) {
+        for (int j = 0; j < oldLength; j++) {
             long key = oldTable[j];
             if (key != 0) {
-                long value = oldTable[j+1];
                 int i = hash(key, newLength);
                 while (newTable[i] != 0)
                     i = nextKeyIndex(i, newLength);
                 newTable[i] = key;
-                newTable[i + 1] = value;
             }
         }
         table = newTable;
@@ -378,15 +314,16 @@ class LongHashMap {
      * @param m mappings to be stored in this map
      * @throws NullPointerException if the specified map is null
      */
-    void putAll(Map<Long,Long> m) {
+    void putAll(Set<Long> m) {
         int n = m.size();
         if (n == 0)
             return;
         if (n > threshold) // conservatively pre-expand
             resize(capacity(n));
 
-        for (Map.Entry<Long,Long> e : m.entrySet())
-            put(e.getKey(), e.getValue());
+	for (Long e : m) {
+            add(e);
+        }
     }
 
     /**
@@ -398,53 +335,18 @@ class LongHashMap {
      *         (A <tt>null</tt> return can also indicate that the map
      *         previously associated <tt>null</tt> with <tt>key</tt>.)
      */
-    long remove(long key) {
-        long k = key;
+    boolean remove(long key) {
+        key++;
         long[] tab = table;
         int len = tab.length;
-        int i = hash(k, len);
+        int i = hash(key, len);
 
         while (true) {
             long item = tab[i];
-            if (item == k) {
-                modCount++;
-                size--;
-                long oldValue = tab[i + 1];
-                tab[i + 1] = 0;
-                tab[i] = 0;
-                closeDeletion(i);
-                return oldValue;
-            }
-            if (item == 0)
-                return -1;
-            i = nextKeyIndex(i, len);
-        }
-
-    }
-
-    /**
-     * Removes the specified key-value mapping from the map if it is present.
-     *
-     * @param   key   possible key
-     * @param   value possible value
-     * @return  <code>true</code> if and only if the specified key-value
-     *          mapping was in the map
-     */
-    private boolean removeMapping(long key, long value) {
-        long k = key;
-        long[] tab = table;
-        int len = tab.length;
-        int i = hash(k, len);
-
-        while (true) {
-            long item = tab[i];
-            if (item == k) {
-                if (tab[i + 1] != value)
-                    return false;
+            if (item == key) {
                 modCount++;
                 size--;
                 tab[i] = 0;
-                tab[i + 1] = 0;
                 closeDeletion(i);
                 return true;
             }
@@ -452,6 +354,7 @@ class LongHashMap {
                 return false;
             i = nextKeyIndex(i, len);
         }
+
     }
 
     /**
@@ -482,9 +385,7 @@ class LongHashMap {
             int r = hash(item, len);
             if ((i < r && (r <= d || d <= i)) || (r <= d && d <= i)) {
                 tab[d] = item;
-                tab[d + 1] = tab[i + 1];
                 tab[i] = 0;
-                tab[i + 1] = 0;
                 d = i;
             }
         }
@@ -497,7 +398,7 @@ class LongHashMap {
     void clear() {
         modCount++;
         long[] tab = table;
-        Arrays.fill(tab, 0);
+        Arrays.fill(tab,0);
         size = 0;
     }
 
@@ -512,31 +413,27 @@ class LongHashMap {
      * possible that the symmetry and transitivity requirements of the
      * <tt>Object.equals</tt> contract may be violated if this map is compared
      * to a normal map.  However, the <tt>Object.equals</tt> contract is
-     * guaranteed to hold among <tt>LongHashMap</tt> instances.</b>
+     * guaranteed to hold among <tt>IdentityHashMap</tt> instances.</b>
      *
      * @param  o object to be compared for equality with this map
      * @return <tt>true</tt> if the specified object is equal to this map
      * @see Object#equals(Object)
      */
-    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;
-        } else if (o instanceof LongHashMap) {
-            LongHashMap m = (LongHashMap) o;
+        } else if (o instanceof LongSet) {
+            LongSet m = (LongSet) o;
             if (m.size() != size)
                 return false;
 
             long[] tab = m.table;
-            for (int i = 0; i < tab.length; i+=2) {
+            for (int i = 0; i < tab.length; i++) {
                 long k = tab[i];
-                if (k != 0 && !containsMapping(k, tab[i + 1]))
+                if (k != 0 && !contains(k))
                     return false;
             }
             return true;
-        } else if (o instanceof Map) {
-            Map m = (Map)o;
-            return false;
         } else {
             return false;  // o is not a Map
         }
@@ -555,26 +452,21 @@ class LongHashMap {
      * <tt>entrySet</tt> method, it is possible that the contractual
      * requirement of <tt>Object.hashCode</tt> mentioned in the previous
      * paragraph will be violated if one of the two objects being compared is
-     * an <tt>LongHashMap</tt> instance and the other is a normal map.</b>
+     * an <tt>IdentityHashMap</tt> instance and the other is a normal map.</b>
      *
      * @return the hash code value for this map
      * @see Object#equals(Object)
      * @see #equals(Object)
      */
-    @Override
     public int hashCode() {
         int result = 0;
         long[] tab = table;
-        for (int i = 0; i < tab.length; i +=2) {
+        for (int i = 0; i < tab.length; i ++) {
             long key = tab[i];
             if (key != 0) {
-                long k = key;
-                result += hash(k,tab.length) ^
-                          hash(tab[i + 1],tab.length);
+                result += hash(key, tab.length);
             }
         }
         return result;
     }
-
-
 }

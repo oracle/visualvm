@@ -344,6 +344,7 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
                 stopResults();
                 resetResults();
                 submitChanges();
+                unpauseResults();
             }
         };
         settingsUI.add(applyButton);
@@ -423,8 +424,6 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
         if (running) return;
         running = true;
         
-        resetResults();
-        
         refresher = new Runnable() {
             public void run() {
                 if (running) {
@@ -461,6 +460,7 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     
     private void resetResults() {
         if (ui != null) ui.resetData();
+        ResultsManager.getDefault().reset();
     }
     
     private void stopResults() {
@@ -470,6 +470,10 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
         }
     }
     
+    private void unpauseResults() {
+        if (ui != null) ui.resetPause();
+    }
+    
     
     // --- Session lifecycle ---------------------------------------------------
     
@@ -477,14 +481,18 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     
     public void notifyActivated() {
         resetResults();
+        
         resetter = Lookup.getDefault().lookup(ObjectsResetter.class);
         resetter.controller = this;
     }
     
     public void notifyDeactivated() {
         resetResults();
-        resetter.controller = null;
-        resetter = null;
+        
+        if (resetter != null) {
+            resetter.controller = null;
+            resetter = null;
+        }
     }
     
     
@@ -495,6 +503,7 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
             startResults();
         } else if (newState == Profiler.PROFILING_STARTED) {
             resetResults();
+            unpauseResults();
         }
         
         if (ui != null) ui.sessionStateChanged(getSessionState());
@@ -507,7 +516,7 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     public static final class ObjectsResetter implements ResultsListener {
         private ObjectsFeature controller;
         public void resultsAvailable() { /*if (controller != null) controller.refreshView();*/ }
-        public void resultsReset() { if (controller != null) controller.resetResults(); }
+        public void resultsReset() { if (controller != null && controller.ui != null) controller.ui.resetData(); }
     }
     
     

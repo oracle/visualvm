@@ -135,7 +135,7 @@ public class ThreadDumpWindow extends ProfilerTopComponent {
         sb.append("<pre>"); // NOI18N
         sb.append(" <b>Full thread dump: "); // NOI18N
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  // NOI18N
-        sb.append(df.format(td.getTime()) + "<b><br><br>");
+        sb.append(df.format(td.getTime()) + "</b><br><br>");
         for (ThreadInfo thread : threads) {
             if (thread != null) {
                 if (jdk15) {
