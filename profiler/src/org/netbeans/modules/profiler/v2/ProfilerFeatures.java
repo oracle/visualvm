@@ -265,7 +265,7 @@ final class ProfilerFeatures {
     ProfilingSettings getSettings() {
         assert SwingUtilities.isEventDispatchThread();
         
-        session.persistStorage();
+        session.persistStorage(false);
         
         if (activated.isEmpty()) return null;
         
