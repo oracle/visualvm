@@ -108,6 +108,8 @@ public abstract class ProfilerSession {
     // --- Constructor ---------------------------------------------------------
     
     protected ProfilerSession(Profiler _profiler, Lookup context) {
+        if (_profiler == null) throw new IllegalArgumentException("Profiler cannot be null"); // NOI18N
+        
         profiler = _profiler;
         setContext(context);
     }
