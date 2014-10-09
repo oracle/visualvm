@@ -242,9 +242,11 @@ public abstract class ProfilerSession {
         
         UIUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
-                if (window != null && !window.closing && window.isOpened()) {
-                    window.closing = true;
-                    window.close(); // calls session.cleanup()
+                if (window != null) {
+                    if (!window.closing && window.isOpened()) {
+                        window.closing = true;
+                        window.close(); // calls session.cleanup()
+                    }
                 } else {
                     cleanup();
                 }
@@ -274,8 +276,8 @@ public abstract class ProfilerSession {
         return storage;
     }
     
-    final synchronized void persistStorage() {
-        if (storage != null) storage.persist();
+    final synchronized void persistStorage(boolean immediately) {
+        if (storage != null) storage.persist(immediately);
     }
     
     
@@ -305,7 +307,7 @@ public abstract class ProfilerSession {
     private void cleanup() {
         synchronized(this) { if (features != null) features.sessionFinished(); }
         
-        persistStorage();
+        persistStorage(false);
         
         // TODO: unregister listeners (this.addListener) to prevent memory leaks
     }
