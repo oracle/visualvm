@@ -74,6 +74,7 @@ import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.v2.ui.ProjectSelector;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
+import org.openide.modules.OnStop;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -483,6 +484,19 @@ final class ProfilerSessions {
         } finally {
             if (lock != null) synchronized(lock) { lock.notifyAll(); }
         }
+    }
+    
+    
+    // --- Persist session -----------------------------------------------------
+    
+    @OnStop
+    public static final class ExitHandler implements Runnable {
+        
+        public void run() {
+            ProfilerSession current = ProfilerSession.currentSession();
+            if (current != null) current.persistStorage(true);
+        }
+        
     }
     
 }
