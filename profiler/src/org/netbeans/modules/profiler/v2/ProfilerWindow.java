@@ -139,15 +139,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         this.session = session;
         attachSettings = session.getAttachSettings();
         
-        Lookup.Provider project = session.getProject();
-        if (project == null) {
-            setDisplayName(Bundle.ProfilerWindow_captionExternal());
-        } else {
-            String projectN = ProjectUtilities.getDisplayName(project);
-            FileObject file = session.getFile();
-            setDisplayName(file == null ? Bundle.ProfilerWindow_captionProject(projectN) :
-                                          Bundle.ProfilerWindow_captionFile(projectN, file.getNameExt()));
-        }
+        updateWindowName();
         updateWindowIcon();
         
         createUI();
@@ -156,6 +148,8 @@ class ProfilerWindow extends ProfilerTopComponent {
     // --- API -----------------------------------------------------------------
     
     void updateSession() {
+        updateWindowName();
+        
         start.setText(session.isAttach() ? Bundle.ProfilerWindow_attach() :
                                            Bundle.ProfilerWindow_profile());
     }
@@ -289,25 +283,26 @@ class ProfilerWindow extends ProfilerTopComponent {
     }
     
     
+    private void updateWindowName() {
+       Lookup.Provider project = session.getProject();
+        if (project == null) {
+            setDisplayName(Bundle.ProfilerWindow_captionExternal());
+        } else {
+            String projectN = ProjectUtilities.getDisplayName(project);
+            FileObject file = session.getFile();
+            setDisplayName(file == null ? Bundle.ProfilerWindow_captionProject(projectN) :
+                                          Bundle.ProfilerWindow_captionFile(projectN, file.getNameExt()));
+        } 
+    }
+    
     private void updateWindowIcon() {
-        Runnable updater = new Runnable() {
+        UIUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 if (session.inProgress()) setIcon(Icons.getImage(ProfilerIcons.PROFILE_RUNNING));
                 else setIcon(Icons.getImage(ProfilerIcons.PROFILE_INACTIVE));
             }
-        };
-        UIUtils.runInEventDispatchThread(updater);
+        });
     }
-    
-//    private void updateProfileIcon() {
-//        Runnable updater = new Runnable() {
-//            public void run() {
-//                if (start != null) start.setIcon(Icons.getIcon(
-//                        session.isAttach() ? GeneralIcons.BUTTON_ATTACH : GeneralIcons.START));
-//            }
-//        };
-//        UIUtils.runInEventDispatchThread(updater);
-//    }
     
     private void updateButtons() {
         int state = session.getState();
