@@ -48,10 +48,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.modules.profiler.v2.ProfilerFeature.Provider;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
 
@@ -62,9 +63,12 @@ import org.openide.util.RequestProcessor;
  */
 final class ProfilerFeatures {
     
-    private static final String FLAG_SINGLE_FEATURE = "SINGLE_FEATURE";
-    private static final String FLAG_SELECTED_FEATURES = "SELECTED_FEATURES";
-    private static final String FLAG_PROFILING_POINTS = "PROFILING_POINTS";
+    private static final String FLAG_SINGLE_FEATURE = "SINGLE_FEATURE"; // NOI18N
+    private static final String FLAG_ACTIVATED_FEATURES = "ACTIVATED_FEATURES"; // NOI18N
+    private static final String FLAG_PROFILING_POINTS = "PROFILING_POINTS"; // NOI18N
+    
+    private static final Boolean SINGLE_FEATURE_DEFAULT = Boolean.TRUE;
+    private static final Boolean PROFILING_POINTS_DEFAULT = Boolean.TRUE;
     
     private static final Comparator<ProfilerFeature> FEATURES_COMPARATOR =
         new Comparator<ProfilerFeature>() {
@@ -76,14 +80,14 @@ final class ProfilerFeatures {
     private final ProfilerSession session;
     
     private final Set<ProfilerFeature> features;
-    private final Set<ProfilerFeature> selected;
+    private final Set<ProfilerFeature> activated;
     
     private final Set<Listener> listeners;
     private final ChangeListener listener = new ChangeListener() {
         public void stateChanged(ChangeEvent e) { fireSettingsChanged(); }
     };
     
-    private boolean singleFeature;
+    private boolean singleFeatured;
     private boolean ppoints;
     
     
@@ -91,18 +95,19 @@ final class ProfilerFeatures {
         this.session = session;
         
         SessionStorage storage = session.getStorage();
-        singleFeature = Boolean.parseBoolean(storage.loadFlag(FLAG_SINGLE_FEATURE, "true"));
-        ppoints = Boolean.parseBoolean(storage.loadFlag(FLAG_PROFILING_POINTS, "true"));
+        singleFeatured = Boolean.parseBoolean(storage.readFlag(FLAG_SINGLE_FEATURE, SINGLE_FEATURE_DEFAULT.toString()));
+        ppoints = Boolean.parseBoolean(storage.readFlag(FLAG_PROFILING_POINTS, PROFILING_POINTS_DEFAULT.toString()));
         
         features = new TreeSet(FEATURES_COMPARATOR);
-        selected = new TreeSet(FEATURES_COMPARATOR);
+        activated = new TreeSet(FEATURES_COMPARATOR);
         
         listeners = new HashSet();
         
-        for (Provider provider : Lookup.getDefault().lookupAll(Provider.class))
-            features.addAll(provider.getFeatures(session.getProject()));
+        // Populates SessionStorage, can be accessed in EDT from now
+        for (ProfilerFeature.Provider provider : Lookup.getDefault().lookupAll(ProfilerFeature.Provider.class))
+            features.add(provider.getFeature(session));
         
-        loadSelectedFeatures();
+        loadActivatedFeatures();
     }
     
     
@@ -110,8 +115,10 @@ final class ProfilerFeatures {
         return features;
     }
     
-    Set<ProfilerFeature> getSelected() {
-        return selected;
+    Set<ProfilerFeature> getActivated() {
+        assert SwingUtilities.isEventDispatchThread();
+        
+        return activated;
     }
     
     static Set<ProfilerFeature> getCompatible(Set<ProfilerFeature> f, Lookup c) {
@@ -120,118 +127,150 @@ final class ProfilerFeatures {
         return s;
     }
     
-    void selectFeature(ProfilerFeature feature) {
-        if (singleFeature) {
-            if (selected.size() == 1 && selected.contains(feature)) return;
-            for (ProfilerFeature f : selected) {
-                f.detachedFromSession(session);
+    void activateFeature(ProfilerFeature feature) {
+        assert SwingUtilities.isEventDispatchThread();
+        
+        if (singleFeatured) {
+            if (activated.size() == 1 && activated.contains(feature)) return;
+            for (ProfilerFeature f : activated) {
+                f.deactivatedInSession();
                 f.removeChangeListener(listener);
             }
-            selected.clear();
-            selected.add(feature);
+            activated.clear();
+            activated.add(feature);
             feature.addChangeListener(listener);
-            feature.attachedToSession(session);
+            feature.activatedInSession();
             fireFeaturesChanged(feature);
-            saveSelectedFeatures();
+            saveActivatedFeatures();
         } else {
-            if (selected.add(feature)) {
+            if (activated.add(feature)) {
                 ProfilingSettings ps = new ProfilingSettings();
                 feature.configureSettings(ps);
                 
-                Iterator<ProfilerFeature> it = selected.iterator();
+                Iterator<ProfilerFeature> it = activated.iterator();
                 while (it.hasNext()) {
                     ProfilerFeature f = it.next();
-                    if (f != selected && !f.supportsSettings(ps)) it.remove();
+                    if (f != activated && !f.supportsSettings(ps)) it.remove();
                 }
                 
                 feature.addChangeListener(listener);
-                feature.attachedToSession(session);
+                feature.activatedInSession();
                 fireFeaturesChanged(feature);
-                saveSelectedFeatures();
+                saveActivatedFeatures();
             }
         }
     }
     
-    void deselectFeature(ProfilerFeature feature) {
-        if (selected.size() == 1 && selected.contains(feature) && session.inProgress()) return;
-        if (selected.remove(feature)) {
-            feature.detachedFromSession(session);
+    void deactivateFeature(ProfilerFeature feature) {
+        assert SwingUtilities.isEventDispatchThread();
+        
+        if (activated.size() == 1 && activated.contains(feature) && session.inProgress()) return;
+        if (activated.remove(feature)) {
+            feature.deactivatedInSession();
             feature.removeChangeListener(listener);
             fireFeaturesChanged(feature);
-            saveSelectedFeatures();
+            saveActivatedFeatures();
         }
     }
     
-    void toggleFeatureSelection(ProfilerFeature feature) {
-        if (selected.contains(feature)) deselectFeature(feature);
-        else selectFeature(feature);
+    void toggleActivated(ProfilerFeature feature) {
+        if (activated.contains(feature)) deactivateFeature(feature);
+        else activateFeature(feature);
     }
     
-    private boolean loading;
     
-    private void loadSelectedFeatures() {
+    private volatile boolean loading;
+    
+    private void loadActivatedFeatures() {
         loading = true;
-        String _selected = session.getStorage().loadFlag(FLAG_SELECTED_FEATURES, "");
-        for (ProfilerFeature feature : features)
-            if (_selected.contains("#" + feature.getClass().getName() + "@"))
-                selectFeature(feature);
-        loading = false;
+        final String _activated = session.getStorage().readFlag(FLAG_ACTIVATED_FEATURES, ""); // NOI18N
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                for (ProfilerFeature feature : features)
+                    if (_activated.contains(getFeatureID(feature)))
+                        activateFeature(feature);
+                loading = false;
+            }
+        });
     }
     
-    private void saveSelectedFeatures() {
+    private void saveActivatedFeatures() {
         if (loading) return;
-        final Set<ProfilerFeature> _selected = new HashSet(selected);
+        final Set<ProfilerFeature> _activated = new HashSet(activated);
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 SessionStorage storage = session.getStorage();
-                if (_selected.isEmpty()) {
-                    storage.saveFlag(FLAG_SELECTED_FEATURES, null);
+                if (_activated.isEmpty()) {
+                    storage.storeFlag(FLAG_ACTIVATED_FEATURES, null);
                 } else {
                     StringBuilder b = new StringBuilder();
-                    for (ProfilerFeature feature : _selected)
-                        b.append("#" + feature.getClass().getName() + "@");
-                    storage.saveFlag(FLAG_SELECTED_FEATURES, b.toString());
+                    for (ProfilerFeature feature : _activated)
+                        b.append(getFeatureID(feature));
+                    storage.storeFlag(FLAG_ACTIVATED_FEATURES, b.toString());
                 }
             }
         });
     }
     
-    
-    void setSingleFeatureSelection(boolean single) {
-        singleFeature = single;
-        if (singleFeature && !selected.isEmpty())
-            selectFeature(selected.iterator().next());
-        session.getStorage().saveFlag(FLAG_SINGLE_FEATURE, Boolean.toString(singleFeature));
+    private static String getFeatureID(ProfilerFeature feature) {
+        return "#" + feature.getClass().getName() + "@"; // NOI18N
     }
     
-    boolean isSingleFeatureSelection() {
-        return singleFeature;
+    
+    void setSingleFeatured(boolean single) {
+        assert SwingUtilities.isEventDispatchThread();
+        
+        singleFeatured = single;
+        
+        if (singleFeatured && !activated.isEmpty())
+            activateFeature(activated.iterator().next());
+        
+        session.getStorage().storeFlag(FLAG_SINGLE_FEATURE, SINGLE_FEATURE_DEFAULT.equals(single) ?
+                                       null : Boolean.toString(singleFeatured));
+    }
+    
+    boolean isSingleFeatured() {
+        assert SwingUtilities.isEventDispatchThread();
+        
+        return singleFeatured;
     }
     
     
     void setUseProfilingPoints(boolean use) {
+        assert SwingUtilities.isEventDispatchThread();
+        
         ppoints = use;
-        session.getStorage().saveFlag(FLAG_PROFILING_POINTS, Boolean.toString(use));
+        
+        session.getStorage().storeFlag(FLAG_PROFILING_POINTS, PROFILING_POINTS_DEFAULT.equals(use) ?
+                                       null : Boolean.toString(use));
     }
     
     boolean getUseProfilingPoints() {
+        assert SwingUtilities.isEventDispatchThread();
+        
         return ppoints;
     }
     
     
     boolean settingsValid() {
-        if (selected.isEmpty()) return false;
+        assert SwingUtilities.isEventDispatchThread();
         
-        for (ProfilerFeature f : selected) if (!f.settingsValid()) return false;
+        if (activated.isEmpty()) return false;
+        
+        for (ProfilerFeature f : activated) if (!f.currentSettingsValid()) return false;
         
         return true;
     }
     
     ProfilingSettings getSettings() {
-        if (selected.isEmpty()) return null;
+        assert SwingUtilities.isEventDispatchThread();
+        
+        session.persistStorage(false);
+        
+        if (activated.isEmpty()) return null;
         
         ProfilingSettings settings = new ProfilingSettings();
-        for (ProfilerFeature f : selected) f.configureSettings(settings);
+        for (ProfilerFeature f : activated) f.configureSettings(settings);
         
         settings.setUseProfilingPoints(ppoints);
         
@@ -239,11 +278,25 @@ final class ProfilerFeatures {
     }
     
     
+    void sessionFinished() {
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                for (ProfilerFeature activated : getActivated())
+                    activated.deactivatedInSession();
+            }
+        });
+    }
+    
+    
     void addListener(Listener listener) {
+        assert SwingUtilities.isEventDispatchThread();
+        
         listeners.add(listener);
     }
     
     void removeListener(Listener listener) {
+        assert SwingUtilities.isEventDispatchThread();
+        
         listeners.remove(listener);
     }
     

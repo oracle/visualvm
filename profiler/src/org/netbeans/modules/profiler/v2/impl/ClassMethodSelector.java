@@ -49,8 +49,6 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -80,13 +78,14 @@ import org.netbeans.modules.profiler.api.java.SourcePackageInfo;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
-import org.openide.util.RequestProcessor;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 public final class ClassMethodSelector {
+    
+    private static final WeakProcessor PROCESSOR = new WeakProcessor("Profiler ClassMethodSelector Processor"); // NOI18N
     
     public static SourceClassInfo selectClass(Lookup.Provider project) {
         // TODO: wait for finished scan
@@ -398,7 +397,7 @@ public final class ClassMethodSelector {
             
             if (project != null) {
                 // TODO: display progress label for packages list
-                processor().post(new Runnable() {
+                PROCESSOR.post(new Runnable() {
                     public void run() {
                         final Collection<SourcePackageInfo> packages = getPackages(project);
                         SwingUtilities.invokeLater(new Runnable() {
@@ -421,7 +420,7 @@ public final class ClassMethodSelector {
             
             if (pkg != null) {
                 // TODO: display progress label for classes list
-                processor().post(new Runnable() {
+                PROCESSOR.post(new Runnable() {
                     public void run() {
                         final Collection<SourceClassInfo> classes = getClasses(pkg, true, true);
                         SwingUtilities.invokeLater(new Runnable() {
@@ -445,7 +444,7 @@ public final class ClassMethodSelector {
             
                 if (cls != null) {
                     // TODO: display progress label for methods list
-                    processor().post(new Runnable() {
+                    PROCESSOR.post(new Runnable() {
                         public void run() {
                             final Collection<SourceMethodInfo> methods = getMethods(cls, true);
                             SwingUtilities.invokeLater(new Runnable() {
@@ -465,22 +464,6 @@ public final class ClassMethodSelector {
             okButton.setEnabled(!methods.isEmpty());
         }
         
-    }
-    
-    
-    // --- Processor -----------------------------------------------------------
-    
-    private static Reference<RequestProcessor> PROCESSOR;
-    
-    private static synchronized RequestProcessor processor() {
-        RequestProcessor p = PROCESSOR != null ? PROCESSOR.get() : null;
-        
-        if (p == null) {
-            p = new RequestProcessor("Profiler ClassMethodSelector Processor");
-            PROCESSOR = new WeakReference(p);
-        }
-        
-        return p;
     }
     
 }

@@ -43,26 +43,17 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
-import org.netbeans.modules.profiler.v2.ProfilerFeature;
-import java.awt.event.ActionEvent;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.locks.LockContentionPanel;
-import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.actions.HeapDumpAction;
-import org.netbeans.modules.profiler.actions.RunGCAction;
-import org.netbeans.modules.profiler.actions.TakeThreadDumpAction;
+import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.v2.ui.GrayLabel;
-import org.netbeans.modules.profiler.v2.ui.PopupButton;
+import org.netbeans.modules.profiler.v2.ProfilerFeature;
+import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -79,147 +70,70 @@ import org.openide.util.NbBundle;
 })
 final class LocksFeature extends ProfilerFeature.Basic {
     
-    private JLabel shLabel;
-    private PopupButton shAggregation;
-    
-    private JLabel apLabel;
-    private JButton apThreadDumpButton;
-    private JButton apHeapDumpButton;
-    private JButton apGCButton;
-    
-    private ProfilerToolbar toolbar;
-    
-    private LockContentionPanel locksPanel;
-    
-    
-    LocksFeature() {
+    private LocksFeature(ProfilerSession session) {
         super(Icons.getIcon(ProfilerIcons.WINDOW_LOCKS), Bundle.LocksFeature_name(),
-              Bundle.LocksFeature_description(), 16);
+              Bundle.LocksFeature_description(), 16, session);
     }
     
-
-    public JPanel getResultsUI() {
-        if (locksPanel == null) initResultsUI();
-        return locksPanel;
-    }
     
-    public ProfilerToolbar getToolbar() {
-        if (toolbar == null) {
-            getResultsUI(); // locksPanel must be ready for toolbar actions
-            
-            shLabel = new GrayLabel(Bundle.LocksFeature_show());
-            
-            shAggregation = new PopupButton(Bundle.LocksFeature_aggregationByThreads()) {
-                protected void populatePopup(JPopupMenu popup) { populateFilters(popup); }
-            };
-            
-            apLabel = new GrayLabel(Bundle.LocksFeature_application());
-            
-            apThreadDumpButton = new JButton(TakeThreadDumpAction.getInstance());
-            apThreadDumpButton.setHideActionText(true);
-            apThreadDumpButton.setText(Bundle.LocksFeature_threadDump());
-            
-            apHeapDumpButton = new JButton(HeapDumpAction.getInstance());
-            apHeapDumpButton.setHideActionText(true);
-            apHeapDumpButton.setText(Bundle.MemoryFeature_heapDump());
-            
-            apGCButton = new JButton(RunGCAction.getInstance());
-            apGCButton.setHideActionText(true);
-            apGCButton.setText(Bundle.MemoryFeature_gc());
-            
-            toolbar = ProfilerToolbar.create(true);
-            
-            toolbar.addSpace(2);
-            toolbar.addSeparator();
-            toolbar.addSpace(5);
-            
-            toolbar.add(shLabel);
-            toolbar.addSpace(2);
-            toolbar.add(shAggregation);
-            
-            toolbar.addSpace(2);
-            toolbar.addSeparator();
-            toolbar.addSpace(5);
-            
-            toolbar.add(apLabel);
-            toolbar.addSpace(2);
-            toolbar.add(apThreadDumpButton);
-            toolbar.add(apHeapDumpButton);
-            toolbar.add(apGCButton);
-            
-            setAggregation(LockContentionPanel.Aggregation.BY_THREADS);
-            
-            refreshToolbar(getSessionState());
-        }
-        
-        return toolbar;
-    }
-    
-    public boolean supportsSettings(ProfilingSettings settings) {
-        return true;
-    }
+    // --- Settings ------------------------------------------------------------
     
     public void configureSettings(ProfilingSettings settings) {
         settings.setLockContentionMonitoringEnabled(true);
     }
     
-    private void populateFilters(JPopupMenu popup) {
-        LockContentionPanel.Aggregation a = locksPanel.getAggregation();
-        
-        popup.add(new JRadioButtonMenuItem(Bundle.LocksFeature_aggregationByThreads(), a == LockContentionPanel.Aggregation.BY_THREADS) {
-            protected void fireActionPerformed(ActionEvent e) { setAggregation(LockContentionPanel.Aggregation.BY_THREADS); }
-        });
-        
-        popup.add(new JRadioButtonMenuItem(Bundle.LocksFeature_aggregationByMonitors(), a == LockContentionPanel.Aggregation.BY_MONITORS) {
-            protected void fireActionPerformed(ActionEvent e) { setAggregation(LockContentionPanel.Aggregation.BY_MONITORS); }
-        });
-    }
-
-    private void setAggregation(LockContentionPanel.Aggregation aggregation) {
-        locksPanel.setAggregation(aggregation);
-        
-        switch (aggregation) {
-            case BY_THREADS:
-                shAggregation.setText(Bundle.LocksFeature_aggregationByThreads());
-                break;
-            case BY_MONITORS:
-                shAggregation.setText(Bundle.LocksFeature_aggregationByMonitors());
-                break;
-        }
+    
+    // --- Toolbar & Results UI ------------------------------------------------
+    
+    private LocksFeatureUI ui;
+    
+    public JPanel getResultsUI() {
+        return getUI().getResultsUI();
     }
     
-    private void initResultsUI() {
-        locksPanel = new LockContentionPanel();
-        locksPanel.lockContentionEnabled();
-        profilingStateChanged(-1, getSessionState());
+    public ProfilerToolbar getToolbar() {
+        return getUI().getToolbar();
     }
     
-//    private void refreshToolbar() {
-//        ProjectSession session = getSession();
-//        refreshToolbar(session == null ? null : session.getState());
-//    }
-    
-    private void refreshToolbar(int state) {
-        final boolean inactive = state == NetBeansProfiler.PROFILING_INACTIVE;
-        if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-//                boolean running = state == ProjectSession.State.RUNNING;
-//                lrPauseButton.setEnabled(running);
-//                lrRefreshButton.setEnabled(running && lrPauseButton.isSelected());
-                
-                shLabel.setEnabled(!inactive);
-                apLabel.setEnabled(!inactive);
+    private LocksFeatureUI getUI() {
+        if (ui == null) ui = new LocksFeatureUI() {
+            int getSessionState() {
+                return LocksFeature.this.getSessionState();
             }
-        });
+        };
+        return ui;
     }
+    
+    
+    // --- Session lifecycle ---------------------------------------------------
+    
+    public void notifyActivated() {
+        // TODO: reset only the Locks data!
+        ResultsManager.getDefault().reset();
+    }
+    
+    public void notifyDeactivated() {
+        // TODO: reset only the Locks data!
+        ResultsManager.getDefault().reset();
+    }
+    
     
     protected void profilingStateChanged(int oldState, int newState) {
-        if (newState == NetBeansProfiler.PROFILING_INACTIVE || newState == NetBeansProfiler.PROFILING_IN_TRANSITION) {
-            if (locksPanel != null) locksPanel.profilingSessionFinished();
-        } else if (newState == NetBeansProfiler.PROFILING_RUNNING) {
-            if (locksPanel != null) locksPanel.profilingSessionStarted();
+        // TODO: reset only the Locks data!
+        if (newState == Profiler.PROFILING_STARTED)
+            ResultsManager.getDefault().reset();
+        
+        if (ui != null) ui.sessionStateChanged(getSessionState());
+    }
+    
+    
+    // --- Provider ------------------------------------------------------------
+    
+    @ServiceProvider(service=ProfilerFeature.Provider.class)
+    public static final class Provider extends ProfilerFeature.Provider {
+        public ProfilerFeature getFeature(ProfilerSession session) {
+            return new LocksFeature(session);
         }
-        refreshToolbar(newState);
     }
     
 }

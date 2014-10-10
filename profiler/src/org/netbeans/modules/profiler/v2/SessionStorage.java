@@ -48,29 +48,28 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.util.Properties;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.api.project.ProjectStorage;
+import org.netbeans.modules.profiler.v2.impl.WeakProcessor;
 import org.openide.ErrorManager;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileSystem;
 import org.openide.util.Lookup;
-import org.openide.util.RequestProcessor;
 
 /**
- * TODO: IMPLEMENT SOME LEVEL OF LAZYNESS, CURRENTLY SAVED ON EACH CHANGE !!!
- *       maybe change to save on demand?
  *
  * @author Jiri Sedlacek
  */
 final class SessionStorage {
     
-    private static final String SETTINGS_FILENAME = "session";
-    private static final String SETTINGS_FILEEXT = "xml";
+    private static final String SETTINGS_FILENAME = "settings"; // NOI18N
+    private static final String SETTINGS_FILEEXT = "xml"; // NOI18N
     
+    private static final WeakProcessor PROCESSOR = new WeakProcessor("Profiler Storage Processor"); // NOI18N
+    
+    private boolean dirty;
     private Properties properties;
     private final Lookup.Provider project;
     
@@ -80,99 +79,93 @@ final class SessionStorage {
     }
     
     
-    synchronized void saveFlag(String flag, String value) {
+    synchronized void storeFlag(String flag, String value) {
         if (properties == null) loadProperties();
         
-        if (value != null) properties.put(flag, value);
-        else properties.remove(flag);
+        boolean _dirty;
+        if (value != null) _dirty = !value.equals(properties.put(flag, value));
+        else _dirty = properties.remove(flag) != null;
         
-        processor().post(new Runnable() {
-            public void run() { saveProperties(); }
-        });
+        dirty |= _dirty;
     }
     
-    synchronized String loadFlag(String flag, String defaultValue) {
+    synchronized String readFlag(String flag, String defaultValue) {
         if (properties == null) loadProperties();
         
         return properties.getProperty(flag, defaultValue);
     }
     
     
+    synchronized void persist(boolean immediately) {
+        if (dirty) {
+            if (immediately) {
+                synchronized(PROCESSOR) { saveProperties(properties); }
+            } else {
+                final Properties _properties = new Properties(properties);
+                PROCESSOR.post(new Runnable() {
+                    public void run() { synchronized(PROCESSOR) { saveProperties(_properties); } }
+                });
+            }
+            dirty = false;
+        }
+    }
+    
+    
     private void loadProperties() {
-        if (properties == null) {
-            properties = new Properties();
-            
-            assert !SwingUtilities.isEventDispatchThread();
-            try {
-                FileObject settingsStorage = ProjectStorage.getSettingsFolder(project, false);
-                if (settingsStorage != null) {
-                    FileSystem fs = settingsStorage.getFileSystem();
-                    fs.runAtomicAction(new FileSystem.AtomicAction() {
-                        public void run() throws IOException {
-                            FileObject _settingsStorage = ProjectStorage.getSettingsFolder(project, true);
-                            FileObject __settingsStorage = _settingsStorage.getFileObject(SETTINGS_FILENAME,
-                                                                                          SETTINGS_FILEEXT);
+        properties = new Properties();
 
-                            if (__settingsStorage != null) {
-                                InputStream is = __settingsStorage.getInputStream();
-                                BufferedInputStream bis = new BufferedInputStream(is);
-                                properties.loadFromXML(bis);
-                                bis.close();
-                            }
+        assert !SwingUtilities.isEventDispatchThread();
+        try {
+            FileObject settingsStorage = ProjectStorage.getSettingsFolder(project, false);
+            if (settingsStorage != null) {
+                FileSystem fs = settingsStorage.getFileSystem();
+                fs.runAtomicAction(new FileSystem.AtomicAction() {
+                    public void run() throws IOException {
+                        FileObject _settingsStorage = ProjectStorage.getSettingsFolder(project, true);
+                        FileObject __settingsStorage = _settingsStorage.getFileObject(SETTINGS_FILENAME,
+                                                                                      SETTINGS_FILEEXT);
+
+                        if (__settingsStorage != null) {
+                            InputStream is = __settingsStorage.getInputStream();
+                            BufferedInputStream bis = new BufferedInputStream(is);
+                            properties.loadFromXML(bis);
+                            bis.close();
                         }
-                    });
-                }
-            } catch (Exception e) {
-                ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());
-                e.printStackTrace();
-            }
-        }
-    }
-    
-    private void saveProperties() {
-        if (properties != null) {
-            assert !SwingUtilities.isEventDispatchThread();
-            try {
-                FileObject _settingsStorage = ProjectStorage.getSettingsFolder(project, true);
-                FileObject __settingsStorage = _settingsStorage.getFileObject(SETTINGS_FILENAME,
-                                                                              SETTINGS_FILEEXT);
-                if (__settingsStorage == null) __settingsStorage = _settingsStorage.createData(SETTINGS_FILENAME,
-                                                                                               SETTINGS_FILEEXT);
-                
-                if (__settingsStorage != null) {
-                    FileLock lock = null;
-
-                    try {
-                        lock = __settingsStorage.lock();
-                        final OutputStream os = __settingsStorage.getOutputStream(lock);
-                        final BufferedOutputStream bos = new BufferedOutputStream(os);
-                        properties.storeToXML(os, null);
-                        bos.close();
-                    } finally {
-                        if (lock != null) lock.releaseLock();
                     }
-                }
-            } catch (Exception e) {
-                ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());
-                e.printStackTrace();
+                });
             }
+        } catch (Exception e) {
+            ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());
+            e.printStackTrace();
         }
     }
     
-    
-    // --- Processor -----------------------------------------------------------
-    
-    private static Reference<RequestProcessor> PROCESSOR;
-    
-    private static synchronized RequestProcessor processor() {
-        RequestProcessor p = PROCESSOR != null ? PROCESSOR.get() : null;
-        
-        if (p == null) {
-            p = new RequestProcessor("Profiler Storage Processor");
-            PROCESSOR = new WeakReference(p);
+    private void saveProperties(Properties _properties) {
+        assert !SwingUtilities.isEventDispatchThread();
+        try {
+            FileObject _settingsStorage = ProjectStorage.getSettingsFolder(project, true);
+            FileObject __settingsStorage = _settingsStorage.getFileObject(SETTINGS_FILENAME,
+                                                                          SETTINGS_FILEEXT);
+            if (__settingsStorage == null) __settingsStorage = _settingsStorage.createData(SETTINGS_FILENAME,
+                                                                                           SETTINGS_FILEEXT);
+
+            if (__settingsStorage != null) {
+                FileLock lock = null;
+
+                try {
+                    lock = __settingsStorage.lock();
+                    final OutputStream os = __settingsStorage.getOutputStream(lock);
+                    final BufferedOutputStream bos = new BufferedOutputStream(os);
+                    _properties.storeToXML(os, null);
+                    bos.close();
+                } finally {
+                    if (lock != null) lock.releaseLock();
+                }
+            }
+        } catch (Exception e) {
+            ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());
+            e.printStackTrace();
         }
-        
-        return p;
     }
     
 }

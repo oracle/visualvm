@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler.actions;
 
+import javax.swing.Action;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
@@ -67,7 +68,7 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @NbBundle.Messages({
     "LBL_TakeSnapshotAction=&Take Snapshot of Collected Results",
-    "HINT_TakeSnapshotAction=Take Snapshot of Collected Results"
+    "HINT_TakeSnapshotAction=Take snapshot of collected results"
 })
 public final class TakeSnapshotAction extends ProfilingAwareAction {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
@@ -119,6 +120,7 @@ public final class TakeSnapshotAction extends ProfilingAwareAction {
         listener = Lookup.getDefault().lookup(Listener.class);
         listener.setDelegate(this);
         setIcon(Icons.getIcon(ProfilerIcons.SNAPSHOT_TAKE));
+        putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_TakeSnapshotAction());
         putValue("iconBase", Icons.getResource(ProfilerIcons.SNAPSHOT_TAKE)); // NOI18N
     }
 

@@ -106,8 +106,8 @@ import org.openide.windows.WindowManager;
     "HeapDumpAction_DefaultLocationRadioText=Default location",
     "HeapDumpAction_CustomLocationRadioText=Custom directory:",
     "HeapDumpAction_BrowseButtonText=Browse",
-    "HeapDumpAction_ToolTip=Takes a heap snapshot of the application",
-    "HeapDumpAction_ToolTipNoRemote=Takes a heap snapshot of the application (not supported for remote profiling)"
+    "HeapDumpAction_ToolTip=Take heap dump from the profiled application",
+    "HeapDumpAction_ToolTipNoRemote=Take heap dump from the profiled application (not supported for remote profiling)"
 })
 public final class HeapDumpAction extends ProfilingAwareAction {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------

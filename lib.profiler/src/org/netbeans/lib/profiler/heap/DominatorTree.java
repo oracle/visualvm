@@ -45,14 +45,11 @@ package org.netbeans.lib.profiler.heap;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -72,8 +69,8 @@ class DominatorTree {
     private LongBuffer multipleParents;
     private LongBuffer revertedMultipleParents;
     private LongBuffer currentMultipleParents;
-    private Map<Long,Long> map;
-    private Set dirtySet = Collections.EMPTY_SET;
+    private LongHashMap map;
+    private LongSet dirtySet;
     private int dirtySetSameSize;
     private Map canContainItself;
     private Map nearestGCRootCache = new NearestGCRootCache(400000);
@@ -84,7 +81,8 @@ class DominatorTree {
         heap = h;
         multipleParents = multiParents;
         currentMultipleParents = multipleParents;
-        map = new HashMap(multiParents.getSize());
+        map = new LongHashMap(multiParents.getSize());
+        dirtySet = new LongSet();
         try {
             revertedMultipleParents = multiParents.revertBuffer();
         } catch (IOException ex) {
@@ -108,12 +106,12 @@ class DominatorTree {
             ex.printStackTrace();
         }
         deleteBuffers();
-        dirtySet = Collections.EMPTY_SET;
+        dirtySet = new LongSet();
     }
     
     private boolean computeOneLevel(boolean ignoreDirty) throws IOException {
         boolean changed = false;
-        Set newDirtySet = new HashSet(map.size()/10);
+        LongSet newDirtySet = new LongSet(map.size()/10);
         List<Long> additionalIds = new ArrayList();
         int additionalIndex = 0;
         // debug 
@@ -138,36 +136,35 @@ class DominatorTree {
                 }
                 instanceId = additionalIds.get(additionalIndex++).longValue();
             }
-            Long instanceIdObj = new Long(instanceId);
-            Long oldIdomObj = (Long) map.get(instanceIdObj);
+            long oldIdom = map.get(instanceId);
 //index++;
-            if (oldIdomObj == null || (oldIdomObj.longValue() != 0 && (ignoreDirty || dirtySet.contains(oldIdomObj) || dirtySet.contains(instanceIdObj)))) {            
+            if (oldIdom == -1 || (oldIdom > 0 && (ignoreDirty || dirtySet.contains(oldIdom) || dirtySet.contains(instanceId)))) {            
 //processedId++;
                 LongMap.Entry entry = heap.idToOffsetMap.get(instanceId);
                 List refs = entry.getReferences();
                 Iterator refIt = refs.iterator();
-                Long newIdomIdObj = (Long)refIt.next();
+                long newIdomId = ((Long)refIt.next()).longValue();
                 boolean dirty = false;
                 
-                while(refIt.hasNext() && newIdomIdObj.longValue() != 0) {
+                while(refIt.hasNext() && newIdomId != 0) {
                     Long refIdObj = (Long)refIt.next();
-                    newIdomIdObj = intersect(newIdomIdObj,refIdObj);
+                    newIdomId = intersect(newIdomId, refIdObj.longValue());
                 }
-                if (oldIdomObj == null) {
-//addedBynewDirtySet.add((newDirtySet.contains(oldIdomObj) || newDirtySet.contains(instanceIdObj)) && !(dirtySet.contains(oldIdomObj) || dirtySet.contains(instanceIdObj)));
-                    map.put(instanceIdObj, newIdomIdObj);
-                    newDirtySet.add(newIdomIdObj);
+                if (oldIdom == -1) {
+//addedBynewDirtySet.add(newDirtySet.contains(instanceId) && !dirtySet.contains(instanceId));
+                    map.put(instanceId, newIdomId);
+                    if (newIdomId != 0) newDirtySet.add(newIdomId);
                     changed = true;
 //changedId++;
 //changedIds.add(instanceIdObj);
 //changedIdx.add(index);
 //oldDomIds.add(null);
 //newDomIds.add(newIdomIdObj);
-                } else if (oldIdomObj.longValue() != newIdomIdObj.longValue()) {
-//addedBynewDirtySet.add((newDirtySet.contains(oldIdomObj) || newDirtySet.contains(instanceIdObj)) && !(dirtySet.contains(oldIdomObj) || dirtySet.contains(instanceIdObj)));
-                    newDirtySet.add(oldIdomObj);
-                    newDirtySet.add(newIdomIdObj);
-                    map.put(instanceIdObj,newIdomIdObj);
+                } else if (oldIdom != newIdomId) {
+//addedBynewDirtySet.add((newDirtySet.contains(oldIdom) || newDirtySet.contains(instanceId)) && !(dirtySet.contains(oldIdom) || dirtySet.contains(instanceId)));
+                    newDirtySet.add(oldIdom);
+                    if (newIdomId != 0) newDirtySet.add(newIdomId);
+                    map.put(instanceId,newIdomId);
                     if (dirtySet.size() < ADDITIONAL_IDS_THRESHOLD || dirtySetSameSize >= ADDITIONAL_IDS_THRESHOLD_DIRTYSET_SAME_SIZE) {
                         updateAdditionalIds(instanceId, additionalIds);
                     }
@@ -204,8 +201,8 @@ class DominatorTree {
                     if (val != null) {
                         long idp = val.getInstanceId();
                         Long idO = new Long(idp);
-                        Long idomO = map.get(idO);
-                        if (idomO != null && idomO.longValue() != 0) {
+                        long idomO = map.get(idp);
+                        if (idomO > 0) {
                             additionalIds.add(idO);
 //System.out.println("  Adding "+printInstance(idO));
                         }
@@ -225,9 +222,9 @@ class DominatorTree {
     }
     
     long getIdomId(long instanceId, LongMap.Entry entry) {
-        Long idomEntry = (Long) map.get(new Long(instanceId));
-        if (idomEntry != null) {
-            return idomEntry.longValue();
+        long idomEntry = map.get(instanceId);
+        if (idomEntry != -1) {
+            return idomEntry;
         }
         if (entry == null) {
             entry = heap.idToOffsetMap.get(instanceId);
@@ -284,44 +281,49 @@ class DominatorTree {
         return nearestGC;
     }
     
-    private Long getIdomId(Long instanceIdLong) {
-        Long idomObj = (Long) map.get(instanceIdLong);
+    private long getIdomId(long instanceIdLong) {
+        long idom = map.get(instanceIdLong);
         
-        if (idomObj != null) {
-            return idomObj;
+        if (idom != -1) {
+            return idom;
         }
         return getNearestGCRootPointer(instanceIdLong);
     }
     
-    private Long intersect(Long idomIdObj, Long refIdObj) {
-        if (idomIdObj.longValue() == refIdObj.longValue()) {
-            return idomIdObj;
+    private long intersect(long idomId, long refId) {
+        if (idomId == refId) {
+            return idomId;
         }
-        if (idomIdObj.longValue() == 0 || refIdObj.longValue() == 0) {
-            return Long.valueOf(0);
+        if (idomId == 0 || refId == 0) {
+            return 0;
         }
-        Set leftIdoms = new HashSet(200);
-        Set rightIdoms = new HashSet(200);
-        Long leftIdomObj = idomIdObj;
-        Long rightIdomObj = refIdObj;
+        LongSet leftIdoms = new LongSet(200);
+        LongSet rightIdoms = new LongSet(200);        
+        long leftIdom = idomId;
+        long rightIdom = refId;
 
         
-        leftIdoms.add(leftIdomObj);
-        rightIdoms.add(rightIdomObj);
+        leftIdoms.add(leftIdom);
+        rightIdoms.add(rightIdom);
         while(true) {
-            if (leftIdomObj.longValue() != 0) {
-                leftIdomObj = getIdomId(leftIdomObj);
-                if (rightIdoms.contains(leftIdomObj)) {
-                    return leftIdomObj;
+            if (rightIdom == 0 && leftIdom == 0) return 0;
+            if (leftIdom != 0) {
+                leftIdom = getIdomId(leftIdom);
+                if (leftIdom != 0) {
+                    if (rightIdoms.contains(leftIdom)) {
+                        return leftIdom;
+                    }
+                    leftIdoms.add(leftIdom);
                 }
-                leftIdoms.add(leftIdomObj);
             }
-            if (rightIdomObj.longValue() != 0) {
-                rightIdomObj = getIdomId(rightIdomObj);
-                if (leftIdoms.contains(rightIdomObj)) {
-                    return rightIdomObj;
+            if (rightIdom != 0) {
+                rightIdom = getIdomId(rightIdom);
+                if (rightIdom != 0) {
+                    if (leftIdoms.contains(rightIdom)) {
+                        return rightIdom;
+                    }
+                    rightIdoms.add(rightIdom);
                 }
-                rightIdoms.add(rightIdomObj);
             }
         }
     }
