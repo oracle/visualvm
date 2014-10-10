@@ -140,8 +140,7 @@ final class ProfilerSessions {
         }
     }
     
-    static void createAndConfigure(final Lookup context, final String actionName) {
-        Lookup.Provider project = context.lookup(Lookup.Provider.class);
+    static void createAndConfigure(final Lookup context, Lookup.Provider project, final String actionName) {
         if (project == null) project = ProjectUtilities.getMainProject();
         final Lookup.Provider _project = project;
         

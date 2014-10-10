@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.v2;
 
-import java.util.Objects;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.Profiler;
@@ -90,7 +89,7 @@ public abstract class ProfilerSession {
 
         // Create a new session, will eliminate another session when showing UI
         Provider provider = Lookup.getDefault().lookup(Provider.class);
-        ProfilerSession session = provider == null ? null : provider.getSession(context);
+        ProfilerSession session = provider == null ? null : provider.createSession(context);
 
         synchronized(CURRENT_SESSION_LOCK) { CURRENT_SESSION = session; }
 
@@ -99,16 +98,18 @@ public abstract class ProfilerSession {
     };
     
     
-    public static void findAndConfigure(Lookup context, String actionName) {
+    public static void findAndConfigure(Lookup context, Lookup.Provider project, String actionName) {
         ProfilerSession current = currentSession();
         if (current != null) ProfilerSessions.configure(current, context, actionName);
-        else ProfilerSessions.createAndConfigure(context, actionName);
+        else ProfilerSessions.createAndConfigure(context, project, actionName);
     }
     
     
     // --- Constructor ---------------------------------------------------------
     
     protected ProfilerSession(Profiler _profiler, Lookup context) {
+        if (_profiler == null) throw new IllegalArgumentException("Profiler cannot be null"); // NOI18N
+        
         profiler = _profiler;
         setContext(context);
     }
@@ -124,10 +125,6 @@ public abstract class ProfilerSession {
     private final void setContext(Lookup _context) {
         synchronized(this) { context = _context; }
         notifyWindow();
-    }
-    
-    protected synchronized boolean isCompatibleContext(Lookup _context) {
-        return Objects.equals(getProject(), _context.lookup(Lookup.Provider.class));
     }
     
     
@@ -146,6 +143,9 @@ public abstract class ProfilerSession {
     public abstract Lookup.Provider getProject();
     
     public abstract FileObject getFile();
+    
+    
+    protected abstract boolean isCompatibleContext(Lookup context);
     
     
     // --- API -----------------------------------------------------------------
@@ -317,7 +317,7 @@ public abstract class ProfilerSession {
     
     public static abstract class Provider {
         
-        public abstract ProfilerSession getSession(Lookup context);
+        public abstract ProfilerSession createSession(Lookup context);
         
     }
     
