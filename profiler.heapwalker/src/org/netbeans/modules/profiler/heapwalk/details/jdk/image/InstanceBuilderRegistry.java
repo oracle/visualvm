@@ -46,7 +46,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 
 /**
  * Support for automatic selection of {@link InstanceBuilder} for an instance.
