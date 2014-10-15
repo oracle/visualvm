@@ -46,7 +46,6 @@ import java.util.List;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
-import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 
