@@ -65,7 +65,7 @@ public class LangDetailsProvider extends DetailsProvider.Basic {
             int ordinal = DetailsUtils.getIntFieldValue(instance, "ordinal", -1); // NOI18N
             if (name != null) {
                 if (ordinal != -1) {
-                    return name+" ("+ordinal+")";
+                    return name+" ("+ordinal+")";       // NOI18N
                 }
                 return name;
             }
