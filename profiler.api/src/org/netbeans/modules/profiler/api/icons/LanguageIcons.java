@@ -48,6 +48,7 @@ package org.netbeans.modules.profiler.api.icons;
 public interface LanguageIcons extends Icons.Keys {
     
     public static final String CLASS = "LanguageIcons.Class"; // NOI18N
+    public static final String CLASS_ANONYMOUS = "LanguageIcons.ClassAnonymous"; // NOI18N
     public static final String CONSTRUCTOR_PACKAGE = "LanguageIcons.ConstructorPackage"; // NOI18N
     public static final String CONSTRUCTOR_PRIVATE = "LanguageIcons.ConstructorPrivate"; // NOI18N
     public static final String CONSTRUCTOR_PROTECTED = "LanguageIcons.ConstructorProtected"; // NOI18N
@@ -65,6 +66,7 @@ public interface LanguageIcons extends Icons.Keys {
     public static final String METHOD_PRIVATE_STATIC = "LanguageIcons.MethodPrivateStatic"; // NOI18N
     public static final String METHOD_PROTECTED_STATIC = "LanguageIcons.MethodProtectedStatic"; // NOI18N
     public static final String METHOD_PUBLIC_STATIC = "LanguageIcons.MethodPublicStatic"; // NOI18N
+    public static final String METHOD_INHERITED = "LanguageIcons.MethodInheritedStatic"; // NOI18N
     public static final String METHODS = "LanguageIcons.Methods"; // NOI18N
     public static final String PACKAGE = "LanguageIcons.Package"; // NOI18N
     public static final String VARIABLE_PACKAGE = "LanguageIcons.VariablePackage"; // NOI18N
