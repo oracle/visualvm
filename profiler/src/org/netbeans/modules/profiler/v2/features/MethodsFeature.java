@@ -182,8 +182,8 @@ final class MethodsFeature extends ProfilerFeature.Basic {
             void storeFlag(String flag, String value) {
                 MethodsFeature.this.storeFlag(getID() + "_" + flag, value); // NOI18N
             }
-            Lookup.Provider getProject() {
-                return MethodsFeature.this.getSession().getProject();
+            ProfilerSession getSession() {
+                return MethodsFeature.this.getSession();
             }
             void selectForProfiling(SourceClassInfo classInfo) {
                 MethodsFeature.this.selectClassForProfiling(classInfo);
@@ -207,8 +207,8 @@ final class MethodsFeature extends ProfilerFeature.Basic {
             void storeFlag(String flag, String value) {
                 MethodsFeature.this.storeFlag(getID() + "_" + flag, value); // NOI18N
             }
-            Lookup.Provider getProject() {
-                return MethodsFeature.this.getSession().getProject();
+            ProfilerSession getSession() {
+                return MethodsFeature.this.getSession();
             }
             void selectForProfiling(SourceMethodInfo methodInfo) {
                 MethodsFeature.this.selectMethodForProfiling(methodInfo);
