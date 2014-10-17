@@ -178,6 +178,7 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(ProfilerIcons.STARTUP_32, "startup32.png");
         
         cache.put(LanguageIcons.CLASS, "class.png");
+        cache.put(LanguageIcons.CLASS_ANONYMOUS, "classAnonymous.png");
         cache.put(LanguageIcons.CONSTRUCTOR_PACKAGE, "constructorPackage.png");
         cache.put(LanguageIcons.CONSTRUCTOR_PRIVATE, "constructorPrivate.png");
         cache.put(LanguageIcons.CONSTRUCTOR_PROTECTED, "constructorProtected.png");
@@ -195,6 +196,7 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(LanguageIcons.METHOD_PRIVATE_STATIC, "methodStPrivate.png");
         cache.put(LanguageIcons.METHOD_PROTECTED_STATIC, "methodStProtected.png");
         cache.put(LanguageIcons.METHOD_PUBLIC_STATIC, "methodStPublic.png");
+        cache.put(LanguageIcons.METHOD_INHERITED, "methodInherited.png");
         cache.put(LanguageIcons.METHODS, "methods.png");
         cache.put(LanguageIcons.PACKAGE, "package.png");
         cache.put(LanguageIcons.VARIABLE_PACKAGE, "variablePackage.png");
