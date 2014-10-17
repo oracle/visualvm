@@ -43,7 +43,6 @@
 
 package org.netbeans.modules.profiler.api;
 
-import java.util.prefs.BackingStoreException;
 import org.netbeans.lib.profiler.common.GlobalProfilingSettings;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
@@ -81,7 +80,7 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     public static final int OPEN_NEVER = 3;
 
     // --- Singleton pattern ---
-    private static ProfilerIDESettings defaultInstance = new ProfilerIDESettings();
+    private static final ProfilerIDESettings defaultInstance = new ProfilerIDESettings();
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -157,100 +156,8 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
         return defaultInstance;
     }
     
-    private ProfilerIDESettings() {
-        try {
-            if (contains55Settings()) convert55Settings();
-            else if (contains701Settings()) convert701Settings();
-        } catch (BackingStoreException e) {
-            // Silently skip exception in NB55 settings
-        }
-    }
+    private ProfilerIDESettings() {}
     
-    //~ Conversion of 7.0 / 7.0.1 settings ---------------------------------------------------------------------------------------
-    
-    private boolean contains701Settings() throws BackingStoreException {
-        return get701Preferences().keys().length > 0;
-    }
-    
-    private void convert701Settings() throws BackingStoreException {
-        Preferences preferences = getPreferences();
-        Preferences pref701 = get701Preferences();
-        
-        for (String key : pref701.keys()) {
-            String oldValue = pref701.get(key, null);
-            
-            assert oldValue != null;
-            preferences.put(key, oldValue);
-        }
-        pref701.clear();
-    }
-    
-    private Preferences get701Preferences() {
-        return NbPreferences.root().node("org/netbeans/modules/profiler");  // NOI18N
-    }
-    
-    //~ Conversion of 5.5 / 5.5.1 settings ---------------------------------------------------------------------------------------
-    
-    private boolean contains55Settings() {
-        return getPreferences().getInt(PORT_NO_KEY_55, Integer.MIN_VALUE) != Integer.MIN_VALUE;
-    }
-    
-    private void convert55Settings() throws BackingStoreException {
-        Preferences preferences = getPreferences();
-        String[] keys = preferences.keys();
-        
-        for (String key : keys) {
-            if (AUTO_OPEN_SNAPSHOT_KEY_55.equals(key))
-                convertBoolean(AUTO_OPEN_SNAPSHOT_KEY_55, AUTO_OPEN_SNAPSHOT_KEY, AUTO_OPEN_SNAPSHOT_DEFAULT, preferences);
-            else if (AUTO_SAVE_SNAPSHOT_KEY_55.equals(key))
-                convertBoolean(AUTO_SAVE_SNAPSHOT_KEY_55, AUTO_SAVE_SNAPSHOT_KEY, AUTO_SAVE_SNAPSHOT_DEFAULT, preferences);
-            else if (CALIBRATION_PORT_NO_KEY_55.equals(key))
-                convertInteger(CALIBRATION_PORT_NO_KEY_55, CALIBRATION_PORT_NO_KEY, CALIBRATION_PORT_NO_DEFAULT, preferences);
-            else if (CPU_TASK_KEY_55.equals(key))
-                convertInteger(CPU_TASK_KEY_55, CPU_TASK_KEY, CPU_TASK_DEFAULT, preferences);
-            else if (LIVE_CPU_KEY_55.equals(key))
-                convertBoolean(LIVE_CPU_KEY_55, LIVE_CPU_KEY, LIVE_CPU_DEFAULT, preferences);
-            else if (LIVE_FRAGMENT_KEY_55.equals(key))
-                convertBoolean(LIVE_FRAGMENT_KEY_55, LIVE_FRAGMENT_KEY, LIVE_FRAGMENT_DEFAULT, preferences);
-            else if (LIVE_MEMORY_KEY_55.equals(key))
-                convertBoolean(LIVE_MEMORY_KEY_55, LIVE_MEMORY_KEY, LIVE_MEMORY_DEFAULT, preferences);
-            else if (MEMORY_TASK_ALLOCATIONS_KEY_55.equals(key))
-                convertBoolean(MEMORY_TASK_ALLOCATIONS_KEY_55, MEMORY_TASK_ALLOCATIONS_KEY, MEMORY_TASK_ALLOCATIONS_DEFAULT, preferences);
-            else if (PLATFORM_NAME_KEY_55.equals(key))
-                convertString(PLATFORM_NAME_KEY_55, PLATFORM_NAME_KEY, PLATFORM_NAME_DEFAULT, preferences);
-            else if (PORT_NO_KEY_55.equals(key))
-                convertInteger(PORT_NO_KEY_55, PORT_NO_KEY, PORT_NO_DEFAULT, preferences);
-            else if (RECORD_STACK_TRACES_KEY_55.equals(key))
-                convertBoolean(RECORD_STACK_TRACES_KEY_55, RECORD_STACK_TRACES_KEY, RECORD_STACK_TRACES_DEFAULT, preferences);
-            else if (THREADS_MONITORING_KEY_55.equals(key))
-                convertBoolean(THREADS_MONITORING_KEY_55, THREADS_MONITORING_KEY, THREADS_MONITORING_DEFAULT, preferences);
-            else if (TO_BEHAVIOR_KEY_55.equals(key))
-                convertInteger(TO_BEHAVIOR_KEY_55, TO_BEHAVIOR_KEY, TO_BEHAVIOR_DEFAULT, preferences);
-            else if (TRACK_EVERY_KEY_55.equals(key))
-                convertInteger(TRACK_EVERY_KEY_55, TRACK_EVERY_KEY, TRACK_EVERY_DEFAULT, preferences);
-            else if (TV_BEHAVIOR_KEY_55.equals(key))
-                convertInteger(TV_BEHAVIOR_KEY_55, TV_BEHAVIOR_KEY, TV_BEHAVIOR_DEFAULT, preferences);
-        }
-    }
-    
-    private static void convertBoolean(String oldKey, String newKey, boolean defaultValue, Preferences preferences) {
-        boolean value = preferences.getBoolean(oldKey, defaultValue);
-        preferences.remove(oldKey);
-        preferences.putBoolean(newKey, value);
-    }
-    
-    private static void convertInteger(String oldKey, String newKey, int defaultValue, Preferences preferences) {
-        int value = preferences.getInt(oldKey, defaultValue);
-        preferences.remove(oldKey);
-        preferences.putInt(newKey, value);
-    }
-    
-    private static void convertString(String oldKey, String newKey, String defaultValue, Preferences preferences) {
-        String value = preferences.get(oldKey, defaultValue);
-        preferences.remove(oldKey);
-        preferences.put(newKey, value);
-    }
-
     // Properties --------------------------------------------------------------------------------------------------------
     
     /** Determines whether snapshots are automatically opened.
