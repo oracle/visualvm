@@ -63,6 +63,7 @@ import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
+import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.impl.ClassMethodList;
 import org.netbeans.modules.profiler.v2.impl.ClassMethodSelector;
 import org.netbeans.modules.profiler.v2.ui.GrayLabel;
@@ -160,7 +161,7 @@ final class ObjectsFeatureModes {
         
         abstract void selectionChanged();
         
-        abstract Lookup.Provider getProject();
+        abstract ProfilerSession getSession();
         
         abstract void selectForProfiling(SourceClassInfo classInfo);
         
@@ -299,7 +300,7 @@ final class ObjectsFeatureModes {
                         super.setText(Bundle.ObjectsFeatureModes_editLink(text));
                     }
                     protected void fireActionPerformed(ActionEvent e) {
-                        ClassMethodList.showClasses(getProject(), selection, editSelectionLink);
+                        ClassMethodList.showClasses(getSession(), selection, editSelectionLink);
                     }
                     public Dimension getMinimumSize() {
                         return getPreferredSize();
@@ -355,7 +356,7 @@ final class ObjectsFeatureModes {
 
                 addSelectionButton = new SmallButton("+") {
                     protected void fireActionPerformed(ActionEvent e) {
-                        SourceClassInfo classInfo = ClassMethodSelector.selectClass(getProject());
+                        SourceClassInfo classInfo = ClassMethodSelector.selectClass(getSession());
                         if (classInfo != null) selectForProfiling(classInfo);
                     }
                     public Dimension getMinimumSize() {
