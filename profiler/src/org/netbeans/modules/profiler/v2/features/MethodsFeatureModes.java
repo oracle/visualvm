@@ -68,6 +68,7 @@ import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.api.java.SourceMethodInfo;
 import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
+import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.impl.ClassMethodList;
 import org.netbeans.modules.profiler.v2.impl.ClassMethodSelector;
 import org.netbeans.modules.profiler.v2.ui.GrayLabel;
@@ -182,7 +183,7 @@ final class MethodsFeatureModes {
         
         abstract void selectionChanged();
         
-        abstract Lookup.Provider getProject();
+        abstract ProfilerSession getSession();
         
         
         // --- API implementation ----------------------------------------------
@@ -437,12 +438,12 @@ final class MethodsFeatureModes {
         
         
         protected void performAddSelection() {
-            SourceClassInfo classInfo = ClassMethodSelector.selectClass(getProject());
+            SourceClassInfo classInfo = ClassMethodSelector.selectClass(getSession());
             if (classInfo != null) selectForProfiling(classInfo);
         }
         
         protected void performEditSelection(Component invoker) {
-            ClassMethodList.showClasses(getProject(), getSelection(), invoker);
+            ClassMethodList.showClasses(getSession(), getSelection(), invoker);
         }
         
     }
@@ -475,12 +476,12 @@ final class MethodsFeatureModes {
         
         
         protected void performAddSelection() {
-            SourceMethodInfo methodInfo = ClassMethodSelector.selectMethod(getProject());
+            SourceMethodInfo methodInfo = ClassMethodSelector.selectMethod(getSession());
             if (methodInfo != null) selectForProfiling(methodInfo);
         }
         
         protected void performEditSelection(Component invoker) {
-            ClassMethodList.showMethods(getProject(), getSelection(), invoker);
+            ClassMethodList.showMethods(getSession(), getSelection(), invoker);
         }
         
     }
