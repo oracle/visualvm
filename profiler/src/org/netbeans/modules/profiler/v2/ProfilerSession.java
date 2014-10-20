@@ -178,6 +178,11 @@ public abstract class ProfilerSession {
     // Set when starting profiling session, not a persistent storage!
     public final AttachSettings getAttachSettings() { return attachSettings; }
     
+    public final synchronized SessionStorage getStorage() {
+        if (storage == null) storage = new SessionStorage(getProject());
+        return storage;
+    }
+    
     
     public final void open() {
         UIUtils.runInEventDispatchThread(new Runnable() {
@@ -269,11 +274,6 @@ public abstract class ProfilerSession {
             public void run() { getWindow().selectFeature(feature); }
         };
         UIUtils.runInEventDispatchThread(task);
-    }
-    
-    final synchronized SessionStorage getStorage() {
-        if (storage == null) storage = new SessionStorage(getProject());
-        return storage;
     }
     
     final synchronized void persistStorage(boolean immediately) {
