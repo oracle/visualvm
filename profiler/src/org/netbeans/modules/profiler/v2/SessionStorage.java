@@ -62,7 +62,7 @@ import org.openide.util.Lookup;
  *
  * @author Jiri Sedlacek
  */
-final class SessionStorage {
+public final class SessionStorage {
     
     private static final String SETTINGS_FILENAME = "settings"; // NOI18N
     private static final String SETTINGS_FILEEXT = "xml"; // NOI18N
@@ -79,7 +79,7 @@ final class SessionStorage {
     }
     
     
-    synchronized void storeFlag(String flag, String value) {
+    public synchronized void storeFlag(String flag, String value) {
         if (properties == null) loadProperties();
         
         boolean _dirty;
@@ -89,7 +89,7 @@ final class SessionStorage {
         dirty |= _dirty;
     }
     
-    synchronized String readFlag(String flag, String defaultValue) {
+    public synchronized String readFlag(String flag, String defaultValue) {
         if (properties == null) loadProperties();
         
         return properties.getProperty(flag, defaultValue);

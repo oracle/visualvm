@@ -105,6 +105,14 @@ final public class ExternalPackages {
             }
             return rslt;
         }
+        
+        boolean hasClasses() {
+            Enumeration<? extends FileObject> e = pkg.getData(false);
+            while (e.hasMoreElements())
+                if (e.nextElement().getExt().equalsIgnoreCase("class")) // NOI18N
+                    return true;
+            return false;
+        }
 
         @Override
         public Collection<SourcePackageInfo> getSubpackages() {
@@ -128,7 +136,7 @@ final public class ExternalPackages {
         private ClassInfo ci;
         
         public FileClassInfo(ClassInfo ci, FileObject root, FileObject clazz) {
-            super(clazz.getName(), FileUtil.getRelativePath(root, clazz).replace('/', '.').replace(".class", ""), FileUtil.getRelativePath(root, clazz).replace(".class", ""));
+            super(clazz.getName(), FileUtil.getRelativePath(root, clazz).replace('/', '.').replace(".class", ""), FileUtil.getRelativePath(root, clazz).replace(".class", "")); // NOI18N
             this.ci = ci;
             this.clazz = clazz;
             this.root = root;
@@ -140,7 +148,7 @@ final public class ExternalPackages {
             Set<SourceMethodInfo> cts = new HashSet<SourceMethodInfo>();
             if (names != null) {
                 for(int i=0;i<names.length;i++) {
-                    if (names[i].equals("<init>")) {
+                    if (names[i].equals("<init>")) { // NOI18N
                         cts.add(new FileMethodInfo(ci, i));
                     }
                 }
@@ -287,20 +295,20 @@ final public class ExternalPackages {
             return modifiers;
         }
         public FileMethodInfo(ClassInfo ci, int mIndex) {
-            super(ci.getName().replace('/', '.'), ci.getMethodName(mIndex), ci.getMethodSignature(mIndex), ci.getMethodName(mIndex), false, getModifiers(ci, mIndex));
+            super(ci.getName().replace('/', '.'), ci.getMethodName(mIndex), ci.getMethodSignature(mIndex), ci.getMethodName(mIndex), false, getModifiers(ci, mIndex)); // NOI18N
         }
     }
     
-    public static List<SourcePackageInfo> forPath(FileObject fo) {
+    public static List<SourcePackageInfo> forPath(FileObject fo, boolean rec) {
         FileObject root = null;
-        if (fo.getExt().equalsIgnoreCase("jar")) {
+        if (fo.getExt().equalsIgnoreCase("jar")) { // NOI18N
             if (FileUtil.isArchiveFile(fo)) {
                 root = FileUtil.getArchiveRoot(fo);
             }
         } else if (fo.isFolder()) {
             root = fo;
         }
-        if (fo != null) {
+        if (root != null) {
             Queue<FileObject> stack = new ArrayDeque<FileObject>();
             Set<FileObject> packages = new TreeSet<FileObject>(pathComparator);
             Set<String> pkgsContent = new HashSet<String>();
@@ -309,13 +317,13 @@ final public class ExternalPackages {
             while (!stack.isEmpty()) {
                 FileObject f = stack.poll();
                 if (f != null) {
-                    if (f.isData() && f.getExt().equalsIgnoreCase("class")) {
+                    if (f.isData() && f.getExt().equalsIgnoreCase("class")) { // NOI18N
                         String path = f.getParent().getPath();
-                        int i = path.lastIndexOf('/');
+                        int i = path.lastIndexOf('/'); // NOI18N
                         while (i > -1) {
                             pkgsContent.add(path);
                             path = path.substring(0, i);
-                            i = path.lastIndexOf('/');
+                            i = path.lastIndexOf('/'); // NOI18N
                         }
                         pkgsContent.add(path);
                     } else {
@@ -335,6 +343,16 @@ final public class ExternalPackages {
             List<SourcePackageInfo> pkgis = new ArrayList<SourcePackageInfo>(packages.size());
             for (FileObject pkg : packages) {
                 pkgis.add(new FilePackageInfo(root, pkg, pkgsContent));
+            }
+            
+            if (rec) {
+                Queue<SourcePackageInfo> _packages = new ArrayDeque(pkgis);
+                pkgis.clear();
+                while (!_packages.isEmpty()) {
+                    FilePackageInfo pkg = (FilePackageInfo)_packages.poll();
+                    if (pkg.hasClasses()) pkgis.add(pkg);
+                    _packages.addAll(pkg.getSubpackages());
+                }
             }
 
             return pkgis;
