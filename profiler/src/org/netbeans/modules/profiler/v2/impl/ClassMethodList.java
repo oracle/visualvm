@@ -69,8 +69,8 @@ import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.lib.profiler.utils.formatting.DefaultMethodNameFormatter;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.api.java.SourceMethodInfo;
+import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.ui.SmallButton;
-import org.openide.util.Lookup;
 
 /**
  *
@@ -78,13 +78,13 @@ import org.openide.util.Lookup;
  */
 public final class ClassMethodList {
     
-    public static void showClasses(Lookup.Provider project, Set<ClientUtils.SourceCodeSelection> selection, Component invoker) {
-        UI ui = UI.forClasses(project, selection, invoker);
+    public static void showClasses(ProfilerSession session, Set<ClientUtils.SourceCodeSelection> selection, Component invoker) {
+        UI ui = UI.forClasses(session, selection, invoker);
         ui.show(invoker, -8, invoker.getHeight() + 1);
     }
     
-    public static void showMethods(Lookup.Provider project, Set<ClientUtils.SourceCodeSelection> selection, Component invoker) {
-        UI ui = UI.forMethods(project, selection, invoker);
+    public static void showMethods(ProfilerSession session, Set<ClientUtils.SourceCodeSelection> selection, Component invoker) {
+        UI ui = UI.forMethods(session, selection, invoker);
         ui.show(invoker, -8, invoker.getHeight() + 1);
     }
     
@@ -95,16 +95,16 @@ public final class ClassMethodList {
         
         private boolean addingEntry = false;
         
-        static UI forClasses(Lookup.Provider project, Set<ClientUtils.SourceCodeSelection> selection, Component invoker) {
-            return new UI(project, selection, false);
+        static UI forClasses(ProfilerSession session, Set<ClientUtils.SourceCodeSelection> selection, Component invoker) {
+            return new UI(session, selection, false);
         }
         
-        static UI forMethods(Lookup.Provider project, Set<ClientUtils.SourceCodeSelection> selection, Component invoker) {
-            return new UI(project, selection, true);
+        static UI forMethods(ProfilerSession session, Set<ClientUtils.SourceCodeSelection> selection, Component invoker) {
+            return new UI(session, selection, true);
         }
         
         
-        private UI(final Lookup.Provider project, final Set<ClientUtils.SourceCodeSelection> selection, final boolean methods) {
+        private UI(final ProfilerSession session, final Set<ClientUtils.SourceCodeSelection> selection, final boolean methods) {
             
             JPanel content = new JPanel(new BorderLayout(8, 8));
             content.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
@@ -146,7 +146,7 @@ public final class ClassMethodList {
                     ClientUtils.SourceCodeSelection sel = null;
                     
                     if (methods) {
-                        SourceMethodInfo mtd = ClassMethodSelector.selectMethod(project);
+                        SourceMethodInfo mtd = ClassMethodSelector.selectMethod(session);
                         
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
@@ -162,7 +162,7 @@ public final class ClassMethodList {
                             sel = new ClientUtils.SourceCodeSelection(mtd.getClassName(),
                                                                       mtd.getName(), mtd.getSignature());
                     } else {
-                        SourceClassInfo cls = ClassMethodSelector.selectClass(project);
+                        SourceClassInfo cls = ClassMethodSelector.selectClass(session);
                         
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {

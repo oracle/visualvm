@@ -170,8 +170,8 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
             void storeFlag(String flag, String value) {
                 ObjectsFeature.this.storeFlag(getID() + "_" + flag, value); // NOI18N
             }
-            Lookup.Provider getProject() {
-                return ObjectsFeature.this.getSession().getProject();
+            ProfilerSession getSession() {
+                return ObjectsFeature.this.getSession();
             }
             void selectForProfiling(SourceClassInfo classInfo) {
                 ObjectsFeature.this.selectClassForProfiling(classInfo);

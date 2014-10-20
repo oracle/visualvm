@@ -126,7 +126,7 @@ final public class FileSelectRootMethodsPanel extends JPanel {
                 } else {
                     FileObject fo = context.lookup(FileObject.class);
                     if (FileUtil.isArchiveFile(fo) || fo.isFolder()) {
-                        for(SourcePackageInfo spi : ExternalPackages.forPath(fo)) {
+                        for(SourcePackageInfo spi : ExternalPackages.forPath(fo, false)) {
                             addPackageRecursively(spi, rslt);
                         }
                     }
