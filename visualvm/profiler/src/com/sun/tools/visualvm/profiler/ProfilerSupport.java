@@ -313,7 +313,7 @@ public final class ProfilerSupport {
         String vmName = jvm.getVmName();
         String vmVendor = jvm.getVmVendor();
         
-        // VM has to be a HotSpot VM or OpenJDK by Sun Microsystems Inc. or Oracle Co. or Apple Inc. or Hewlett-Packard Co.
+        // VM has to be a HotSpot VM or OpenJDK by Sun Microsystems Inc. or Oracle Co. or Apple Inc. or Hewlett-Packard Co. or Azul Systems, Inc.
         return vmName != null && (vmName.startsWith(HOTSPOT_VM_NAME_PREFIX) || vmName.startsWith(OPENJDK_VM_NAME_PREFIX)) && 
                vmVendor != null && (vmVendor.startsWith(ORACLE_VM_VENDOR_PREFIX) || vmVendor.startsWith(SUN_VM_VENDOR_PREFIX) 
                                  || vmVendor.startsWith(APPLE_VM_VENDOR_PREFIX) || vmVendor.startsWith(HP_VM_VENDOR_PREFIX)
