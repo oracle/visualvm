@@ -68,6 +68,7 @@ public interface LanguageIcons extends Icons.Keys {
     public static final String METHOD_PUBLIC_STATIC = "LanguageIcons.MethodPublicStatic"; // NOI18N
     public static final String METHOD_INHERITED = "LanguageIcons.MethodInheritedStatic"; // NOI18N
     public static final String METHODS = "LanguageIcons.Methods"; // NOI18N
+    public static final String METHOD = "LanguageIcons.Method"; // NOI18N
     public static final String PACKAGE = "LanguageIcons.Package"; // NOI18N
     public static final String VARIABLE_PACKAGE = "LanguageIcons.VariablePackage"; // NOI18N
     public static final String VARIABLE_PRIVATE = "LanguageIcons.VariablePrivate"; // NOI18N
