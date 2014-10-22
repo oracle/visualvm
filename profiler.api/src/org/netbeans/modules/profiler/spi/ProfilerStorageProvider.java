@@ -226,9 +226,7 @@ public abstract class ProfilerStorageProvider {
 
         protected void deleteProperties(FileObject storage) throws IOException {
             synchronized (this) {
-                FileLock fol = storage.lock();
-                try { storage.delete(); } // NOI18N
-                finally { fol.releaseLock(); }
+                storage.delete();
             }
         }
         
