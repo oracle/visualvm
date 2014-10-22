@@ -66,9 +66,9 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
+import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.v2.SnapshotsWindow;
 import org.openide.DialogDescriptor;
@@ -367,7 +367,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
         try {
             String fileName = ResultsManager.getDefault().getDefaultHeapDumpFileName(System.currentTimeMillis());
             FileObject folder = (targetFolder == null)
-                                ? ProjectStorage.getSettingsFolder(NetBeansProfiler.getDefaultNB().getProfiledProject(), true)
+                                ? ProfilerStorage.getProjectFolder(NetBeansProfiler.getDefaultNB().getProfiledProject(), true)
                                 : FileUtil.toFileObject(FileUtil.normalizeFile(new File(targetFolder)));
 
             return FileUtil.toFile(folder).getAbsolutePath() + File.separator

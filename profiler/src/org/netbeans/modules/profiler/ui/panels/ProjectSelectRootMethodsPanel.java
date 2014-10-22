@@ -66,11 +66,11 @@ import java.util.StringTokenizer;
 import java.util.logging.Logger;
 import javax.swing.*;
 import org.netbeans.lib.profiler.common.CommonUtils;
+import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.java.ProfilerTypeUtils;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.api.java.SourcePackageInfo;
-import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.selector.api.SelectionTreeBuilderFactory;
 import org.netbeans.modules.profiler.selector.api.SelectionTreeBuilderType;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder;
@@ -561,7 +561,7 @@ final public class ProjectSelectRootMethodsPanel extends JPanel implements HelpC
     }
     
     private FileObject getProjectPropertiesFile() throws IOException {
-        FileObject propsFolder = ProjectStorage.getSettingsFolder(currentProject, true);
+        FileObject propsFolder = ProfilerStorage.getProjectFolder(currentProject, true);
         FileObject propsFile = propsFolder.getFileObject(PROPS_FILE_NAME);
 
         if (propsFile == null) {

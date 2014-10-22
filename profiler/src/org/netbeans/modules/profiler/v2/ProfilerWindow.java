@@ -57,6 +57,7 @@ import java.awt.event.ItemEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -81,11 +82,11 @@ import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.RunGCAction;
 import org.netbeans.modules.profiler.actions.TakeThreadDumpAction;
+import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.attach.AttachWizard;
 import org.netbeans.modules.profiler.v2.impl.FeaturesView;
 import org.netbeans.modules.profiler.v2.impl.WelcomePanel;
@@ -205,17 +206,14 @@ class ProfilerWindow extends ProfilerTopComponent {
     private void loadSessionSettings() {
         features = session.getFeatures();
         
+        Properties p = new Properties();
         try {
-            attachSettings = ProjectStorage.loadAttachSettings(session.getProject());
+            ProfilerStorage.loadProjectProperties(p, session.getProject(), "attach"); // NOI18N
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
-        
-//        SessionStorage storage = session.getStorage();
-        
-//        session.setAttach(session.getProject() == null ? true :
-//                          Boolean.parseBoolean(storage.loadFlag(FLAG_ATTACH, "false")));
-//        updateProfileIcon();
+        attachSettings = new AttachSettings();
+        attachSettings.load(p);
     }
     
     private void popupulateUI() {  
@@ -405,7 +403,15 @@ class ProfilerWindow extends ProfilerTopComponent {
             final AttachSettings as = attachSettings;
             final Lookup.Provider lp = session.getProject();
             RequestProcessor.getDefault().post(new Runnable() {
-                public void run() { ProjectStorage.saveAttachSettings(lp, as); }
+                public void run() {
+                    Properties p = new Properties();
+                    attachSettings.store(p);
+                    try {
+                        ProfilerStorage.saveProjectProperties(p, lp, "attach"); // NOI18N
+                    } catch (IOException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                }
             });
         }
         return attachSettings != null;
