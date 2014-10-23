@@ -98,16 +98,16 @@ public final class ProfilerStorage {
     // --- Project storage -----------------------------------------------------
     
     /**
-     * Returns FileObject which can be used as a settings storage for the provided project or null if not available.
+     * Returns FileObject which can be used as a settings storage for the provided project, or global storage for null project.
      * 
-     * @param project project context, for null GlobalStorage.getSettingsFolder(create) will be called
+     * @param project project context
      * @param create if <code>true</code> the storage will be created if not already available
      * @return FileObject which can be used as a settings storage for the provided project or null if not available
      * @throws IOException 
      */
     public static FileObject getProjectFolder(Lookup.Provider project, boolean create)
             throws IOException {
-        if (project == null) return null;
+        if (project == null) return getGlobalFolder(create);
         ProfilerStorageProvider p = provider();
         if (p != null) return p.getProjectFolder(project, create);
         else return null;
@@ -126,8 +126,9 @@ public final class ProfilerStorage {
     }
     
     /**
-     * Loads the provided Properties from the project storage directory.
+     * Loads the provided Properties from the project (or global for null project) storage directory.
      * @param properties Properties instance to load
+     * @param project project context
      * @param filename name of the file containing the persisted properties
      * @throws IOException 
      */
@@ -141,8 +142,9 @@ public final class ProfilerStorage {
     }
     
     /**
-     * Saves the provided Properties to the project storage directory.
+     * Saves the provided Properties to the project (or global for null project) storage directory.
      * @param properties Properties instance to save
+     * @param project project context
      * @param filename name of the file containing the persisted properties
      * @throws IOException 
      */
