@@ -334,10 +334,10 @@ class ProfilerWindow extends ProfilerTopComponent {
         
         ProfilerFeature selected = featuresView.getSelectedFeature();
         featureToolbar = selected == null ? null : selected.getToolbar();
-        if (featureToolbar != null) toolbar.add(featureToolbar, 2);
+        if (featureToolbar != null) toolbar.add(featureToolbar, toolbar.getComponentCount() - 2); // add before filler & settingsButton
         settingsButton.setFeature(selected);
         
-        if (selected != null) toolbar.add(getApplicationToolbar(), 3);
+        if (selected != null) toolbar.add(getApplicationToolbar(), toolbar.getComponentCount() - 2); // add before filler & settingsButton
         else applicationToolbar = null;
         
         doLayout();
