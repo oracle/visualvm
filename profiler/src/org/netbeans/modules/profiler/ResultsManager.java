@@ -76,7 +76,7 @@ import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.project.ProjectStorage;
+import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileLock;
@@ -626,7 +626,7 @@ public final class ResultsManager {
             if (project == null && directory != null) {
                 snapshotsFolder = FileUtil.toFileObject(directory);
             } else {
-                snapshotsFolder = ProjectStorage.getSettingsFolder(project, false);
+                snapshotsFolder = ProfilerStorage.getProjectFolder(project, false);
             }
 
             if (snapshotsFolder == null) {
@@ -673,7 +673,7 @@ public final class ResultsManager {
             if (project == null && directory != null) {
                 snapshotsFolder = FileUtil.toFileObject(directory);
             } else {
-                snapshotsFolder = ProjectStorage.getSettingsFolder(project, false);
+                snapshotsFolder = ProfilerStorage.getProjectFolder(project, false);
             }
 
             if (snapshotsFolder == null) {
@@ -717,7 +717,7 @@ public final class ResultsManager {
 
     public boolean hasSnapshotsFor(Lookup.Provider project) {
         try {
-            FileObject snapshotsFolder = ProjectStorage.getSettingsFolder(project, false);
+            FileObject snapshotsFolder = ProfilerStorage.getProjectFolder(project, false);
             FileObject[] children;
             
             if (snapshotsFolder == null) {
@@ -966,7 +966,7 @@ public final class ResultsManager {
         FileObject saveDir = null;
 
         try {
-            saveDir = ProjectStorage.getSettingsFolder(p, true);
+            saveDir = ProfilerStorage.getProjectFolder(p, true);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, Bundle.ResultsManager_CantFindSnapshotLocationMsg(e.getMessage()), e);
 
@@ -1231,7 +1231,7 @@ public final class ResultsManager {
     }
 
     private Lookup.Provider findProjectForSnapshot(FileObject selectedFile) {
-        return ProjectStorage.getProjectFromSettingsFolder(selectedFile.getParent());
+        return ProfilerStorage.getProjectFromFolder(selectedFile.getParent());
     }
 
     private LoadedSnapshot loadSnapshotFromFileObject(FileObject selectedFile)

@@ -47,6 +47,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
@@ -61,6 +62,9 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
@@ -68,6 +72,7 @@ import org.netbeans.modules.profiler.v2.impl.ClassMethodList;
 import org.netbeans.modules.profiler.v2.impl.ClassMethodSelector;
 import org.netbeans.modules.profiler.v2.ui.GrayLabel;
 import org.netbeans.modules.profiler.v2.ui.SmallButton;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -84,7 +89,8 @@ import org.openide.util.NbBundle;
     "ObjectsFeatureModes_recordAllocations=Record allocations",
     "ObjectsFeatureModes_noClassSelected=No classes selected, use Profile Class action in editor or results or click the Add button:",
     "ObjectsFeatureModes_oneClassSelected=Selected 1 class",
-    "ObjectsFeatureModes_multipleClassesSelected=Selected {0} classes"
+    "ObjectsFeatureModes_multipleClassesSelected=Selected {0} classes",
+    "ObjectsFeatureModes_addClass=Select class"
 })
 final class ObjectsFeatureModes {
     
@@ -354,7 +360,11 @@ final class ObjectsFeatureModes {
 
                 noSelectionContent.add(Box.createHorizontalStrut(5));
 
-                addSelectionButton = new SmallButton("+") {
+                String iconMask = LanguageIcons.CLASS;
+                Image baseIcon = Icons.getImage(iconMask);
+                Image addBadge = Icons.getImage(GeneralIcons.BADGE_ADD);
+                Image addImage = ImageUtilities.mergeImages(baseIcon, addBadge, 0, 0);
+                addSelectionButton = new SmallButton(ImageUtilities.image2Icon(addImage)) {
                     protected void fireActionPerformed(ActionEvent e) {
                         SourceClassInfo classInfo = ClassMethodSelector.selectClass(getSession());
                         if (classInfo != null) selectForProfiling(classInfo);
@@ -366,6 +376,7 @@ final class ObjectsFeatureModes {
                         return getPreferredSize();
                     }
                 };
+                addSelectionButton.setToolTipText(Bundle.ObjectsFeatureModes_addClass());
                 noSelectionContent.add(addSelectionButton);
                 updateSelectionCustomizer();
             }

@@ -49,6 +49,7 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
@@ -107,11 +108,13 @@ import org.netbeans.modules.profiler.api.java.SourceMethodInfo;
 import org.netbeans.modules.profiler.api.java.SourcePackageInfo;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.SessionStorage;
+import org.netbeans.modules.profiler.v2.ui.InvisibleToolbar;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.filesystems.FileChooserBuilder;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbPreferences;
 
@@ -483,7 +486,11 @@ public final class ClassMethodSelector {
                     filteredFiles.setFilter(filter);
                 }
             };
-            addFileB = new JButton(Icons.getIcon(GeneralIcons.FOLDER_ADD)) {
+            String iconMask = GeneralIcons.FOLDER;
+            Image baseIcon = Icons.getImage(iconMask);
+            Image addBadge = Icons.getImage(GeneralIcons.BADGE_ADD);
+            Image addImage = ImageUtilities.mergeImages(baseIcon, addBadge, 0, 0);
+            addFileB = new JButton(ImageUtilities.image2Icon(addImage)) {
                 protected void fireActionPerformed(ActionEvent e) {
                     super.fireActionPerformed(e);
                     FileChooserBuilder b = new FileChooserBuilder(ClassMethodSelector.class);
@@ -514,7 +521,9 @@ public final class ClassMethodSelector {
                 }
             };
             addFileB.setToolTipText("Add file or folder");
-            removeFileB = new JButton(Icons.getIcon(GeneralIcons.FOLDER_REMOVE)) {
+            Image removeBadge = Icons.getImage(GeneralIcons.BADGE_REMOVE);
+            Image removeImage = ImageUtilities.mergeImages(baseIcon, removeBadge, 0, 0);
+            removeFileB = new JButton(ImageUtilities.image2Icon(removeImage)) {
                 protected void fireActionPerformed(ActionEvent e) {
                     super.fireActionPerformed(e);
                     List<FileObject> files = fileList.getSelectedValuesList();
@@ -1160,18 +1169,13 @@ public final class ClassMethodSelector {
 
     }
     
-    private static abstract class FilteringToolBar extends JToolBar {
+    private static abstract class FilteringToolBar extends InvisibleToolbar {
         
         private final List<Component> hiddenComponents = new ArrayList();
         private final AbstractButton filterButton;
         
         public FilteringToolBar() {
             setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
-            setBorderPainted(false);
-            setFloatable(false);
-            setRollover(true);
-            setOpaque(false);
-            setMargin(new Insets(0, 0, 0, 0));
             
             filterButton = new JToggleButton(Icons.getIcon(GeneralIcons.FILTER)) {
                 protected void fireActionPerformed(ActionEvent e) {
