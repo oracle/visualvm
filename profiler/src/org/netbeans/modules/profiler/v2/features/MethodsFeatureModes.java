@@ -47,12 +47,14 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -65,6 +67,9 @@ import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.api.java.SourceMethodInfo;
 import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
@@ -73,6 +78,7 @@ import org.netbeans.modules.profiler.v2.impl.ClassMethodList;
 import org.netbeans.modules.profiler.v2.impl.ClassMethodSelector;
 import org.netbeans.modules.profiler.v2.ui.GrayLabel;
 import org.netbeans.modules.profiler.v2.ui.SmallButton;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -92,7 +98,9 @@ import org.openide.util.NbBundle;
     "MethodsFeatureModes_multipleClassesSelected=Selected {0} classes",
     "MethodsFeatureModes_noMethodSelected=No methods selected, use Profile Method action in editor or results or click the Add button:",
     "MethodsFeatureModes_oneMethodSelected=Selected 1 method",
-    "MethodsFeatureModes_multipleMethodsSelected=Selected {0} methods"
+    "MethodsFeatureModes_multipleMethodsSelected=Selected {0} methods",
+    "MethodsFeatureModes_addMethod=Select method",
+    "MethodsFeatureModes_addClass=Select class"
 })
 final class MethodsFeatureModes {
     
@@ -301,6 +309,10 @@ final class MethodsFeatureModes {
         
         protected abstract String multipleSelectionsString(int count);
         
+        protected abstract Icon getAddIcon();
+        
+        protected abstract String getAddTooltip();
+        
         protected abstract void performAddSelection();
         
         protected abstract void performEditSelection(Component invoker);
@@ -372,7 +384,7 @@ final class MethodsFeatureModes {
 
                 noSelectionContent.add(Box.createHorizontalStrut(5));
 
-                addSelectionButton = new SmallButton("+") {
+                addSelectionButton = new SmallButton(getAddIcon()) {
                     protected void fireActionPerformed(ActionEvent e) {
                         performAddSelection();
                     }
@@ -383,6 +395,7 @@ final class MethodsFeatureModes {
                         return getPreferredSize();
                     }
                 };
+                addSelectionButton.setToolTipText(getAddTooltip());
                 noSelectionContent.add(addSelectionButton);
                 updateSelectionCustomizer();
             }
@@ -437,6 +450,19 @@ final class MethodsFeatureModes {
         }
         
         
+        protected Icon getAddIcon() {
+            String iconMask = LanguageIcons.CLASS;
+            Image baseIcon = Icons.getImage(iconMask);
+            Image addBadge = Icons.getImage(GeneralIcons.BADGE_ADD);
+            Image addImage = ImageUtilities.mergeImages(baseIcon, addBadge, 0, 0);
+            return ImageUtilities.image2Icon(addImage);
+        }
+        
+        protected String getAddTooltip() {
+            return Bundle.MethodsFeatureModes_addClass();
+        }
+        
+        
         protected void performAddSelection() {
             SourceClassInfo classInfo = ClassMethodSelector.selectClass(getSession());
             if (classInfo != null) selectForProfiling(classInfo);
@@ -472,6 +498,19 @@ final class MethodsFeatureModes {
         
         protected String multipleSelectionsString(int count) {
             return Bundle.MethodsFeatureModes_multipleMethodsSelected(count);
+        }
+        
+        
+        protected Icon getAddIcon() {
+            String iconMask = LanguageIcons.METHOD;
+            Image baseIcon = Icons.getImage(iconMask);
+            Image addBadge = Icons.getImage(GeneralIcons.BADGE_ADD);
+            Image addImage = ImageUtilities.mergeImages(baseIcon, addBadge, 0, 0);
+            return ImageUtilities.image2Icon(addImage);
+        }
+        
+        protected String getAddTooltip() {
+            return Bundle.MethodsFeatureModes_addMethod();
         }
         
         

@@ -49,11 +49,9 @@ import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.ui.panels.PIDSelectPanel;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
-import java.io.IOException;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.api.TaskConfigurator;
 import org.netbeans.modules.profiler.api.project.ProjectProfilingSupport;
 import org.netbeans.modules.profiler.attach.AttachWizard;
@@ -273,12 +271,12 @@ public final class ProfilingSupport {
             // 6. the user may have altered the attach settings from the Select task panel, let's reread them
             AttachSettings as = null;
 
-            try {
-                as = ProjectStorage.loadAttachSettings(project);
-            } catch (IOException e) {
-                ProfilerDialogs.displayWarning(Bundle.ProfilingSupport_FailedLoadSettingsMsg(e.getMessage()));
-                ProfilerLogger.log(e);
-            }
+//            try {
+//                as = ProjectStorage.loadAttachSettings(project);
+//            } catch (IOException e) {
+//                ProfilerDialogs.displayWarning(Bundle.ProfilingSupport_FailedLoadSettingsMsg(e.getMessage()));
+//                ProfilerLogger.log(e);
+//            }
 
             ProfilerLogger.log(">>> Attach settings: " + as); // NOI18N
 
@@ -299,7 +297,7 @@ public final class ProfilingSupport {
 //                            as = attachWizard.getAttachSettings();
                 as = AttachWizard.getDefault().configure(as);
                 if (as == null) return; // cancelled by the user
-                ProjectStorage.saveAttachSettings(project, as);
+//                ProjectStorage.saveAttachSettings(project, as);
             }
 
             if (!as.isRemote() && as.isDynamic16()) {

@@ -43,19 +43,11 @@
 
 package org.netbeans.modules.profiler.v2;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Properties;
 import javax.swing.SwingUtilities;
-import org.netbeans.modules.profiler.api.project.ProjectStorage;
+import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.v2.impl.WeakProcessor;
 import org.openide.ErrorManager;
-import org.openide.filesystems.FileLock;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileSystem;
 import org.openide.util.Lookup;
 
 /**
@@ -65,7 +57,6 @@ import org.openide.util.Lookup;
 public final class SessionStorage {
     
     private static final String SETTINGS_FILENAME = "settings"; // NOI18N
-    private static final String SETTINGS_FILEEXT = "xml"; // NOI18N
     
     private static final WeakProcessor PROCESSOR = new WeakProcessor("Profiler Storage Processor"); // NOI18N
     
@@ -116,24 +107,7 @@ public final class SessionStorage {
 
         assert !SwingUtilities.isEventDispatchThread();
         try {
-            FileObject settingsStorage = ProjectStorage.getSettingsFolder(project, false);
-            if (settingsStorage != null) {
-                FileSystem fs = settingsStorage.getFileSystem();
-                fs.runAtomicAction(new FileSystem.AtomicAction() {
-                    public void run() throws IOException {
-                        FileObject _settingsStorage = ProjectStorage.getSettingsFolder(project, true);
-                        FileObject __settingsStorage = _settingsStorage.getFileObject(SETTINGS_FILENAME,
-                                                                                      SETTINGS_FILEEXT);
-
-                        if (__settingsStorage != null) {
-                            InputStream is = __settingsStorage.getInputStream();
-                            BufferedInputStream bis = new BufferedInputStream(is);
-                            properties.loadFromXML(bis);
-                            bis.close();
-                        }
-                    }
-                });
-            }
+            ProfilerStorage.loadProjectProperties(properties, project, SETTINGS_FILENAME);
         } catch (Exception e) {
             ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());
             e.printStackTrace();
@@ -143,25 +117,7 @@ public final class SessionStorage {
     private void saveProperties(Properties _properties) {
         assert !SwingUtilities.isEventDispatchThread();
         try {
-            FileObject _settingsStorage = ProjectStorage.getSettingsFolder(project, true);
-            FileObject __settingsStorage = _settingsStorage.getFileObject(SETTINGS_FILENAME,
-                                                                          SETTINGS_FILEEXT);
-            if (__settingsStorage == null) __settingsStorage = _settingsStorage.createData(SETTINGS_FILENAME,
-                                                                                           SETTINGS_FILEEXT);
-
-            if (__settingsStorage != null) {
-                FileLock lock = null;
-
-                try {
-                    lock = __settingsStorage.lock();
-                    final OutputStream os = __settingsStorage.getOutputStream(lock);
-                    final BufferedOutputStream bos = new BufferedOutputStream(os);
-                    _properties.storeToXML(os, null);
-                    bos.close();
-                } finally {
-                    if (lock != null) lock.releaseLock();
-                }
-            }
+            ProfilerStorage.saveProjectProperties(_properties, project, SETTINGS_FILENAME);
         } catch (Exception e) {
             ErrorManager.getDefault().log(ErrorManager.ERROR, e.getMessage());
             e.printStackTrace();
