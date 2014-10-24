@@ -58,14 +58,11 @@ import java.awt.event.HierarchyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.Collection;
@@ -121,10 +118,10 @@ import org.netbeans.lib.profiler.wireprotocol.Command;
 import org.netbeans.lib.profiler.wireprotocol.Response;
 import org.netbeans.lib.profiler.wireprotocol.WireIO;
 import org.netbeans.modules.profiler.api.GestureSubmitter;
-import org.netbeans.modules.profiler.api.GlobalStorage;
 import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
+import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.api.ProgressDisplayer;
 import org.netbeans.modules.profiler.spi.SessionListener;
 import org.netbeans.modules.profiler.ui.ProfilerProgressDisplayer;
@@ -133,7 +130,6 @@ import org.openide.awt.Mnemonics;
 import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -1448,21 +1444,9 @@ public abstract class NetBeansProfiler extends Profiler {
         FileLock lock = null;
 
         try {
-            final FileObject folder = GlobalStorage.getSettingsFolder(true);
-            FileObject fo = folder.getFileObject(GLOBAL_FILTERS_FILENAME, "xml"); //NOI18N
-
-            if (fo == null) {
-                fo = folder.createData(GLOBAL_FILTERS_FILENAME, "xml"); //NOI18N
-            }
-
-            lock = fo.lock();
-
-            final OutputStream os = fo.getOutputStream(lock);
-            final BufferedOutputStream bos = new BufferedOutputStream(os);
-            final Properties globalFiltersProps = new Properties();
+            Properties globalFiltersProps = new Properties();
             globalFilters.store(globalFiltersProps);
-            globalFiltersProps.storeToXML(bos, ""); //NOI18N
-            bos.close();
+            ProfilerStorage.saveGlobalProperties(globalFiltersProps, GLOBAL_FILTERS_FILENAME);
         } catch (Exception e) {
             ProfilerLogger.log(e);
             ProfilerDialogs.displayError(
@@ -1477,23 +1461,9 @@ public abstract class NetBeansProfiler extends Profiler {
         lock = null;
 
         try {
-            final FileObject folder = GlobalStorage.getSettingsFolder(true);
-            FileObject fo = folder.getFileObject(DEFINED_FILTERSETS_FILENAME, "xml"); //NOI18N
-
-            if (fo == null) {
-                fo = folder.createData(DEFINED_FILTERSETS_FILENAME, "xml"); //NOI18N
-            }
-
-            lock = fo.lock();
-
-            final OutputStream os = fo.getOutputStream(lock);
-            final BufferedOutputStream bos = new BufferedOutputStream(os);
-            final Properties definedFilterSetsProps = new Properties();
-
+            Properties definedFilterSetsProps = new Properties();
             definedFilterSets.store(definedFilterSetsProps);
-
-            definedFilterSetsProps.storeToXML(bos, ""); //NOI18N
-            bos.close();
+            ProfilerStorage.saveGlobalProperties(definedFilterSetsProps, DEFINED_FILTERSETS_FILENAME);
         } catch (Exception e) {
             ProfilerLogger.log(e);
             ProfilerDialogs.displayError(
@@ -1667,50 +1637,15 @@ public abstract class NetBeansProfiler extends Profiler {
     // -- Package-Private stuff --------------------------------------------------------------------------------------------
     private void loadGlobalFilters() {
         try {
-            FileObject folder = GlobalStorage.getSettingsFolder(false);
-            FileObject configFolder = FileUtil.getConfigFile("NBProfiler/Config");
-
-            // 1. Deal with global filters
-            FileObject filtersFO = null;
-
-            if ((folder != null) && folder.isValid()) {
-                filtersFO = folder.getFileObject(GLOBAL_FILTERS_FILENAME, "xml"); //NOI18N
-            }
-
-            if ((filtersFO == null) && (configFolder != null) && configFolder.isValid()) {
-                filtersFO = configFolder.getFileObject(GLOBAL_FILTERS_FILENAME + DEFAULT_FILE_SUFFIX, "xml"); //NOI18N
-            }
-
-            if (filtersFO != null) {
-                final InputStream fis = filtersFO.getInputStream();
-                final BufferedInputStream bis = new BufferedInputStream(fis);
-                final Properties globalFiltersProps = new Properties();
-                globalFiltersProps.loadFromXML(bis);
-                globalFilters = new GlobalFilters();
-                globalFilters.load(globalFiltersProps);
-                bis.close();
-            }
-
-            // 2. Deal with defined filter sets
-            FileObject filterSetsFO = null;
-
-            if ((folder != null) && folder.isValid()) {
-                filterSetsFO = folder.getFileObject(DEFINED_FILTERSETS_FILENAME, "xml"); //NOI18N
-            }
-
-            if ((filterSetsFO == null) && (configFolder != null) && configFolder.isValid()) {
-                filterSetsFO = configFolder.getFileObject(DEFINED_FILTERSETS_FILENAME + DEFAULT_FILE_SUFFIX, "xml"); //NOI18N
-            }
-
-            if (filterSetsFO != null) {
-                final InputStream fis = filterSetsFO.getInputStream();
-                final BufferedInputStream bis = new BufferedInputStream(fis);
-                final Properties definedFilterSetsProps = new Properties();
-                definedFilterSetsProps.loadFromXML(bis);
-                definedFilterSets = new DefinedFilterSets();
-                definedFilterSets.load(definedFilterSetsProps);
-                bis.close();
-            }
+            Properties globalFiltersProps = new Properties();
+            ProfilerStorage.loadGlobalProperties(globalFiltersProps, GLOBAL_FILTERS_FILENAME);
+            globalFilters = new GlobalFilters();
+            globalFilters.load(globalFiltersProps);
+            
+            Properties definedFilterSetsProps = new Properties();
+            ProfilerStorage.loadGlobalProperties(definedFilterSetsProps, DEFINED_FILTERSETS_FILENAME);
+            definedFilterSets = new DefinedFilterSets();
+            definedFilterSets.load(definedFilterSetsProps);
         } catch (Exception e) {
             ProfilerLogger.log(e);
             ProfilerDialogs.displayError(

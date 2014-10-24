@@ -59,7 +59,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.ResultsManager;
-import org.netbeans.modules.profiler.api.project.ProjectStorage;
+import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.openide.util.Lookup;
 
 
@@ -178,7 +178,7 @@ public class HeapWalker {
             return null;
         }
 
-        return ProjectStorage.getProjectFromSettingsFolder(heapDumpDirObj);
+        return ProfilerStorage.getProjectFromFolder(heapDumpDirObj);
     }
 
     private static Heap createHeap(File heapFile) throws FileNotFoundException, IOException {

@@ -56,7 +56,7 @@ import java.util.logging.Logger;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.api.project.ProjectStorage;
+import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.spi.SessionListener;
 import org.netbeans.modules.profiler.v2.SnapshotsWindow;
 import org.openide.util.Lookup;
@@ -110,7 +110,7 @@ public class HeapDumpWatch extends SessionListener.Adapter {
             case ProfilerIDESettings.OOME_DETECTION_PROJECTDIR:
 
                 try {
-                    return FileUtil.toFile(ProjectStorage.getSettingsFolder(project, true)).getAbsolutePath();
+                    return FileUtil.toFile(ProfilerStorage.getProjectFolder(project, true)).getAbsolutePath();
                 } catch (IOException e) {
                     LOG.log(Level.WARNING, "Cannot resolve project settings directory:\n" + e.getMessage(), e);
                     

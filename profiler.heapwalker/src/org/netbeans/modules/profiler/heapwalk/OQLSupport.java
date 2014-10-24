@@ -43,10 +43,6 @@
 
 package org.netbeans.modules.profiler.heapwalk;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
@@ -54,12 +50,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.modules.profiler.api.GlobalStorage;
+import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.oql.repository.api.OQLQueryCategory;
 import org.netbeans.modules.profiler.oql.repository.api.OQLQueryDefinition;
 import org.netbeans.modules.profiler.oql.repository.api.OQLQueryRepository;
 import org.openide.filesystems.FileLock;
-import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 
 /**
@@ -92,21 +87,9 @@ public final class OQLSupport {
 
         // Custom category
         try {
-            FileObject folder = GlobalStorage.getSettingsFolder(false);
-
-            FileObject filtersFO = null;
-
-            if ((folder != null) && folder.isValid())
-                filtersFO = folder.getFileObject(SAVED_OQL_QUERIES_FILENAME, "xml"); // NOI18N
-
-            if (filtersFO != null) {
-                InputStream fis = filtersFO.getInputStream();
-                BufferedInputStream bis = new BufferedInputStream(fis);
-                Properties properties = new Properties();
-                properties.loadFromXML(bis);
-                bis.close();
-                if (!properties.isEmpty()) propertiesToModel(properties, model);
-            }
+            Properties p = new Properties();
+            ProfilerStorage.loadGlobalProperties(p, SAVED_OQL_QUERIES_FILENAME);
+            if (!p.isEmpty()) propertiesToModel(p, model);
         } catch (Exception e) {
             ProfilerLogger.log(e);
         }
@@ -130,23 +113,8 @@ public final class OQLSupport {
     public static void saveModel(OQLTreeModel model) {
         FileLock lock = null;
         try {
-            Properties properties = modelToProperties(model);
-            FileObject folder = GlobalStorage.getSettingsFolder(true);
-            FileObject fo = folder.getFileObject(SAVED_OQL_QUERIES_FILENAME,
-                                                            "xml"); // NOI18N
-            if (fo != null || !properties.isEmpty()) {
-                if (fo == null) fo = folder.createData(SAVED_OQL_QUERIES_FILENAME,
-                                                                "xml"); // NOI18N
-                lock = fo.lock();
-                if (properties.isEmpty()) {
-                    fo.delete(lock);
-                } else {
-                    OutputStream os = fo.getOutputStream(lock);
-                    BufferedOutputStream bos = new BufferedOutputStream(os);
-                    properties.storeToXML(bos, SNAPSHOT_VERSION);
-                    bos.close();
-                }
-            }
+            Properties p = modelToProperties(model);
+            if (!p.isEmpty()) ProfilerStorage.saveGlobalProperties(p, SAVED_OQL_QUERIES_FILENAME);
         } catch (Exception e) {
             ProfilerLogger.log(e);
         } finally {
