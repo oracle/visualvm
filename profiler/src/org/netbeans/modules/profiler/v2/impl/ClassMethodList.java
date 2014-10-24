@@ -46,15 +46,17 @@ package org.netbeans.modules.profiler.v2.impl;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -67,15 +69,28 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.lib.profiler.utils.formatting.DefaultMethodNameFormatter;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.api.java.SourceMethodInfo;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.ui.SmallButton;
+import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ClassMethodList_addMethod=Add method",
+    "ClassMethodList_removeMethods=Remove selected methods",
+    "ClassMethodList_addClass=Add class",
+    "ClassMethodList_removeClasses=Remove selected classes",
+    "ClassMethodList_selectedMethods=Selected methods:",
+    "ClassMethodList_selectedClasses=Selected classes:"
+})
 public final class ClassMethodList {
     
     public static void showClasses(ProfilerSession session, Set<ClientUtils.SourceCodeSelection> selection, Component invoker) {
@@ -106,8 +121,12 @@ public final class ClassMethodList {
         
         private UI(final ProfilerSession session, final Set<ClientUtils.SourceCodeSelection> selection, final boolean methods) {
             
-            JPanel content = new JPanel(new BorderLayout(8, 8));
-            content.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+            JPanel content = new JPanel(new BorderLayout(8, 3));
+            content.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
+            
+            JLabel caption = new JLabel(methods ? Bundle.ClassMethodList_selectedMethods() :
+                                                  Bundle.ClassMethodList_selectedClasses(), JLabel.LEADING);
+            content.add(caption, BorderLayout.NORTH);
             
             class XListModel extends AbstractListModel<ClientUtils.SourceCodeSelection> {
                 public int getSize() {
@@ -139,7 +158,11 @@ public final class ClassMethodList {
                 }
             });
             
-            final JButton addB = new SmallButton("+") {
+            String iconMask = methods ? LanguageIcons.METHOD : LanguageIcons.CLASS;
+            Image baseIcon = Icons.getImage(iconMask);
+            Image addBadge = Icons.getImage(GeneralIcons.BADGE_ADD);
+            Image addImage = ImageUtilities.mergeImages(baseIcon, addBadge, 0, 0);
+            final JButton addB = new SmallButton(ImageUtilities.image2Icon(addImage)) {
                 protected void fireActionPerformed(ActionEvent e) {
                     final Component invoker = getInvoker();
                     addingEntry = true;
@@ -185,8 +208,12 @@ public final class ClassMethodList {
                     }
                 }   
             };
+            addB.setToolTipText(methods ? Bundle.ClassMethodList_addMethod() :
+                                          Bundle.ClassMethodList_addClass());
             
-            final JButton removeB = new SmallButton("-") {
+            Image removeBadge = Icons.getImage(GeneralIcons.BADGE_REMOVE);
+            Image removeImage = ImageUtilities.mergeImages(baseIcon, removeBadge, 0, 0);
+            final JButton removeB = new SmallButton(ImageUtilities.image2Icon(removeImage)) {
                 protected void fireActionPerformed(ActionEvent e) {
                     final Component invoker = getInvoker();
                     
@@ -204,6 +231,8 @@ public final class ClassMethodList {
                     setEnabled(false);
                 }
             };
+            removeB.setToolTipText(methods ? Bundle.ClassMethodList_removeMethods() :
+                                             Bundle.ClassMethodList_removeClasses());
             removeB.setEnabled(false);
             
             
@@ -215,9 +244,12 @@ public final class ClassMethodList {
                 }
             });
             
-            content.add(new JScrollPane(list), BorderLayout.CENTER);
+            JScrollPane scroll = new JScrollPane(list);
+            caption.setLabelFor(scroll);
+            content.add(scroll, BorderLayout.CENTER);
             
-            JPanel buttons = new JPanel(new GridLayout(5, 1));
+            JPanel buttons = new JPanel(null);
+            buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
             buttons.add(addB);
             buttons.add(removeB);
             content.add(buttons, BorderLayout.EAST);

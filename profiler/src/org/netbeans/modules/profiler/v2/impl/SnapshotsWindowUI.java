@@ -71,10 +71,10 @@ import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.api.project.ProjectStorage;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.ui.ProjectSelector;
 import org.openide.filesystems.FileObject;
@@ -196,7 +196,7 @@ public final class SnapshotsWindowUI extends TopComponent {
                     _snapshots.add(new Snapshot(fo));
                 FileObject __currentFolder = null;
                 try {
-                    __currentFolder = ProjectStorage.getSettingsFolder(project, false);
+                    __currentFolder = ProfilerStorage.getProjectFolder(project, false);
                 } catch (IOException e) {}
                 final FileObject _currentFolder = __currentFolder;
                 SwingUtilities.invokeLater(new Runnable() {

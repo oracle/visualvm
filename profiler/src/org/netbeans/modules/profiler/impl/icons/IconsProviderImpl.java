@@ -110,8 +110,9 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(GeneralIcons.BACK, "back.png");
         cache.put(GeneralIcons.SETTINGS, "settings.png");
         cache.put(GeneralIcons.JAVA_PROCESS, "javaProcess.png");
-        cache.put(GeneralIcons.FOLDER_ADD, "addFolder.png");
-        cache.put(GeneralIcons.FOLDER_REMOVE, "removeFolder.png");
+        cache.put(GeneralIcons.FOLDER, "folder.png");
+        cache.put(GeneralIcons.BADGE_ADD, "badgeAdd.png");
+        cache.put(GeneralIcons.BADGE_REMOVE, "badgeRemove.png");
         
         cache.put(ProfilerIcons.NODE_FORWARD, "forwardNode.png");
         cache.put(ProfilerIcons.NODE_REVERSE, "reverseNode.png");
@@ -200,6 +201,7 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(LanguageIcons.METHOD_PUBLIC_STATIC, "methodStPublic.png");
         cache.put(LanguageIcons.METHOD_INHERITED, "methodInherited.png");
         cache.put(LanguageIcons.METHODS, "methods.png");
+        cache.put(LanguageIcons.METHOD, "method.png");
         cache.put(LanguageIcons.PACKAGE, "package.png");
         cache.put(LanguageIcons.VARIABLE_PACKAGE, "variablePackage.png");
         cache.put(LanguageIcons.VARIABLE_PRIVATE, "variablePrivate.gif");
