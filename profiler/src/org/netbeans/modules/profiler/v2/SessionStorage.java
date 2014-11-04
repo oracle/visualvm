@@ -92,7 +92,9 @@ public final class SessionStorage {
             if (immediately) {
                 synchronized(PROCESSOR) { saveProperties(properties); }
             } else {
-                final Properties _properties = new Properties(properties);
+                final Properties _properties = new Properties();
+                for (String key : properties.stringPropertyNames())
+                    _properties.setProperty(key, properties.getProperty(key));
                 PROCESSOR.post(new Runnable() {
                     public void run() { synchronized(PROCESSOR) { saveProperties(_properties); } }
                 });
