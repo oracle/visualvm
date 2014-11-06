@@ -138,7 +138,6 @@ class ProfilerWindow extends ProfilerTopComponent {
     
     ProfilerWindow(ProfilerSession session) {
         this.session = session;
-        attachSettings = session.getAttachSettings();
         
         updateWindowName();
         updateWindowIcon();
@@ -212,8 +211,10 @@ class ProfilerWindow extends ProfilerTopComponent {
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
-        attachSettings = new AttachSettings();
-        attachSettings.load(p);
+        if (!p.isEmpty()) {
+            attachSettings = new AttachSettings();
+            attachSettings.load(p);
+        }
     }
     
     private void popupulateUI() {  
