@@ -44,10 +44,15 @@
 package org.netbeans.modules.profiler.v2.impl;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
@@ -58,11 +63,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
@@ -71,14 +82,23 @@ import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.netbeans.modules.profiler.actions.CompareSnapshotsAction;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.ui.ProjectSelector;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.awt.Mnemonics;
+import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.loaders.DataObject;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -120,7 +140,7 @@ public final class SnapshotsWindowUI extends TopComponent {
         File f2 = currentFolder == null ? null : FileUtil.toFile(currentFolder);
         if (Objects.equals(f1, f2)) {
             if (fullRefresh) refreshSnapshots();
-            else repaintSnapshots();
+            else snapshotsTableModel.fireTableDataChanged();
         }
     }
     
@@ -140,8 +160,14 @@ public final class SnapshotsWindowUI extends TopComponent {
     
     private FileObject currentFolder;
     private final List<Snapshot> snapshots = new ArrayList();
+    
+    private JButton openB;
+    private JButton exportB;
+    private JButton compareB;
+    private JButton renameB;
+    private JButton deleteB;
 
-    private final AbstractTableModel threadsTableModel = new AbstractTableModel() {
+    private final AbstractTableModel snapshotsTableModel = new AbstractTableModel() {
         public String getColumnName(int columnIndex) {
             if (columnIndex == 0) {
                 return "Type";
@@ -204,15 +230,11 @@ public final class SnapshotsWindowUI extends TopComponent {
                         currentFolder = _currentFolder;
                         snapshots.clear();
                         snapshots.addAll(_snapshots);
-                        threadsTableModel.fireTableDataChanged();
+                        snapshotsTableModel.fireTableDataChanged();
                     }
                 });
             }
         });
-    }
-    
-    void repaintSnapshots() {
-        threadsTableModel.fireTableDataChanged();
     }
     
     
@@ -269,7 +291,7 @@ public final class SnapshotsWindowUI extends TopComponent {
         c.insets = new Insets(15, 10, 0, 10);
         contents.add(snapshotsListL, c);
         
-        final ProfilerTable snapshotsTable = new ProfilerTable(threadsTableModel, true, true, null);
+        final ProfilerTable snapshotsTable = new ProfilerTable(snapshotsTableModel, true, true, null);
         snapshotsTable.setMainColumn(1);
         snapshotsTable.setFitWidthColumn(1);
         snapshotsTable.setDefaultColumnWidth(0, new JLabel("Type").getPreferredSize().width + 30);      
@@ -297,10 +319,14 @@ public final class SnapshotsWindowUI extends TopComponent {
         snapshotsTable.setDefaultAction(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 Snapshot s = (Snapshot)snapshotsTable.getSelectedValue(1);
-                final FileObject fo = s == null ? null : s.getFile();
-                if (fo != null) RequestProcessor.getDefault().post(new Runnable() {
-                    public void run() { ResultsManager.getDefault().openSnapshot(fo); }
-                });
+                if (s != null) openSnapshots(Collections.singleton(s));
+            }
+        });
+        snapshotsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                Snapshot selected = (Snapshot)snapshotsTable.getSelectedValue(1);
+                updateButtons(selected == null ? Collections.EMPTY_SET :
+                                                 Collections.singleton(selected));
             }
         });
         
@@ -317,7 +343,83 @@ public final class SnapshotsWindowUI extends TopComponent {
         setLayout(new BorderLayout());
         add(contents, BorderLayout.CENTER);
         
+        class ThinButton extends JButton {
+            public ThinButton(Icon icon) {
+                super(icon);
+                setOpaque(false);
+            }
+            public Dimension getMinimumSize() {
+                Dimension d = super.getMinimumSize();
+                d.width = 5;
+                return d;
+            }
+        }
+        
+        openB = new ThinButton(Icons.getIcon(ProfilerIcons.SNAPSHOT_OPEN)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                Snapshot s = (Snapshot)snapshotsTable.getSelectedValue(1);
+                if (s != null) openSnapshots(Collections.singleton(s));
+            }
+        };
+        openB.setToolTipText("Open selected snapshots");
+        exportB = new ThinButton(Icons.getIcon(GeneralIcons.EXPORT)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                Snapshot s = (Snapshot)snapshotsTable.getSelectedValue(1);
+                if (s != null) exportSnapshots(Collections.singleton(s));
+            }
+        };
+        exportB.setToolTipText("Export selected snapshot");
+        compareB = new ThinButton(Icons.getIcon(ProfilerIcons.SNAPSHOTS_COMPARE)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                Snapshot s1 = (Snapshot)snapshotsTable.getSelectedValue(1);
+                Snapshot s2 = (Snapshot)snapshotsTable.getSelectedValue(1);
+                if (s1 != null && s2 != null) compareSnapshots(s1, s2);
+            }
+        };
+        compareB.setToolTipText("Compare selected snapshots");
+        renameB = new ThinButton(Icons.getIcon(GeneralIcons.RENAME)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                Snapshot s = (Snapshot)snapshotsTable.getSelectedValue(1);
+                if (s != null) renameSnapshot(s, snapshotsTableModel);
+            }
+        };
+        renameB.setToolTipText("Rename selected snapshot");
+        deleteB = new ThinButton(Icons.getIcon(ProfilerIcons.RUN_GC)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                Snapshot s = (Snapshot)snapshotsTable.getSelectedValue(1);
+                if (s != null) deleteSnapshots(Collections.singleton(s));
+            }
+        };
+        deleteB.setToolTipText("Delete selected snapshots");
+        
+        JPanel actions = new JPanel(new ButtonsLayout());
+        actions.setOpaque(true);
+        actions.setBackground(UIUtils.getProfilerResultsBackground());
+        actions.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+        actions.add(openB);
+        actions.add(exportB);
+        actions.add(compareB);
+        actions.add(renameB);
+        actions.add(deleteB);
+        add(actions, BorderLayout.SOUTH);
+        
         refreshSnapshots();
+        updateButtons(Collections.EMPTY_SET);
+    }
+    
+    private void updateButtons(Collection<Snapshot> selectedSnapshots) {
+        int selected = selectedSnapshots.size();
+        openB.setEnabled(selected > 0);
+        exportB.setEnabled(selected == 1);
+        compareB.setEnabled(selected == 2);
+        renameB.setEnabled(selected == 1);
+        deleteB.setEnabled(selected > 0);
+        
     }
     
     private static boolean hasSnapshots(ProfilerSession session) {
@@ -343,6 +445,102 @@ public final class SnapshotsWindowUI extends TopComponent {
             if (ls != null) return true;
         }
         return false;
+    }
+    
+    
+    private static void openSnapshots(final Collection<Snapshot> snapshots) {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                for (Snapshot snapshot : snapshots)
+                    ResultsManager.getDefault().openSnapshot(snapshot.getFile());
+            }
+        });
+    }
+    
+    private static void exportSnapshots(final Collection<Snapshot> snapshots) {
+        FileObject[] files = new FileObject[snapshots.size()];
+        int idx = 0;
+        for (Snapshot snapshot : snapshots) files[idx++] = snapshot.getFile();
+        ResultsManager.getDefault().exportSnapshots(files);
+    }
+    
+    private static void compareSnapshots(final Snapshot snapshot1, final Snapshot snapshot2) {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                FileObject file1 = snapshot1.getFile();
+                FileObject file2 = snapshot2.getFile();
+                if (CompareSnapshotsAction.areComparableSnapshots(file1, file2)) {
+                    ResultsManager.getDefault().compareSnapshots(file1, file2);
+                } else {
+                    ProfilerDialogs.displayError("Selected snapshots cannot be compared.");
+                }   
+            }
+        });
+        ResultsManager.getDefault().compareSnapshots(snapshot1.getFile(), snapshot2.getFile());
+    }
+    
+    private static void renameSnapshot(final Snapshot snapshot, final AbstractTableModel model) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                final FileObject file = snapshot.getFile();
+                String origName = file.getName();
+                RenameSnapshotPanel panel = new RenameSnapshotPanel();
+                panel.setSnapshotName(origName);
+                DialogDescriptor dd = new DialogDescriptor(panel, "Rename Snapshot",
+                            true, new Object[] { DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION },
+                            DialogDescriptor.OK_OPTION, 0, null, null);
+                Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+                d.setVisible(true);
+                
+                if (dd.getValue() != DialogDescriptor.OK_OPTION) return;
+                
+                final String newName = panel.getSnapshotName();
+                if (!origName.equals(newName)) {
+                    if (newName.length() == 0) {
+                        ProfilerDialogs.displayError("Snapshot name cannot be empty.");
+                        renameSnapshot(snapshot, model);
+                    } else {
+                        RequestProcessor.getDefault().post(new Runnable() {
+                            public void run() {
+                                FileLock lock = null;
+                                try {
+                                    lock = file.lock();
+                                    final LoadedSnapshot ls = ResultsManager.getDefault().findLoadedSnapshot(
+                                            FileUtil.toFile(file));
+                                    file.rename(lock, newName, file.getExt());
+                                    if (ls != null) ls.setFile(FileUtil.toFile(file));
+                                    snapshot.loadDetails();
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        public void run() { model.fireTableDataChanged(); }
+                                    });
+                                } catch (IOException e) {
+                                    ProfilerDialogs.displayError("Failed to rename " + snapshot.getDisplayName());
+                                    e.printStackTrace();
+                                    renameSnapshot(snapshot, model);
+                                } finally {
+                                    if (lock != null) lock.releaseLock();
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+    
+    private static void deleteSnapshots(final Collection<Snapshot> snapshots) {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                if (ProfilerDialogs.displayConfirmation("Delete selected snapshots?", "Confirm Delete")) {
+                    for (Snapshot snapshot : snapshots) try {
+                        DataObject.find(snapshot.getFile()).delete();
+                    } catch (Throwable t) {
+                        ProfilerDialogs.displayError("Failed to delete " + snapshot.getDisplayName());
+                        t.printStackTrace();
+                    }
+                }
+            }
+        });
     }
     
     
@@ -410,7 +608,7 @@ public final class SnapshotsWindowUI extends TopComponent {
             return isHeapDump;
         }
 
-        private void loadDetails() {
+        void loadDetails() {
             if (fo.getExt().equalsIgnoreCase(ResultsManager.HEAPDUMP_EXTENSION)) {
                 // Heap Dump
 //                this.icon = Icons.getIcon(ProfilerIcons.HEAP_DUMP);
@@ -455,6 +653,160 @@ public final class SnapshotsWindowUI extends TopComponent {
             Snapshot s = (Snapshot)o;
             return getDisplayName().compareTo(s.getDisplayName());
         }
+    }
+    
+    
+    // --- Rename panel --------------------------------------------------------
+    
+    private static final class RenameSnapshotPanel extends JPanel {
+        //~ Instance fields ----------------------------------------------------------------------------------------------------
+
+        private JTextField textField;
+
+        //~ Constructors ---------------------------------------------------------------------------------------------------------
+
+        RenameSnapshotPanel() {
+            initComponents();
+        }
+
+        //~ Methods --------------------------------------------------------------------------------------------------------------
+
+        String getSnapshotName() {
+            return textField.getText().trim();
+        }
+
+        void setSnapshotName(final String text) {
+            textField.setText(text);
+            textField.selectAll();
+        }
+
+        private void initComponents() {
+            GridBagConstraints gridBagConstraints;
+            
+            JLabel textLabel = new JLabel();
+            Mnemonics.setLocalizedText(textLabel, "&New file name:");
+            textLabel.setAlignmentX(JLabel.LEFT_ALIGNMENT);
+
+            textField = new JTextField();
+            textLabel.setLabelFor(textField);
+            textField.setPreferredSize(new Dimension(350, textField.getPreferredSize().height));
+            textField.requestFocus();            
+            textField.setAlignmentX(JLabel.LEFT_ALIGNMENT);
+
+            setLayout(new GridBagLayout());
+            
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new java.awt.Insets(15, 10, 5, 10);
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            add(textLabel, gridBagConstraints);
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.insets = new java.awt.Insets(0, 10, 15, 10);
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            add(textField, gridBagConstraints);
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;            
+            add(new JPanel(), gridBagConstraints);
+            
+            getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(
+                    NotifyDescriptor.class, "ACSD_InputPanel")); // NOI18N
+            textField.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(
+                    NotifyDescriptor.class, "ACSD_InputField")); // NOI18N
+                    
+        }
+    };
+    
+    
+    // --- Buttons Layout ------------------------------------------------------
+    
+    private static final class ButtonsLayout implements LayoutManager {
+        
+        private static final int HGAP = 2;
+        private static final float MAX_WIDTH_FACTOR = 1.8f;
+        
+        public void layoutContainer(Container parent) {
+            int c = parent.getComponentCount();
+            
+            Insets insets = parent.getInsets();
+            Dimension size = parent.getSize();
+            size.width = Math.min(size.width, maximumLayoutSize(parent).width);
+            
+            int x = insets.left;
+            int y = insets.top;
+            int w = size.width - x - insets.right - HGAP * (c - 1);
+            int h = size.height - y - insets.bottom;
+            
+            int m = w % c;
+            w /= c;
+
+            for (int i = 0; i < c; i++) {
+                int o = i < m ? 1 : 0;
+                parent.getComponent(i).setBounds(x, y, w + o, h);
+                x += w + o + HGAP;
+            }
+        }
+
+        public Dimension preferredLayoutSize(Container parent) {
+            int prefw = 0;
+            int prefh = 0;
+            for (Component c : parent.getComponents()) {
+                Dimension pref = c.getPreferredSize();
+                prefw += pref.width;
+                prefh = Math.max(prefh, pref.height);
+            }
+            prefw += HGAP * (parent.getComponentCount() - 1);
+            
+            Insets i = parent.getInsets();
+            prefw += i.left + i.right;
+            prefh += i.top + i.bottom;
+            
+            return new Dimension(prefw, prefh);
+        }
+
+        public Dimension minimumLayoutSize(Container parent) {
+            int minw = 0;
+            int minh = 0;
+            for (Component c : parent.getComponents()) {
+                Dimension min = c.getMinimumSize();
+                minw += min.width;
+                minh = Math.max(minh, min.height);
+            }
+            minw += HGAP * (parent.getComponentCount() - 1);
+            return new Dimension(minw, minh);
+        }
+        
+        private Dimension maximumLayoutSize(Container parent) {
+            int maxw = 0;
+            int maxh = 0;
+            for (Component c : parent.getComponents()) {
+                Dimension pref = c.getPreferredSize();
+                maxw += pref.height * MAX_WIDTH_FACTOR;
+                maxh = Math.max(maxh, pref.height);
+            }
+            maxw += HGAP * (parent.getComponentCount() - 1);
+            
+            Insets i = parent.getInsets();
+            maxw += i.left + i.right;
+            maxh += i.top + i.bottom;
+            
+            return new Dimension(maxw, maxh);
+        }
+        
+        public void addLayoutComponent(String name, Component comp) {}
+
+        public void removeLayoutComponent(Component comp) {}
+        
     }
     
 }
