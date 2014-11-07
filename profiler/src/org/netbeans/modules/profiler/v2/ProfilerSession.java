@@ -91,7 +91,10 @@ public abstract class ProfilerSession {
         Provider provider = Lookup.getDefault().lookup(Provider.class);
         ProfilerSession session = provider == null ? null : provider.createSession(context);
 
-        synchronized(CURRENT_SESSION_LOCK) { CURRENT_SESSION = session; }
+        synchronized(CURRENT_SESSION_LOCK) {
+            CURRENT_SESSION = session;
+            notifyStopAction();
+        }
 
         return session;
         
@@ -242,7 +245,10 @@ public abstract class ProfilerSession {
         }
         
         synchronized(CURRENT_SESSION_LOCK) {
-            if (CURRENT_SESSION == this) CURRENT_SESSION = null;
+            if (CURRENT_SESSION == this) {
+                CURRENT_SESSION = null;
+                notifyStopAction();
+            }
         }
         
         UIUtils.runInEventDispatchThread(new Runnable() {
@@ -310,6 +316,13 @@ public abstract class ProfilerSession {
         persistStorage(false);
         
         // TODO: unregister listeners (this.addListener) to prevent memory leaks
+    }
+    
+    private static void notifyStopAction() {
+        final ProfilerSession CURRENT_SESSION_F = CURRENT_SESSION;
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() { ProfilerSessions.StopAction.getInstance().setSession(CURRENT_SESSION_F); }
+        });
     }
     
     
