@@ -71,6 +71,10 @@ public final class WeakProcessor {
         processor().post(task);
     }
     
+    public void post(Runnable task, int delay) {
+        processor().post(task, delay);
+    }
+    
     private synchronized RequestProcessor processor() {
         RequestProcessor p = processor != null ? processor.get() : null;
         

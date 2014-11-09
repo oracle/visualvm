@@ -103,5 +103,6 @@ public interface GeneralIcons extends Icons.Keys {
     public static final String FOLDER = "GeneralIcons.Folder"; // NOI18N
     public static final String BADGE_ADD = "GeneralIcons.BadgeAdd"; // NOI18N
     public static final String BADGE_REMOVE = "GeneralIcons.BadgeRemove"; // NOI18N
+    public static final String RENAME = "GeneralIcons.Rename"; // NOI18N
     
 }
