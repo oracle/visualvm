@@ -53,6 +53,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.util.Set;
+import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -67,13 +68,20 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.event.ProfilingStateAdapter;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
+import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedRadioButton;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.v2.ui.ProjectSelector;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
+import org.openide.awt.ActionRegistration;
 import org.openide.modules.OnStop;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -483,6 +491,75 @@ final class ProfilerSessions {
         } finally {
             if (lock != null) synchronized(lock) { lock.notifyAll(); }
         }
+    }
+    
+    
+    // --- Stop action ---------------------------------------------------------
+    
+    @NbBundle.Messages({
+        "LBL_StopAction=Fini&sh Profiler Session",
+        "HINT_StopAction=Finish profiler session (terminate profiled application)",
+        "HINT_DetachAction=Finish profiler session (detach from profiled application)"
+    })
+    public static final class StopAction extends AbstractAction {
+        
+        // --- Singleton -------------------------------------------------------
+        
+        private static final class Singleton {
+            final private static StopAction INSTANCE = new StopAction();
+        }
+        @ActionID(category="Profile", id="org.netbeans.modules.profiler.v2.ProfilerSessions.StopAction") // NOI18N
+        @ActionRegistration(displayName="#LBL_StopAction", lazy=false) // NOI18N
+        @ActionReferences({
+            @ActionReference(path="Menu/Profile", position=300, separatorAfter=400), // NOI18N
+            @ActionReference(path="Shortcuts", name="S-F2") // NOI18N
+        })
+        public static StopAction getInstance() { return Singleton.INSTANCE; }
+        
+        
+        // --- Implementation --------------------------------------------------
+        
+        private ProfilerSession session;
+        
+        private final ProfilingStateListener listener = new SimpleProfilingStateAdapter() {
+            protected void update() { updateState(); }
+        };
+        
+        public void actionPerformed(ActionEvent e) {
+            if (session != null) {
+                setEnabled(false);
+                final ProfilerSession sessionF = session;
+        
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { if (!sessionF.doStop()) setEnabled(true); }
+                });
+            }
+        }
+        
+        
+        void setSession(final ProfilerSession _session) {
+            if (session != null) session.removeListener(listener);
+            session = _session;
+            if (session != null) session.addListener(listener);
+
+            putValue(SHORT_DESCRIPTION, session != null && session.isAttach() ?
+                     Bundle.HINT_DetachAction() : Bundle.HINT_StopAction());
+            updateState();
+        }
+        
+        private void updateState() {
+            setEnabled(session != null && session.getState() == Profiler.PROFILING_RUNNING);
+        }
+
+        private StopAction() {
+            putValue(NAME, Bundle.LBL_StopAction());
+            putValue(SHORT_DESCRIPTION, Bundle.HINT_StopAction());
+            putValue(SMALL_ICON, Icons.getIcon(GeneralIcons.STOP));
+            putValue("iconBase", Icons.getResource(GeneralIcons.STOP)); // NOI18N
+            
+            updateState();
+        }
+        
     }
     
     

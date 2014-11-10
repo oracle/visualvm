@@ -63,12 +63,13 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
+import org.netbeans.modules.profiler.v2.impl.WeakProcessor;
 import org.netbeans.modules.profiler.v2.ui.PopupButton;
 import org.netbeans.modules.profiler.v2.ui.SmallButton;
 import org.netbeans.modules.profiler.v2.ui.TitledMenuSeparator;
@@ -90,6 +91,8 @@ import org.openide.util.lookup.ServiceProvider;
 })
 final class ObjectsFeature extends ProfilerFeature.Basic {
     
+    private final WeakProcessor processor;
+    
     private FeatureMode currentMode;
     private FeatureMode appliedMode;
     
@@ -103,6 +106,11 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
               Bundle.ObjectsFeature_description(), 13, session);
         
         assert !SwingUtilities.isEventDispatchThread();
+        
+        Lookup.Provider project = session.getProject();
+        String projectName = project == null ? "External Process" : // NOI18N
+                             ProjectUtilities.getDisplayName(project);
+        processor = new WeakProcessor("ObjectsFeature Processor for " + projectName); // NOI18N
 
         initModes();
     }
@@ -437,15 +445,16 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     }
 
     private void refreshView() {
-        try {
-            if (ui != null && ResultsManager.getDefault().resultsAvailable()) ui.refreshData();
+        if (ui != null && ResultsManager.getDefault().resultsAvailable()) try {
+            // NOTE: might check ProfilerClient.getCurrentInstrType() here if #247827 still occurs
+            ui.refreshData();
         } catch (ClientUtils.TargetAppOrVMTerminated ex) {
             stopResults();
         }
     }
     
     private void refreshResults() {
-        if (running) ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+        if (running) processor.post(new Runnable() {
             public void run() {
                 if (ui != null) ui.setForceRefresh();
                 refreshView();
@@ -454,8 +463,7 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     }
     
     private void refreshResults(int delay) {
-        if (running && refresher != null)
-            ProfilerUtils.runInProfilerRequestProcessor(refresher, delay);
+        if (running && refresher != null) processor.post(refresher, delay);
     }
     
     private void resetResults() {
@@ -497,7 +505,7 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     
     
     protected void profilingStateChanged(int oldState, int newState) {
-        if (newState == Profiler.PROFILING_INACTIVE) {
+        if (newState == Profiler.PROFILING_INACTIVE || newState == Profiler.PROFILING_IN_TRANSITION) {
             stopResults();
         } else if (isActivated() && newState == Profiler.PROFILING_RUNNING) {
             startResults();
