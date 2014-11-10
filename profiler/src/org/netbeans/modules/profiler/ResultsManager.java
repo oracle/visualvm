@@ -1128,6 +1128,7 @@ public final class ResultsManager {
         chooser.setMultiSelectionEnabled(false);
         chooser.setDialogTitle(Bundle.ResultsManager_SelectFileOrDirDialogCaption());
         chooser.setApproveButtonText(Bundle.ResultsManager_SaveButtonName());
+        chooser.setAcceptAllFileFilterUsed(false);
         chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
                 public boolean accept(File f) {
                     return f.isDirectory() || f.getName().endsWith("." + (heapdump ? HEAPDUMP_EXTENSION : SNAPSHOT_EXTENSION)); //NOI18N
