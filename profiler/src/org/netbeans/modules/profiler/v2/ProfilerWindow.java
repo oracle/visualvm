@@ -170,7 +170,6 @@ class ProfilerWindow extends ProfilerTopComponent {
     private FeaturesView featuresView;
     
     private DropdownButton start;
-    private JButton stop;
     private SettingsPresenter settingsButton;
     
     private AttachSettings attachSettings;
@@ -228,9 +227,8 @@ class ProfilerWindow extends ProfilerTopComponent {
 //        updateProfileIcon();
         toolbar.add(start);
         
-        stop = new JButton(Icons.getIcon(GeneralIcons.STOP)) {
-            protected void fireActionPerformed(ActionEvent e) { performStopImpl(); }
-        };
+        JButton stop = new JButton(ProfilerSessions.StopAction.getInstance());
+        stop.setHideActionText(true);
         toolbar.add(stop);
         
 //        statusBar = new ProfilerStatus(session).getToolbar();
@@ -308,7 +306,6 @@ class ProfilerWindow extends ProfilerTopComponent {
         start.setPushed(state != Profiler.PROFILING_INACTIVE);
 //        start.setEnabled(state != Profiler.PROFILING_IN_TRANSITION);
         start.setPopupEnabled(state != Profiler.PROFILING_IN_TRANSITION);
-        stop.setEnabled(state == Profiler.PROFILING_RUNNING);
     }
     
     
@@ -433,16 +430,6 @@ class ProfilerWindow extends ProfilerTopComponent {
 
                 if (!session.doStart(__profilingSettings(), __attachSettings()))
                     start.setPushed(false);
-            }
-        });
-    }
-    
-    private void performStopImpl() {
-        stop.setEnabled(false);
-        
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                if (!session.doStop()) stop.setEnabled(true);
             }
         });
     }

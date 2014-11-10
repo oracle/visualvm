@@ -494,6 +494,7 @@ public final class ClassMethodSelector {
                 protected void fireActionPerformed(ActionEvent e) {
                     super.fireActionPerformed(e);
                     FileChooserBuilder b = new FileChooserBuilder(ClassMethodSelector.class);
+                    b.setAcceptAllFileFilterUsed(false);
                     final File file = b.setFileFilter(new FileFilter() {
                         public boolean accept(File f) {
                             if (f.isDirectory()) {
