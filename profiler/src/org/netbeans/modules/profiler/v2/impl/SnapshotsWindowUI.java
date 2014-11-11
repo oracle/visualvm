@@ -157,6 +157,8 @@ public final class SnapshotsWindowUI extends TopComponent {
     
     // --- Implementation ------------------------------------------------------
     
+    private ProfilerTable snapshotsTable;
+    
     private ProjectSelector selector;
     private ChangeListener openProjectsListener;
     
@@ -219,9 +221,17 @@ public final class SnapshotsWindowUI extends TopComponent {
                 ResultsManager rm = ResultsManager.getDefault();
                 final List<Snapshot> _snapshots = new ArrayList();
                 for (FileObject fo : rm.listSavedSnapshots(project, null))
-                    _snapshots.add(new Snapshot(fo));
+                    _snapshots.add(new Snapshot(fo) {
+                        boolean alternativeSorting() {
+                            return snapshotsTable.getSortColumn() == 0;
+                        }
+                    });
                 for (FileObject fo : rm.listSavedHeapdumps(project, null))
-                    _snapshots.add(new Snapshot(fo));
+                    _snapshots.add(new Snapshot(fo) {
+                        boolean alternativeSorting() {
+                            return snapshotsTable.getSortColumn() == 0;
+                        }
+                    });
                 FileObject __currentFolder = null;
                 try {
                     __currentFolder = ProfilerStorage.getProjectFolder(project, false);
@@ -293,7 +303,7 @@ public final class SnapshotsWindowUI extends TopComponent {
         c.insets = new Insets(15, 10, 0, 10);
         contents.add(snapshotsListL, c);
         
-        final ProfilerTable snapshotsTable = new ProfilerTable(snapshotsTableModel, true, true, null);
+        snapshotsTable = new ProfilerTable(snapshotsTableModel, true, true, null);
         snapshotsTable.setMainColumn(1);
         snapshotsTable.setDefaultSortOrder(SortOrder.ASCENDING);
         snapshotsTable.setSecondarySortColumn(1);
@@ -586,10 +596,12 @@ public final class SnapshotsWindowUI extends TopComponent {
     
     // --- Snapshot wrapper  ---------------------------------------------------
     
-    private static final class Snapshot implements Comparable {
+    private static abstract class Snapshot implements Comparable {
         
         private final FileObject fo;
         private String displayName;
+        private boolean customName;
+        private long timestamp;
         private int snapshotType;
         private boolean isHeapDump;
 
@@ -597,6 +609,8 @@ public final class SnapshotsWindowUI extends TopComponent {
             this.fo = fo;
             loadDetails();
         }
+        
+        abstract boolean alternativeSorting();
         
         public String getDisplayName() {
             return displayName;
@@ -631,11 +645,12 @@ public final class SnapshotsWindowUI extends TopComponent {
         }
 
         void loadDetails() {
+            String fileName = fo.getName();
             if (fo.getExt().equalsIgnoreCase(ResultsManager.HEAPDUMP_EXTENSION)) {
                 // Heap Dump
-                this.snapshotType = 4;
-                this.displayName = ResultsManager.getDefault().getHeapDumpDisplayName(fo.getName());
-                this.isHeapDump = true;
+                snapshotType = 4;
+                displayName = ResultsManager.getDefault().getHeapDumpDisplayName(fileName);
+                isHeapDump = true;
 //            } else if (fo.getExt().equalsIgnoreCase(ResultsManager.THREADDUMP_EXTENSION)) {
 //                // Thread Dump
 ////                this.icon = Icons.getIcon(ProfilerIcons.HEAP_DUMP);
@@ -646,8 +661,13 @@ public final class SnapshotsWindowUI extends TopComponent {
             } else {
                 int type = ResultsManager.getDefault().getSnapshotType(fo);
                 snapshotType = type == LoadedSnapshot.SNAPSHOT_TYPE_CPU ? 1 : 2;
-                this.displayName = ResultsManager.getDefault().getSnapshotDisplayName(fo.getName(), type);
-                this.isHeapDump = false;
+                displayName = ResultsManager.getDefault().getSnapshotDisplayName(fileName, type);
+                isHeapDump = false;
+            }
+            customName = fileName.equals(displayName);
+            if (!customName) {
+                String _timestamp = fileName.substring(fileName.lastIndexOf("-")); // NOI18N
+                try { timestamp = Long.parseLong(_timestamp); } catch (NumberFormatException e) {}
             }
         }
 
@@ -661,7 +681,21 @@ public final class SnapshotsWindowUI extends TopComponent {
 
         public int compareTo(Object o) {
             Snapshot s = (Snapshot)o;
-            return Collator.getInstance().compare(getDisplayName(), s.getDisplayName());
+            // Alternative sorting: when sorting by snapshot type, the secondary
+            // sorting sorts custom-named snapshots alphabetically and default-named
+            // snapshots by timestamp, newest first. Custom-named snapshots display
+            // above the default-named snapshots.
+            if (alternativeSorting()) {
+                if (customName) {
+                    if (!s.customName) return -1;
+                    else return Collator.getInstance().compare(getDisplayName(), s.getDisplayName());
+                } else {
+                    if (s.customName) return 1;
+                    else return Long.compare(timestamp, s.timestamp);
+                }
+            } else {
+                return Collator.getInstance().compare(getDisplayName(), s.getDisplayName());
+            }
         }
     }
     
