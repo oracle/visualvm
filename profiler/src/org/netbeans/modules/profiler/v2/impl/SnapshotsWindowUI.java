@@ -56,6 +56,7 @@ import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -69,6 +70,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -179,7 +181,7 @@ public final class SnapshotsWindowUI extends TopComponent {
 
         public Class<?> getColumnClass(int columnIndex) {
             if (columnIndex == 0) {
-                return String.class;
+                return Integer.class;
             } else if (columnIndex == 1) {
                 return Snapshot.class;
             }
@@ -196,7 +198,7 @@ public final class SnapshotsWindowUI extends TopComponent {
 
         public Object getValueAt(int rowIndex, int columnIndex) {
             if (columnIndex == 0) {
-                return snapshots.get(rowIndex).getIcon();
+                return snapshots.get(rowIndex).getSnapshotType();
             } else if (columnIndex == 1) {
                 return snapshots.get(rowIndex);
             }
@@ -293,6 +295,9 @@ public final class SnapshotsWindowUI extends TopComponent {
         
         final ProfilerTable snapshotsTable = new ProfilerTable(snapshotsTableModel, true, true, null);
         snapshotsTable.setMainColumn(1);
+        snapshotsTable.setDefaultSortOrder(SortOrder.ASCENDING);
+        snapshotsTable.setSecondarySortColumn(1);
+        snapshotsTable.setSortColumn(0);
         snapshotsTable.setFitWidthColumn(1);
         snapshotsTable.setDefaultColumnWidth(0, new JLabel("Type").getPreferredSize().width + 30);      
         snapshotsTable.setColumnRenderer(0, new LabelRenderer() {
@@ -300,7 +305,7 @@ public final class SnapshotsWindowUI extends TopComponent {
                 setHorizontalAlignment(CENTER);
             }
             public void setValue(Object value, int row) {
-                setIcon(Icons.getIcon(value.toString()));
+                setIcon(Icons.getIcon(Snapshot.getIconName((Integer)value)));
             }
         });
         snapshotsTable.setColumnRenderer(1, new LabelRenderer() {
@@ -582,22 +587,39 @@ public final class SnapshotsWindowUI extends TopComponent {
     // --- Snapshot wrapper  ---------------------------------------------------
     
     private static final class Snapshot implements Comparable {
+        
         private final FileObject fo;
         private String displayName;
-        private String icon;
+        private int snapshotType;
         private boolean isHeapDump;
 
         Snapshot(FileObject fo) {
             this.fo = fo;
             loadDetails();
         }
-
+        
         public String getDisplayName() {
             return displayName;
         }
+        
+        // Snapshot types (internal):
+        // 1: CPU snapshot
+        // 2: Memory snapshot
+        // 3: Thread dump
+        // 4: Heap dump
+        
+        public int getSnapshotType() {
+            return snapshotType;
+        }
 
-        public String getIcon() {
-            return icon;
+        public static String getIconName(int type) {
+            switch (type) {
+                case 1: return ProfilerIcons.CPU;
+                case 2: return ProfilerIcons.MEMORY;
+                case 3: return ProfilerIcons.SNAPSHOT_THREADS;
+                case 4: return ProfilerIcons.HEAP_DUMP;
+                default: return null;
+            }
         }
 
         public FileObject getFile() {
@@ -611,33 +633,21 @@ public final class SnapshotsWindowUI extends TopComponent {
         void loadDetails() {
             if (fo.getExt().equalsIgnoreCase(ResultsManager.HEAPDUMP_EXTENSION)) {
                 // Heap Dump
-//                this.icon = Icons.getIcon(ProfilerIcons.HEAP_DUMP);
-                this.icon =  ProfilerIcons.HEAP_DUMP;
+                this.snapshotType = 4;
                 this.displayName = ResultsManager.getDefault().getHeapDumpDisplayName(fo.getName());
                 this.isHeapDump = true;
+//            } else if (fo.getExt().equalsIgnoreCase(ResultsManager.THREADDUMP_EXTENSION)) {
+//                // Thread Dump
+////                this.icon = Icons.getIcon(ProfilerIcons.HEAP_DUMP);
+////                this.icon =  ProfilerIcons.SNAPSHOT_THREADS;
+//                this.snapshotType = 4;
+//                this.displayName = ResultsManager.getDefault().getHeapDumpDisplayName(fo.getName());
+//                this.isHeapDump = false;
             } else {
-                int snapshotType = ResultsManager.getDefault().getSnapshotType(fo);
-                this.displayName = ResultsManager.getDefault().getSnapshotDisplayName(fo.getName(), snapshotType);
-                this.icon = getIcon(snapshotType);
+                int type = ResultsManager.getDefault().getSnapshotType(fo);
+                snapshotType = type == LoadedSnapshot.SNAPSHOT_TYPE_CPU ? 1 : 2;
+                this.displayName = ResultsManager.getDefault().getSnapshotDisplayName(fo.getName(), type);
                 this.isHeapDump = false;
-            }
-        }
-
-        private static String getIcon(int snapshotType) {
-            switch (snapshotType) {
-                case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
-//                    return Icons.getIcon(ProfilerIcons.CPU);
-                    return ProfilerIcons.CPU;
-                case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
-//                    return Icons.getIcon(ProfilerIcons.FRAGMENT);
-                    return ProfilerIcons.FRAGMENT;
-                case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
-                case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
-                case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_SAMPLED:
-//                    return Icons.getIcon(ProfilerIcons.MEMORY);
-                    return ProfilerIcons.MEMORY;
-                default:
-                    return null;
             }
         }
 
@@ -651,7 +661,7 @@ public final class SnapshotsWindowUI extends TopComponent {
 
         public int compareTo(Object o) {
             Snapshot s = (Snapshot)o;
-            return getDisplayName().compareTo(s.getDisplayName());
+            return Collator.getInstance().compare(getDisplayName(), s.getDisplayName());
         }
     }
     
