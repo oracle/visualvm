@@ -733,6 +733,18 @@ public class ProfilerTable extends JTable {
         if (isSortable()) _getRowSorter().setSortColumn(column);
     }
     
+    public int getSortColumn() {
+        return isSortable() ? _getRowSorter().getSortColumn() : -1;
+    }
+    
+    public void setSecondarySortColumn(int column) {
+        if (isSortable()) _getRowSorter().setSecondarySortColumn(column);
+    }
+    
+    public void setDefaultSortOrder(SortOrder sortOrder) {
+        if (isSortable()) _getRowSorter().setDefaultSortOrder(sortOrder);
+    }
+    
     public void setDefaultSortOrder(int column, SortOrder sortOrder) {
         if (isSortable()) _getRowSorter().setDefaultSortOrder(column, sortOrder);
     }

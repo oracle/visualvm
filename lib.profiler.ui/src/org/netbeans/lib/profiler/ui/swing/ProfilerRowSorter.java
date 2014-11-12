@@ -62,6 +62,8 @@ class ProfilerRowSorter extends TableRowSorter {
     private SortOrder defaultSortOrder = SortOrder.ASCENDING;
     private Map<Integer, SortOrder> defaultSortOrders;
     
+    private int secondarySortColumn;
+    
     
     // --- Package-private constructor -----------------------------------------
     
@@ -96,7 +98,11 @@ class ProfilerRowSorter extends TableRowSorter {
     }
     
     void setSortKey(RowSorter.SortKey key) {
-        setSortKeysImpl(Arrays.asList(key));
+        RowSorter.SortKey secondaryKey = secondarySortColumn == key.getColumn() ?
+                          null : new RowSorter.SortKey(secondarySortColumn,
+                          getDefaultSortOrder(secondarySortColumn));
+        setSortKeysImpl(secondaryKey == null ? Arrays.asList(key) :
+                          Arrays.asList(key, secondaryKey));
     }
     
     int getSortColumn() {
@@ -112,6 +118,15 @@ class ProfilerRowSorter extends TableRowSorter {
     RowSorter.SortKey getSortKey() {
         List<? extends RowSorter.SortKey> keys = getSortKeys();
         return keys.isEmpty() ? null : keys.get(0);
+    }
+    
+    
+    void setSecondarySortColumn(int column) {
+        secondarySortColumn = column;
+    }
+    
+    int getSecondarySortColumn() {
+        return secondarySortColumn;
     }
     
     
