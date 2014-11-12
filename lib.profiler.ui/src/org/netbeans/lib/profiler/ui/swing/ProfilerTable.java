@@ -380,7 +380,7 @@ public class ProfilerTable extends JTable {
     
     public void selectRow(int row, boolean scrollToVisible) {
         internal = true;
-        try { setRowSelectionInterval(row, row); }
+        try { setRowSelectionInterval(row, row); saveSelection(); }
         finally { internal = false; }
         if (scrollToVisible) scrollRectToVisible(getCellRect(row, getSelectedColumn(), true));
     }
