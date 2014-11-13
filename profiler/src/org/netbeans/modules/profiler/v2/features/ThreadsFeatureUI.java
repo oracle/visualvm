@@ -53,6 +53,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.v2.ui.GrayLabel;
 import org.netbeans.modules.profiler.v2.ui.PopupButton;
 import org.openide.util.NbBundle;
@@ -66,8 +67,11 @@ import org.openide.util.NbBundle;
     "ThreadsFeatureUI_filterAll=All threads",
     "ThreadsFeatureUI_filterLive=Live threads",
     "ThreadsFeatureUI_filterFinished=Finished threads",
+    "ThreadsFeatureUI_filterSelected=Selected threads",
     "ThreadsFeatureUI_timeline=Timeline:",
-    "ThreadsFeatureUI_threadsFilter=Threads filter"
+    "ThreadsFeatureUI_threadsFilter=Threads filter",
+    "# HTML formatted:",
+    "ThreadsFeatureUI_noThreadsMsg=<html><b>No threads are currently selected.</b><br><br>Use the Selected column or invoke Select thread action to select threads.</html>"
 })
 abstract class ThreadsFeatureUI extends FeatureUI {
     
@@ -190,6 +194,19 @@ abstract class ThreadsFeatureUI extends FeatureUI {
         popup.add(new JRadioButtonMenuItem(Bundle.ThreadsFeatureUI_filterFinished(), f == ThreadsPanel.Filter.FINISHED) {
             protected void fireActionPerformed(ActionEvent e) { setFilter(ThreadsPanel.Filter.FINISHED); }
         });
+        
+        popup.add(new JRadioButtonMenuItem(Bundle.ThreadsFeatureUI_filterSelected(), f == ThreadsPanel.Filter.SELECTED) {
+            protected void fireActionPerformed(ActionEvent e) { setSelectedFilter(); }
+        });
+    }
+    
+    private void setSelectedFilter() {
+        if (threadsView.hasSelectedThreads()) {
+            setFilter(ThreadsPanel.Filter.SELECTED);
+        } else {
+            threadsView.showSelectedColumn();
+            ProfilerDialogs.displayWarning(Bundle.ThreadsFeatureUI_noThreadsMsg());
+        }
     }
 
     private void setFilter(ThreadsPanel.Filter filter) {
@@ -204,6 +221,9 @@ abstract class ThreadsFeatureUI extends FeatureUI {
                 break;
             case FINISHED:
                 shFilter.setText(Bundle.ThreadsFeatureUI_filterFinished());
+                break;
+            case SELECTED:
+                shFilter.setText(Bundle.ThreadsFeatureUI_filterSelected());
                 break;
         }
     }
