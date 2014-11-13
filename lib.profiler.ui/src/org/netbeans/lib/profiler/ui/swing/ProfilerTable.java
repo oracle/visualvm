@@ -380,7 +380,7 @@ public class ProfilerTable extends JTable {
     
     public void selectRow(int row, boolean scrollToVisible) {
         internal = true;
-        try { setRowSelectionInterval(row, row); }
+        try { setRowSelectionInterval(row, row); saveSelection(); }
         finally { internal = false; }
         if (scrollToVisible) scrollRectToVisible(getCellRect(row, getSelectedColumn(), true));
     }
@@ -731,6 +731,18 @@ public class ProfilerTable extends JTable {
     
     public void setSortColumn(int column) {
         if (isSortable()) _getRowSorter().setSortColumn(column);
+    }
+    
+    public int getSortColumn() {
+        return isSortable() ? _getRowSorter().getSortColumn() : -1;
+    }
+    
+    public void setSecondarySortColumn(int column) {
+        if (isSortable()) _getRowSorter().setSecondarySortColumn(column);
+    }
+    
+    public void setDefaultSortOrder(SortOrder sortOrder) {
+        if (isSortable()) _getRowSorter().setDefaultSortOrder(sortOrder);
     }
     
     public void setDefaultSortOrder(int column, SortOrder sortOrder) {

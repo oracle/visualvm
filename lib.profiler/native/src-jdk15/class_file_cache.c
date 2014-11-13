@@ -611,7 +611,7 @@ void JNICALL monitor_contended_enter_hook(
         initializeMethods (jni_env);
     }
   
-    if (waitTrackingEnabled) {
+    if (waitTrackingEnabled || lockContentionMonitoringEnabled) {
         jthread owner = NULL;
         if (lockContentionMonitoringEnabled) {
             owner = getOwner(jvmti_env, object);
@@ -631,7 +631,7 @@ void JNICALL monitor_contended_entered_hook(
         initializeMethods (jni_env);
     }
     
-    if (waitTrackingEnabled) {
+    if (waitTrackingEnabled || lockContentionMonitoringEnabled) {
         (*jni_env)->CallStaticVoidMethod (jni_env, profilerRuntimeID, monitorExitID, thread, object);
         (*jni_env)->ExceptionDescribe (jni_env);
     }
