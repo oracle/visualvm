@@ -57,6 +57,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -412,6 +413,16 @@ public class ProfilerTable extends JTable {
         if (row == -1) return null;
         if (row >= getModel().getRowCount()) return null; // #239936
         return getValueAt(row, convertColumnIndexToView(column));
+    }
+    
+    public List getSelectedValues(int column) {
+        List values = new ArrayList();
+        int col = convertColumnIndexToView(column);
+        int rowCount = getModel().getRowCount();
+        for (int row : getSelectedRows())
+            if (row < rowCount) // #239936
+                values.add(getValueAt(row, col));
+        return values;
     }
     
     public void tableChanged(TableModelEvent e) {
