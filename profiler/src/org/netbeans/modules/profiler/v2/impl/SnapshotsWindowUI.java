@@ -70,6 +70,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
@@ -337,11 +338,10 @@ public final class SnapshotsWindowUI extends TopComponent {
                 if (s != null) openSnapshots(Collections.singleton(s));
             }
         });
+        snapshotsTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         snapshotsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                Snapshot selected = (Snapshot)snapshotsTable.getSelectedValue(1);
-                updateButtons(selected == null ? Collections.EMPTY_SET :
-                                                 Collections.singleton(selected));
+                updateButtons(snapshotsTable.getSelectedValues(1));
             }
         });
         
@@ -373,25 +373,22 @@ public final class SnapshotsWindowUI extends TopComponent {
         openB = new ThinButton(Icons.getIcon(ProfilerIcons.SNAPSHOT_OPEN)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
-                Snapshot s = (Snapshot)snapshotsTable.getSelectedValue(1);
-                if (s != null) openSnapshots(Collections.singleton(s));
+                openSnapshots(snapshotsTable.getSelectedValues(1));
             }
         };
         openB.setToolTipText("Open selected snapshots");
         exportB = new ThinButton(Icons.getIcon(GeneralIcons.EXPORT)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
-                Snapshot s = (Snapshot)snapshotsTable.getSelectedValue(1);
-                if (s != null) exportSnapshots(Collections.singleton(s));
+                exportSnapshots(snapshotsTable.getSelectedValues(1));
             }
         };
         exportB.setToolTipText("Export selected snapshot");
         compareB = new ThinButton(Icons.getIcon(ProfilerIcons.SNAPSHOTS_COMPARE)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
-                Snapshot s1 = (Snapshot)snapshotsTable.getSelectedValue(1);
-                Snapshot s2 = (Snapshot)snapshotsTable.getSelectedValue(1);
-                if (s1 != null && s2 != null) compareSnapshots(s1, s2);
+                List<Snapshot> snapshots = snapshotsTable.getSelectedValues(1);
+                compareSnapshots(snapshots.get(0), snapshots.get(1));
             }
         };
         compareB.setToolTipText("Compare selected snapshots");
@@ -399,15 +396,14 @@ public final class SnapshotsWindowUI extends TopComponent {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 Snapshot s = (Snapshot)snapshotsTable.getSelectedValue(1);
-                if (s != null) renameSnapshot(s, snapshotsTableModel);
+                renameSnapshot(s, snapshotsTableModel);
             }
         };
         renameB.setToolTipText("Rename selected snapshot");
         deleteB = new ThinButton(Icons.getIcon(ProfilerIcons.RUN_GC)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
-                Snapshot s = (Snapshot)snapshotsTable.getSelectedValue(1);
-                if (s != null) deleteSnapshots(Collections.singleton(s));
+                deleteSnapshots(snapshotsTable.getSelectedValues(1));
             }
         };
         deleteB.setToolTipText("Delete selected snapshots");
@@ -424,14 +420,15 @@ public final class SnapshotsWindowUI extends TopComponent {
         add(actions, BorderLayout.SOUTH);
         
         refreshSnapshots();
-        updateButtons(Collections.EMPTY_SET);
+        updateButtons(Collections.EMPTY_LIST);
     }
     
-    private void updateButtons(Collection<Snapshot> selectedSnapshots) {
+    private void updateButtons(List<Snapshot> selectedSnapshots) {
         int selected = selectedSnapshots.size();
         openB.setEnabled(selected > 0);
-        exportB.setEnabled(selected == 1);
-        compareB.setEnabled(selected == 2);
+        exportB.setEnabled(selected > 0);
+        compareB.setEnabled(selected == 2 && !selectedSnapshots.get(0).isHeapDump()
+                                          && !selectedSnapshots.get(1).isHeapDump());
         renameB.setEnabled(selected == 1);
         deleteB.setEnabled(selected > 0);
         
@@ -482,16 +479,17 @@ public final class SnapshotsWindowUI extends TopComponent {
     private static void compareSnapshots(final Snapshot snapshot1, final Snapshot snapshot2) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                FileObject file1 = snapshot1.getFile();
-                FileObject file2 = snapshot2.getFile();
+                final FileObject file1 = snapshot1.getFile();
+                final FileObject file2 = snapshot2.getFile();
                 if (CompareSnapshotsAction.areComparableSnapshots(file1, file2)) {
-                    ResultsManager.getDefault().compareSnapshots(file1, file2);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() { ResultsManager.getDefault().compareSnapshots(file1, file2); }
+                    });
                 } else {
                     ProfilerDialogs.displayError("Selected snapshots cannot be compared.");
                 }   
             }
         });
-        ResultsManager.getDefault().compareSnapshots(snapshot1.getFile(), snapshot2.getFile());
     }
     
     private static void renameSnapshot(final Snapshot snapshot, final AbstractTableModel model) {
