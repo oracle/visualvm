@@ -23,13 +23,16 @@
  *  questions.
  */
 
-importPackage(com.sun.tools.visualvm.modules.tracer.dynamic.impl)
-importPackage(com.sun.tools.visualvm.modules.tracer)
-importPackage(com.sun.tools.visualvm.tools.jmx)
-importPackage(javax.management)
-importPackage(org.openide.util)
-
-var Color = Packages.java.awt.Color;
+var Color = java.awt.Color;
+var ProbeItemDescriptor = Packages.com.sun.tools.visualvm.modules.tracer.ProbeItemDescriptor;
+var ItemValueFormatter = Packages.com.sun.tools.visualvm.modules.tracer.ItemValueFormatter;
+var TracerProbeDescriptor = Packages.com.sun.tools.visualvm.modules.tracer.TracerProbeDescriptor;
+var ValueProvider = Packages.com.sun.tools.visualvm.modules.tracer.dynamic.impl.ValueProvider;
+var DynamicPackage = Packages.com.sun.tools.visualvm.modules.tracer.dynamic.impl.DynamicPackage;
+var DynamicProbe = Packages.com.sun.tools.visualvm.modules.tracer.dynamic.impl.DynamicProbe;
+var JmxModelFactory = Packages.com.sun.tools.visualvm.tools.jmx.JmxModelFactory;
+var NbBundle = Packages.org.openide.util.NbBundle;
+var QueryExp = javax.management.QueryExp;
 var AUTOCOLOR = ProbeItemDescriptor.DEFAULT_COLOR;
 
 function VisualVM(){}
@@ -64,7 +67,7 @@ VisualVM.MBeans = {
         if (jmxModel != undefined && jmxModel != null) {
             var connection = jmxModel.getMBeanServerConnection();
             if (connection != undefined && connection != null) {
-                var names = connection.queryNames(Packages.javax.management.ObjectName.getInstance(objectNamePattern), query);
+                var names = connection.queryNames(javax.management.ObjectName.getInstance(objectNamePattern), query);
                 var iter = names.iterator();
                 var nameArr = new Array();
                 while (iter.hasNext()) {
@@ -93,7 +96,7 @@ function L11N(baseName) {
         if (this.bundle != undefined) {
             var msg = this.bundle.getString(key);
             if (attrs != undefined && msg != undefined && msg != null) {
-                msg = Packages.java.text.MessageFormat(msg, attrs);
+                msg = java.text.MessageFormat(msg, attrs);
             }
             return msg;
         }
@@ -222,7 +225,7 @@ function getItemDescriptor(property) {
     return undefined;
 }
 
-var configuredPackages = new Packages.java.util.ArrayList();
+var configuredPackages = new java.util.ArrayList();
 
 function configure(packages) {
     if (application != undefined && packages != undefined) {
@@ -246,7 +249,7 @@ function processPackage(pkg) {
             desc = desc.concat(getReqDesc(pkg));
         }
         var icon = pkg.icon != undefined ? pkg.icon : null;
-        var position = pkg.position != undefined ? pkg.position : Packages.java.lang.Integer.MAX_VALUE;
+        var position = pkg.position != undefined ? pkg.position : java.lang.Integer.MAX_VALUE;
 
         if (typeof(icon) == "string") {
             try {
@@ -266,8 +269,8 @@ function processPackage(pkg) {
 
             // a valid probe must have properties
             if (probe.properties != undefined) {
-                var itemDescriptors = new Packages.java.util.ArrayList();
-                var valProviders = new Packages.java.util.ArrayList();
+                var itemDescriptors = new java.util.ArrayList();
+                var valProviders = new java.util.ArrayList();
                 var propArray;
                 if (typeof(probe.properties) == "function") {
                     propArray = probe.properties();
@@ -348,7 +351,7 @@ function processPackage(pkg) {
 }
 
 function getDeploymentAttributes(deployment) {
-    var map = new Packages.java.util.HashMap();
+    var map = new java.util.HashMap();
     for(var attr in deployment) {
         if (attr != "deployer") {
             map.put(attr, deployment[attr]);
@@ -372,7 +375,7 @@ function getKeys(map) {
         for(var counter=0; counter < map.length; counter++) {
             ret[ret.length] = map[counter].get("key");
         }
-    } else if (map instanceof Packages.javax.management.openmbean.CompositeData) {
+    } else if (map instanceof javax.management.openmbean.CompositeData) {
         if (map.getCompositeType != undefined) {
             var type = map.getCompositeType();
         
@@ -408,7 +411,7 @@ function get(map, keys) {
                 }
             }
         }
-    } else if (map instanceof Packages.javax.management.openmbean.CompositeData) {
+    } else if (map instanceof javax.management.openmbean.CompositeData) {
         if (map.getTabularType != undefined) {
             // javax.management.openmbean.TabularDataSupport -> effectively a Map instance
             if (!keyArray || keys.length == 1) {
