@@ -162,7 +162,7 @@ public class ProfilerValidationTest extends JellyTestCase {
         assertTrue("Menu item in incorrect state: " + item, new Action(item, null).isEnabled());
         item = "Profile|Take Snapshot of Collected Results";
         assertFalse("Menu item in incorrect state: " + item, new Action(item, null).isEnabled());
-        item = "Profile|Stop Profiling Session";
+        item = "Profile|Finish Profiler Session";
         assertFalse("Menu item in incorrect state: " + item, new Action(item, null).isEnabled());
         MainWindowOperator.getDefault().pushKey(KeyEvent.VK_ESCAPE);
     }
@@ -213,7 +213,7 @@ public class ProfilerValidationTest extends JellyTestCase {
      * - click "Snapshot" button in tool bar<br>
      * - wait for snapshot TopComponent<br>
      * - save snapshot<br>
-     * - call "Profile|Stop Profiling Session"<br>
+     * - call "Profile|Finish Profiler Session"<br>
      */
     public void testProfiler() {
         new Action("Profile|Profile Project", null).perform();
@@ -255,7 +255,7 @@ public class ProfilerValidationTest extends JellyTestCase {
         }));
         tcSnapshot.save();
         // stop profiler
-        new Action("Profile|Stop Profiling Session", null).perform();
+        new Action("Profile|Finish Profiler Session", null).perform();
         waitProfilerStopped();
     }
 
