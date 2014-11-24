@@ -272,7 +272,7 @@ public final class SnapshotsWindowUI extends TopComponent {
         ProjectSelector.Populator populator = new ProjectSelector.Populator() {
             protected Lookup.Provider initialProject() {
                 ProfilerSession ps = ProfilerSession.currentSession();
-                return ps == null ? null : ps.getProject();
+                return ps == null ? ProjectUtilities.getMainProject() : ps.getProject();
             }
             protected Collection<Lookup.Provider> additionalProjects() {
                 ProfilerSession ps = ProfilerSession.currentSession();
