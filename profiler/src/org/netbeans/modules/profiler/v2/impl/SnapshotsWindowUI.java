@@ -104,7 +104,6 @@ import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.windows.Mode;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -217,7 +216,7 @@ public final class SnapshotsWindowUI extends TopComponent {
     
     void refreshSnapshots() {
         final Lookup.Provider project = selector.getProject();
-        RequestProcessor.getDefault().post(new Runnable() {
+        SnapshotsWindowHelper.PROCESSOR.post(new Runnable() {
             public void run() {
                 ResultsManager rm = ResultsManager.getDefault();
                 final List<Snapshot> _snapshots = new ArrayList();
@@ -461,7 +460,7 @@ public final class SnapshotsWindowUI extends TopComponent {
     
     
     private static void openSnapshots(final Collection<Snapshot> snapshots) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        SnapshotsWindowHelper.PROCESSOR.post(new Runnable() {
             public void run() {
                 for (Snapshot snapshot : snapshots)
                     ResultsManager.getDefault().openSnapshot(snapshot.getFile());
@@ -477,7 +476,7 @@ public final class SnapshotsWindowUI extends TopComponent {
     }
     
     private static void compareSnapshots(final Snapshot snapshot1, final Snapshot snapshot2) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        SnapshotsWindowHelper.PROCESSOR.post(new Runnable() {
             public void run() {
                 final FileObject file1 = snapshot1.getFile();
                 final FileObject file2 = snapshot2.getFile();
@@ -513,7 +512,7 @@ public final class SnapshotsWindowUI extends TopComponent {
                         ProfilerDialogs.displayError("Snapshot name cannot be empty.");
                         renameSnapshot(snapshot, model);
                     } else {
-                        RequestProcessor.getDefault().post(new Runnable() {
+                        SnapshotsWindowHelper.PROCESSOR.post(new Runnable() {
                             public void run() {
                                 FileLock lock = null;
                                 try {
@@ -542,7 +541,7 @@ public final class SnapshotsWindowUI extends TopComponent {
     }
     
     private static void deleteSnapshots(final Collection<Snapshot> snapshots) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        SnapshotsWindowHelper.PROCESSOR.post(new Runnable() {
             public void run() {
                 if (ProfilerDialogs.displayConfirmation("Delete selected snapshots?", "Confirm Delete")) {
                     for (Snapshot snapshot : snapshots) try {
