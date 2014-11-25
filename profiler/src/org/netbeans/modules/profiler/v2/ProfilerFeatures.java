@@ -150,7 +150,11 @@ final class ProfilerFeatures {
                 Iterator<ProfilerFeature> it = activated.iterator();
                 while (it.hasNext()) {
                     ProfilerFeature f = it.next();
-                    if (f != activated && !f.supportsSettings(ps)) it.remove();
+                    if (f != feature && !f.supportsSettings(ps)) {
+                        it.remove();
+                        f.deactivatedInSession();
+                        f.removeChangeListener(listener);
+                    }
                 }
                 
                 feature.addChangeListener(listener);
