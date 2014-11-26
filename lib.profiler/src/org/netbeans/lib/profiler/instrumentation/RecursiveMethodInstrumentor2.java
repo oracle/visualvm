@@ -54,7 +54,7 @@ import java.util.ArrayList;
 
 
 /**
- * Recursive method scaner that implements the eager instrumentation scheme ("Scheme A" in the JFluid paper).
+ * Recursive method scanner that implements the eager instrumentation scheme ("Scheme A" in the JFluid paper).
  *
  * @author Misha Dmitriev
  * @author Adrian Mos

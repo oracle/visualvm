@@ -60,7 +60,7 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service=SnapshotsListener.class)
 public final class SnapshotsWindowHelper implements SnapshotsListener {
     
-    private static final WeakProcessor PROCESSOR = new WeakProcessor("Snapshots Window Helper Processor"); // NOI18N
+    static final WeakProcessor PROCESSOR = new WeakProcessor("Snapshots Window Processor"); // NOI18N
     
     public void snapshotTaken(LoadedSnapshot snapshot) {
         if (ProfilerIDESettings.getInstance().getAutoOpenSnapshot()) {

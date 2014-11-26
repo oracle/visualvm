@@ -51,8 +51,8 @@ import org.netbeans.lib.profiler.utils.Wildcards;
 
 
 /**
- * Recursive method scaner that implements the total instrumentation scheme.
- * In fact, it's not even a scaner, since it just instruments absolutely everything -
+ * Recursive method scanner that implements the total instrumentation scheme.
+ * In fact, it's not even a scanner, since it just instruments absolutely everything -
  * but it uses the same interface.
  *
  * @author Tomas Hurka
