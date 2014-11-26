@@ -55,7 +55,7 @@ import java.util.Hashtable;
 
 /**
  * Base class for two "recursive" method scanners, implementing the "eager" and "lazy" transitive call subgraph revelation and
- * instrumentation schemes. This class contains functionality used by both scaners.
+ * instrumentation schemes. This class contains functionality used by both scanners.
  *
  * @author Tomas Hurka
  * @author Misha Dmitriev
