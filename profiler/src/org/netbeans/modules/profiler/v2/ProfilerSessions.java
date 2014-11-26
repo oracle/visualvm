@@ -163,9 +163,10 @@ final class ProfilerSessions {
                                                            null, null);
                 Dialog d = DialogDisplayer.getDefault().createDialog(dd);
                 d.setVisible(true);
+                
+                final ProfilerSession session = ui.selectedSession();
 
                 if (dd.getValue() == DialogDescriptor.OK_OPTION) {
-                    final ProfilerSession session = ui.selectedSession();
                     final ProfilerFeature feature = ui.selectedFeature();
 
                     RequestProcessor.getDefault().post(new Runnable() {
@@ -181,7 +182,10 @@ final class ProfilerSessions {
                             });
                         }
                     });
+                } else {
+                    if (session != null) session.close();
                 }
+                
             }
         });
     }
@@ -223,7 +227,7 @@ final class ProfilerSessions {
             return selectedSession;
         }
         
-        
+            
         UI(Set<ProfilerFeature> features) {
             super(new GridBagLayout());
             
@@ -361,6 +365,8 @@ final class ProfilerSessions {
             
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
+                    
+                    if (selectedSession != null) selectedSession.close();
                     
                     Lookup projectContext = Lookups.fixed(project);
                     selectedSession = ProfilerSession.forContext(projectContext);
