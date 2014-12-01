@@ -54,9 +54,10 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service=DetailsProvider.class)
 public class LangDetailsProvider extends DetailsProvider.Basic {
     private static final String ENUM_MASK = "java.lang.Enum+";                    // NOI18N
+    private static final String STACKTRACE_MASK = "java.lang.StackTraceElement";    // NOI18N
     
     public LangDetailsProvider() {
-        super(ENUM_MASK);
+        super(ENUM_MASK, STACKTRACE_MASK);
     }
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -68,6 +69,16 @@ public class LangDetailsProvider extends DetailsProvider.Basic {
                     return name+" ("+ordinal+")";       // NOI18N
                 }
                 return name;
+            }
+        } else if (STACKTRACE_MASK.equals(className)) {                         // StackTraceElement
+            String declaringClass = DetailsUtils.getInstanceFieldString(instance, "declaringClass", heap); // NOI18N
+            if (declaringClass != null) {
+                String methodName = DetailsUtils.getInstanceFieldString(instance, "methodName", heap); // NOI18N
+                String fileName = DetailsUtils.getInstanceFieldString(instance, "fileName", heap); // NOI18N
+                int lineNumber = DetailsUtils.getIntFieldValue(instance, "lineNumber", -1); // NOi18N                
+                if (methodName == null) methodName = "Unknown method";   // NOI18N
+                StackTraceElement ste = new StackTraceElement(declaringClass, methodName, fileName, lineNumber);
+                return ste.toString();
             }
         }
         
