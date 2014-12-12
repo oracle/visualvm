@@ -76,6 +76,7 @@ public class JMethodIdTable {
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
+    static String NATIVE_SUFFIX = "[native]";   // NOI18N
     private static JMethodIdTable defaultTable;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -150,8 +151,13 @@ public class JMethodIdTable {
             String className = in.readUTF();
             String methodName = in.readUTF();
             String methodSig = in.readUTF();
-
-            addEntry(methodId, className, methodName, methodSig, false);
+            boolean isNative = false;
+            
+            if (methodName.endsWith(NATIVE_SUFFIX)) {
+                methodName = methodName.substring(0, methodName.length() - NATIVE_SUFFIX.length());
+                isNative = true;
+            }
+            addEntry(methodId, className, methodName, methodSig, isNative);
         }
     }
 
@@ -174,7 +180,7 @@ public class JMethodIdTable {
             if (entries[i] != null) {
                 out.writeInt(entries[i].methodId);
                 out.writeUTF(entries[i].className);
-                out.writeUTF(entries[i].methodName);
+                out.writeUTF(entries[i].isNative ? entries[i].methodName.concat(NATIVE_SUFFIX) : entries[i].methodName);
                 out.writeUTF(entries[i].methodSig);
             }
         }
