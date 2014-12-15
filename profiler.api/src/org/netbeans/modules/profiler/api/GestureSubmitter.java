@@ -43,22 +43,19 @@
 
 package org.netbeans.modules.profiler.api;
 
-import org.netbeans.lib.profiler.common.AttachSettings;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.SessionSettings;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.openide.util.NbBundle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.common.AttachSettings;
+import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.lib.profiler.common.SessionSettings;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
-import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
-import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -69,8 +66,6 @@ public class GestureSubmitter {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final Logger USG_LOGGER = Logger.getLogger("org.netbeans.ui.metrics.profiler"); // NOI18N
-
-    private static final MethodNameFormatter formatter = MethodNameFormatterFactory.getDefault().getFormatter();
     
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
