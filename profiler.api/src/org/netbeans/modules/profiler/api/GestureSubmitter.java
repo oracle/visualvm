@@ -137,6 +137,10 @@ public class GestureSubmitter {
                 paramList.add("TYPE_CPU_PART"); // NOI18N
 
                 break;
+            case ProfilingSettings.PROFILE_CPU_SAMPLING:
+                paramList.add("TYPE_CPU_SAMPLING"); // NOI18N
+
+                break;
             case ProfilingSettings.PROFILE_CPU_STOPWATCH:
                 paramList.add("TYPE_CPU_STOPWATCH"); // NOI18N
 
@@ -147,6 +151,10 @@ public class GestureSubmitter {
                 break;
             case ProfilingSettings.PROFILE_MEMORY_LIVENESS:
                 paramList.add("TYPE_MEM_LIVENESS"); // NOI18N
+
+                break;
+            case ProfilingSettings.PROFILE_MEMORY_SAMPLING:
+                paramList.add("TYPE_MEM_SAMPLING"); // NOI18N
 
                 break;
             case ProfilingSettings.PROFILE_MONITOR:
