@@ -77,7 +77,7 @@ public class GestureSubmitter {
     public static void logConfig(ProfilingSettings settings, InstrumentationFilter filter) {
         List<Object> paramList = new ArrayList<Object>();
 
-        fillParamsForProfiling(settings, filter, paramList);
+        fillParamsForProfiling(settings, paramList);
 
         logUsage("CONFIG", paramList); // NOI18N
     }
@@ -127,7 +127,7 @@ public class GestureSubmitter {
         paramList.add(as.isRemote() ? "ATTACH_REMOTE" : "ATTACH_LOCAL"); // NOI18N
     }
 
-    private static void fillParamsForProfiling(ProfilingSettings ps, InstrumentationFilter filter, List<Object> paramList) {
+    private static void fillParamsForProfiling(ProfilingSettings ps, List<Object> paramList) {
         switch (ps.getProfilingType()) {
             case ProfilingSettings.PROFILE_CPU_ENTIRE:
                 paramList.add("TYPE_CPU_ENTIRE"); // NOI18N
@@ -170,19 +170,6 @@ public class GestureSubmitter {
                 break;
         }
 
-        ClientUtils.SourceCodeSelection[] rootMethods = ps.getInstrumentationRootMethods();
-        if (rootMethods != null && rootMethods.length > 0) {
-            StringBuilder sb = new StringBuilder("PROFILING_ROOTS={"); // NOI18N
-            for(ClientUtils.SourceCodeSelection scc : rootMethods) {
-                sb.append(formatter.formatMethodName(scc)).append(","); // NOI18N
-            }
-            sb.append("}");
-            paramList.add(sb.toString());
-        }
-        if (filter != null) {
-            StringBuilder sb = new StringBuilder("PROFILING_FILTER={\n").append(filter.debug()).append("}"); // NOI18N
-            paramList.add(sb.toString());
-        }
         paramList.add(ps.getProfileUnderlyingFramework() ? "FRAMEWORK_YES" : "FRAMEWORK_NO");
         paramList.add(ps.getExcludeWaitTime() ? "WAIT_EXCLUDE" : "WAIT_INCLUDE"); // NOI18N
         paramList.add(ps.getInstrumentMethodInvoke() ? "REFL_INVOKE_YES" : "REFL_INVOKE_NO"); // NOI18N
