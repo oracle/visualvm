@@ -43,22 +43,19 @@
 
 package org.netbeans.modules.profiler.api;
 
-import org.netbeans.lib.profiler.common.AttachSettings;
-import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.SessionSettings;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.openide.util.NbBundle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.common.AttachSettings;
+import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.lib.profiler.common.SessionSettings;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
-import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
-import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -69,15 +66,13 @@ public class GestureSubmitter {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final Logger USG_LOGGER = Logger.getLogger("org.netbeans.ui.metrics.profiler"); // NOI18N
-
-    private static final MethodNameFormatter formatter = MethodNameFormatterFactory.getDefault().getFormatter();
     
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public static void logConfig(ProfilingSettings settings, InstrumentationFilter filter) {
         List<Object> paramList = new ArrayList<Object>();
 
-        fillParamsForProfiling(settings, filter, paramList);
+        fillParamsForProfiling(settings, paramList);
 
         logUsage("CONFIG", paramList); // NOI18N
     }
@@ -127,7 +122,7 @@ public class GestureSubmitter {
         paramList.add(as.isRemote() ? "ATTACH_REMOTE" : "ATTACH_LOCAL"); // NOI18N
     }
 
-    private static void fillParamsForProfiling(ProfilingSettings ps, InstrumentationFilter filter, List<Object> paramList) {
+    private static void fillParamsForProfiling(ProfilingSettings ps, List<Object> paramList) {
         switch (ps.getProfilingType()) {
             case ProfilingSettings.PROFILE_CPU_ENTIRE:
                 paramList.add("TYPE_CPU_ENTIRE"); // NOI18N
@@ -135,6 +130,10 @@ public class GestureSubmitter {
                 break;
             case ProfilingSettings.PROFILE_CPU_PART:
                 paramList.add("TYPE_CPU_PART"); // NOI18N
+
+                break;
+            case ProfilingSettings.PROFILE_CPU_SAMPLING:
+                paramList.add("TYPE_CPU_SAMPLING"); // NOI18N
 
                 break;
             case ProfilingSettings.PROFILE_CPU_STOPWATCH:
@@ -147,6 +146,10 @@ public class GestureSubmitter {
                 break;
             case ProfilingSettings.PROFILE_MEMORY_LIVENESS:
                 paramList.add("TYPE_MEM_LIVENESS"); // NOI18N
+
+                break;
+            case ProfilingSettings.PROFILE_MEMORY_SAMPLING:
+                paramList.add("TYPE_MEM_SAMPLING"); // NOI18N
 
                 break;
             case ProfilingSettings.PROFILE_MONITOR:
@@ -170,19 +173,6 @@ public class GestureSubmitter {
                 break;
         }
 
-        ClientUtils.SourceCodeSelection[] rootMethods = ps.getInstrumentationRootMethods();
-        if (rootMethods != null && rootMethods.length > 0) {
-            StringBuilder sb = new StringBuilder("PROFILING_ROOTS={"); // NOI18N
-            for(ClientUtils.SourceCodeSelection scc : rootMethods) {
-                sb.append(formatter.formatMethodName(scc)).append(","); // NOI18N
-            }
-            sb.append("}");
-            paramList.add(sb.toString());
-        }
-        if (filter != null) {
-            StringBuilder sb = new StringBuilder("PROFILING_FILTER={\n").append(filter.debug()).append("}"); // NOI18N
-            paramList.add(sb.toString());
-        }
         paramList.add(ps.getProfileUnderlyingFramework() ? "FRAMEWORK_YES" : "FRAMEWORK_NO");
         paramList.add(ps.getExcludeWaitTime() ? "WAIT_EXCLUDE" : "WAIT_INCLUDE"); // NOI18N
         paramList.add(ps.getInstrumentMethodInvoke() ? "REFL_INVOKE_YES" : "REFL_INVOKE_NO"); // NOI18N

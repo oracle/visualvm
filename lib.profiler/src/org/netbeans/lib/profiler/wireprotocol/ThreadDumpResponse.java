@@ -104,7 +104,7 @@ public class ThreadDumpResponse extends Response {
         out.writeLong(time.getTime());
         out.writeInt(cdThreads.length);
         for (int i = 0; i < cdThreads.length; i++) {
-            out.writeObject((cdThreads[i]));
+            out.writeObject(cdThreads[i]);
         }
         time = null;
         cdThreads = null;
