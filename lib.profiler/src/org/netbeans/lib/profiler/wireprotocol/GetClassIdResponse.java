@@ -49,7 +49,8 @@ import java.io.ObjectOutputStream;
 
 
 /**
- * Response to the client's request to dump the current rough profiling data contents into the shared-memory file.
+ * Response to the client's request when classId is needed for given class identified 
+ * by class name and classloader id.
  *
  * @author Tomas Hurka
  * @author Misha Dmitriev

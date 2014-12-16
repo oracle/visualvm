@@ -116,6 +116,11 @@ final class ExportSnapshotAction extends AbstractAction {
                 } else {
                     LAST_DIRECTORY = selected.getParent();
                 }
+                filename = selected.getName();
+                if (!filename.toLowerCase().endsWith(NPSS_EXT)) {
+                    filename+=NPSS_EXT;
+                    selected = new File(selected.getParentFile(), filename);
+                }
                 if (!checkItselfOrOverwrite(snapshotFileObject, selected)) actionPerformed(e);
                 else export(snapshotFileObject, selected);
             }
@@ -137,9 +142,7 @@ final class ExportSnapshotAction extends AbstractAction {
                     } else {
                         FileObject targetFO = FileUtil.toFileObject(targetFile.getParentFile());
                         String targetName = targetFile.getName();
-                        int targetExtIndex = targetName.indexOf('.'); // NOI18N
-                        if (targetExtIndex > -1) targetName = targetName.substring(0, targetExtIndex);
-                        FileUtil.copyFile(sourceFO, targetFO, targetName);
+                        FileUtil.copyFile(sourceFO, targetFO, targetName, null);
                     }
                 } catch (IOException e) {
                     ProfilerDialogs.displayError(Bundle.ExportSnapshotAction_ExportFailedMsg());
