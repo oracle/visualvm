@@ -50,7 +50,7 @@ import java.io.ObjectOutputStream;
 
 /**
  * Command that is issued by back end when the instance is allocated via reflection
- * and a classId is needed for given class identified by class name and classloaded id.
+ * and a classId is needed for given class identified by class name and classloader id.
  *
  * It is only used for Memory profiling
  *
