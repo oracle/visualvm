@@ -356,6 +356,7 @@ public class PresoObjAllocCCTNode implements CCTNode {
             if (VM_ALLOC_CLASS.equals(className) && VM_ALLOC_METHOD.equals(methodName)) { // special handling of ProfilerRuntimeMemory.traceVMObjectAlloc
                 nodeName = VM_ALLOC_TEXT;
             } else {
+                if (entry.isNative) methodName = methodName.concat(JMethodIdTable.NATIVE_SUFFIX);
                 nodeName = MethodNameFormatterFactory.getDefault().getFormatter()
                                                      .formatMethodName(className, methodName, methodSig).toFormatted();
             }
