@@ -177,11 +177,13 @@ public class JMethodIdTable {
         out.writeInt(count);
 
         for (int i = 0; i < entries.length; i++) {
-            if (entries[i] != null) {
-                out.writeInt(entries[i].methodId);
-                out.writeUTF(entries[i].className);
-                out.writeUTF(entries[i].isNative ? entries[i].methodName.concat(NATIVE_SUFFIX) : entries[i].methodName);
-                out.writeUTF(entries[i].methodSig);
+            JMethodIdTableEntry entry = entries[i];
+            
+            if (entry != null) {
+                out.writeInt(entry.methodId);
+                out.writeUTF(entry.className);
+                out.writeUTF(entry.isNative ? entry.methodName.concat(NATIVE_SUFFIX) : entry.methodName);
+                out.writeUTF(entry.methodSig);
             }
         }
     }
