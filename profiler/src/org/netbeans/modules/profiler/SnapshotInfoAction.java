@@ -46,53 +46,32 @@ package org.netbeans.modules.profiler;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
 
 @NbBundle.Messages({
-    "SaveSnapshotAction_ActionName=Save Snapshot",
-    "SaveSnapshotAction_ActionDescr=Save Snapshot to Project"
+    "SnapshotInfoAction_ActionName=Snapshot information",
+    "SnapshotInfoAction_ActionDescr=Snapshot information"
 })
-class SaveSnapshotAction extends AbstractAction {
+class SnapshotInfoAction extends AbstractAction {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     private final LoadedSnapshot snapshot;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public SaveSnapshotAction(LoadedSnapshot snapshot) {
-        putValue(Action.NAME, Bundle.SaveSnapshotAction_ActionName());
-        putValue(Action.SHORT_DESCRIPTION, Bundle.SaveSnapshotAction_ActionDescr());
-        putValue(Action.SMALL_ICON, Icons.getIcon(GeneralIcons.SAVE));
-        putValue("iconBase", Icons.getResource(GeneralIcons.SAVE)); // NOI18N
+    public SnapshotInfoAction(LoadedSnapshot snapshot) {
+        putValue(Action.NAME, Bundle.SnapshotInfoAction_ActionName());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.SnapshotInfoAction_ActionDescr());
+        putValue(Action.SMALL_ICON, Icons.getIcon(GeneralIcons.INFO));
+        putValue("iconBase", Icons.getResource(GeneralIcons.INFO)); // NOI18N
         this.snapshot = snapshot;
-        updateState();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void actionPerformed(ActionEvent e) {
-        new NBSwingWorker() {
-            final private ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.MSG_SavingSnapshot());
-            @Override
-            protected void doInBackground() {
-                ph.setInitialDelay(500);
-                ph.start();
-                ResultsManager.getDefault().saveSnapshot(snapshot);
-            }
-
-            @Override
-            protected void done() {
-                ph.finish();
-                updateState();
-            }
-        }.execute();
-    }
-
-    public void updateState() {
-        setEnabled(!snapshot.isSaved());
+        ProfilerDialogs.displayInfo("Snapshot information and settings");
     }
 }

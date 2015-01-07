@@ -334,7 +334,7 @@ public class ClientUtils implements CommonConstants {
 
         public String getMessage() {
             if (super.getMessage() == null) {
-                return (code == VM) ? "Target JVM inactive" : "Target JVM inactive"; // NOI18N
+                return (code == VM) ? "Target JVM inactive" : "Target application inactive"; // NOI18N
             } else {
                 return super.getMessage();
             }
