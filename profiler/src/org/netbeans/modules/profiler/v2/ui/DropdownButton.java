@@ -62,6 +62,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.swing.SmallButton;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 

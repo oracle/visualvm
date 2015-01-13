@@ -60,6 +60,8 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.swing.PopupButton;
+import org.netbeans.lib.profiler.ui.swing.SmallButton;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
@@ -71,8 +73,6 @@ import org.netbeans.modules.profiler.api.java.SourceMethodInfo;
 import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.impl.WeakProcessor;
-import org.netbeans.modules.profiler.v2.ui.PopupButton;
-import org.netbeans.modules.profiler.v2.ui.SmallButton;
 import org.netbeans.modules.profiler.v2.ui.TitledMenuSeparator;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -118,17 +118,22 @@ final class MethodsFeature extends ProfilerFeature.Basic {
     
     public boolean supportsConfiguration(Lookup configuration) {
         return configuration.lookup(SourceMethodInfo.class) != null ||
-               configuration.lookup(SourceClassInfo.class) != null;
+               configuration.lookup(SourceClassInfo.class) != null ||
+               configuration.lookup(ClientUtils.SourceCodeSelection.class) != null;
     }
     
     public void configure(Lookup configuration) {
-        // Handle Profile Method action
+        // Handle Profile Method action from editor
         SourceMethodInfo methodInfo = configuration.lookup(SourceMethodInfo.class);
         if (methodInfo != null) selectMethodForProfiling(methodInfo);
         
-        // Handle Profile Class action
+        // Handle Profile Class action from editor
         SourceClassInfo classInfo = configuration.lookup(SourceClassInfo.class);
         if (classInfo != null) selectClassForProfiling(classInfo);
+        
+        // Handle Profile Class/Method action from snapshot
+        ClientUtils.SourceCodeSelection sel = configuration.lookup(ClientUtils.SourceCodeSelection.class);
+        if (sel != null) selectForProfiling(sel);
     }
     
     
