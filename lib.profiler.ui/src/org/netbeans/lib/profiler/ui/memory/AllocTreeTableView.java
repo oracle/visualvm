@@ -62,6 +62,7 @@ import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTManager;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.Formatters;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
@@ -132,6 +133,16 @@ abstract class AllocTreeTableView extends JPanel {
                 treeTableModel.setRoot(root);
             }
         });
+    }
+    
+    
+    ExportUtils.ExportProvider[] getExportProviders() {
+        return treeTable.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
+            new ExportUtils.CSVExportProvider(treeTable),
+            new ExportUtils.HTMLExportProvider(treeTable, "Allocated Objects"),
+            new ExportUtils.XMLExportProvider(treeTable, "Allocated Objects"),
+            new ExportUtils.PNGExportProvider(treeTable)
+        };
     }
     
     

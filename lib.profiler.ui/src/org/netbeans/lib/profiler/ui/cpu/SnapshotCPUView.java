@@ -46,7 +46,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -65,6 +69,8 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils.ExportProvider;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.utils.Wildcards;
 
@@ -89,6 +95,31 @@ public abstract class SnapshotCPUView extends JPanel {
         initUI(actions);
         
         setAggregation(CPUResultsSnapshot.METHOD_LEVEL_VIEW);
+    }
+    
+    
+    public ExportUtils.Exportable getExportable(final File sourceFile) {
+        return new ExportUtils.Exportable() {
+            public String getName() {
+                return "Export Methods";
+            }
+            public ExportUtils.ExportProvider[] getProviders() {
+                ExportUtils.ExportProvider[] providers = null;
+                ExportProvider npsProvider = sourceFile == null ? null :
+                    new ExportUtils.NPSExportProvider(sourceFile);
+                
+                if (tableView.isVisible() && !treeTableView.isVisible()) {
+                    providers = tableView.getExportProviders();
+                } else if (!tableView.isVisible() && treeTableView.isVisible()) {
+                    providers = treeTableView.getExportProviders();
+                }
+                
+                List<ExportUtils.ExportProvider> _providers = new ArrayList();
+                if (npsProvider != null) _providers.add(npsProvider);
+                if (providers != null) _providers.addAll(Arrays.asList(providers));
+                return _providers.toArray(new ExportUtils.ExportProvider[_providers.size()]);
+            }
+        };
     }
     
     

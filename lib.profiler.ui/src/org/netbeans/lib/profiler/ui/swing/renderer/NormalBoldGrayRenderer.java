@@ -135,4 +135,9 @@ public class NormalBoldGrayRenderer extends MultiRenderer {
         }
     }
     
+    
+    public String toString() {
+        return normalRenderer.toString() + boldRenderer.toString() + grayRenderer.toString();
+    }
+    
 }

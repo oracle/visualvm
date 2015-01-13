@@ -45,7 +45,11 @@ package org.netbeans.lib.profiler.ui.memory;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenuItem;
@@ -60,6 +64,7 @@ import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.utils.Wildcards;
 
@@ -70,6 +75,7 @@ import org.netbeans.lib.profiler.utils.Wildcards;
 public abstract class SnapshotMemoryView extends JPanel {
     
     private final DataSetter dataSetter;
+    private final ExporterGetter exporterGetter;
     
     private int aggregation;
     
@@ -91,6 +97,9 @@ public abstract class SnapshotMemoryView extends JPanel {
             dataSetter = new DataSetter() {
                 public void setData(int aggregation) { view.setData((SampledMemoryResultsSnapshot)snapshot, aggregation); }
             };
+            exporterGetter = new ExporterGetter() {
+                public ExportUtils.ExportProvider[] getProviders() { return view.getExportProviders(); }
+            };
         } else if (snapshot instanceof AllocMemoryResultsSnapshot) {
             final AllocMemoryResultsSnapshot _snapshot = (AllocMemoryResultsSnapshot)snapshot;
             if (snapshot.containsStacks()) {
@@ -106,6 +115,9 @@ public abstract class SnapshotMemoryView extends JPanel {
                 dataSetter = new DataSetter() {
                     public void setData(int aggregation) { view.setData(_snapshot, filter, aggregation); }
                 };
+                exporterGetter = new ExporterGetter() {
+                    public ExportUtils.ExportProvider[] getProviders() { return view.getExportProviders(); }
+                };
                 supportsPackageAggregation = false;
             } else {
                 final AllocTableView view = new AllocTableView(null) {
@@ -119,6 +131,9 @@ public abstract class SnapshotMemoryView extends JPanel {
                 add(view, BorderLayout.CENTER);
                 dataSetter = new DataSetter() {
                     public void setData(int aggregation) { view.setData(_snapshot, filter, aggregation); }
+                };
+                exporterGetter = new ExporterGetter() {
+                    public ExportUtils.ExportProvider[] getProviders() { return view.getExportProviders(); }
                 };
             }
         } else if (snapshot instanceof LivenessMemoryResultsSnapshot) {
@@ -134,8 +149,12 @@ public abstract class SnapshotMemoryView extends JPanel {
             dataSetter = new DataSetter() {
                 public void setData(int aggregation) { view.setData((LivenessMemoryResultsSnapshot)snapshot, filter, aggregation); }
             };
+            exporterGetter = new ExporterGetter() {
+                public ExportUtils.ExportProvider[] getProviders() { return view.getExportProviders(); }
+            };
         } else {
             dataSetter = null;
+            exporterGetter = null;
         }
         
         ProfilerToolbar toolbar = ProfilerToolbar.create(true);
@@ -207,6 +226,25 @@ public abstract class SnapshotMemoryView extends JPanel {
     }
     
     
+    public ExportUtils.Exportable getExportable(final File sourceFile) {
+        return new ExportUtils.Exportable() {
+            public String getName() {
+                return "Export Objects";
+            }
+            public ExportUtils.ExportProvider[] getProviders() {
+                ExportUtils.ExportProvider npsProvider = sourceFile == null ? null :
+                    new ExportUtils.NPSExportProvider(sourceFile);
+                ExportUtils.ExportProvider[] providers = exporterGetter.getProviders();
+                
+                List<ExportUtils.ExportProvider> _providers = new ArrayList();
+                if (npsProvider != null) _providers.add(npsProvider);
+                if (providers != null) _providers.addAll(Arrays.asList(providers));
+                return _providers.toArray(new ExportUtils.ExportProvider[_providers.size()]);
+            }
+        };
+    }
+    
+    
     public abstract boolean showSourceSupported();
     
     public abstract void showSource(ClientUtils.SourceCodeSelection value);
@@ -269,5 +307,7 @@ public abstract class SnapshotMemoryView extends JPanel {
     
     
     private static interface DataSetter { void setData(int aggregation); }
+    
+    private static interface ExporterGetter { ExportUtils.ExportProvider[] getProviders(); }
     
 }

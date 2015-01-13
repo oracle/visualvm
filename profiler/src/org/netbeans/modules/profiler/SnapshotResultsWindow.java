@@ -56,7 +56,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import javax.swing.*;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -67,6 +66,7 @@ import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.cpu.SnapshotCPUView;
 import org.netbeans.lib.profiler.ui.memory.SnapshotMemoryView;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.actions.CompareSnapshotsAction;
 import org.netbeans.modules.profiler.api.GoToSource;
@@ -430,11 +430,14 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             
             Action aSave = new SaveSnapshotAction(ls);
             
+            final Action[] aExportPerformer = new Action[1];
             Action aExport = new AbstractAction() {
-                { putValue(NAME, "Export snapshot to file or image");
-                  putValue(SHORT_DESCRIPTION, "Export snapshot to file or image");
+                { putValue(NAME, "Export data to file or image");
+                  putValue(SHORT_DESCRIPTION, "Export data to file or image");
                   putValue(SMALL_ICON, Icons.getIcon(GeneralIcons.SAVE_AS)); }
-                public void actionPerformed(ActionEvent e) { ProfilerDialogs.displayInfo("Export snapshot to file or image"); }
+                public void actionPerformed(ActionEvent e) {
+                    aExportPerformer[0].actionPerformed(e);
+                }
 
             };
             
@@ -442,7 +445,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             
             Action aInfo = new SnapshotInfoAction(ls);
             
-            cpuSnapshot = new SnapshotCPUView(s, sampling, aSave, aExport, null, aCompare, aInfo) {
+            final SnapshotCPUView _cpuSnapshot = new SnapshotCPUView(s, sampling, aSave, aExport, null, aCompare, aInfo) {
                 public boolean showSourceSupported() {
                     return GoToSource.isAvailable();
                 }
@@ -464,6 +467,10 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                     });
                 }
             };
+            
+            aExportPerformer[0] = ExportUtils.exportAction(_cpuSnapshot.getExportable(ls.getFile()), "Export Data", SnapshotResultsWindow.this);
+            
+            cpuSnapshot = _cpuSnapshot;
         }
         
         if (cpuSnapshot != null) add(cpuSnapshot, BorderLayout.CENTER);
@@ -504,11 +511,14 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             
             Action aSave = new SaveSnapshotAction(ls);
             
+            final Action[] aExportPerformer = new Action[1];
             Action aExport = new AbstractAction() {
-                { putValue(NAME, "Export snapshot to file or image");
-                  putValue(SHORT_DESCRIPTION, "Export snapshot to file or image");
+                { putValue(NAME, "Export data to file or image");
+                  putValue(SHORT_DESCRIPTION, "Export data to file or image");
                   putValue(SMALL_ICON, Icons.getIcon(GeneralIcons.SAVE_AS)); }
-                public void actionPerformed(ActionEvent e) { ProfilerDialogs.displayInfo("Export snapshot to file or image"); }
+                public void actionPerformed(ActionEvent e) {
+                    aExportPerformer[0].actionPerformed(e);
+                }
 
             };
             
@@ -516,7 +526,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             
             Action aInfo = new SnapshotInfoAction(ls);
             
-            memorySnapshot = new SnapshotMemoryView(s, filter, aSave, aExport, null, aCompare, aInfo) {
+            final SnapshotMemoryView _memorySnapshot = new SnapshotMemoryView(s, filter, aSave, aExport, null, aCompare, aInfo) {
                 public boolean showSourceSupported() {
                     return GoToSource.isAvailable();
                 }
@@ -536,6 +546,10 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                     });
                 }
             };
+            
+            aExportPerformer[0] = ExportUtils.exportAction(_memorySnapshot.getExportable(ls.getFile()), "Export Data", SnapshotResultsWindow.this);
+            
+            memorySnapshot = _memorySnapshot;
         }
         
         if (memorySnapshot != null) add(memorySnapshot, BorderLayout.CENTER);

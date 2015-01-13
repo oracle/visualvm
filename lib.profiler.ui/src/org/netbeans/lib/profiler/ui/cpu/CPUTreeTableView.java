@@ -60,6 +60,7 @@ import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
@@ -124,6 +125,16 @@ abstract class CPUTreeTableView extends JPanel {
     
     public void refreshSelection() {
         treeTableModel.dataChanged();
+    }
+    
+    
+    ExportUtils.ExportProvider[] getExportProviders() {
+        return treeTable.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
+            new ExportUtils.CSVExportProvider(treeTable),
+            new ExportUtils.HTMLExportProvider(treeTable, "Methods - Call Tree"),
+            new ExportUtils.XMLExportProvider(treeTable, "Methods - Call Tree"),
+            new ExportUtils.PNGExportProvider(treeTable)
+        };
     }
     
     

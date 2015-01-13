@@ -60,6 +60,7 @@ import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.Formatters;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
@@ -187,6 +188,16 @@ abstract class AllocTableView extends JPanel {
     
     public void refreshSelection() {
         tableModel.fireTableDataChanged();
+    }
+    
+    
+    ExportUtils.ExportProvider[] getExportProviders() {
+        return table.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
+            new ExportUtils.CSVExportProvider(table),
+            new ExportUtils.HTMLExportProvider(table, "Allocated Objects"),
+            new ExportUtils.XMLExportProvider(table, "Allocated Objects"),
+            new ExportUtils.PNGExportProvider(table)
+        };
     }
     
     
