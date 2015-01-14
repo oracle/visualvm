@@ -141,7 +141,7 @@ abstract class AllocTreeTableView extends JPanel {
             new ExportUtils.CSVExportProvider(treeTable),
             new ExportUtils.HTMLExportProvider(treeTable, "Allocated Objects"),
             new ExportUtils.XMLExportProvider(treeTable, "Allocated Objects"),
-            new ExportUtils.PNGExportProvider(treeTable)
+            new ExportUtils.PNGExportProvider(treeTable.getParent())
         };
     }
     

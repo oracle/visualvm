@@ -133,7 +133,7 @@ abstract class CPUTreeTableView extends JPanel {
             new ExportUtils.CSVExportProvider(treeTable),
             new ExportUtils.HTMLExportProvider(treeTable, "Methods - Call Tree"),
             new ExportUtils.XMLExportProvider(treeTable, "Methods - Call Tree"),
-            new ExportUtils.PNGExportProvider(treeTable)
+            new ExportUtils.PNGExportProvider(treeTable.getParent())
         };
     }
     

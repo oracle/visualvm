@@ -196,7 +196,7 @@ abstract class AllocTableView extends JPanel {
             new ExportUtils.CSVExportProvider(table),
             new ExportUtils.HTMLExportProvider(table, "Allocated Objects"),
             new ExportUtils.XMLExportProvider(table, "Allocated Objects"),
-            new ExportUtils.PNGExportProvider(table)
+            new ExportUtils.PNGExportProvider(table.getParent())
         };
     }
     

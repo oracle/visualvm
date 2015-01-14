@@ -213,14 +213,17 @@ public final class ExportUtils {
         
     }
     
-    public static class PNGExportProvider extends ProfilerTableExportProvider {
+    public static class PNGExportProvider extends BaseExportProvider {
         
-        public PNGExportProvider(ProfilerTable table) {
-            super(table, PNG_FILTER);
+        private final Component component;
+        
+        public PNGExportProvider(Component component) {
+            super(PNG_FILTER);
+            this.component = component;
         }
         
-        protected void export(ProfilerTable table, final File targetFile) {
-            final BufferedImage image = UIUtils.createScreenshot(table);
+        public void export(final File targetFile) {
+            final BufferedImage image = UIUtils.createScreenshot(component);
             createExecutor(targetFile.getName()).submit(new Runnable() {
                 public void run() {
                     try {

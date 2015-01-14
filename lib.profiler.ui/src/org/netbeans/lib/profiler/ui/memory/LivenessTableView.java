@@ -243,7 +243,7 @@ abstract class LivenessTableView extends JPanel {
             new ExportUtils.CSVExportProvider(table),
             new ExportUtils.HTMLExportProvider(table, "Allocated and Live Objects"),
             new ExportUtils.XMLExportProvider(table, "Allocated and Live Objects"),
-            new ExportUtils.PNGExportProvider(table)
+            new ExportUtils.PNGExportProvider(table.getParent())
         };
     }
     

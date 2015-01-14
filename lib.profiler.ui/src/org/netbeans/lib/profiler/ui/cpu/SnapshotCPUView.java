@@ -44,6 +44,7 @@ package org.netbeans.lib.profiler.ui.cpu;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -88,6 +89,8 @@ public abstract class SnapshotCPUView extends JPanel {
     private CPUTableView tableView;
     private CPUTreeTableView treeTableView;
     
+    private Component viewContainer;
+    
     public SnapshotCPUView(CPUResultsSnapshot snapshot, boolean sampled, Action... actions) {
         this.sampled = sampled;
         this.snapshot = snapshot;
@@ -117,6 +120,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 List<ExportUtils.ExportProvider> _providers = new ArrayList();
                 if (npsProvider != null) _providers.add(npsProvider);
                 if (providers != null) _providers.addAll(Arrays.asList(providers));
+                _providers.add(new ExportUtils.PNGExportProvider(viewContainer));
                 return _providers.toArray(new ExportUtils.ExportProvider[_providers.size()]);
             }
         };
@@ -183,6 +187,7 @@ public abstract class SnapshotCPUView extends JPanel {
         split.setResizeWeight(0.5d);
         
         add(split, BorderLayout.CENTER);
+        viewContainer = split;
         
         ProfilerToolbar toolbar = ProfilerToolbar.create(true);
         

@@ -149,7 +149,7 @@ abstract class CPUTableView extends JPanel {
             new ExportUtils.CSVExportProvider(table),
             new ExportUtils.HTMLExportProvider(table, "Methods - Hot Spots"),
             new ExportUtils.XMLExportProvider(table, "Methods - Hot Spots"),
-            new ExportUtils.PNGExportProvider(table)
+            new ExportUtils.PNGExportProvider(table.getParent())
         };
     }
     

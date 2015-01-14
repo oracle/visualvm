@@ -170,7 +170,7 @@ abstract class SampledTableView extends JPanel {
             new ExportUtils.CSVExportProvider(table),
             new ExportUtils.HTMLExportProvider(table, "Live Objects"),
             new ExportUtils.XMLExportProvider(table, "Live Objects"),
-            new ExportUtils.PNGExportProvider(table)
+            new ExportUtils.PNGExportProvider(table.getParent())
         };
     }
     
