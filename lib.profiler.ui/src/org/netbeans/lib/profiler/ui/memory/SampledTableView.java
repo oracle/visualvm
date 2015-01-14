@@ -55,7 +55,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.memory.HeapHistogram;
+import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.Formatters;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
@@ -107,8 +109,50 @@ abstract class SampledTableView extends JPanel {
         });
     }
     
+    void setData(final SampledMemoryResultsSnapshot snapshot, final int aggregation) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+
+                int totalSize = 0;
+                int totalInstances = 0;
+                
+                int count = snapshot.getNProfiledClasses();
+                
+                int[] counts = snapshot.getObjectsCounts();
+                long[] sizes = snapshot.getObjectsSizePerClass();
+                String[] names = snapshot.getClassNames();
+                
+                data = new HeapHistogram.ClassInfo[count];
+                classNames = new ClientUtils.SourceCodeSelection[count];
+                
+                for (int i = 0; i < count; i++) {
+                    final String name = names[i];
+
+                    final int instances = counts[i];
+                    totalInstances += instances;
+
+                    final long size = sizes[i];
+                    totalSize += size;
+
+                    data[i] = new HeapHistogram.ClassInfo() {
+                        public String getName() { return name; }
+                        public long getInstancesCount() { return instances;}
+                        public long getBytes() { return size;}
+                    };
+                    
+                    classNames[i] = new ClientUtils.SourceCodeSelection(data[i].getName(), Wildcards.ALLWILDCARD, null);
+                }
+
+                renderers[0].setMaxValue(totalSize);
+                renderers[1].setMaxValue(totalInstances);
+
+                tableModel.fireTableDataChanged();
+            }
+        });
+    }
+    
     void resetData() {
-        setData(null);
+        setData((HeapHistogram)null);
     }
     
     
@@ -121,13 +165,23 @@ abstract class SampledTableView extends JPanel {
     }
     
     
+    ExportUtils.ExportProvider[] getExportProviders() {
+        return table.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
+            new ExportUtils.CSVExportProvider(table),
+            new ExportUtils.HTMLExportProvider(table, "Live Objects"),
+            new ExportUtils.XMLExportProvider(table, "Live Objects"),
+            new ExportUtils.PNGExportProvider(table)
+        };
+    }
+    
+    
     protected abstract void performDefaultAction(ClientUtils.SourceCodeSelection value);
     
     protected abstract void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value);
     
-    protected abstract void popupShowing();
+    protected void popupShowing() {};
     
-    protected abstract void popupHidden();
+    protected void popupHidden()  {};
     
     
     private HideableBarRenderer[] renderers;
@@ -159,13 +213,15 @@ abstract class SampledTableView extends JPanel {
             }
         });
         
-        table.setMainColumn(1);
-        table.setFitWidthColumn(1);
+        int offset = selection == null ? -1 : 0;
         
-        table.setSortColumn(2);
-        table.setDefaultSortOrder(1, SortOrder.ASCENDING);
+        table.setMainColumn(1 + offset);
+        table.setFitWidthColumn(1 + offset);
         
-        table.setColumnVisibility(0, false);
+        table.setSortColumn(2 + offset);
+        table.setDefaultSortOrder(1 + offset, SortOrder.ASCENDING);
+        
+        if (selection != null) table.setColumnVisibility(0, false);
         
         renderers = new HideableBarRenderer[2];
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
@@ -174,15 +230,17 @@ abstract class SampledTableView extends JPanel {
         renderers[0].setMaxValue(123456789);
         renderers[1].setMaxValue(12345678);
         
-        table.setColumnRenderer(0, new CheckBoxRenderer());
-        table.setColumnRenderer(1, new JavaNameRenderer());
-        table.setColumnRenderer(2, renderers[0]);
-        table.setColumnRenderer(3, renderers[1]);
+        if (selection != null) table.setColumnRenderer(0, new CheckBoxRenderer());
+        table.setColumnRenderer(1 + offset, new JavaNameRenderer());
+        table.setColumnRenderer(2 + offset, renderers[0]);
+        table.setColumnRenderer(3 + offset, renderers[1]);
         
-        int w = new JLabel(table.getColumnName(0)).getPreferredSize().width;
-        table.setDefaultColumnWidth(0, w + 15);
-        table.setDefaultColumnWidth(2, renderers[0].getOptimalWidth());
-        table.setDefaultColumnWidth(3, renderers[1].getMaxNoBarWidth());
+        if (selection != null) {
+            int w = new JLabel(table.getColumnName(0)).getPreferredSize().width;
+            table.setDefaultColumnWidth(0, w + 15);
+        }
+        table.setDefaultColumnWidth(2 + offset, renderers[0].getOptimalWidth());
+        table.setDefaultColumnWidth(3 + offset, renderers[1].getMaxNoBarWidth());
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(table, false, null);
         
@@ -201,6 +259,8 @@ abstract class SampledTableView extends JPanel {
     private class MemoryTableModel extends AbstractTableModel {
         
         public String getColumnName(int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             if (columnIndex == 1) {
                 return "Name";
             } else if (columnIndex == 2) {
@@ -214,6 +274,8 @@ abstract class SampledTableView extends JPanel {
         }
 
         public Class<?> getColumnClass(int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             if (columnIndex == 1) {
                 return String.class;
             } else if (columnIndex == 0) {
@@ -228,11 +290,13 @@ abstract class SampledTableView extends JPanel {
         }
 
         public int getColumnCount() {
-            return 4;
+            return selection == null ? 3 : 4;
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
             if (data == null) return null;
+            
+            if (selection == null) columnIndex++;
             
             if (columnIndex == 1) {
                 return data[rowIndex].getName();
@@ -249,6 +313,8 @@ abstract class SampledTableView extends JPanel {
         }
 
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             if (columnIndex == 0) {
                 if (Boolean.FALSE.equals(aValue)) selection.remove(classNames[rowIndex]);
                 else selection.add(classNames[rowIndex]);
@@ -256,6 +322,8 @@ abstract class SampledTableView extends JPanel {
         }
 
         public boolean isCellEditable(int rowIndex, int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             return columnIndex == 0;
         }
         
