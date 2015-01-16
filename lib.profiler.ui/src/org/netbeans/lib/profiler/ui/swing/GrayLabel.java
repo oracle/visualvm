@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -41,58 +41,39 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler;
+package org.netbeans.lib.profiler.ui.swing;
 
-import org.openide.util.NbBundle;
-import java.awt.event.ActionEvent;
-import javax.swing.*;
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
+import java.awt.Color;
+import javax.swing.Icon;
+import javax.swing.JLabel;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
-@NbBundle.Messages({
-    "SaveSnapshotAction_ActionName=Save Snapshot",
-    "SaveSnapshotAction_ActionDescr=Save Snapshot to Project"
-})
-class SaveSnapshotAction extends AbstractAction {
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    private final LoadedSnapshot snapshot;
-
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    public SaveSnapshotAction(LoadedSnapshot snapshot) {
-        putValue(Action.NAME, Bundle.SaveSnapshotAction_ActionName());
-        putValue(Action.SHORT_DESCRIPTION, Bundle.SaveSnapshotAction_ActionDescr());
-        putValue(Action.SMALL_ICON, Icons.getIcon(GeneralIcons.SAVE));
-        putValue("iconBase", Icons.getResource(GeneralIcons.SAVE)); // NOI18N
-        this.snapshot = snapshot;
-        updateState();
+/**
+ *
+ * @author Jiri Sedlacek
+ */
+public class GrayLabel extends JLabel {
+    
+    public GrayLabel() { super(); }
+    
+    public GrayLabel(Icon icon) { super(icon); }
+    
+    public GrayLabel(String text) { super(text); }
+    
+    public GrayLabel(Icon icon, int alignment) { super(icon, alignment); }
+    
+    public GrayLabel(String text, int alignment) { super(text, alignment); }
+    
+    public GrayLabel(String text, Icon icon, int alignment) { super(text, icon, alignment); }
+    
+    
+    public Color getForeground() {
+        return UIUtils.getDisabledLineColor();
     }
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public void actionPerformed(ActionEvent e) {
-        new NBSwingWorker() {
-            final private ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.MSG_SavingSnapshot());
-            @Override
-            protected void doInBackground() {
-                ph.setInitialDelay(500);
-                ph.start();
-                ResultsManager.getDefault().saveSnapshot(snapshot);
-            }
-
-            @Override
-            protected void done() {
-                ph.finish();
-                updateState();
-            }
-        }.execute();
+    
+    
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(true); // To workaround the 3D look on some LaFs
     }
-
-    public void updateState() {
-        setEnabled(!snapshot.isSaved());
-    }
+    
 }

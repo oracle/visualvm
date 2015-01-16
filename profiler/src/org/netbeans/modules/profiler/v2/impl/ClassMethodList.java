@@ -66,6 +66,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.ui.swing.SmallButton;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.lib.profiler.utils.formatting.DefaultMethodNameFormatter;
@@ -75,7 +76,6 @@ import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.api.java.SourceMethodInfo;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
-import org.netbeans.modules.profiler.v2.ui.SmallButton;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
