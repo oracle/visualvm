@@ -166,6 +166,9 @@ public class ProfilerTreeTable extends ProfilerTable {
                 comp.setForeground(tree.getForeground());
                 return comp;
             }
+            public String toString() {
+                return renderer.toString();
+            }
         };
     }
     
@@ -716,6 +719,10 @@ public class ProfilerTreeTable extends ProfilerTable {
         
         boolean isChangingModel() {
             return changingModel;
+        }
+        
+        public String toString() {
+            return getCellRenderer().toString();
         }
         
     }
