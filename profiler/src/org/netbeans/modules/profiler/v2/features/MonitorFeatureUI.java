@@ -51,9 +51,9 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.monitor.MonitorView;
+import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.v2.ui.GrayLabel;
 import org.openide.util.NbBundle;
 
 /**
