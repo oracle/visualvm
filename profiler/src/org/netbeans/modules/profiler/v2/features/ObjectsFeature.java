@@ -60,6 +60,8 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.swing.PopupButton;
+import org.netbeans.lib.profiler.ui.swing.SmallButton;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
@@ -70,8 +72,6 @@ import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.impl.WeakProcessor;
-import org.netbeans.modules.profiler.v2.ui.PopupButton;
-import org.netbeans.modules.profiler.v2.ui.SmallButton;
 import org.netbeans.modules.profiler.v2.ui.TitledMenuSeparator;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -119,13 +119,20 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     // --- Configuration -------------------------------------------------------
     
     public boolean supportsConfiguration(Lookup configuration) {
-        return configuration.lookup(SourceClassInfo.class) != null;
+        if (configuration.lookup(SourceClassInfo.class) != null) return true;
+        
+        ClientUtils.SourceCodeSelection sel = configuration.lookup(ClientUtils.SourceCodeSelection.class);
+        return sel != null && Wildcards.ALLWILDCARD.equals(sel.getMethodName());
     }
     
     public void configure(Lookup configuration) {
-        // Handle Profile Class action
+        // Handle Profile Class action from editor
         SourceClassInfo classInfo = configuration.lookup(SourceClassInfo.class);
         if (classInfo != null) selectClassForProfiling(classInfo);
+        
+        // Handle Profile Class action from snapshot
+        ClientUtils.SourceCodeSelection sel = configuration.lookup(ClientUtils.SourceCodeSelection.class);
+        if (sel != null && Wildcards.ALLWILDCARD.equals(sel.getMethodName())) selectForProfiling(sel);
     }
     
     

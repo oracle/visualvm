@@ -40,75 +40,36 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+package org.netbeans.lib.profiler.ui.memory;
 
-package org.netbeans.modules.profiler.v2.ui;
-
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Insets;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JToolBar;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
+import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class SmallButton extends JButton {
+public class MemoryJavaNameRenderer extends JavaNameRenderer {
     
-    protected static final Icon NO_ICON = new Icon() {
-        public int getIconWidth() { return 0; }
-        public int getIconHeight() { return 16; }
-        public void paintIcon(Component c, Graphics g, int x, int y) {}
-    };
-    
-    
-    {
-        setDefaultCapable(false);
-        if (UIUtils.isWindowsLookAndFeel()) setOpaque(false);
-    }
-    
-    
-    public SmallButton() { this(null, null);  }
-
-    public SmallButton(Icon icon) { this(null, icon); }
-
-    public SmallButton(String text) { this(text, null); }
-
-    public SmallButton(Action a) { super(a); }
-
-    public SmallButton(String text, Icon icon) { super(text); setIcon(icon); }
-    
-    
-    public void setIcon(Icon defaultIcon) {
-        if (defaultIcon == null) {
-            defaultIcon = NO_ICON;
-            setIconTextGap(0);
+    public void setValue(Object value, int row) {
+        super.setValue(value, row);
+        
+        if (value instanceof PresoObjAllocCCTNode) {
+            PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)value;
+            
+            if (node.getMethodClassNameAndSig()[2] == null) setIcon(null); // class name
+            else setIcon(Icons.getIcon(ProfilerIcons.NODE_REVERSE)); // method name
         }
-        super.setIcon(defaultIcon);
-    }
-    
-    public Insets getMargin() {
-        Insets margin = super.getMargin();
-        if (margin != null) {
-            if (getParent() instanceof JToolBar) {
-                if (UIUtils.isNimbus()) {
-                    margin.left = margin.top + 3;
-                    margin.right = margin.top + 3;
-                }
-            } else {
-                if (UIUtils.isNimbus()) {
-                    margin.left = margin.top - 6;
-                    margin.right = margin.top - 6;
-                } else {
-                    margin.left = margin.top + 3;
-                    margin.right = margin.top + 3;
-                }
-            }
-        }
-        return margin;
+        
+//        // TODO: <clinit> methods should be displayed with "()" similar to <init>
+//        // PlainFormattableMethodName.getFullFormattedMethod()
+//        
+//        if (getGrayValue().isEmpty()) System.err.println(">> value: " + ((PresoObjAllocCCTNode)value).getMethodClassNameAndSig()[2]);
+//        // TODO: also "Objects allocated by reflection" should be excluded to display icon
+//        if (getGrayValue().isEmpty()) setIcon(null); // class name
+//        else setIcon(Icons.getIcon(ProfilerIcons.NODE_REVERSE)); // method name
     }
     
 }
