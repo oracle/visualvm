@@ -63,6 +63,7 @@ import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
@@ -73,6 +74,8 @@ import org.netbeans.lib.profiler.utils.Wildcards;
  * @author Jiri Sedlacek
  */
 public abstract class SnapshotMemoryView extends JPanel {
+    
+    private final DataView dataView;
     
     private final DataSetter dataSetter;
     private final ExporterGetter exporterGetter;
@@ -90,10 +93,12 @@ public abstract class SnapshotMemoryView extends JPanel {
                     if (showSourceSupported()) showSource(value);
                 }
                 protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                    SnapshotMemoryView.this.populatePopup(popup, value);
+                    SnapshotMemoryView.this.populatePopup(this, popup, value);
                 }
             };
             add(view, BorderLayout.CENTER);
+            
+            dataView = view;
             dataSetter = new DataSetter() {
                 public void setData(int aggregation) { view.setData((SampledMemoryResultsSnapshot)snapshot, aggregation); }
             };
@@ -108,10 +113,12 @@ public abstract class SnapshotMemoryView extends JPanel {
                         if (showSourceSupported()) showSource(value);
                     }
                     protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                        SnapshotMemoryView.this.populatePopup(popup, value);
+                        SnapshotMemoryView.this.populatePopup(this, popup, value);
                     }
                 };
                 add(view, BorderLayout.CENTER);
+                
+                dataView = view;
                 dataSetter = new DataSetter() {
                     public void setData(int aggregation) { view.setData(_snapshot, filter, aggregation); }
                 };
@@ -125,10 +132,12 @@ public abstract class SnapshotMemoryView extends JPanel {
                         if (showSourceSupported()) showSource(value);
                     }
                     protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                        SnapshotMemoryView.this.populatePopup(popup, value);
+                        SnapshotMemoryView.this.populatePopup(this, popup, value);
                     }
                 };
                 add(view, BorderLayout.CENTER);
+                
+                dataView = view;
                 dataSetter = new DataSetter() {
                     public void setData(int aggregation) { view.setData(_snapshot, filter, aggregation); }
                 };
@@ -142,10 +151,12 @@ public abstract class SnapshotMemoryView extends JPanel {
                     if (showSourceSupported()) showSource(value);
                 }
                 protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                    SnapshotMemoryView.this.populatePopup(popup, value);
+                    SnapshotMemoryView.this.populatePopup(this, popup, value);
                 }
             };
             add(view, BorderLayout.CENTER);
+            
+            dataView = view;
             dataSetter = new DataSetter() {
                 public void setData(int aggregation) { view.setData((LivenessMemoryResultsSnapshot)snapshot, filter, aggregation); }
             };
@@ -153,6 +164,7 @@ public abstract class SnapshotMemoryView extends JPanel {
                 public ExportUtils.ExportProvider[] getProviders() { return view.getExportProviders(); }
             };
         } else {
+            dataView = null;
             dataSetter = null;
             exporterGetter = null;
         }
@@ -226,6 +238,15 @@ public abstract class SnapshotMemoryView extends JPanel {
     }
     
     
+    public void activateFilter() {
+        dataView.activateFilter();
+    }
+    
+    public void activateSearch() {
+        dataView.activateSearch();
+    }
+    
+    
     public ExportUtils.Exportable getExportable(final File sourceFile) {
         return new ExportUtils.Exportable() {
             public String getName() {
@@ -277,7 +298,7 @@ public abstract class SnapshotMemoryView extends JPanel {
         return true;
     }
     
-    private void populatePopup(JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
+    private void populatePopup(final DataView invoker, JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
         if (showSourceSupported()) {
             popup.add(new JMenuItem("Go to Source") {
                 { setEnabled(value != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); setFont(getFont().deriveFont(Font.BOLD)); }
@@ -296,6 +317,14 @@ public abstract class SnapshotMemoryView extends JPanel {
         popup.add(new JMenuItem("Profile Class") {
             { setEnabled(value != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW && isSelectable(value, false)); }
             protected void fireActionPerformed(ActionEvent e) { profileClass(value); }
+        });
+        
+        popup.addSeparator();
+        popup.add(new JMenuItem("Filter") {
+            protected void fireActionPerformed(ActionEvent e) { invoker.activateFilter(); }
+        });
+        popup.add(new JMenuItem("Find") {
+            protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
         });
     }
     

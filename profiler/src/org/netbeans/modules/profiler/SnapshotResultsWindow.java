@@ -51,6 +51,8 @@ import org.openide.util.actions.SystemAction;
 import org.openide.windows.TopComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -419,7 +421,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     private void displayCPUResults(final LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
         CPUSnapshotPanel cpuPanel = new CPUSnapshotPanel(getLookup(), ls, sortingColumn, sortingOrder);
         displayedPanel = cpuPanel;
-        updateFind(true, cpuPanel);
+//        updateFind(true, cpuPanel);
         
         JPanel cpuSnapshot = null;
         ResultsSnapshot _snapshot = ls.getSnapshot();
@@ -468,6 +470,14 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                 }
             };
             
+            updateFilter(new Runnable() {
+                public void run() { _cpuSnapshot.activateFilter(); }
+            });
+            
+            updateFind(new Runnable() {
+                public void run() { _cpuSnapshot.activateSearch(); }
+            });
+            
             aExportPerformer[0] = ExportUtils.exportAction(_cpuSnapshot.getExportable(ls.getFile()), "Export Data", SnapshotResultsWindow.this);
             
             cpuSnapshot = _cpuSnapshot;
@@ -481,7 +491,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     }
 
     private void displayCodeRegionResults(LoadedSnapshot ls) {
-        updateFind(false, null);
+        updateFind(null);
 
         FragmentSnapshotPanel codeRegionPanel = new FragmentSnapshotPanel(ls);
         displayedPanel = codeRegionPanel;
@@ -493,7 +503,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     private void displayMemoryResults(final LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
         MemorySnapshotPanel memoryPanel = new MemorySnapshotPanel(getLookup(), ls, sortingColumn, sortingOrder);
         displayedPanel = memoryPanel;
-        updateFind(true, memoryPanel);
+//        updateFind(true, memoryPanel);
         
         JPanel memorySnapshot = null;
         ResultsSnapshot _snapshot = ls.getSnapshot();
@@ -547,6 +557,14 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                 }
             };
             
+            updateFilter(new Runnable() {
+                public void run() { _memorySnapshot.activateFilter(); }
+            });
+            
+            updateFind(new Runnable() {
+                public void run() { _memorySnapshot.activateSearch(); }
+            });
+            
             aExportPerformer[0] = ExportUtils.exportAction(_memorySnapshot.getExportable(ls.getFile()), "Export Data", SnapshotResultsWindow.this);
             
             memorySnapshot = _memorySnapshot;
@@ -563,18 +581,37 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
         forcedClose = true;
         close();
     }
-
-    private void updateFind(boolean enabled, final FindPerformer performer) {
+    
+    private void updateFilter(final Runnable performer) {
+        String FILTER = "filter-action"; // NOI18N
+        InputMap map = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        Action hiderAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { performer.run(); }
+        };
+        getActionMap().put(FILTER, hiderAction);
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK | InputEvent.ALT_MASK), FILTER);
+        
+        
         CallbackSystemAction globalFindAction = (CallbackSystemAction) SystemAction.get(FindAction.class);
         Object findActionKey = globalFindAction.getActionMapKey();
 
-        if (enabled) {
-            getActionMap().put(findActionKey,
-                               new AbstractAction() {
-                    public void actionPerformed(ActionEvent e) {
-                        performer.performFind();
-                    }
-                });
+        if (performer != null) {
+            getActionMap().put(findActionKey, new AbstractAction() {
+                public void actionPerformed(ActionEvent e) { performer.run(); }
+            });
+        } else {
+            getActionMap().remove(findActionKey);
+        }
+    }
+
+    private void updateFind(final Runnable performer) {
+        CallbackSystemAction globalFindAction = (CallbackSystemAction) SystemAction.get(FindAction.class);
+        Object findActionKey = globalFindAction.getActionMapKey();
+
+        if (performer != null) {
+            getActionMap().put(findActionKey, new AbstractAction() {
+                public void actionPerformed(ActionEvent e) { performer.run(); }
+            });
         } else {
             getActionMap().remove(findActionKey);
         }

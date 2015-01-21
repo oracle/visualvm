@@ -48,7 +48,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.swing.AbstractAction;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SortOrder;
@@ -62,7 +61,9 @@ import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTManager;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.Formatters;
+import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
@@ -73,7 +74,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
  *
  * @author Jiri Sedlacek
  */
-abstract class AllocTreeTableView extends JPanel {
+abstract class AllocTreeTableView extends DataView {
     
     private AllocTreeTableModel treeTableModel;
     private ProfilerTreeTable treeTable;
@@ -81,6 +82,9 @@ abstract class AllocTreeTableView extends JPanel {
     public AllocTreeTableView() {
         initUI();
     }
+    
+    
+    protected ProfilerTable getResultsComponent() { return treeTable; }
     
     
     void setData(final AllocMemoryResultsSnapshot snapshot, Collection filter, int aggregation) {

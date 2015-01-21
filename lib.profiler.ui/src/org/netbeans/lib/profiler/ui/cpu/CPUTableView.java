@@ -46,20 +46,25 @@ package org.netbeans.lib.profiler.ui.cpu;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
+import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
@@ -71,12 +76,13 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
  *
  * @author Jiri Sedlacek
  */
-abstract class CPUTableView extends JPanel {
+abstract class CPUTableView extends DataView {
     
     private CPUTableModel tableModel;
     private ProfilerTable table;
     
     private FlatProfileContainer data;
+    private JComponent searchPanel;
     
     private Map<Integer, ClientUtils.SourceCodeSelection> idMap;
     private final Set<ClientUtils.SourceCodeSelection> selection;
@@ -262,6 +268,10 @@ abstract class CPUTableView extends JPanel {
         
         setLayout(new BorderLayout());
         add(tableContainer, BorderLayout.CENTER);
+    }
+    
+    protected ProfilerTable getResultsComponent() {
+        return table;
     }
     
     

@@ -48,7 +48,6 @@ import java.awt.event.ActionEvent;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
@@ -57,6 +56,7 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.memory.HeapHistogram;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.Formatters;
+import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
@@ -70,7 +70,7 @@ import org.netbeans.lib.profiler.utils.Wildcards;
  *
  * @author Jiri Sedlacek
  */
-abstract class SampledTableView extends JPanel {
+abstract class SampledTableView extends DataView {
     
     private MemoryTableModel tableModel;
     private ProfilerTable table;
@@ -86,6 +86,9 @@ abstract class SampledTableView extends JPanel {
         
         initUI();
     }
+    
+    
+    protected ProfilerTable getResultsComponent() { return table; }
     
     
     void setData(final HeapHistogram histogram) {

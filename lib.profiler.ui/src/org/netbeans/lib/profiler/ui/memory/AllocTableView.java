@@ -51,7 +51,6 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
@@ -60,6 +59,7 @@ import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.Formatters;
+import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
@@ -74,7 +74,7 @@ import org.netbeans.lib.profiler.utils.Wildcards;
  *
  * @author Jiri Sedlacek
  */
-abstract class AllocTableView extends JPanel {
+abstract class AllocTableView extends DataView {
     
     private MemoryTableModel tableModel;
     private ProfilerTable table;
@@ -94,6 +94,9 @@ abstract class AllocTableView extends JPanel {
         
         initUI();
     }
+    
+    
+    protected ProfilerTable getResultsComponent() { return table; }
     
     
     void setData(final int _nTrackedItems, final String[] _classNames,
@@ -250,7 +253,7 @@ abstract class AllocTableView extends JPanel {
         if (selection != null) table.setColumnVisibility(0, false);
         
         // Filter out classes with no instances
-        table.setRowFilter(new RowFilter() {
+        table.addRowFilter(new RowFilter() {
             public boolean include(RowFilter.Entry entry) {
                 return !filterZeroItems || ((Number)entry.getValue(3 + offset)).intValue() > 0;
             }

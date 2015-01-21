@@ -69,6 +69,7 @@ import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils.ExportProvider;
@@ -86,6 +87,7 @@ public abstract class SnapshotCPUView extends JPanel {
     
     private int aggregation;
     
+    private DataView lastFocused;
     private CPUTableView tableView;
     private CPUTreeTableView treeTableView;
     
@@ -98,6 +100,25 @@ public abstract class SnapshotCPUView extends JPanel {
         initUI(actions);
         
         setAggregation(CPUResultsSnapshot.METHOD_LEVEL_VIEW);
+    }
+    
+    
+    public void activateFilter() {
+        DataView active = getLastFocused();
+        if (active != null) active.activateFilter();
+    }
+    
+    public void activateSearch() {
+        DataView active = getLastFocused();
+        if (active != null) active.activateSearch();
+    }
+    
+    private DataView getLastFocused() {
+        if (lastFocused == null) {
+            if (treeTableView.isVisible()) lastFocused = treeTableView;
+            else if (tableView.isVisible()) lastFocused = tableView;
+        }
+        return lastFocused;
     }
     
     
@@ -152,18 +173,24 @@ public abstract class SnapshotCPUView extends JPanel {
                 if (showSourceSupported()) showSource(value);
             }
             protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                SnapshotCPUView.this.populatePopup(popup, value);
+                SnapshotCPUView.this.populatePopup(treeTableView, popup, value);
             }
         };
+        treeTableView.notifyOnFocus(new Runnable() {
+            public void run() { lastFocused = treeTableView; }
+        });
         
         tableView = new CPUTableView(null) {
             protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
                 if (showSourceSupported()) showSource(value);
             }
             protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                SnapshotCPUView.this.populatePopup(popup, value);
+                SnapshotCPUView.this.populatePopup(tableView, popup, value);
             }
         };
+        tableView.notifyOnFocus(new Runnable() {
+            public void run() { lastFocused = tableView; }
+        });
         
         JSplitPane split = new JExtendedSplitPane(JSplitPane.VERTICAL_SPLIT) {
             {
@@ -175,7 +202,7 @@ public abstract class SnapshotCPUView extends JPanel {
                     if (divider != null) {
                         Color c = UIUtils.isNimbus() ? UIUtils.getDisabledLineColor() :
                                 new JSeparator().getForeground();
-                        divider.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, c));
+                        divider.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, c));
                     }
                 }
             }
@@ -288,7 +315,7 @@ public abstract class SnapshotCPUView extends JPanel {
 //        setView(true, false);
     }
     
-    private void populatePopup(JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
+    private void populatePopup(final DataView invoker, JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
         if (showSourceSupported()) {
             popup.add(new JMenuItem("Go to Source") {
                 { setEnabled(value != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); setFont(getFont().deriveFont(Font.BOLD)); }
@@ -306,6 +333,15 @@ public abstract class SnapshotCPUView extends JPanel {
             { setEnabled(value != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); }
             protected void fireActionPerformed(ActionEvent e) { profileClass(value); }
         });
+        
+        popup.addSeparator();
+        popup.add(new JMenuItem("Filter") {
+            protected void fireActionPerformed(ActionEvent e) { invoker.activateFilter(); }
+        });
+        popup.add(new JMenuItem("Find") {
+            protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
+        });
+        
     }
     
     private void setView(boolean callTree, boolean hotSpots) {

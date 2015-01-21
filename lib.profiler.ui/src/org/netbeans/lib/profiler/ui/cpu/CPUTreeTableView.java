@@ -46,11 +46,12 @@ package org.netbeans.lib.profiler.ui.cpu;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SortOrder;
@@ -60,7 +61,9 @@ import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
+import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
@@ -74,7 +77,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
  *
  * @author Jiri Sedlacek
  */
-abstract class CPUTreeTableView extends JPanel {
+abstract class CPUTreeTableView extends DataView {
     
     private CPUTreeTableModel treeTableModel;
     private ProfilerTreeTable treeTable;
@@ -252,6 +255,12 @@ abstract class CPUTreeTableView extends JPanel {
         setLayout(new BorderLayout());
         add(tableContainer, BorderLayout.CENTER);
     }
+    
+    
+    protected ProfilerTable getResultsComponent() {
+        return treeTable;
+    }
+    
     
     private long getMaxValue(int row, boolean secondary) {
         TreePath path = treeTable.getPathForRow(row);
