@@ -154,4 +154,8 @@ public class HideableBarRenderer extends MultiRenderer {
         }
     }
     
+    public String toString() {
+        return mainRenderer.toString();
+    }
+    
 }
