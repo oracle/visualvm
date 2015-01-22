@@ -46,21 +46,24 @@ package org.netbeans.lib.profiler.ui.cpu;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
+import org.netbeans.lib.profiler.ui.results.DataView;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
@@ -74,9 +77,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
  *
  * @author Jiri Sedlacek
  */
-abstract class CPUTreeTableView extends JPanel {
-    
-//    private final ProfilerClient client;
+abstract class CPUTreeTableView extends DataView {
     
     private CPUTreeTableModel treeTableModel;
     private ProfilerTreeTable treeTable;
@@ -88,15 +89,14 @@ abstract class CPUTreeTableView extends JPanel {
     private boolean twoTimeStamps;
     
     
-    public CPUTreeTableView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection) {
-//        this.client = client;
+    public CPUTreeTableView(Set<ClientUtils.SourceCodeSelection> selection) {
         this.selection = selection;
         
         initUI();
     }
     
     
-    void setData(final CPUResultsSnapshot newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final boolean _sampled) {
+    void setData(final CPUResultsSnapshot newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final int aggregation, final boolean _sampled) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 boolean structureChange = sampled != _sampled;
@@ -105,11 +105,11 @@ abstract class CPUTreeTableView extends JPanel {
                 idMap = newIdMap;
                 if (treeTableModel != null) {
                     treeTableModel.setRoot(newData == null ? PrestimeCPUCCTNode.EMPTY :
-                                           newData.getRootNode(CPUResultsSnapshot.METHOD_LEVEL_VIEW));
+                                           newData.getRootNode(aggregation));
                 }
                 if (structureChange) {
-                    int col = treeTable.convertColumnIndexToView(4);
-                    String colN = treeTableModel.getColumnName(4);
+                    int col = treeTable.convertColumnIndexToView(selection == null ? 3 : 4);
+                    String colN = treeTableModel.getColumnName(selection == null ? 3 : 4);
                     treeTable.getColumnModel().getColumn(col).setHeaderValue(colN);
                     repaint();
                 }
@@ -118,7 +118,7 @@ abstract class CPUTreeTableView extends JPanel {
     }
     
     public void resetData() {
-        setData(null, null, sampled);
+        setData(null, null, -1, sampled);
     }
     
     
@@ -131,13 +131,23 @@ abstract class CPUTreeTableView extends JPanel {
     }
     
     
+    ExportUtils.ExportProvider[] getExportProviders() {
+        return treeTable.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
+            new ExportUtils.CSVExportProvider(treeTable),
+            new ExportUtils.HTMLExportProvider(treeTable, "Methods - Call Tree"),
+            new ExportUtils.XMLExportProvider(treeTable, "Methods - Call Tree"),
+            new ExportUtils.PNGExportProvider(treeTable.getParent())
+        };
+    }
+    
+    
     protected abstract void performDefaultAction(ClientUtils.SourceCodeSelection value);
     
     protected abstract void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value);
     
-    protected abstract void popupShowing();
+    protected void popupShowing() {};
     
-    protected abstract void popupHidden();
+    protected void popupHidden()  {};
     
     
     private HideableBarRenderer[] renderers;
@@ -145,7 +155,9 @@ abstract class CPUTreeTableView extends JPanel {
     private void initUI() {
         treeTableModel = new CPUTreeTableModel(PrestimeCPUCCTNode.EMPTY);
         
-        treeTable = new ProfilerTreeTable(treeTableModel, true, true, new int[] { 1 }) {
+        int offset = selection == null ? -1 : 0;
+        
+        treeTable = new ProfilerTreeTable(treeTableModel, true, true, new int[] { 1 + offset }) {
             protected ClientUtils.SourceCodeSelection getValueForPopup(int row) {
                 return valueForRow(row);
             }
@@ -173,14 +185,14 @@ abstract class CPUTreeTableView extends JPanel {
         treeTable.setShowsRootHandles(true);
         treeTable.makeTreeAutoExpandable(2);
         
-        treeTable.setMainColumn(1);
-        treeTable.setFitWidthColumn(1);
+        treeTable.setMainColumn(1 + offset);
+        treeTable.setFitWidthColumn(1 + offset);
         
-        treeTable.setSortColumn(2);
-        treeTable.setDefaultSortOrder(1, SortOrder.ASCENDING);
+        treeTable.setSortColumn(2 + offset);
+        treeTable.setDefaultSortOrder(1 + offset, SortOrder.ASCENDING);
         
-        treeTable.setColumnVisibility(0, false);
-        treeTable.setColumnVisibility(4, false);
+        if (selection != null) treeTable.setColumnVisibility(0, false);
+        treeTable.setColumnVisibility(4 + offset, false);
         
         renderers = new HideableBarRenderer[3];
         
@@ -203,7 +215,7 @@ abstract class CPUTreeTableView extends JPanel {
         renderers[1].setMaxValue(refTime);
         renderers[2].setMaxValue(refTime);
         
-        treeTable.setColumnRenderer(0, new CheckBoxRenderer() {
+        if (selection != null) treeTable.setColumnRenderer(0, new CheckBoxRenderer() {
             private boolean visible;
             public void setValue(Object value, int row) {
                 TreePath path = treeTable.getPathForRow(row);
@@ -220,26 +232,35 @@ abstract class CPUTreeTableView extends JPanel {
             }
         });
         treeTable.setTreeCellRenderer(new CPUJavaNameRenderer());
-        treeTable.setColumnRenderer(2, renderers[0]);
-        treeTable.setColumnRenderer(3, renderers[1]);
-        treeTable.setColumnRenderer(4, renderers[2]);
+        treeTable.setColumnRenderer(2 + offset, renderers[0]);
+        treeTable.setColumnRenderer(3 + offset, renderers[1]);
+        treeTable.setColumnRenderer(4 + offset, renderers[2]);
         
-        int w = new JLabel(treeTable.getColumnName(0)).getPreferredSize().width;
-        treeTable.setDefaultColumnWidth(0, w + 15);
-        treeTable.setDefaultColumnWidth(2, renderers[0].getOptimalWidth());
-        treeTable.setDefaultColumnWidth(3, renderers[1].getMaxNoBarWidth());
+        int w;
+        if (selection != null) {
+            w = new JLabel(treeTable.getColumnName(0)).getPreferredSize().width;
+            treeTable.setDefaultColumnWidth(0, w + 15);
+        }
+        treeTable.setDefaultColumnWidth(2 + offset, renderers[0].getOptimalWidth());
+        treeTable.setDefaultColumnWidth(3 + offset, renderers[1].getMaxNoBarWidth());
         
         sampled = !sampled;
-        w = new JLabel(treeTable.getColumnName(4)).getPreferredSize().width;
+        w = new JLabel(treeTable.getColumnName(4 + offset)).getPreferredSize().width;
         sampled = !sampled;
-        w = Math.max(w, new JLabel(treeTable.getColumnName(4)).getPreferredSize().width);
-        treeTable.setDefaultColumnWidth(4, Math.max(renderers[2].getNoBarWidth(), w + 15));
+        w = Math.max(w, new JLabel(treeTable.getColumnName(4 + offset)).getPreferredSize().width);
+        treeTable.setDefaultColumnWidth(4 + offset, Math.max(renderers[2].getNoBarWidth(), w + 15));
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(treeTable, false, null);
         
         setLayout(new BorderLayout());
         add(tableContainer, BorderLayout.CENTER);
     }
+    
+    
+    protected ProfilerTable getResultsComponent() {
+        return treeTable;
+    }
+    
     
     private long getMaxValue(int row, boolean secondary) {
         TreePath path = treeTable.getPathForRow(row);
@@ -282,10 +303,6 @@ abstract class CPUTreeTableView extends JPanel {
         return true;
     }
     
-    static boolean isSelectable(ClientUtils.SourceCodeSelection method) {
-        return !method.getMethodName().endsWith("[native]"); // NOI18N
-    }
-    
     
     private class CPUTreeTableModel extends ProfilerTreeTableModel.Abstract {
         
@@ -294,6 +311,8 @@ abstract class CPUTreeTableView extends JPanel {
         }
         
         public String getColumnName(int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             if (columnIndex == 1) {
                 return "Name";
             } else if (columnIndex == 2) {
@@ -309,6 +328,8 @@ abstract class CPUTreeTableView extends JPanel {
         }
 
         public Class<?> getColumnClass(int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             if (columnIndex == 1) {
                 return JTree.class;
             } else if (columnIndex == 4) {
@@ -321,11 +342,13 @@ abstract class CPUTreeTableView extends JPanel {
         }
 
         public int getColumnCount() {
-            return 5;
+            return selection == null ? 4 : 5;
         }
 
         public Object getValueAt(TreeNode node, int columnIndex) {
             PrestimeCPUCCTNode cpuNode = (PrestimeCPUCCTNode)node;
+            
+            if (selection == null) columnIndex++;
             
             if (columnIndex == 1) {
                 return cpuNode.getNodeName();
@@ -344,6 +367,8 @@ abstract class CPUTreeTableView extends JPanel {
         }
         
         public void setValueAt(Object aValue, TreeNode node, int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             if (columnIndex == 0) {
                 PrestimeCPUCCTNode cpuNode = (PrestimeCPUCCTNode)node;
                 int methodId = cpuNode.getMethodId();
@@ -353,6 +378,7 @@ abstract class CPUTreeTableView extends JPanel {
         }
 
         public boolean isCellEditable(TreeNode node, int columnIndex) {
+            if (selection == null) columnIndex++;
             if (columnIndex != 0) return false;
             return (isSelectable((PrestimeCPUCCTNode)node));
         }

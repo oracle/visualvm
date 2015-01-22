@@ -68,13 +68,12 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
-public abstract class MemoryView extends JPanel {
+public abstract class LiveMemoryView extends JPanel {
     
     private static final int MIN_UPDATE_DIFF = 900;
     private static final int MAX_UPDATE_DIFF = 1400;
     
     private final ProfilerClient client;
-    private final boolean showSourceSupported;
     
     private SampledTableView sampledView;
     private AllocTableView allocView;
@@ -92,7 +91,7 @@ public abstract class MemoryView extends JPanel {
     @ServiceProvider(service=MemoryCCTProvider.Listener.class)
     public static final class ResultsMonitor implements MemoryCCTProvider.Listener {
 
-        private MemoryView view;
+        private LiveMemoryView view;
         
         @Override
         public void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
@@ -100,7 +99,7 @@ public abstract class MemoryView extends JPanel {
                 try {
                     view.refreshData(appRootNode);
                 } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    Logger.getLogger(MemoryView.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(LiveMemoryView.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -113,10 +112,9 @@ public abstract class MemoryView extends JPanel {
         }
     }
        
-    public MemoryView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection, boolean showSourceSupported) {
+    public LiveMemoryView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection) {
         this.client = client;
         this.selection = selection;
-        this.showSourceSupported = showSourceSupported;
         
         initUI();
         rm = Lookup.getDefault().lookup(ResultsMonitor.class);
@@ -307,6 +305,8 @@ public abstract class MemoryView extends JPanel {
     }
     
     
+    public abstract boolean showSourceSupported();
+    
     public abstract void showSource(ClientUtils.SourceCodeSelection value);
     
     public abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
@@ -324,40 +324,40 @@ public abstract class MemoryView extends JPanel {
             case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
                 if (allocView == null) allocView = new AllocTableView(selection) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                        if (showSourceSupported) showSource(value);
+                        if (showSourceSupported()) showSource(value);
                     }
                     protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                        MemoryView.this.populatePopup(popup, value);
+                        LiveMemoryView.this.populatePopup(popup, value);
                     }
-                    protected void popupShowing() { MemoryView.this.popupShowing(); }
-                    protected void popupHidden()  { MemoryView.this.popupHidden(); }
+                    protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
+                    protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
                 };
                 return allocView;
             case CommonConstants.INSTR_OBJECT_LIVENESS:
                 if (livenessView == null) livenessView = new LivenessTableView(selection) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                        if (showSourceSupported) showSource(value);
+                        if (showSourceSupported()) showSource(value);
                     }
                     protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                        MemoryView.this.populatePopup(popup, value);
+                        LiveMemoryView.this.populatePopup(popup, value);
                     }
-                    protected void popupShowing() { MemoryView.this.popupShowing(); }
-                    protected void popupHidden()  { MemoryView.this.popupHidden(); }
+                    protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
+                    protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
                 };
                 return livenessView;
             default:
                 if (sampledView == null) sampledView = new SampledTableView(selection) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                        if (showSourceSupported) showSource(value);
+                        if (showSourceSupported()) showSource(value);
                     }
                     protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                        MemoryView.this.populatePopup(popup, value);
+                        LiveMemoryView.this.populatePopup(popup, value);
                     }
-                    protected void popupShowing() { MemoryView.this.popupShowing(); }
-                    protected void popupHidden()  { MemoryView.this.popupHidden(); }
+                    protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
+                    protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
                 };
                 return sampledView;
-//                return null;
+//                return null;//                return null;
         }
     }
 
@@ -374,7 +374,7 @@ public abstract class MemoryView extends JPanel {
     }
     
     private void populatePopup(JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
-        if (showSourceSupported) {
+        if (showSourceSupported()) {
             popup.add(new JMenuItem("Go to Source") {
                 { setEnabled(value != null); setFont(getFont().deriveFont(Font.BOLD)); }
                 protected void fireActionPerformed(ActionEvent e) { showSource(value); }
