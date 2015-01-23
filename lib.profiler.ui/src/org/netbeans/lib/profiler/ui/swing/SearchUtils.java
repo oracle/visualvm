@@ -73,6 +73,8 @@ import org.netbeans.modules.profiler.api.icons.Icons;
  */
 public final class SearchUtils {
     
+    public static final String FIND_ACTION_KEY = "find-action-key"; // NOI18N
+    
     public static boolean findString(ProfilerTable table, String text, boolean next) {
         int rowCount = table.getRowCount();
         
@@ -108,17 +110,18 @@ public final class SearchUtils {
         int newRow = next ? row + 1 : row - 1;
         
         if (newRow == -1 || newRow == rowCount) {
-            if (notifyMargin && !ProfilerDialogs.displayConfirmation(getEndMessage(next), "Find")) newRow = -1;
-            else newRow = next ? 0 : rowCount - 1;
+//            if (notifyMargin && !ProfilerDialogs.displayConfirmation(getEndMessage(next), "Find")) newRow = -1;
+//            else newRow = next ? 0 : rowCount - 1;
+            newRow = next ? 0 : rowCount - 1;
         }
         
         return newRow;
     }
     
-    private static String getEndMessage(boolean next) {
-        return next ? "Reached end of view. Continue from top?" :
-                      "Reached top of view. Continue from end?";
-    }
+//    private static String getEndMessage(boolean next) {
+//        return next ? "Reached end of view. Continue from top?" :
+//                      "Reached top of view. Continue from end?";
+//    }
     
     
     public static JComponent createSearchPanel(final ProfilerTable table) {
@@ -193,6 +196,10 @@ public final class SearchUtils {
         });
         
         final JPanel panel = new JPanel(new BorderLayout()) {
+            public void setVisible(boolean visible) {
+                super.setVisible(visible);
+                if (!visible) table.requestFocusInWindow();
+            }
             public boolean requestFocusInWindow() {
                 if (textC != null) textC.selectAll();
                 return combo.requestFocusInWindow();

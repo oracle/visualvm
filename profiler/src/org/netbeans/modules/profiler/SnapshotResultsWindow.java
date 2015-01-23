@@ -51,6 +51,7 @@ import org.openide.util.actions.SystemAction;
 import org.openide.windows.TopComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -69,6 +70,7 @@ import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.cpu.SnapshotCPUView;
 import org.netbeans.lib.profiler.ui.memory.SnapshotMemoryView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.actions.CompareSnapshotsAction;
 import org.netbeans.modules.profiler.api.GoToSource;
@@ -470,13 +472,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                 }
             };
             
-            updateFilter(new Runnable() {
-                public void run() { _cpuSnapshot.activateFilter(); }
-            });
-            
-            updateFind(new Runnable() {
-                public void run() { _cpuSnapshot.activateSearch(); }
-            });
+            registerActions(_cpuSnapshot);
             
             aExportPerformer[0] = ExportUtils.exportAction(_cpuSnapshot.getExportable(ls.getFile()), "Export Data", SnapshotResultsWindow.this);
             
@@ -491,8 +487,6 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     }
 
     private void displayCodeRegionResults(LoadedSnapshot ls) {
-        updateFind(null);
-
         FragmentSnapshotPanel codeRegionPanel = new FragmentSnapshotPanel(ls);
         displayedPanel = codeRegionPanel;
         add(codeRegionPanel, BorderLayout.CENTER);
@@ -557,13 +551,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                 }
             };
             
-            updateFilter(new Runnable() {
-                public void run() { _memorySnapshot.activateFilter(); }
-            });
-            
-            updateFind(new Runnable() {
-                public void run() { _memorySnapshot.activateSearch(); }
-            });
+            registerActions(_memorySnapshot);
             
             aExportPerformer[0] = ExportUtils.exportAction(_memorySnapshot.getExportable(ls.getFile()), "Export Data", SnapshotResultsWindow.this);
             
@@ -582,39 +570,33 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
         close();
     }
     
-    private void updateFilter(final Runnable performer) {
-        String FILTER = "filter-action"; // NOI18N
-        InputMap map = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        Action hiderAction = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) { performer.run(); }
+    private void registerActions(final JComponent view) {
+        final String FILTER = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        final ActionListener filter = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Action action = view.getActionMap().get(FILTER);
+                if (action != null && action.isEnabled()) action.actionPerformed(e);
+            }
         };
-        getActionMap().put(FILTER, hiderAction);
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK | InputEvent.ALT_MASK), FILTER);
+        InputMap map = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        Action filterAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { filter.actionPerformed(e); }
+        };
+        getActionMap().put(FILTER, filterAction);
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK), FILTER);
         
-        
+        final ActionListener find = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String FIND = SearchUtils.FIND_ACTION_KEY;
+                Action action = view.getActionMap().get(FIND);
+                if (action != null && action.isEnabled()) action.actionPerformed(null);
+            }
+        };
         CallbackSystemAction globalFindAction = (CallbackSystemAction) SystemAction.get(FindAction.class);
         Object findActionKey = globalFindAction.getActionMapKey();
-
-        if (performer != null) {
-            getActionMap().put(findActionKey, new AbstractAction() {
-                public void actionPerformed(ActionEvent e) { performer.run(); }
-            });
-        } else {
-            getActionMap().remove(findActionKey);
-        }
-    }
-
-    private void updateFind(final Runnable performer) {
-        CallbackSystemAction globalFindAction = (CallbackSystemAction) SystemAction.get(FindAction.class);
-        Object findActionKey = globalFindAction.getActionMapKey();
-
-        if (performer != null) {
-            getActionMap().put(findActionKey, new AbstractAction() {
-                public void actionPerformed(ActionEvent e) { performer.run(); }
-            });
-        } else {
-            getActionMap().remove(findActionKey);
-        }
+        getActionMap().put(findActionKey, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { find.actionPerformed(e); }
+        });
     }
 
     private void updateSaveState() {

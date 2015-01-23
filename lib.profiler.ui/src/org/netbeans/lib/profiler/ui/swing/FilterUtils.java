@@ -72,6 +72,8 @@ import org.netbeans.modules.profiler.api.icons.Icons;
  */
 public final class FilterUtils {
     
+    public static final String FILTER_ACTION_KEY = "filter-action-key"; // NOI18N
+    
     public static boolean filterContains(ProfilerTable table, final String text) {
         final int mainColumn = table.getMainColumn();
         
@@ -145,6 +147,10 @@ public final class FilterUtils {
         });
         
         final JPanel panel = new JPanel(new BorderLayout()) {
+            public void setVisible(boolean visible) {
+                super.setVisible(visible);
+                if (!visible) table.requestFocusInWindow();
+            }
             public boolean requestFocusInWindow() {
                 if (textC != null) textC.selectAll();
                 return combo.requestFocusInWindow();
@@ -176,7 +182,6 @@ public final class FilterUtils {
         
         if (textC != null) {
             map = textC.getInputMap();
-            String FILTER = "filter-action"; // NOI18N
             Action nextAction = new AbstractAction() {
                 public void actionPerformed(final ActionEvent e) {
                     SwingUtilities.invokeLater(new Runnable() {
@@ -184,8 +189,8 @@ public final class FilterUtils {
                     });
                 }
             };
-            textC.getActionMap().put(FILTER, nextAction);
-            map.put(filterKey, FILTER);
+            textC.getActionMap().put(FILTER_ACTION_KEY, nextAction);
+            map.put(filterKey, FILTER_ACTION_KEY);
         }
         
         return panel;

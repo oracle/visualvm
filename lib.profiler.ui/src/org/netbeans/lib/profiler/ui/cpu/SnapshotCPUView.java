@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -73,7 +74,9 @@ import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils.ExportProvider;
+import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 
 /**
@@ -98,27 +101,9 @@ public abstract class SnapshotCPUView extends JPanel {
         this.snapshot = snapshot;
         
         initUI(actions);
+        registerActions();
         
         setAggregation(CPUResultsSnapshot.METHOD_LEVEL_VIEW);
-    }
-    
-    
-    public void activateFilter() {
-        DataView active = getLastFocused();
-        if (active != null) active.activateFilter();
-    }
-    
-    public void activateSearch() {
-        DataView active = getLastFocused();
-        if (active != null) active.activateSearch();
-    }
-    
-    private DataView getLastFocused() {
-        if (lastFocused == null) {
-            if (treeTableView.isVisible()) lastFocused = treeTableView;
-            else if (tableView.isVisible()) lastFocused = tableView;
-        }
-        return lastFocused;
     }
     
     
@@ -313,6 +298,35 @@ public abstract class SnapshotCPUView extends JPanel {
         
 //        // TODO: read last state?
 //        setView(true, false);
+    }
+    
+    private void registerActions() {
+        ActionMap map = getActionMap();
+        
+        map.put(FilterUtils.FILTER_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                DataView active = getLastFocused();
+                if (active != null) active.activateFilter();
+            }
+        });
+        
+        map.put(SearchUtils.FIND_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                DataView active = getLastFocused();
+                if (active != null) active.activateSearch();
+            }
+        });
+    }
+    
+    private DataView getLastFocused() {
+        if (lastFocused != null && !lastFocused.isShowing()) lastFocused = null;
+        
+        if (lastFocused == null) {
+            if (treeTableView.isShowing()) lastFocused = treeTableView;
+            else if (tableView.isShowing()) lastFocused = tableView;
+        }
+        
+        return lastFocused;
     }
     
     private void populatePopup(final DataView invoker, JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {

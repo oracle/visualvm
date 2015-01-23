@@ -89,15 +89,18 @@ public abstract class DataView extends JPanel {
 //    }
     
     public void activateFilter() {
+        JComponent panel = getBottomPanel();
+        
         if (filterPanel == null) {
             filterPanel = FilterUtils.createFilterPanel(getResultsComponent());
-            getBottomPanel().add(filterPanel);
-            invalidate();
-            revalidate();
-            repaint();
+            panel.add(filterPanel);
+            Container parent = panel.getParent();
+            parent.invalidate();
+            parent.revalidate();
+            parent.repaint();
         }
         
-        getBottomPanel().setVisible(true);
+        panel.setVisible(true);
         
         filterPanel.setVisible(true);
         filterPanel.requestFocusInWindow();
@@ -109,18 +112,30 @@ public abstract class DataView extends JPanel {
 //    }
     
     public void activateSearch() {
+        JComponent panel = getBottomPanel();
+        
         if (searchPanel == null) {
             searchPanel = SearchUtils.createSearchPanel(getResultsComponent());
-            getBottomPanel().add(searchPanel);
-            invalidate();
-            revalidate();
-            repaint();
+            panel.add(searchPanel);
+            Container parent = panel.getParent();
+            parent.invalidate();
+            parent.revalidate();
+            parent.repaint();
         }
         
-        getBottomPanel().setVisible(true);
+        panel.setVisible(true);
         
         searchPanel.setVisible(true);
         searchPanel.requestFocusInWindow();
+    }
+    
+    
+    protected boolean hasBottomFilterFindMargin() {
+        return false;
+    }
+    
+    protected void addFilterFindPanel(JComponent comp) {
+        add(comp, BorderLayout.SOUTH);
     }
     
     
@@ -129,7 +144,7 @@ public abstract class DataView extends JPanel {
             bottomPanel = new JPanel(new FilterFindLayout());
             bottomPanel.setOpaque(true);
             bottomPanel.setBackground(UIManager.getColor("controlShadow")); // NOI18N
-            add(bottomPanel, BorderLayout.SOUTH);
+            addFilterFindPanel(bottomPanel);
         }
         return bottomPanel;
     }
@@ -160,6 +175,9 @@ public abstract class DataView extends JPanel {
                 dim = search.getPreferredSize();
             }
             
+            if ((filter != null || search != null) && hasBottomFilterFindMargin())
+                dim.height += 1;
+            
             return dim;
         }
 
@@ -183,6 +201,9 @@ public abstract class DataView extends JPanel {
                 dim = search.getMinimumSize();
             }
             
+            if ((filter != null || search != null) && hasBottomFilterFindMargin())
+                dim.height += 1;
+            
             return dim;
         }
 
@@ -193,17 +214,19 @@ public abstract class DataView extends JPanel {
             JComponent search = searchPanel;
             if (search != null && !search.isVisible()) search = null;
             
+            int bottomOffset = hasBottomFilterFindMargin() ? 1 : 0;
+            
             if (filter != null && search != null) {
                 Dimension size = parent.getSize();
                 int w = (size.width - 1) / 2;
-                filter.setBounds(0, 0, w, size.height);
-                search.setBounds(w + 1, 0, size.width - w - 1, size.height);
+                filter.setBounds(0, 0, w, size.height - bottomOffset);
+                search.setBounds(w + 1, 0, size.width - w - 1, size.height - bottomOffset);
             } else if (filter != null) {
                 Dimension size = parent.getSize();
-                filter.setBounds(0, 0, size.width, size.height);
+                filter.setBounds(0, 0, size.width, size.height - bottomOffset);
             } else if (search != null) {
                 Dimension size = parent.getSize();
-                search.setBounds(0, 0, size.width, size.height);
+                search.setBounds(0, 0, size.width, size.height - bottomOffset);
             }
         }
         

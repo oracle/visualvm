@@ -52,6 +52,7 @@ import java.util.Collection;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -66,7 +67,9 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 
 /**
@@ -235,15 +238,20 @@ public abstract class SnapshotMemoryView extends JPanel {
         add(toolbar.getComponent(), BorderLayout.NORTH);
         
         setAggregation(CPUResultsSnapshot.CLASS_LEVEL_VIEW);
+        
+        registerActions();
     }
     
-    
-    public void activateFilter() {
-        dataView.activateFilter();
-    }
-    
-    public void activateSearch() {
-        dataView.activateSearch();
+    private void registerActions() {
+        ActionMap map = getActionMap();
+        
+        map.put(FilterUtils.FILTER_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { dataView.activateFilter(); }
+        });
+        
+        map.put(SearchUtils.FIND_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { dataView.activateSearch(); }
+        });
     }
     
     

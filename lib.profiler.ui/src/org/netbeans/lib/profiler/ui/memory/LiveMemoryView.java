@@ -49,6 +49,8 @@ import java.awt.event.ActionEvent;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -60,6 +62,9 @@ import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.memory.HeapHistogram;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
+import org.netbeans.lib.profiler.ui.results.DataView;
+import org.netbeans.lib.profiler.ui.swing.FilterUtils;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
@@ -79,7 +84,7 @@ public abstract class LiveMemoryView extends JPanel {
     private AllocTableView allocView;
     private LivenessTableView livenessView;
     
-    private JPanel currentView;
+    private DataView currentView;
     private long lastupdate;
     private volatile boolean paused;
     private volatile boolean forceRefresh;
@@ -316,7 +321,7 @@ public abstract class LiveMemoryView extends JPanel {
     public void popupHidden() {};
     
     
-    private JPanel getView() {
+    private DataView getView() {
         switch (client.getCurrentInstrType()) {
 //            case CommonConstants.INSTR_NONE_MEMORY_SAMPLING:
 //                if (sampledView == null) sampledView = new SampledTableView();
@@ -327,10 +332,11 @@ public abstract class LiveMemoryView extends JPanel {
                         if (showSourceSupported()) showSource(value);
                     }
                     protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                        LiveMemoryView.this.populatePopup(popup, value);
+                        LiveMemoryView.this.populatePopup(allocView, popup, value);
                     }
                     protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
                     protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
+                    protected boolean hasBottomFilterFindMargin() { return true; }
                 };
                 return allocView;
             case CommonConstants.INSTR_OBJECT_LIVENESS:
@@ -339,10 +345,11 @@ public abstract class LiveMemoryView extends JPanel {
                         if (showSourceSupported()) showSource(value);
                     }
                     protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                        LiveMemoryView.this.populatePopup(popup, value);
+                        LiveMemoryView.this.populatePopup(livenessView, popup, value);
                     }
                     protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
                     protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
+                    protected boolean hasBottomFilterFindMargin() { return true; }
                 };
                 return livenessView;
             default:
@@ -351,10 +358,11 @@ public abstract class LiveMemoryView extends JPanel {
                         if (showSourceSupported()) showSource(value);
                     }
                     protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                        LiveMemoryView.this.populatePopup(popup, value);
+                        LiveMemoryView.this.populatePopup(sampledView, popup, value);
                     }
                     protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
                     protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
+                    protected boolean hasBottomFilterFindMargin() { return true; }
                 };
                 return sampledView;
 //                return null;//                return null;
@@ -362,7 +370,7 @@ public abstract class LiveMemoryView extends JPanel {
     }
 
     private void updateCurrentView() {
-        JPanel newView = getView();
+        DataView newView = getView();
         if (newView != currentView) {
             removeAll();
             resetData();
@@ -373,7 +381,7 @@ public abstract class LiveMemoryView extends JPanel {
         }
     }
     
-    private void populatePopup(JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
+    private void populatePopup(final DataView invoker, JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
         if (showSourceSupported()) {
             popup.add(new JMenuItem("Go to Source") {
                 { setEnabled(value != null); setFont(getFont().deriveFont(Font.BOLD)); }
@@ -386,6 +394,14 @@ public abstract class LiveMemoryView extends JPanel {
             { setEnabled(value != null); }
             protected void fireActionPerformed(ActionEvent e) { selectForProfiling(value); }
         });
+        
+        popup.addSeparator();
+        popup.add(new JMenuItem("Filter") {
+            protected void fireActionPerformed(ActionEvent e) { invoker.activateFilter(); }
+        });
+        popup.add(new JMenuItem("Find") {
+            protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
+        });
     }
     
     
@@ -397,6 +413,20 @@ public abstract class LiveMemoryView extends JPanel {
         add(currentView, BorderLayout.CENTER);
         revalidate();
         repaint();
+        
+        registerActions();
+    }
+    
+    private void registerActions() {
+        ActionMap map = getActionMap();
+        
+        map.put(FilterUtils.FILTER_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { currentView.activateFilter(); }
+        });
+        
+        map.put(SearchUtils.FIND_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { currentView.activateSearch(); }
+        });
     }
     
 }

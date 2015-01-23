@@ -52,6 +52,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -70,6 +72,9 @@ import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
 import org.netbeans.lib.profiler.ui.memory.LiveMemoryView;
+import org.netbeans.lib.profiler.ui.results.DataView;
+import org.netbeans.lib.profiler.ui.swing.FilterUtils;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
@@ -86,8 +91,10 @@ public abstract class LiveCPUView extends JPanel {
     private final ProfilerClient client;
     private final ResultsMonitor rm;
     
+    private DataView lastFocused;
     private CPUTableView tableView;
     private CPUTreeTableView treeTableView;
+    
     private long lastupdate;
     private volatile boolean paused;
     private volatile boolean forceRefresh;
@@ -120,6 +127,8 @@ public abstract class LiveCPUView extends JPanel {
         this.client = client;
         
         initUI(selection);
+        registerActions();
+        
         rm = Lookup.getDefault().lookup(ResultsMonitor.class);
         rm.view = this;
     }
@@ -228,22 +237,30 @@ public abstract class LiveCPUView extends JPanel {
                 if (showSourceSupported()) showSource(value);
             }
             protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                LiveCPUView.this.populatePopup(popup, value);
+                LiveCPUView.this.populatePopup(treeTableView, popup, value);
             }
             protected void popupShowing() { LiveCPUView.this.popupShowing(); }
             protected void popupHidden()  { LiveCPUView.this.popupHidden(); }
+            protected boolean hasBottomFilterFindMargin() { return true; }
         };
+        treeTableView.notifyOnFocus(new Runnable() {
+            public void run() { lastFocused = treeTableView; }
+        });
         
         tableView = new CPUTableView(selection) {
             protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
                 if (showSourceSupported()) showSource(value);
             }
             protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                LiveCPUView.this.populatePopup(popup, value);
+                LiveCPUView.this.populatePopup(tableView, popup, value);
             }
             protected void popupShowing() { LiveCPUView.this.popupShowing(); }
             protected void popupHidden()  { LiveCPUView.this.popupHidden(); }
+            protected boolean hasBottomFilterFindMargin() { return true; }
         };
+        tableView.notifyOnFocus(new Runnable() {
+            public void run() { lastFocused = tableView; }
+        });
         
         JSplitPane split = new JExtendedSplitPane(JSplitPane.VERTICAL_SPLIT) {
             {
@@ -272,7 +289,36 @@ public abstract class LiveCPUView extends JPanel {
 //        setView(true, false);
     }
     
-    private void populatePopup(JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
+    private void registerActions() {
+        ActionMap map = getActionMap();
+        
+        map.put(FilterUtils.FILTER_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                DataView active = getLastFocused();
+                if (active != null) active.activateFilter();
+            }
+        });
+        
+        map.put(SearchUtils.FIND_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                DataView active = getLastFocused();
+                if (active != null) active.activateSearch();
+            }
+        });
+    }
+    
+    private DataView getLastFocused() {
+        if (lastFocused != null && !lastFocused.isShowing()) lastFocused = null;
+        
+        if (lastFocused == null) {
+            if (treeTableView.isShowing()) lastFocused = treeTableView;
+            else if (tableView.isShowing()) lastFocused = tableView;
+        }
+        
+        return lastFocused;
+    }
+    
+    private void populatePopup(final DataView invoker, JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
         if (showSourceSupported()) {
             popup.add(new JMenuItem("Go to Source") {
                 { setEnabled(value != null); setFont(getFont().deriveFont(Font.BOLD)); }
@@ -289,6 +335,14 @@ public abstract class LiveCPUView extends JPanel {
         popup.add(new JMenuItem("Profile Class") {
             { setEnabled(value != null); }
             protected void fireActionPerformed(ActionEvent e) { profileClass(value); }
+        });
+        
+        popup.addSeparator();
+        popup.add(new JMenuItem("Filter") {
+            protected void fireActionPerformed(ActionEvent e) { invoker.activateFilter(); }
+        });
+        popup.add(new JMenuItem("Find") {
+            protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
         });
     }
     

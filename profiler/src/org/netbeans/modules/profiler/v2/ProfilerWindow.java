@@ -51,22 +51,30 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
 import javax.swing.MenuElement;
 import javax.swing.MenuSelectionManager;
 import javax.swing.SwingUtilities;
@@ -79,6 +87,7 @@ import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.RunGCAction;
@@ -94,11 +103,14 @@ import org.netbeans.modules.profiler.v2.impl.WelcomePanel;
 import org.netbeans.modules.profiler.v2.ui.DropdownButton;
 import org.netbeans.modules.profiler.v2.ui.StayOpenPopupMenu;
 import org.netbeans.modules.profiler.v2.ui.ToggleButtonMenuItem;
+import org.openide.actions.FindAction;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
+import org.openide.util.actions.CallbackSystemAction;
+import org.openide.util.actions.SystemAction;
 import org.openide.windows.Mode;
 import org.openide.windows.WindowManager;
 
@@ -277,6 +289,45 @@ class ProfilerWindow extends ProfilerTopComponent {
             }
         });
         updateButtons();
+        
+        registerActions();
+    }
+    
+    private void registerActions() {
+        final String FILTER = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        final ActionListener filter = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ProfilerFeature feature = featuresView.getSelectedFeature();
+                JPanel resultsUI = feature == null ? null : feature.getResultsUI();
+                if (resultsUI == null) return;
+                
+                Action action = resultsUI.getActionMap().get(FILTER);
+                if (action != null && action.isEnabled()) action.actionPerformed(e);
+            }
+        };
+        InputMap map = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        Action filterAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { filter.actionPerformed(e); }
+        };
+        getActionMap().put(FILTER, filterAction);
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK), FILTER);
+        
+        final ActionListener find = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String FIND = SearchUtils.FIND_ACTION_KEY;
+                ProfilerFeature feature = featuresView.getSelectedFeature();
+                JPanel resultsUI = feature == null ? null : feature.getResultsUI();
+                if (resultsUI == null) return;
+                
+                Action action = resultsUI.getActionMap().get(FIND);
+                if (action != null && action.isEnabled()) action.actionPerformed(null);
+            }
+        };
+        CallbackSystemAction globalFindAction = (CallbackSystemAction) SystemAction.get(FindAction.class);
+        Object findActionKey = globalFindAction.getActionMapKey();
+        getActionMap().put(findActionKey, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { find.actionPerformed(e); }
+        });
     }
     
     
