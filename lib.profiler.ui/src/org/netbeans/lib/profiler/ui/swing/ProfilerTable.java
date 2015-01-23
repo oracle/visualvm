@@ -203,6 +203,9 @@ public class ProfilerTable extends JTable {
                 renderer.setValue(value, table.convertRowIndexToModel(row));
                 return renderer.getComponent();
             }
+            public String toString() {
+                return renderer.toString();
+            }
         };
     }
     
@@ -334,6 +337,18 @@ public class ProfilerTable extends JTable {
     
     final boolean isCustomRendering() {
         return isCustomRendering;
+    }
+    
+    // --- String value --------------------------------------------------------
+    
+    public String getStringValue(int row, int column) {
+        TableCellRenderer renderer = getCellRenderer(row, column);
+        if (renderer instanceof ProfilerRenderer) {
+            ((ProfilerRenderer)renderer).setValue(renderer, row);
+        } else {
+            prepareRenderer(renderer, row, column);
+        }
+        return renderer.toString();
     }
     
     // --- Main column ---------------------------------------------------------
@@ -761,6 +776,14 @@ public class ProfilerTable extends JTable {
     }
     
     // --- Row filter ----------------------------------------------------------
+    
+    public void addRowFilter(RowFilter filter) {
+        _getRowSorter().addRowFilter(filter);
+    }
+    
+    public void removeRowFilter(RowFilter filter) {
+        _getRowSorter().removeRowFilter(filter);
+    }
     
     public void setRowFilter(RowFilter filter) {
         _getRowSorter().setRowFilter(filter);

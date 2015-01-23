@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -41,58 +41,74 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler;
+package org.netbeans.lib.profiler.ui.swing;
 
-import org.openide.util.NbBundle;
-import java.awt.event.ActionEvent;
-import javax.swing.*;
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Insets;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JToolBar;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
-@NbBundle.Messages({
-    "SaveSnapshotAction_ActionName=Save Snapshot",
-    "SaveSnapshotAction_ActionDescr=Save Snapshot to Project"
-})
-class SaveSnapshotAction extends AbstractAction {
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    private final LoadedSnapshot snapshot;
-
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    public SaveSnapshotAction(LoadedSnapshot snapshot) {
-        putValue(Action.NAME, Bundle.SaveSnapshotAction_ActionName());
-        putValue(Action.SHORT_DESCRIPTION, Bundle.SaveSnapshotAction_ActionDescr());
-        putValue(Action.SMALL_ICON, Icons.getIcon(GeneralIcons.SAVE));
-        putValue("iconBase", Icons.getResource(GeneralIcons.SAVE)); // NOI18N
-        this.snapshot = snapshot;
-        updateState();
+/**
+ *
+ * @author Jiri Sedlacek
+ */
+public class SmallButton extends JButton {
+    
+    protected static final Icon NO_ICON = new Icon() {
+        public int getIconWidth() { return 0; }
+        public int getIconHeight() { return 16; }
+        public void paintIcon(Component c, Graphics g, int x, int y) {}
+    };
+    
+    
+    {
+        setDefaultCapable(false);
+        if (UIUtils.isWindowsLookAndFeel()) setOpaque(false);
     }
+    
+    
+    public SmallButton() { this(null, null);  }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+    public SmallButton(Icon icon) { this(null, icon); }
 
-    public void actionPerformed(ActionEvent e) {
-        new NBSwingWorker() {
-            final private ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.MSG_SavingSnapshot());
-            @Override
-            protected void doInBackground() {
-                ph.setInitialDelay(500);
-                ph.start();
-                ResultsManager.getDefault().saveSnapshot(snapshot);
+    public SmallButton(String text) { this(text, null); }
+
+    public SmallButton(Action a) { super(a); }
+
+    public SmallButton(String text, Icon icon) { super(text); setIcon(icon); }
+    
+    
+    public void setIcon(Icon defaultIcon) {
+        if (defaultIcon == null) {
+            defaultIcon = NO_ICON;
+            setIconTextGap(0);
+        }
+        super.setIcon(defaultIcon);
+    }
+    
+    public Insets getMargin() {
+        Insets margin = super.getMargin();
+        if (margin != null) {
+            if (getParent() instanceof JToolBar) {
+                if (UIUtils.isNimbus()) {
+                    margin.left = margin.top + 3;
+                    margin.right = margin.top + 3;
+                }
+            } else {
+                if (UIUtils.isNimbus()) {
+                    margin.left = margin.top - 6;
+                    margin.right = margin.top - 6;
+                } else {
+                    margin.left = margin.top + 3;
+                    margin.right = margin.top + 3;
+                }
             }
-
-            @Override
-            protected void done() {
-                ph.finish();
-                updateState();
-            }
-        }.execute();
+        }
+        return margin;
     }
-
-    public void updateState() {
-        setEnabled(!snapshot.isSaved());
-    }
+    
 }

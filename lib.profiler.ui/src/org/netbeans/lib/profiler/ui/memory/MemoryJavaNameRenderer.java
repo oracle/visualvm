@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -40,59 +40,36 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+package org.netbeans.lib.profiler.ui.memory;
 
-package org.netbeans.modules.profiler;
-
-import org.openide.util.NbBundle;
-import java.awt.event.ActionEvent;
-import javax.swing.*;
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
+import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.ui.NBSwingWorker;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
-@NbBundle.Messages({
-    "SaveSnapshotAction_ActionName=Save Snapshot",
-    "SaveSnapshotAction_ActionDescr=Save Snapshot to Project"
-})
-class SaveSnapshotAction extends AbstractAction {
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-    private final LoadedSnapshot snapshot;
-
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    public SaveSnapshotAction(LoadedSnapshot snapshot) {
-        putValue(Action.NAME, Bundle.SaveSnapshotAction_ActionName());
-        putValue(Action.SHORT_DESCRIPTION, Bundle.SaveSnapshotAction_ActionDescr());
-        putValue(Action.SMALL_ICON, Icons.getIcon(GeneralIcons.SAVE));
-        putValue("iconBase", Icons.getResource(GeneralIcons.SAVE)); // NOI18N
-        this.snapshot = snapshot;
-        updateState();
+/**
+ *
+ * @author Jiri Sedlacek
+ */
+public class MemoryJavaNameRenderer extends JavaNameRenderer {
+    
+    public void setValue(Object value, int row) {
+        super.setValue(value, row);
+        
+        if (value instanceof PresoObjAllocCCTNode) {
+            PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)value;
+            
+            if (node.getMethodClassNameAndSig()[2] == null) setIcon(null); // class name
+            else setIcon(Icons.getIcon(ProfilerIcons.NODE_REVERSE)); // method name
+        }
+        
+//        // TODO: <clinit> methods should be displayed with "()" similar to <init>
+//        // PlainFormattableMethodName.getFullFormattedMethod()
+//        
+//        if (getGrayValue().isEmpty()) System.err.println(">> value: " + ((PresoObjAllocCCTNode)value).getMethodClassNameAndSig()[2]);
+//        // TODO: also "Objects allocated by reflection" should be excluded to display icon
+//        if (getGrayValue().isEmpty()) setIcon(null); // class name
+//        else setIcon(Icons.getIcon(ProfilerIcons.NODE_REVERSE)); // method name
     }
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public void actionPerformed(ActionEvent e) {
-        new NBSwingWorker() {
-            final private ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.MSG_SavingSnapshot());
-            @Override
-            protected void doInBackground() {
-                ph.setInitialDelay(500);
-                ph.start();
-                ResultsManager.getDefault().saveSnapshot(snapshot);
-            }
-
-            @Override
-            protected void done() {
-                ph.finish();
-                updateState();
-            }
-        }.execute();
-    }
-
-    public void updateState() {
-        setEnabled(!snapshot.isSaved());
-    }
+    
 }
