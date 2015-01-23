@@ -85,8 +85,8 @@ import org.netbeans.lib.profiler.utils.Wildcards;
  */
 public abstract class SnapshotCPUView extends JPanel {
     
-    private final boolean sampled;
-    private final CPUResultsSnapshot snapshot;
+    private boolean sampled;
+    private CPUResultsSnapshot snapshot;
     
     private int aggregation;
     
@@ -97,13 +97,11 @@ public abstract class SnapshotCPUView extends JPanel {
     private Component viewContainer;
     
     public SnapshotCPUView(CPUResultsSnapshot snapshot, boolean sampled, Action... actions) {
-        this.sampled = sampled;
-        this.snapshot = snapshot;
-        
         initUI(actions);
         registerActions();
         
-        setAggregation(CPUResultsSnapshot.METHOD_LEVEL_VIEW);
+        aggregation = CPUResultsSnapshot.METHOD_LEVEL_VIEW;
+        setSnapshot(snapshot, sampled);
     }
     
     
@@ -382,6 +380,13 @@ public abstract class SnapshotCPUView extends JPanel {
         
         treeTableView.setData(snapshot, idMap, aggregation, sampled);
         tableView.setData(flatData, idMap, sampled);
+    }
+    
+    protected final void setSnapshot(CPUResultsSnapshot snapshot, boolean sampled) {
+        this.snapshot = snapshot;
+        this.sampled = sampled;
+        
+        setAggregation(aggregation);
     }
     
 }
