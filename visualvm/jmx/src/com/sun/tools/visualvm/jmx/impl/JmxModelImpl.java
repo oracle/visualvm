@@ -76,6 +76,7 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
+import javax.security.sasl.SaslException;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -508,6 +509,9 @@ class JmxModelImpl extends JmxModel {
             } catch (SecurityException e) {
                 setConnectionState(ConnectionState.DISCONNECTED);
                 throw e;
+            } catch (SaslException e) {
+                // Workaround for JBoss/WildFly authentication failed exception     
+                throw new SecurityException(e);
             } catch (Exception e) {
                 setConnectionState(ConnectionState.DISCONNECTED);
                 // Workaround for GlassFish's LoginException class not found
