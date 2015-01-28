@@ -53,6 +53,7 @@ import org.netbeans.lib.profiler.results.ExportDataDumper;
 import java.util.ResourceBundle;
 import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.results.FilterSortSupport;
+import org.netbeans.lib.profiler.utils.Wildcards;
 
 
 /**
@@ -84,18 +85,34 @@ public class PresoObjAllocCCTNode implements CCTNode {
 
     public long nCalls;
     public long totalObjSize;
-    PresoObjAllocCCTNode parent;
+    protected PresoObjAllocCCTNode parent;
     String className;
     String methodName;
     String methodSig;
     String nodeName;
-    PresoObjAllocCCTNode[] children;
+    protected PresoObjAllocCCTNode[] children;
     int methodId;
     
     protected char flags;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
+    
+    public static PresoObjAllocCCTNode rootNode(PresoObjAllocCCTNode[] children) {
+        PresoObjAllocCCTNode root = new PresoObjAllocCCTNode();
+        root.setChildren(children);
+        return root;
+    }
+    
+    public PresoObjAllocCCTNode(String className, long nCalls, long totalObjSize) {
+        this.className = className;
+        this.nCalls = nCalls;
+        this.totalObjSize = totalObjSize;
+        
+        methodName = Wildcards.ALLWILDCARD;
+    }
+    
+    private PresoObjAllocCCTNode() {}
+    
     protected PresoObjAllocCCTNode(RuntimeMemoryCCTNode rtNode) {
         methodId = rtNode.methodId;
 
@@ -104,6 +121,12 @@ public class PresoObjAllocCCTNode implements CCTNode {
             nCalls += rtTermNode.nCalls;
             totalObjSize += rtTermNode.totalObjSize;
         }
+    }
+    
+    
+    protected final void setChildren(PresoObjAllocCCTNode[] children) {
+        this.children = children;
+        for (PresoObjAllocCCTNode child : children) child.parent = this;
     }
     
     //--- TreeNode adapter ---

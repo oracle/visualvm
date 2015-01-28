@@ -43,12 +43,13 @@
 
 package org.netbeans.lib.profiler.instrumentation;
 
+import java.util.ArrayList;
 import org.netbeans.lib.profiler.classfile.BaseClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import java.util.ArrayList;
+import org.netbeans.lib.profiler.wireprotocol.RootClassLoadedCommand;
 
 
 /**
@@ -147,14 +148,15 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public Object[] getInitialMethodsToInstrument(String[] loadedClasses, int[] loadedClassLoaderIds,
-                                                  byte[][] cachedClassFileBytes) {
+    public Object[] getInitialMethodsToInstrument(RootClassLoadedCommand rootLoaded) {
         resetLoadedClassData();
         initInstrumentationPackData();
         instrClassId = 0;
 
-        storeClassFileBytesForCustomLoaderClasses(loadedClasses, loadedClassLoaderIds, cachedClassFileBytes);
+        storeClassFileBytesForCustomLoaderClasses(rootLoaded);
 
+        String[] loadedClasses = rootLoaded.getAllLoadedClassNames();
+        int[] loadedClassLoaderIds = rootLoaded.getAllLoadedClassLoaderIds();
         for (int i = 0; i < loadedClasses.length; i++) {
             findAndMarkMethodsToInstrumentInClass(loadedClasses[i], loadedClassLoaderIds[i]);
         }

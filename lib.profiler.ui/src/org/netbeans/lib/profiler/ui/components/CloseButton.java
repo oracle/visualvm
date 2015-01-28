@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -40,75 +40,39 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+package org.netbeans.lib.profiler.ui.components;
 
-package org.netbeans.modules.profiler.v2.ui;
-
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Insets;
-import javax.swing.Action;
-import javax.swing.Icon;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JButton;
-import javax.swing.JToolBar;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.openide.util.Lookup;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class SmallButton extends JButton {
+public class CloseButton {
     
-    protected static final Icon NO_ICON = new Icon() {
-        public int getIconWidth() { return 0; }
-        public int getIconHeight() { return 16; }
-        public void paintIcon(Component c, Graphics g, int x, int y) {}
-    };
+    public static JButton create(Runnable onClose) {
+        Provider provider = Lookup.getDefault().lookup(Provider.class);
+        return provider != null ? provider.create(onClose) : new Impl(onClose);
+    }
+    protected CloseButton() {}
     
     
-    {
-        setDefaultCapable(false);
-        if (UIUtils.isWindowsLookAndFeel()) setOpaque(false);
+    public static abstract class Provider {
+        
+        public abstract JButton create(Runnable onClose);
+        
     }
     
-    
-    public SmallButton() { this(null, null);  }
-
-    public SmallButton(Icon icon) { this(null, icon); }
-
-    public SmallButton(String text) { this(text, null); }
-
-    public SmallButton(Action a) { super(a); }
-
-    public SmallButton(String text, Icon icon) { super(text); setIcon(icon); }
-    
-    
-    public void setIcon(Icon defaultIcon) {
-        if (defaultIcon == null) {
-            defaultIcon = NO_ICON;
-            setIconTextGap(0);
+    public static class Impl extends JButton {
+        public Impl(final Runnable onClose) {
+            super("Close");
+            if (onClose != null) addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) { onClose.run(); }
+            });
         }
-        super.setIcon(defaultIcon);
-    }
-    
-    public Insets getMargin() {
-        Insets margin = super.getMargin();
-        if (margin != null) {
-            if (getParent() instanceof JToolBar) {
-                if (UIUtils.isNimbus()) {
-                    margin.left = margin.top + 3;
-                    margin.right = margin.top + 3;
-                }
-            } else {
-                if (UIUtils.isNimbus()) {
-                    margin.left = margin.top - 6;
-                    margin.right = margin.top - 6;
-                } else {
-                    margin.left = margin.top + 3;
-                    margin.right = margin.top + 3;
-                }
-            }
-        }
-        return margin;
     }
     
 }

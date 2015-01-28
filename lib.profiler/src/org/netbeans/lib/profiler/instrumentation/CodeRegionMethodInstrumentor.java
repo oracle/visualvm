@@ -104,7 +104,7 @@ public class CodeRegionMethodInstrumentor extends ClassManager {
 
         // We may have more than one version of the class with the given name, hence this search and instrClasses array
         for (int i = 0; i < loadedClasses.length; i++) {
-            String loadedClassName = loadedClasses[i].replace('.', '/').intern(); // NOI18N
+            String loadedClassName = loadedClasses[i];
 
             if (className == loadedClassName) {
                 clazz = javaClassForName(loadedClasses[i], loadedClassLoaderIds[i]);

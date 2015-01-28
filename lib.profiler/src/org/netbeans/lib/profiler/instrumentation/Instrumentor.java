@@ -235,7 +235,7 @@ public class Instrumentor implements CommonConstants {
             byte[] classFileBytes = clcmd.getClassFileBytes();
 
             if (classFileBytes != null) {
-                ClassRepository.addVMSuppliedClassFile(clcmd.getClassName(), thisAndParentLoaderData[0], classFileBytes);
+                ClassRepository.addVMSuppliedClassFile(clcmd.getClassName().replace(".","/"), thisAndParentLoaderData[0], classFileBytes);
             }
 
             ClassLoaderTable.addChildAndParent(thisAndParentLoaderData);
@@ -294,23 +294,16 @@ public class Instrumentor implements CommonConstants {
         switch (status.currentInstrType) {
             case INSTR_RECURSIVE_FULL:
             case INSTR_RECURSIVE_SAMPLED:
-                imgr = createInitialInstrumentMethodGroupResponseForCallGraph(cmd.getAllLoadedClassNames(),
-                                                                              cmd.getAllLoadedClassLoaderIds(),
-                                                                              cmd.getCachedClassFileBytes());
+                imgr = createInitialInstrumentMethodGroupResponseForCallGraph(cmd);
 
                 break;
             case INSTR_CODE_REGION:
-                imgr = createInitialInstrumentMethodGroupResponseForCodeRegion(cmd.getAllLoadedClassNames(),
-                                                                               cmd.getAllLoadedClassLoaderIds(),
-                                                                               cmd.getCachedClassFileBytes());
+                imgr = createInitialInstrumentMethodGroupResponseForCodeRegion(cmd);
 
                 break;
             case INSTR_OBJECT_ALLOCATIONS:
             case INSTR_OBJECT_LIVENESS:
-                imgr = createInitialInstrumentMethodGroupResponseForMemoryProfiling(status.currentInstrType,
-                                                                                    cmd.getAllLoadedClassNames(),
-                                                                                    cmd.getAllLoadedClassLoaderIds(),
-                                                                                    cmd.getCachedClassFileBytes());
+                imgr = createInitialInstrumentMethodGroupResponseForMemoryProfiling(status.currentInstrType, cmd);
 
                 break;
             default:
@@ -423,9 +416,7 @@ public class Instrumentor implements CommonConstants {
     }
 
     // ------------------------------------ Transitive method closure instrumentation ------------------------------------
-    private InstrumentMethodGroupResponse createInitialInstrumentMethodGroupResponseForCallGraph(String[] loadedClasses,
-                                                                                                 int[] loadedClassLoaderIds,
-                                                                                                 byte[][] cachedClassFileBytes) {
+    private InstrumentMethodGroupResponse createInitialInstrumentMethodGroupResponseForCallGraph(RootClassLoadedCommand rootLoaded) {
         //System.err.println("*** Received root class load event for class names: ");
         //for (int i = 0; i < rootClassNames.length; i++) System.err.println("  " + rootClassNames[i] + "." +
         // rootMethodNames[i] + rootMethodSignatures[i]);
@@ -454,7 +445,7 @@ public class Instrumentor implements CommonConstants {
                 break;
         }
 
-        ret = ms.getInitialMethodsToInstrument(loadedClasses, loadedClassLoaderIds, cachedClassFileBytes, rootMethods);
+        ret = ms.getInitialMethodsToInstrument(rootLoaded, rootMethods);
 
         if (ret == null) {
             return new InstrumentMethodGroupResponse(null);
@@ -464,15 +455,15 @@ public class Instrumentor implements CommonConstants {
     }
 
     // ---------------------------------- Code region instrumentation ----------------------------------------------------
-    private InstrumentMethodGroupResponse createInitialInstrumentMethodGroupResponseForCodeRegion(String[] loadedClasses,
-                                                                                                  int[] loadedClassLoaderIds,
-                                                                                                  byte[][] loadedClassBytes)
+    private InstrumentMethodGroupResponse createInitialInstrumentMethodGroupResponseForCodeRegion(RootClassLoadedCommand rootLoaded)
         throws ClassNotFoundException, BadLocationException {
         CodeRegionMethodInstrumentor.resetLoadedClassData();
-        ClassManager.storeClassFileBytesForCustomLoaderClasses(loadedClasses, loadedClassLoaderIds, loadedClassBytes);
+        ClassManager.storeClassFileBytesForCustomLoaderClasses(rootLoaded);
 
         crms = new CodeRegionMethodInstrumentor(status, savedSourceCodeSelection);
 
+        String[] loadedClasses = rootLoaded.getAllLoadedClassNames();
+        int[] loadedClassLoaderIds = rootLoaded.getAllLoadedClassLoaderIds();
         Object[] ret = crms.getInitialInstrumentCodeRegionResponse(loadedClasses, loadedClassLoaderIds);
 
         if (ret == null) {
@@ -484,15 +475,13 @@ public class Instrumentor implements CommonConstants {
 
     // -------------------------------------- Memory profiling instrumentation -------------------------------------------
     private InstrumentMethodGroupResponse createInitialInstrumentMethodGroupResponseForMemoryProfiling(int instrType,
-                                                                                                       String[] loadedClasses,
-                                                                                                       int[] loadedClassLoaderIds,
-                                                                                                       byte[][] cachedClassFileBytes) {
+                                                                         RootClassLoadedCommand rootLoaded) {
         //System.out.println("+++++++++ Received memory profiling instrumentation initialization event of type "
         // + instrType);
         //System.out.println("+++++++++ Number of target VM loaded classes: " + loadedClasses.length);
         oms = new ObjLivenessMethodInstrumentor(status, settings, (instrType == INSTR_OBJECT_LIVENESS));
 
-        Object[] ret = oms.getInitialMethodsToInstrument(loadedClasses, loadedClassLoaderIds, cachedClassFileBytes);
+        Object[] ret = oms.getInitialMethodsToInstrument(rootLoaded);
 
         if (ret == null) {
             return new InstrumentMethodGroupResponse(null);
