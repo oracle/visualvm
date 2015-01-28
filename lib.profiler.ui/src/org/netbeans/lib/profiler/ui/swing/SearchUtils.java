@@ -189,7 +189,7 @@ public final class SearchUtils {
         
         combo.setOnTextChangeHandler(new Runnable() {
             public void run() {
-                boolean enable = !combo.getText().trim().isEmpty();
+                boolean enable = !(table instanceof ProfilerTreeTable) && !combo.getText().trim().isEmpty();// NOTE: temporarily disabled for TreeTables
                 prev.setEnabled(enable);
                 next.setEnabled(enable);
             }

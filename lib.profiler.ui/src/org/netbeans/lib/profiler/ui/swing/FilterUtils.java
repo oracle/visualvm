@@ -117,6 +117,7 @@ public final class FilterUtils {
         KeyStroke filterKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
         
         final String[] activeFilter = new String[1];
+        final boolean disabled = table instanceof ProfilerTreeTable; // NOTE: temporarily disabled for TreeTables
         
         final JButton filter = new JButton("Filter", Icons.getIcon(GeneralIcons.FILTER)) {
             protected void fireActionPerformed(ActionEvent e) {
@@ -127,7 +128,7 @@ public final class FilterUtils {
                         String filterString = getFilterString(combo);
                         if (filterContains(table, filterString)) combo.addItem(filterString);
                         activeFilter[0] = filterString;
-                        updateFilterButton(_filter, activeFilter, filterString);
+                        updateFilterButton(_filter, activeFilter, filterString, disabled);
                     }
                 });
             }
@@ -136,13 +137,13 @@ public final class FilterUtils {
         filter.setToolTipText("Filter results (" + filterAccelerator + ")");
         toolbar.add(filter);
         
-        updateFilterButton(filter, activeFilter, getFilterString(combo));
+        updateFilterButton(filter, activeFilter, getFilterString(combo), disabled);
         
         toolbar.add(Box.createHorizontalStrut(2));
         
         combo.setOnTextChangeHandler(new Runnable() {
             public void run() {
-                updateFilterButton(filter, activeFilter, getFilterString(combo));
+                updateFilterButton(filter, activeFilter, getFilterString(combo), disabled);
             }
         });
         
@@ -162,7 +163,7 @@ public final class FilterUtils {
         final Runnable hider = new Runnable() {
             public void run() {
                 activeFilter[0] = null;
-                updateFilterButton(filter, activeFilter, getFilterString(combo));
+                updateFilterButton(filter, activeFilter, getFilterString(combo), disabled);
                 filterContains(table, activeFilter[0]);
                 panel.setVisible(false);
             }
@@ -201,11 +202,15 @@ public final class FilterUtils {
         return filter == null ? null : filter.trim();
     }
     
-    private static void updateFilterButton(JButton button, String[] activeFilter, String currentFilter) {
-        String active = activeFilter[0];
-        if (active == null) active = ""; // NOI18N
-        String current = currentFilter == null ? "" : currentFilter; // NOI18N
-        button.setEnabled(!current.equals(active));
+    private static void updateFilterButton(JButton button, String[] activeFilter, String currentFilter, boolean disabled) {
+        if (disabled) {
+            button.setEnabled(false);
+        } else {
+            String active = activeFilter[0];
+            if (active == null) active = ""; // NOI18N
+            String current = currentFilter == null ? "" : currentFilter; // NOI18N
+            button.setEnabled(!current.equals(active));
+        }
     }
     
     private static abstract class Filter extends RowFilter {
