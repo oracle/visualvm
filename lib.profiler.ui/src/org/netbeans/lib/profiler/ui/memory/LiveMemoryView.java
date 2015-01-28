@@ -49,6 +49,8 @@ import java.awt.event.ActionEvent;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -60,6 +62,9 @@ import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.memory.HeapHistogram;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
+import org.netbeans.lib.profiler.ui.results.DataView;
+import org.netbeans.lib.profiler.ui.swing.FilterUtils;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
@@ -68,19 +73,18 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
-public abstract class MemoryView extends JPanel {
+public abstract class LiveMemoryView extends JPanel {
     
     private static final int MIN_UPDATE_DIFF = 900;
     private static final int MAX_UPDATE_DIFF = 1400;
     
     private final ProfilerClient client;
-    private final boolean showSourceSupported;
     
     private SampledTableView sampledView;
     private AllocTableView allocView;
     private LivenessTableView livenessView;
     
-    private JPanel currentView;
+    private DataView currentView;
     private long lastupdate;
     private volatile boolean paused;
     private volatile boolean forceRefresh;
@@ -92,7 +96,7 @@ public abstract class MemoryView extends JPanel {
     @ServiceProvider(service=MemoryCCTProvider.Listener.class)
     public static final class ResultsMonitor implements MemoryCCTProvider.Listener {
 
-        private MemoryView view;
+        private LiveMemoryView view;
         
         @Override
         public void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
@@ -100,7 +104,7 @@ public abstract class MemoryView extends JPanel {
                 try {
                     view.refreshData(appRootNode);
                 } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    Logger.getLogger(MemoryView.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(LiveMemoryView.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -113,10 +117,9 @@ public abstract class MemoryView extends JPanel {
         }
     }
        
-    public MemoryView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection, boolean showSourceSupported) {
+    public LiveMemoryView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection) {
         this.client = client;
         this.selection = selection;
-        this.showSourceSupported = showSourceSupported;
         
         initUI();
         rm = Lookup.getDefault().lookup(ResultsMonitor.class);
@@ -307,6 +310,8 @@ public abstract class MemoryView extends JPanel {
     }
     
     
+    public abstract boolean showSourceSupported();
+    
     public abstract void showSource(ClientUtils.SourceCodeSelection value);
     
     public abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
@@ -316,53 +321,56 @@ public abstract class MemoryView extends JPanel {
     public void popupHidden() {};
     
     
-    private JPanel getView() {
+    private DataView getView() {
         switch (client.getCurrentInstrType()) {
 //            case CommonConstants.INSTR_NONE_MEMORY_SAMPLING:
 //                if (sampledView == null) sampledView = new SampledTableView();
 //                return sampledView;
             case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
                 if (allocView == null) allocView = new AllocTableView(selection) {
-                    protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                        if (showSourceSupported) showSource(value);
+                    protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                        if (showSourceSupported()) showSource(userValue);
                     }
-                    protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                        MemoryView.this.populatePopup(popup, value);
+                    protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                        LiveMemoryView.this.populatePopup(allocView, popup, value, userValue);
                     }
-                    protected void popupShowing() { MemoryView.this.popupShowing(); }
-                    protected void popupHidden()  { MemoryView.this.popupHidden(); }
+                    protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
+                    protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
+                    protected boolean hasBottomFilterFindMargin() { return true; }
                 };
                 return allocView;
             case CommonConstants.INSTR_OBJECT_LIVENESS:
                 if (livenessView == null) livenessView = new LivenessTableView(selection) {
-                    protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                        if (showSourceSupported) showSource(value);
+                    protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                        if (showSourceSupported()) showSource(userValue);
                     }
-                    protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                        MemoryView.this.populatePopup(popup, value);
+                    protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                        LiveMemoryView.this.populatePopup(livenessView, popup, value, userValue);
                     }
-                    protected void popupShowing() { MemoryView.this.popupShowing(); }
-                    protected void popupHidden()  { MemoryView.this.popupHidden(); }
+                    protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
+                    protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
+                    protected boolean hasBottomFilterFindMargin() { return true; }
                 };
                 return livenessView;
             default:
                 if (sampledView == null) sampledView = new SampledTableView(selection) {
-                    protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                        if (showSourceSupported) showSource(value);
+                    protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                        if (showSourceSupported()) showSource(userValue);
                     }
-                    protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                        MemoryView.this.populatePopup(popup, value);
+                    protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                        LiveMemoryView.this.populatePopup(sampledView, popup, value, userValue);
                     }
-                    protected void popupShowing() { MemoryView.this.popupShowing(); }
-                    protected void popupHidden()  { MemoryView.this.popupHidden(); }
+                    protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
+                    protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
+                    protected boolean hasBottomFilterFindMargin() { return true; }
                 };
                 return sampledView;
-//                return null;
+//                return null;//                return null;
         }
     }
 
     private void updateCurrentView() {
-        JPanel newView = getView();
+        DataView newView = getView();
         if (newView != currentView) {
             removeAll();
             resetData();
@@ -373,18 +381,26 @@ public abstract class MemoryView extends JPanel {
         }
     }
     
-    private void populatePopup(JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
-        if (showSourceSupported) {
+    private void populatePopup(final DataView invoker, JPopupMenu popup, Object value, final ClientUtils.SourceCodeSelection userValue) {
+        if (showSourceSupported()) {
             popup.add(new JMenuItem("Go to Source") {
-                { setEnabled(value != null); setFont(getFont().deriveFont(Font.BOLD)); }
-                protected void fireActionPerformed(ActionEvent e) { showSource(value); }
+                { setEnabled(userValue != null); setFont(getFont().deriveFont(Font.BOLD)); }
+                protected void fireActionPerformed(ActionEvent e) { showSource(userValue); }
             });
             popup.addSeparator();
         }
         
         popup.add(new JMenuItem("Profile Class") {
-            { setEnabled(value != null); }
-            protected void fireActionPerformed(ActionEvent e) { selectForProfiling(value); }
+            { setEnabled(userValue != null); }
+            protected void fireActionPerformed(ActionEvent e) { selectForProfiling(userValue); }
+        });
+        
+        popup.addSeparator();
+        popup.add(new JMenuItem("Filter") {
+            protected void fireActionPerformed(ActionEvent e) { invoker.activateFilter(); }
+        });
+        popup.add(new JMenuItem("Find") {
+            protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
         });
     }
     
@@ -397,6 +413,20 @@ public abstract class MemoryView extends JPanel {
         add(currentView, BorderLayout.CENTER);
         revalidate();
         repaint();
+        
+        registerActions();
+    }
+    
+    private void registerActions() {
+        ActionMap map = getActionMap();
+        
+        map.put(FilterUtils.FILTER_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { currentView.activateFilter(); }
+        });
+        
+        map.put(SearchUtils.FIND_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { currentView.activateSearch(); }
+        });
     }
     
 }

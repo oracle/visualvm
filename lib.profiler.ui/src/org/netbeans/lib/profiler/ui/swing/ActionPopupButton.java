@@ -40,97 +40,86 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+package org.netbeans.lib.profiler.ui.swing;
 
-package org.netbeans.modules.profiler.v2.ui;
-
-import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
-import javax.swing.Icon;
 import javax.swing.JPopupMenu;
-import javax.swing.JToolBar;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
+import javax.swing.JRadioButtonMenuItem;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class PopupButton extends SmallButton {
+public class ActionPopupButton extends PopupButton {
     
-    private static final Icon DROPDOWN_ICON = Icons.getIcon(GeneralIcons.POPUP_ARROW);
-    private static final int DROPDOWN_ICON_WIDTH = DROPDOWN_ICON.getIconWidth();
-    private static final int DROPDOWN_ICON_HEIGHT = DROPDOWN_ICON.getIconHeight();
+    private Action action;
+    private final Action[] actions;
     
-    private int iconOffset;
+//    private Dimension minSize;
+//    private Dimension prefSize;
     
-    
-    {
-        iconOffset = 7;
-        setHorizontalAlignment(LEADING);
+    public ActionPopupButton(Action... _actions) {
+        this(0, _actions);
     }
     
-    
-    public PopupButton() { super(); }
-
-    public PopupButton(Icon icon) { super(icon); }
-
-    public PopupButton(String text) { super(text); }
-
-    public PopupButton(Action a) { super(a); }
-
-    public PopupButton(String text, Icon icon) { super(text, icon); }
-    
-    
-    protected void fireActionPerformed(ActionEvent e) {
-        super.fireActionPerformed(e);
-        displayPopup();
+    public ActionPopupButton(int initial, Action... _actions) {
+        actions = _actions;
+        selectAction(initial);
     }
     
-    protected void displayPopup() {
-        JPopupMenu menu = new JPopupMenu();
-        populatePopup(menu);
-        if (menu.getComponentCount() > 0) {
-            Dimension size = menu.getPreferredSize();
-            size.width = Math.max(size.width, getWidth());
-            menu.setPreferredSize(size);
-            menu.show(this, 0, getHeight());
-        }
+    public final void selectAction(Action _action) {
+        action = _action;
+        setText(action == null ? "" : action.getValue(Action.NAME).toString()); // NOI18N
+    }
+    
+    public final void selectAction(int index) {
+        selectAction(actions[index]);
     }
     
     protected void populatePopup(JPopupMenu popup) {
-        // Implementation here
-    }
-    
-    
-    public Dimension getPreferredSize() {
-        Dimension size = super.getPreferredSize();
-        size.width += DROPDOWN_ICON_WIDTH + 5;
-        return size;
-    }
-    
-    public Dimension getMinimumSize() {
-        return getPreferredSize();
-    }
-    
-    public Dimension getMaximumSize() {
-        return getPreferredSize();
-    }
-    
-    public void addNotify() {
-        super.addNotify();
-        if (UIUtils.isWindowsLookAndFeel() && getParent() instanceof JToolBar) {
-            if (getIcon() == NO_ICON) setIconTextGap(2);
-            iconOffset = 5;
+        for (final Action _action : actions) {
+            if (_action != null) {
+                popup.add(new JRadioButtonMenuItem(_action.getValue(Action.NAME).toString(), _action == action) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        selectAction(_action);
+                        _action.actionPerformed(e);
+                    }
+                });
+            } else {
+                popup.addSeparator();
+            }
         }
     }
     
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        DROPDOWN_ICON.paintIcon(this, g, getWidth() - DROPDOWN_ICON_WIDTH - iconOffset,
-                                        (getHeight() - DROPDOWN_ICON_HEIGHT) / 2);
-    }
+//    public Dimension getMinimumSize() {
+//        if (minSize == null) {
+//            Action orig = action;
+//            for (Action _action : actions) if (_action != null) {
+//                selectAction(_action);
+//                Dimension min = super.getMinimumSize();
+//                if (minSize == null) minSize = min;
+//                minSize.width = Math.max(minSize.width, min.width);
+//                minSize.height = Math.max(minSize.height, min.height);
+//            }
+//            selectAction(orig);
+//        }
+//        return minSize;
+//    }
+//    
+//    public Dimension getPreferredSize() {
+//        if (prefSize == null) {
+//            Action orig = action;
+//            for (Action _action : actions) if (_action != null) {
+//                selectAction(_action);
+//                Dimension pref = super.getPreferredSize();
+//                if (prefSize == null) prefSize = pref;
+//                prefSize.width = Math.max(prefSize.width, pref.width);
+//                prefSize.height = Math.max(prefSize.height, pref.height);
+//            }
+//            selectAction(orig);
+//        }
+//        return prefSize;
+//    }
     
 }

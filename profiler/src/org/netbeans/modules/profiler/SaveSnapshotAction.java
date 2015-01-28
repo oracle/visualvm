@@ -59,7 +59,7 @@ import org.netbeans.modules.profiler.ui.NBSwingWorker;
 class SaveSnapshotAction extends AbstractAction {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private LoadedSnapshot snapshot;
+    private final LoadedSnapshot snapshot;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 

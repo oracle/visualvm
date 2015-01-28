@@ -203,6 +203,9 @@ public class ProfilerTable extends JTable {
                 renderer.setValue(value, table.convertRowIndexToModel(row));
                 return renderer.getComponent();
             }
+            public String toString() {
+                return renderer.toString();
+            }
         };
     }
     
@@ -334,6 +337,18 @@ public class ProfilerTable extends JTable {
     
     final boolean isCustomRendering() {
         return isCustomRendering;
+    }
+    
+    // --- String value --------------------------------------------------------
+    
+    public String getStringValue(int row, int column) {
+        TableCellRenderer renderer = getCellRenderer(row, column);
+        if (renderer instanceof ProfilerRenderer) {
+            ((ProfilerRenderer)renderer).setValue(renderer, row);
+        } else {
+            prepareRenderer(renderer, row, column);
+        }
+        return renderer.toString();
     }
     
     // --- Main column ---------------------------------------------------------
@@ -762,6 +777,14 @@ public class ProfilerTable extends JTable {
     
     // --- Row filter ----------------------------------------------------------
     
+    public void addRowFilter(RowFilter filter) {
+        _getRowSorter().addRowFilter(filter);
+    }
+    
+    public void removeRowFilter(RowFilter filter) {
+        _getRowSorter().removeRowFilter(filter);
+    }
+    
     public void setRowFilter(RowFilter filter) {
         _getRowSorter().setRowFilter(filter);
     }
@@ -796,7 +819,7 @@ public class ProfilerTable extends JTable {
         return providesPopupMenu;
     }
     
-    protected void populatePopup(JPopupMenu popup, Object value) {
+    protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
         // Implementation here
     }
     
@@ -804,10 +827,14 @@ public class ProfilerTable extends JTable {
     
     protected void popupHidden() {}
     
-    protected Object getValueForPopup(int row) {
+    public Object getValueForRow(int row) {
         if (row == -1) return null;
         if (row >= getModel().getRowCount()) return null; // #239936
         return getValueAt(row, convertColumnIndexToView(mainColumn));
+    }
+    
+    public Object getUserValueForRow(int row) {
+        return getValueForRow(row);
     }
     
     protected void processMouseEvent(MouseEvent e) {
@@ -886,8 +913,9 @@ public class ProfilerTable extends JTable {
         };
         
         int row = getSelectedRow();
-        Object value = getValueForPopup(row);
-        populatePopup(popup, value);
+        Object value = getValueForRow(row);
+        Object userValue = getUserValueForRow(row);
+        populatePopup(popup, value, userValue);
         
         if (popup.getComponentCount() > 0) {
             if (e == null) {

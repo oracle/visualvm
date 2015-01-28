@@ -1673,6 +1673,13 @@ public class ProfilerServer extends Thread implements CommonConstants {
                 sendComplexResponseToClient(tdResp);
                 
                 break;
+            case Command.GET_CLASS_FILE_BYTES:
+                //System.out.println(cmd);
+                GetClassFileBytesCommand getCmd = (GetClassFileBytesCommand) cmd;
+                byte[][] bytes = ProfilerInterface.getClassFileBytes(getCmd.getClasses(), getCmd.getClassLoaderIds());
+                sendComplexResponseToClient(new GetClassFileBytesResponse(bytes));
+                
+                break;
         }
     }
 

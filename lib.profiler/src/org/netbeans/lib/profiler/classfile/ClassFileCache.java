@@ -43,15 +43,20 @@
 
 package org.netbeans.lib.profiler.classfile;
 
-import org.netbeans.lib.profiler.utils.FileOrZipEntry;
-import org.netbeans.lib.profiler.utils.MiscUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+import org.netbeans.lib.profiler.ProfilerClient;
+import org.netbeans.lib.profiler.TargetAppRunner;
+import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.utils.FileOrZipEntry;
+import org.netbeans.lib.profiler.utils.MiscUtils;
 
 
 /**
@@ -77,6 +82,8 @@ public class ClassFileCache {
     private int size;
     private int sizeLimit;
     private long timeCounter;
+    private List preloadNames;
+    private List preloadLoaderIds;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -90,6 +97,8 @@ public class ClassFileCache {
         lastTimeUsed = new long[capacity];
 
         vmSuppliedClassCache = new Hashtable();
+        preloadNames = new ArrayList();
+        preloadLoaderIds = new ArrayList();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -112,6 +121,38 @@ public class ClassFileCache {
 
         if (location.startsWith(ClassRepository.LOCATION_VMSUPPLIED)) {
             res = (byte[]) vmSuppliedClassCache.get(nameAndLocation);
+            if (res != null && res.length == 0) {
+                try {
+                    // known class without bytecode; get it from TA
+                    ProfilerClient client = TargetAppRunner.getDefault().getProfilerClient();
+                    if (!preloadNames.contains(name)) {
+                        preloadBytecode(name, location);
+                    }
+                    String names[] = (String[]) preloadNames.toArray(new String[preloadNames.size()]);
+                    int loadersId[] = new int[preloadLoaderIds.size()];
+                    for (int i=0; i<loadersId.length; i++) {
+                        loadersId[i] = ((Integer)preloadLoaderIds.get(i)).intValue();
+                    }
+                    //System.out.println("Caching "+names.length+" classes");
+                    byte[][] bytes = client.getCachedClassFileBytes(names, loadersId);
+                    for (int i=0; i<bytes.length; i++) {
+                        res = bytes[i];
+                        if (res == null) res = new byte[0];
+                        //System.out.println("Get class file for " + names[i] + " " + res.length + " bytes");
+                        if (res.length != 0) {
+                            vmSuppliedClassCache.put(getNameAndLocation(names[i],loadersId[i]), res);
+                        }
+                    }
+                    preloadNames = new ArrayList();
+                    preloadLoaderIds = new ArrayList();
+                    res = (byte[]) vmSuppliedClassCache.get(nameAndLocation);
+                    if (res.length == 0) {
+                        throw new IOException("Get class file for " + name + " not found in TA");
+                    }
+                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                    throw new IOException(ex);
+                }
+            }
         } else {
             res = get(nameAndLocation);
 
@@ -127,9 +168,26 @@ public class ClassFileCache {
         return res;
     }
 
+    void preloadBytecode(String name, String location) {
+        String nameAndLocation = (name + "#" + location).intern(); // NOI18N
+        if (location.startsWith(ClassRepository.LOCATION_VMSUPPLIED)) {
+            byte[] res = (byte[]) vmSuppliedClassCache.get(nameAndLocation);
+            if (res != null && res.length == 0) {
+                // known class without bytecode; get it from TA
+                preloadNames.add(name);
+                String loaderIdStr = location.substring(ClassRepository.LOCATION_VMSUPPLIED.length());
+                preloadLoaderIds.add(Integer.valueOf(loaderIdStr));
+            }
+        }
+    }
+
     void addVMSuppliedClassFile(String name, int classLoaderId, byte[] buf) {
-        String nameAndLocation = (name + "#" + ClassRepository.LOCATION_VMSUPPLIED + classLoaderId).intern(); // NOI18N
+        String nameAndLocation = getNameAndLocation(name, classLoaderId); 
         vmSuppliedClassCache.put(nameAndLocation, buf);
+    }
+
+    private String getNameAndLocation(String name, int classLoaderId) {
+        return (name + "#" + ClassRepository.getClassFileLoc(classLoaderId)).intern(); // NOI18N
     }
 
     /**
@@ -139,7 +197,8 @@ public class ClassFileCache {
     int hasVMSuppliedClassFile(String name, int classLoaderId) {
         do {
             // we are trying the whole classloader hierarchy up to the root system classloader with id=0
-            boolean res = (vmSuppliedClassCache.containsKey((name + "#" + ClassRepository.LOCATION_VMSUPPLIED + classLoaderId).intern())); // NOI18N
+            String nameAndLocation = getNameAndLocation(name, classLoaderId);  
+            boolean res = vmSuppliedClassCache.containsKey(nameAndLocation);
 
             if (res) {
                 return classLoaderId;

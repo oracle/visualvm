@@ -94,6 +94,7 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
                     if (LOGGER.isLoggable(Level.FINEST)) {
                         LOGGER.finest("Frame start, size="+buffer.length); // NOI18N
                     }
+                    collectingTwoTimeStamps = (client != null) ? client.getStatus().collectingTwoTimeStamps() : false;
                     doProcessDataFrame(ByteBuffer.wrap(buffer));
                 } catch (Throwable e) {
                     LOGGER.log(Level.SEVERE, "Error while processing data frame", e); // NOI18N
@@ -131,7 +132,6 @@ public abstract class AbstractDataFrameProcessor implements DataFrameProcessor {
             processorLives = true;
             this.client = client;
         }
-        collectingTwoTimeStamps = (client != null) ? client.getStatus().collectingTwoTimeStamps() : false;
     }
 
     protected void addListener(final ProfilingResultListener listener) {

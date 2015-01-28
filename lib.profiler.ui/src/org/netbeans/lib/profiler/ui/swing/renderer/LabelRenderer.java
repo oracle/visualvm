@@ -98,6 +98,10 @@ public class LabelRenderer extends JLabel implements ProfilerRenderer {
         return this;
     }
     
+    public String toString() {
+        return getText();
+    }
+    
     // --- Appearance ----------------------------------------------------------
     
     private static final LabelRendererUI UI = new LabelRendererUI();

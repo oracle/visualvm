@@ -46,16 +46,28 @@ import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.lib.profiler.ui.swing.FilterUtils;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.openide.actions.FindAction;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
+import org.openide.util.actions.CallbackSystemAction;
+import org.openide.util.actions.SystemAction;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
@@ -114,8 +126,36 @@ public final class IdeSnapshotAction implements ActionListener {
             npssFilePath = f.getAbsolutePath();
         }
         TopComponent tc = new IdeSnapshotComponent(npssFileName, npssFilePath);
-        TracerView tracer = new TracerView(model, controller);
-        tc.add(tracer.createComponent(), BorderLayout.CENTER);
+        final JComponent tracer = new TracerView(model, controller).createComponent();
+        tc.add(tracer, BorderLayout.CENTER);
+        
+        final String FILTER = FilterUtils.FILTER_ACTION_KEY;
+        final ActionListener filter = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Action action = tracer.getActionMap().get(FILTER);
+                if (action != null && action.isEnabled()) action.actionPerformed(e);
+            }
+        };
+        InputMap map = tc.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        Action filterAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { filter.actionPerformed(e); }
+        };
+        tc.getActionMap().put(FILTER, filterAction);
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK), FILTER);
+        
+        final ActionListener find = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String FIND = SearchUtils.FIND_ACTION_KEY;
+                Action action = tracer.getActionMap().get(FIND);
+                if (action != null && action.isEnabled()) action.actionPerformed(null);
+            }
+        };
+        CallbackSystemAction globalFindAction = (CallbackSystemAction) SystemAction.get(FindAction.class);
+        Object findActionKey = globalFindAction.getActionMapKey();
+        tc.getActionMap().put(findActionKey, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { find.actionPerformed(e); }
+        });
+        
         return tc;
     }
 

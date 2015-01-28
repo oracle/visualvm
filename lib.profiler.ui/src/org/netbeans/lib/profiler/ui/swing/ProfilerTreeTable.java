@@ -129,6 +129,12 @@ public class ProfilerTreeTable extends ProfilerTable {
         return tree.getPathForRow(row);
     }
     
+    public Object getValueForRow(int row) {
+        if (row == -1) return null;
+        TreePath path = getPathForRow(row);
+        return path == null ? null : path.getLastPathComponent();
+    }
+    
     
     public void setRowHeight(int rowHeight) {
         super.setRowHeight(rowHeight);
@@ -165,6 +171,9 @@ public class ProfilerTreeTable extends ProfilerTable {
                 comp.setOpaque(false);
                 comp.setForeground(tree.getForeground());
                 return comp;
+            }
+            public String toString() {
+                return renderer.toString();
             }
         };
     }
@@ -206,8 +215,9 @@ public class ProfilerTreeTable extends ProfilerTable {
                                                e.getModifiers(), treeX, e.getY(),
                                                e.getClickCount(), e.isPopupTrigger());
                     
-                    // Prevent invoking default action on doubleclick
-                    e = clearClicks(e);
+                    // Prevent invoking default action on expanding a node
+                    Object value = getValueForRow(row);
+                    if (value instanceof TreeNode && !((TreeNode)value).isLeaf()) e = clearClicks(e);
                 }
             }
         }
@@ -716,6 +726,10 @@ public class ProfilerTreeTable extends ProfilerTable {
         
         boolean isChangingModel() {
             return changingModel;
+        }
+        
+        public String toString() {
+            return getCellRenderer().toString();
         }
         
     }
