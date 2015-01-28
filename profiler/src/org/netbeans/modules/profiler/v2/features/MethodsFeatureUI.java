@@ -46,24 +46,24 @@ package org.netbeans.modules.profiler.v2.features;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.util.Set;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.cpu.CPUView;
+import org.netbeans.lib.profiler.ui.cpu.LiveCPUView;
+import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
+import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.v2.ui.GrayLabel;
-import org.netbeans.modules.profiler.v2.ui.PopupButton;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -72,8 +72,8 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "MethodsFeatureUI_viewHotSpots=Hot Spots",
-    "MethodsFeatureUI_viewCallTree=Call Tree",
+    "MethodsFeatureUI_viewHotSpots=Hot spots",
+    "MethodsFeatureUI_viewCallTree=Call tree",
     "MethodsFeatureUI_viewCombined=Combined",
     "MethodsFeatureUI_selectedMethods=Selected methods",
     "MethodsFeatureUI_liveResults=Live results:",
@@ -86,7 +86,7 @@ import org.openide.util.NbBundle;
 abstract class MethodsFeatureUI extends FeatureUI {
     
     private ProfilerToolbar toolbar;
-    private CPUView cpuView;
+    private LiveCPUView cpuView;
 
     
     // --- External implementation ---------------------------------------------
@@ -140,20 +140,18 @@ abstract class MethodsFeatureUI extends FeatureUI {
     
     // --- UI ------------------------------------------------------------------
     
-    private static enum View { HOT_SPOTS, CALL_TREE, COMBINED }
+    private static enum View { CALL_TREE, HOT_SPOTS, COMBINED }
     
     private JLabel lrLabel;
     private JToggleButton lrPauseButton;
     private JButton lrRefreshButton;
-    private PopupButton lrView;
+    private ActionPopupButton lrView;
     
     private JLabel pdLabel;
     private JButton pdSnapshotButton;
     private JButton pdResetResultsButton;
     
     private boolean popupPause;
-    
-    private View view;
     
     
     private void initUI() {
@@ -162,7 +160,10 @@ abstract class MethodsFeatureUI extends FeatureUI {
         
         // --- Results ---------------------------------------------------------
         
-        cpuView = new CPUView(getProfiler().getTargetAppRunner().getProfilerClient(), getMethodsSelection(), GoToSource.isAvailable()) {
+        cpuView = new LiveCPUView(getProfiler().getTargetAppRunner().getProfilerClient(), getMethodsSelection()) {
+            public boolean showSourceSupported() {
+                return GoToSource.isAvailable();
+            }
             public void showSource(ClientUtils.SourceCodeSelection value) {
                 Lookup.Provider project = getProject();
                 String className = value.getClassName();
@@ -209,10 +210,23 @@ abstract class MethodsFeatureUI extends FeatureUI {
             }
         };
         lrRefreshButton.setToolTipText(Bundle.MethodsFeatureUI_updateResults());
-
-        lrView = new PopupButton(Bundle.MethodsFeatureUI_viewHotSpots()) {
-            protected void populatePopup(JPopupMenu popup) { populateViews(popup); }
+        
+        Action aCallTree = new AbstractAction() {
+            { putValue(NAME, Bundle.MethodsFeatureUI_viewCallTree()); }
+            public void actionPerformed(ActionEvent e) { setView(View.CALL_TREE); }
+            
         };
+        Action aHotSpots = new AbstractAction() {
+            { putValue(NAME, Bundle.MethodsFeatureUI_viewHotSpots()); }
+            public void actionPerformed(ActionEvent e) { setView(View.HOT_SPOTS); }
+            
+        };
+        Action aCombined = new AbstractAction() {
+            { putValue(NAME, Bundle.MethodsFeatureUI_viewCombined()); }
+            public void actionPerformed(ActionEvent e) { setView(View.COMBINED); }
+            
+        };
+        lrView = new ActionPopupButton(aCallTree, aHotSpots, aCombined);
         lrView.setToolTipText(Bundle.MethodsFeatureUI_resultsMode());
 
         pdLabel = new GrayLabel(Bundle.MethodsFeatureUI_profilingData());
@@ -263,46 +277,23 @@ abstract class MethodsFeatureUI extends FeatureUI {
             }
         });
     }
-    
-    private void populateViews(JPopupMenu popup) {
-        popup.add(new JRadioButtonMenuItem(Bundle.MethodsFeatureUI_viewHotSpots(), getView() == View.HOT_SPOTS) {
-            protected void fireActionPerformed(ActionEvent e) { setView(View.HOT_SPOTS); }
-        });
-        
-        popup.add(new JRadioButtonMenuItem(Bundle.MethodsFeatureUI_viewCallTree(), getView() == View.CALL_TREE) {
-            protected void fireActionPerformed(ActionEvent e) { setView(View.CALL_TREE); }
-        });
-        
-        popup.add(new JRadioButtonMenuItem(Bundle.MethodsFeatureUI_viewCombined(), getView() == View.COMBINED) {
-            protected void fireActionPerformed(ActionEvent e) { setView(View.COMBINED); }
-        });
-    }
 
     private void setView(View view) {
-        if (view == this.view) return;
-        
-        this.view = view;
+        lrView.selectAction(view.ordinal());
         
         switch (view) {
             case HOT_SPOTS:
                 cpuView.setView(false, true);
-                lrView.setText(Bundle.MethodsFeatureUI_viewHotSpots());
                 break;
             case CALL_TREE:
                 cpuView.setView(true, false);
-                lrView.setText(Bundle.MethodsFeatureUI_viewCallTree());
                 break;
             case COMBINED:
                 cpuView.setView(true, true);
-                lrView.setText(Bundle.MethodsFeatureUI_viewCombined());
                 break;
         }
         
         refreshResults();
-    }
-    
-    private View getView() {
-        return view;
     }
     
 }

@@ -52,6 +52,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -69,7 +71,10 @@ import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
-import org.netbeans.lib.profiler.ui.memory.MemoryView;
+import org.netbeans.lib.profiler.ui.memory.LiveMemoryView;
+import org.netbeans.lib.profiler.ui.results.DataView;
+import org.netbeans.lib.profiler.ui.swing.FilterUtils;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
@@ -78,17 +83,18 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
-public abstract class CPUView extends JPanel {
+public abstract class LiveCPUView extends JPanel {
 
     private static final int MIN_UPDATE_DIFF = 900;
     private static final int MAX_UPDATE_DIFF = 1400;
     
     private final ProfilerClient client;
-    private final boolean showSourceSupported;
     private final ResultsMonitor rm;
     
+    private DataView lastFocused;
     private CPUTableView tableView;
     private CPUTreeTableView treeTableView;
+    
     private long lastupdate;
     private volatile boolean paused;
     private volatile boolean forceRefresh;
@@ -96,7 +102,7 @@ public abstract class CPUView extends JPanel {
     @ServiceProvider(service=CPUCCTProvider.Listener.class)
     public static final class ResultsMonitor implements CPUCCTProvider.Listener {
 
-        private CPUView view;
+        private LiveCPUView view;
         
         @Override
         public void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
@@ -104,7 +110,7 @@ public abstract class CPUView extends JPanel {
                 try {
                     view.refreshData(appRootNode);
                 } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    Logger.getLogger(MemoryView.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(LiveMemoryView.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -117,12 +123,12 @@ public abstract class CPUView extends JPanel {
         }
     }
     
-    public CPUView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection,
-                   boolean showSourceSupported) {
+    public LiveCPUView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection) {
         this.client = client;
-        this.showSourceSupported = showSourceSupported;
         
         initUI(selection);
+        registerActions();
+        
         rm = Lookup.getDefault().lookup(ResultsMonitor.class);
         rm.view = this;
     }
@@ -161,7 +167,7 @@ public abstract class CPUView extends JPanel {
 
                     @Override
                     public void run() {
-                        treeTableView.setData(snapshotData, idMap, sampled);
+                        treeTableView.setData(snapshotData, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, sampled);
                         tableView.setData(flatData, idMap, sampled);
                     }
                 });
@@ -174,7 +180,7 @@ public abstract class CPUView extends JPanel {
             if (t instanceof ClientUtils.TargetAppOrVMTerminated) {
                 throw ((ClientUtils.TargetAppOrVMTerminated)t);
             } else {
-                Logger.getLogger(CPUView.class.getName()).log(Level.SEVERE, null, t);
+                Logger.getLogger(LiveCPUView.class.getName()).log(Level.SEVERE, null, t);
             }
         }
     }
@@ -202,6 +208,8 @@ public abstract class CPUView extends JPanel {
     }
     
     
+    public abstract boolean showSourceSupported();
+    
     public abstract void showSource(ClientUtils.SourceCodeSelection value);
     
     public abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
@@ -224,27 +232,35 @@ public abstract class CPUView extends JPanel {
     private void initUI(Set<ClientUtils.SourceCodeSelection> selection) {
         setLayout(new BorderLayout(0, 0));
         
-        treeTableView = new CPUTreeTableView(client, selection) {
+        treeTableView = new CPUTreeTableView(selection) {
             protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                if (showSourceSupported) showSource(value);
+                if (showSourceSupported()) showSource(value);
             }
             protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                CPUView.this.populatePopup(popup, value, value == null ? false : isSelectable(value));
+                LiveCPUView.this.populatePopup(treeTableView, popup, value);
             }
-            protected void popupShowing() { CPUView.this.popupShowing(); }
-            protected void popupHidden()  { CPUView.this.popupHidden(); }
+            protected void popupShowing() { LiveCPUView.this.popupShowing(); }
+            protected void popupHidden()  { LiveCPUView.this.popupHidden(); }
+            protected boolean hasBottomFilterFindMargin() { return true; }
         };
+        treeTableView.notifyOnFocus(new Runnable() {
+            public void run() { lastFocused = treeTableView; }
+        });
         
-        tableView = new CPUTableView(client, selection) {
+        tableView = new CPUTableView(selection) {
             protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                if (showSourceSupported) showSource(value);
+                if (showSourceSupported()) showSource(value);
             }
             protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                CPUView.this.populatePopup(popup, value, value == null ? false : isSelectable(value));
+                LiveCPUView.this.populatePopup(tableView, popup, value);
             }
-            protected void popupShowing() { CPUView.this.popupShowing(); }
-            protected void popupHidden()  { CPUView.this.popupHidden(); }
+            protected void popupShowing() { LiveCPUView.this.popupShowing(); }
+            protected void popupHidden()  { LiveCPUView.this.popupHidden(); }
+            protected boolean hasBottomFilterFindMargin() { return true; }
         };
+        tableView.notifyOnFocus(new Runnable() {
+            public void run() { lastFocused = tableView; }
+        });
         
         JSplitPane split = new JExtendedSplitPane(JSplitPane.VERTICAL_SPLIT) {
             {
@@ -264,6 +280,8 @@ public abstract class CPUView extends JPanel {
         split.setBorder(BorderFactory.createEmptyBorder());
         split.setTopComponent(treeTableView);
         split.setBottomComponent(tableView);
+        split.setDividerLocation(0.5d);
+        split.setResizeWeight(0.5d);
         
         add(split, BorderLayout.CENTER);
         
@@ -271,8 +289,37 @@ public abstract class CPUView extends JPanel {
 //        setView(true, false);
     }
     
-    private void populatePopup(JPopupMenu popup, final ClientUtils.SourceCodeSelection value, final boolean selectable) {
-        if (showSourceSupported) {
+    private void registerActions() {
+        ActionMap map = getActionMap();
+        
+        map.put(FilterUtils.FILTER_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                DataView active = getLastFocused();
+                if (active != null) active.activateFilter();
+            }
+        });
+        
+        map.put(SearchUtils.FIND_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                DataView active = getLastFocused();
+                if (active != null) active.activateSearch();
+            }
+        });
+    }
+    
+    private DataView getLastFocused() {
+        if (lastFocused != null && !lastFocused.isShowing()) lastFocused = null;
+        
+        if (lastFocused == null) {
+            if (treeTableView.isShowing()) lastFocused = treeTableView;
+            else if (tableView.isShowing()) lastFocused = tableView;
+        }
+        
+        return lastFocused;
+    }
+    
+    private void populatePopup(final DataView invoker, JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
+        if (showSourceSupported()) {
             popup.add(new JMenuItem("Go to Source") {
                 { setEnabled(value != null); setFont(getFont().deriveFont(Font.BOLD)); }
                 protected void fireActionPerformed(ActionEvent e) { showSource(value); }
@@ -281,13 +328,21 @@ public abstract class CPUView extends JPanel {
         }
         
         popup.add(new JMenuItem("Profile Method") {
-            { setEnabled(value != null && selectable); }
+            { setEnabled(value != null && CPUTableView.isSelectable(value)); }
             protected void fireActionPerformed(ActionEvent e) { profileMethod(value); }
         });
         
         popup.add(new JMenuItem("Profile Class") {
             { setEnabled(value != null); }
             protected void fireActionPerformed(ActionEvent e) { profileClass(value); }
+        });
+        
+        popup.addSeparator();
+        popup.add(new JMenuItem("Filter") {
+            protected void fireActionPerformed(ActionEvent e) { invoker.activateFilter(); }
+        });
+        popup.add(new JMenuItem("Find") {
+            protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
         });
     }
     

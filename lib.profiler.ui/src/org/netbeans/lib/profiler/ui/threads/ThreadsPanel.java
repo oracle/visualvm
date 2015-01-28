@@ -52,9 +52,12 @@ import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
+import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -74,8 +77,11 @@ import org.netbeans.lib.profiler.results.threads.ThreadData;
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.results.DataView;
+import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
 
@@ -83,7 +89,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
  *
  * @author Jiri Sedlacek
  */
-public class ThreadsPanel extends JPanel {
+public class ThreadsPanel extends DataView {
     
     private static ResourceBundle BUNDLE() {
         return ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.threads.Bundle"); // NOI18N
@@ -96,6 +102,7 @@ public class ThreadsPanel extends JPanel {
     
     private ProfilerTable threadsTable;
     private ProfilerTableContainer threadsTableContainer;
+    private JPanel bottomPanel;
     private JPanel legendPanel;
     
     private Filter filter = Filter.ALL;
@@ -285,17 +292,27 @@ public class ThreadsPanel extends JPanel {
                 return Integer.valueOf(convertRowIndexToModel(row));
             }
             protected void populatePopup(JPopupMenu popup, Object value) {
-                if (value == null) return;
-                final int row = ((Integer)value).intValue();
-                final boolean sel = selected.contains(row);
-                popup.add(new JMenuItem(sel ? BUNDLE().getString("ACT_UnselectThread") :
-                                              BUNDLE().getString("ACT_SelectThread")) { // NOI18N
-                    protected void fireActionPerformed(ActionEvent e) {
-                        if (sel) selected.remove(row);
-                        else selected.add(row);
-                        threadsTableModel.fireTableDataChanged();
-                        if (!sel) showSelectedColumn();
-                    }
+                if (value != null) {
+                    final int row = ((Integer)value).intValue();
+                    final boolean sel = selected.contains(row);
+                    popup.add(new JMenuItem(sel ? BUNDLE().getString("ACT_UnselectThread") :
+                                                  BUNDLE().getString("ACT_SelectThread")) { // NOI18N
+                        protected void fireActionPerformed(ActionEvent e) {
+                            if (sel) selected.remove(row);
+                            else selected.add(row);
+                            threadsTableModel.fireTableDataChanged();
+                            if (!sel) showSelectedColumn();
+                        }
+                    });
+
+                    popup.addSeparator();
+                }
+                
+                popup.add(new JMenuItem("Filter") {
+                    protected void fireActionPerformed(ActionEvent e) { activateFilter(); }
+                });
+                popup.add(new JMenuItem("Find") {
+                    protected void fireActionPerformed(ActionEvent e) { activateSearch(); }
                 });
             }
         };
@@ -413,11 +430,15 @@ public class ThreadsPanel extends JPanel {
         };
         fitAction.setEnabled(false);
         
+        bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.setOpaque(false);
+        bottomPanel.add(legendPanel, BorderLayout.SOUTH);
+        
         setOpaque(true);
         setBackground(UIUtils.getProfilerResultsBackground());
         setLayout(new BorderLayout());
         add(threadsTableContainer, BorderLayout.CENTER);
-        add(legendPanel, BorderLayout.SOUTH);
+        add(bottomPanel, BorderLayout.SOUTH);
         
         dataManager.addDataListener(new DataManagerListener() {
             private boolean firstChange = true;
@@ -436,6 +457,32 @@ public class ThreadsPanel extends JPanel {
                 threadsTableModel.fireTableDataChanged();
             }
         });
+        
+        registerActions();
+    }
+    
+    private void registerActions() {
+        ActionMap map = getActionMap();
+        
+        map.put(FilterUtils.FILTER_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { activateFilter(); }
+        });
+        
+        map.put(SearchUtils.FIND_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { activateSearch(); }
+        });
+    }
+    
+    protected ProfilerTable getResultsComponent() {
+        return threadsTable;
+    }
+    
+    protected boolean hasBottomFilterFindMargin() {
+        return true;
+    }
+    
+    protected void addFilterFindPanel(JComponent comp) {
+        bottomPanel.add(comp, BorderLayout.NORTH);
     }
     
     private void repaintTimeline() {

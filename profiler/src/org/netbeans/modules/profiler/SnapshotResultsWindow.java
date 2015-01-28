@@ -51,21 +51,42 @@ import org.openide.util.actions.SystemAction;
 import org.openide.windows.TopComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import javax.swing.*;
+import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.common.filters.FilterUtils;
+import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.lib.profiler.results.ResultsSnapshot;
+import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
+import org.netbeans.lib.profiler.ui.cpu.SnapshotCPUView;
+import org.netbeans.lib.profiler.ui.memory.SnapshotMemoryView;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
+import org.netbeans.lib.profiler.utils.Wildcards;
+import org.netbeans.modules.profiler.actions.CompareSnapshotsAction;
+import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.spi.actions.AbstractSavable;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
+import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
+import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ServiceProvider;
 
 
@@ -399,18 +420,73 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
 
     // -- Private methods --------------------------------------------------------------------------------------------------
 
-    private void displayCPUResults(LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
+    private void displayCPUResults(final LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
         CPUSnapshotPanel cpuPanel = new CPUSnapshotPanel(getLookup(), ls, sortingColumn, sortingOrder);
         displayedPanel = cpuPanel;
-        updateFind(true, cpuPanel);
-        add(cpuPanel, BorderLayout.CENTER);
+//        updateFind(true, cpuPanel);
+        
+        JPanel cpuSnapshot = null;
+        ResultsSnapshot _snapshot = ls.getSnapshot();
+        
+        if (_snapshot instanceof CPUResultsSnapshot) {
+            CPUResultsSnapshot s = (CPUResultsSnapshot)ls.getSnapshot();
+            boolean sampling = Boolean.valueOf(ls.getSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED);
+            
+            Action aSave = new SaveSnapshotAction(ls);
+            
+            final Action[] aExportPerformer = new Action[1];
+            Action aExport = new AbstractAction() {
+                { putValue(NAME, "Export data to file or image");
+                  putValue(SHORT_DESCRIPTION, "Export data to file or image");
+                  putValue(SMALL_ICON, Icons.getIcon(GeneralIcons.SAVE_AS)); }
+                public void actionPerformed(ActionEvent e) {
+                    aExportPerformer[0].actionPerformed(e);
+                }
+
+            };
+            
+            Action aCompare = new CompareSnapshotsAction(ls);
+            
+            Action aInfo = new SnapshotInfoAction(ls);
+            
+            final SnapshotCPUView _cpuSnapshot = new SnapshotCPUView(s, sampling, aSave, aExport, null, aCompare, aInfo) {
+                public boolean showSourceSupported() {
+                    return GoToSource.isAvailable();
+                }
+                public void showSource(ClientUtils.SourceCodeSelection value) {
+                    Lookup.Provider project = ls.getProject();
+                    String className = value.getClassName();
+                    String methodName = value.getMethodName();
+                    String methodSig = value.getMethodSignature();
+                    GoToSource.openSource(project, className, methodName, methodSig);
+                }
+                public void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            Lookup.Provider project = ls.getProject();
+                            String name = Wildcards.ALLWILDCARD.equals(value.getMethodName()) ?
+                                          "Profile Class" : "Profile Method";
+                            ProfilerSession.findAndConfigure(Lookups.fixed(value), project, name);
+                        }
+                    });
+                }
+            };
+            
+            registerActions(_cpuSnapshot);
+            
+            aExportPerformer[0] = ExportUtils.exportAction(_cpuSnapshot.getExportable(ls.getFile()), "Export Data", SnapshotResultsWindow.this);
+            
+            cpuSnapshot = _cpuSnapshot;
+        }
+        
+        if (cpuSnapshot != null) add(cpuSnapshot, BorderLayout.CENTER);
+        
+//        add(cpuPanel, BorderLayout.CENTER);
         setIcon(WINDOW_ICON_CPU);
         helpCtx = new HelpCtx(HELP_CTX_KEY_CPU);
     }
 
     private void displayCodeRegionResults(LoadedSnapshot ls) {
-        updateFind(false, null);
-
         FragmentSnapshotPanel codeRegionPanel = new FragmentSnapshotPanel(ls);
         displayedPanel = codeRegionPanel;
         add(codeRegionPanel, BorderLayout.CENTER);
@@ -418,11 +494,73 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
         setIcon(WINDOWS_ICON_FRAGMENT);
     }
 
-    private void displayMemoryResults(LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
+    private void displayMemoryResults(final LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
         MemorySnapshotPanel memoryPanel = new MemorySnapshotPanel(getLookup(), ls, sortingColumn, sortingOrder);
         displayedPanel = memoryPanel;
-        updateFind(true, memoryPanel);
-        add(memoryPanel, BorderLayout.CENTER);
+//        updateFind(true, memoryPanel);
+        
+        JPanel memorySnapshot = null;
+        ResultsSnapshot _snapshot = ls.getSnapshot();
+        
+        if (_snapshot instanceof MemoryResultsSnapshot) {
+            Object f = ls.getSettings().getSelectedInstrumentationFilter();
+            SimpleFilter sf = f instanceof SimpleFilter ? (SimpleFilter)f : null;
+            String value = sf == null ? null : sf.getFilterValue();
+            Collection filter = value == null || value.isEmpty() ? null :
+                       Arrays.asList(FilterUtils.getSeparateFilters(value));
+            
+            if (filter != null && filter.isEmpty()) filter = null;
+            
+            MemoryResultsSnapshot s = (MemoryResultsSnapshot)ls.getSnapshot();
+            
+            Action aSave = new SaveSnapshotAction(ls);
+            
+            final Action[] aExportPerformer = new Action[1];
+            Action aExport = new AbstractAction() {
+                { putValue(NAME, "Export data to file or image");
+                  putValue(SHORT_DESCRIPTION, "Export data to file or image");
+                  putValue(SMALL_ICON, Icons.getIcon(GeneralIcons.SAVE_AS)); }
+                public void actionPerformed(ActionEvent e) {
+                    aExportPerformer[0].actionPerformed(e);
+                }
+
+            };
+            
+            Action aCompare = new CompareSnapshotsAction(ls);
+            
+            Action aInfo = new SnapshotInfoAction(ls);
+            
+            final SnapshotMemoryView _memorySnapshot = new SnapshotMemoryView(s, filter, aSave, aExport, null, aCompare, aInfo) {
+                public boolean showSourceSupported() {
+                    return GoToSource.isAvailable();
+                }
+                public void showSource(ClientUtils.SourceCodeSelection value) {
+                    Lookup.Provider project = ls.getProject();
+                    String className = value.getClassName();
+                    String methodName = value.getMethodName();
+                    String methodSig = value.getMethodSignature();
+                    GoToSource.openSource(project, className, methodName, methodSig);
+                }
+                public void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            Lookup.Provider project = ls.getProject();
+                            ProfilerSession.findAndConfigure(Lookups.fixed(value), project, "Profile Class");
+                        }
+                    });
+                }
+            };
+            
+            registerActions(_memorySnapshot);
+            
+            aExportPerformer[0] = ExportUtils.exportAction(_memorySnapshot.getExportable(ls.getFile()), "Export Data", SnapshotResultsWindow.this);
+            
+            memorySnapshot = _memorySnapshot;
+        }
+        
+        if (memorySnapshot != null) add(memorySnapshot, BorderLayout.CENTER);
+        
+//        add(memoryPanel, BorderLayout.CENTER);
         setIcon(WINDOWS_ICON_MEMORY);
         helpCtx = new HelpCtx(HELP_CTX_KEY_MEM);
     }
@@ -431,21 +569,34 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
         forcedClose = true;
         close();
     }
-
-    private void updateFind(boolean enabled, final FindPerformer performer) {
+    
+    private void registerActions(final JComponent view) {
+        final String FILTER = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        final ActionListener filter = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Action action = view.getActionMap().get(FILTER);
+                if (action != null && action.isEnabled()) action.actionPerformed(e);
+            }
+        };
+        InputMap map = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        Action filterAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { filter.actionPerformed(e); }
+        };
+        getActionMap().put(FILTER, filterAction);
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK), FILTER);
+        
+        final ActionListener find = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String FIND = SearchUtils.FIND_ACTION_KEY;
+                Action action = view.getActionMap().get(FIND);
+                if (action != null && action.isEnabled()) action.actionPerformed(null);
+            }
+        };
         CallbackSystemAction globalFindAction = (CallbackSystemAction) SystemAction.get(FindAction.class);
         Object findActionKey = globalFindAction.getActionMapKey();
-
-        if (enabled) {
-            getActionMap().put(findActionKey,
-                               new AbstractAction() {
-                    public void actionPerformed(ActionEvent e) {
-                        performer.performFind();
-                    }
-                });
-        } else {
-            getActionMap().remove(findActionKey);
-        }
+        getActionMap().put(findActionKey, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { find.actionPerformed(e); }
+        });
     }
 
     private void updateSaveState() {

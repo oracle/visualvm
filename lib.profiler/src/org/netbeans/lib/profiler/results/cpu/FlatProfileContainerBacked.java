@@ -93,9 +93,7 @@ public class FlatProfileContainerBacked extends FlatProfileContainer {
 
     public String getMethodNameAtRow(int row) {
         ClientUtils.SourceCodeSelection sel = getSourceCodeSelectionAtRow(row);
-        return MethodNameFormatterFactory.getDefault().getFormatter()
-                                         .formatMethodName(sel.getClassName(), sel.getMethodName(),
-                                                           sel.getMethodSignature()).toFormatted();
+        return MethodNameFormatterFactory.getDefault().getFormatter().formatMethodName(sel).toFormatted();
         
 //        int methodId = methodIds[row];
 //        String[] methodClassNameAndSig = cctContainer.getMethodClassNameAndSig(methodId);

@@ -61,19 +61,30 @@ import java.util.List;
 import javax.swing.*;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.modules.profiler.snaptracer.TracerPackage;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.cpu.CCTDisplay;
+import org.netbeans.lib.profiler.ui.cpu.SnapshotCPUView;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.ui.swing.FilterUtils;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
+import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.CPUSnapshotPanel;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.SampledCPUSnapshot;
 import org.netbeans.modules.profiler.SnapshotPanel;
-import org.netbeans.modules.profiler.SnapshotResultsWindow;
+import org.netbeans.modules.profiler.actions.CompareSnapshotsAction;
 import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
+import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -89,6 +100,7 @@ final class TracerView {
     private final TracerController controller;
     private LoadedSnapshot lsF;
     private TimelineView timelineView;
+    private SnapshotView snapshotView;
     private FindMethodAction findMethod;
     
     private SnapshotPanel.State lastState;
@@ -150,6 +162,22 @@ final class TracerView {
                 initData(component, container);
                 // init required listeners - timeline selection
                 initListeners(component);
+            }
+        });
+        
+        ActionMap map = component.getActionMap();
+        
+        map.put(FilterUtils.FILTER_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                if (snapshotView.isShowing()) snapshotView.getActionMap().get
+                            (FilterUtils.FILTER_ACTION_KEY).actionPerformed(e);
+            }
+        });
+        
+        map.put(SearchUtils.FIND_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                if (snapshotView.isShowing()) snapshotView.getActionMap().get
+                            (SearchUtils.FIND_ACTION_KEY).actionPerformed(e);
             }
         });
 
@@ -247,8 +275,28 @@ final class TracerView {
             register(this);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    SnapshotResultsWindow w = new SnapshotResultsWindow(lsF, 1, false);
-                    addContents(p, w);
+                    CPUResultsSnapshot s = (CPUResultsSnapshot)lsF.getSnapshot();
+                    if (snapshotView == null) {
+                        final Action[] aExportPerformer = new Action[1];
+                        Action aExport = new AbstractAction() {
+                            { putValue(NAME, "Export data to file or image");
+                              putValue(SHORT_DESCRIPTION, "Export data to file or image");
+                              putValue(SMALL_ICON, Icons.getIcon(GeneralIcons.SAVE_AS)); }
+                            public void actionPerformed(ActionEvent e) {
+                                aExportPerformer[0].actionPerformed(e);
+                            }
+
+                        };
+                        Action aCompare = new CompareSnapshotsAction(lsF);
+                        
+                        snapshotView = new SnapshotView(s, aExport, aCompare, null);
+                        
+                        aExportPerformer[0] = ExportUtils.exportAction(snapshotView.getExportable(lsF.getFile()), "Export Data", snapshotView);
+                    } else {
+                        snapshotView.setData(s);
+                    }
+//                    SnapshotResultsWindow w = new SnapshotResultsWindow(lsF, 1, false);
+                    addContents(p, snapshotView);
                 }
             });
         }
@@ -288,17 +336,20 @@ final class TracerView {
     private void addContents(JComponent container, JComponent contents) {
         BorderLayout layout = (BorderLayout)container.getLayout();
         Component oldContents = layout.getLayoutComponent(BorderLayout.CENTER);
-        if (oldContents != null) {
-            if (oldContents instanceof SnapshotResultsWindow)
-                lastState = ((SnapshotResultsWindow)oldContents).getState();
-            container.remove(oldContents);
+        if (oldContents != contents) {
+            if (oldContents != null) container.remove(oldContents);
+            container.add(contents, BorderLayout.CENTER);
+            contents.requestFocusInWindow();
+            container.revalidate();
+            container.repaint();
         }
-        if (contents instanceof SnapshotResultsWindow)
-            ((SnapshotResultsWindow)contents).setState(lastState);
-        container.add(contents, BorderLayout.CENTER);
-        contents.requestFocusInWindow();
-        container.revalidate();
-        container.repaint();
+//        if (oldContents != null) {
+//            if (oldContents instanceof SnapshotResultsWindow)
+//                lastState = ((SnapshotResultsWindow)oldContents).getState();
+//            container.remove(oldContents);
+//        }
+//        if (contents instanceof SnapshotResultsWindow)
+//            ((SnapshotResultsWindow)contents).setState(lastState);
     }
 
     void showURL(String urls) {
@@ -331,6 +382,39 @@ final class TracerView {
             }
         }
         return null;
+    }
+    
+    private static final class SnapshotView extends SnapshotCPUView {
+        
+        SnapshotView(CPUResultsSnapshot snapshot, Action... actions) {
+            super(snapshot, true, actions);
+        }
+        
+        void setData(CPUResultsSnapshot snapshot) {
+            super.setSnapshot(snapshot, true);
+        }
+
+        public boolean showSourceSupported() {
+            return GoToSource.isAvailable();
+        }
+        
+        public void showSource(ClientUtils.SourceCodeSelection value) {
+            String className = value.getClassName();
+            String methodName = value.getMethodName();
+            String methodSig = value.getMethodSignature();
+            GoToSource.openSource(null, className, methodName, methodSig);
+        }
+        
+        public void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    String name = Wildcards.ALLWILDCARD.equals(value.getMethodName()) ?
+                                  "Profile Class" : "Profile Method";
+                    ProfilerSession.findAndConfigure(Lookups.fixed(value), null, name);
+                }
+            });
+        }
+        
     }
     
     @ServiceProvider(service=CPUSnapshotPanel.CCTPopupEnhancer.class)
