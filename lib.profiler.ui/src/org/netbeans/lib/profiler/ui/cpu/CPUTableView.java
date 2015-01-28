@@ -46,13 +46,9 @@ package org.netbeans.lib.profiler.ui.cpu;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.AbstractAction;
-import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.SortOrder;
@@ -64,7 +60,6 @@ import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
-import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
@@ -82,7 +77,6 @@ abstract class CPUTableView extends DataView {
     private ProfilerTable table;
     
     private FlatProfileContainer data;
-    private JComponent searchPanel;
     
     private Map<Integer, ClientUtils.SourceCodeSelection> idMap;
     private final Set<ClientUtils.SourceCodeSelection> selection;
@@ -160,9 +154,7 @@ abstract class CPUTableView extends DataView {
     }
     
     
-    protected abstract void performDefaultAction(ClientUtils.SourceCodeSelection value);
-    
-    protected abstract void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value);
+    protected abstract void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue);
     
     protected void popupShowing() {};
     
@@ -175,11 +167,11 @@ abstract class CPUTableView extends DataView {
         tableModel = new CPUTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null) {
-            protected ClientUtils.SourceCodeSelection getValueForPopup(int row) {
-                return valueForRow(row);
+            public ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
+                return CPUTableView.this.getUserValueForRow(row);
             }
-            protected void populatePopup(JPopupMenu popup, Object value) {
-                CPUTableView.this.populatePopup(popup, (ClientUtils.SourceCodeSelection)value);
+            protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
+                CPUTableView.this.populatePopup(popup, value, (ClientUtils.SourceCodeSelection)userValue);
             }
             protected void popupShowing() {
                 CPUTableView.this.popupShowing();
@@ -190,13 +182,7 @@ abstract class CPUTableView extends DataView {
         };
         
         table.providePopupMenu(true);
-        table.setDefaultAction(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                int row = table.getSelectedRow();
-                ClientUtils.SourceCodeSelection value = valueForRow(row);
-                if (value != null) performDefaultAction(value);
-            }
-        });
+        installDefaultAction();
         
         int offset = selection == null ? -1 : 0;
         
@@ -275,7 +261,7 @@ abstract class CPUTableView extends DataView {
     }
     
     
-    private ClientUtils.SourceCodeSelection valueForRow(int row) {
+    protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
         if (data == null || row == -1) return null;
         if (row >= tableModel.getRowCount()) return null; // #239936
         row = table.convertRowIndexToModel(row);

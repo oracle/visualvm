@@ -251,9 +251,9 @@ abstract class LivenessTableView extends DataView {
     }
     
     
-    protected abstract void performDefaultAction(ClientUtils.SourceCodeSelection value);
+    protected abstract void performDefaultAction(ClientUtils.SourceCodeSelection userValue);
     
-    protected abstract void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value);
+    protected abstract void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue);
     
     protected void popupShowing() {};
     
@@ -266,11 +266,11 @@ abstract class LivenessTableView extends DataView {
         tableModel = new MemoryTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null) {
-            protected ClientUtils.SourceCodeSelection getValueForPopup(int row) {
-                return valueForRow(row);
+            public ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
+                return LivenessTableView.this.getUserValueForRow(row);
             }
-            protected void populatePopup(JPopupMenu popup, Object value) {
-                LivenessTableView.this.populatePopup(popup, (ClientUtils.SourceCodeSelection)value);
+            protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
+                LivenessTableView.this.populatePopup(popup, value, (ClientUtils.SourceCodeSelection)userValue);
             }
             protected void popupShowing() {
                 LivenessTableView.this.popupShowing();
@@ -281,13 +281,7 @@ abstract class LivenessTableView extends DataView {
         };
         
         table.providePopupMenu(true);
-        table.setDefaultAction(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                int row = table.getSelectedRow();
-                ClientUtils.SourceCodeSelection value = valueForRow(row);
-                if (value != null) performDefaultAction(value);
-            }
-        });
+        installDefaultAction();
         
         final int offset = selection == null ? -1 : 0;
         
@@ -346,7 +340,7 @@ abstract class LivenessTableView extends DataView {
     }
     
     
-    private ClientUtils.SourceCodeSelection valueForRow(int row) {
+    protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
         if (nTrackedItems == 0 || row == -1) return null;
         if (row >= tableModel.getRowCount()) return null; // #239936
         return classNames[table.convertRowIndexToModel(row)];

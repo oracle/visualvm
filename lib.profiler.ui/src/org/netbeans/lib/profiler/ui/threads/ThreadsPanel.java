@@ -286,14 +286,14 @@ public class ThreadsPanel extends DataView {
                     return viewManager.getViewWidth();
                 }
             }
-            protected Object getValueForPopup(int row) {
+            public Object getUserValueForRow(int row) {
                 if (row == -1) return null;
                 if (row >= getModel().getRowCount()) return null; // #239936
                 return Integer.valueOf(convertRowIndexToModel(row));
             }
-            protected void populatePopup(JPopupMenu popup, Object value) {
-                if (value != null) {
-                    final int row = ((Integer)value).intValue();
+            protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
+                if (userValue != null) {
+                    final int row = ((Integer)userValue).intValue();
                     final boolean sel = selected.contains(row);
                     popup.add(new JMenuItem(sel ? BUNDLE().getString("ACT_UnselectThread") :
                                                   BUNDLE().getString("ACT_SelectThread")) { // NOI18N

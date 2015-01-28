@@ -46,8 +46,6 @@ package org.netbeans.lib.profiler.ui.cpu;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.AbstractAction;
@@ -141,9 +139,7 @@ abstract class CPUTreeTableView extends DataView {
     }
     
     
-    protected abstract void performDefaultAction(ClientUtils.SourceCodeSelection value);
-    
-    protected abstract void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value);
+    protected abstract void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue);
     
     protected void popupShowing() {};
     
@@ -158,11 +154,11 @@ abstract class CPUTreeTableView extends DataView {
         int offset = selection == null ? -1 : 0;
         
         treeTable = new ProfilerTreeTable(treeTableModel, true, true, new int[] { 1 + offset }) {
-            protected ClientUtils.SourceCodeSelection getValueForPopup(int row) {
-                return valueForRow(row);
+            public ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
+                return CPUTreeTableView.this.getUserValueForRow(row);
             }
-            protected void populatePopup(JPopupMenu popup, Object value) {
-                CPUTreeTableView.this.populatePopup(popup, (ClientUtils.SourceCodeSelection)value);
+            protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
+                CPUTreeTableView.this.populatePopup(popup, value, (ClientUtils.SourceCodeSelection)userValue);
             }
             protected void popupShowing() {
                 CPUTreeTableView.this.popupShowing();
@@ -173,13 +169,7 @@ abstract class CPUTreeTableView extends DataView {
         };
         
         treeTable.providePopupMenu(true);
-        treeTable.setDefaultAction(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                int row = treeTable.getSelectedRow();
-                ClientUtils.SourceCodeSelection value = valueForRow(row);
-                if (value != null) performDefaultAction(value);
-            }
-        });
+        installDefaultAction();
         
         treeTable.setRootVisible(false);
         treeTable.setShowsRootHandles(true);
@@ -270,14 +260,8 @@ abstract class CPUTreeTableView extends DataView {
         return secondary ? node.getTotalTime1() : node.getTotalTime0();
     }
     
-    private PrestimeCPUCCTNode nodeAtRow(int row) {
-        if (row == -1) return null;
-        TreePath path = treeTable.getPathForRow(row);
-        return path == null ? null : (PrestimeCPUCCTNode)path.getLastPathComponent();
-    }
-    
-    private ClientUtils.SourceCodeSelection valueForRow(int row) {
-        PrestimeCPUCCTNode node = nodeAtRow(row);
+    protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
+        PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)treeTable.getValueForRow(row);
         if (node == null) return null;
         else if (node.isThreadNode() || node.isFilteredNode() || node.isSelfTimeNode()) return null;
 //        else return selectionForId(node.getMethodId());

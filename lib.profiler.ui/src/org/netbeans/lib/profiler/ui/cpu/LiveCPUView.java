@@ -233,11 +233,11 @@ public abstract class LiveCPUView extends JPanel {
         setLayout(new BorderLayout(0, 0));
         
         treeTableView = new CPUTreeTableView(selection) {
-            protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                if (showSourceSupported()) showSource(value);
+            protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                if (showSourceSupported()) showSource(userValue);
             }
-            protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                LiveCPUView.this.populatePopup(treeTableView, popup, value);
+            protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                LiveCPUView.this.populatePopup(treeTableView, popup, value, userValue);
             }
             protected void popupShowing() { LiveCPUView.this.popupShowing(); }
             protected void popupHidden()  { LiveCPUView.this.popupHidden(); }
@@ -248,11 +248,11 @@ public abstract class LiveCPUView extends JPanel {
         });
         
         tableView = new CPUTableView(selection) {
-            protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                if (showSourceSupported()) showSource(value);
+            protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                if (showSourceSupported()) showSource(userValue);
             }
-            protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                LiveCPUView.this.populatePopup(tableView, popup, value);
+            protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                LiveCPUView.this.populatePopup(tableView, popup, value, userValue);
             }
             protected void popupShowing() { LiveCPUView.this.popupShowing(); }
             protected void popupHidden()  { LiveCPUView.this.popupHidden(); }
@@ -318,23 +318,23 @@ public abstract class LiveCPUView extends JPanel {
         return lastFocused;
     }
     
-    private void populatePopup(final DataView invoker, JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
+    private void populatePopup(final DataView invoker, JPopupMenu popup, Object value, final ClientUtils.SourceCodeSelection userValue) {
         if (showSourceSupported()) {
             popup.add(new JMenuItem("Go to Source") {
-                { setEnabled(value != null); setFont(getFont().deriveFont(Font.BOLD)); }
-                protected void fireActionPerformed(ActionEvent e) { showSource(value); }
+                { setEnabled(userValue != null); setFont(getFont().deriveFont(Font.BOLD)); }
+                protected void fireActionPerformed(ActionEvent e) { showSource(userValue); }
             });
             popup.addSeparator();
         }
         
         popup.add(new JMenuItem("Profile Method") {
-            { setEnabled(value != null && CPUTableView.isSelectable(value)); }
-            protected void fireActionPerformed(ActionEvent e) { profileMethod(value); }
+            { setEnabled(userValue != null && CPUTableView.isSelectable(userValue)); }
+            protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
         });
         
         popup.add(new JMenuItem("Profile Class") {
-            { setEnabled(value != null); }
-            protected void fireActionPerformed(ActionEvent e) { profileClass(value); }
+            { setEnabled(userValue != null); }
+            protected void fireActionPerformed(ActionEvent e) { profileClass(userValue); }
         });
         
         popup.addSeparator();

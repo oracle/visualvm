@@ -229,7 +229,7 @@ public class LockContentionPanel extends DataView {
 //                if (row >= getModel().getRowCount()) return null; // #239936
 //                return Integer.valueOf(convertRowIndexToModel(row));
 //            }
-            protected void populatePopup(JPopupMenu popup, Object value) {
+            protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
 //                if (value != null) {
 //                    final int row = ((Integer)value).intValue();
 //                    final boolean sel = selected.contains(row);

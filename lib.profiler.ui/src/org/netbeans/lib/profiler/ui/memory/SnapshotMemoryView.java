@@ -92,11 +92,11 @@ public abstract class SnapshotMemoryView extends JPanel {
         
         if (snapshot instanceof SampledMemoryResultsSnapshot) {
             final SampledTableView view = new SampledTableView(null) {
-                protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                    if (showSourceSupported()) showSource(value);
+                protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                    if (showSourceSupported()) showSource(userValue);
                 }
-                protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                    SnapshotMemoryView.this.populatePopup(this, popup, value);
+                protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                    SnapshotMemoryView.this.populatePopup(this, popup, value, userValue);
                 }
             };
             add(view, BorderLayout.CENTER);
@@ -112,11 +112,11 @@ public abstract class SnapshotMemoryView extends JPanel {
             final AllocMemoryResultsSnapshot _snapshot = (AllocMemoryResultsSnapshot)snapshot;
             if (snapshot.containsStacks()) {
                 final AllocTreeTableView view = new AllocTreeTableView() {
-                    protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                        if (showSourceSupported()) showSource(value);
+                    protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                        if (showSourceSupported()) showSource(userValue);
                     }
-                    protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                        SnapshotMemoryView.this.populatePopup(this, popup, value);
+                    protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                        SnapshotMemoryView.this.populatePopup(this, popup, value, userValue);
                     }
                 };
                 add(view, BorderLayout.CENTER);
@@ -131,11 +131,11 @@ public abstract class SnapshotMemoryView extends JPanel {
                 supportsPackageAggregation = false;
             } else {
                 final AllocTableView view = new AllocTableView(null) {
-                    protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                        if (showSourceSupported()) showSource(value);
+                    protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                        if (showSourceSupported()) showSource(userValue);
                     }
-                    protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                        SnapshotMemoryView.this.populatePopup(this, popup, value);
+                    protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                        SnapshotMemoryView.this.populatePopup(this, popup, value, userValue);
                     }
                 };
                 add(view, BorderLayout.CENTER);
@@ -150,11 +150,11 @@ public abstract class SnapshotMemoryView extends JPanel {
             }
         } else if (snapshot instanceof LivenessMemoryResultsSnapshot) {
             final LivenessTableView view = new LivenessTableView(null) {
-                protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                    if (showSourceSupported()) showSource(value);
+                protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                    if (showSourceSupported()) showSource(userValue);
                 }
-                protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                    SnapshotMemoryView.this.populatePopup(this, popup, value);
+                protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                    SnapshotMemoryView.this.populatePopup(this, popup, value, userValue);
                 }
             };
             add(view, BorderLayout.CENTER);
@@ -306,25 +306,25 @@ public abstract class SnapshotMemoryView extends JPanel {
         return true;
     }
     
-    private void populatePopup(final DataView invoker, JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
+    private void populatePopup(final DataView invoker, JPopupMenu popup, Object value, final ClientUtils.SourceCodeSelection userValue) {
         if (showSourceSupported()) {
             popup.add(new JMenuItem("Go to Source") {
-                { setEnabled(value != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); setFont(getFont().deriveFont(Font.BOLD)); }
-                protected void fireActionPerformed(ActionEvent e) { showSource(value); }
+                { setEnabled(userValue != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); setFont(getFont().deriveFont(Font.BOLD)); }
+                protected void fireActionPerformed(ActionEvent e) { showSource(userValue); }
             });
             popup.addSeparator();
         }
         
-        if (value != null && !Wildcards.ALLWILDCARD.equals(value.getMethodName())) {
+        if (userValue != null && !Wildcards.ALLWILDCARD.equals(userValue.getMethodName())) {
             popup.add(new JMenuItem("Profile Method") {
-                { setEnabled(isSelectable(value, true)); }
-                protected void fireActionPerformed(ActionEvent e) { profileMethod(value); }
+                { setEnabled(isSelectable(userValue, true)); }
+                protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
             });
         }
         
         popup.add(new JMenuItem("Profile Class") {
-            { setEnabled(value != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW && isSelectable(value, false)); }
-            protected void fireActionPerformed(ActionEvent e) { profileClass(value); }
+            { setEnabled(userValue != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW && isSelectable(userValue, false)); }
+            protected void fireActionPerformed(ActionEvent e) { profileClass(userValue); }
         });
         
         popup.addSeparator();

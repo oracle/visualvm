@@ -328,11 +328,11 @@ public abstract class LiveMemoryView extends JPanel {
 //                return sampledView;
             case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
                 if (allocView == null) allocView = new AllocTableView(selection) {
-                    protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                        if (showSourceSupported()) showSource(value);
+                    protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                        if (showSourceSupported()) showSource(userValue);
                     }
-                    protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                        LiveMemoryView.this.populatePopup(allocView, popup, value);
+                    protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                        LiveMemoryView.this.populatePopup(allocView, popup, value, userValue);
                     }
                     protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
                     protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
@@ -341,11 +341,11 @@ public abstract class LiveMemoryView extends JPanel {
                 return allocView;
             case CommonConstants.INSTR_OBJECT_LIVENESS:
                 if (livenessView == null) livenessView = new LivenessTableView(selection) {
-                    protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                        if (showSourceSupported()) showSource(value);
+                    protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                        if (showSourceSupported()) showSource(userValue);
                     }
-                    protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                        LiveMemoryView.this.populatePopup(livenessView, popup, value);
+                    protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                        LiveMemoryView.this.populatePopup(livenessView, popup, value, userValue);
                     }
                     protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
                     protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
@@ -354,11 +354,11 @@ public abstract class LiveMemoryView extends JPanel {
                 return livenessView;
             default:
                 if (sampledView == null) sampledView = new SampledTableView(selection) {
-                    protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                        if (showSourceSupported()) showSource(value);
+                    protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                        if (showSourceSupported()) showSource(userValue);
                     }
-                    protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                        LiveMemoryView.this.populatePopup(sampledView, popup, value);
+                    protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                        LiveMemoryView.this.populatePopup(sampledView, popup, value, userValue);
                     }
                     protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
                     protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
@@ -381,18 +381,18 @@ public abstract class LiveMemoryView extends JPanel {
         }
     }
     
-    private void populatePopup(final DataView invoker, JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
+    private void populatePopup(final DataView invoker, JPopupMenu popup, Object value, final ClientUtils.SourceCodeSelection userValue) {
         if (showSourceSupported()) {
             popup.add(new JMenuItem("Go to Source") {
-                { setEnabled(value != null); setFont(getFont().deriveFont(Font.BOLD)); }
-                protected void fireActionPerformed(ActionEvent e) { showSource(value); }
+                { setEnabled(userValue != null); setFont(getFont().deriveFont(Font.BOLD)); }
+                protected void fireActionPerformed(ActionEvent e) { showSource(userValue); }
             });
             popup.addSeparator();
         }
         
         popup.add(new JMenuItem("Profile Class") {
-            { setEnabled(value != null); }
-            protected void fireActionPerformed(ActionEvent e) { selectForProfiling(value); }
+            { setEnabled(userValue != null); }
+            protected void fireActionPerformed(ActionEvent e) { selectForProfiling(userValue); }
         });
         
         popup.addSeparator();

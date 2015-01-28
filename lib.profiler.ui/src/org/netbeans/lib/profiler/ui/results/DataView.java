@@ -47,11 +47,14 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
@@ -76,6 +79,23 @@ public abstract class DataView extends JPanel {
             public void focusGained(FocusEvent e) { handler.run(); }
         });
     }
+    
+    
+    // --- Default action ------------------------------------------------------
+    
+    protected void installDefaultAction() {
+        getResultsComponent().setDefaultAction(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                int row = getResultsComponent().getSelectedRow();
+                ClientUtils.SourceCodeSelection userValue = getUserValueForRow(row);
+                if (userValue != null) performDefaultAction(userValue);
+            }
+        });
+    }
+    
+    protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {};
+    
+    protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) { return null; }
     
     
     // --- Filter & Find support -----------------------------------------------

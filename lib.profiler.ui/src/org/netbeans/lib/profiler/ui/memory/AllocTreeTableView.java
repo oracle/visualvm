@@ -150,9 +150,9 @@ abstract class AllocTreeTableView extends DataView {
     }
     
     
-    protected abstract void performDefaultAction(ClientUtils.SourceCodeSelection value);
+    protected abstract void performDefaultAction(ClientUtils.SourceCodeSelection userValue);
     
-    protected abstract void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value);
+    protected abstract void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue);
     
     
     private HideableBarRenderer[] renderers;
@@ -161,11 +161,11 @@ abstract class AllocTreeTableView extends DataView {
         treeTableModel = new AllocTreeTableModel(PrestimeCPUCCTNode.EMPTY);
         
         treeTable = new ProfilerTreeTable(treeTableModel, true, true, new int[] { 0 }) {
-            protected ClientUtils.SourceCodeSelection getValueForPopup(int row) {
-                return valueForRow(row);
+            public ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
+                return AllocTreeTableView.this.getUserValueForRow(row);
             }
-            protected void populatePopup(JPopupMenu popup, Object value) {
-                AllocTreeTableView.this.populatePopup(popup, (ClientUtils.SourceCodeSelection)value);
+            protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
+                AllocTreeTableView.this.populatePopup(popup, value, (ClientUtils.SourceCodeSelection)userValue);
             }
         };
         
@@ -173,8 +173,8 @@ abstract class AllocTreeTableView extends DataView {
         treeTable.setDefaultAction(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 int row = treeTable.getSelectedRow();
-                ClientUtils.SourceCodeSelection value = valueForRow(row);
-                if (value != null) performDefaultAction(value);
+                ClientUtils.SourceCodeSelection userValue = getUserValueForRow(row);
+                if (userValue != null) performDefaultAction(userValue);
             }
         });
         
@@ -208,14 +208,8 @@ abstract class AllocTreeTableView extends DataView {
         add(tableContainer, BorderLayout.CENTER);
     }
     
-    private PresoObjAllocCCTNode nodeAtRow(int row) {
-        if (row == -1) return null;
-        TreePath path = treeTable.getPathForRow(row);
-        return path == null ? null : (PresoObjAllocCCTNode)path.getLastPathComponent();
-    }
-    
-    private ClientUtils.SourceCodeSelection valueForRow(int row) {
-        PresoObjAllocCCTNode node = nodeAtRow(row);
+    protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
+        PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)treeTable.getValueForRow(row);
         String[] name = node.getMethodClassNameAndSig();
         return new ClientUtils.SourceCodeSelection(name[0], name[1], name[2]);
     }

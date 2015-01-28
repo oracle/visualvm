@@ -155,8 +155,8 @@ public abstract class SnapshotCPUView extends JPanel {
             protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
                 if (showSourceSupported()) showSource(value);
             }
-            protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                SnapshotCPUView.this.populatePopup(treeTableView, popup, value);
+            protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                SnapshotCPUView.this.populatePopup(treeTableView, popup, value, userValue);
             }
         };
         treeTableView.notifyOnFocus(new Runnable() {
@@ -164,11 +164,11 @@ public abstract class SnapshotCPUView extends JPanel {
         });
         
         tableView = new CPUTableView(null) {
-            protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-                if (showSourceSupported()) showSource(value);
+            protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                if (showSourceSupported()) showSource(userValue);
             }
-            protected void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value) {
-                SnapshotCPUView.this.populatePopup(tableView, popup, value);
+            protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                SnapshotCPUView.this.populatePopup(tableView, popup, value, userValue);
             }
         };
         tableView.notifyOnFocus(new Runnable() {
@@ -327,24 +327,26 @@ public abstract class SnapshotCPUView extends JPanel {
         return lastFocused;
     }
     
-    private void populatePopup(final DataView invoker, JPopupMenu popup, final ClientUtils.SourceCodeSelection value) {
+    private void populatePopup(final DataView invoker, JPopupMenu popup, Object value, final ClientUtils.SourceCodeSelection userValue) {
         if (showSourceSupported()) {
             popup.add(new JMenuItem("Go to Source") {
-                { setEnabled(value != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); setFont(getFont().deriveFont(Font.BOLD)); }
-                protected void fireActionPerformed(ActionEvent e) { showSource(value); }
+                { setEnabled(userValue != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); setFont(getFont().deriveFont(Font.BOLD)); }
+                protected void fireActionPerformed(ActionEvent e) { showSource(userValue); }
             });
             popup.addSeparator();
         }
         
         popup.add(new JMenuItem("Profile Method") {
-            { setEnabled(value != null && aggregation == CPUResultsSnapshot.METHOD_LEVEL_VIEW && CPUTableView.isSelectable(value)); }
-            protected void fireActionPerformed(ActionEvent e) { profileMethod(value); }
+            { setEnabled(userValue != null && aggregation == CPUResultsSnapshot.METHOD_LEVEL_VIEW && CPUTableView.isSelectable(userValue)); }
+            protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
         });
         
         popup.add(new JMenuItem("Profile Class") {
-            { setEnabled(value != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); }
-            protected void fireActionPerformed(ActionEvent e) { profileClass(value); }
+            { setEnabled(userValue != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); }
+            protected void fireActionPerformed(ActionEvent e) { profileClass(userValue); }
         });
+        
+        customizeNodePopup(invoker, popup, value, userValue);
         
         popup.addSeparator();
         popup.add(new JMenuItem("Filter") {
@@ -355,6 +357,8 @@ public abstract class SnapshotCPUView extends JPanel {
         });
         
     }
+    
+    protected void customizeNodePopup(DataView invoker, JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {}
     
     private void setView(boolean callTree, boolean hotSpots) {
         treeTableView.setVisible(callTree);
