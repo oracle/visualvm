@@ -74,6 +74,7 @@ public class Response {
     public static final int CLASSID_RESPONSE = 12;
     public static final int HEAP_HISTOGRAM = 13;
     public static final int THREAD_DUMP = 14;
+    public static final int GET_CLASS_FILE_BYTES_RESPONSE = 15;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -178,6 +179,8 @@ public class Response {
                     return "HEAP_HISTOGRAM"; // NOI18N
                 case THREAD_DUMP:
                     return "THREAD_DUMP";   // NOI18N
+                case GET_CLASS_FILE_BYTES_RESPONSE:
+                    return "GET_CLASS_FILE_BYTES_RESPONSE";
                 default:
                     return "Unknown response"; // NOI18N
             }

@@ -46,7 +46,6 @@ package org.netbeans.lib.profiler;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.management.ThreadInfo;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.text.MessageFormat;
@@ -706,6 +705,16 @@ public class ProfilerClient implements CommonConstants {
         sendSimpleCmdToServer(Command.TAKE_THREAD_DUMP);
         resp = (ThreadDumpResponse) getAndCheckLastResponse("Unknown problem when trying to take thread dump"); // NOI18N
         return new ThreadDump(resp.isJDK15(), resp.getTime(), resp.getThreads());
+    }
+
+    public synchronized byte[][] getCachedClassFileBytes(String[] classes, int[] classLoaderIds) throws ClientUtils.TargetAppOrVMTerminated {        
+        GetClassFileBytesResponse resp;
+        
+        checkForTargetVMAlive();
+        GetClassFileBytesCommand cmd = new GetClassFileBytesCommand(classes, classLoaderIds);
+        sendComplexCmdToServer(cmd);
+        resp = (GetClassFileBytesResponse) getAndCheckLastResponse("Unknown problem when trying to get cached class file bytes"); // NOI18N
+        return resp.getClassBytes();
     }
 
     public synchronized MonitoredData getMonitoredData() {
