@@ -944,6 +944,9 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     }
 
     public int getMethodIndex(String name, String sig) {
+        if (methodNames == null) {
+            return -1;
+        }
         for (int i = 0; i < methodNames.length; i++) {
             if ((methodNames[i] == name) && (methodSignatures[i] == sig)) {
                 return i;

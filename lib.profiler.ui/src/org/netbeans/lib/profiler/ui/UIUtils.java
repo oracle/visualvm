@@ -46,6 +46,7 @@ package org.netbeans.lib.profiler.ui;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.PixelGrabber;
 import java.lang.reflect.InvocationTargetException;
@@ -506,16 +507,6 @@ public final class UIUtils {
         }
     }
 
-    public static BufferedImage createScreenshot(Component component) {
-        if (component instanceof JScrollPane) {
-            JScrollPane scrollPane = (JScrollPane) component;
-
-            return createComponentScreenshot(scrollPane.getViewport());
-        } else {
-            return createComponentScreenshot(component);
-        }
-    }
-
     public static void ensureMinimumSize(Component comp) {
         comp = getParentWindow(comp);
 
@@ -691,30 +682,42 @@ public final class UIUtils {
             if (disabledLineColor == null) disabledLineColor = Color.GRAY;
         }
         return disabledLineColor;
-    } 
-
-    private static BufferedImage createComponentScreenshot(final Component component) {
-        final BufferedImage[] result = new BufferedImage[1];
-
-        final Runnable screenshotPerformer = new Runnable() {
-            public void run() {
-                if (component instanceof JTable
-                        || (component instanceof JViewport && ((JViewport) component).getView() instanceof JTable)) {
-                    result[0] = createTableScreenshot(component);
-                } else {
-                    result[0] = createGeneralComponentScreenshot(component);
-                }
-            }
-        };
+    }
+    
+    
+    private static String acceleratorDelimiter;
+    public static String keyAcceleratorString(KeyStroke keyStroke) {
+        String keyText = KeyEvent.getKeyText(keyStroke.getKeyCode());
         
-        try {
-            if (SwingUtilities.isEventDispatchThread()) screenshotPerformer.run();
-            else SwingUtilities.invokeAndWait(screenshotPerformer);
-        } catch (Exception e) {
-            return null;
+        int modifiers = keyStroke.getModifiers();
+        if (modifiers == 0) return keyText;
+        
+        if (acceleratorDelimiter == null) {
+            acceleratorDelimiter = UIManager.getString("MenuItem.acceleratorDelimiter"); // NOI18N
+            if (acceleratorDelimiter == null) acceleratorDelimiter = "+"; // NOI18N // Note: NetBeans default, Swing uses '-' by default
         }
+        return KeyEvent.getKeyModifiersText(modifiers) + acceleratorDelimiter + keyText;
+    }
+    
+    
+    public static BufferedImage createScreenshot(Component component) {
+        assert SwingUtilities.isEventDispatchThread();
         
-        return result[0];
+        if (component instanceof JScrollPane) {
+            JScrollPane scrollPane = (JScrollPane) component;
+            return createComponentScreenshot(scrollPane.getViewport());
+        } else {
+            return createComponentScreenshot(component);
+        }
+    }
+
+    private static BufferedImage createComponentScreenshot(Component component) {
+        if (component instanceof JTable || (component instanceof JViewport &&
+                                           ((JViewport) component).getView() instanceof JTable)) {
+            return createTableScreenshot(component);
+        } else {
+            return createGeneralComponentScreenshot(component);
+        }
     }
 
     private static BufferedImage createGeneralComponentScreenshot(Component component) {
@@ -782,40 +785,11 @@ public final class UIUtils {
 
         BufferedImage tableScreenshot = new BufferedImage(sourceSize.width, tableHeaderSize.height + sourceSize.height,
                                                           BufferedImage.TYPE_INT_RGB);
-        final Graphics tableScreenshotGraphics = tableScreenshot.getGraphics();
-
-        // Component.printAll has to run in AWT Thread to print component contents correctly
-        if (SwingUtilities.isEventDispatchThread()) {
-            tableHeader.printAll(tableScreenshotGraphics);
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                        public void run() {
-                            tableHeader.printAll(tableScreenshotGraphics);
-                        }
-                    });
-            } catch (Exception e) {
-            }
-        }
-
+        Graphics tableScreenshotGraphics = tableScreenshot.getGraphics();
+        tableHeader.printAll(tableScreenshotGraphics);
         tableScreenshotGraphics.translate(0, tableHeaderSize.height);
-
-        final Component printSrc = source;
-
-        // Component.printAll has to run in AWT Thread to print component contents correctly
-        if (SwingUtilities.isEventDispatchThread()) {
-            printSrc.printAll(tableScreenshotGraphics);
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                        public void run() {
-                            printSrc.printAll(tableScreenshotGraphics);
-                        }
-                    });
-            } catch (Exception e) {
-            }
-        }
-
+        source.printAll(tableScreenshotGraphics);
         return tableScreenshot;
     }
+    
 }
