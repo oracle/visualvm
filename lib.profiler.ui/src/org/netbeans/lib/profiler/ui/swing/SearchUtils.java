@@ -227,6 +227,7 @@ public final class SearchUtils {
             String NEXT = "search-next-action"; // NOI18N
             Action nextAction = new AbstractAction() {
                 public void actionPerformed(final ActionEvent e) {
+                    if (combo.isPopupVisible()) combo.hidePopup();
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() { if (next.isEnabled()) next.doClick(); }
                     });
@@ -238,6 +239,7 @@ public final class SearchUtils {
             String PREV = "search-prev-action"; // NOI18N
             Action prevAction = new AbstractAction() {
                 public void actionPerformed(final ActionEvent e) {
+                    if (combo.isPopupVisible()) combo.hidePopup();
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() { if (next.isEnabled()) prev.doClick(); }
                     });
