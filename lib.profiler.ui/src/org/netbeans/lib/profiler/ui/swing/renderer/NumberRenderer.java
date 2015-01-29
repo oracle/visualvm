@@ -68,6 +68,7 @@ public class NumberRenderer extends FormattedLabelRenderer {
     }
     
     protected String getValueString(Object value, int row, Format format) {
+        if (value == null) return "-"; // NOI18N
         String string = super.getValueString(value, row, format);
         return outputFormat == null ? string : formatImpl(outputFormat, string);
     }

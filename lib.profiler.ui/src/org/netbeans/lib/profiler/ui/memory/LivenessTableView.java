@@ -44,12 +44,10 @@
 package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.RowFilter;
@@ -66,6 +64,7 @@ import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
 import org.netbeans.lib.profiler.utils.StringUtils;
@@ -319,7 +318,14 @@ abstract class LivenessTableView extends DataView {
         table.setColumnRenderer(3 + offset, renderers[1]);
         table.setColumnRenderer(4 + offset, renderers[2]);
         table.setColumnRenderer(5 + offset, renderers[3]);
-        table.setColumnRenderer(6 + offset, new NumberRenderer());
+        table.setColumnRenderer(6 + offset, new LabelRenderer() {
+            public void setValue(Object value, int row) {
+                super.setValue(StringUtils.floatPerCentToString(((Float)value).floatValue()), row);
+            }
+            public int getHorizontalAlignment() {
+                return LabelRenderer.TRAILING;
+            }
+        });
         table.setColumnRenderer(7 + offset, new NumberRenderer());
         
         if (selection != null) {
