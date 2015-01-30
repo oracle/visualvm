@@ -149,23 +149,45 @@ public abstract class SnapshotMemoryView extends JPanel {
                 };
             }
         } else if (snapshot instanceof LivenessMemoryResultsSnapshot) {
-            final LivenessTableView view = new LivenessTableView(null) {
-                protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
-                    if (showSourceSupported()) showSource(userValue);
-                }
-                protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
-                    SnapshotMemoryView.this.populatePopup(this, popup, value, userValue);
-                }
-            };
-            add(view, BorderLayout.CENTER);
-            
-            dataView = view;
-            dataSetter = new DataSetter() {
-                public void setData(int aggregation) { view.setData((LivenessMemoryResultsSnapshot)snapshot, filter, aggregation); }
-            };
-            exporterGetter = new ExporterGetter() {
-                public ExportUtils.ExportProvider[] getProviders() { return view.getExportProviders(); }
-            };
+            final LivenessMemoryResultsSnapshot _snapshot = (LivenessMemoryResultsSnapshot)snapshot;
+            if (snapshot.containsStacks()) {
+                final LivenessTreeTableView view = new LivenessTreeTableView() {
+                    protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                        if (showSourceSupported()) showSource(userValue);
+                    }
+                    protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                        SnapshotMemoryView.this.populatePopup(this, popup, value, userValue);
+                    }
+                };
+                add(view, BorderLayout.CENTER);
+                
+                dataView = view;
+                dataSetter = new DataSetter() {
+                    public void setData(int aggregation) { view.setData(_snapshot, filter, aggregation); }
+                };
+                exporterGetter = new ExporterGetter() {
+                    public ExportUtils.ExportProvider[] getProviders() { return view.getExportProviders(); }
+                };
+                supportsPackageAggregation = false;
+            } else {
+                final LivenessTableView view = new LivenessTableView(null) {
+                    protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                        if (showSourceSupported()) showSource(userValue);
+                    }
+                    protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                        SnapshotMemoryView.this.populatePopup(this, popup, value, userValue);
+                    }
+                };
+                add(view, BorderLayout.CENTER);
+
+                dataView = view;
+                dataSetter = new DataSetter() {
+                    public void setData(int aggregation) { view.setData((LivenessMemoryResultsSnapshot)snapshot, filter, aggregation); }
+                };
+                exporterGetter = new ExporterGetter() {
+                    public ExportUtils.ExportProvider[] getProviders() { return view.getExportProviders(); }
+                };
+            }
         } else {
             dataView = null;
             dataSetter = null;

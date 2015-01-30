@@ -185,6 +185,7 @@ public final class FilterUtils {
             map = textC.getInputMap();
             Action nextAction = new AbstractAction() {
                 public void actionPerformed(final ActionEvent e) {
+                    if (combo.isPopupVisible()) combo.hidePopup();
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() { if (filter.isEnabled()) filter.doClick(); }
                     });

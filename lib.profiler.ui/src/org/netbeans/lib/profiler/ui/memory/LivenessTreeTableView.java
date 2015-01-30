@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -56,9 +56,10 @@ import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
-import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTManager;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
+import org.netbeans.lib.profiler.results.memory.PresoObjLivenessCCTNode;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
@@ -67,18 +68,20 @@ import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
+import org.netbeans.lib.profiler.utils.StringUtils;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-abstract class AllocTreeTableView extends DataView {
+abstract class LivenessTreeTableView extends DataView {
     
-    private AllocTreeTableModel treeTableModel;
+    private LivenessTreeTableModel treeTableModel;
     private ProfilerTreeTable treeTable;
     
-    public AllocTreeTableView() {
+    public LivenessTreeTableView() {
         initUI();
     }
     
@@ -86,26 +89,35 @@ abstract class AllocTreeTableView extends DataView {
     protected ProfilerTable getResultsComponent() { return treeTable; }
     
     
-    void setData(final AllocMemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
-        final boolean includeEmpty = filter != null;
+    void setData(final LivenessMemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
+//        final boolean includeEmpty = filter != null;
+        final boolean includeEmpty = false;
         
         int _nTrackedItems = snapshot.getNProfiledClasses();
         String[] _classNames = snapshot.getClassNames();
-        int[] _nTotalAllocObjects = snapshot.getObjectsCounts();
-        long[] _totalAllocObjectsSize = snapshot.getObjectsSizePerClass();
+        long[] _nTrackedAllocObjects = snapshot.getNTrackedAllocObjects();
+        long[] _objectsSizePerClass = snapshot.getObjectsSizePerClass();
+        int[] _nTrackedLiveObjects = snapshot.getNTrackedLiveObjects();
+        int[] _nTotalAllocObjects = snapshot.getnTotalAllocObjects();
+        float[] _avgObjectAge = snapshot.getAvgObjectAge();
+        int[] _maxSurvGen = snapshot.getMaxSurvGen();
         
-        List<PresoObjAllocCCTNode> nodes = new ArrayList();
+        List<PresoObjLivenessCCTNode> nodes = new ArrayList();
         
-        long totalObjects = 0;
-        long totalBytes = 0;
+        long totalLiveBytes = 0;
+        long totalLiveObjects = 0;
+        long totalTrackedAlloc = 0;
+        long totalTotalAlloc = 0;
         
         for (int i = 0; i < _nTrackedItems; i++) {
-            totalObjects += _nTotalAllocObjects[i];
-            totalBytes += _totalAllocObjectsSize[i];
+            totalLiveBytes += _objectsSizePerClass[i];
+            totalLiveObjects += _nTrackedLiveObjects[i];
+            totalTrackedAlloc += _nTrackedAllocObjects[i];
+            totalTotalAlloc += _nTotalAllocObjects[i];
             
             if ((!includeEmpty && _nTotalAllocObjects[i] > 0) || (includeEmpty && filter.contains(_classNames[i]))) {
                 final int _i = i;
-                PresoObjAllocCCTNode node = new PresoObjAllocCCTNode(_classNames[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i]) {
+                PresoObjLivenessCCTNode node = new PresoObjLivenessCCTNode(_classNames[i], _nTrackedAllocObjects[i], _objectsSizePerClass[i], _nTrackedLiveObjects[i], _nTotalAllocObjects[i], _avgObjectAge[i], _maxSurvGen[i]) {
                     public CCTNode[] getChildren() {
                         if (children == null) {
                             MemoryCCTManager callGraphManager = new MemoryCCTManager(snapshot, _i, true);
@@ -128,10 +140,12 @@ abstract class AllocTreeTableView extends DataView {
             }
         }
         
-        renderers[0].setMaxValue(totalBytes);
-        renderers[1].setMaxValue(totalObjects);
+        renderers[0].setMaxValue(totalLiveBytes);
+        renderers[1].setMaxValue(totalLiveObjects);
+        renderers[2].setMaxValue(totalTrackedAlloc);
+        renderers[3].setMaxValue(totalTotalAlloc);
         
-        final PresoObjAllocCCTNode root = PresoObjAllocCCTNode.rootNode(nodes.toArray(new PresoObjAllocCCTNode[nodes.size()]));
+        final PresoObjLivenessCCTNode root = PresoObjLivenessCCTNode.rootNode(nodes.toArray(new PresoObjLivenessCCTNode[nodes.size()]));
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -159,14 +173,14 @@ abstract class AllocTreeTableView extends DataView {
     private HideableBarRenderer[] renderers;
     
     private void initUI() {
-        treeTableModel = new AllocTreeTableModel(PrestimeCPUCCTNode.EMPTY);
+        treeTableModel = new LivenessTreeTableModel(PrestimeCPUCCTNode.EMPTY);
         
         treeTable = new ProfilerTreeTable(treeTableModel, true, true, new int[] { 0 }) {
             public ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
-                return AllocTreeTableView.this.getUserValueForRow(row);
+                return LivenessTreeTableView.this.getUserValueForRow(row);
             }
             protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
-                AllocTreeTableView.this.populatePopup(popup, value, (ClientUtils.SourceCodeSelection)userValue);
+                LivenessTreeTableView.this.populatePopup(popup, value, (ClientUtils.SourceCodeSelection)userValue);
             }
         };
         
@@ -189,19 +203,47 @@ abstract class AllocTreeTableView extends DataView {
         treeTable.setSortColumn(1);
         treeTable.setDefaultSortOrder(0, SortOrder.ASCENDING);
         
-        renderers = new HideableBarRenderer[2];
+        treeTable.setColumnVisibility(4, false);
+        treeTable.setColumnVisibility(5, false);
+        
+        renderers = new HideableBarRenderer[4];
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
         renderers[1] = new HideableBarRenderer(new NumberPercentRenderer());
+        renderers[2] = new HideableBarRenderer(new NumberPercentRenderer());
+        renderers[3] = new HideableBarRenderer(new NumberPercentRenderer() {
+            public void setValue(Object value, int row) {
+                if (((Number)value).longValue() == -1) {
+                    super.setValue(null, row);
+                } else {
+                    super.setValue(value, row);
+                }
+            }
+        });
         
         renderers[0].setMaxValue(123456789);
         renderers[1].setMaxValue(12345678);
+        renderers[2].setMaxValue(12345678);
+        renderers[3].setMaxValue(12345678);
         
         treeTable.setTreeCellRenderer(new MemoryJavaNameRenderer());
         treeTable.setColumnRenderer(1, renderers[0]);
         treeTable.setColumnRenderer(2, renderers[1]);
-        
+        treeTable.setColumnRenderer(3, renderers[2]);
+        treeTable.setColumnRenderer(4, renderers[3]);
+        treeTable.setColumnRenderer(5, new LabelRenderer() {
+            public void setValue(Object value, int row) {
+                super.setValue(StringUtils.floatPerCentToString(((Float)value).floatValue()), row);
+            }
+            public int getHorizontalAlignment() {
+                return LabelRenderer.TRAILING;
+            }
+        });
+
         treeTable.setDefaultColumnWidth(1, renderers[0].getOptimalWidth());
         treeTable.setDefaultColumnWidth(2, renderers[1].getMaxNoBarWidth());
+        treeTable.setDefaultColumnWidth(3, renderers[2].getMaxNoBarWidth());
+        treeTable.setDefaultColumnWidth(4, renderers[3].getMaxNoBarWidth());
+        treeTable.setDefaultColumnWidth(5, renderers[3].getNoBarWidth() - 25);
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(treeTable, false, null);
         
@@ -210,15 +252,15 @@ abstract class AllocTreeTableView extends DataView {
     }
     
     protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
-        PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)treeTable.getValueForRow(row);
+        PresoObjLivenessCCTNode node = (PresoObjLivenessCCTNode)treeTable.getValueForRow(row);
         String[] name = node.getMethodClassNameAndSig();
         return new ClientUtils.SourceCodeSelection(name[0], name[1], name[2]);
     }
     
     
-    private class AllocTreeTableModel extends ProfilerTreeTableModel.Abstract {
+    private class LivenessTreeTableModel extends ProfilerTreeTableModel.Abstract {
         
-        AllocTreeTableModel(TreeNode root) {
+        LivenessTreeTableModel(TreeNode root) {
             super(root);
         }
         
@@ -226,9 +268,17 @@ abstract class AllocTreeTableView extends DataView {
             if (columnIndex == 0) {
                 return "Name";
             } else if (columnIndex == 1) {
-                return "Allocated Bytes";
+                return "Live Bytes";
             } else if (columnIndex == 2) {
+                return "Live Objects";
+            } else if (columnIndex == 3) {
                 return "Allocated Objects";
+            } else if (columnIndex == 4) {
+                return "Total Alloc. Obj.";
+            } else if (columnIndex == 5) {
+                return "Avg. Age";
+            } else if (columnIndex == 6) {
+                return "Generations";
             }
             return null;
         }
@@ -240,23 +290,39 @@ abstract class AllocTreeTableView extends DataView {
                 return Long.class;
             } else if (columnIndex == 2) {
                 return Integer.class;
+            } else if (columnIndex == 3) {
+                return Long.class;
+            } else if (columnIndex == 4) {
+                return Integer.class;
+            } else if (columnIndex == 5) {
+                return Float.class;
+            } else if (columnIndex == 6) {
+                return Integer.class;
             }
             return null;
         }
 
         public int getColumnCount() {
-            return 3;
+            return 7;
         }
 
         public Object getValueAt(TreeNode node, int columnIndex) {
-            PresoObjAllocCCTNode allocNode = (PresoObjAllocCCTNode)node;
+            PresoObjLivenessCCTNode livenessNode = (PresoObjLivenessCCTNode)node;
             
             if (columnIndex == 0) {
-                return allocNode.getNodeName();
+                return livenessNode.getNodeName();
             } else if (columnIndex == 1) {
-                return allocNode.totalObjSize;
+                return livenessNode.totalObjSize;
             } else if (columnIndex == 2) {
-                return allocNode.nCalls;
+                return livenessNode.nLiveObjects;
+            } else if (columnIndex == 3) {
+                return livenessNode.nCalls;
+            } else if (columnIndex == 4) {
+                return livenessNode.nTotalAllocObjects;
+            } else if (columnIndex == 5) {
+                return livenessNode.avgObjectAge;
+            } else if (columnIndex == 6) {
+                return livenessNode.survGen;
             }
 
             return null;

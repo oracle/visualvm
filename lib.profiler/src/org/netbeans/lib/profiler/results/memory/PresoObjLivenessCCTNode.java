@@ -74,9 +74,26 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
     public float avgObjectAge;
     public int nLiveObjects;
     public int survGen;
+    public int nTotalAllocObjects = -1; // Only populated for root nodes
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
+    public static PresoObjLivenessCCTNode rootNode(PresoObjLivenessCCTNode[] children) {
+        PresoObjLivenessCCTNode root = new PresoObjLivenessCCTNode();
+        root.setChildren(children);
+        return root;
+    }
+    
+    public PresoObjLivenessCCTNode(String className, long nCalls, long totalObjSize, int nLiveObjects, int nTotalAllocObjects, float avgObjectAge, int survGen) {
+        super(className, nCalls, totalObjSize);
+        this.nLiveObjects = nLiveObjects;
+        this.nTotalAllocObjects = nTotalAllocObjects;
+        this.avgObjectAge = avgObjectAge;
+        this.survGen = survGen;
+    }
+    
+    PresoObjLivenessCCTNode() {}
+    
     protected PresoObjLivenessCCTNode(RuntimeMemoryCCTNode rtNode) {
         super(rtNode);
     }
