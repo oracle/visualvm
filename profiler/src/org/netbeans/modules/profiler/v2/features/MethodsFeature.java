@@ -310,6 +310,13 @@ final class MethodsFeature extends ProfilerFeature.Basic {
         currentMode.confirmSettings();
     }
     
+    private void confirmAllSettings() {
+        allClassesMode.confirmSettings();
+        projectClassesMode.confirmSettings();
+        selectedClassesMode.confirmSettings();
+        selectedMethodsMode.confirmSettings();
+    }
+    
     private void settingsChanged() {
         configurationChanged();
     }
@@ -556,6 +563,7 @@ final class MethodsFeature extends ProfilerFeature.Basic {
     protected void profilingStateChanged(int oldState, int newState) {
         if (newState == Profiler.PROFILING_INACTIVE || newState == Profiler.PROFILING_IN_TRANSITION) {
             stopResults();
+            confirmAllSettings();
         } else if (isActivated() && newState == Profiler.PROFILING_RUNNING) {
             startResults();
         } else if (newState == Profiler.PROFILING_STARTED) {
