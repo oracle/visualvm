@@ -60,7 +60,6 @@ import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTManager;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.Formatters;
-import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
@@ -73,7 +72,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
  *
  * @author Jiri Sedlacek
  */
-abstract class AllocTreeTableView extends DataView {
+abstract class AllocTreeTableView extends MemoryView {
     
     private AllocTreeTableModel treeTableModel;
     private ProfilerTreeTable treeTable;
@@ -144,8 +143,8 @@ abstract class AllocTreeTableView extends DataView {
     ExportUtils.ExportProvider[] getExportProviders() {
         return treeTable.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
             new ExportUtils.CSVExportProvider(treeTable),
-            new ExportUtils.HTMLExportProvider(treeTable, "Allocated Objects"),
-            new ExportUtils.XMLExportProvider(treeTable, "Allocated Objects"),
+            new ExportUtils.HTMLExportProvider(treeTable, EXPORT_ALLOCATED),
+            new ExportUtils.XMLExportProvider(treeTable, EXPORT_ALLOCATED),
             new ExportUtils.PNGExportProvider(treeTable.getParent())
         };
     }
@@ -224,11 +223,11 @@ abstract class AllocTreeTableView extends DataView {
         
         public String getColumnName(int columnIndex) {
             if (columnIndex == 0) {
-                return "Name";
+                return COLUMN_NAME;
             } else if (columnIndex == 1) {
-                return "Allocated Bytes";
+                return COLUMN_ALLOCATED_BYTES;
             } else if (columnIndex == 2) {
-                return "Allocated Objects";
+                return COLUMN_ALLOCATED_OBJECTS;
             }
             return null;
         }

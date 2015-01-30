@@ -46,6 +46,8 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -73,13 +75,27 @@ import org.netbeans.modules.profiler.api.icons.Icons;
  */
 public final class SearchUtils {
     
+    // -----
+    // I18N String constants
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.swing.Bundle"); // NOI18N
+    public static final String ACTION_FIND = messages.getString("SearchUtils_ActionFind"); // NOI18N
+    private static final String MSG_NODATA = messages.getString("SearchUtils_MsgNoData"); // NOI18N
+    private static final String MSG_NOTFOUND = messages.getString("SearchUtils_MsgNotFound"); // NOI18N
+    private static final String SIDEBAR_CAPTION = messages.getString("SearchUtils_SidebarCaption"); // NOI18N
+    private static final String BTN_PREVIOUS = messages.getString("SearchUtils_BtnPrevious"); // NOI18N
+    private static final String BTN_PREVIOUS_TOOLTIP = messages.getString("SearchUtils_BtnPreviousTooltip"); // NOI18N
+    private static final String BTN_NEXT = messages.getString("SearchUtils_BtnNext"); // NOI18N
+    private static final String BTN_NEXT_TOOLTIP = messages.getString("SearchUtils_BtnNextTooltip"); // NOI18N
+    private static final String BTN_CLOSE_TOOLTIP = messages.getString("SearchUtils_BtnCloseTooltip"); // NOI18N
+    // -----
+    
     public static final String FIND_ACTION_KEY = "find-action-key"; // NOI18N
     
     public static boolean findString(ProfilerTable table, String text, boolean next) {
         int rowCount = table.getRowCount();
         
         if (rowCount == 0) {
-            ProfilerDialogs.displayWarning("No data to search.", "Find", null);
+            ProfilerDialogs.displayWarning(MSG_NODATA, ACTION_FIND, null);
             return false;
         } else if (rowCount == 1) {
             return false;
@@ -102,7 +118,7 @@ public final class SearchUtils {
             if (selectedRow == -1) return false;
         }
         
-        ProfilerDialogs.displayInfo("Searched string not found.", "Find", null);
+        ProfilerDialogs.displayInfo(MSG_NOTFOUND, ACTION_FIND, null);
         return false;
     }
     
@@ -135,7 +151,7 @@ public final class SearchUtils {
         toolbar.setOpaque(false);
         
         toolbar.add(Box.createHorizontalStrut(6));
-        toolbar.add(new JLabel("Find:"));
+        toolbar.add(new JLabel(SIDEBAR_CAPTION));
         toolbar.add(Box.createHorizontalStrut(3));
         
         final EditableHistoryCombo combo = new EditableHistoryCombo();        
@@ -149,7 +165,7 @@ public final class SearchUtils {
         KeyStroke prevKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_MASK);
         KeyStroke nextKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
         
-        final JButton prev = new JButton("Previous", Icons.getIcon(GeneralIcons.FIND_PREVIOUS)) {
+        final JButton prev = new JButton(BTN_PREVIOUS, Icons.getIcon(GeneralIcons.FIND_PREVIOUS)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 SwingUtilities.invokeLater(new Runnable() {
@@ -162,13 +178,13 @@ public final class SearchUtils {
             }
         };
         String prevAccelerator = UIUtils.keyAcceleratorString(prevKey);
-        prev.setToolTipText("Find previous occurence (" + prevAccelerator + ")");
+        prev.setToolTipText(MessageFormat.format(BTN_PREVIOUS_TOOLTIP, prevAccelerator));
         prev.setEnabled(false);
         toolbar.add(prev);
         
         toolbar.add(Box.createHorizontalStrut(2));
         
-        final JButton next = new JButton("Next", Icons.getIcon(GeneralIcons.FIND_NEXT)) {
+        final JButton next = new JButton(BTN_NEXT, Icons.getIcon(GeneralIcons.FIND_NEXT)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 SwingUtilities.invokeLater(new Runnable() {
@@ -181,7 +197,7 @@ public final class SearchUtils {
             }
         };
         String nextAccelerator = UIUtils.keyAcceleratorString(nextKey);
-        next.setToolTipText("Find next occurence (" + nextAccelerator + ")");
+        next.setToolTipText(MessageFormat.format(BTN_NEXT_TOOLTIP, nextAccelerator));
         next.setEnabled(false);
         toolbar.add(next);
         
@@ -211,7 +227,7 @@ public final class SearchUtils {
         final Runnable hider = new Runnable() { public void run() { panel.setVisible(false); } };
         JButton closeButton = CloseButton.create(hider);
         String escAccelerator = UIUtils.keyAcceleratorString(escKey);
-        closeButton.setToolTipText("Close Find sidebar (" + escAccelerator + ")");
+        closeButton.setToolTipText(MessageFormat.format(BTN_CLOSE_TOOLTIP, escAccelerator));
         panel.add(closeButton, BorderLayout.EAST);
         
         String HIDE = "hide-action"; // NOI18N

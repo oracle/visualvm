@@ -45,10 +45,8 @@ package org.netbeans.lib.profiler.ui.cpu;
 
 import java.awt.BorderLayout;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
 import java.util.Map;
 import java.util.Set;
-import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
@@ -59,7 +57,6 @@ import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
-import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
@@ -75,7 +72,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
  *
  * @author Jiri Sedlacek
  */
-abstract class CPUTreeTableView extends DataView {
+abstract class CPUTreeTableView extends CPUView {
     
     private CPUTreeTableModel treeTableModel;
     private ProfilerTreeTable treeTable;
@@ -132,8 +129,8 @@ abstract class CPUTreeTableView extends DataView {
     ExportUtils.ExportProvider[] getExportProviders() {
         return treeTable.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
             new ExportUtils.CSVExportProvider(treeTable),
-            new ExportUtils.HTMLExportProvider(treeTable, "Methods - Call Tree"),
-            new ExportUtils.XMLExportProvider(treeTable, "Methods - Call Tree"),
+            new ExportUtils.HTMLExportProvider(treeTable, EXPORT_CALLTREE),
+            new ExportUtils.XMLExportProvider(treeTable, EXPORT_CALLTREE),
             new ExportUtils.PNGExportProvider(treeTable.getParent())
         };
     }
@@ -298,15 +295,15 @@ abstract class CPUTreeTableView extends DataView {
             if (selection == null) columnIndex++;
             
             if (columnIndex == 1) {
-                return "Name";
+                return COLUMN_NAME;
             } else if (columnIndex == 2) {
-                return "Total Time";
+                return COLUMN_TOTALTIME;
             } else if (columnIndex == 3) {
-                return "Total Time (CPU)";
+                return COLUMN_TOTALTIME_CPU;
             } else if (columnIndex == 4) {
-                return sampled ? "Hits" : "Invocations";
+                return sampled ? COLUMN_HITS : COLUMN_INVOCATIONS;
             } else if (columnIndex == 0) {
-                return "Selected";
+                return COLUMN_SELECTED;
             }
             return null;
         }

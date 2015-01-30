@@ -61,7 +61,6 @@ import org.netbeans.lib.profiler.results.memory.MemoryCCTManager;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.results.memory.PresoObjLivenessCCTNode;
 import org.netbeans.lib.profiler.ui.Formatters;
-import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
@@ -76,7 +75,7 @@ import org.netbeans.lib.profiler.utils.StringUtils;
  *
  * @author Jiri Sedlacek
  */
-abstract class LivenessTreeTableView extends DataView {
+abstract class LivenessTreeTableView extends MemoryView {
     
     private LivenessTreeTableModel treeTableModel;
     private ProfilerTreeTable treeTable;
@@ -158,8 +157,8 @@ abstract class LivenessTreeTableView extends DataView {
     ExportUtils.ExportProvider[] getExportProviders() {
         return treeTable.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
             new ExportUtils.CSVExportProvider(treeTable),
-            new ExportUtils.HTMLExportProvider(treeTable, "Allocated Objects"),
-            new ExportUtils.XMLExportProvider(treeTable, "Allocated Objects"),
+            new ExportUtils.HTMLExportProvider(treeTable, EXPORT_ALLOCATED_LIVE),
+            new ExportUtils.XMLExportProvider(treeTable, EXPORT_ALLOCATED_LIVE),
             new ExportUtils.PNGExportProvider(treeTable.getParent())
         };
     }
@@ -266,19 +265,19 @@ abstract class LivenessTreeTableView extends DataView {
         
         public String getColumnName(int columnIndex) {
             if (columnIndex == 0) {
-                return "Name";
+                return COLUMN_NAME;
             } else if (columnIndex == 1) {
-                return "Live Bytes";
+                return COLUMN_LIVE_BYTES;
             } else if (columnIndex == 2) {
-                return "Live Objects";
+                return COLUMN_LIVE_OBJECTS;
             } else if (columnIndex == 3) {
-                return "Allocated Objects";
+                return COLUMN_ALLOCATED_OBJECTS;
             } else if (columnIndex == 4) {
-                return "Total Alloc. Obj.";
+                return COLUMN_TOTAL_ALLOCATED_OBJECTS;
             } else if (columnIndex == 5) {
-                return "Avg. Age";
+                return COLUMN_AVG_AGE;
             } else if (columnIndex == 6) {
-                return "Generations";
+                return COLUMN_GENERATIONS;
             }
             return null;
         }

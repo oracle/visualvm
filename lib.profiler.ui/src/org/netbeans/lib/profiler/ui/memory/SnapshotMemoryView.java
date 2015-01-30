@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -77,6 +78,14 @@ import org.netbeans.lib.profiler.utils.Wildcards;
  * @author Jiri Sedlacek
  */
 public abstract class SnapshotMemoryView extends JPanel {
+    
+    // -----
+    // I18N String constants
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle"); // NOI18N
+    private static final String TOOLBAR_AGGREGATION = messages.getString("SnapshotMemoryView_ToolbarAggregation"); // NOI18N
+    private static final String AGGREGATION_CLASSES = messages.getString("SnapshotMemoryView_AggregationClasses"); // NOI18N
+    private static final String AGGREGATION_PACKAGES = messages.getString("SnapshotMemoryView_AggregationPackages"); // NOI18N
+    // -----
     
     private final DataView dataView;
     
@@ -231,18 +240,18 @@ public abstract class SnapshotMemoryView extends JPanel {
 //        toolbar.addSeparator();
 //        toolbar.addSpace(5);
         
-        GrayLabel aggregationL = new GrayLabel("Aggregation:");
+        GrayLabel aggregationL = new GrayLabel(TOOLBAR_AGGREGATION);
         toolbar.add(aggregationL);
         
         toolbar.addSpace(2);
         
         Action aClasses = new AbstractAction() {
-            { putValue(NAME, "Classes"); }
+            { putValue(NAME, AGGREGATION_CLASSES); }
             public void actionPerformed(ActionEvent e) { setAggregation(CPUResultsSnapshot.CLASS_LEVEL_VIEW); }
             
         };
         Action aPackages = new AbstractAction() {
-            { putValue(NAME, "Packages"); }
+            { putValue(NAME, AGGREGATION_PACKAGES); }
             public void actionPerformed(ActionEvent e) { setAggregation(CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); }
             
         };
@@ -280,7 +289,7 @@ public abstract class SnapshotMemoryView extends JPanel {
     public ExportUtils.Exportable getExportable(final File sourceFile) {
         return new ExportUtils.Exportable() {
             public String getName() {
-                return "Export Objects";
+                return MemoryView.EXPORT_OBJECTS;
             }
             public ExportUtils.ExportProvider[] getProviders() {
                 ExportUtils.ExportProvider npsProvider = sourceFile == null ? null :
@@ -330,7 +339,7 @@ public abstract class SnapshotMemoryView extends JPanel {
     
     private void populatePopup(final DataView invoker, JPopupMenu popup, Object value, final ClientUtils.SourceCodeSelection userValue) {
         if (showSourceSupported()) {
-            popup.add(new JMenuItem("Go to Source") {
+            popup.add(new JMenuItem(MemoryView.ACTION_GOTOSOURCE) {
                 { setEnabled(userValue != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); setFont(getFont().deriveFont(Font.BOLD)); }
                 protected void fireActionPerformed(ActionEvent e) { showSource(userValue); }
             });
@@ -338,22 +347,22 @@ public abstract class SnapshotMemoryView extends JPanel {
         }
         
         if (userValue != null && !Wildcards.ALLWILDCARD.equals(userValue.getMethodName())) {
-            popup.add(new JMenuItem("Profile Method") {
+            popup.add(new JMenuItem(MemoryView.ACTION_PROFILE_METHOD) {
                 { setEnabled(isSelectable(userValue, true)); }
                 protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
             });
         }
         
-        popup.add(new JMenuItem("Profile Class") {
+        popup.add(new JMenuItem(MemoryView.ACTION_PROFILE_CLASS) {
             { setEnabled(userValue != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW && isSelectable(userValue, false)); }
             protected void fireActionPerformed(ActionEvent e) { profileClass(userValue); }
         });
         
         popup.addSeparator();
-        popup.add(new JMenuItem("Filter") {
+        popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateFilter(); }
         });
-        popup.add(new JMenuItem("Find") {
+        popup.add(new JMenuItem(SearchUtils.ACTION_FIND) {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
         });
     }

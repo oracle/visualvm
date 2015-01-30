@@ -60,11 +60,26 @@ import javax.swing.JPanel;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.v2.ProfilerFeature;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "WelcomePanel_howtoCaption=How To Configure Profiling Session",
+    "WelcomePanel_profilingSettings=Access the profiling settings:",
+    "WelcomePanel_profileButton=Profile",
+    "WelcomePanel_clickForSetings=Click the {0} dropdown arrow in the above toolbar to access the profiling settings.",
+    "WelcomePanel_configureTarget=Configure the target:",
+    "WelcomePanel_setupProjectAttach=Setup attach to project...",
+    "WelcomePanel_setupProcessAttach=Setup attach to process...",
+    "WelcomePanel_configureProjectAttach=Select the {0} item to configure the target project for profiling.",
+    "WelcomePanel_configureProcessAttach=Select the {0} item to configure the external process for profiling.",
+    "WelcomePanel_selectFeatures=Select what features will be used to analyze the application:",
+    "#HTML-formatted, names of items from Profile dropdown menu should be in bold",
+    "WelcomePanel_multipleFeaturesHint=To profile multiple features simultaneously, select the <b>Profile multiple features</b> choice. Note that profiling <b>Methods</b> and <b>Objects</b> is mutually exclusive."
+})
 public abstract class WelcomePanel extends JPanel {
     
     public WelcomePanel(boolean project, boolean attach, Set<ProfilerFeature> features) {
@@ -77,7 +92,7 @@ public abstract class WelcomePanel extends JPanel {
         
         int y = 0;
         
-        HTMLTextArea header = new HTMLTextArea("<font size='+1'>How To Configure Profiling Session</font>");
+        HTMLTextArea header = new HTMLTextArea("<font size='+1'>" + Bundle.WelcomePanel_howtoCaption() + "</font>"); // NOI18N
         header.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, header.getForeground()));
         header.setBackground(background);
         if (UIUtils.isNimbus()) header.setOpaque(false);
@@ -91,7 +106,7 @@ public abstract class WelcomePanel extends JPanel {
         c.insets = new Insets(5, 20, 0, 20);
         pp.add(header, c);
         
-        HTMLTextArea caption1 = new HTMLTextArea("<b>Access the profiling settings:</b>");
+        HTMLTextArea caption1 = new HTMLTextArea("<b>" + Bundle.WelcomePanel_profilingSettings() + "</b>"); // NOI18N
         caption1.setBackground(background);
         if (UIUtils.isNimbus()) caption1.setOpaque(false);
         c = new GridBagConstraints();
@@ -104,7 +119,7 @@ public abstract class WelcomePanel extends JPanel {
         c.insets = new Insets(20, 20, 3, 20);
         pp.add(caption1, c);
         
-        HTMLTextArea hint1 = new HTMLTextArea("Click the <b><a href='#'>Profile</a></b> dropdown arrow in the above toolbar to access the profiling settings.") {
+        HTMLTextArea hint1 = new HTMLTextArea(Bundle.WelcomePanel_clickForSetings("<b><a href='#'>" + Bundle.WelcomePanel_profileButton() + "</a></b>")) { // NOI18N
             protected void showURL(URL url) { highlightItem(null); }
         };
         hint1.setBackground(background);
@@ -121,81 +136,10 @@ public abstract class WelcomePanel extends JPanel {
         
         HTMLTextArea caption2 = null;
         HTMLTextArea hint2 = null;
-//        if (project) {
-//        
-//            caption2 = new HTMLTextArea("<b>Define how the profiling session will be started:</b>");
-//            caption2.setBackground(background);
-//            if (UIUtils.isNimbus()) caption2.setOpaque(false);
-//            c = new GridBagConstraints();
-//            c.gridy = y++;
-//            c.weightx = 1;
-//            c.weighty = 1;
-//            c.gridwidth = GridBagConstraints.REMAINDER;
-//            c.anchor = GridBagConstraints.NORTHWEST;
-//            c.fill = GridBagConstraints.BOTH;
-//            c.insets = new Insets(20, 20, 3, 20);
-//            pp.add(caption2, c);
-//
-//            Link lk1 = new Link("Run project", null);
-//            c = new GridBagConstraints();
-//            c.gridx = 0;
-//            c.gridy = y;
-//            c.gridwidth = 1;
-//            c.anchor = GridBagConstraints.WEST;
-//            c.fill = GridBagConstraints.NONE;
-//            c.insets = new Insets(0, 40, 0, 10);
-//            pp.add(lk1, c);
-//
-//            JLabel lx2 = new JLabel("Start the project with the profiler automatically connected");
-//            lx2.setEnabled(false);
-//            c = new GridBagConstraints();
-//            c.gridx = 1;
-//            c.gridy = y++;
-//            c.gridwidth = 1;
-//            c.anchor = GridBagConstraints.WEST;
-//            c.fill = GridBagConstraints.HORIZONTAL;
-//            c.insets = new Insets(3, 0, 3, 20);
-//            pp.add(lx2, c);
-//
-//            Link lk2 = new Link("Attach to project", null);
-//            c = new GridBagConstraints();
-//            c.gridx = 0;
-//            c.gridy = y;
-//            c.gridwidth = 1;
-//            c.anchor = GridBagConstraints.WEST;
-//            c.fill = GridBagConstraints.NONE;
-//            c.insets = new Insets(0, 40, 0, 10);
-//            pp.add(lk2, c);
-//
-//            JLabel lxx2 = new JLabel("Connect to a project process already running or waiting for the profiler");
-//            lxx2.setEnabled(false);
-//            c = new GridBagConstraints();
-//            c.gridx = 1;
-//            c.gridy = y++;
-//            c.gridwidth = 1;
-//            c.anchor = GridBagConstraints.WEST;
-//            c.fill = GridBagConstraints.HORIZONTAL;
-//            c.insets = new Insets(3, 0, 3, 20);
-//            pp.add(lxx2, c);
-//
-//            hint2 = new HTMLTextArea("To define or review the attach settings, invoke <b>Attach to project | Setup...</b> once selected.");
-//            hint2.setBackground(background);
-//            if (UIUtils.isNimbus()) caption2.setOpaque(false);
-//            c = new GridBagConstraints();
-//            c.gridy = y++;
-//            c.weightx = 1;
-//            c.weighty = 1;
-//            c.gridwidth = GridBagConstraints.REMAINDER;
-//            c.anchor = GridBagConstraints.NORTHWEST;
-//            c.fill = GridBagConstraints.BOTH;
-//            c.insets = new Insets(3, 20, 0, 20);
-//            pp.add(hint2, c);
-//        
-//        } else {
         
         if (attach) {
             
-            caption2 = new HTMLTextArea("<b>Configure the target:</b>");
+            caption2 = new HTMLTextArea("<b>" + Bundle.WelcomePanel_configureTarget() + "</b>"); // NOI18N
             caption2.setBackground(background);
             if (UIUtils.isNimbus()) caption2.setOpaque(false);
             c = new GridBagConstraints();
@@ -208,10 +152,10 @@ public abstract class WelcomePanel extends JPanel {
             c.insets = new Insets(20, 20, 3, 20);
             pp.add(caption2, c);
             
-            final String hint2h = project ? "Setup attach to project..." :
-                                            "Setup attach to process...";
-            final String hint2s = project ? "Select the <b><a href='#'>" + hint2h + "</a></b> item to configure the target project for profiling." :
-                                            "Select the <b><a href='#'>" + hint2h + "</a></b> item to configure the external process for profiling.";
+            final String hint2h = project ? Bundle.WelcomePanel_setupProjectAttach() :
+                                            Bundle.WelcomePanel_setupProcessAttach();
+            final String hint2s = project ? Bundle.WelcomePanel_configureProjectAttach("<b><a href='#'>" + hint2h + "</a></b>"): // NOI18N
+                                            Bundle.WelcomePanel_configureProcessAttach("<b><a href='#'>" + hint2h + "</a></b>"); // NOI18N
             hint2 = new HTMLTextArea(hint2s) {
                 protected void showURL(URL url) { highlightItem(hint2h); }
             };
@@ -229,7 +173,7 @@ public abstract class WelcomePanel extends JPanel {
             
         }
         
-        HTMLTextArea caption3 = new HTMLTextArea("<b>Select what features will be used to analyze the application:</b>");
+        HTMLTextArea caption3 = new HTMLTextArea("<b>" + Bundle.WelcomePanel_selectFeatures() + "</b>"); // NOI18N
         caption3.setBackground(background);
         if (UIUtils.isNimbus()) caption3.setOpaque(false);
         c = new GridBagConstraints();
@@ -267,7 +211,7 @@ public abstract class WelcomePanel extends JPanel {
         
         }
         
-        HTMLTextArea hint3 = new HTMLTextArea("To profile multiple features simultaneously, select the <b>Profile multiple features</b> choice. Note that profiling <b>Methods</b> and <b>Objects</b> is mutually exclusive.");
+        HTMLTextArea hint3 = new HTMLTextArea(Bundle.WelcomePanel_multipleFeaturesHint());
         hint3.setBackground(background);
         if (UIUtils.isNimbus()) hint3.setOpaque(false);
         c = new GridBagConstraints();
