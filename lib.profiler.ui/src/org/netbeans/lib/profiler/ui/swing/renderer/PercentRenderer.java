@@ -73,6 +73,8 @@ public class PercentRenderer extends FormattedLabelRenderer {
     
     
     protected String getValueString(Object value, int row, Format format) {
+        if (value == null) return "-"; // NOI18N
+        
         StringBuilder s = new StringBuilder();
         s.append("("); // NOI18N
         

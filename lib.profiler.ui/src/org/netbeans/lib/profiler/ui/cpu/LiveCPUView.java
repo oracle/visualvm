@@ -320,28 +320,28 @@ public abstract class LiveCPUView extends JPanel {
     
     private void populatePopup(final DataView invoker, JPopupMenu popup, Object value, final ClientUtils.SourceCodeSelection userValue) {
         if (showSourceSupported()) {
-            popup.add(new JMenuItem("Go to Source") {
+            popup.add(new JMenuItem(CPUView.ACTION_GOTOSOURCE) {
                 { setEnabled(userValue != null); setFont(getFont().deriveFont(Font.BOLD)); }
                 protected void fireActionPerformed(ActionEvent e) { showSource(userValue); }
             });
             popup.addSeparator();
         }
         
-        popup.add(new JMenuItem("Profile Method") {
+        popup.add(new JMenuItem(CPUView.ACTION_PROFILE_METHOD) {
             { setEnabled(userValue != null && CPUTableView.isSelectable(userValue)); }
             protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
         });
         
-        popup.add(new JMenuItem("Profile Class") {
+        popup.add(new JMenuItem(CPUView.ACTION_PROFILE_CLASS) {
             { setEnabled(userValue != null); }
             protected void fireActionPerformed(ActionEvent e) { profileClass(userValue); }
         });
         
         popup.addSeparator();
-        popup.add(new JMenuItem("Filter") {
+        popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateFilter(); }
         });
-        popup.add(new JMenuItem("Find") {
+        popup.add(new JMenuItem(SearchUtils.ACTION_FIND) {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
         });
     }

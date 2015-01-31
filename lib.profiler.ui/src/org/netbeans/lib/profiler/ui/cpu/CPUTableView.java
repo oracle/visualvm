@@ -45,10 +45,8 @@ package org.netbeans.lib.profiler.ui.cpu;
 
 import java.awt.BorderLayout;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
 import java.util.Map;
 import java.util.Set;
-import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.SortOrder;
@@ -56,7 +54,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
-import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
@@ -71,7 +68,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
  *
  * @author Jiri Sedlacek
  */
-abstract class CPUTableView extends DataView {
+abstract class CPUTableView extends CPUView {
     
     private CPUTableModel tableModel;
     private ProfilerTable table;
@@ -147,8 +144,8 @@ abstract class CPUTableView extends DataView {
     ExportUtils.ExportProvider[] getExportProviders() {
         return table.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
             new ExportUtils.CSVExportProvider(table),
-            new ExportUtils.HTMLExportProvider(table, "Methods - Hot Spots"),
-            new ExportUtils.XMLExportProvider(table, "Methods - Hot Spots"),
+            new ExportUtils.HTMLExportProvider(table, EXPORT_HOTSPOTS),
+            new ExportUtils.XMLExportProvider(table, EXPORT_HOTSPOTS),
             new ExportUtils.PNGExportProvider(table.getParent())
         };
     }
@@ -293,19 +290,19 @@ abstract class CPUTableView extends DataView {
             if (selection == null) columnIndex++;
             
             if (columnIndex == 1) {
-                return "Name";
+                return COLUMN_NAME;
             } else if (columnIndex == 2) {
-                return "Self Time";
+                return COLUMN_SELFTIME;
             } else if (columnIndex == 3) {
-                return "Self Time (CPU)";
+                return COLUMN_SELFTIME_CPU;
             } else if (columnIndex == 4) {
-                return "Total Time";
+                return COLUMN_TOTALTIME;
             } else if (columnIndex == 5) {
-                return "Total Time (CPU)";
+                return COLUMN_TOTALTIME_CPU;
             } else if (columnIndex == 6) {
-                return sampled ? "Hits" : "Invocations";
+                return sampled ? COLUMN_HITS : COLUMN_INVOCATIONS;
             } else if (columnIndex == 0) {
-                return "Selected";
+                return COLUMN_SELECTED;
             }
             return null;
         }

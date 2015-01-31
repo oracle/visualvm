@@ -45,6 +45,8 @@ package org.netbeans.lib.profiler.ui.swing;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -71,6 +73,15 @@ import org.netbeans.modules.profiler.api.icons.Icons;
  * @author Jiri Sedlacek
  */
 public final class FilterUtils {
+    
+    // -----
+    // I18N String constants
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.swing.Bundle"); // NOI18N
+    public static final String ACTION_FILTER = messages.getString("FilterUtils_ActionFilter"); // NOI18N
+    private static final String SIDEBAR_CAPTION = messages.getString("FilterUtils_SidebarCaption"); // NOI18N
+    private static final String BTN_FILTER_TOOLTIP = messages.getString("FilterUtils_BtnFilterTooltip"); // NOI18N
+    private static final String BTN_CLOSE_TOOLTIP = messages.getString("FilterUtils_BtnCloseTooltip"); // NOI18N
+    // -----
     
     public static final String FILTER_ACTION_KEY = "filter-action-key"; // NOI18N
     
@@ -103,7 +114,7 @@ public final class FilterUtils {
         toolbar.setOpaque(false);
         
         toolbar.add(Box.createHorizontalStrut(6));
-        toolbar.add(new JLabel("Filter:"));
+        toolbar.add(new JLabel(SIDEBAR_CAPTION));
         toolbar.add(Box.createHorizontalStrut(3));
         
         final EditableHistoryCombo combo = new EditableHistoryCombo();        
@@ -119,7 +130,7 @@ public final class FilterUtils {
         final String[] activeFilter = new String[1];
         final boolean disabled = table instanceof ProfilerTreeTable; // NOTE: temporarily disabled for TreeTables
         
-        final JButton filter = new JButton("Filter", Icons.getIcon(GeneralIcons.FILTER)) {
+        final JButton filter = new JButton(ACTION_FILTER, Icons.getIcon(GeneralIcons.FILTER)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 final JButton _filter = this;
@@ -134,7 +145,7 @@ public final class FilterUtils {
             }
         };
         String filterAccelerator = UIUtils.keyAcceleratorString(filterKey);
-        filter.setToolTipText("Filter results (" + filterAccelerator + ")");
+        filter.setToolTipText(MessageFormat.format(BTN_FILTER_TOOLTIP, filterAccelerator));
         toolbar.add(filter);
         
         updateFilterButton(filter, activeFilter, getFilterString(combo), disabled);
@@ -170,7 +181,7 @@ public final class FilterUtils {
         };
         JButton closeButton = CloseButton.create(hider);
         String escAccelerator = UIUtils.keyAcceleratorString(escKey);
-        closeButton.setToolTipText("Close Filter sidebar (" + escAccelerator + ")");
+        closeButton.setToolTipText(MessageFormat.format(BTN_CLOSE_TOOLTIP, escAccelerator));
         panel.add(closeButton, BorderLayout.EAST);
         
         String HIDE = "hide-action"; // NOI18N
@@ -185,6 +196,7 @@ public final class FilterUtils {
             map = textC.getInputMap();
             Action nextAction = new AbstractAction() {
                 public void actionPerformed(final ActionEvent e) {
+                    if (combo.isPopupVisible()) combo.hidePopup();
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() { if (filter.isEnabled()) filter.doClick(); }
                     });

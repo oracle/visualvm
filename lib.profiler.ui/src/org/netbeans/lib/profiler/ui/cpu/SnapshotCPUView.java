@@ -53,6 +53,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -85,6 +86,19 @@ import org.netbeans.lib.profiler.utils.Wildcards;
  */
 public abstract class SnapshotCPUView extends JPanel {
     
+    // -----
+    // I18N String constants
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.cpu.Bundle"); // NOI18N
+    private static final String TOOLBAR_VIEW = messages.getString("SnapshotCPUView_ToolbarView"); // NOI18N
+    private static final String VIEW_CALLTREE = messages.getString("SnapshotCPUView_ViewCallTree"); // NOI18N
+    private static final String VIEW_HOTSPOTS = messages.getString("SnapshotCPUView_ViewHotSpots"); // NOI18N
+    private static final String VIEW_COMBINED = messages.getString("SnapshotCPUView_ViewCombined"); // NOI18N
+    private static final String TOOLBAR_AGGREGATION = messages.getString("SnapshotCPUView_ToolbarAggregation"); // NOI18N
+    private static final String AGGREGATION_METHODS = messages.getString("SnapshotCPUView_AggregationMethods"); // NOI18N
+    private static final String AGGREGATION_CLASSES = messages.getString("SnapshotCPUView_AggregationClasses"); // NOI18N
+    private static final String AGGREGATION_PACKAGES = messages.getString("SnapshotCPUView_AggregationPackages"); // NOI18N
+    // -----
+    
     private boolean sampled;
     private CPUResultsSnapshot snapshot;
     
@@ -108,7 +122,7 @@ public abstract class SnapshotCPUView extends JPanel {
     public ExportUtils.Exportable getExportable(final File sourceFile) {
         return new ExportUtils.Exportable() {
             public String getName() {
-                return "Export Methods";
+                return CPUView.EXPORT_METHODS;
             }
             public ExportUtils.ExportProvider[] getProviders() {
                 ExportUtils.ExportProvider[] providers = null;
@@ -218,23 +232,23 @@ public abstract class SnapshotCPUView extends JPanel {
             toolbar.addSpace(5);
         }
         
-        GrayLabel viewL = new GrayLabel("View:");
+        GrayLabel viewL = new GrayLabel(TOOLBAR_VIEW);
         toolbar.add(viewL);
         
         toolbar.addSpace(2);
         
         Action aCallTree = new AbstractAction() {
-            { putValue(NAME, "Call tree"); }
+            { putValue(NAME, VIEW_CALLTREE); }
             public void actionPerformed(ActionEvent e) { setView(true, false); }
             
         };
         Action aHotSpots = new AbstractAction() {
-            { putValue(NAME, "Hot spots"); }
+            { putValue(NAME, VIEW_HOTSPOTS); }
             public void actionPerformed(ActionEvent e) { setView(false, true); }
             
         };
         Action aCombined = new AbstractAction() {
-            { putValue(NAME, "Combined"); }
+            { putValue(NAME, VIEW_COMBINED); }
             public void actionPerformed(ActionEvent e) { setView(true, true); }
             
         };
@@ -262,23 +276,23 @@ public abstract class SnapshotCPUView extends JPanel {
 //        toolbar.addSeparator();
 //        toolbar.addSpace(5);
         
-        GrayLabel aggregationL = new GrayLabel("Aggregation:");
+        GrayLabel aggregationL = new GrayLabel(TOOLBAR_AGGREGATION);
         toolbar.add(aggregationL);
         
         toolbar.addSpace(2);
         
         Action aMethods = new AbstractAction() {
-            { putValue(NAME, "Methods"); }
+            { putValue(NAME, AGGREGATION_METHODS); }
             public void actionPerformed(ActionEvent e) { setAggregation(CPUResultsSnapshot.METHOD_LEVEL_VIEW); }
             
         };
         Action aClasses = new AbstractAction() {
-            { putValue(NAME, "Classes"); }
+            { putValue(NAME, AGGREGATION_CLASSES); }
             public void actionPerformed(ActionEvent e) { setAggregation(CPUResultsSnapshot.CLASS_LEVEL_VIEW); }
             
         };
         Action aPackages = new AbstractAction() {
-            { putValue(NAME, "Packages"); }
+            { putValue(NAME, AGGREGATION_PACKAGES); }
             public void actionPerformed(ActionEvent e) { setAggregation(CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); }
             
         };
@@ -329,19 +343,19 @@ public abstract class SnapshotCPUView extends JPanel {
     
     private void populatePopup(final DataView invoker, JPopupMenu popup, Object value, final ClientUtils.SourceCodeSelection userValue) {
         if (showSourceSupported()) {
-            popup.add(new JMenuItem("Go to Source") {
+            popup.add(new JMenuItem(CPUView.ACTION_GOTOSOURCE) {
                 { setEnabled(userValue != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); setFont(getFont().deriveFont(Font.BOLD)); }
                 protected void fireActionPerformed(ActionEvent e) { showSource(userValue); }
             });
             popup.addSeparator();
         }
         
-        popup.add(new JMenuItem("Profile Method") {
+        popup.add(new JMenuItem(CPUView.ACTION_PROFILE_METHOD) {
             { setEnabled(userValue != null && aggregation == CPUResultsSnapshot.METHOD_LEVEL_VIEW && CPUTableView.isSelectable(userValue)); }
             protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
         });
         
-        popup.add(new JMenuItem("Profile Class") {
+        popup.add(new JMenuItem(CPUView.ACTION_PROFILE_CLASS) {
             { setEnabled(userValue != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); }
             protected void fireActionPerformed(ActionEvent e) { profileClass(userValue); }
         });
@@ -349,10 +363,10 @@ public abstract class SnapshotCPUView extends JPanel {
         customizeNodePopup(invoker, popup, value, userValue);
         
         popup.addSeparator();
-        popup.add(new JMenuItem("Filter") {
+        popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateFilter(); }
         });
-        popup.add(new JMenuItem("Find") {
+        popup.add(new JMenuItem(SearchUtils.ACTION_FIND) {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
         });
         

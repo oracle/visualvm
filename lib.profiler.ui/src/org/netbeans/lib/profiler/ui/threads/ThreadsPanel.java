@@ -308,10 +308,10 @@ public class ThreadsPanel extends DataView {
                     popup.addSeparator();
                 }
                 
-                popup.add(new JMenuItem("Filter") {
+                popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
                     protected void fireActionPerformed(ActionEvent e) { activateFilter(); }
                 });
-                popup.add(new JMenuItem("Find") {
+                popup.add(new JMenuItem(SearchUtils.ACTION_FIND) {
                     protected void fireActionPerformed(ActionEvent e) { activateSearch(); }
                 });
             }

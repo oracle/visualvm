@@ -111,7 +111,7 @@ public class PresoObjAllocCCTNode implements CCTNode {
         methodName = Wildcards.ALLWILDCARD;
     }
     
-    private PresoObjAllocCCTNode() {}
+    PresoObjAllocCCTNode() {}
     
     protected PresoObjAllocCCTNode(RuntimeMemoryCCTNode rtNode) {
         methodId = rtNode.methodId;

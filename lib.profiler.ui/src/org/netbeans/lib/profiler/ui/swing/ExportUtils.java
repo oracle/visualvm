@@ -55,6 +55,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -73,6 +75,24 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
  */
 public final class ExportUtils {
     
+    // -----
+    // I18N String constants
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.swing.Bundle"); // NOI18N
+    public static final String ACTION_EXPORT = messages.getString("ExportUtils_ActionExport"); // NOI18N
+    private static final String NPS_FILE = messages.getString("ExportUtils_NpsFile"); // NOI18N
+    private static final String CSV_FILE = messages.getString("ExportUtils_CsvFile"); // NOI18N
+    private static final String HTML_FILE = messages.getString("ExportUtils_HtmlFile"); // NOI18N
+    private static final String XML_FILE = messages.getString("ExportUtils_XmlFile"); // NOI18N
+    private static final String PNG_FILE = messages.getString("ExportUtils_PngFile"); // NOI18N
+    private static final String FILE_FILTER_DESCR = messages.getString("ExportUtils_FileFilterDescr"); // NOI18N
+    private static final String MSG_CANNOT_OVERWRITE_SOURCE = messages.getString("ExportUtils_MsgCannotOverwriteSource"); // NOI18N
+    private static final String MSG_EXPORT_SNAPSHOT_FAILED = messages.getString("ExportUtils_MsgExportSnapshotFailed"); // NOI18N
+    private static final String MSG_EXPORT_IMAGE_FAILED = messages.getString("ExportUtils_MsgExportImageFailed"); // NOI18N
+    private static final String MSG_NODATA = messages.getString("ExportUtils_MsgNoData"); // NOI18N
+    private static final String TITLE_OVERWRITE_FILE = messages.getString("ExportUtils_TitleOverwriteFile"); // NOI18N
+    private static final String MSG_OVERWRITE_FILE = messages.getString("ExportUtils_MsgOverwriteFile"); // NOI18N
+    // -----
+    
     public static class FormatFilter extends FileFilter {
         
         private final String name;
@@ -88,7 +108,7 @@ public final class ExportUtils {
         }
         
         public String getDescription() {
-            return name + " (*" + extension + ")";
+            return MessageFormat.format(FILE_FILTER_DESCR, name, extension);
         }
         
         public String getExtension() {
@@ -97,11 +117,11 @@ public final class ExportUtils {
         
     }
     
-    public static final FormatFilter NPS_FILTER = new FormatFilter("Profiler Snapshot File", "nps");
-    public static final FormatFilter CSV_FILTER = new FormatFilter("CSV File", "csv");
-    public static final FormatFilter HTML_FILTER = new FormatFilter("HTML File", "html");
-    public static final FormatFilter XML_FILTER = new FormatFilter("XML File", "xml");
-    public static final FormatFilter PNG_FILTER = new FormatFilter("PNG Image", "png");
+    public static final FormatFilter NPS_FILTER = new FormatFilter(NPS_FILE, "nps"); // NOI18N
+    public static final FormatFilter CSV_FILTER = new FormatFilter(CSV_FILE, "csv"); // NOI18N
+    public static final FormatFilter HTML_FILTER = new FormatFilter(HTML_FILE, "html"); // NOI18N
+    public static final FormatFilter XML_FILTER = new FormatFilter(XML_FILE, "xml"); // NOI18N
+    public static final FormatFilter PNG_FILTER = new FormatFilter(PNG_FILE, "png"); // NOI18N
     
     
     public static abstract class Exportable {
@@ -157,14 +177,14 @@ public final class ExportUtils {
         
         public void export(File targetFile) {
             if (targetFile.isFile() && targetFile.equals(sourceFile)) {
-                ProfilerDialogs.displayError("Cannot overwrite source file.");
+                ProfilerDialogs.displayError(MSG_CANNOT_OVERWRITE_SOURCE);
             } else {
                 try {
                     Files.copy(sourceFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING,
                                                                          StandardCopyOption.COPY_ATTRIBUTES);
                 } catch (IOException ex) {
                     System.err.println(ex);
-                    ProfilerDialogs.displayError("Exporting snapshot failed.");
+                    ProfilerDialogs.displayError(MSG_EXPORT_SNAPSHOT_FAILED);
                 }
             }
         }
@@ -230,7 +250,7 @@ public final class ExportUtils {
                         ImageIO.write(image, "PNG", targetFile); // NOI18N
                     } catch (IOException ex) {
                         System.err.println(ex);
-                        ProfilerDialogs.displayError("Exporting image failed.");
+                        ProfilerDialogs.displayError(MSG_EXPORT_IMAGE_FAILED);
                     }
                 }
             });
@@ -245,7 +265,7 @@ public final class ExportUtils {
                 ExportProvider[] providers = exportable == null ? null : exportable.getProviders();
                 
                 if (providers == null || providers.length == 0) {
-                    ProfilerDialogs.displayWarning("No data to export", name, null);
+                    ProfilerDialogs.displayWarning(MSG_NODATA, name, null);
                 } else {
                     JFileChooser fileChooser = new JFileChooser();
                     fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
@@ -269,7 +289,7 @@ public final class ExportUtils {
     private static void showExportDialog(final JFileChooser fileChooser, final Component parent, final ExportProvider[] providers) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                if (fileChooser.showDialog(parent, "Export") != JFileChooser.APPROVE_OPTION) return;
+                if (fileChooser.showDialog(parent, ACTION_EXPORT) != JFileChooser.APPROVE_OPTION) return;
 
                 File targetFile = fileChooser.getSelectedFile();
                 FileFilter filter = fileChooser.getFileFilter();
@@ -289,8 +309,7 @@ public final class ExportUtils {
     
     private static boolean checkFileExists(File file) {
         return !file.isFile() ? true : ProfilerDialogs.displayConfirmation(
-                                       "Overwrite existing file?",
-                                       "Overwrite Existing File");
+                                       MSG_OVERWRITE_FILE, TITLE_OVERWRITE_FILE);
     }
     
     public static File checkFileExtesion(File file, String extension) {

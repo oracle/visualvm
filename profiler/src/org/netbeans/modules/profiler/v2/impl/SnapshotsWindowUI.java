@@ -115,7 +115,24 @@ import org.openide.windows.WindowManager;
 @NbBundle.Messages({
     "SnapshotsWindowUI_name=Snapshots",
     "#NOI18N",
-    "SnapshotsWindowUI_mode=properties"
+    "SnapshotsWindowUI_mode=properties",
+    "SnapshotsWindowUI_colType=Type",
+    "SnapshotsWindowUI_colName=Name",
+    "SnapshotsWindowUI_lblProject=Project:",
+    "SnapshotsWindowUI_lblSnapshots=Snapshots:",
+    "SnapshotsWindowUI_actOpenSnapshots=Open selected snapshots",
+    "SnapshotsWindowUI_actExportSnapshot=Export selected snapshot",
+    "SnapshotsWindowUI_actCompareSnapshots=Compare selected snapshots",
+    "SnapshotsWindowUI_actRenameSnapshot=Rename selected snapshot",
+    "SnapshotsWindowUI_actDeleteSnapshots=Delete selected snapshots",
+    "SnapshotsWindowUI_msgCannotCompareSnapshots=Selected snapshots cannot be compared.",
+    "SnapshotsWindowUI_capRenameSnapshot=Rename Snapshot",
+    "SnapshotsWindowUI_msgNameEmpty=Snapshot name cannot be empty.",
+    "SnapshotsWindowUI_msgRenameFailed=Failed to rename {0}",
+    "SnapshotsWindowUI_capDeleteSnapshots=Confirm Delete",
+    "SnapshotsWindowUI_msgDeleteSnapshots=Delete selected snapshots?",
+    "SnapshotsWindowUI_msgDeleteFailed=Failed to delete {0}",
+    "SnapshotsWindowUI_lblNewFile=&New file name:"
 })
 public final class SnapshotsWindowUI extends TopComponent {
     
@@ -174,9 +191,9 @@ public final class SnapshotsWindowUI extends TopComponent {
     private final AbstractTableModel snapshotsTableModel = new AbstractTableModel() {
         public String getColumnName(int columnIndex) {
             if (columnIndex == 0) {
-                return "Type";
+                return Bundle.SnapshotsWindowUI_colType();
             } else if (columnIndex == 1) {
-                return "Name";
+                return Bundle.SnapshotsWindowUI_colName();
             }
             return null;
         }
@@ -260,7 +277,7 @@ public final class SnapshotsWindowUI extends TopComponent {
         GridBagConstraints c;
         int y = 0;
         
-        JLabel projectSelectL = new JLabel("Project:", JLabel.LEADING);
+        JLabel projectSelectL = new JLabel(Bundle.SnapshotsWindowUI_lblProject(), JLabel.LEADING);
         c = new GridBagConstraints();
         c.gridy = y++;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -294,7 +311,7 @@ public final class SnapshotsWindowUI extends TopComponent {
         c.insets = new Insets(3, 10, 0, 10);
         contents.add(selector, c);
         
-        JLabel snapshotsListL = new JLabel("Snapshots:", JLabel.LEADING);
+        JLabel snapshotsListL = new JLabel(Bundle.SnapshotsWindowUI_lblSnapshots(), JLabel.LEADING);
         c = new GridBagConstraints();
         c.gridy = y++;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -309,7 +326,7 @@ public final class SnapshotsWindowUI extends TopComponent {
         snapshotsTable.setSecondarySortColumn(1);
         snapshotsTable.setSortColumn(0);
         snapshotsTable.setFitWidthColumn(1);
-        snapshotsTable.setDefaultColumnWidth(0, new JLabel("Type").getPreferredSize().width + 30);      
+        snapshotsTable.setDefaultColumnWidth(0, new JLabel(Bundle.SnapshotsWindowUI_colType()).getPreferredSize().width + 30);      
         snapshotsTable.setColumnRenderer(0, new LabelRenderer() {
             {
                 setHorizontalAlignment(CENTER);
@@ -375,14 +392,14 @@ public final class SnapshotsWindowUI extends TopComponent {
                 openSnapshots(snapshotsTable.getSelectedValues(1));
             }
         };
-        openB.setToolTipText("Open selected snapshots");
+        openB.setToolTipText(Bundle.SnapshotsWindowUI_actOpenSnapshots());
         exportB = new ThinButton(Icons.getIcon(GeneralIcons.EXPORT)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 exportSnapshots(snapshotsTable.getSelectedValues(1));
             }
         };
-        exportB.setToolTipText("Export selected snapshot");
+        exportB.setToolTipText(Bundle.SnapshotsWindowUI_actExportSnapshot());
         compareB = new ThinButton(Icons.getIcon(ProfilerIcons.SNAPSHOTS_COMPARE)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
@@ -390,7 +407,7 @@ public final class SnapshotsWindowUI extends TopComponent {
                 compareSnapshots(snapshots.get(0), snapshots.get(1));
             }
         };
-        compareB.setToolTipText("Compare selected snapshots");
+        compareB.setToolTipText(Bundle.SnapshotsWindowUI_actCompareSnapshots());
         renameB = new ThinButton(Icons.getIcon(GeneralIcons.RENAME)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
@@ -398,14 +415,14 @@ public final class SnapshotsWindowUI extends TopComponent {
                 renameSnapshot(s, snapshotsTableModel);
             }
         };
-        renameB.setToolTipText("Rename selected snapshot");
+        renameB.setToolTipText(Bundle.SnapshotsWindowUI_actRenameSnapshot());
         deleteB = new ThinButton(Icons.getIcon(ProfilerIcons.RUN_GC)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 deleteSnapshots(snapshotsTable.getSelectedValues(1));
             }
         };
-        deleteB.setToolTipText("Delete selected snapshots");
+        deleteB.setToolTipText(Bundle.SnapshotsWindowUI_actDeleteSnapshots());
         
         JPanel actions = new JPanel(new ButtonsLayout());
         actions.setOpaque(true);
@@ -485,7 +502,7 @@ public final class SnapshotsWindowUI extends TopComponent {
                         public void run() { ResultsManager.getDefault().compareSnapshots(file1, file2); }
                     });
                 } else {
-                    ProfilerDialogs.displayError("Selected snapshots cannot be compared.");
+                    ProfilerDialogs.displayError(Bundle.SnapshotsWindowUI_msgCannotCompareSnapshots());
                 }   
             }
         });
@@ -498,7 +515,7 @@ public final class SnapshotsWindowUI extends TopComponent {
                 String origName = file.getName();
                 RenameSnapshotPanel panel = new RenameSnapshotPanel();
                 panel.setSnapshotName(origName);
-                DialogDescriptor dd = new DialogDescriptor(panel, "Rename Snapshot",
+                DialogDescriptor dd = new DialogDescriptor(panel, Bundle.SnapshotsWindowUI_capRenameSnapshot(),
                             true, new Object[] { DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION },
                             DialogDescriptor.OK_OPTION, 0, null, null);
                 Dialog d = DialogDisplayer.getDefault().createDialog(dd);
@@ -509,7 +526,7 @@ public final class SnapshotsWindowUI extends TopComponent {
                 final String newName = panel.getSnapshotName();
                 if (!origName.equals(newName)) {
                     if (newName.length() == 0) {
-                        ProfilerDialogs.displayError("Snapshot name cannot be empty.");
+                        ProfilerDialogs.displayError(Bundle.SnapshotsWindowUI_msgNameEmpty());
                         renameSnapshot(snapshot, model);
                     } else {
                         SnapshotsWindowHelper.PROCESSOR.post(new Runnable() {
@@ -526,7 +543,7 @@ public final class SnapshotsWindowUI extends TopComponent {
                                         public void run() { model.fireTableDataChanged(); }
                                     });
                                 } catch (IOException e) {
-                                    ProfilerDialogs.displayError("Failed to rename " + snapshot.getDisplayName());
+                                    ProfilerDialogs.displayError(Bundle.SnapshotsWindowUI_msgRenameFailed(snapshot.getDisplayName()));
                                     e.printStackTrace();
                                     renameSnapshot(snapshot, model);
                                 } finally {
@@ -543,11 +560,11 @@ public final class SnapshotsWindowUI extends TopComponent {
     private static void deleteSnapshots(final Collection<Snapshot> snapshots) {
         SnapshotsWindowHelper.PROCESSOR.post(new Runnable() {
             public void run() {
-                if (ProfilerDialogs.displayConfirmation("Delete selected snapshots?", "Confirm Delete")) {
+                if (ProfilerDialogs.displayConfirmation(Bundle.SnapshotsWindowUI_msgDeleteSnapshots(), Bundle.SnapshotsWindowUI_capDeleteSnapshots())) {
                     for (Snapshot snapshot : snapshots) try {
                         DataObject.find(snapshot.getFile()).delete();
                     } catch (Throwable t) {
-                        ProfilerDialogs.displayError("Failed to delete " + snapshot.getDisplayName());
+                        ProfilerDialogs.displayError(Bundle.SnapshotsWindowUI_msgDeleteFailed(snapshot.getDisplayName()));
                         t.printStackTrace();
                     }
                 }
@@ -725,7 +742,7 @@ public final class SnapshotsWindowUI extends TopComponent {
             GridBagConstraints gridBagConstraints;
             
             JLabel textLabel = new JLabel();
-            Mnemonics.setLocalizedText(textLabel, "&New file name:");
+            Mnemonics.setLocalizedText(textLabel, Bundle.SnapshotsWindowUI_lblNewFile());
             textLabel.setAlignmentX(JLabel.LEFT_ALIGNMENT);
 
             textField = new JTextField();

@@ -206,7 +206,7 @@ public abstract class LiveMemoryView extends JPanel {
                 }
                 break;
             default:
-                throw new IllegalArgumentException("Invalid profiling instr. type: "+client.getCurrentInstrType());
+                throw new IllegalArgumentException("Invalid profiling instr. type: " + client.getCurrentInstrType()); // NOI18N
         }
         final Runnable updateDataInAWTFinal = updateDataInAWT;
         SwingUtilities.invokeLater(new Runnable() {
@@ -244,7 +244,7 @@ public abstract class LiveMemoryView extends JPanel {
                 }
                 break;
             default:
-                throw new IllegalArgumentException("Invalid profiling instr. type: "+client.getCurrentInstrType());
+                throw new IllegalArgumentException("Invalid profiling instr. type: " + client.getCurrentInstrType()); // NOI18N
         }
     }
     
@@ -383,23 +383,23 @@ public abstract class LiveMemoryView extends JPanel {
     
     private void populatePopup(final DataView invoker, JPopupMenu popup, Object value, final ClientUtils.SourceCodeSelection userValue) {
         if (showSourceSupported()) {
-            popup.add(new JMenuItem("Go to Source") {
+            popup.add(new JMenuItem(MemoryView.ACTION_GOTOSOURCE) {
                 { setEnabled(userValue != null); setFont(getFont().deriveFont(Font.BOLD)); }
                 protected void fireActionPerformed(ActionEvent e) { showSource(userValue); }
             });
             popup.addSeparator();
         }
         
-        popup.add(new JMenuItem("Profile Class") {
+        popup.add(new JMenuItem(MemoryView.ACTION_PROFILE_CLASS) {
             { setEnabled(userValue != null); }
             protected void fireActionPerformed(ActionEvent e) { selectForProfiling(userValue); }
         });
         
         popup.addSeparator();
-        popup.add(new JMenuItem("Filter") {
+        popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateFilter(); }
         });
-        popup.add(new JMenuItem("Find") {
+        popup.add(new JMenuItem(SearchUtils.ACTION_FIND) {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
         });
     }
