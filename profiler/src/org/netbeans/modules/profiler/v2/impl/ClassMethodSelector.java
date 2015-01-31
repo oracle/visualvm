@@ -116,12 +116,40 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ClassMethodSelector_selectClass=Select Class",
+    "ClassMethodSelector_selectMethod=Select Method",
+    "ClassMethodSelector_btnOk=OK",
+    "ClassMethodSelector_capFromProject=From Project",
+    "ClassMethodSelector_capFromJarFolder=From JAR/Folder",
+    "ClassMethodSelector_capFiles=Files:",
+    "ClassMethodSelector_jarsFoldersFilterDescr=.jar files/.class folders",
+    "ClassMethodSelector_selectJarOrFolder=Select JAR File or Class Folder",
+    "ClassMethodSelector_addFileOrFolder=Add file or folder",
+    "ClassMethodSelector_removeSelectedItem=Remove selected item",
+    "ClassMethodSelector_capProjects=Projects:",
+    "ClassMethodSelector_capPackages=Packages:",
+    "ClassMethodSelector_showProjectPackages=Show project packages",
+    "ClassMethodSelector_showDependenciesPackages=Show dependencies packages",
+    "ClassMethodSelector_capClasses=Classes:",
+    "ClassMethodSelector_showInnerClasses=Show inner classes",
+    "ClassMethodSelector_showAnonymousClasses=Show anonymous classes",
+    "ClassMethodSelector_capMethods=Methods:",
+    "ClassMethodSelector_showInheritedMethods=Show inherited methods",
+    "ClassMethodSelector_showNonPublicMethods=Show non-public methods",
+    "ClassMethodSelector_showStaticMethods=Show static methods",
+    "ClassMethodSelector_lblComputing=Computing...",
+    "ClassMethodSelector_lblNoItems=No items",
+    "ClassMethodSelector_lblNoSelection=No selection",
+    "ClassMethodSelector_lblFilterItems=Filter items"
+})
 public final class ClassMethodSelector {
     
     private static final WeakProcessor PROCESSOR = new WeakProcessor("Profiler ClassMethodSelector Processor"); // NOI18N
@@ -132,7 +160,7 @@ public final class ClassMethodSelector {
         
         UI ui = UI.forSession(session, false);
 
-        DialogDescriptor dd = new DialogDescriptor(ui, "Select Class", true,
+        DialogDescriptor dd = new DialogDescriptor(ui, Bundle.ClassMethodSelector_selectClass(), true,
                                                    new Object[] { ui.getOKButton(), DialogDescriptor.CANCEL_OPTION },
                                                    ui.getOKButton(), DialogDescriptor.BOTTOM_ALIGN, null, null);
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
@@ -146,7 +174,7 @@ public final class ClassMethodSelector {
         
         UI ui = UI.forSession(session, true);
 
-        DialogDescriptor dd = new DialogDescriptor(ui, "Select Method", true,
+        DialogDescriptor dd = new DialogDescriptor(ui, Bundle.ClassMethodSelector_selectMethod(), true,
                                                    new Object[] { ui.getOKButton(), DialogDescriptor.CANCEL_OPTION },
                                                    ui.getOKButton(), DialogDescriptor.BOTTOM_ALIGN, null, null);
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
@@ -211,7 +239,7 @@ public final class ClassMethodSelector {
         
         
         private UI(final ProfilerSession session, final boolean method) {
-            okButton = new JButton("OK");
+            okButton = new JButton(Bundle.ClassMethodSelector_btnOk());
             okButton.setEnabled(false);
             
             // --- From Project ------------------------------------------------
@@ -358,8 +386,8 @@ public final class ClassMethodSelector {
                 if (i == null) p.setBorder(BorderFactory.createEmptyBorder());
                 else p.setBorder(BorderFactory.createEmptyBorder(0, -i.left, -i.bottom, -i.right));
             }
-            if (p_selectors != null) p.addTab("From Project", null, p_selectors, null);
-            if (f_selectors != null) p.addTab("From JAR/Folder", null, f_selectors, null);
+            if (p_selectors != null) p.addTab(Bundle.ClassMethodSelector_capFromProject(), null, p_selectors, null);
+            if (f_selectors != null) p.addTab(Bundle.ClassMethodSelector_capFromJarFolder(), null, f_selectors, null);
             
             setLayout(new BorderLayout());
             setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -479,7 +507,7 @@ public final class ClassMethodSelector {
                 }
             });
             
-            JLabel projectsLabel = new JLabel("Files:", JLabel.LEADING);
+            JLabel projectsLabel = new JLabel(Bundle.ClassMethodSelector_capFiles(), JLabel.LEADING);
             projectsLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
             JToolBar fileTools = new FilteringToolBar() {
                 protected void filterChanged(String filter) {
@@ -509,9 +537,9 @@ public final class ClassMethodSelector {
                             return ext != null && ext.equalsIgnoreCase("jar"); // NOI18N
                         }
                         public String getDescription() {
-                            return ".jar files/.class folders";
+                            return Bundle.ClassMethodSelector_jarsFoldersFilterDescr();
                         }
-                    }).setTitle("Select JAR File or Class Folder").showOpenDialog();
+                    }).setTitle(Bundle.ClassMethodSelector_selectJarOrFolder()).showOpenDialog();
                     if (file != null) {
                         FileObject f = FileUtil.toFileObject(FileUtil.normalizeFile(file));
                         if (f != null) {
@@ -521,7 +549,7 @@ public final class ClassMethodSelector {
                     }
                 }
             };
-            addFileB.setToolTipText("Add file or folder");
+            addFileB.setToolTipText(Bundle.ClassMethodSelector_addFileOrFolder());
             Image removeBadge = Icons.getImage(GeneralIcons.BADGE_REMOVE);
             Image removeImage = ImageUtilities.mergeImages(baseIcon, removeBadge, 0, 0);
             removeFileB = new JButton(ImageUtilities.image2Icon(removeImage)) {
@@ -534,7 +562,7 @@ public final class ClassMethodSelector {
                     }
                 }
             };
-            removeFileB.setToolTipText("Remove selected item");
+            removeFileB.setToolTipText(Bundle.ClassMethodSelector_removeSelectedItem());
             removeFileB.setEnabled(fileList.getSelectedValue() != null);
             fileTools.add(Box.createHorizontalStrut(2));
             fileTools.addSeparator();
@@ -632,7 +660,7 @@ public final class ClassMethodSelector {
                 }
             });
             
-            JLabel projectsLabel = new JLabel("Projects:", JLabel.LEADING);
+            JLabel projectsLabel = new JLabel(Bundle.ClassMethodSelector_capProjects(), JLabel.LEADING);
             projectsLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
             JToolBar projectsTools = new FilteringToolBar() {
                 protected void filterChanged(String filter) {
@@ -786,7 +814,7 @@ public final class ClassMethodSelector {
                 }
             });
             
-            JLabel packagesLabel = new JLabel("Packages:", JLabel.LEADING);
+            JLabel packagesLabel = new JLabel(Bundle.ClassMethodSelector_capPackages(), JLabel.LEADING);
             packagesLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
             JToolBar packagesTools = new FilteringToolBar() {
                 protected void filterChanged(String filter) {
@@ -801,7 +829,7 @@ public final class ClassMethodSelector {
                         PREF.putBoolean("Profiler.CMS.packagesSourcesB", packagesSourcesB.isSelected()); // NOI18N
                     }
                 };
-                packagesSourcesB.setToolTipText("Show project packages");
+                packagesSourcesB.setToolTipText(Bundle.ClassMethodSelector_showProjectPackages());
                 packagesSourcesB.setSelected(PREF.getBoolean("Profiler.CMS.packagesSourcesB", true)); // NOI18N
                 packagesDependenciesB = new JToggleButton(Icons.getIcon(LanguageIcons.JAR)) {
                     protected void fireActionPerformed(ActionEvent e) {
@@ -810,7 +838,7 @@ public final class ClassMethodSelector {
                         PREF.putBoolean("Profiler.CMS.packagesDependenciesB", packagesDependenciesB.isSelected()); // NOI18N
                     }
                 };
-                packagesDependenciesB.setToolTipText("Show dependencies packages");
+                packagesDependenciesB.setToolTipText(Bundle.ClassMethodSelector_showDependenciesPackages());
                 packagesDependenciesB.setSelected(PREF.getBoolean("Profiler.CMS.packagesDependenciesB", false)); // NOI18N
                 
                 packagesTools.add(Box.createHorizontalStrut(2));
@@ -944,7 +972,7 @@ public final class ClassMethodSelector {
                 }
             });
             
-            JLabel classesLabel = new JLabel("Classes:", JLabel.LEADING);
+            JLabel classesLabel = new JLabel(Bundle.ClassMethodSelector_capClasses(), JLabel.LEADING);
             classesLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
             classesInnerB = new JToggleButton(Icons.getIcon(LanguageIcons.CLASS)) {
                 protected void fireActionPerformed(ActionEvent e) {
@@ -954,7 +982,7 @@ public final class ClassMethodSelector {
                     PREF.putBoolean("Profiler.CMS.classesInnerB", classesInnerB.isSelected()); // NOI18N
                 }
             };
-            classesInnerB.setToolTipText("Show inner classes");
+            classesInnerB.setToolTipText(Bundle.ClassMethodSelector_showInnerClasses());
             classesInnerB.setSelected(PREF.getBoolean("Profiler.CMS.classesInnerB", true)); // NOI18N
             classesAnonymousB = new JToggleButton(Icons.getIcon(LanguageIcons.CLASS_ANONYMOUS)) {
                 protected void fireActionPerformed(ActionEvent e) {
@@ -967,7 +995,7 @@ public final class ClassMethodSelector {
                     if (!isEnabled()) setSelected(false);
                 }
             };
-            classesAnonymousB.setToolTipText("Show anonymous classes");
+            classesAnonymousB.setToolTipText(Bundle.ClassMethodSelector_showAnonymousClasses());
             classesAnonymousB.setSelected(PREF.getBoolean("Profiler.CMS.classesAnonymousB", false)); // NOI18N
             JToolBar classesTools = new FilteringToolBar() {
                 protected void filterChanged(String filter) {
@@ -1100,7 +1128,7 @@ public final class ClassMethodSelector {
                 }
             });
 
-            JLabel methodsLabel = new JLabel("Methods:", JLabel.LEADING);
+            JLabel methodsLabel = new JLabel(Bundle.ClassMethodSelector_capMethods(), JLabel.LEADING);
             methodsLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
             methodsInheritedB = new JToggleButton(Icons.getIcon(LanguageIcons.METHOD_INHERITED)) {
                 protected void fireActionPerformed(ActionEvent e) {
@@ -1109,7 +1137,7 @@ public final class ClassMethodSelector {
                     PREF.putBoolean("Profiler.CMS.methodsInheritedB", methodsInheritedB.isSelected()); // NOI18N
                 }
             };
-            methodsInheritedB.setToolTipText("Show inherited methods");
+            methodsInheritedB.setToolTipText(Bundle.ClassMethodSelector_showInheritedMethods());
             methodsInheritedB.setSelected(PREF.getBoolean("Profiler.CMS.methodsInheritedB", false));
             methodsNonPublicB = new JToggleButton(Icons.getIcon(LanguageIcons.METHOD_PRIVATE)) {
                 protected void fireActionPerformed(ActionEvent e) {
@@ -1118,7 +1146,7 @@ public final class ClassMethodSelector {
                     PREF.putBoolean("Profiler.CMS.methodsNonPublicB", methodsNonPublicB.isSelected()); // NOI18N
                 }
             };
-            methodsNonPublicB.setToolTipText("Show non-public methods");
+            methodsNonPublicB.setToolTipText(Bundle.ClassMethodSelector_showNonPublicMethods());
             methodsNonPublicB.setSelected(PREF.getBoolean("Profiler.CMS.methodsNonPublicB", true));
             methodsStaticB = new JToggleButton(Icons.getIcon(LanguageIcons.METHOD_PUBLIC_STATIC)) {
                 protected void fireActionPerformed(ActionEvent e) {
@@ -1127,7 +1155,7 @@ public final class ClassMethodSelector {
                     PREF.putBoolean("Profiler.CMS.methodsStaticB", methodsStaticB.isSelected()); // NOI18N
                 }
             };
-            methodsStaticB.setToolTipText("Show static methods");
+            methodsStaticB.setToolTipText(Bundle.ClassMethodSelector_showStaticMethods());
             methodsStaticB.setSelected(PREF.getBoolean("Profiler.CMS.methodsStaticB", true));
             JToolBar methodsTools = new FilteringToolBar() {
                 protected void filterChanged(String filter) {
@@ -1162,9 +1190,9 @@ public final class ClassMethodSelector {
         }
 
         void setup(Boolean mode, Dimension size) {
-            if (Boolean.FALSE.equals(mode)) setText("Computing...");
-            else if (Boolean.TRUE.equals(mode)) setText("No items");
-            else setText("No selection");
+            if (Boolean.FALSE.equals(mode)) setText(Bundle.ClassMethodSelector_lblComputing());
+            else if (Boolean.TRUE.equals(mode)) setText(Bundle.ClassMethodSelector_lblNoItems());
+            else setText(Bundle.ClassMethodSelector_lblNoSelection());
             setSize(size);
         }
 
@@ -1183,7 +1211,7 @@ public final class ClassMethodSelector {
                     if (isSelected()) showFilter(); else hideFilter();
                 }
             };
-            filterButton.setToolTipText("Filter items");
+            filterButton.setToolTipText(Bundle.ClassMethodSelector_lblFilterItems());
             add(filterButton);
         }
         

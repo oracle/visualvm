@@ -44,9 +44,7 @@
 package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
 import java.util.Set;
-import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.SortOrder;
@@ -56,7 +54,6 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.memory.HeapHistogram;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.Formatters;
-import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
@@ -70,7 +67,7 @@ import org.netbeans.lib.profiler.utils.Wildcards;
  *
  * @author Jiri Sedlacek
  */
-abstract class SampledTableView extends DataView {
+abstract class SampledTableView extends MemoryView {
     
     private MemoryTableModel tableModel;
     private ProfilerTable table;
@@ -171,8 +168,8 @@ abstract class SampledTableView extends DataView {
     ExportUtils.ExportProvider[] getExportProviders() {
         return table.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
             new ExportUtils.CSVExportProvider(table),
-            new ExportUtils.HTMLExportProvider(table, "Live Objects"),
-            new ExportUtils.XMLExportProvider(table, "Live Objects"),
+            new ExportUtils.HTMLExportProvider(table, EXPORT_LIVE),
+            new ExportUtils.XMLExportProvider(table, EXPORT_LIVE),
             new ExportUtils.PNGExportProvider(table.getParent())
         };
     }
@@ -259,13 +256,13 @@ abstract class SampledTableView extends DataView {
             if (selection == null) columnIndex++;
             
             if (columnIndex == 1) {
-                return "Name";
+                return COLUMN_NAME;
             } else if (columnIndex == 2) {
-                return "Live Bytes";
+                return COLUMN_LIVE_BYTES;
             } else if (columnIndex == 3) {
-                return "Live Objects";
+                return COLUMN_LIVE_OBJECTS;
             } else if (columnIndex == 0) {
-                return "Selected";
+                return COLUMN_SELECTED;
             }
             return null;
         }

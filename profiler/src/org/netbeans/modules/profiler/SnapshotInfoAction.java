@@ -67,6 +67,9 @@ class SnapshotInfoAction extends AbstractAction {
         putValue(Action.SMALL_ICON, Icons.getIcon(GeneralIcons.INFO));
         putValue("iconBase", Icons.getResource(GeneralIcons.INFO)); // NOI18N
         this.snapshot = snapshot;
+        
+        // Temporarily disabled until fully implemented
+        setEnabled(false);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

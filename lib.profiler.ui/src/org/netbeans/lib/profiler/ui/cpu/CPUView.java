@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -40,37 +40,34 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+package org.netbeans.lib.profiler.ui.cpu;
 
-package org.netbeans.lib.profiler.ui.swing.renderer;
-
-import java.text.Format;
-import javax.swing.SwingConstants;
-import org.netbeans.lib.profiler.ui.Formatters;
+import java.util.ResourceBundle;
+import org.netbeans.lib.profiler.ui.results.DataView;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class NumberRenderer extends FormattedLabelRenderer {
+public abstract class CPUView extends DataView {
     
-    private final Format outputFormat;
-    
-    public NumberRenderer() {
-        this(null);
-    }
-    
-    public NumberRenderer(Format outputFormat) {
-        super(Formatters.numberFormat());
-        
-        this.outputFormat = outputFormat;
-        
-        setHorizontalAlignment(SwingConstants.TRAILING);
-    }
-    
-    protected String getValueString(Object value, int row, Format format) {
-        if (value == null) return "-"; // NOI18N
-        String string = super.getValueString(value, row, format);
-        return outputFormat == null ? string : formatImpl(outputFormat, string);
-    }
+    // -----
+    // I18N String constants
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.cpu.Bundle"); // NOI18N
+    protected static final String EXPORT_METHODS = messages.getString("CPUView_ExportMethods"); // NOI18N
+    protected static final String EXPORT_CALLTREE = messages.getString("CPUView_ExportCallTree"); // NOI18N
+    protected static final String EXPORT_HOTSPOTS = messages.getString("CPUView_ExportHotSpots"); // NOI18N
+    protected static final String COLUMN_NAME = messages.getString("CPUView_ColumnName"); // NOI18N
+    protected static final String COLUMN_SELFTIME = messages.getString("CPUView_ColumnSelfTime"); // NOI18N
+    protected static final String COLUMN_SELFTIME_CPU = messages.getString("CPUView_ColumnSelfTimeCpu"); // NOI18N
+    protected static final String COLUMN_TOTALTIME = messages.getString("CPUView_ColumnTotalTime"); // NOI18N
+    protected static final String COLUMN_TOTALTIME_CPU = messages.getString("CPUView_ColumnTotalTimeCpu"); // NOI18N
+    protected static final String COLUMN_HITS = messages.getString("CPUView_ColumnHits"); // NOI18N
+    protected static final String COLUMN_INVOCATIONS = messages.getString("CPUView_ColumnInvocations"); // NOI18N
+    protected static final String COLUMN_SELECTED = messages.getString("CPUView_ColumnSelected"); // NOI18N
+    protected static final String ACTION_GOTOSOURCE = messages.getString("CPUView_ActionGoToSource"); // NOI18N
+    protected static final String ACTION_PROFILE_METHOD = messages.getString("CPUView_ActionProfileMethod"); // NOI18N
+    protected static final String ACTION_PROFILE_CLASS = messages.getString("CPUView_ActionProfileClass"); // NOI18N
+    // -----
     
 }

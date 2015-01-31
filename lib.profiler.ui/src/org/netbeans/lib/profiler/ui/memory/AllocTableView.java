@@ -44,12 +44,10 @@
 package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.RowFilter;
@@ -59,7 +57,6 @@ import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.Formatters;
-import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
@@ -74,7 +71,7 @@ import org.netbeans.lib.profiler.utils.Wildcards;
  *
  * @author Jiri Sedlacek
  */
-abstract class AllocTableView extends DataView {
+abstract class AllocTableView extends MemoryView {
     
     private MemoryTableModel tableModel;
     private ProfilerTable table;
@@ -197,8 +194,8 @@ abstract class AllocTableView extends DataView {
     ExportUtils.ExportProvider[] getExportProviders() {
         return table.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
             new ExportUtils.CSVExportProvider(table),
-            new ExportUtils.HTMLExportProvider(table, "Allocated Objects"),
-            new ExportUtils.XMLExportProvider(table, "Allocated Objects"),
+            new ExportUtils.HTMLExportProvider(table, EXPORT_ALLOCATED),
+            new ExportUtils.XMLExportProvider(table, EXPORT_ALLOCATED),
             new ExportUtils.PNGExportProvider(table.getParent())
         };
     }
@@ -292,13 +289,13 @@ abstract class AllocTableView extends DataView {
             if (selection == null) columnIndex++;
             
             if (columnIndex == 1) {
-                return "Name";
+                return COLUMN_NAME;
             } else if (columnIndex == 2) {
-                return "Allocated Bytes";
+                return COLUMN_ALLOCATED_BYTES;
             } else if (columnIndex == 3) {
-                return "Allocated Objects";
+                return COLUMN_ALLOCATED_OBJECTS;
             } else if (columnIndex == 0) {
-                return "Selected";
+                return COLUMN_SELECTED;
             }
             return null;
         }
