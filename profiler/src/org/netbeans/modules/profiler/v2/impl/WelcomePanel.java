@@ -70,6 +70,7 @@ import org.openide.util.NbBundle;
     "WelcomePanel_howtoCaption=How To Configure Profiling Session",
     "WelcomePanel_profilingSettings=Access the profiling settings:",
     "WelcomePanel_profileButton=Profile",
+    "WelcomePanel_attachButton=Attach",
     "WelcomePanel_clickForSetings=Click the {0} dropdown arrow in the above toolbar to access the profiling settings.",
     "WelcomePanel_configureTarget=Configure the target:",
     "WelcomePanel_setupProjectAttach=Setup attach to project...",
@@ -119,7 +120,8 @@ public abstract class WelcomePanel extends JPanel {
         c.insets = new Insets(20, 20, 3, 20);
         pp.add(caption1, c);
         
-        HTMLTextArea hint1 = new HTMLTextArea(Bundle.WelcomePanel_clickForSetings("<b><a href='#'>" + Bundle.WelcomePanel_profileButton() + "</a></b>")) { // NOI18N
+        String popupButton = attach ? Bundle.WelcomePanel_attachButton() : Bundle.WelcomePanel_profileButton();
+        HTMLTextArea hint1 = new HTMLTextArea(Bundle.WelcomePanel_clickForSetings("<b><a href='#'>" + popupButton + "</a></b>")) { // NOI18N
             protected void showURL(URL url) { highlightItem(null); }
         };
         hint1.setBackground(background);
