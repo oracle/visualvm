@@ -437,7 +437,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
 
             if (clazz.isMethodNative(idx) || clazz.isMethodAbstract(idx)
                     || (!clazz.isMethodRoot(idx) && !clazz.isMethodMarker(idx) && !instrFilter.passesFilter(className))
-                    || (className == "java/lang/Object")) { // NOI18N  // Actually, just the Object.<init> method?
+                    || (className == OBJECT_SLASHED_CLASS_NAME)) {  // Actually, just the Object.<init> method?
                 clazz.setMethodUnscannable(idx);
             } else {
                 byte[] bytecode = clazz.getMethodBytecode(idx);
