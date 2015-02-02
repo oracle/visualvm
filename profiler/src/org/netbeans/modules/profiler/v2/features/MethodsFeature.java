@@ -311,10 +311,10 @@ final class MethodsFeature extends ProfilerFeature.Basic {
     }
     
     private void confirmAllSettings() {
-        allClassesMode.confirmSettings();
-        projectClassesMode.confirmSettings();
-        selectedClassesMode.confirmSettings();
-        selectedMethodsMode.confirmSettings();
+        if (allClassesMode != null) allClassesMode.confirmSettings();
+        if (projectClassesMode != null) projectClassesMode.confirmSettings();
+        if (selectedClassesMode != null) selectedClassesMode.confirmSettings();
+        if (selectedMethodsMode != null) selectedMethodsMode.confirmSettings();
     }
     
     private void settingsChanged() {
