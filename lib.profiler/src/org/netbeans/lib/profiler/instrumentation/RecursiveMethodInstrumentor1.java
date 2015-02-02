@@ -462,7 +462,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
             }
         }
 
-        if (checkSubclasses && (((idx != -1) && clazz.isMethodVirtual(idx)) || ((idx == -1) && virtualCall))) {
+        if (checkSubclasses && (((idx != -1) && clazz.isMethodVirtual(idx)) || ((idx == -1) && virtualCall)) && className != OBJECT_SLASHED_CLASS_NAME) {
             ArrayList subclasses = clazz.getSubclasses();
 
             if (subclasses != null) {
