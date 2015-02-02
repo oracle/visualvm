@@ -275,9 +275,9 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     }
     
     private void confirmAllSettings() {
-        allClassesMode.confirmSettings();
-        projectClassesMode.confirmSettings();
-        selectedClassesMode.confirmSettings();
+        if (allClassesMode != null) allClassesMode.confirmSettings();
+        if (projectClassesMode != null) projectClassesMode.confirmSettings();
+        if (selectedClassesMode != null) selectedClassesMode.confirmSettings();
     }
     
     private void settingsChanged() {
