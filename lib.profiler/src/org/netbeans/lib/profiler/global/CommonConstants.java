@@ -213,6 +213,7 @@ public interface CommonConstants {
     static final String JAVA_LANG_REFLECT_METHOD_SLASHED_CLASS_NAME = "java/lang/reflect/Method"; // NOI18N
     static final String INVOKE_METHOD_NAME = "invoke"; // NOI18N
     static final String INVOKE_METHOD_SIGNATURE = "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"; // NOI18N
+    static final String OBJECT_SLASHED_CLASS_NAME = "java/lang/Object";
 
     // Kinds of injections that we make into TA methods
     public static final int INJ_RECURSIVE_NORMAL_METHOD = 0;
