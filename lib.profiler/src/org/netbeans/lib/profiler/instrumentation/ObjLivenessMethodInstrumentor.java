@@ -270,7 +270,7 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
     }
     
     static boolean isObjectConstructor(ClassInfo clazz, int methodIdx) {
-        if ("java/lang/Object".equals(clazz.getName())  // NOI18N
+        if (OBJECT_SLASHED_CLASS_NAME.equals(clazz.getName())
                 && clazz.getLoaderId() <= 0
                 && "<init>".equals(clazz.getMethodName(methodIdx))) {   // NOI18N
             return true;
