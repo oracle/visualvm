@@ -45,6 +45,7 @@ package org.netbeans.lib.profiler.classfile;
 
 import org.netbeans.lib.profiler.classfile.ClassInfo.LocalVariableTables;
 import org.netbeans.lib.profiler.classfile.ClassInfo.LocalVariableTypeTables;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.instrumentation.JavaClassConstants;
 import org.netbeans.lib.profiler.utils.StringUtils;
 
@@ -393,8 +394,8 @@ public class ClassFileParser implements JavaClassConstants {
         superClassIdx = nextChar();
 
         if (cpTags[superClassIdx] != CONSTANT_Class) {
-            if ((superClassIdx == 0) && classInfo.name.equals("java/lang/Object")) {  // NOI18N
-                classInfo.superName = "java/lang/Object"; // NOI18N
+            if ((superClassIdx == 0) && classInfo.name.equals(CommonConstants.OBJECT_SLASHED_CLASS_NAME)) {
+                classInfo.superName = CommonConstants.OBJECT_SLASHED_CLASS_NAME;
             } else {
                 throw classFileReadException("Bad reference to super class name"); // NOI18N
             }
