@@ -260,7 +260,7 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
                     if (sidx != -1 ) {
                         superClass = loadedClasses[sidx];
                     } else {
-                        superClass = "java/lang/Object";    // NOI18N
+                        superClass = OBJECT_SLASHED_CLASS_NAME;
                     }
                     int[] interfaceNamedIdxs = interfaceNames[i];
                     List interfaces = new ArrayList();

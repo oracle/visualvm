@@ -437,7 +437,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
 
             if (clazz.isMethodNative(idx) || clazz.isMethodAbstract(idx)
                     || (!clazz.isMethodRoot(idx) && !clazz.isMethodMarker(idx) && !instrFilter.passesFilter(className))
-                    || (className == "java/lang/Object")) { // NOI18N  // Actually, just the Object.<init> method?
+                    || (className == OBJECT_SLASHED_CLASS_NAME)) {  // Actually, just the Object.<init> method?
                 clazz.setMethodUnscannable(idx);
             } else {
                 byte[] bytecode = clazz.getMethodBytecode(idx);
@@ -462,7 +462,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
             }
         }
 
-        if (checkSubclasses && (((idx != -1) && clazz.isMethodVirtual(idx)) || ((idx == -1) && virtualCall))) {
+        if (checkSubclasses && (((idx != -1) && clazz.isMethodVirtual(idx)) || ((idx == -1) && virtualCall)) && className != OBJECT_SLASHED_CLASS_NAME) {
             ArrayList subclasses = clazz.getSubclasses();
 
             if (subclasses != null) {
