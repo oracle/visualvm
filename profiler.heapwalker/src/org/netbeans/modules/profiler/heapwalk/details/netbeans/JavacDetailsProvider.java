@@ -59,32 +59,39 @@ public class JavacDetailsProvider extends DetailsProvider.Basic {
     
     private static final String SHAREDNAMETABLE_NAMEIMPL_MASK =
             "com.sun.tools.javac.util.SharedNameTable$NameImpl";                // NOI18N
+    private static final String NAME_MASK =
+            "com.sun.tools.javac.util.Name";                                    // NOI18N
     
     public JavacDetailsProvider() {
-        super(SHAREDNAMETABLE_NAMEIMPL_MASK);
+        super(SHAREDNAMETABLE_NAMEIMPL_MASK, NAME_MASK);
     }
 
     @Override
     public String getDetailsString(String className, Instance instance, Heap heap) {
         if (SHAREDNAMETABLE_NAMEIMPL_MASK.equals(className)) {
-            Integer length = (Integer) instance.getValueOfField("length"); // NOI18N
-            Integer index = (Integer) instance.getValueOfField("index"); // NOI18N
-            Instance table = (Instance) instance.getValueOfField("table"); // NOI18N
-            
-            if (length != null && index != null && table != null) {
-                PrimitiveArrayInstance bytes = (PrimitiveArrayInstance) table.getValueOfField("bytes"); // NOI18N
-                List elements = bytes.getValues();
-                byte[] data = new byte[length];
-                
-                for (int i = 0; i < length; i++) {
-                    String el = (String) elements.get(index+i);
-                    data[i] = Byte.valueOf(el).byteValue();
-                }
-                try {
-                    return new String(data, "UTF-8");   // NOI18N
-                } catch (UnsupportedEncodingException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
+            return getName(instance, "length", "index", "table", "bytes");      // NOI18N
+        } else if (NAME_MASK.equals(className)) {
+            return getName(instance, "len", "index", "table", "names");         // NOI18N
+        }
+        return null;
+    }
+
+    private String getName(Instance instance, String lenField, String indexField, String tableField, String bytesField) {
+        Integer length = (Integer) instance.getValueOfField(lenField);
+        Integer index = (Integer) instance.getValueOfField(indexField);
+        Instance table = (Instance) instance.getValueOfField(tableField);
+        if (length != null && index != null && table != null) {
+            PrimitiveArrayInstance bytes = (PrimitiveArrayInstance) table.getValueOfField(bytesField);
+            List elements = bytes.getValues();
+            byte[] data = new byte[length];
+            for (int i = 0; i < length; i++) {
+                String el = (String) elements.get(index+i);
+                data[i] = Byte.valueOf(el).byteValue();
+            }
+            try {
+                return new String(data, "UTF-8"); // NOI18N
+            } catch (UnsupportedEncodingException ex) {
+                Exceptions.printStackTrace(ex);
             }
         }
         return null;
