@@ -85,12 +85,13 @@ public final class FilterUtils {
     
     public static final String FILTER_ACTION_KEY = "filter-action-key"; // NOI18N
     
-    public static boolean filterContains(ProfilerTable table, final String text) {
+    public static boolean filterContains(ProfilerTable table, String text) {
         final int mainColumn = table.getMainColumn();
         
+        final String textF = text == null ? null : text.toLowerCase();
         Filter filter = new Filter() {
             public boolean include(RowFilter.Entry entry) {
-                return (entry.getValue(mainColumn)).toString().contains(text);
+                return (entry.getValue(mainColumn)).toString().toLowerCase().contains(textF);
             }
         };
         
