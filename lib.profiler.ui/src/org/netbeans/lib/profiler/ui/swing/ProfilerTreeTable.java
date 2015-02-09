@@ -66,6 +66,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
@@ -156,7 +157,10 @@ public class ProfilerTreeTable extends ProfilerTable {
     
     
     public void setCellRenderer(TreeCellRenderer renderer) {
-        if (tree != null) tree.setCellRenderer(renderer);
+        if (tree != null) {
+            tree.setCellRenderer(renderer);
+            model.setRenderer(renderer);
+        }
     }
     
     public void setTreeCellRenderer(ProfilerRenderer renderer) {
@@ -169,7 +173,7 @@ public class ProfilerTreeTable extends ProfilerTable {
                 renderer.setValue(value, row);
                 JComponent comp = renderer.getComponent();
                 comp.setOpaque(false);
-                comp.setForeground(tree.getForeground());
+                if (tree != null) comp.setForeground(tree.getForeground());
                 return comp;
             }
             public String toString() {
@@ -224,6 +228,23 @@ public class ProfilerTreeTable extends ProfilerTable {
         
         super.processMouseEvent(e);
         if (treeEvent != null) tree.dispatchEvent(treeEvent);
+    }
+    
+    
+    public void addRowFilter(RowFilter filter) {
+        setRowFilter(filter);
+    }
+    
+    public void removeRowFilter(RowFilter filter) {
+        setRowFilter(null);
+    }
+    
+    public void setRowFilter(RowFilter filter) {
+        model.filter(filter);
+    }
+    
+    public RowFilter getRowFilter() {
+        return model.getFilter();
     }
     
     
@@ -311,13 +332,13 @@ public class ProfilerTreeTable extends ProfilerTable {
     private static class TableModelImpl extends AbstractTableModel {
         
         private final ProfilerTreeTableTree tree;
-        private TreeModelImpl treeModel;
+        private SortedFilteredTreeModel treeModel;
         private final ProfilerTreeTableModel treeTableModel;
         
         TableModelImpl(ProfilerTreeTableModel model) {
             this.treeTableModel = model;
             
-            treeModel = treeModelImpl(model.getRoot(), null);
+            treeModel = treeModelImpl(model.getRoot(), null, null);
             
             model.addListener(new ProfilerTreeTableModel.Adapter() {
                 public void dataChanged() {
@@ -334,7 +355,8 @@ public class ProfilerTreeTable extends ProfilerTable {
                         UIState uiState = getUIState(tree);
 
                         Comparator comparator = treeModel != null ? treeModel.getComparator() : null;
-                        treeModel = treeModelImpl(newRoot, comparator);
+                        RowFilter filter = treeModel != null ? treeModel.getFilter() : null;
+                        treeModel = treeModelImpl(newRoot, comparator, filter);
                         tree.setModel(treeModel);
                         fireTableDataChanged();
 
@@ -348,8 +370,8 @@ public class ProfilerTreeTable extends ProfilerTable {
             tree = new ProfilerTreeTableTree(treeModel);
         }
         
-        private TreeModelImpl treeModelImpl(TreeNode root, Comparator comparator) {
-            return new TreeModelImpl(root, comparator) {
+        private SortedFilteredTreeModel treeModelImpl(TreeNode root, Comparator comparator, RowFilter filter) {
+            return new SortedFilteredTreeModel(root, tree == null ? null : tree.getCellRenderer(), comparator, filter) {
                 protected void fireTreeStructureChanged(Object source, Object[] path,
                                         int[] childIndices,
                                         Object[] children) {
@@ -364,6 +386,18 @@ public class ProfilerTreeTable extends ProfilerTable {
         
         void sort(Comparator comparator) {
             treeModel.setComparator(comparator);
+        }
+        
+        void filter(RowFilter filter) {
+            treeModel.setFilter(filter);
+        }
+        
+        RowFilter getFilter() {
+            return treeModel.getFilter();
+        }
+        
+        void setRenderer(TreeCellRenderer renderer) {
+            treeModel.setRenderer(renderer);
         }
         
         
@@ -411,21 +445,103 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
     
     
-    private static class TreeModelImpl extends DefaultTreeModel {
+    private static class FilteredTreeModel extends DefaultTreeModel {
+        
+        private TreeCellRenderer renderer;
+        
+        private RowFilter filter;
+        private Map<Object, List> cache;
+        
+        FilteredTreeModel(TreeNode root, TreeCellRenderer r, RowFilter f) {
+            super(root);
+            renderer = r;
+            filter = f;
+        }
+        
+        void setRenderer(TreeCellRenderer r) {
+            renderer = r;
+            reload();
+        }
+        
+        TreeCellRenderer getRenderer() {
+            return renderer;
+        }
+        
+        void setFilter(RowFilter f) {
+            filter = f;
+            reload();
+        }
+        
+        RowFilter getFilter() {
+            return filter;
+        }
+        
+        public Object getChild(Object parent, int index) {
+            if (renderer == null || filter == null) return super.getChild(parent, index);
+            return filteredChildren(parent).get(index);
+        }
+        
+        public int getIndexOfChild(Object parent, Object child) {
+            if (renderer == null || filter == null) return super.getIndexOfChild(parent, child);
+            return filteredChildren(parent).indexOf(child);
+        }
+        
+        public int getChildCount(Object parent) {
+            if (renderer == null || filter == null) return super.getChildCount(parent);
+            return filteredChildren(parent).size();
+        }
+        
+        
+        protected void fireTreeStructureChanged(Object source, Object[] path,
+                                                int[] childIndices,
+                                                Object[] children) {
+            cache = null;
+            super.fireTreeStructureChanged(source, path, childIndices, children);
+        }
+        
+        
+        private List filteredChildren(Object parent) {
+            if (cache == null) cache = new HashMap();
+            
+            TreePath parentPath = new TreePath(getPathToRoot((TreeNode)parent));
+            List children = cache.get(parentPath);
+            
+            if (children == null) {
+                children = new ArrayList();
+                Enumeration childrenE = ((TreeNode)parent).children();
+                if (childrenE != null) while (childrenE.hasMoreElements()) {
+                    final Object child = childrenE.nextElement();
+                    renderer.getTreeCellRendererComponent(null, child, false, false, false, -1, false);
+                    RowFilter.Entry e = new RowFilter.Entry() {
+                        public Object getModel() { return null; }
+                        public int getValueCount() { return 1; }
+                        public Object getValue(int index) { return renderer.toString(); }
+                        public Object getIdentifier() { return null; }
+                    };
+                    if (filter.include(e)) children.add(child);
+                }
+            }
+            
+            return children;
+        }
+        
+    }
+    
+    
+    private static class SortedFilteredTreeModel extends FilteredTreeModel {
         
         private Comparator comparator;
         private Map<Object, int[]> viewToModel;
         
         
-        TreeModelImpl(TreeNode root, Comparator comp) {
-            super(root);
+        SortedFilteredTreeModel(TreeNode root, TreeCellRenderer r, Comparator comp, RowFilter filter) {
+            super(root, r, filter);
             comparator = comp;
         }
         
         
         void setComparator(Comparator comp) {
             comparator = comp;
-            viewToModel = null;
             reload();
         }
         
@@ -448,6 +564,14 @@ public class ProfilerTreeTable extends ProfilerTable {
                 if (indexes[i] == index) return i;
             
             return -1;
+        }
+        
+        
+        protected void fireTreeStructureChanged(Object source, Object[] path,
+                                                int[] childIndices,
+                                                Object[] children) {
+            viewToModel = null;
+            super.fireTreeStructureChanged(source, path, childIndices, children);
         }
         
         
@@ -592,7 +716,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         private SynthLikeTreeUI synthLikeUI;
 
         
-        ProfilerTreeTableTree(TreeModelImpl model) {
+        ProfilerTreeTableTree(SortedFilteredTreeModel model) {
             super(model);
             
             setOpaque(false);
