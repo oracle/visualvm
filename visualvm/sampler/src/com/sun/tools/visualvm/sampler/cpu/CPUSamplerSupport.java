@@ -337,7 +337,8 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
             CPUResultsSnapshot snapshot = builder.createSnapshot(time);
             LoadedSnapshot ls = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createCPUPreset(), null, null);
             File file = Utils.getUniqueFile(directory,
-                    Long.toString(time),"." + ResultsManager.SNAPSHOT_EXTENSION); // NOI18N
+                    ResultsManager.getDefault().getDefaultSnapshotFileName(ls),
+                    "." + ResultsManager.SNAPSHOT_EXTENSION); // NOI18N
             DataOutputStream dos = new DataOutputStream(new FileOutputStream(file));
             try {
                 ls.save(dos);

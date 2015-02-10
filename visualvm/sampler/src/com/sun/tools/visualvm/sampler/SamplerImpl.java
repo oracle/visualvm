@@ -690,7 +690,7 @@ final class SamplerImpl {
                                     } else {
                                         ls = new LoadedSnapshot(snapshot, ProfilingSettingsPresets.createMemoryPreset(), null, null);
                                         File file = Utils.getUniqueFile(application.getStorage().getDirectory(),
-                                                                        Long.toString(time),
+                                                                        ResultsManager.getDefault().getDefaultSnapshotFileName(ls),
                                                                         "." + ResultsManager.SNAPSHOT_EXTENSION); // NOI18N
                                         dos = new DataOutputStream(new FileOutputStream(file));
                                         ls.save(dos);
