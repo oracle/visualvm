@@ -101,6 +101,8 @@ public final class SearchUtils {
             return false;
         }
         
+        text = text.toLowerCase();
+        
         int selectedRow = table.getSelectedRow();
         boolean fromSelection = selectedRow != -1;
         if (!fromSelection) selectedRow = next ? 0 : rowCount - 1;
@@ -110,7 +112,7 @@ public final class SearchUtils {
         
         int searchSteps = fromSelection ? rowCount - 1 : rowCount;
         for (int i = 0; i < searchSteps; i++) {
-            if (table.getStringValue(selectedRow, mainColumn).contains(text)) {
+            if (table.getStringValue(selectedRow, mainColumn).toLowerCase().contains(text)) {
                 table.selectRow(selectedRow, true);
                 return true;
             }
