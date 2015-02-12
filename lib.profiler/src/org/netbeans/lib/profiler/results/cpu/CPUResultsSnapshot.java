@@ -310,9 +310,9 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         config.setFilterInfo(filter, filterType);
         
         if (!FilterSortSupport.passesFilter(config, root.getNodeName())) {
-            root.setFilteredNode();
+//            root.setFilteredNode();
         } else {
-            root.resetFilteredNode();
+//            root.resetFilteredNode();
         }
         root.resetChildren();
     }
@@ -331,9 +331,9 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
             root.sortChildren(config.getSortBy(), config.getSortOrder());
         }
         if (!FilterSortSupport.passesFilter(config, root.getNodeName())) {
-            root.setFilteredNode();
+//            root.setFilteredNode();
         } else {
-            root.resetFilteredNode();
+//            root.resetFilteredNode();
         }
     }
     
@@ -349,7 +349,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
                     else ch.get(i).merge(nn);
                 } else {
                     if (filtered == null) {
-                        nn.setFilteredNode();
+//                        nn.setFilteredNode();
                         filtered = nn;
                         ch.add(nn);
                     } else {
@@ -361,7 +361,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
             if (ch.isEmpty()) {
                 node.children = null;
             } else {
-                if (node.isFilteredNode() && filtered != null && ch.size() == 1) {
+                if (node.isFiltered() && filtered != null && ch.size() == 1) {
                     // "naive" approach, collapse simple chain of filtered out nodes
                     PrestimeCPUCCTNodeFree n = ch.get(0);
                     filter(config, n);

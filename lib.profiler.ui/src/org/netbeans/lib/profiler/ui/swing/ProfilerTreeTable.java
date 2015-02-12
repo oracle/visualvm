@@ -93,6 +93,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
@@ -232,19 +233,22 @@ public class ProfilerTreeTable extends ProfilerTable {
     
     
     public void addRowFilter(RowFilter filter) {
-        setRowFilter(filter);
+        super.addRowFilter(filter);
+        refreshFilter();
     }
     
     public void removeRowFilter(RowFilter filter) {
-        setRowFilter(null);
+        super.removeRowFilter(filter);
+        refreshFilter();
     }
     
     public void setRowFilter(RowFilter filter) {
-        model.filter(filter);
+        super.setRowFilter(filter);
+        refreshFilter();
     }
     
-    public RowFilter getRowFilter() {
-        return model.getFilter();
+    private void refreshFilter() {
+        model.filter(_getRowSorter().getRowFilter());
     }
     
     
@@ -268,6 +272,8 @@ public class ProfilerTreeTable extends ProfilerTable {
         private final TableModelImpl model;
         private List<RowSorter.SortKey> sortKeys;
         
+        private boolean sorting;
+        
         ProfilerTreeTableSorter(TableModel model) {
             super(model);
             this.model = (TableModelImpl)model;
@@ -287,6 +293,16 @@ public class ProfilerTreeTable extends ProfilerTable {
         
         public int getModelRowCount() {
             return model.getRowCount();
+        }
+        
+        public void sort() {
+            sorting = true;
+            super.sort();
+            sorting = false;
+        }
+        
+        public RowFilter getRowFilter() {
+            return sorting ? null : super.getRowFilter();
         }
         
         protected void setSortKeysImpl(List newKeys) {
@@ -507,23 +523,61 @@ public class ProfilerTreeTable extends ProfilerTable {
             List children = cache.get(parentPath);
             
             if (children == null) {
+                
+                class Entry extends RowFilter.Entry {
+                    private Object value; private Object identifier;
+                    void setContext(Object _value, Object _identifier) { value = _value; identifier = _identifier; }
+                    public Object getValue(int index) { return value; }
+                    public Object getModel() { return null; }
+                    public int getValueCount() { return 1; }
+                    public Object getIdentifier() { return identifier; }
+                }
+                Entry entry = null;
+                
                 children = new ArrayList();
+                CCTNode filtered = null;
+                boolean createdFiltered = false;
                 Enumeration childrenE = ((TreeNode)parent).children();
                 if (childrenE != null) while (childrenE.hasMoreElements()) {
                     final Object child = childrenE.nextElement();
                     renderer.getTreeCellRendererComponent(null, child, false, false, false, -1, false);
-                    RowFilter.Entry e = new RowFilter.Entry() {
-                        public Object getModel() { return null; }
-                        public int getValueCount() { return 1; }
-                        public Object getValue(int index) { return renderer.toString(); }
-                        public Object getIdentifier() { return null; }
-                    };
-                    if (filter.include(e)) children.add(child);
+                    if (entry == null) entry = new Entry();
+                    entry.setContext(renderer.toString(), child);
+                    if (filter.include(entry)) {
+                        children.add(child);
+                    } else if (parent instanceof CCTNode) {
+                        if (!createdFiltered) {
+                            filtered = ((CCTNode)child).createFilteredNode();
+                            createdFiltered = true;
+                        } else if (filtered != null) {
+                            filtered.merge((CCTNode)child);
+                        }
+                    }
                 }
+                
+                if (filtered != null) {
+                    List filteredChildren = filteredChildren(filtered);
+                    if (!((CCTNode)parent).isFiltered()) children.add(filtered);
+                    else if (!children.isEmpty()) children.add(filtered);
+                    else children.addAll(filteredChildren);
+                }
+                
+                cache.put(parentPath, children);
             }
             
             return children;
         }
+        
+        
+        // NOTE: use the alternative implementation if facing StackOverflows
+//        public TreeNode[] getPathToRoot(TreeNode node) {
+//            List<TreeNode> path = new ArrayList();
+//            while (node != null) {
+//                path.add(node);
+//                node = node.getParent();
+//            }
+//            return path.toArray(new TreeNode[path.size()]);
+//        }
         
     }
     

@@ -233,19 +233,19 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
     }
     
     public void setFilteredNode() {
-        if (node1 != null) node1.setFilteredNode();
-        if (node2 != null) node2.setFilteredNode();
+//        if (node1 != null) node1.setFilteredNode();
+//        if (node2 != null) node2.setFilteredNode();
     }
     
     public void resetFilteredNode() {
-        if (node1 != null) node1.resetFilteredNode();
-        if (node2 != null) node2.resetFilteredNode();
+//        if (node1 != null) node1.resetFilteredNode();
+//        if (node2 != null) node2.resetFilteredNode();
     }
 
-    @Override
-    public boolean isFilteredNode() {
-        return node1 == null ? node2.isFilteredNode() : node1.isFilteredNode();
-    }
+//    @Override
+//    public boolean isFilteredNode() {
+//        return node1 == null ? node2.isFilteredNode() : node1.isFilteredNode();
+//    }
     
     public boolean equals(Object o) {
         return getNodeName().equals(((DiffCPUCCTNode)o).getNodeName());
