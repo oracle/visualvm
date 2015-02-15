@@ -566,6 +566,6 @@ public class SnapshotReverseMemCallGraphPanel extends ReverseMemCallGraphPanel {
     }
     
     private void enableDisablePopup(PresoObjAllocCCTNode node) {
-        if (popupShowSource != null) popupShowSource.setEnabled(!node.isFilteredNode());
+        if (popupShowSource != null) popupShowSource.setEnabled(!node.isFiltered());
     }
 }

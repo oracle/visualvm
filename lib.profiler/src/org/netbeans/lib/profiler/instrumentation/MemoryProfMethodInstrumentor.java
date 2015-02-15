@@ -76,7 +76,7 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
         
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        boolean hasNewArrayOpcodes(MemoryProfMethodInstrumentor minstr, boolean checkForOpcNew) {
+        boolean hasNewOpcodes(MemoryProfMethodInstrumentor minstr, boolean checkForOpcNew) {
             int loaderId = clazz.getLoaderId();
             boolean found = false;
             int bc;
@@ -242,7 +242,7 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
     protected boolean hasNewOpcodes(ClassInfo clazz, int methodIdx, boolean checkForOpcNew) {
         MethodScanerForNewOpcodes msfno = new MethodScanerForNewOpcodes(clazz, methodIdx);
 
-        return msfno.hasNewArrayOpcodes(this, checkForOpcNew);
+        return msfno.hasNewOpcodes(this, checkForOpcNew);
     }
 
     protected abstract byte[] instrumentMethod(DynamicClassInfo clazz, int methodIdx);

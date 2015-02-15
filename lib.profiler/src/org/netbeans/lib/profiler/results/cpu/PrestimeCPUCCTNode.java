@@ -46,7 +46,11 @@ package org.netbeans.lib.profiler.results.cpu;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.results.FilterSortSupport;
@@ -59,7 +63,7 @@ import org.netbeans.lib.profiler.results.FilterSortSupport;
  *
  * @author Misha Dmitriev
  */
-public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
+public abstract class PrestimeCPUCCTNode extends CCTNode implements Cloneable {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // -----
@@ -76,7 +80,7 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
     protected static final char MASK_SELF_TIME_NODE = 0x1;
     protected static final char MASK_CONTEXT_CALLS_NODE = 0x2;
     protected static final char MASK_THREAD_NODE = 0x4;
-    protected static final char MASK_FILTERED_NODE = 0x8;
+//    protected static final char MASK_FILTERED_NODE = 0x8;
     public static final int SORT_BY_NAME = 1;
     public static final int SORT_BY_TIME_0 = 2;
     public static final int SORT_BY_TIME_1 = 3;
@@ -132,41 +136,48 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
         this.parent = parent;
     }
     
-    //--- TreeNode adapter ---
-    public Enumeration<PrestimeCPUCCTNode> children() {
-        return new Enumeration<PrestimeCPUCCTNode>() {
-            private int index = 0;
-            
-            public boolean hasMoreElements() {
-                return getChildren() != null && index < getChildren().length;
-            }
+    // --- Filtering support
+    
+    protected void setupFilteredNode(PrestimeCPUCCTNode filtered) {
+        filtered.setFilteredNode();
+        
+        filtered.parent = parent;
+        filtered.container = container;
 
-            public PrestimeCPUCCTNode nextElement() {
-                return (PrestimeCPUCCTNode)getChildren()[index++];
+        Collection<PrestimeCPUCCTNode> _childrenL = resolveChildren(this);
+        int nChildren = _childrenL.size();
+        filtered.children = _childrenL.toArray(new PrestimeCPUCCTNode[nChildren]);
+    }
+    
+    public void merge(CCTNode node) {
+        if (node instanceof PrestimeCPUCCTNode) {
+            PrestimeCPUCCTNode _node = (PrestimeCPUCCTNode)node;
+
+            List<CCTNode> ch = new ArrayList();
+            
+            // Include current children
+            if (children != null) ch.addAll(Arrays.asList(children));
+            
+            // Add or merge new children
+            for (PrestimeCPUCCTNode child : resolveChildren(_node)) {
+                int idx = ch.indexOf(child);
+                if (idx == -1) ch.add(child);
+                else ch.get(idx).merge(child);
             }
-        };
+            
+            children = ch.toArray(new PrestimeCPUCCTNode[ch.size()]);
+        }
+    }
+
+    protected static Collection<PrestimeCPUCCTNode> resolveChildren(PrestimeCPUCCTNode node) {
+        List<PrestimeCPUCCTNode> chldrn = new ArrayList();
+        PrestimeCPUCCTNode[] chld = (PrestimeCPUCCTNode[])node.getChildren();
+        if (chld != null) for (PrestimeCPUCCTNode chl : chld)
+            if (!chl.isSelfTimeNode()) chldrn.add(chl);
+        return chldrn;
     }
     
-    public boolean isLeaf() {
-        return getChildCount() == 0;
-    }
-    
-    public boolean getAllowsChildren() {
-        return true;
-    }
-    
-    public int getIndex(TreeNode node) {
-        return getIndexOfChild(node);
-    }
-    
-    public int getChildCount() {
-        return getNChildren();
-    }
-    
-    public TreeNode getChildAt(int index) {
-        return getChild(index);
-    }
-    //---
+    // ---
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -207,7 +218,7 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
     public abstract int getNChildren();
 
     public String getNodeName() {
-        if (isFilteredNode()) {
+        if (isFiltered()) {
             return FilterSortSupport.FILTERED_OUT_LBL;
         } else if (isSelfTimeNode()) {
             return SELF_TIME_STRING;
@@ -247,7 +258,7 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
         if (isSelfTimeNode()) return oo.isSelfTimeNode();
         
         // Handle filtered-out containers
-        if (isFilteredNode()) return oo.isFilteredNode();
+        if (isFiltered()) return oo.isFiltered();
         
         // Handle "when called from" containers
         if (isContextCallsNode()) return getMethodId() == oo.getMethodId();
@@ -270,7 +281,7 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
         if (isSelfTimeNode()) return -1;
         
         // Handle filtered-out containers
-        if (isFilteredNode()) return -10;
+        if (isFiltered()) return -10;
         
         // Handle "when called from" containers
         if (isContextCallsNode()) return Integer.MIN_VALUE + getMethodId();
@@ -306,17 +317,17 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
         return (flags & MASK_THREAD_NODE) != 0;
     }
     
-    public void setFilteredNode() {
-        flags |= MASK_FILTERED_NODE;
-    }
-    
-    public void resetFilteredNode() {
-        flags &= ~MASK_FILTERED_NODE;
-    }
-
-    public boolean isFilteredNode() {
-        return (flags & MASK_FILTERED_NODE) != 0;
-    }
+//    public void setFilteredNode() {
+//        flags |= MASK_FILTERED_NODE;
+//    }
+//    
+//    public void resetFilteredNode() {
+//        flags &= ~MASK_FILTERED_NODE;
+//    }
+//
+//    public boolean isFilteredNode() {
+//        return (flags & MASK_FILTERED_NODE) != 0;
+//    }
 
     public abstract long getTotalTime0();
 

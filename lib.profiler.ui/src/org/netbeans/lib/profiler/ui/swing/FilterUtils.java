@@ -91,16 +91,17 @@ public final class FilterUtils {
         final String textF = text == null ? null : text.toLowerCase();
         Filter filter = new Filter() {
             public boolean include(RowFilter.Entry entry) {
-                return (entry.getValue(mainColumn)).toString().toLowerCase().contains(textF);
+                if (textF == null || textF.isEmpty()) return true;
+                else return (entry.getValue(mainColumn)).toString().toLowerCase().contains(textF);
             }
         };
         
-        if (text == null || text.isEmpty()) {
-            table.removeRowFilter(filter);
-            return false;
-        } else {
+        if ((text != null && !text.isEmpty()) || table instanceof ProfilerTreeTable) {
             table.addRowFilter(filter);
             return table.getRowCount() > 0;
+        } else {
+            table.removeRowFilter(filter);
+            return false;
         }
     }
     
