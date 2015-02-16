@@ -50,6 +50,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
+import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeNode;
@@ -62,6 +63,7 @@ import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.results.memory.PresoObjLivenessCCTNode;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
@@ -248,6 +250,15 @@ abstract class LivenessTreeTableView extends MemoryView {
         
         setLayout(new BorderLayout());
         add(tableContainer, BorderLayout.CENTER);
+        
+        treeTable.setFiltersMode(false); // OR filter for results treetable
+        treeTable.addRowFilter(new RowFilter() { // Do not filter first level nodes
+            public boolean include(RowFilter.Entry entry) {
+                PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)entry.getIdentifier();
+                return node.getParent() != null && node.getParent().getParent() == null;
+            }
+        });
+        FilterUtils.filterContains(treeTable, null); // Installs filter accepting all nodes by default
     }
     
     protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {

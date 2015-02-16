@@ -287,7 +287,7 @@ public abstract class ReverseMemCallGraphPanel extends ResultsPanel {
 
     void performDefaultAction(TreePath path) {
         PresoObjAllocCCTNode node = (PresoObjAllocCCTNode) path.getLastPathComponent();
-        if (node.isFilteredNode()) return;
+        if (node.isFiltered()) return;
         String[] classMethodAndSig = node.getMethodClassNameAndSig();
         if (node.getParent() == null) showSourceForClass(classMethodAndSig[0]);
         else actionsHandler.showSourceForMethod(classMethodAndSig[0], classMethodAndSig[1], classMethodAndSig[2]);

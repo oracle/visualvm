@@ -100,7 +100,6 @@ import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
 import org.netbeans.lib.profiler.ui.components.tree.EnhancedTreeCellRenderer;
 import org.netbeans.lib.profiler.ui.results.DataView;
-import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
@@ -246,9 +245,9 @@ public class LockContentionPanel extends DataView {
 //                    popup.addSeparator();
 //                }
                 
-                popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
-                    protected void fireActionPerformed(ActionEvent e) { activateFilter(); }
-                });
+//                popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
+//                    protected void fireActionPerformed(ActionEvent e) { activateFilter(); }
+//                });
                 popup.add(new JMenuItem(SearchUtils.ACTION_FIND) {
                     protected void fireActionPerformed(ActionEvent e) { activateSearch(); }
                 });
@@ -376,9 +375,9 @@ public class LockContentionPanel extends DataView {
     private void registerActions() {
         ActionMap map = getActionMap();
         
-        map.put(FilterUtils.FILTER_ACTION_KEY, new AbstractAction() {
-            public void actionPerformed(ActionEvent e) { activateFilter(); }
-        });
+//        map.put(FilterUtils.FILTER_ACTION_KEY, new AbstractAction() {
+//            public void actionPerformed(ActionEvent e) { activateFilter(); }
+//        });
         
         map.put(SearchUtils.FIND_ACTION_KEY, new AbstractAction() {
             public void actionPerformed(ActionEvent e) { activateSearch(); }
