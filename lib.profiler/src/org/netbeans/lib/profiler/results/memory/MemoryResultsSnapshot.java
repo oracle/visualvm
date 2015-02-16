@@ -165,10 +165,10 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
             root.sortChildren(sortBy, sortOrder);
         }
         if (!FilterSortSupport.passesFilter(filter, filterType, root.getNodeName())) {
-            root.setFilteredNode();
+//            root.setFilteredNode();
 //            root.methodId = -1;
         } else {
-            root.resetFilteredNode();
+//            root.resetFilteredNode();
         }
     }
     
@@ -184,7 +184,7 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
                     else ch.get(i).merge(nn);
                 } else {
                     if (filtered == null) {
-                        nn.setFilteredNode();
+//                        nn.setFilteredNode();
 //                        nn.methodId = -1;
                         filtered = nn;
                         ch.add(nn);
@@ -197,7 +197,7 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
             if (ch.isEmpty()) {
                 node.children = null;
             } else {
-                if (node.isFilteredNode() && filtered != null && ch.size() == 1) {
+                if (node.isFiltered() && filtered != null && ch.size() == 1) {
                     // "naive" approach, collapse simple chain of filtered out nodes
                     PresoObjAllocCCTNode n = ch.get(0);
                     filter(filter, filterType, n);

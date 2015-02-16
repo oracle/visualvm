@@ -777,6 +777,15 @@ public class ProfilerTable extends JTable {
     
     // --- Row filter ----------------------------------------------------------
     
+    // false = OR, true = AND
+    public void setFiltersMode(boolean mode) {
+        _getRowSorter().setFiltersMode(mode);
+    }
+    
+    public boolean getFiltersMode() {
+        return _getRowSorter().getFiltersMode();
+    }
+    
     public void addRowFilter(RowFilter filter) {
         _getRowSorter().addRowFilter(filter);
     }

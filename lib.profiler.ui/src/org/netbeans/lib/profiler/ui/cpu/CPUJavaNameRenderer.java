@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.ui.cpu;
 
 import javax.swing.Icon;
+import javax.swing.UIManager;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -67,6 +68,10 @@ public class CPUJavaNameRenderer extends JavaNameRenderer {
                 setNormalValue(""); // NOI18N
                 setBoldValue(node.getNodeName());
                 setGrayValue(""); // NOI18N
+            } else if (node.isFiltered()) {
+                setNormalValue(""); // NOI18N
+                setBoldValue("");
+                setGrayValue(node.getNodeName()); // NOI18N
             } else {
                 super.setValue(node.getNodeName(), row);
             }
@@ -76,6 +81,8 @@ public class CPUJavaNameRenderer extends JavaNameRenderer {
             if (node.isThreadNode()) icon = Icons.getIcon(ProfilerIcons.THREAD);
             else if (node.isLeaf()) icon = Icons.getIcon(ProfilerIcons.NODE_LEAF);
             else icon = Icons.getIcon(ProfilerIcons.NODE_FORWARD);
+            
+            if (node.isFiltered()) icon = UIManager.getLookAndFeel().getDisabledIcon(this, icon);
             
             setIcon(icon);
         } else {
