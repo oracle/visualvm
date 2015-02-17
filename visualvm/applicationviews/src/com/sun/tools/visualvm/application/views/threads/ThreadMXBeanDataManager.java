@@ -183,9 +183,12 @@ class ThreadMXBeanDataManager extends VisualVMThreadsDataManager {
                     return CommonConstants.THREAD_STATUS_RUNNING;
                 case TIMED_WAITING:
                 case WAITING:
-                    StackTraceElement el = threadInfo.getStackTrace()[0];
-                    if (isSleeping(el)) return CommonConstants.THREAD_STATUS_SLEEPING;
-                    if (isParked(el)) return CommonConstants.THREAD_STATUS_PARK;
+                    StackTraceElement[] stack = threadInfo.getStackTrace();
+                    if (stack.length>0) {
+                        StackTraceElement el = stack[0];
+                        if (isSleeping(el)) return CommonConstants.THREAD_STATUS_SLEEPING;
+                        if (isParked(el)) return CommonConstants.THREAD_STATUS_PARK;
+                    }
                     return CommonConstants.THREAD_STATUS_WAIT;
                 case TERMINATED:
                 case NEW:
