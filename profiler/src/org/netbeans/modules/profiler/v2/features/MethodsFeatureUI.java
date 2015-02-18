@@ -46,8 +46,6 @@ package org.netbeans.modules.profiler.v2.features;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.util.Set;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -57,13 +55,14 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.LiveCPUView;
-import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
+import org.netbeans.lib.profiler.ui.swing.MultiButtonGroup;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -72,15 +71,19 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "MethodsFeatureUI_viewHotSpots=Hot spots",
-    "MethodsFeatureUI_viewCallTree=Call tree",
-    "MethodsFeatureUI_viewCombined=Combined",
+//    "MethodsFeatureUI_viewHotSpots=Hot spots",
+//    "MethodsFeatureUI_viewCallTree=Call tree",
+//    "MethodsFeatureUI_viewCombined=Combined",
     "MethodsFeatureUI_selectedMethods=Selected methods",
-    "MethodsFeatureUI_liveResults=Live results:",
+    "MethodsFeatureUI_liveResults=Results:",
     "MethodsFeatureUI_pauseResults=Pause live results",
     "MethodsFeatureUI_updateResults=Update live results",
+    "MethodsFeatureUI_view=View:",
+    "MethodsFeatureUI_viewForward=Forward calls",
+    "MethodsFeatureUI_viewHotSpots=Hot spots",
+    "MethodsFeatureUI_viewReverse=Reverse calls",
     "MethodsFeatureUI_resultsMode=Results mode",
-    "MethodsFeatureUI_profilingData=Profiling data:",
+    "MethodsFeatureUI_profilingData=Collected data:",
     "MethodsFeatureUI_snapshot=Snapshot"
 })
 abstract class MethodsFeatureUI extends FeatureUI {
@@ -140,12 +143,12 @@ abstract class MethodsFeatureUI extends FeatureUI {
     
     // --- UI ------------------------------------------------------------------
     
-    private static enum View { CALL_TREE, HOT_SPOTS, COMBINED }
+//    private static enum View { CALL_TREE, HOT_SPOTS, COMBINED }
     
     private JLabel lrLabel;
     private JToggleButton lrPauseButton;
     private JButton lrRefreshButton;
-    private ActionPopupButton lrView;
+//    private ActionPopupButton lrView;
     
     private JLabel pdLabel;
     private JButton pdSnapshotButton;
@@ -211,23 +214,65 @@ abstract class MethodsFeatureUI extends FeatureUI {
         };
         lrRefreshButton.setToolTipText(Bundle.MethodsFeatureUI_updateResults());
         
-        Action aCallTree = new AbstractAction() {
-            { putValue(NAME, Bundle.MethodsFeatureUI_viewCallTree()); }
-            public void actionPerformed(ActionEvent e) { setView(View.CALL_TREE); }
-            
+        MultiButtonGroup group = new MultiButtonGroup();
+        final JToggleButton[] toggles = new JToggleButton[3];
+        
+        JToggleButton forwardCalls = new JToggleButton(Icons.getIcon(ProfilerIcons.NODE_FORWARD)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                cpuView.setView(isSelected(), toggles[1].isSelected(), toggles[2].isSelected());
+                refreshResults();
+            }
         };
-        Action aHotSpots = new AbstractAction() {
-            { putValue(NAME, Bundle.MethodsFeatureUI_viewHotSpots()); }
-            public void actionPerformed(ActionEvent e) { setView(View.HOT_SPOTS); }
-            
+        forwardCalls.setToolTipText(Bundle.MethodsFeatureUI_viewForward());
+        group.add(forwardCalls);
+        toggles[0] = forwardCalls;
+//        toolbar.add(forwardCalls);
+        forwardCalls.setSelected(true);
+        
+        JToggleButton hotSpots = new JToggleButton(Icons.getIcon(ProfilerIcons.TAB_HOTSPOTS)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                cpuView.setView(toggles[0].isSelected(), isSelected(), toggles[2].isSelected());
+                refreshResults();
+            }
         };
-        Action aCombined = new AbstractAction() {
-            { putValue(NAME, Bundle.MethodsFeatureUI_viewCombined()); }
-            public void actionPerformed(ActionEvent e) { setView(View.COMBINED); }
-            
+        hotSpots.setToolTipText(Bundle.MethodsFeatureUI_viewHotSpots());
+        group.add(hotSpots);
+        toggles[1] = hotSpots;
+//        toolbar.add(hotSpots);
+        hotSpots.setSelected(false);
+        
+        JToggleButton reverseCalls = new JToggleButton(Icons.getIcon(ProfilerIcons.NODE_REVERSE)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                cpuView.setView(toggles[0].isSelected(), toggles[1].isSelected(), isSelected());
+                refreshResults();
+            }
         };
-        lrView = new ActionPopupButton(aCallTree, aHotSpots, aCombined);
-        lrView.setToolTipText(Bundle.MethodsFeatureUI_resultsMode());
+        reverseCalls.setToolTipText(Bundle.MethodsFeatureUI_viewReverse());
+        group.add(reverseCalls);
+        toggles[2] = reverseCalls;
+//        toolbar.add(reverseCalls);
+        reverseCalls.setSelected(false);
+        
+//        Action aCallTree = new AbstractAction() {
+//            { putValue(NAME, Bundle.MethodsFeatureUI_viewCallTree()); }
+//            public void actionPerformed(ActionEvent e) { setView(View.CALL_TREE); }
+//            
+//        };
+//        Action aHotSpots = new AbstractAction() {
+//            { putValue(NAME, Bundle.MethodsFeatureUI_viewHotSpots()); }
+//            public void actionPerformed(ActionEvent e) { setView(View.HOT_SPOTS); }
+//            
+//        };
+//        Action aCombined = new AbstractAction() {
+//            { putValue(NAME, Bundle.MethodsFeatureUI_viewCombined()); }
+//            public void actionPerformed(ActionEvent e) { setView(View.COMBINED); }
+//            
+//        };
+//        lrView = new ActionPopupButton(aCallTree, aHotSpots, aCombined);
+//        lrView.setToolTipText(Bundle.MethodsFeatureUI_resultsMode());
 
         pdLabel = new GrayLabel(Bundle.MethodsFeatureUI_profilingData());
 
@@ -248,7 +293,16 @@ abstract class MethodsFeatureUI extends FeatureUI {
         toolbar.addSpace(2);
         toolbar.add(lrPauseButton);
         toolbar.add(lrRefreshButton);
-        toolbar.add(lrView);
+        
+        toolbar.addSpace(2);
+//        toolbar.addSeparator();
+        toolbar.addSpace(5);
+        
+        toolbar.add(new GrayLabel(Bundle.MethodsFeatureUI_view()));
+        toolbar.addSpace(2);
+        toolbar.add(forwardCalls);
+        toolbar.add(hotSpots);
+        toolbar.add(reverseCalls);
 
         toolbar.addSpace(2);
         toolbar.addSeparator();
@@ -262,7 +316,8 @@ abstract class MethodsFeatureUI extends FeatureUI {
         
         // --- Sync UI ---------------------------------------------------------
         
-        setView(View.HOT_SPOTS);
+//        setView(View.HOT_SPOTS);
+        cpuView.setView(true, false, false);
         sessionStateChanged(getSessionState());
         
     }
@@ -278,22 +333,22 @@ abstract class MethodsFeatureUI extends FeatureUI {
         });
     }
 
-    private void setView(View view) {
-        lrView.selectAction(view.ordinal());
-        
-        switch (view) {
-            case HOT_SPOTS:
-                cpuView.setView(false, true);
-                break;
-            case CALL_TREE:
-                cpuView.setView(true, false);
-                break;
-            case COMBINED:
-                cpuView.setView(true, true);
-                break;
-        }
-        
-        refreshResults();
-    }
+//    private void setView(View view) {
+//        lrView.selectAction(view.ordinal());
+//        
+//        switch (view) {
+//            case HOT_SPOTS:
+//                cpuView.setView(false, true);
+//                break;
+//            case CALL_TREE:
+//                cpuView.setView(true, false);
+//                break;
+//            case COMBINED:
+//                cpuView.setView(true, true);
+//                break;
+//        }
+//        
+//        refreshResults();
+//    }
     
 }
