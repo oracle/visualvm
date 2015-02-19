@@ -92,7 +92,7 @@ import org.openide.util.NbBundle;
     "MethodsFeatureModes_selectedClasses=Selected classes",
     "MethodsFeatureModes_selectedMethods=Selected methods",
     "MethodsFeatureModes_editLink=<html><a href='#'>{0}, edit</a></html>",
-    "MethodsFeatureModes_outgoingCalls=Outgoing calls:",
+    "MethodsFeatureModes_outgoingCalls=Limit outgoing calls:",
     "MethodsFeatureModes_noClassSelected=No classes selected, use Profile Class action in editor or results or click the Add button:",
     "MethodsFeatureModes_oneClassSelected=Selected 1 class",
     "MethodsFeatureModes_multipleClassesSelected=Selected {0} classes",
