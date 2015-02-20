@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.instrumentation;
 
 import java.util.ArrayList;
+import java.util.List;
 import org.netbeans.lib.profiler.classfile.BaseClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
@@ -76,7 +77,8 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
         
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
-        boolean hasNewOpcodes(MemoryProfMethodInstrumentor minstr, boolean checkForOpcNew) {
+        boolean hasNewOpcodes(MemoryProfMethodInstrumentor minstr, boolean checkForOpcNew, boolean checkForOpcNewArray) {
+            if (!checkForOpcNew && !checkForOpcNewArray) return false;
             int loaderId = clazz.getLoaderId();
             boolean found = false;
             int bc;
@@ -95,7 +97,7 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
                     if (refClazz.getInstrClassId() == -1) {
                         refClazz.setInstrClassId(minstr.getNextClassId(refClazz.getName()));
                     }
-                } else if ((bc == opc_anewarray) || (bc == opc_multianewarray)) {
+                } else if ((bc == opc_anewarray || bc == opc_multianewarray) && checkForOpcNewArray) {
                     found = true;
 
                     int classCPIdx = getU2(bci + 1);
@@ -109,7 +111,7 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
                             refClazz.setInstrClassId(minstr.getNextClassId(refClazz.getName()));
                         }
                     }
-                } else if (bc == opc_newarray) {
+                } else if (bc == opc_newarray && checkForOpcNewArray) {
                     found = true;
 
                     int arrayClassId = getByte(bci + 1);
@@ -149,6 +151,7 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public Object[] getInitialMethodsToInstrument(RootClassLoadedCommand rootLoaded) {
+        List classes = new ArrayList();
         resetLoadedClassData();
         initInstrumentationPackData();
         instrClassId = 0;
@@ -158,7 +161,15 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
         String[] loadedClasses = rootLoaded.getAllLoadedClassNames();
         int[] loadedClassLoaderIds = rootLoaded.getAllLoadedClassLoaderIds();
         for (int i = 0; i < loadedClasses.length; i++) {
-            findAndMarkMethodsToInstrumentInClass(loadedClasses[i], loadedClassLoaderIds[i]);
+            DynamicClassInfo clazz = javaClassForName(loadedClasses[i], loadedClassLoaderIds[i]);
+
+            if (classNeedsInstrumentation(clazz)) {
+                clazz.preloadBytecode();
+            }
+            classes.add(clazz);
+        }
+        for (Object clazz : classes) {
+            findAndMarkMethodsToInstrumentInClass((DynamicClassInfo) clazz);
         }
 
         return createInstrumentedMethodPack();
@@ -181,8 +192,11 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
 
     /** Checks if there are any methods in this class that need to be instrumented. */
     protected void findAndMarkMethodsToInstrumentInClass(String className, int classLoaderId) {
-        DynamicClassInfo clazz = javaClassForName(className, classLoaderId);
-
+        findAndMarkMethodsToInstrumentInClass(javaClassForName(className, classLoaderId));
+    }
+    
+    /** Checks if there are any methods in this class that need to be instrumented. */
+    protected void findAndMarkMethodsToInstrumentInClass(DynamicClassInfo clazz) {
         if (clazz == null) {
             return; // Warning has already been reported
         }
@@ -198,26 +212,28 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
                 clazz.setInstrClassId(getNextClassId(clazz.getName()));
             }
 
-            String[] methodNames = clazz.getMethodNames();
-            boolean found = false;
+            if (classNeedsInstrumentation(clazz)) {
+                String[] methodNames = clazz.getMethodNames();
+                boolean found = false;
 
-            for (int i = 0; i < methodNames.length; i++) {
-                if (clazz.isMethodNative(i) || clazz.isMethodAbstract(i)) {
-                    clazz.setMethodUnscannable(i);
+                for (int i = 0; i < methodNames.length; i++) {
+                    if (clazz.isMethodNative(i) || clazz.isMethodAbstract(i)) {
+                        clazz.setMethodUnscannable(i);
 
-                    continue;
+                        continue;
+                    }
+
+                    if (methodNeedsInstrumentation(clazz, i)) {
+                        nInstrMethods++;
+                        clazz.setMethodInstrumented(i);
+                        found = true;
+                    }
                 }
 
-                if (methodNeedsInstrumentation(clazz, i)) {
-                    nInstrMethods++;
-                    clazz.setMethodInstrumented(i);
-                    found = true;
+                if (found) {
+                    nInstrClasses++;
+                    instrClasses.add(clazz);
                 }
-            }
-
-            if (found) {
-                nInstrClasses++;
-                instrClasses.add(clazz);
             }
         }
     }
@@ -228,6 +244,7 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
         nInstantiatableClasses = 0;
     }
 
+    protected abstract boolean classNeedsInstrumentation(ClassInfo clazz);
     protected abstract boolean methodNeedsInstrumentation(ClassInfo clazz, int methodIdx);
 
     /** Creates a multi-class packet of instrumented methods or classes */
@@ -239,10 +256,10 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
         return createInstrumentedMethodPack15();
     }
 
-    protected boolean hasNewOpcodes(ClassInfo clazz, int methodIdx, boolean checkForOpcNew) {
+    protected boolean hasNewOpcodes(ClassInfo clazz, int methodIdx, boolean checkForOpcNew, boolean checkForOpcNewArray) {
         MethodScanerForNewOpcodes msfno = new MethodScanerForNewOpcodes(clazz, methodIdx);
 
-        return msfno.hasNewOpcodes(this, checkForOpcNew);
+        return msfno.hasNewOpcodes(this, checkForOpcNew, checkForOpcNewArray);
     }
 
     protected abstract byte[] instrumentMethod(DynamicClassInfo clazz, int methodIdx);

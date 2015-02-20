@@ -71,6 +71,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
     private static int stackDepth;
     private static int[] stackFrameIds;
     private static Map classIdMap;
+    private static final boolean DEBUG = false;
 
     // -------------------------------------- Miscellaneous support routines ------------------------------------------
     private static long randSeed;
@@ -201,7 +202,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
                 classIdMap.put(classNameId, classIdInt);
             }
             if (newClassId == -1) {
-                System.err.println("*** JFluid warning: Invalid classId for class:"+classNameId);
+                if (DEBUG) System.out.println("ProfilerRuntimeMemory.DEBUG: Invalid classId for class:"+classNameId);
 //                if (classNameId.startsWith("org.netbeans.lib.profiler")) Thread.dumpStack();
 //                if (classNameId.startsWith("[")) Thread.dumpStack();
             }
