@@ -199,13 +199,13 @@ final class ObjectsFeatureModes {
         void configureSettings(ProfilingSettings settings) {
             assert SwingUtilities.isEventDispatchThread();
             
-            String l = readFlag(LIFECYCLE_FLAG, null);
-            settings.setProfilingType(l == null ? ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS :
-                                                  ProfilingSettings.PROFILE_MEMORY_LIVENESS);
+            boolean lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.FALSE.toString()));
+            settings.setProfilingType(lifecycle ? ProfilingSettings.PROFILE_MEMORY_LIVENESS :
+                                                  ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS);
 
-            String s = readFlag(ALLOCATIONS_FLAG, null);
+            boolean alloc = Boolean.parseBoolean(readFlag(ALLOCATIONS_FLAG, Boolean.TRUE.toString()));
             int limit = Integer.parseInt(readFlag(LIMIT_ALLOCATIONS_FLAG, LIMIT_ALLOCATIONS_DEFAULT.toString()));
-            settings.setAllocStackTraceLimit(s != null ? 0 : limit); // TODO: should follow limit from Options
+            settings.setAllocStackTraceLimit(alloc ? limit : 0); // TODO: should follow limit from Options
             
 //            settings.setAllocTrackEvery(1); // TODO: should follow value from Options
 
@@ -244,11 +244,11 @@ final class ObjectsFeatureModes {
                 assert SwingUtilities.isEventDispatchThread();
                 
                 boolean lifecycle = lifecycleCheckbox.isSelected();
-                boolean _lifecycle = readFlag(LIFECYCLE_FLAG, null) != null;
+                boolean _lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.FALSE.toString()));
                 if (lifecycle != _lifecycle) return true;
                 
                 boolean alloc = allocationsCheckbox.isSelected();
-                boolean _alloc = readFlag(ALLOCATIONS_FLAG, null) == null;
+                boolean _alloc = Boolean.parseBoolean(readFlag(ALLOCATIONS_FLAG, Boolean.TRUE.toString()));
                 if (alloc != _alloc) return true;
                 
                 int limit = Integer.parseInt(readFlag(LIMIT_ALLOCATIONS_FLAG, LIMIT_ALLOCATIONS_DEFAULT.toString()));
@@ -356,7 +356,7 @@ final class ObjectsFeatureModes {
 
                 selectionContent.add(Box.createHorizontalStrut(8));
 
-                boolean lifecycle = readFlag(LIFECYCLE_FLAG, null) != null;
+                boolean lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.FALSE.toString()));
                 lifecycleCheckbox = new JCheckBox(Bundle.ObjectsFeatureModes_recordLifecycle(), lifecycle) {
                     protected void fireActionPerformed(ActionEvent e) { super.fireActionPerformed(e); settingsChanged(); }
                 };
@@ -365,7 +365,7 @@ final class ObjectsFeatureModes {
                 
                 selectionContent.add(Box.createHorizontalStrut(3));
 
-                boolean alloc = readFlag(ALLOCATIONS_FLAG, null) == null;
+                boolean alloc = Boolean.parseBoolean(readFlag(ALLOCATIONS_FLAG, Boolean.TRUE.toString()));
                 allocationsCheckbox = new JCheckBox(Bundle.ObjectsFeatureModes_recordAllocations(), alloc) {
                     protected void fireActionPerformed(ActionEvent e) {
                         super.fireActionPerformed(e);

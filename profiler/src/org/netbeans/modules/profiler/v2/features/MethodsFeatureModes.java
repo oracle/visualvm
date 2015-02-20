@@ -218,9 +218,9 @@ final class MethodsFeatureModes {
             settings.setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
             settings.setInstrumentSpawnedThreads(false);
             
-            SimpleFilter filter = readFlag(SKIP_JAVA_FLAG, null) != null ? SimpleFilter.NO_FILTER :
-                         new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_EXCLUSIVE, CORE_JAVA_FILTER); // NOI18N
-            settings.setSelectedInstrumentationFilter(filter);
+            boolean filter = Boolean.parseBoolean(readFlag(SKIP_JAVA_FLAG, Boolean.TRUE.toString()));
+            settings.setSelectedInstrumentationFilter(!filter ? SimpleFilter.NO_FILTER :
+                    new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_EXCLUSIVE, CORE_JAVA_FILTER)); // NOI18N
             
             StringBuilder b = new StringBuilder();
             HashSet<ClientUtils.SourceCodeSelection> _sel = getSelection();
