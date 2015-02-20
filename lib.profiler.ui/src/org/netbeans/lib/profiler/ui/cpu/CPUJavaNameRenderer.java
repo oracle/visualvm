@@ -56,14 +56,17 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  */
 public class CPUJavaNameRenderer extends JavaNameRenderer {
     
-    private final String iconKey;
+    private static final Icon THREAD_ICON = Icons.getIcon(ProfilerIcons.THREAD);
+    private static final Icon LEAF_ICON = Icons.getIcon(ProfilerIcons.NODE_LEAF);
+    
+    private final Icon icon;
     
     public CPUJavaNameRenderer() {
         this(ProfilerIcons.NODE_FORWARD);
     }
     
     public CPUJavaNameRenderer(String iconKey) {
-        this.iconKey = iconKey;
+        this.icon = Icons.getIcon(iconKey);
     }
     
     public void setValue(Object value, int row) {
@@ -86,15 +89,15 @@ public class CPUJavaNameRenderer extends JavaNameRenderer {
                 super.setValue(node.getNodeName(), row);
             }
             
-            Icon icon = null;
+            Icon _icon = null;
             
-            if (node.isThreadNode()) icon = Icons.getIcon(ProfilerIcons.THREAD);
-            else if (node.isLeaf()) icon = Icons.getIcon(ProfilerIcons.NODE_LEAF);
-            else icon = Icons.getIcon(iconKey);
+            if (node.isThreadNode()) _icon = THREAD_ICON;
+            else if (node.isLeaf()) _icon = LEAF_ICON;
+            else _icon = icon;
             
-            if (node.isFiltered()) icon = UIManager.getLookAndFeel().getDisabledIcon(this, icon);
+            if (node.isFiltered()) _icon = UIManager.getLookAndFeel().getDisabledIcon(this, _icon);
             
-            setIcon(icon);
+            setIcon(_icon);
         } else {
             super.setValue(value, row);
         }
