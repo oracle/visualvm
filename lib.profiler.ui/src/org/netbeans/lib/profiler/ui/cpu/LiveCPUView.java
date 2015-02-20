@@ -92,8 +92,9 @@ public abstract class LiveCPUView extends JPanel {
     private final ResultsMonitor rm;
     
     private DataView lastFocused;
-    private CPUTableView tableView;
-    private CPUTreeTableView treeTableView;
+    private CPUTableView hotSpotsView;
+    private CPUTreeTableView forwardCallsView;
+    private CPUTreeTableView reverseCallsView;
     
     private long lastupdate;
     private volatile boolean paused;
@@ -134,9 +135,10 @@ public abstract class LiveCPUView extends JPanel {
     }
     
     
-    public void setView(boolean callTree, boolean hotSpots) {
-        treeTableView.setVisible(callTree);
-        tableView.setVisible(hotSpots);
+    public void setView(boolean forwardCalls, boolean hotSpots, boolean reverseCalls) {
+        forwardCallsView.setVisible(forwardCalls);
+        hotSpotsView.setVisible(hotSpots);
+        reverseCallsView.setVisible(reverseCalls);
     }
     
     public void setPaused(boolean paused) {
@@ -167,8 +169,9 @@ public abstract class LiveCPUView extends JPanel {
 
                     @Override
                     public void run() {
-                        treeTableView.setData(snapshotData, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, sampled);
-                        tableView.setData(flatData, idMap, sampled);
+                        forwardCallsView.setData(snapshotData, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, sampled);
+                        hotSpotsView.setData(flatData, idMap, sampled);
+                        reverseCallsView.setData(snapshotData, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, sampled);
                     }
                 });
                 lastupdate = System.currentTimeMillis();
@@ -192,19 +195,22 @@ public abstract class LiveCPUView extends JPanel {
     }
     
     public void resetData() {
-        treeTableView.resetData();
-        tableView.resetData();
+        forwardCallsView.resetData();
+        hotSpotsView.resetData();
+        reverseCallsView.resetData();
     }
     
     
     public void showSelectionColumn() {
-        treeTableView.showSelectionColumn();
-        tableView.showSelectionColumn();
+        forwardCallsView.showSelectionColumn();
+        hotSpotsView.showSelectionColumn();
+        reverseCallsView.showSelectionColumn();
     }
     
     public void refreshSelection() {
-        treeTableView.refreshSelection();
-        tableView.refreshSelection();
+        forwardCallsView.refreshSelection();
+        hotSpotsView.refreshSelection();
+        reverseCallsView.refreshSelection();
     }
     
     
@@ -232,37 +238,52 @@ public abstract class LiveCPUView extends JPanel {
     private void initUI(Set<ClientUtils.SourceCodeSelection> selection) {
         setLayout(new BorderLayout(0, 0));
         
-        treeTableView = new CPUTreeTableView(selection) {
+        forwardCallsView = new CPUTreeTableView(selection, false) {
             protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                 if (showSourceSupported()) showSource(userValue);
             }
             protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
-                LiveCPUView.this.populatePopup(treeTableView, popup, value, userValue);
+                LiveCPUView.this.populatePopup(forwardCallsView, popup, value, userValue);
             }
             protected void popupShowing() { LiveCPUView.this.popupShowing(); }
             protected void popupHidden()  { LiveCPUView.this.popupHidden(); }
             protected boolean hasBottomFilterFindMargin() { return true; }
         };
-        treeTableView.notifyOnFocus(new Runnable() {
-            public void run() { lastFocused = treeTableView; }
+        forwardCallsView.notifyOnFocus(new Runnable() {
+            public void run() { lastFocused = forwardCallsView; }
         });
         
-        tableView = new CPUTableView(selection) {
+        hotSpotsView = new CPUTableView(selection) {
             protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                 if (showSourceSupported()) showSource(userValue);
             }
             protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
-                LiveCPUView.this.populatePopup(tableView, popup, value, userValue);
+                LiveCPUView.this.populatePopup(hotSpotsView, popup, value, userValue);
             }
             protected void popupShowing() { LiveCPUView.this.popupShowing(); }
             protected void popupHidden()  { LiveCPUView.this.popupHidden(); }
             protected boolean hasBottomFilterFindMargin() { return true; }
         };
-        tableView.notifyOnFocus(new Runnable() {
-            public void run() { lastFocused = tableView; }
+        hotSpotsView.notifyOnFocus(new Runnable() {
+            public void run() { lastFocused = hotSpotsView; }
         });
         
-        JSplitPane split = new JExtendedSplitPane(JSplitPane.VERTICAL_SPLIT) {
+        reverseCallsView = new CPUTreeTableView(selection, true) {
+            protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                if (showSourceSupported()) showSource(userValue);
+            }
+            protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                LiveCPUView.this.populatePopup(reverseCallsView, popup, value, userValue);
+            }
+            protected void popupShowing() { LiveCPUView.this.popupShowing(); }
+            protected void popupHidden()  { LiveCPUView.this.popupHidden(); }
+            protected boolean hasBottomFilterFindMargin() { return true; }
+        };
+        reverseCallsView.notifyOnFocus(new Runnable() {
+            public void run() { lastFocused = reverseCallsView; }
+        });
+        
+        JSplitPane upperSplit = new JExtendedSplitPane(JSplitPane.VERTICAL_SPLIT) {
             {
                 setBorder(null);
                 setDividerSize(5);
@@ -277,13 +298,34 @@ public abstract class LiveCPUView extends JPanel {
                 }
             }
         };
-        split.setBorder(BorderFactory.createEmptyBorder());
-        split.setTopComponent(treeTableView);
-        split.setBottomComponent(tableView);
-        split.setDividerLocation(0.5d);
-        split.setResizeWeight(0.5d);
+        upperSplit.setBorder(BorderFactory.createEmptyBorder());
+        upperSplit.setTopComponent(forwardCallsView);
+        upperSplit.setBottomComponent(hotSpotsView);
+        upperSplit.setDividerLocation(0.5d);
+        upperSplit.setResizeWeight(0.5d);
         
-        add(split, BorderLayout.CENTER);
+        JSplitPane lowerSplit = new JExtendedSplitPane(JSplitPane.VERTICAL_SPLIT) {
+            {
+                setBorder(null);
+                setDividerSize(5);
+
+                if (getUI() instanceof BasicSplitPaneUI) {
+                    BasicSplitPaneDivider divider = ((BasicSplitPaneUI)getUI()).getDivider();
+                    if (divider != null) {
+                        Color c = UIUtils.isNimbus() ? UIUtils.getDisabledLineColor() :
+                                new JSeparator().getForeground();
+                        divider.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, c));
+                    }
+                }
+            }
+        };
+        lowerSplit.setBorder(BorderFactory.createEmptyBorder());
+        lowerSplit.setTopComponent(upperSplit);
+        lowerSplit.setBottomComponent(reverseCallsView);
+        lowerSplit.setDividerLocation(0.66d);
+        lowerSplit.setResizeWeight(0.66d);
+        
+        add(lowerSplit, BorderLayout.CENTER);
         
 //        // TODO: read last state?
 //        setView(true, false);
@@ -311,8 +353,9 @@ public abstract class LiveCPUView extends JPanel {
         if (lastFocused != null && !lastFocused.isShowing()) lastFocused = null;
         
         if (lastFocused == null) {
-            if (treeTableView.isShowing()) lastFocused = treeTableView;
-            else if (tableView.isShowing()) lastFocused = tableView;
+            if (forwardCallsView.isShowing()) lastFocused = forwardCallsView;
+            else if (hotSpotsView.isShowing()) lastFocused = hotSpotsView;
+            else if (reverseCallsView.isShowing()) lastFocused = reverseCallsView;
         }
         
         return lastFocused;

@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
+import java.util.Collection;
 import java.util.Set;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
@@ -51,7 +52,7 @@ import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.results.memory.HeapHistogram;
+import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
@@ -72,7 +73,9 @@ abstract class SampledTableView extends MemoryView {
     private MemoryTableModel tableModel;
     private ProfilerTable table;
     
-    private HeapHistogram.ClassInfo[] data;
+    private String[] names;
+    private int[] instances;
+    private long[] bytes;
     private ClientUtils.SourceCodeSelection[] classNames;
     
     private final Set<ClientUtils.SourceCodeSelection> selection;
@@ -88,61 +91,26 @@ abstract class SampledTableView extends MemoryView {
     protected ProfilerTable getResultsComponent() { return table; }
     
     
-    void setData(final HeapHistogram histogram) {
+    public void setData(MemoryResultsSnapshot snapshot, Collection filter, final int aggregation) {
+        final SampledMemoryResultsSnapshot _snapshot = (SampledMemoryResultsSnapshot)snapshot;
+        
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                if (tableModel != null) {
-                    Set<HeapHistogram.ClassInfo> classes = histogram == null ? null :
-                                                 histogram.getHeapHistogram();
-                    data = classes == null ? null :
-                           classes.toArray(new HeapHistogram.ClassInfo[classes.size()]);
-                    classNames = new ClientUtils.SourceCodeSelection[data == null ? 0 : data.length];
-                    for (int i = 0; i < classNames.length; i++)
-                        classNames[i] = new ClientUtils.SourceCodeSelection(data[i].getName(), Wildcards.ALLWILDCARD, null);
-                    
-                    renderers[0].setMaxValue(histogram == null ? 0 : histogram.getTotalHeapBytes());
-                    renderers[1].setMaxValue(histogram == null ? 0 : histogram.getTotalHeapInstances());
-                    
-                    tableModel.fireTableDataChanged();
-                }
-            }
-        });
-    }
-    
-    void setData(final SampledMemoryResultsSnapshot snapshot, final int aggregation) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-
                 int totalSize = 0;
                 int totalInstances = 0;
                 
-                int count = snapshot.getNProfiledClasses();
-                
-                int[] counts = snapshot.getObjectsCounts();
-                long[] sizes = snapshot.getObjectsSizePerClass();
-                String[] names = snapshot.getClassNames();
-                
-                data = new HeapHistogram.ClassInfo[count];
-                classNames = new ClientUtils.SourceCodeSelection[count];
-                
-                for (int i = 0; i < count; i++) {
-                    final String name = names[i];
+                names = _snapshot.getClassNames();
+                instances = _snapshot.getObjectsCounts();
+                bytes = _snapshot.getObjectsSizePerClass();
 
-                    final int instances = counts[i];
-                    totalInstances += instances;
+                classNames = new ClientUtils.SourceCodeSelection[names.length];
 
-                    final long size = sizes[i];
-                    totalSize += size;
-
-                    data[i] = new HeapHistogram.ClassInfo() {
-                        public String getName() { return name; }
-                        public long getInstancesCount() { return instances;}
-                        public long getBytes() { return size;}
-                    };
-                    
-                    classNames[i] = new ClientUtils.SourceCodeSelection(data[i].getName(), Wildcards.ALLWILDCARD, null);
+                for (int i = 0; i < names.length; i++) {
+                    totalInstances += instances[i];
+                    totalSize += bytes[i];
+                    classNames[i] = new ClientUtils.SourceCodeSelection(names[i], Wildcards.ALLWILDCARD, null);
                 }
-
+                
                 renderers[0].setMaxValue(totalSize);
                 renderers[1].setMaxValue(totalInstances);
 
@@ -151,8 +119,20 @@ abstract class SampledTableView extends MemoryView {
         });
     }
     
-    void resetData() {
-        setData((HeapHistogram)null);
+    public void resetData() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                names = null;
+                instances = null;
+                bytes = null;
+                classNames = null;
+                
+                renderers[0].setMaxValue(0);
+                renderers[1].setMaxValue(0);
+
+                tableModel.fireTableDataChanged();
+            }
+        });
     }
     
     
@@ -165,7 +145,7 @@ abstract class SampledTableView extends MemoryView {
     }
     
     
-    ExportUtils.ExportProvider[] getExportProviders() {
+    public ExportUtils.ExportProvider[] getExportProviders() {
         return table.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
             new ExportUtils.CSVExportProvider(table),
             new ExportUtils.HTMLExportProvider(table, EXPORT_LIVE),
@@ -187,6 +167,8 @@ abstract class SampledTableView extends MemoryView {
     private HideableBarRenderer[] renderers;
     
     private void initUI() {
+        int offset = selection == null ? -1 : 0;
+        
         tableModel = new MemoryTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null) {
@@ -206,8 +188,6 @@ abstract class SampledTableView extends MemoryView {
         
         table.providePopupMenu(true);
         installDefaultAction();
-        
-        int offset = selection == null ? -1 : 0;
         
         table.setMainColumn(1 + offset);
         table.setFitWidthColumn(1 + offset);
@@ -244,7 +224,7 @@ abstract class SampledTableView extends MemoryView {
     
     
     protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
-        if (data == null || row == -1) return null;
+        if (names == null || row == -1) return null;
         if (row >= tableModel.getRowCount()) return null; // #239936
         return classNames[table.convertRowIndexToModel(row)];
     }
@@ -280,7 +260,7 @@ abstract class SampledTableView extends MemoryView {
         }
 
         public int getRowCount() {
-            return data == null ? 0 : data.length;
+            return names == null ? 0 : names.length;
         }
 
         public int getColumnCount() {
@@ -288,16 +268,16 @@ abstract class SampledTableView extends MemoryView {
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
-            if (data == null) return null;
+            if (names == null) return null;
             
             if (selection == null) columnIndex++;
             
             if (columnIndex == 1) {
-                return data[rowIndex].getName();
+                return names[rowIndex];
             } else if (columnIndex == 2) {
-                return data[rowIndex].getBytes();
+                return bytes[rowIndex];
             } else if (columnIndex == 3) {
-                return data[rowIndex].getInstancesCount();
+                return instances[rowIndex];
             } else if (columnIndex == 0) {
                 if (selection.isEmpty()) return Boolean.FALSE;
                 return selection.contains(classNames[rowIndex]);

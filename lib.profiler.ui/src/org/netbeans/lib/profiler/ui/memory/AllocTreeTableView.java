@@ -43,22 +43,29 @@
 package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.AbstractAction;
+import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTManager;
+import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
@@ -67,8 +74,11 @@ import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
+import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
+import org.netbeans.lib.profiler.utils.StringUtils;
+import org.netbeans.lib.profiler.utils.Wildcards;
 
 /**
  *
@@ -79,7 +89,13 @@ abstract class AllocTreeTableView extends MemoryView {
     private AllocTreeTableModel treeTableModel;
     private ProfilerTreeTable treeTable;
     
-    public AllocTreeTableView() {
+    private Map<TreeNode, ClientUtils.SourceCodeSelection> nodesMap;
+    private final Set<ClientUtils.SourceCodeSelection> selection;
+    
+    
+    public AllocTreeTableView(Set<ClientUtils.SourceCodeSelection> selection) {
+        this.selection = selection;
+        
         initUI();
     }
     
@@ -87,15 +103,19 @@ abstract class AllocTreeTableView extends MemoryView {
     protected ProfilerTable getResultsComponent() { return treeTable; }
     
     
-    void setData(final AllocMemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
+    public void setData(MemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
         final boolean includeEmpty = filter != null;
+        final AllocMemoryResultsSnapshot _snapshot = (AllocMemoryResultsSnapshot)snapshot;
         
-        int _nTrackedItems = snapshot.getNProfiledClasses();
-        String[] _classNames = snapshot.getClassNames();
-        int[] _nTotalAllocObjects = snapshot.getObjectsCounts();
-        long[] _totalAllocObjectsSize = snapshot.getObjectsSizePerClass();
+        String[] _classNames = _snapshot.getClassNames();
+        int[] _nTotalAllocObjects = _snapshot.getObjectsCounts();
+        long[] _totalAllocObjectsSize = _snapshot.getObjectsSizePerClass();
+        
+        int _nTrackedItems = Math.min(_snapshot.getNProfiledClasses(), _classNames.length);
+        _nTrackedItems = Math.min(_nTrackedItems, _nTotalAllocObjects.length);
         
         List<PresoObjAllocCCTNode> nodes = new ArrayList();
+        final Map<TreeNode, ClientUtils.SourceCodeSelection> _nodesMap = new HashMap();
         
         long totalObjects = 0;
         long totalBytes = 0;
@@ -104,12 +124,14 @@ abstract class AllocTreeTableView extends MemoryView {
             totalObjects += _nTotalAllocObjects[i];
             totalBytes += _totalAllocObjectsSize[i];
             
-            if ((!includeEmpty && _nTotalAllocObjects[i] > 0) || (includeEmpty && filter.contains(_classNames[i]))) {
+            String className = StringUtils.userFormClassName(_classNames[i]);
+            
+            if ((!includeEmpty && _nTotalAllocObjects[i] > 0) || (includeEmpty && filter.contains(className))) {
                 final int _i = i;
-                PresoObjAllocCCTNode node = new PresoObjAllocCCTNode(_classNames[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i]) {
+                PresoObjAllocCCTNode node = new PresoObjAllocCCTNode(className, _nTotalAllocObjects[i], _totalAllocObjectsSize[i]) {
                     public CCTNode[] getChildren() {
                         if (children == null) {
-                            MemoryCCTManager callGraphManager = new MemoryCCTManager(snapshot, _i, true);
+                            MemoryCCTManager callGraphManager = new MemoryCCTManager(_snapshot, _i, true);
                             PresoObjAllocCCTNode root = callGraphManager.getRootNode();
                             setChildren(root == null ? new PresoObjAllocCCTNode[0] :
                                         (PresoObjAllocCCTNode[])root.getChildren());
@@ -126,23 +148,48 @@ abstract class AllocTreeTableView extends MemoryView {
                     }
                 };
                 nodes.add(node);
+                _nodesMap.put(node, new ClientUtils.SourceCodeSelection(className, Wildcards.ALLWILDCARD, null));
             }
         }
         
-        renderers[0].setMaxValue(totalBytes);
-        renderers[1].setMaxValue(totalObjects);
-        
+        final long _totalBytes = totalBytes;
+        final long _totalObjects = totalObjects;
         final PresoObjAllocCCTNode root = PresoObjAllocCCTNode.rootNode(nodes.toArray(new PresoObjAllocCCTNode[nodes.size()]));
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                nodesMap = _nodesMap;
+                renderers[0].setMaxValue(_totalBytes);
+                renderers[1].setMaxValue(_totalObjects);
+                treeTableModel.setRoot(root);
+            }
+        });
+    }
+    
+    public void resetData() {
+        final PresoObjAllocCCTNode root = PresoObjAllocCCTNode.rootNode(new PresoObjAllocCCTNode[0]);
+        
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                nodesMap = null;
+                renderers[0].setMaxValue(0);
+                renderers[1].setMaxValue(0);
                 treeTableModel.setRoot(root);
             }
         });
     }
     
     
-    ExportUtils.ExportProvider[] getExportProviders() {
+    public void showSelectionColumn() {
+        treeTable.setColumnVisibility(0, true);
+    }
+    
+    public void refreshSelection() {
+        treeTableModel.dataChanged();
+    }
+    
+    
+    public ExportUtils.ExportProvider[] getExportProviders() {
         return treeTable.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
             new ExportUtils.CSVExportProvider(treeTable),
             new ExportUtils.HTMLExportProvider(treeTable, EXPORT_ALLOCATED),
@@ -160,9 +207,11 @@ abstract class AllocTreeTableView extends MemoryView {
     private HideableBarRenderer[] renderers;
     
     private void initUI() {
+        final int offset = selection == null ? -1 : 0;
+        
         treeTableModel = new AllocTreeTableModel(PrestimeCPUCCTNode.EMPTY);
         
-        treeTable = new ProfilerTreeTable(treeTableModel, true, true, new int[] { 0 }) {
+        treeTable = new ProfilerTreeTable(treeTableModel, true, true, new int[] { 1 + offset }) {
             public ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
                 return AllocTreeTableView.this.getUserValueForRow(row);
             }
@@ -184,11 +233,13 @@ abstract class AllocTreeTableView extends MemoryView {
         treeTable.setShowsRootHandles(true);
         treeTable.makeTreeAutoExpandable(2);
         
-        treeTable.setMainColumn(0);
-        treeTable.setFitWidthColumn(0);
+        treeTable.setMainColumn(1 + offset);
+        treeTable.setFitWidthColumn(1 + offset);
         
-        treeTable.setSortColumn(1);
-        treeTable.setDefaultSortOrder(0, SortOrder.ASCENDING);
+        treeTable.setSortColumn(2 + offset);
+        treeTable.setDefaultSortOrder(1 + offset, SortOrder.ASCENDING);
+        
+        if (selection != null) treeTable.setColumnVisibility(0, false);
         
         renderers = new HideableBarRenderer[2];
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
@@ -197,12 +248,32 @@ abstract class AllocTreeTableView extends MemoryView {
         renderers[0].setMaxValue(123456789);
         renderers[1].setMaxValue(12345678);
         
+        if (selection != null) treeTable.setColumnRenderer(0, new CheckBoxRenderer() {
+            private boolean visible;
+            public void setValue(Object value, int row) {
+                TreePath path = treeTable.getPathForRow(row);
+                visible = nodesMap.containsKey((TreeNode)path.getLastPathComponent());
+                if (visible) super.setValue(value, row);
+            }
+            public void paint(Graphics g) {
+                if (visible) {
+                    super.paint(g);
+                } else {
+                    g.setColor(getBackground());
+                    g.fillRect(0, 0, size.width, size.height);
+                }
+            }
+        });
         treeTable.setTreeCellRenderer(new MemoryJavaNameRenderer());
-        treeTable.setColumnRenderer(1, renderers[0]);
-        treeTable.setColumnRenderer(2, renderers[1]);
+        treeTable.setColumnRenderer(2 + offset, renderers[0]);
+        treeTable.setColumnRenderer(3 + offset, renderers[1]);
         
-        treeTable.setDefaultColumnWidth(1, renderers[0].getOptimalWidth());
-        treeTable.setDefaultColumnWidth(2, renderers[1].getMaxNoBarWidth());
+        if (selection != null) {
+            int w = new JLabel(treeTable.getColumnName(0)).getPreferredSize().width;
+            treeTable.setDefaultColumnWidth(0, w + 15);
+        }
+        treeTable.setDefaultColumnWidth(2 + offset, renderers[0].getOptimalWidth());
+        treeTable.setDefaultColumnWidth(3 + offset, renderers[1].getMaxNoBarWidth());
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(treeTable, false, null);
         
@@ -233,50 +304,71 @@ abstract class AllocTreeTableView extends MemoryView {
         }
         
         public String getColumnName(int columnIndex) {
-            if (columnIndex == 0) {
+            if (selection == null) columnIndex++;
+            
+            if (columnIndex == 1) {
                 return COLUMN_NAME;
-            } else if (columnIndex == 1) {
-                return COLUMN_ALLOCATED_BYTES;
             } else if (columnIndex == 2) {
+                return COLUMN_ALLOCATED_BYTES;
+            } else if (columnIndex == 3) {
                 return COLUMN_ALLOCATED_OBJECTS;
+            } else if (columnIndex == 0) {
+                return COLUMN_SELECTED;
             }
             return null;
         }
 
         public Class<?> getColumnClass(int columnIndex) {
-            if (columnIndex == 0) {
+            if (selection == null) columnIndex++;
+            
+            if (columnIndex == 1) {
                 return JTree.class;
-            } else if (columnIndex == 1) {
-                return Long.class;
             } else if (columnIndex == 2) {
+                return Long.class;
+            } else if (columnIndex == 3) {
                 return Integer.class;
+            } else if (columnIndex == 0) {
+                return Boolean.class;
             }
             return null;
         }
 
         public int getColumnCount() {
-            return 3;
+            return selection == null ? 3 : 4;
         }
 
         public Object getValueAt(TreeNode node, int columnIndex) {
             PresoObjAllocCCTNode allocNode = (PresoObjAllocCCTNode)node;
             
-            if (columnIndex == 0) {
+            if (selection == null) columnIndex++;
+            
+            if (columnIndex == 1) {
                 return allocNode.getNodeName();
-            } else if (columnIndex == 1) {
-                return allocNode.totalObjSize;
             } else if (columnIndex == 2) {
+                return allocNode.totalObjSize;
+            } else if (columnIndex == 3) {
                 return allocNode.nCalls;
+            } else if (columnIndex == 0) {
+                if (selection.isEmpty()) return Boolean.FALSE;
+                return selection.contains(nodesMap.get(node));
             }
 
             return null;
         }
         
         public void setValueAt(Object aValue, TreeNode node, int columnIndex) {
+            if (selection == null) columnIndex++;
+            
+            if (columnIndex == 0) {
+                if (Boolean.TRUE.equals(aValue)) selection.add(nodesMap.get(node));
+                else selection.remove(nodesMap.get(node));
+            }
         }
 
         public boolean isCellEditable(TreeNode node, int columnIndex) {
-            return false;
+            if (selection == null) columnIndex++;
+            if (columnIndex != 0) return false;
+            return (nodesMap.containsKey(node));
         }
         
     }
