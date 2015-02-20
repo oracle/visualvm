@@ -108,11 +108,8 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         super(container, null, -1);
         setThreadNode();
         this.children = children;
-        nChildren = children.length;
-        
-        for (int i = 0; i < nChildren; i++) {
-            children[i].parent = this;
-        }
+        nChildren = children == null ? 0 : children.length;
+        for (int i = 0; i < nChildren; i++) children[i].parent = this;
     }
     
     PrestimeCPUCCTNodeBacked() {}
@@ -220,6 +217,12 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
 //        sortChildren(config.getSortBy(), config.getSortOrder());
         
         return children;
+    }
+    
+    public boolean isLeaf() {
+        if (nChildren == 0) return true;
+        else if (children == null) return false;
+        else return children.length == 0;
     }
     
     private boolean hasSelfTimeChild() {

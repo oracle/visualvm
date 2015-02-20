@@ -290,23 +290,42 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         return rootNode[view];
     }
     
-    public PrestimeCPUCCTNode getReverseRootNode(int view) {
+    public PrestimeCPUCCTNode getReverseRootNode(final int view) {
         int[] threadIds = getThreadIds();
         PrestimeCPUCCTNode[] nodes = new PrestimeCPUCCTNode[threadIds.length];
         for (int i = 0; i < nodes.length; i++) {
-            final CPUCCTContainer container = getContainerForThread(threadIds[i], view);
-            FlatProfileContainer flat = container.getFlatProfile();
+            final int _threadId = threadIds[i];
+            final CPUCCTContainer container = getContainerForThread(_threadId, view);
+            final FlatProfileContainer flat = container.getFlatProfile();
+            final int _nChildren = flat.getNRows();
             final int _nCalls = (int)flat.getNTotalInvocations();
             final long _totalTime0 = container.getWholeGraphNetTime0();
             final long _totalTime1 = container.getWholeGraphNetTime1();
-            PrestimeCPUCCTNode[] children = new PrestimeCPUCCTNode[flat.getNRows()];
-            for (int m = 0; m < children.length; m++)
-                children[m] = getReverseCCT(threadIds[i], flat.getMethodIdAtRow(m), view);
-            nodes[i] = new PrestimeCPUCCTNodeBacked(container, children) {
+            
+            // TODO: !!!!!!!!!!!!!!! Compute even more lazily !!!!!!!!!!!!!!!
+            // The toplevel method nodes can be created from flat profile
+            // and only compute the reverseCCT when asking for their children
+            
+            PrestimeCPUCCTNodeBacked threadNode = new PrestimeCPUCCTNodeBacked(container, null) {
+                public CCTNode[] getChildren() {
+                    if (nChildren == 0) return null;
+                    
+                    if (children == null) {
+                        children = new PrestimeCPUCCTNode[_nChildren];
+                        for (int m = 0; m < children.length; m++) {
+                            children[m] = getReverseCCT(_threadId, flat.getMethodIdAtRow(m), view);
+                            children[m].parent = this;
+                        }
+                    }
+                    
+                    return children;
+                }
                 public int getNCalls() { return _nCalls; }
                 public long getTotalTime0() { return _totalTime0; }
                 public long getTotalTime1() { return _totalTime1; }
             };
+            threadNode.nChildren = _nChildren;
+            nodes[i] = threadNode;
         }
         PrestimeCPUCCTNode root = new PrestimeCPUCCTNodeBacked(threadCCTContainers[view][0], nodes);
         return root;
