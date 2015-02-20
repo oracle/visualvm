@@ -117,29 +117,49 @@ public class Histogram {
 
     private static boolean initialize() {
         try {
-            Class vmClass;
-            ClassLoader toolsJar = null;
-            try {
-                vmClass = Class.forName(VIRTUAL_MACHINE_CLASS);
-            } catch (ClassNotFoundException ex) {
-                toolsJar = getToolsJar();
-                if (toolsJar == null) {
-                    return false;
-                }
-                vmClass = Class.forName(VIRTUAL_MACHINE_CLASS, true, toolsJar);
-            }
-            Class hsVmClass = toolsJar == null ? Class.forName(HS_VIRTUAL_MACHINE_CLASS) : Class.forName(HS_VIRTUAL_MACHINE_CLASS, true, toolsJar);
+            Class vmClass = loadClass(VIRTUAL_MACHINE_CLASS);
+            Class hsVmClass = Class.forName(HS_VIRTUAL_MACHINE_CLASS, true, vmClass.getClassLoader()); 
             vmAttach = vmClass.getMethod(VIRTUAL_MACHINE_ATTACH_METHOD, String.class);
             vmHisto = hsVmClass.getMethod(VIRTUAL_MACHINE_HEAPHISTO_METHOD, Object[].class);
         } catch (NoSuchMethodException ex) {
+//            ex.printStackTrace();
             return false;
         } catch (SecurityException ex) {
+//            ex.printStackTrace();
             return false;
         } catch (ClassNotFoundException ex) {
+//            ex.printStackTrace();
             return false;
         }
         String selfName = ManagementFactory.getRuntimeMXBean().getName();
         selfPid = selfName.substring(0, selfName.indexOf('@')); // NOI18N
         return true;
+    }
+    
+    /** load class from tools.jar
+     * 
+     * @param className class name
+     * @return class
+     * @throws ClassNotFoundException 
+     */
+    private static Class loadClass(String className) throws ClassNotFoundException {
+        // try boot classloader first
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException ex) {
+//            ex.printStackTrace();
+        }
+        // try system classloader (this is for JDK 9) 
+        try {
+            return Class.forName(className, true, ClassLoader.getSystemClassLoader());
+        } catch (ClassNotFoundException ex) {
+//            ex.printStackTrace();
+        }
+        // locate and try to use tools.jar
+        ClassLoader toolsJar = getToolsJar();
+        if (toolsJar == null) {
+            throw new ClassNotFoundException(className);
+        }
+        return Class.forName(className, true, toolsJar);
     }
 }
