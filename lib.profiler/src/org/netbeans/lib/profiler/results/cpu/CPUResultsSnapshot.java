@@ -290,6 +290,60 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         return rootNode[view];
     }
     
+    public PrestimeCPUCCTNode getReverseRootNode(final int view) {
+        int[] threadIds = getThreadIds();
+        PrestimeCPUCCTNode[] nodes = new PrestimeCPUCCTNode[threadIds.length];
+        for (int i = 0; i < nodes.length; i++) {
+            final int _threadId = threadIds[i];
+            final CPUCCTContainer container = getContainerForThread(_threadId, view);
+            final FlatProfileContainer flat = container.getFlatProfile();
+            
+            PrestimeCPUCCTNodeBacked threadNode = new PrestimeCPUCCTNodeBacked(container, null) {
+                public CCTNode[] getChildren() {
+                    if (nChildren == 0) return null;
+                    
+                    if (children == null) {
+                        children = new PrestimeCPUCCTNode[flat.getNRows()];
+                        for (int m = 0; m < children.length; m++) {
+                            final int _methodId = flat.getMethodIdAtRow(m);
+                            PrestimeCPUCCTNodeBacked n = new PrestimeCPUCCTNodeBacked() {
+                                public CCTNode[] getChildren() {
+                                    if (nChildren == 0) return null;
+                                    
+                                    if (children == null) {
+                                        PrestimeCPUCCTNode r = getReverseCCT(_threadId, _methodId, view);
+                                        children = r.children;
+                                        nChildren = children == null ? 0 : children.length;
+                                        if (nChildren > 0) for (PrestimeCPUCCTNode ch : children) ch.parent = this;
+                                    }
+                                    
+                                    return children;
+                                }
+                            };
+                            n.nChildren = 1;
+                            n.container = container;
+                            n.methodId = _methodId;
+                            n.nCalls = flat.getNInvocationsAtRow(m);
+                            n.totalTime0 = flat.getTotalTimeInMcs0AtRow(m);
+                            n.totalTime1 = flat.getTotalTimeInMcs1AtRow(m);
+                            n.parent = this;
+                            children[m] = n;
+                        }
+                    }
+                    
+                    return children;
+                }
+                public int getNCalls() { return (int)flat.getNTotalInvocations(); }
+                public long getTotalTime0() { return container.getWholeGraphNetTime0(); }
+                public long getTotalTime1() { return container.getWholeGraphNetTime1(); }
+            };
+            threadNode.nChildren = flat.getNRows();
+            nodes[i] = threadNode;
+        }
+        PrestimeCPUCCTNode root = new PrestimeCPUCCTNodeBacked(threadCCTContainers[view][0], nodes);
+        return root;
+    }
+    
     public FilterSortSupport.Configuration getFilterSortInfo(CCTNode node) {
         return sortInfo(node);
     }
@@ -306,76 +360,76 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
     }
     
     public void filterForward(final String filter, final int filterType, final PrestimeCPUCCTNodeBacked root) {
-        FilterSortSupport.Configuration config = sortInfo(root);
-        config.setFilterInfo(filter, filterType);
-        
-        if (!FilterSortSupport.passesFilter(config, root.getNodeName())) {
-//            root.setFilteredNode();
-        } else {
-//            root.resetFilteredNode();
-        }
-        root.resetChildren();
+//        FilterSortSupport.Configuration config = sortInfo(root);
+//        config.setFilterInfo(filter, filterType);
+//        
+//        if (!FilterSortSupport.passesFilter(config, root.getNodeName())) {
+////            root.setFilteredNode();
+//        } else {
+////            root.resetFilteredNode();
+//        }
+//        root.resetChildren();
     }
     
     public void filterReverse(String filter, int filterType, PrestimeCPUCCTNodeFree root, int view) {
-        PrestimeCPUCCTNodeFree rev = (PrestimeCPUCCTNodeFree)getReverseCCT(
-                root.getContainer().getThreadId(), root.getMethodId(), view);
-        FilterSortSupport.Configuration config = sortInfo(root);
-        config.setFilterInfo(filter, filterType);
-        filter(config, rev);
-        root.children = rev.children;
-        if (root.children != null) {
-            for (PrestimeCPUCCTNode ch : root.children)
-                ch.parent = root;
-            
-            root.sortChildren(config.getSortBy(), config.getSortOrder());
-        }
-        if (!FilterSortSupport.passesFilter(config, root.getNodeName())) {
-//            root.setFilteredNode();
-        } else {
-//            root.resetFilteredNode();
-        }
+//        PrestimeCPUCCTNodeFree rev = (PrestimeCPUCCTNodeFree)getReverseCCT(
+//                root.getContainer().getThreadId(), root.getMethodId(), view);
+//        FilterSortSupport.Configuration config = sortInfo(root);
+//        config.setFilterInfo(filter, filterType);
+//        filter(config, rev);
+//        root.children = rev.children;
+//        if (root.children != null) {
+//            for (PrestimeCPUCCTNode ch : root.children)
+//                ch.parent = root;
+//            
+//            root.sortChildren(config.getSortBy(), config.getSortOrder());
+//        }
+//        if (!FilterSortSupport.passesFilter(config, root.getNodeName())) {
+////            root.setFilteredNode();
+//        } else {
+////            root.resetFilteredNode();
+//        }
     }
     
-    private void filter(FilterSortSupport.Configuration config, PrestimeCPUCCTNodeFree node) {
-        if (node.children != null) {
-            PrestimeCPUCCTNodeFree filtered = null;
-            List<PrestimeCPUCCTNodeFree> ch = new ArrayList();
-            for (PrestimeCPUCCTNode n : node.children) {
-                PrestimeCPUCCTNodeFree nn = (PrestimeCPUCCTNodeFree)n;
-                if (FilterSortSupport.passesFilter(config, nn.getNodeName())) {
-                    int i = ch.indexOf(nn);
-                    if (i == -1) ch.add(nn);
-                    else ch.get(i).merge(nn);
-                } else {
-                    if (filtered == null) {
-//                        nn.setFilteredNode();
-                        filtered = nn;
-                        ch.add(nn);
-                    } else {
-                        filtered.merge(nn);
-                    }
-                }
-            }
-            
-            if (ch.isEmpty()) {
-                node.children = null;
-            } else {
-                if (node.isFiltered() && filtered != null && ch.size() == 1) {
-                    // "naive" approach, collapse simple chain of filtered out nodes
-                    PrestimeCPUCCTNodeFree n = ch.get(0);
-                    filter(config, n);
-                    node.children = n.children;
-                } else {
-                    node.children = ch.toArray(new PrestimeCPUCCTNodeFree[ch.size()]);
-                }
-            }
-            
-            if (node.children != null)
-                for (PrestimeCPUCCTNode n : node.children)
-                    filter(config, (PrestimeCPUCCTNodeFree)n);
-        }
-    }
+//    private void filter(FilterSortSupport.Configuration config, PrestimeCPUCCTNodeFree node) {
+//        if (node.children != null) {
+//            PrestimeCPUCCTNodeFree filtered = null;
+//            List<PrestimeCPUCCTNodeFree> ch = new ArrayList();
+//            for (PrestimeCPUCCTNode n : node.children) {
+//                PrestimeCPUCCTNodeFree nn = (PrestimeCPUCCTNodeFree)n;
+//                if (FilterSortSupport.passesFilter(config, nn.getNodeName())) {
+//                    int i = ch.indexOf(nn);
+//                    if (i == -1) ch.add(nn);
+//                    else ch.get(i).merge(nn);
+//                } else {
+//                    if (filtered == null) {
+////                        nn.setFilteredNode();
+//                        filtered = nn;
+//                        ch.add(nn);
+//                    } else {
+//                        filtered.merge(nn);
+//                    }
+//                }
+//            }
+//            
+//            if (ch.isEmpty()) {
+//                node.children = null;
+//            } else {
+//                if (node.isFiltered() && filtered != null && ch.size() == 1) {
+//                    // "naive" approach, collapse simple chain of filtered out nodes
+//                    PrestimeCPUCCTNodeFree n = ch.get(0);
+//                    filter(config, n);
+//                    node.children = n.children;
+//                } else {
+//                    node.children = ch.toArray(new PrestimeCPUCCTNodeFree[ch.size()]);
+//                }
+//            }
+//            
+//            if (node.children != null)
+//                for (PrestimeCPUCCTNode n : node.children)
+//                    filter(config, (PrestimeCPUCCTNodeFree)n);
+//        }
+//    }
 
     public int[] getThreadIds() {
         int[] ret = new int[threadCCTContainers[METHOD_LEVEL_VIEW].length];
@@ -559,7 +613,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
 
         return allThreadsMergedCCTContainers[view].getRootNode();
     }
-
+    
     private void debugValues() {
         LOGGER.log(Level.FINEST, "collectingTwoTimeStamps: {0}", collectingTwoTimeStamps); // NOI18N
         LOGGER.log(Level.FINEST, "threadCCTContainers.length: {0}", debugLength(threadCCTContainers)); // NOI18N

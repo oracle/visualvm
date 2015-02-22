@@ -979,6 +979,9 @@ public abstract class ClassInfo extends BaseClassInfo implements JavaClassConsta
     }
 
     public String[] getMethodNames() {
+        if (methodNames == null) {
+            return new String[0];
+        }
         return methodNames;
     }
 

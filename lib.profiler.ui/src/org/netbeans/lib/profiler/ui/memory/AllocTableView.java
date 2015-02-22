@@ -56,6 +56,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
@@ -126,11 +127,15 @@ abstract class AllocTableView extends MemoryView {
         });
     }
     
-    void setData(AllocMemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
-        int _nTrackedItems = snapshot.getNProfiledClasses();
-        String[] _classNames = snapshot.getClassNames();
-        int[] _nTotalAllocObjects = snapshot.getObjectsCounts();
-        long[] _totalAllocObjectsSize = snapshot.getObjectsSizePerClass();
+    public void setData(MemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
+        AllocMemoryResultsSnapshot _snapshot = (AllocMemoryResultsSnapshot)snapshot;
+        
+        String[] _classNames = _snapshot.getClassNames();
+        int[] _nTotalAllocObjects = _snapshot.getObjectsCounts();
+        long[] _totalAllocObjectsSize = _snapshot.getObjectsSizePerClass();
+        
+        int _nTrackedItems = Math.min(_snapshot.getNProfiledClasses(), _classNames.length);
+        _nTrackedItems = Math.min(_nTrackedItems, _nTotalAllocObjects.length);
         
         if (filter == null) { // old snapshot
             filterZeroItems = true;
@@ -168,7 +173,7 @@ abstract class AllocTableView extends MemoryView {
         }
     }
     
-    void resetData() {
+    public void resetData() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 nTrackedItems = 0;
@@ -191,7 +196,7 @@ abstract class AllocTableView extends MemoryView {
     }
     
     
-    ExportUtils.ExportProvider[] getExportProviders() {
+    public ExportUtils.ExportProvider[] getExportProviders() {
         return table.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
             new ExportUtils.CSVExportProvider(table),
             new ExportUtils.HTMLExportProvider(table, EXPORT_ALLOCATED),
@@ -213,6 +218,8 @@ abstract class AllocTableView extends MemoryView {
     private HideableBarRenderer[] renderers;
     
     private void initUI() {
+        final int offset = selection == null ? -1 : 0;
+        
         tableModel = new MemoryTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null) {
@@ -232,8 +239,6 @@ abstract class AllocTableView extends MemoryView {
         
         table.providePopupMenu(true);
         installDefaultAction();
-        
-        final int offset = selection == null ? -1 : 0;
         
         table.setMainColumn(1 + offset);
         table.setFitWidthColumn(1 + offset);

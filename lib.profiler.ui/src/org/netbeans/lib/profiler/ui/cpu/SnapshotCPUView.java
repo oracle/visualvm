@@ -63,6 +63,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
+import javax.swing.JToggleButton;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -77,8 +78,11 @@ import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils.ExportProvider;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
+import org.netbeans.lib.profiler.ui.swing.MultiButtonGroup;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 /**
  *
@@ -90,9 +94,9 @@ public abstract class SnapshotCPUView extends JPanel {
     // I18N String constants
     private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.cpu.Bundle"); // NOI18N
     private static final String TOOLBAR_VIEW = messages.getString("SnapshotCPUView_ToolbarView"); // NOI18N
-    private static final String VIEW_CALLTREE = messages.getString("SnapshotCPUView_ViewCallTree"); // NOI18N
+    private static final String VIEW_FORWARD = messages.getString("SnapshotCPUView_ViewForward"); // NOI18N
     private static final String VIEW_HOTSPOTS = messages.getString("SnapshotCPUView_ViewHotSpots"); // NOI18N
-    private static final String VIEW_COMBINED = messages.getString("SnapshotCPUView_ViewCombined"); // NOI18N
+    private static final String VIEW_REVERSE = messages.getString("SnapshotCPUView_ViewReverse"); // NOI18N
     private static final String TOOLBAR_AGGREGATION = messages.getString("SnapshotCPUView_ToolbarAggregation"); // NOI18N
     private static final String AGGREGATION_METHODS = messages.getString("SnapshotCPUView_AggregationMethods"); // NOI18N
     private static final String AGGREGATION_CLASSES = messages.getString("SnapshotCPUView_AggregationClasses"); // NOI18N
@@ -105,8 +109,9 @@ public abstract class SnapshotCPUView extends JPanel {
     private int aggregation;
     
     private DataView lastFocused;
-    private CPUTableView tableView;
-    private CPUTreeTableView treeTableView;
+    private CPUTableView hotSpotsView;
+    private CPUTreeTableView forwardCallsView;
+    private CPUTreeTableView reverseCallsView;
     
     private Component viewContainer;
     
@@ -129,10 +134,10 @@ public abstract class SnapshotCPUView extends JPanel {
                 ExportProvider npsProvider = sourceFile == null ? null :
                     new ExportUtils.NPSExportProvider(sourceFile);
                 
-                if (tableView.isVisible() && !treeTableView.isVisible()) {
-                    providers = tableView.getExportProviders();
-                } else if (!tableView.isVisible() && treeTableView.isVisible()) {
-                    providers = treeTableView.getExportProviders();
+                if (hotSpotsView.isVisible() && !forwardCallsView.isVisible()) {
+                    providers = hotSpotsView.getExportProviders();
+                } else if (!hotSpotsView.isVisible() && forwardCallsView.isVisible()) {
+                    providers = forwardCallsView.getExportProviders();
                 }
                 
                 List<ExportUtils.ExportProvider> _providers = new ArrayList();
@@ -165,31 +170,43 @@ public abstract class SnapshotCPUView extends JPanel {
     private void initUI(Action... actions) {
         setLayout(new BorderLayout(0, 0));
         
-        treeTableView = new CPUTreeTableView(null) {
+        forwardCallsView = new CPUTreeTableView(null, false) {
             protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
                 if (showSourceSupported()) showSource(value);
             }
             protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
-                SnapshotCPUView.this.populatePopup(treeTableView, popup, value, userValue);
+                SnapshotCPUView.this.populatePopup(forwardCallsView, popup, value, userValue);
             }
         };
-        treeTableView.notifyOnFocus(new Runnable() {
-            public void run() { lastFocused = treeTableView; }
+        forwardCallsView.notifyOnFocus(new Runnable() {
+            public void run() { lastFocused = forwardCallsView; }
         });
         
-        tableView = new CPUTableView(null) {
+        hotSpotsView = new CPUTableView(null) {
             protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                 if (showSourceSupported()) showSource(userValue);
             }
             protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
-                SnapshotCPUView.this.populatePopup(tableView, popup, value, userValue);
+                SnapshotCPUView.this.populatePopup(hotSpotsView, popup, value, userValue);
             }
         };
-        tableView.notifyOnFocus(new Runnable() {
-            public void run() { lastFocused = tableView; }
+        hotSpotsView.notifyOnFocus(new Runnable() {
+            public void run() { lastFocused = hotSpotsView; }
         });
         
-        JSplitPane split = new JExtendedSplitPane(JSplitPane.VERTICAL_SPLIT) {
+        reverseCallsView = new CPUTreeTableView(null, true) {
+            protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
+                if (showSourceSupported()) showSource(value);
+            }
+            protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                SnapshotCPUView.this.populatePopup(reverseCallsView, popup, value, userValue);
+            }
+        };
+        reverseCallsView.notifyOnFocus(new Runnable() {
+            public void run() { lastFocused = reverseCallsView; }
+        });
+        
+        JSplitPane upperSplit = new JExtendedSplitPane(JSplitPane.VERTICAL_SPLIT) {
             {
                 setBorder(null);
                 setDividerSize(5);
@@ -204,14 +221,35 @@ public abstract class SnapshotCPUView extends JPanel {
                 }
             }
         };
-        split.setBorder(BorderFactory.createEmptyBorder());
-        split.setTopComponent(treeTableView);
-        split.setBottomComponent(tableView);
-        split.setDividerLocation(0.5d);
-        split.setResizeWeight(0.5d);
+        upperSplit.setBorder(BorderFactory.createEmptyBorder());
+        upperSplit.setTopComponent(forwardCallsView);
+        upperSplit.setBottomComponent(hotSpotsView);
+        upperSplit.setDividerLocation(0.5d);
+        upperSplit.setResizeWeight(0.5d);
         
-        add(split, BorderLayout.CENTER);
-        viewContainer = split;
+        JSplitPane lowerSplit = new JExtendedSplitPane(JSplitPane.VERTICAL_SPLIT) {
+            {
+                setBorder(null);
+                setDividerSize(5);
+
+                if (getUI() instanceof BasicSplitPaneUI) {
+                    BasicSplitPaneDivider divider = ((BasicSplitPaneUI)getUI()).getDivider();
+                    if (divider != null) {
+                        Color c = UIUtils.isNimbus() ? UIUtils.getDisabledLineColor() :
+                                new JSeparator().getForeground();
+                        divider.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, c));
+                    }
+                }
+            }
+        };
+        lowerSplit.setBorder(BorderFactory.createEmptyBorder());
+        lowerSplit.setTopComponent(upperSplit);
+        lowerSplit.setBottomComponent(reverseCallsView);
+        lowerSplit.setDividerLocation(0.66d);
+        lowerSplit.setResizeWeight(0.66d);
+        
+        add(lowerSplit, BorderLayout.CENTER);
+        viewContainer = upperSplit;
         
         ProfilerToolbar toolbar = ProfilerToolbar.create(true);
         
@@ -235,24 +273,62 @@ public abstract class SnapshotCPUView extends JPanel {
         GrayLabel viewL = new GrayLabel(TOOLBAR_VIEW);
         toolbar.add(viewL);
         
-        toolbar.addSpace(2);
+        toolbar.addSpace(5);
         
-        Action aCallTree = new AbstractAction() {
-            { putValue(NAME, VIEW_CALLTREE); }
-            public void actionPerformed(ActionEvent e) { setView(true, false); }
-            
+        MultiButtonGroup group = new MultiButtonGroup();
+        
+        JToggleButton forwardCalls = new JToggleButton(Icons.getIcon(ProfilerIcons.NODE_FORWARD)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                setView(isSelected(), hotSpotsView.isVisible(), reverseCallsView.isVisible());
+            }
         };
-        Action aHotSpots = new AbstractAction() {
-            { putValue(NAME, VIEW_HOTSPOTS); }
-            public void actionPerformed(ActionEvent e) { setView(false, true); }
-            
+        forwardCalls.setToolTipText(VIEW_FORWARD);
+        group.add(forwardCalls);
+        toolbar.add(forwardCalls);
+        forwardCallsView.setVisible(true);
+        forwardCalls.setSelected(true);
+        
+        JToggleButton hotSpots = new JToggleButton(Icons.getIcon(ProfilerIcons.TAB_HOTSPOTS)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                setView(forwardCallsView.isVisible(), isSelected(), reverseCallsView.isVisible());
+            }
         };
-        Action aCombined = new AbstractAction() {
-            { putValue(NAME, VIEW_COMBINED); }
-            public void actionPerformed(ActionEvent e) { setView(true, true); }
-            
+        hotSpots.setToolTipText(VIEW_HOTSPOTS);
+        group.add(hotSpots);
+        toolbar.add(hotSpots);
+        hotSpotsView.setVisible(false);
+        hotSpots.setSelected(false);
+        
+        JToggleButton reverseCalls = new JToggleButton(Icons.getIcon(ProfilerIcons.NODE_REVERSE)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                setView(forwardCallsView.isVisible(), hotSpotsView.isVisible(), isSelected());
+            }
         };
-        toolbar.add(new ActionPopupButton(2, aCallTree, aHotSpots, aCombined));
+        reverseCalls.setToolTipText(VIEW_REVERSE);
+        group.add(reverseCalls);
+        toolbar.add(reverseCalls);
+        reverseCallsView.setVisible(false);
+        reverseCalls.setSelected(false);
+        
+//        Action aCallTree = new AbstractAction() {
+//            { putValue(NAME, VIEW_CALLTREE); }
+//            public void actionPerformed(ActionEvent e) { setView(true, false); }
+//            
+//        };
+//        Action aHotSpots = new AbstractAction() {
+//            { putValue(NAME, VIEW_HOTSPOTS); }
+//            public void actionPerformed(ActionEvent e) { setView(false, true); }
+//            
+//        };
+//        Action aCombined = new AbstractAction() {
+//            { putValue(NAME, VIEW_COMBINED); }
+//            public void actionPerformed(ActionEvent e) { setView(true, true); }
+//            
+//        };
+//        toolbar.add(new ActionPopupButton(2, aCallTree, aHotSpots, aCombined));
         
         toolbar.addSpace(2);
         toolbar.addSeparator();
@@ -334,8 +410,9 @@ public abstract class SnapshotCPUView extends JPanel {
         if (lastFocused != null && !lastFocused.isShowing()) lastFocused = null;
         
         if (lastFocused == null) {
-            if (treeTableView.isShowing()) lastFocused = treeTableView;
-            else if (tableView.isShowing()) lastFocused = tableView;
+            if (forwardCallsView.isShowing()) lastFocused = forwardCallsView;
+            else if (hotSpotsView.isShowing()) lastFocused = hotSpotsView;
+            else if (reverseCallsView.isShowing()) lastFocused = reverseCallsView;
         }
         
         return lastFocused;
@@ -374,9 +451,10 @@ public abstract class SnapshotCPUView extends JPanel {
     
     protected void customizeNodePopup(DataView invoker, JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {}
     
-    private void setView(boolean callTree, boolean hotSpots) {
-        treeTableView.setVisible(callTree);
-        tableView.setVisible(hotSpots);
+    private void setView(boolean forwardCalls, boolean hotSpots, boolean reverseCalls) {
+        forwardCallsView.setVisible(forwardCalls);
+        hotSpotsView.setVisible(hotSpots);
+        reverseCallsView.setVisible(reverseCalls);
     }
     
     private void setAggregation(int _aggregation) {
@@ -396,8 +474,9 @@ public abstract class SnapshotCPUView extends JPanel {
 //            }
 //        });
         
-        treeTableView.setData(snapshot, idMap, aggregation, sampled);
-        tableView.setData(flatData, idMap, sampled);
+        forwardCallsView.setData(snapshot, idMap, aggregation, sampled);
+        hotSpotsView.setData(flatData, idMap, sampled);
+        reverseCallsView.setData(snapshot, idMap, aggregation, sampled);
     }
     
     protected final void setSnapshot(CPUResultsSnapshot snapshot, boolean sampled) {

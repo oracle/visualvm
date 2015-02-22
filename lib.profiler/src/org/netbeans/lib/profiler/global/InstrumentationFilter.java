@@ -181,6 +181,23 @@ public class InstrumentationFilter implements Cloneable {
         return filterStringsBuffer.toString();
     }
 
+    public boolean acceptsArrays() {
+        switch (instrFilterType) {
+            case INSTR_FILTER_NONE:
+            case INSTR_FILTER_EXCLUSIVE:
+            case INSTR_FILTER_INCLUSIVE:
+                return true;
+            case INSTR_FILTER_INCLUSIVE_EXACT:
+                for (int i = 0; i < instrFilterStrings.length; i++) {
+                    if (instrFilterStrings[i].contains("[")) {      // NOI18N
+                        return true;
+                    }
+                }
+                return false;
+        }
+        return true;
+    }
+    
     public void debugDump() {
         System.err.println("----------------------------------"); // NOI18N
         System.err.println("Instrumentation filter debug dump:"); // NOI18N

@@ -87,20 +87,23 @@ public abstract class SnapshotMemoryView extends JPanel {
     private static final String AGGREGATION_PACKAGES = messages.getString("SnapshotMemoryView_AggregationPackages"); // NOI18N
     // -----
     
-    private final DataView dataView;
-    
-    private final DataSetter dataSetter;
-    private final ExporterGetter exporterGetter;
+    private final MemoryView dataView;
     
     private int aggregation;
+    private final Collection filter;
+    private final MemoryResultsSnapshot snapshot;
     
-    public SnapshotMemoryView(final MemoryResultsSnapshot snapshot, final Collection filter, Action... actions) {
+    
+    public SnapshotMemoryView(MemoryResultsSnapshot snapshot, Collection filter, Action... actions) {
+        this.filter = filter;
+        this.snapshot = snapshot;
+        
         setLayout(new BorderLayout());
         
         boolean supportsPackageAggregation = true;
         
         if (snapshot instanceof SampledMemoryResultsSnapshot) {
-            final SampledTableView view = new SampledTableView(null) {
+            dataView = new SampledTableView(null) {
                 protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                     if (showSourceSupported()) showSource(userValue);
                 }
@@ -108,99 +111,50 @@ public abstract class SnapshotMemoryView extends JPanel {
                     SnapshotMemoryView.this.populatePopup(this, popup, value, userValue);
                 }
             };
-            add(view, BorderLayout.CENTER);
-            
-            dataView = view;
-            dataSetter = new DataSetter() {
-                public void setData(int aggregation) { view.setData((SampledMemoryResultsSnapshot)snapshot, aggregation); }
-            };
-            exporterGetter = new ExporterGetter() {
-                public ExportUtils.ExportProvider[] getProviders() { return view.getExportProviders(); }
-            };
         } else if (snapshot instanceof AllocMemoryResultsSnapshot) {
-            final AllocMemoryResultsSnapshot _snapshot = (AllocMemoryResultsSnapshot)snapshot;
             if (snapshot.containsStacks()) {
-                final AllocTreeTableView view = new AllocTreeTableView() {
+                dataView = new AllocTreeTableView(null) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
                     protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
                         SnapshotMemoryView.this.populatePopup(this, popup, value, userValue);
                     }
-                };
-                add(view, BorderLayout.CENTER);
-                
-                dataView = view;
-                dataSetter = new DataSetter() {
-                    public void setData(int aggregation) { view.setData(_snapshot, filter, aggregation); }
-                };
-                exporterGetter = new ExporterGetter() {
-                    public ExportUtils.ExportProvider[] getProviders() { return view.getExportProviders(); }
                 };
                 supportsPackageAggregation = false;
             } else {
-                final AllocTableView view = new AllocTableView(null) {
+                dataView = new AllocTableView(null) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
                     protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
                         SnapshotMemoryView.this.populatePopup(this, popup, value, userValue);
                     }
-                };
-                add(view, BorderLayout.CENTER);
-                
-                dataView = view;
-                dataSetter = new DataSetter() {
-                    public void setData(int aggregation) { view.setData(_snapshot, filter, aggregation); }
-                };
-                exporterGetter = new ExporterGetter() {
-                    public ExportUtils.ExportProvider[] getProviders() { return view.getExportProviders(); }
                 };
             }
         } else if (snapshot instanceof LivenessMemoryResultsSnapshot) {
-            final LivenessMemoryResultsSnapshot _snapshot = (LivenessMemoryResultsSnapshot)snapshot;
             if (snapshot.containsStacks()) {
-                final LivenessTreeTableView view = new LivenessTreeTableView() {
+                dataView = new LivenessTreeTableView(null) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
                     protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
                         SnapshotMemoryView.this.populatePopup(this, popup, value, userValue);
                     }
-                };
-                add(view, BorderLayout.CENTER);
-                
-                dataView = view;
-                dataSetter = new DataSetter() {
-                    public void setData(int aggregation) { view.setData(_snapshot, filter, aggregation); }
-                };
-                exporterGetter = new ExporterGetter() {
-                    public ExportUtils.ExportProvider[] getProviders() { return view.getExportProviders(); }
                 };
                 supportsPackageAggregation = false;
             } else {
-                final LivenessTableView view = new LivenessTableView(null) {
+                dataView = new LivenessTableView(null) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
                     protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
                         SnapshotMemoryView.this.populatePopup(this, popup, value, userValue);
                     }
-                };
-                add(view, BorderLayout.CENTER);
-
-                dataView = view;
-                dataSetter = new DataSetter() {
-                    public void setData(int aggregation) { view.setData((LivenessMemoryResultsSnapshot)snapshot, filter, aggregation); }
-                };
-                exporterGetter = new ExporterGetter() {
-                    public ExportUtils.ExportProvider[] getProviders() { return view.getExportProviders(); }
                 };
             }
         } else {
             dataView = null;
-            dataSetter = null;
-            exporterGetter = null;
         }
         
         ProfilerToolbar toolbar = ProfilerToolbar.create(true);
@@ -266,6 +220,7 @@ public abstract class SnapshotMemoryView extends JPanel {
             toolbar.add(aInfo);
         }
         
+        if (dataView != null) add(dataView, BorderLayout.CENTER);
         add(toolbar.getComponent(), BorderLayout.NORTH);
         
         setAggregation(CPUResultsSnapshot.CLASS_LEVEL_VIEW);
@@ -294,7 +249,7 @@ public abstract class SnapshotMemoryView extends JPanel {
             public ExportUtils.ExportProvider[] getProviders() {
                 ExportUtils.ExportProvider npsProvider = sourceFile == null ? null :
                     new ExportUtils.NPSExportProvider(sourceFile);
-                ExportUtils.ExportProvider[] providers = exporterGetter.getProviders();
+                ExportUtils.ExportProvider[] providers = dataView.getExportProviders();
                 
                 List<ExportUtils.ExportProvider> _providers = new ArrayList();
                 if (npsProvider != null) _providers.add(npsProvider);
@@ -367,15 +322,9 @@ public abstract class SnapshotMemoryView extends JPanel {
         });
     }
     
-    private void setAggregation(int _aggregation) {
-        aggregation = _aggregation;
-        
-        dataSetter.setData(aggregation);
+    private void setAggregation(int aggregation) {
+        this.aggregation = aggregation;
+        if (dataView != null) dataView.setData(snapshot, filter, aggregation);
     }
-    
-    
-    private static interface DataSetter { void setData(int aggregation); }
-    
-    private static interface ExporterGetter { ExportUtils.ExportProvider[] getProviders(); }
     
 }
