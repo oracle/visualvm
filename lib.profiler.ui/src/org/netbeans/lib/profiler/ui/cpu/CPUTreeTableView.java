@@ -69,6 +69,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.McsTimeRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 /**
  *
@@ -82,12 +83,15 @@ abstract class CPUTreeTableView extends CPUView {
     private Map<Integer, ClientUtils.SourceCodeSelection> idMap;
     private final Set<ClientUtils.SourceCodeSelection> selection;
     
+    private final boolean reverse;
+    
     private boolean sampled = true;
     private boolean twoTimeStamps;
     
     
-    public CPUTreeTableView(Set<ClientUtils.SourceCodeSelection> selection) {
+    public CPUTreeTableView(Set<ClientUtils.SourceCodeSelection> selection, boolean reverse) {
         this.selection = selection;
+        this.reverse = reverse;
         
         initUI();
     }
@@ -102,7 +106,8 @@ abstract class CPUTreeTableView extends CPUView {
                 idMap = newIdMap;
                 if (treeTableModel != null) {
                     treeTableModel.setRoot(newData == null ? PrestimeCPUCCTNode.EMPTY :
-                                           newData.getRootNode(aggregation));
+                                           !reverse ? newData.getRootNode(aggregation):
+                                           newData.getReverseRootNode(aggregation));
                 }
                 if (structureChange) {
                     int col = treeTable.convertColumnIndexToView(selection == null ? 3 : 4);
@@ -220,7 +225,7 @@ abstract class CPUTreeTableView extends CPUView {
                 }
             }
         });
-        treeTable.setTreeCellRenderer(new CPUJavaNameRenderer());
+        treeTable.setTreeCellRenderer(new CPUJavaNameRenderer(reverse ? ProfilerIcons.NODE_REVERSE : ProfilerIcons.NODE_FORWARD));
         treeTable.setColumnRenderer(2 + offset, renderers[0]);
         treeTable.setColumnRenderer(3 + offset, renderers[1]);
         treeTable.setColumnRenderer(4 + offset, renderers[2]);

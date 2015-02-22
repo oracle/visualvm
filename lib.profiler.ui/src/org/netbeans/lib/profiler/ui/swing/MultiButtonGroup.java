@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -40,67 +40,37 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+package org.netbeans.lib.profiler.ui.swing;
 
-package org.netbeans.lib.profiler.ui.cpu;
-
-import javax.swing.Icon;
-import javax.swing.UIManager;
-import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
-import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import java.util.HashSet;
+import java.util.Set;
+import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
 
 /**
+ * Button group with AT LEAST one button selected.
  *
  * @author Jiri Sedlacek
  */
-public class CPUJavaNameRenderer extends JavaNameRenderer {
-    
-    private static final Icon THREAD_ICON = Icons.getIcon(ProfilerIcons.THREAD);
-    private static final Icon LEAF_ICON = Icons.getIcon(ProfilerIcons.NODE_LEAF);
-    
-    private final Icon icon;
-    
-    public CPUJavaNameRenderer() {
-        this(ProfilerIcons.NODE_FORWARD);
-    }
-    
-    public CPUJavaNameRenderer(String iconKey) {
-        this.icon = Icons.getIcon(iconKey);
-    }
-    
-    public void setValue(Object value, int row) {
-        if (value instanceof PrestimeCPUCCTNode) {
-            PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)value;
-            
-            if (node.isSelfTimeNode()) {
-                setNormalValue(node.getNodeName());
-                setBoldValue(""); // NOI18N
-                setGrayValue(""); // NOI18N
-            } else if (node.isThreadNode()) {
-                setNormalValue(""); // NOI18N
-                setBoldValue(node.getNodeName());
-                setGrayValue(""); // NOI18N
-            } else if (node.isFiltered()) {
-                setNormalValue(""); // NOI18N
-                setBoldValue("");
-                setGrayValue(node.getNodeName()); // NOI18N
-            } else {
-                super.setValue(node.getNodeName(), row);
+public class MultiButtonGroup extends ButtonGroup {
+        
+    private final Set<ButtonModel> selected = new HashSet();
+
+    public void setSelected(ButtonModel m, boolean b) {
+        if (b == false) {
+            for (ButtonModel model : selected) {
+                if (model.isSelected() && model != m) {
+                    selected.remove(m);
+                    return;
+                }
             }
-            
-            Icon _icon = null;
-            
-            if (node.isThreadNode()) _icon = THREAD_ICON;
-            else if (node.isLeaf()) _icon = LEAF_ICON;
-            else _icon = icon;
-            
-            if (node.isFiltered()) _icon = UIManager.getLookAndFeel().getDisabledIcon(this, _icon);
-            
-            setIcon(_icon);
         } else {
-            super.setValue(value, row);
+            selected.add(m);
         }
     }
-    
+
+    public boolean isSelected(ButtonModel m) {
+        return selected.contains(m);
+    }
+
 }

@@ -1455,10 +1455,13 @@ public class ProfilerInterface implements CommonConstants {
         byte[][] cachedClassFileBytes = new byte[len][];
         int[] loadedClassesSuper = new int[len];
         int[][] loadedClassesInterfaces = new int[len][];
+        int instrType = getCurrentInstrType();
         boolean isLazyInstrType = profilerServer.isDynamic()
-                && getCurrentInstrType() == INSTR_RECURSIVE_FULL 
+                && (instrType == INSTR_RECURSIVE_FULL || instrType == INSTR_RECURSIVE_SAMPLED)
                 && status.instrScheme == INSTRSCHEME_LAZY 
                 && !instrSpawnedThreads;
+        boolean isMemoryProfiling = profilerServer.isDynamic()
+                && (instrType == INSTR_OBJECT_ALLOCATIONS || instrType == INSTR_OBJECT_LIVENESS);
         Map classIndex = new HashMap(loadedClassesArray.length*4/3);
         Class[] classesArray = new Class[len];
 
@@ -1476,7 +1479,7 @@ public class ProfilerInterface implements CommonConstants {
         for (int i = 0; i < classIndex.size(); i++) {
             Class clazz = classesArray[i];
             String name = clazz.getName();
-            boolean forceClassFile = !isLazyInstrType || isRootClass(name);
+            boolean forceClassFile = (!isLazyInstrType && !isMemoryProfiling) || isRootClass(name);
             loadedClassNames[i] = name;
             cachedClassFileBytes[i] = getClassFileBytes(clazz, loaders[i], forceClassFile);
 

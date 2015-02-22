@@ -42,8 +42,11 @@
  */
 package org.netbeans.lib.profiler.ui.memory;
 
+import java.util.Collection;
 import java.util.ResourceBundle;
+import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.results.DataView;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 
 /**
  *
@@ -71,5 +74,18 @@ public abstract class MemoryView extends DataView {
     protected static final String ACTION_PROFILE_METHOD = messages.getString("MemoryView_ActionProfileMethod"); // NOI18N
     protected static final String ACTION_PROFILE_CLASS = messages.getString("MemoryView_ActionProfileClass"); // NOI18N
     // -----
+    
+    
+    public abstract void setData(MemoryResultsSnapshot snapshot, Collection filter, int aggregation);
+    
+    public abstract void resetData();
+    
+    
+    public abstract void showSelectionColumn();
+    
+    public abstract void refreshSelection();
+    
+    
+    public abstract ExportUtils.ExportProvider[] getExportProviders();
     
 }

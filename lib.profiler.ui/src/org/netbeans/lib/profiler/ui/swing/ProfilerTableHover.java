@@ -192,6 +192,8 @@ class ProfilerTableHover {
         }
 
         public void eventDispatched(AWTEvent e) {
+            if (popup == null) return;
+            
             // Not a mouse event
             if (!(e instanceof MouseEvent)) return;
             MouseEvent me = (MouseEvent)e;
@@ -214,6 +216,7 @@ class ProfilerTableHover {
         }
         
         private boolean overPopup(MouseEvent e) {
+            if (popupRect == null) return false;
             // NOTE: e.getLocationOnScreen() doesn't work for MOUSE_WHEEL events
             Point p = e.getPoint();
             SwingUtilities.convertPointToScreen(p, e.getComponent());

@@ -66,19 +66,17 @@ public class LazyDynamicClassInfo extends DynamicClassInfo {
     }
     
     public int getMethodIndex(String name, String sig) {
-        if (!isInitilaized) {
-            isInitilaized = true;
-            try {
-                parseClassFile(getName());
-            } catch (ClassFormatError ex) {
-                Logger.getLogger(LazyDynamicClassInfo.class.getName()).log(Level.SEVERE, null, ex);
-                return -1;
-            } catch (IOException ex) {
-                Logger.getLogger(LazyDynamicClassInfo.class.getName()).log(Level.INFO, null, ex);
-                return -1;
-            }
+        if (initializeClassFile()) {
+            return super.getMethodIndex(name, sig);
         }
-        return super.getMethodIndex(name, sig);
+        return -1;
+    }
+
+    public String[] getMethodNames() {
+        if (initializeClassFile()) {
+            return super.getMethodNames();
+        }
+        return new String[0];
     }
 
     public void preloadBytecode() {
@@ -97,5 +95,21 @@ public class LazyDynamicClassInfo extends DynamicClassInfo {
     
     public void setInterface() {
         isInterface = true;
+    }
+    
+    private boolean initializeClassFile() {
+        if (!isInitilaized) {
+            isInitilaized = true;
+            try {
+                parseClassFile(getName());
+                return true;
+            } catch (ClassFormatError ex) {
+                Logger.getLogger(LazyDynamicClassInfo.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(LazyDynamicClassInfo.class.getName()).log(Level.INFO, null, ex);
+            }
+            return false;
+        }
+        return true;
     }
 }

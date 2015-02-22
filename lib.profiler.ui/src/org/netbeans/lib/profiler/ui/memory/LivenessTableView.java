@@ -56,6 +56,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
@@ -144,15 +145,19 @@ abstract class LivenessTableView extends MemoryView {
         });
     }
     
-    void setData(LivenessMemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
-        int _nTrackedItems = snapshot.getNTrackedItems();
-        String[] _classNames = snapshot.getClassNames();
-        int[] _nTrackedLiveObjects = snapshot.getNTrackedLiveObjects();
-        long[] _trackedLiveObjectsSize = snapshot.getTrackedLiveObjectsSize();
-        long[] _nTrackedAllocObjects = snapshot.getTrackedLiveObjectsSize();
-        float[] _avgObjectAge = snapshot.getAvgObjectAge();
-        int[] _maxSurvGen = snapshot.getMaxSurvGen();
-        int[] _nTotalAllocObjects = snapshot.getnTotalAllocObjects();
+    public void setData(MemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
+        LivenessMemoryResultsSnapshot _snapshot = (LivenessMemoryResultsSnapshot)snapshot;
+        
+        String[] _classNames = _snapshot.getClassNames();
+        int[] _nTrackedLiveObjects = _snapshot.getNTrackedLiveObjects();
+        long[] _trackedLiveObjectsSize = _snapshot.getTrackedLiveObjectsSize();
+        long[] _nTrackedAllocObjects = _snapshot.getTrackedLiveObjectsSize();
+        float[] _avgObjectAge = _snapshot.getAvgObjectAge();
+        int[] _maxSurvGen = _snapshot.getMaxSurvGen();
+        int[] _nTotalAllocObjects = _snapshot.getnTotalAllocObjects();
+        
+        int _nTrackedItems = Math.min(_snapshot.getNProfiledClasses(), _classNames.length);
+        _nTrackedItems = Math.min(_nTrackedItems, _nTotalAllocObjects.length);
         
         if (filter == null) { // old snapshot
             filterZeroItems = true;
@@ -212,7 +217,7 @@ abstract class LivenessTableView extends MemoryView {
         }
     }
     
-    void resetData() {
+    public void resetData() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 nTrackedItems = 0;
@@ -239,7 +244,7 @@ abstract class LivenessTableView extends MemoryView {
     }
     
     
-    ExportUtils.ExportProvider[] getExportProviders() {
+    public ExportUtils.ExportProvider[] getExportProviders() {
         return table.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
             new ExportUtils.CSVExportProvider(table),
             new ExportUtils.HTMLExportProvider(table, EXPORT_ALLOCATED_LIVE),
@@ -261,6 +266,8 @@ abstract class LivenessTableView extends MemoryView {
     private HideableBarRenderer[] renderers;
     
     private void initUI() {
+        final int offset = selection == null ? -1 : 0;
+        
         tableModel = new MemoryTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null) {
@@ -280,8 +287,6 @@ abstract class LivenessTableView extends MemoryView {
         
         table.providePopupMenu(true);
         installDefaultAction();
-        
-        final int offset = selection == null ? -1 : 0;
         
         table.setMainColumn(1 + offset);
         table.setFitWidthColumn(1 + offset);

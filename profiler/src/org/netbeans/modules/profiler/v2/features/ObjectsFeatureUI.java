@@ -69,10 +69,10 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "ObjectsFeatureUI_liveResults=Live results:",
+    "ObjectsFeatureUI_liveResults=Results:",
     "ObjectsFeatureUI_pauseResults=Pause live results",
     "ObjectsFeatureUI_updateResults=Update live results",
-    "ObjectsFeatureUI_profilingData=Profiling data:",
+    "ObjectsFeatureUI_profilingData=Collected data:",
     "ObjectsFeatureUI_snapshot=Snapshot"
 })
 abstract class ObjectsFeatureUI extends FeatureUI {
