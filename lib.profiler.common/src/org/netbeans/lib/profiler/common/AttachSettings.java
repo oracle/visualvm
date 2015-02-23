@@ -167,7 +167,7 @@ public final class AttachSettings {
 
     /** This is only intended to be used to handle AttachSettings defined via ant.
      *
-     * @param port A port to use insteead of globally defined port. The value is transient and will not be persisted.
+     * @param port A port to use instead of globally defined port. The value is transient and will not be persisted.
      */
     public void setPort(final int port) {
         this.transientPort = port;
@@ -212,6 +212,11 @@ public final class AttachSettings {
             sharedSettings.setRemoteHost(host);
         } else {
             sharedSettings.setRemoteHost(""); // NOI18N
+        }
+        if (isDynamic16()) {
+            sharedSettings.setInstrumentObjectInit(true);
+        } else {
+            sharedSettings.setInstrumentObjectInit(false);            
         }
     }
 

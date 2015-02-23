@@ -93,6 +93,7 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
     private boolean instrumentMethodInvoke = true;
     private boolean instrumentSpawnedThreads = false;
     private boolean runGCOnGetResultsInMemoryProfiling = false;
+    private boolean instrumentObjectInit = false;
 
     // If false, the exec command is issued so that there is no visible console for the TA
     private boolean separateConsole = true;
@@ -325,6 +326,18 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
         return runGCOnGetResultsInMemoryProfiling;
     }
 
+    public boolean isInstrumentArrayAllocation() {
+        return instrumentationFilter.acceptsArrays();
+    }
+
+    public boolean isInstrumentObjectInit() {
+        return instrumentObjectInit;
+    }
+
+    public void setInstrumentObjectInit(boolean v) {
+        instrumentObjectInit = v;
+    }
+    
     public void setRuntimeProfilingPoints(RuntimeProfilingPoint[] profilingPoints) {
         this.profilingPoints = profilingPoints;
     }

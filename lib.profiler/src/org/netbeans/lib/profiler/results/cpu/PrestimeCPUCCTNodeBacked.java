@@ -70,13 +70,13 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
     protected Set<Integer> compactDataOfs;
     protected int nChildren;
     
-    protected int methodID;
-    
-    protected int nCalls;
-    protected long sleepTime0;
-    protected long totalTime0;
-    protected long totalTime1;
-    protected long waitTime0;
+//    protected int methodID;
+//    
+//    protected int nCalls;
+//    protected long sleepTime0;
+//    protected long totalTime0;
+//    protected long totalTime1;
+//    protected long waitTime0;
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -84,7 +84,7 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
      * Constructor for creating normal nodes representing methods
      */
     public PrestimeCPUCCTNodeBacked(CPUCCTContainer container, PrestimeCPUCCTNode parent, int compactDataOfs) {
-        super(container, parent);
+        super(container, parent, container.getMethodIdForNodeOfs(compactDataOfs));
         selfCompactDataOfs = compactDataOfs;
         this.compactDataOfs = new HashSet();
         this.compactDataOfs.add(selfCompactDataOfs);
@@ -92,7 +92,7 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         
         nChildren = container.getNChildrenForNodeOfs(compactDataOfs);
         
-        methodID = container.getMethodIdForNodeOfs(compactDataOfs);
+//        methodId = container.getMethodIdForNodeOfs(compactDataOfs);
         nCalls = container.getNCallsForNodeOfs(compactDataOfs);
         sleepTime0 = container.getSleepTime0ForNodeOfs(compactDataOfs);
         totalTime0 = container.getTotalTime0ForNodeOfs(compactDataOfs);
@@ -105,14 +105,11 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
      * Constructor for creating a node that represent a whole thread
      */
     protected PrestimeCPUCCTNodeBacked(CPUCCTContainer container, PrestimeCPUCCTNode[] children) {
-        super(container, null);
+        super(container, null, -1);
         setThreadNode();
         this.children = children;
-        nChildren = children.length;
-        
-        for (int i = 0; i < nChildren; i++) {
-            children[i].parent = this;
-        }
+        nChildren = children == null ? 0 : children.length;
+        for (int i = 0; i < nChildren; i++) children[i].parent = this;
     }
     
     PrestimeCPUCCTNodeBacked() {}
@@ -127,31 +124,12 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
     
     protected void setupFilteredNode(PrestimeCPUCCTNodeBacked filtered) {
         super.setupFilteredNode(filtered);
-        
-        filtered.methodID = -1;
-
-        filtered.nCalls = nCalls;
-        filtered.sleepTime0 = sleepTime0;
-        filtered.totalTime0 = totalTime0;
-        filtered.totalTime1 = totalTime1;
-        filtered.waitTime0 = waitTime0;
-        
         filtered.nChildren = filtered.children.length;
     }
     
     public void merge(CCTNode node) {
         super.merge(node);
-        
-        if (node instanceof PrestimeCPUCCTNodeBacked) {
-            PrestimeCPUCCTNodeBacked _node = (PrestimeCPUCCTNodeBacked)node;
-            nCalls += _node.getNCalls();
-            sleepTime0 += _node.getSleepTime0();
-            totalTime0 += _node.getTotalTime0();
-            totalTime1 += _node.getTotalTime1();
-            waitTime0 += _node.getWaitTime0();
-
-            nChildren = children.length;
-        }
+        nChildren = children.length;
     }
     
     public PrestimeCPUCCTNodeBacked createRootCopy() {
@@ -165,7 +143,7 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         copy.children = null;
         copy.nChildren = nChildren;
         
-        copy.methodID = methodID;
+        copy.methodId = methodId;
         copy.nCalls = nCalls;
         copy.sleepTime0 = sleepTime0;
         copy.totalTime0 = totalTime0;
@@ -241,6 +219,12 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         return children;
     }
     
+    public boolean isLeaf() {
+        if (nChildren == 0) return true;
+        else if (children == null) return false;
+        else return children.length == 0;
+    }
+    
     private boolean hasSelfTimeChild() {
         return !isThreadNode() && !isFiltered() && compactDataOfs.size() == 1;
     }
@@ -282,32 +266,32 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
             totalTime1 = container.getSelfTime1ForNodeOfs(ofs);
     }
 
-    public int getMethodId() {
-        return methodID;
-    }
+//    public int getMethodId() {
+//        return methodID;
+//    }
 
-    public int getNCalls() {
-        return nCalls;
-    }
+//    public int getNCalls() {
+//        return nCalls;
+//    }
 
     public int getNChildren() {
         if (getChildren() == null) return 0;
         return nChildren;
     }
 
-    public long getSleepTime0() {
-        return sleepTime0;
+//    public long getSleepTime0() {
+//        return sleepTime0;
+//
+//        // TODO: [wait] self time node?
+//    }
 
-        // TODO: [wait] self time node?
-    }
+//    public int getThreadId() {
+//        return container.getThreadId();
+//    }
 
-    public int getThreadId() {
-        return container.getThreadId();
-    }
-
-    public long getTotalTime0() {
-        return totalTime0;
-    }
+//    public long getTotalTime0() {
+//        return totalTime0;
+//    }
 
     public float getTotalTime0InPerCent() {
         float result = (float) ((container.getWholeGraphNetTime0() > 0)
@@ -316,31 +300,20 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         return (result < 100) ? result : 100;
     }
 
-    public long getTotalTime1() {
-        return totalTime1;
-    }
+//    public long getTotalTime1() {
+//        return totalTime1;
+//    }
 
     public float getTotalTime1InPerCent() {
         return (float) ((container.getWholeGraphNetTime1() > 0)
                         ? ((double) totalTime1 / (double) container.getWholeGraphNetTime1() * 100.0) : 0);
     }
 
-    public long getWaitTime0() {
-        return waitTime0;
-
-        // TODO: [wait] self time node?
-    }
-
-    public void sortChildren(int sortBy, boolean sortOrder) {
-//        container.getCPUResSnapshot().saveSortParams(sortBy, sortOrder, this);
+//    public long getWaitTime0() {
+//        return waitTime0;
 //
-//        // We don't eagerly initialize children for sorting
-//        if ((nChildren == 0) || (children == null)) {
-//            return;
-//        }
-//
-//        doSortChildren(sortBy, sortOrder);
-    }
+//        // TODO: [wait] self time node?
+//    }
     
     public void exportXMLData(ExportDataDumper eDD,String indent) {
         String newline = System.getProperty("line.separator"); // NOI18N
