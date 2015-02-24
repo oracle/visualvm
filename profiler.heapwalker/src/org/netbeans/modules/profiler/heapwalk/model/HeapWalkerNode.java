@@ -53,7 +53,7 @@ import javax.swing.Icon;
  *
  * @author Jiri Sedlacek
  */
-public interface HeapWalkerNode extends CCTNode {
+public abstract class HeapWalkerNode extends CCTNode {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     public static final int MODE_FIELDS = 1;
@@ -61,46 +61,46 @@ public interface HeapWalkerNode extends CCTNode {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public HeapWalkerNode getChild(int index);
+    public abstract HeapWalkerNode getChild(int index);
 
-    public HeapWalkerNode[] getChildren();
+    public abstract HeapWalkerNode[] getChildren();
 
-    public Icon getIcon();
+    public abstract Icon getIcon();
 
-    public int getIndexOfChild(Object child);
+//    public abstract int getIndexOfChild(Object child);
 
-    public boolean isLeaf();
+//    public abstract boolean isLeaf();
 
-    public int getNChildren();
+//    public abstract int getNChildren();
 
-    public String getName();
+    public abstract String getName();
 
-    public HeapWalkerNode getParent();
+    public abstract HeapWalkerNode getParent();
 
-    public boolean isRoot();
+    public abstract boolean isRoot();
 
-    public String getSimpleType();
+    public abstract String getSimpleType();
 
-    public String getType();
+    public abstract String getType();
 
-    public String getValue();
+    public abstract String getValue();
     
-    public String getDetails();
+    public abstract String getDetails();
 
-    public String getSize();
+    public abstract String getSize();
 
-    public String getRetainedSize();
+    public abstract String getRetainedSize();
     
     // used for equals() and hashCode() implementation
-    public Object getNodeID();
+    public abstract Object getNodeID();
 
     // used for testing children for null without lazy-populating invocation
     // note that if false, it means that chilren are not yet computed OR this node is leaf!
-    public boolean currentlyHasChildren();
+    public abstract boolean currentlyHasChildren();
 
     /**
      * Used to get information if node is used within Fields Browser or References Browser
      * There are two different algorithms for generating childs in both Browsers.
      */
-    int getMode();
+    public abstract int getMode();
 }

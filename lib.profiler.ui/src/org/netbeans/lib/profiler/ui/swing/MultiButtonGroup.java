@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -40,27 +40,37 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+package org.netbeans.lib.profiler.ui.swing;
 
-package org.netbeans.modules.profiler.heapwalk.model;
-
-import org.netbeans.lib.profiler.heap.*;
-
+import java.util.HashSet;
+import java.util.Set;
+import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
 
 /**
- * Implemented by each HeapWalkerNode representing an instance
+ * Button group with AT LEAST one button selected.
  *
  * @author Jiri Sedlacek
  */
-public interface HeapWalkerInstanceNode {
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
+public class MultiButtonGroup extends ButtonGroup {
+        
+    private final Set<ButtonModel> selected = new HashSet();
 
-    public boolean isArray();
+    public void setSelected(ButtonModel m, boolean b) {
+        if (b == false) {
+            for (ButtonModel model : selected) {
+                if (model.isSelected() && model != m) {
+                    selected.remove(m);
+                    return;
+                }
+            }
+        } else {
+            selected.add(m);
+        }
+    }
 
-    public Instance getInstance();
+    public boolean isSelected(ButtonModel m) {
+        return selected.contains(m);
+    }
 
-    public boolean isLoop();
-
-    public HeapWalkerNode getLoopTo();
-
-    public boolean hasInstance();
 }

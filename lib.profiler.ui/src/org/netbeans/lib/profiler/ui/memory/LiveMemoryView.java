@@ -58,14 +58,16 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.memory.HeapHistogram;
+import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
+import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -80,11 +82,8 @@ public abstract class LiveMemoryView extends JPanel {
     
     private final ProfilerClient client;
     
-    private SampledTableView sampledView;
-    private AllocTableView allocView;
-    private LivenessTableView livenessView;
+    private MemoryView dataView;
     
-    private DataView currentView;
     private long lastupdate;
     private volatile boolean paused;
     private volatile boolean forceRefresh;
@@ -128,95 +127,15 @@ public abstract class LiveMemoryView extends JPanel {
     
     private void refreshData(RuntimeCCTNode appRootNode) throws ClientUtils.TargetAppOrVMTerminated {
         if ((lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis() || paused) && !forceRefresh) return;
-        Runnable updateDataInAWT = null;
         
-        switch (client.getCurrentInstrType()) {
-            case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
-                MemoryCCTProvider oacgb = client.getMemoryCCTProvider();
-                if (oacgb == null) throw new ClientUtils.TargetAppOrVMTerminated(ClientUtils.TargetAppOrVMTerminated.VM);
-                if (oacgb.getObjectsSizePerClass() != null) {
-                    ProfilingSessionStatus status = client.getStatus();
-                    int _nTrackedItems = status.getNInstrClasses();
-                    final int[] _nTotalAllocObjects = client.getAllocatedObjectsCountResults();
-                    final long[] _totalAllocObjectsSize = oacgb.getAllocObjectNumbers();
-
-                    if (_nTrackedItems > _nTotalAllocObjects.length)
-                        _nTrackedItems = _nTotalAllocObjects.length;
-                    if (_nTrackedItems > _totalAllocObjectsSize.length)
-                        _nTrackedItems = _totalAllocObjectsSize.length;
-
-                    final int nTrackedItems = _nTrackedItems;
-                    final String[] _classNames = status.getClassNames();
-                    for (int i = 0; i < _classNames.length; i++)
-                        _classNames[i] = StringUtils.userFormClassName(_classNames[i]);
-                    
-                    updateDataInAWT = new Runnable() {
-
-                        @Override
-                        public void run() {
-                            allocView.setData(nTrackedItems, _classNames, _nTotalAllocObjects,
-                                              _totalAllocObjectsSize);
-                        }
-                    };
-                }
-                break;
-            case CommonConstants.INSTR_OBJECT_LIVENESS: 
-                ProfilingSessionStatus status = client.getStatus();
-                MemoryCCTProvider olcgb = client.getMemoryCCTProvider();
-                if (olcgb == null) throw new ClientUtils.TargetAppOrVMTerminated(ClientUtils.TargetAppOrVMTerminated.VM);
-                if (olcgb.getObjectsSizePerClass() != null) {
-                    MemoryCCTProvider.ObjectNumbersContainer onc = olcgb.getLivenessObjectNumbers();
-                    final long[] _nTrackedAllocObjects = onc.nTrackedAllocObjects;
-                    final int[] _nTrackedLiveObjects = onc.nTrackedLiveObjects;
-                    final long[] _trackedLiveObjectsSize = onc.trackedLiveObjectsSize;
-                    final float[] _avgObjectAge = onc.avgObjectAge;
-                    final int[] _maxSurvGen = onc.maxSurvGen;
-                    int _nInstrClasses = onc.nInstrClasses;
-
-                    if (((_nTrackedLiveObjects == null) && (_nTrackedAllocObjects == null)) ||
-                         (_avgObjectAge == null) || (_maxSurvGen == null)) return;
-
-                    final int[] _nTotalAllocObjects = client.getAllocatedObjectsCountResults();
-
-                    int _nTrackedItems = Math.min(_nTrackedAllocObjects.length, _nTrackedLiveObjects.length);
-                    _nTrackedItems = Math.min(_nTrackedItems, _trackedLiveObjectsSize.length);
-                    _nTrackedItems = Math.min(_nTrackedItems, _avgObjectAge.length);
-                    _nTrackedItems = Math.min(_nTrackedItems, _maxSurvGen.length);
-                    _nTrackedItems = Math.min(_nTrackedItems, _nInstrClasses);
-                    _nTrackedItems = Math.min(_nTrackedItems, _nTotalAllocObjects.length);
-
-                    for (int i = 0; i < _nTrackedItems; i++)
-                        if (_nTrackedAllocObjects[i] == -1)
-                            _nTotalAllocObjects[i] = 0;
-
-                    final String[] _classNames = status.getClassNames();
-                    for (int i = 0; i < _classNames.length; i++)
-                        _classNames[i] = StringUtils.userFormClassName(_classNames[i]);
-                    final int nTrackedItems = _nTrackedItems;
-                    
-                    updateDataInAWT = new Runnable() {
-
-                        @Override
-                        public void run() {
-                            livenessView.setData(nTrackedItems, _classNames, _nTrackedLiveObjects,
-                                                 _trackedLiveObjectsSize, _nTrackedAllocObjects,
-                                                 _avgObjectAge, _maxSurvGen, _nTotalAllocObjects);
-                        }
-                    };
-                }
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid profiling instr. type: " + client.getCurrentInstrType()); // NOI18N
-        }
-        final Runnable updateDataInAWTFinal = updateDataInAWT;
+        final MemoryResultsSnapshot snapshot = client.getMemoryProfilingResultsSnapshot(false);
         SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
             public void run() {
-                updateCurrentView();
-                if (updateDataInAWTFinal != null) updateDataInAWTFinal.run();
+                MemoryView _dataView = getDataView(snapshot);
+                if (_dataView != null) dataView.setData(snapshot, null, CPUResultsSnapshot.CLASS_LEVEL_VIEW);
             }
         });
+        
         lastupdate = System.currentTimeMillis();
         forceRefresh = false;
     }    
@@ -225,17 +144,7 @@ public abstract class LiveMemoryView extends JPanel {
         if (paused && !forceRefresh) return;
         switch (client.getCurrentInstrType()) {
             case CommonConstants.INSTR_NONE_MEMORY_SAMPLING:
-                final HeapHistogram histogram = client.getHeapHistogram();
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        updateCurrentView();
-                        if (histogram != null) sampledView.setData(histogram);
-                    }
-
-                });
-                forceRefresh = false;
+                refreshData(null);
                 break;
             case CommonConstants.INSTR_OBJECT_LIVENESS:
             case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
@@ -249,15 +158,7 @@ public abstract class LiveMemoryView extends JPanel {
     }
     
     public void resetData() {
-        if (currentView == null) return;
-        
-        if (currentView == sampledView) {
-            sampledView.resetData();
-        } else if (currentView == allocView) {
-            allocView.resetData();
-        } else if (currentView == livenessView) {
-            livenessView.resetData();
-        }
+        if (dataView != null) dataView.resetData();
     }
 
     public void setPaused(boolean paused) {
@@ -269,44 +170,12 @@ public abstract class LiveMemoryView extends JPanel {
     }
     
     
-//    public boolean hasSelection() {
-//        if (currentView == null) {
-//            return false;
-//        } else if (currentView == sampledView) {
-//            return sampledView.hasSelection();
-//        } else if (currentView == allocView) {
-//            return allocView.hasSelection();
-//        } else if (currentView == livenessView) {
-//            return livenessView.hasSelection();
-//        } else {
-//            return false;
-//        }
-//    }
-//    
-//    public String[] getSelections() {
-//        if (!hasSelection()) {
-//            return new String[0];
-//        } else if (currentView == sampledView) {
-//            return sampledView.getSelections();
-//        } else if (currentView == allocView) {
-//            return allocView.getSelections();
-//        } else if (currentView == livenessView) {
-//            return livenessView.getSelections();
-//        } else {
-//            return null;
-//        }
-//    }
-    
     public void showSelectionColumn() {
-        if (sampledView != null) sampledView.showSelectionColumn();
-        if (allocView != null) allocView.showSelectionColumn();
-        if (livenessView != null) livenessView.showSelectionColumn();
+        if (dataView != null) dataView.showSelectionColumn();
     }
     
     public void refreshSelection() {
-        if (sampledView != null) sampledView.refreshSelection();
-        if (allocView != null) allocView.refreshSelection();
-        if (livenessView != null) livenessView.refreshSelection();
+        if (dataView != null) dataView.showSelectionColumn();
     }
     
     
@@ -321,64 +190,91 @@ public abstract class LiveMemoryView extends JPanel {
     public void popupHidden() {};
     
     
-    private DataView getView() {
-        switch (client.getCurrentInstrType()) {
-//            case CommonConstants.INSTR_NONE_MEMORY_SAMPLING:
-//                if (sampledView == null) sampledView = new SampledTableView();
-//                return sampledView;
-            case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
-                if (allocView == null) allocView = new AllocTableView(selection) {
+    private MemoryView getDataView(MemoryResultsSnapshot snapshot) {
+        if (snapshot == null || snapshot instanceof SampledMemoryResultsSnapshot) {
+            if (dataView instanceof SampledTableView) return dataView;
+            else dataView = new SampledTableView(selection) {
+                protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                    if (showSourceSupported()) showSource(userValue);
+                }
+                protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                    LiveMemoryView.this.populatePopup(dataView, popup, value, userValue);
+                }
+                protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
+                protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
+                protected boolean hasBottomFilterFindMargin() { return true; }
+            };
+        } else if (snapshot instanceof AllocMemoryResultsSnapshot) {
+            if (snapshot.containsStacks()) {
+                if (dataView instanceof AllocTreeTableView) return dataView;
+                else dataView = new AllocTreeTableView(selection) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
                     protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
-                        LiveMemoryView.this.populatePopup(allocView, popup, value, userValue);
+                        LiveMemoryView.this.populatePopup(dataView, popup, value, userValue);
                     }
                     protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
                     protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
                     protected boolean hasBottomFilterFindMargin() { return true; }
                 };
-                return allocView;
-            case CommonConstants.INSTR_OBJECT_LIVENESS:
-                if (livenessView == null) livenessView = new LivenessTableView(selection) {
+            } else {
+                if (dataView instanceof AllocTableView) return dataView;
+                else dataView = new AllocTableView(selection) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
                     protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
-                        LiveMemoryView.this.populatePopup(livenessView, popup, value, userValue);
+                        LiveMemoryView.this.populatePopup(dataView, popup, value, userValue);
                     }
                     protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
                     protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
                     protected boolean hasBottomFilterFindMargin() { return true; }
                 };
-                return livenessView;
-            default:
-                if (sampledView == null) sampledView = new SampledTableView(selection) {
+            }
+        } else if (snapshot instanceof LivenessMemoryResultsSnapshot) {
+            if (snapshot.containsStacks()) {
+                if (dataView instanceof LivenessTreeTableView) return dataView;
+                else dataView = new LivenessTreeTableView(selection) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
                     protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
-                        LiveMemoryView.this.populatePopup(sampledView, popup, value, userValue);
+                        LiveMemoryView.this.populatePopup(dataView, popup, value, userValue);
                     }
                     protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
                     protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
                     protected boolean hasBottomFilterFindMargin() { return true; }
                 };
-                return sampledView;
-//                return null;//                return null;
+            } else {
+                if (dataView instanceof LivenessTableView) return dataView;
+                else dataView = new LivenessTableView(selection) {
+                    protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
+                        if (showSourceSupported()) showSource(userValue);
+                    }
+                    protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+                        LiveMemoryView.this.populatePopup(dataView, popup, value, userValue);
+                    }
+                    protected void popupShowing() { LiveMemoryView.this.popupShowing(); }
+                    protected void popupHidden()  { LiveMemoryView.this.popupHidden(); }
+                    protected boolean hasBottomFilterFindMargin() { return true; }
+                };
+            }
+        } else {
+            dataView = null;
         }
+        
+        updateDataView(dataView);
+        
+        return dataView;
     }
 
-    private void updateCurrentView() {
-        DataView newView = getView();
-        if (newView != currentView) {
-            removeAll();
-            resetData();
-            currentView = newView;
-            add(currentView, BorderLayout.CENTER);
-            revalidate();
-            repaint();
-        }
+    private void updateDataView(MemoryView _dataView) {
+        removeAll();
+        resetData();
+        if (_dataView != null) add(_dataView, BorderLayout.CENTER);
+        revalidate();
+        repaint();
     }
     
     private void populatePopup(final DataView invoker, JPopupMenu popup, Object value, final ClientUtils.SourceCodeSelection userValue) {
@@ -409,10 +305,7 @@ public abstract class LiveMemoryView extends JPanel {
         setLayout(new BorderLayout(0, 0));
         
         // TODO: read last state?
-        currentView = getView();
-        add(currentView, BorderLayout.CENTER);
-        revalidate();
-        repaint();
+        updateDataView(getDataView(null));
         
         registerActions();
     }
@@ -421,11 +314,11 @@ public abstract class LiveMemoryView extends JPanel {
         ActionMap map = getActionMap();
         
         map.put(FilterUtils.FILTER_ACTION_KEY, new AbstractAction() {
-            public void actionPerformed(ActionEvent e) { currentView.activateFilter(); }
+            public void actionPerformed(ActionEvent e) { dataView.activateFilter(); }
         });
         
         map.put(SearchUtils.FIND_ACTION_KEY, new AbstractAction() {
-            public void actionPerformed(ActionEvent e) { currentView.activateSearch(); }
+            public void actionPerformed(ActionEvent e) { dataView.activateSearch(); }
         });
     }
     

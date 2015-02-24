@@ -42,6 +42,8 @@
  */
 package org.netbeans.lib.profiler.ui.memory;
 
+import javax.swing.Icon;
+import javax.swing.UIManager;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -53,14 +55,23 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  */
 public class MemoryJavaNameRenderer extends JavaNameRenderer {
     
+    private static final Icon REVERSE_ICON = Icons.getIcon(ProfilerIcons.NODE_REVERSE);
+    
     public void setValue(Object value, int row) {
-        super.setValue(value, row);
-        
         if (value instanceof PresoObjAllocCCTNode) {
             PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)value;
             
-            if (node.getMethodClassNameAndSig()[2] == null) setIcon(null); // class name
-            else setIcon(Icons.getIcon(ProfilerIcons.NODE_REVERSE)); // method name
+            if (node.isFiltered()) {
+                setNormalValue(""); // NOI18N
+                setBoldValue("");
+                setGrayValue(node.getNodeName()); // NOI18N
+            } else {
+                super.setValue(value, row);
+            }
+            
+            if (node.isFiltered()) setIcon(UIManager.getLookAndFeel().getDisabledIcon(this, REVERSE_ICON));
+            else if (node.getMethodClassNameAndSig()[2] == null) setIcon(null); // class name
+            else setIcon(REVERSE_ICON); // method name
         }
         
 //        // TODO: <clinit> methods should be displayed with "()" similar to <init>

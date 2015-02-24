@@ -150,7 +150,18 @@ class ProfilerRowSorter extends TableRowSorter {
     
     // --- Filtering support ---------------------------------------------------
     
+    private boolean filterMode = true; // AND filter by default
     private Collection<RowFilter<Object, Object>> filters;
+    
+    // false = OR, true = AND
+    void setFiltersMode(boolean mode) {
+        this.filterMode = mode;
+        if (filters != null) refreshRowFilter();
+    }
+    
+    boolean getFiltersMode() {
+        return filterMode;
+    }
     
     void addRowFilter(RowFilter filter) {
         if (filters == null) filters = new HashSet();
@@ -166,7 +177,8 @@ class ProfilerRowSorter extends TableRowSorter {
     }
     
     private void refreshRowFilter() {
-        setRowFilter(RowFilter.andFilter(filters));
+        setRowFilter(filterMode ? RowFilter.andFilter(filters) :
+                                  RowFilter.orFilter(filters));
     }
     
     // --- Persistence ---------------------------------------------------------

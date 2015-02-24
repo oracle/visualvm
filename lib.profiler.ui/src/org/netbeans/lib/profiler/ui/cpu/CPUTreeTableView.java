@@ -50,6 +50,7 @@ import java.util.Set;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
+import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeNode;
@@ -58,6 +59,7 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
@@ -67,6 +69,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.McsTimeRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 /**
  *
@@ -80,12 +83,15 @@ abstract class CPUTreeTableView extends CPUView {
     private Map<Integer, ClientUtils.SourceCodeSelection> idMap;
     private final Set<ClientUtils.SourceCodeSelection> selection;
     
+    private final boolean reverse;
+    
     private boolean sampled = true;
     private boolean twoTimeStamps;
     
     
-    public CPUTreeTableView(Set<ClientUtils.SourceCodeSelection> selection) {
+    public CPUTreeTableView(Set<ClientUtils.SourceCodeSelection> selection, boolean reverse) {
         this.selection = selection;
+        this.reverse = reverse;
         
         initUI();
     }
@@ -100,7 +106,8 @@ abstract class CPUTreeTableView extends CPUView {
                 idMap = newIdMap;
                 if (treeTableModel != null) {
                     treeTableModel.setRoot(newData == null ? PrestimeCPUCCTNode.EMPTY :
-                                           newData.getRootNode(aggregation));
+                                           !reverse ? newData.getRootNode(aggregation):
+                                           newData.getReverseRootNode(aggregation));
                 }
                 if (structureChange) {
                     int col = treeTable.convertColumnIndexToView(selection == null ? 3 : 4);
@@ -218,7 +225,7 @@ abstract class CPUTreeTableView extends CPUView {
                 }
             }
         });
-        treeTable.setTreeCellRenderer(new CPUJavaNameRenderer());
+        treeTable.setTreeCellRenderer(new CPUJavaNameRenderer(reverse ? ProfilerIcons.NODE_REVERSE : ProfilerIcons.NODE_FORWARD));
         treeTable.setColumnRenderer(2 + offset, renderers[0]);
         treeTable.setColumnRenderer(3 + offset, renderers[1]);
         treeTable.setColumnRenderer(4 + offset, renderers[2]);
@@ -241,6 +248,15 @@ abstract class CPUTreeTableView extends CPUView {
         
         setLayout(new BorderLayout());
         add(tableContainer, BorderLayout.CENTER);
+        
+        treeTable.setFiltersMode(false); // OR filter for results treetable
+        treeTable.addRowFilter(new RowFilter() { // Do not filter threads and self time nodes
+            public boolean include(RowFilter.Entry entry) {
+                PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)entry.getIdentifier();
+                return node.isThreadNode() || node.isSelfTimeNode();
+            }
+        });
+        FilterUtils.filterContains(treeTable, null); // Installs filter accepting all nodes by default
     }
     
     
@@ -260,7 +276,7 @@ abstract class CPUTreeTableView extends CPUView {
     protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
         PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)treeTable.getValueForRow(row);
         if (node == null) return null;
-        else if (node.isThreadNode() || node.isFilteredNode() || node.isSelfTimeNode()) return null;
+        else if (node.isThreadNode() || node.isFiltered() || node.isSelfTimeNode()) return null;
 //        else return selectionForId(node.getMethodId());
         else return idMap.get(node.getMethodId());
     }
@@ -279,7 +295,7 @@ abstract class CPUTreeTableView extends CPUView {
 //    }
     
     private static boolean isSelectable(PrestimeCPUCCTNode node) {
-        if (node.isThreadNode() || node.isFilteredNode() || node.isSelfTimeNode()) return false;
+        if (node.isThreadNode() || node.isFiltered() || node.isSelfTimeNode()) return false;
         if (node.getMethodClassNameAndSig()[1].endsWith("[native]")) return false; // NOI18N
         return true;
     }

@@ -60,16 +60,16 @@ public class PrestimeCPUCCTNodeFree extends PrestimeCPUCCTNode {
     private static NumberFormat percentFormat=null;
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    protected int methodId;
-    protected int nCalls;
-    protected long sleepTime0;
-
-    /** The same class used for both standard and "extended" nodes (collecting one or two timestamps) */
-    protected long totalTime0;
-    protected long totalTime1;
-
-    /** The same class used for both standard and "extended" nodes (collecting one or two timestamps) */
-    protected long waitTime0;
+//    protected int methodId;
+//    protected int nCalls;
+//    protected long sleepTime0;
+//
+//    /** The same class used for both standard and "extended" nodes (collecting one or two timestamps) */
+//    protected long totalTime0;
+//    protected long totalTime1;
+//
+//    /** The same class used for both standard and "extended" nodes (collecting one or two timestamps) */
+//    protected long waitTime0;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -77,47 +77,55 @@ public class PrestimeCPUCCTNodeFree extends PrestimeCPUCCTNode {
      * Constructor for creating normal nodes representing methods
      */
     protected PrestimeCPUCCTNodeFree(CPUCCTContainer container, PrestimeCPUCCTNode parent, int methodId) {
-        super(container, parent);
-        this.methodId = methodId;
+        super(container, parent, methodId);
+//        this.methodId = methodId;
     }
+    
+    PrestimeCPUCCTNodeFree() {}
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public CCTNode getChild(int index) {
-        return children[index];
-    }
-
-    public CCTNode[] getChildren() {
-        return children;
+//    public CCTNode getChild(int index) {
+//        return children[index];
+//    }
+//
+//    public CCTNode[] getChildren() {
+//        return children;
+//    }
+    
+    public CCTNode createFilteredNode() {
+        PrestimeCPUCCTNodeFree filtered = new PrestimeCPUCCTNodeFree();
+        setupFilteredNode(filtered);
+        return filtered;
     }
 
     public void setMethodId(int methodId) {
         this.methodId = methodId;
     }
 
-    public int getMethodId() {
-        return methodId;
-    }
+//    public int getMethodId() {
+//        return methodId;
+//    }
 
-    public int getNCalls() {
-        return nCalls;
-    }
+//    public int getNCalls() {
+//        return nCalls;
+//    }
 
-    public int getNChildren() {
-        return (children != null) ? children.length : 0;
-    }
+//    public int getNChildren() {
+//        return (children != null) ? children.length : 0;
+//    }
 
-    public long getSleepTime0() {
-        return 0; // TODO [wait]
-    }
+//    public long getSleepTime0() {
+//        return 0; // TODO [wait]
+//    }
 
-    public int getThreadId() {
-        return container.getThreadId();
-    }
+//    public int getThreadId() {
+//        return container.getThreadId();
+//    }
 
-    public long getTotalTime0() {
-        return totalTime0;
-    }
+//    public long getTotalTime0() {
+//        return totalTime0;
+//    }
 
     public float getTotalTime0InPerCent() {
         float result = (float) ((double) totalTime0 / container.getWholeGraphNetTime0() * 100);
@@ -125,37 +133,37 @@ public class PrestimeCPUCCTNodeFree extends PrestimeCPUCCTNode {
         return (result < 100) ? result : 100f;
     }
 
-    public long getTotalTime1() {
-        return totalTime1;
-    }
+//    public long getTotalTime1() {
+//        return totalTime1;
+//    }
 
     public float getTotalTime1InPerCent() {
         return (float) ((double) totalTime1 / container.getWholeGraphNetTime1() * 100);
     }
 
-    public long getWaitTime0() {
-        return 0; // TODO [wait]
-    }
+//    public long getWaitTime0() {
+//        return 0; // TODO [wait]
+//    }
     
-    void merge(PrestimeCPUCCTNodeFree node) {
-        addNCalls(node.getNCalls());
-        addSleepTime0(node.getSleepTime0());
-        addTotalTime0(node.getTotalTime0());
-        addTotalTime1(node.getTotalTime1());
-        addWaitTime0(node.getWaitTime0());
-        
-        if (node.children != null) {
-            for (PrestimeCPUCCTNode ch : node.children)
-                ch.parent = this;
-            
-            int chl = children == null ? 0 : children.length;
-            int newchl = node.children.length;
-            PrestimeCPUCCTNodeFree[] newch = new PrestimeCPUCCTNodeFree[chl + newchl];
-            if (children != null) System.arraycopy(children, 0, newch, 0, chl);
-            System.arraycopy(node.children, 0, newch, chl, newchl);
-            children = newch;
-        }
-    }
+//    void merge(PrestimeCPUCCTNodeFree node) {
+//        addNCalls(node.getNCalls());
+//        addSleepTime0(node.getSleepTime0());
+//        addTotalTime0(node.getTotalTime0());
+//        addTotalTime1(node.getTotalTime1());
+//        addWaitTime0(node.getWaitTime0());
+//        
+//        if (node.children != null) {
+//            for (PrestimeCPUCCTNode ch : node.children)
+//                ch.parent = this;
+//            
+//            int chl = children == null ? 0 : children.length;
+//            int newchl = node.children.length;
+//            PrestimeCPUCCTNodeFree[] newch = new PrestimeCPUCCTNodeFree[chl + newchl];
+//            if (children != null) System.arraycopy(children, 0, newch, 0, chl);
+//            System.arraycopy(node.children, 0, newch, chl, newchl);
+//            children = newch;
+//        }
+//    }
 
     public void addChild(PrestimeCPUCCTNodeFree node) {
         if (children == null) {
@@ -169,28 +177,28 @@ public class PrestimeCPUCCTNodeFree extends PrestimeCPUCCTNode {
         children[children.length - 1] = node;
     }
 
-    /**
-     * Methods used during node merging
-     */
-    public void addNCalls(int addCalls) {
-        nCalls += addCalls;
-    }
-
-    public void addSleepTime0(long addTime) {
-        sleepTime0 += addTime;
-    }
-
-    public void addTotalTime0(long addTime) {
-        totalTime0 += addTime;
-    }
-
-    public void addTotalTime1(long addTime) {
-        totalTime1 += addTime;
-    }
-
-    public void addWaitTime0(long addTime) {
-        waitTime0 += addTime;
-    }
+//    /**
+//     * Methods used during node merging
+//     */
+//    public void addNCalls(int addCalls) {
+//        nCalls += addCalls;
+//    }
+//
+//    public void addSleepTime0(long addTime) {
+//        sleepTime0 += addTime;
+//    }
+//
+//    public void addTotalTime0(long addTime) {
+//        totalTime0 += addTime;
+//    }
+//
+//    public void addTotalTime1(long addTime) {
+//        totalTime1 += addTime;
+//    }
+//
+//    public void addWaitTime0(long addTime) {
+//        waitTime0 += addTime;
+//    }
 
     /**
      * Create a copy of this node, but with zero children
@@ -203,12 +211,6 @@ public class PrestimeCPUCCTNodeFree extends PrestimeCPUCCTNode {
             return res;
         } catch (CloneNotSupportedException ex) {
             return null; /* Shouldn't happen */
-        }
-    }
-
-    public void sortChildren(int sortBy, boolean sortOrder) {
-        if (children != null) {
-            doSortChildren(sortBy, sortOrder);
         }
     }
     

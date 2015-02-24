@@ -51,7 +51,7 @@ import org.netbeans.lib.profiler.heap.*;
  *
  * @author Jiri Sedlacek
  */
-public interface HeapWalkerFieldNode extends HeapWalkerNode {
+public interface HeapWalkerFieldNode {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public FieldValue getFieldValue();

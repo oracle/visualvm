@@ -45,8 +45,11 @@ package org.netbeans.lib.profiler.results.cpu;
 
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
-import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.results.FilterSortSupport;
@@ -59,24 +62,22 @@ import org.netbeans.lib.profiler.results.FilterSortSupport;
  *
  * @author Misha Dmitriev
  */
-public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
+public abstract class PrestimeCPUCCTNode extends CCTNode implements Cloneable {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // -----
     // I18N String constants
     private static final String SELF_TIME_STRING;
-    private static final String FROM_MSG;
 
     static {
         ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.results.cpu.Bundle"); // NOI18N
         SELF_TIME_STRING = messages.getString("PrestimeCPUCCTNode_SelfTimeString"); // NOI18N
-        FROM_MSG = messages.getString("PrestimeCPUCCTNode_FromMsg"); // NOI18N
     }
     
     protected static final char MASK_SELF_TIME_NODE = 0x1;
     protected static final char MASK_CONTEXT_CALLS_NODE = 0x2;
     protected static final char MASK_THREAD_NODE = 0x4;
-    protected static final char MASK_FILTERED_NODE = 0x8;
+//    protected static final char MASK_FILTERED_NODE = 0x8;
     public static final int SORT_BY_NAME = 1;
     public static final int SORT_BY_TIME_0 = 2;
     public static final int SORT_BY_TIME_1 = 3;
@@ -118,6 +119,17 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
     protected PrestimeCPUCCTNode parent;
     protected PrestimeCPUCCTNode[] children;
     protected char flags; // Non-zero for several special kinds of nodes, per MASK_* bit constants above
+    
+    protected int methodId;
+    protected int nCalls;
+    protected long sleepTime0;
+
+    /** The same class used for both standard and "extended" nodes (collecting one or two timestamps) */
+    protected long totalTime0;
+    protected long totalTime1;
+
+    /** The same class used for both standard and "extended" nodes (collecting one or two timestamps) */
+    protected long waitTime0;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -127,56 +139,139 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
     /**
      * Constructor for creating normal nodes representing methods
      */
-    protected PrestimeCPUCCTNode(CPUCCTContainer container, PrestimeCPUCCTNode parent) {
+    protected PrestimeCPUCCTNode(CPUCCTContainer container, PrestimeCPUCCTNode parent, int methodId) {
         this.container = container;
         this.parent = parent;
+        this.methodId = methodId;
     }
     
-    //--- TreeNode adapter ---
-    public Enumeration<PrestimeCPUCCTNode> children() {
-        return new Enumeration<PrestimeCPUCCTNode>() {
-            private int index = 0;
-            
-            public boolean hasMoreElements() {
-                return getChildren() != null && index < getChildren().length;
-            }
+    // --- Filtering support ---
+    
+    protected void setupFilteredNode(PrestimeCPUCCTNode filtered) {
+        filtered.setFilteredNode();
+        
+        filtered.parent = parent;
+        filtered.container = container;
+        
+        filtered.methodId = -1;
 
-            public PrestimeCPUCCTNode nextElement() {
-                return (PrestimeCPUCCTNode)getChildren()[index++];
+        filtered.nCalls = nCalls;
+        filtered.sleepTime0 = sleepTime0;
+        filtered.totalTime0 = totalTime0;
+        filtered.totalTime1 = totalTime1;
+        filtered.waitTime0 = waitTime0;
+
+        Collection<PrestimeCPUCCTNode> _childrenL = resolveChildren(this);
+        int nChildren = _childrenL.size();
+        filtered.children = _childrenL.toArray(new PrestimeCPUCCTNode[nChildren]);
+    }
+    
+    public void merge(CCTNode node) {
+        if (node instanceof PrestimeCPUCCTNode) {
+            PrestimeCPUCCTNode _node = (PrestimeCPUCCTNode)node;
+            
+            addNCalls(_node.getNCalls());
+            addSleepTime0(_node.getSleepTime0());
+            addTotalTime0(_node.getTotalTime0());
+            addTotalTime1(_node.getTotalTime1());
+            addWaitTime0(_node.getWaitTime0());
+
+            List<CCTNode> ch = new ArrayList();
+            
+            // Include current children
+            if (children != null) ch.addAll(Arrays.asList(children));
+            
+            // Add or merge new children
+            for (PrestimeCPUCCTNode child : resolveChildren(_node)) {
+                int idx = ch.indexOf(child);
+                if (idx == -1) ch.add(child);
+                else ch.get(idx).merge(child);
             }
-        };
+            
+            children = ch.toArray(new PrestimeCPUCCTNode[ch.size()]);
+        }
+    }
+
+    protected static Collection<PrestimeCPUCCTNode> resolveChildren(PrestimeCPUCCTNode node) {
+        List<PrestimeCPUCCTNode> chldrn = new ArrayList();
+        PrestimeCPUCCTNode[] chld = (PrestimeCPUCCTNode[])node.getChildren();
+        if (chld != null) for (PrestimeCPUCCTNode chl : chld)
+            if (!chl.isSelfTimeNode()) chldrn.add(chl);
+        return chldrn;
     }
     
-    public boolean isLeaf() {
-        return getChildCount() == 0;
-    }
-    
-    public boolean getAllowsChildren() {
-        return true;
-    }
-    
-    public int getIndex(TreeNode node) {
-        return getIndexOfChild(node);
-    }
-    
-    public int getChildCount() {
-        return getNChildren();
-    }
-    
-    public TreeNode getChildAt(int index) {
-        return getChild(index);
-    }
-    //---
+    // ---
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public abstract CCTNode getChild(int index);
+    public CCTNode getChild(int index) {
+        return children[index];
+    }
 
-    public abstract CCTNode[] getChildren();
+    public CCTNode[] getChildren() {
+        return children;
+    }
+    
+    public int getNChildren() {
+        return (children != null) ? children.length : 0;
+    }
 
     public CPUCCTContainer getContainer() {
         return container;
     }
+    
+    
+    public int getMethodId() {
+        return methodId;
+    }
+    
+    public int getNCalls() {
+        return nCalls;
+    }
+    
+    public long getSleepTime0() {
+        return sleepTime0;
+
+        // TODO: [wait] self time node?
+    }
+    
+    public int getThreadId() {
+        return container.getThreadId();
+    }
+    
+    public long getTotalTime0() {
+        return totalTime0;
+    }
+    
+    public long getTotalTime1() {
+        return totalTime1;
+    }
+    
+    public long getWaitTime0() {
+        return waitTime0; // TODO [wait]
+    }
+    
+    
+    public void addNCalls(int addCalls) {
+        nCalls += addCalls;
+    }
+
+    public void addSleepTime0(long addTime) {
+        sleepTime0 += addTime;
+    }
+
+    public void addTotalTime0(long addTime) {
+        totalTime0 += addTime;
+    }
+
+    public void addTotalTime1(long addTime) {
+        totalTime1 += addTime;
+    }
+
+    public void addWaitTime0(long addTime) {
+        waitTime0 += addTime;
+    }
+    
 
     public void setContextCallsNode() {
         flags = MASK_CONTEXT_CALLS_NODE;
@@ -200,14 +295,14 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
                 n.resetChildren();
     }
 
-    public abstract int getMethodId();
-
-    public abstract int getNCalls();
-
-    public abstract int getNChildren();
+//    public abstract int getMethodId();
+//
+//    public abstract int getNCalls();
+//
+//    public abstract int getNChildren();
 
     public String getNodeName() {
-        if (isFilteredNode()) {
+        if (isFiltered()) {
             return FilterSortSupport.FILTERED_OUT_LBL;
         } else if (isSelfTimeNode()) {
             return SELF_TIME_STRING;
@@ -222,15 +317,15 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
         //        methodClassNameAndSig[0], methodClassNameAndSig[1], methodClassNameAndSig[2]
         //    );
         //    String res = format.getFormattedClassAndMethod();
-        String res = MethodNameFormatterFactory.getDefault().getFormatter()
-                                               .formatMethodName(methodClassNameAndSig[0], methodClassNameAndSig[1],
-                                                                 methodClassNameAndSig[2]).toFormatted();
+        return MethodNameFormatterFactory.getDefault().getFormatter().formatMethodName(
+                                          methodClassNameAndSig[0], methodClassNameAndSig[1],
+                                          methodClassNameAndSig[2]).toFormatted();
 
-        if (isContextCallsNode()) {
-            return MessageFormat.format(FROM_MSG, new Object[] { res });
-        } else {
-            return res;
-        }
+//        if (isContextCallsNode()) {
+//            return MessageFormat.format(FROM_MSG, new Object[] { res });
+//        } else {
+//            return res;
+//        }
     }
     
     public boolean equals(Object o) {
@@ -247,7 +342,7 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
         if (isSelfTimeNode()) return oo.isSelfTimeNode();
         
         // Handle filtered-out containers
-        if (isFilteredNode()) return oo.isFilteredNode();
+        if (isFiltered()) return oo.isFiltered();
         
         // Handle "when called from" containers
         if (isContextCallsNode()) return getMethodId() == oo.getMethodId();
@@ -270,7 +365,7 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
         if (isSelfTimeNode()) return -1;
         
         // Handle filtered-out containers
-        if (isFilteredNode()) return -10;
+        if (isFiltered()) return -10;
         
         // Handle "when called from" containers
         if (isContextCallsNode()) return Integer.MIN_VALUE + getMethodId();
@@ -286,9 +381,9 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
         return parent;
     }
 
-    public abstract long getSleepTime0();
-
-    public abstract int getThreadId();
+//    public abstract long getSleepTime0();
+//
+//    public abstract int getThreadId();
 
     public void setSelfTimeNode() {
         flags |= MASK_SELF_TIME_NODE;
@@ -306,27 +401,27 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
         return (flags & MASK_THREAD_NODE) != 0;
     }
     
-    public void setFilteredNode() {
-        flags |= MASK_FILTERED_NODE;
-    }
-    
-    public void resetFilteredNode() {
-        flags &= ~MASK_FILTERED_NODE;
-    }
+//    public void setFilteredNode() {
+//        flags |= MASK_FILTERED_NODE;
+//    }
+//    
+//    public void resetFilteredNode() {
+//        flags &= ~MASK_FILTERED_NODE;
+//    }
+//
+//    public boolean isFilteredNode() {
+//        return (flags & MASK_FILTERED_NODE) != 0;
+//    }
 
-    public boolean isFilteredNode() {
-        return (flags & MASK_FILTERED_NODE) != 0;
-    }
-
-    public abstract long getTotalTime0();
+//    public abstract long getTotalTime0();
 
     public abstract float getTotalTime0InPerCent();
 
-    public abstract long getTotalTime1();
+//    public abstract long getTotalTime1();
 
     public abstract float getTotalTime1InPerCent();
 
-    public abstract long getWaitTime0();
+//    public abstract long getWaitTime0();
 
     public int getIndexOfChild(Object child) {
 //        if (children == null) JOptionPane.showMessageDialog(null, "Node: " + this + "\nindex of child: " + child);\
@@ -344,136 +439,136 @@ public abstract class PrestimeCPUCCTNode implements CCTNode, Cloneable {
      * This is not equal to doSortChildren below, because the real implementation of sortChildren may need to do some
      * more things, such as generating the children, or deciding to return immediately.
      */
-    public abstract void sortChildren(int sortBy, boolean sortOrder);
+    public void sortChildren(int sortBy, boolean sortOrder) {};
     
     public String toString() {
         return getNodeName();
     }
 
-    protected void doSortChildren(int sortBy, boolean sortOrder) {
-        int len = children.length;
-
-        for (int i = 0; i < len; i++) {
-            children[i].sortChildren(sortBy, sortOrder);
-        }
-
-        if (len > 1) {
-            switch (sortBy) {
-                case SORT_BY_NAME:
-                    sortChildrenByName(sortOrder);
-
-                    break;
-                case SORT_BY_TIME_0:
-                    sortChildrenByTime0(sortOrder);
-
-                    break;
-                case SORT_BY_TIME_1:
-                    sortChildrenByTime1(sortOrder);
-
-                    break;
-                case SORT_BY_INVOCATIONS:
-                    sortChildrenByInvocations(sortOrder);
-
-                    break;
-            }
-        }
-    }
-
-    protected void sortChildrenByInvocations(boolean sortOrder) {
-        int len = children.length;
-        int[] values = new int[len];
-
-        for (int i = 0; i < len; i++) {
-            values[i] = children[i].getNCalls();
-        }
-
-        sortInts(values, sortOrder);
-    }
-
-    protected void sortChildrenByName(boolean sortOrder) {
-        int len = children.length;
-        String[] values = new String[len];
-
-        for (int i = 0; i < len; i++) {
-            values[i] = children[i].getNodeName();
-        }
-
-        sortStrings(values, sortOrder);
-    }
-
-    protected void sortChildrenByTime0(boolean sortOrder) {
-        int len = children.length;
-        long[] values = new long[len];
-
-        for (int i = 0; i < len; i++) {
-            values[i] = children[i].getTotalTime0();
-        }
-
-        sortLongs(values, sortOrder);
-    }
-
-    protected void sortChildrenByTime1(boolean sortOrder) {
-        int len = children.length;
-        long[] values = new long[len];
-
-        for (int i = 0; i < len; i++) {
-            values[i] = children[i].getTotalTime1();
-        }
-
-        sortLongs(values, sortOrder);
-    }
-
-    protected void sortInts(int[] values, boolean sortOrder) {
-        int len = values.length;
-
-        // Just the insertion sort - we will never get really large arrays here
-        for (int i = 0; i < len; i++) {
-            for (int j = i; (j > 0) && ((sortOrder == false) ? (values[j - 1] < values[j]) : (values[j - 1] > values[j])); j--) {
-                int tmp = values[j];
-                values[j] = values[j - 1];
-                values[j - 1] = tmp;
-
-                PrestimeCPUCCTNode tmpCh = children[j];
-                children[j] = children[j - 1];
-                children[j - 1] = tmpCh;
-            }
-        }
-    }
-
-    protected void sortLongs(long[] values, boolean sortOrder) {
-        int len = values.length;
-
-        // Just the insertion sort - we will never get really large arrays here
-        for (int i = 0; i < len; i++) {
-            for (int j = i; (j > 0) && ((sortOrder == false) ? (values[j - 1] < values[j]) : (values[j - 1] > values[j])); j--) {
-                long tmp = values[j];
-                values[j] = values[j - 1];
-                values[j - 1] = tmp;
-
-                PrestimeCPUCCTNode tmpCh = children[j];
-                children[j] = children[j - 1];
-                children[j - 1] = tmpCh;
-            }
-        }
-    }
-
-    protected void sortStrings(String[] values, boolean sortOrder) {
-        int len = values.length;
-
-        // Just the insertion sort - we will never get really large arrays here
-        for (int i = 0; i < len; i++) {
-            for (int j = i;
-                     (j > 0)
-                     && ((sortOrder == false) ? (values[j - 1].compareTo(values[j]) < 0) : (values[j - 1].compareTo(values[j]) > 0));
-                     j--) {
-                String tmp = values[j];
-                values[j] = values[j - 1];
-                values[j - 1] = tmp;
-
-                PrestimeCPUCCTNode tmpCh = children[j];
-                children[j] = children[j - 1];
-                children[j - 1] = tmpCh;
-            }
-        }
-    }
+//    protected void doSortChildren(int sortBy, boolean sortOrder) {
+//        int len = children.length;
+//
+//        for (int i = 0; i < len; i++) {
+//            children[i].sortChildren(sortBy, sortOrder);
+//        }
+//
+//        if (len > 1) {
+//            switch (sortBy) {
+//                case SORT_BY_NAME:
+//                    sortChildrenByName(sortOrder);
+//
+//                    break;
+//                case SORT_BY_TIME_0:
+//                    sortChildrenByTime0(sortOrder);
+//
+//                    break;
+//                case SORT_BY_TIME_1:
+//                    sortChildrenByTime1(sortOrder);
+//
+//                    break;
+//                case SORT_BY_INVOCATIONS:
+//                    sortChildrenByInvocations(sortOrder);
+//
+//                    break;
+//            }
+//        }
+//    }
+//
+//    protected void sortChildrenByInvocations(boolean sortOrder) {
+//        int len = children.length;
+//        int[] values = new int[len];
+//
+//        for (int i = 0; i < len; i++) {
+//            values[i] = children[i].getNCalls();
+//        }
+//
+//        sortInts(values, sortOrder);
+//    }
+//
+//    protected void sortChildrenByName(boolean sortOrder) {
+//        int len = children.length;
+//        String[] values = new String[len];
+//
+//        for (int i = 0; i < len; i++) {
+//            values[i] = children[i].getNodeName();
+//        }
+//
+//        sortStrings(values, sortOrder);
+//    }
+//
+//    protected void sortChildrenByTime0(boolean sortOrder) {
+//        int len = children.length;
+//        long[] values = new long[len];
+//
+//        for (int i = 0; i < len; i++) {
+//            values[i] = children[i].getTotalTime0();
+//        }
+//
+//        sortLongs(values, sortOrder);
+//    }
+//
+//    protected void sortChildrenByTime1(boolean sortOrder) {
+//        int len = children.length;
+//        long[] values = new long[len];
+//
+//        for (int i = 0; i < len; i++) {
+//            values[i] = children[i].getTotalTime1();
+//        }
+//
+//        sortLongs(values, sortOrder);
+//    }
+//
+//    protected void sortInts(int[] values, boolean sortOrder) {
+//        int len = values.length;
+//
+//        // Just the insertion sort - we will never get really large arrays here
+//        for (int i = 0; i < len; i++) {
+//            for (int j = i; (j > 0) && ((sortOrder == false) ? (values[j - 1] < values[j]) : (values[j - 1] > values[j])); j--) {
+//                int tmp = values[j];
+//                values[j] = values[j - 1];
+//                values[j - 1] = tmp;
+//
+//                PrestimeCPUCCTNode tmpCh = children[j];
+//                children[j] = children[j - 1];
+//                children[j - 1] = tmpCh;
+//            }
+//        }
+//    }
+//
+//    protected void sortLongs(long[] values, boolean sortOrder) {
+//        int len = values.length;
+//
+//        // Just the insertion sort - we will never get really large arrays here
+//        for (int i = 0; i < len; i++) {
+//            for (int j = i; (j > 0) && ((sortOrder == false) ? (values[j - 1] < values[j]) : (values[j - 1] > values[j])); j--) {
+//                long tmp = values[j];
+//                values[j] = values[j - 1];
+//                values[j - 1] = tmp;
+//
+//                PrestimeCPUCCTNode tmpCh = children[j];
+//                children[j] = children[j - 1];
+//                children[j - 1] = tmpCh;
+//            }
+//        }
+//    }
+//
+//    protected void sortStrings(String[] values, boolean sortOrder) {
+//        int len = values.length;
+//
+//        // Just the insertion sort - we will never get really large arrays here
+//        for (int i = 0; i < len; i++) {
+//            for (int j = i;
+//                     (j > 0)
+//                     && ((sortOrder == false) ? (values[j - 1].compareTo(values[j]) < 0) : (values[j - 1].compareTo(values[j]) > 0));
+//                     j--) {
+//                String tmp = values[j];
+//                values[j] = values[j - 1];
+//                values[j - 1] = tmp;
+//
+//                PrestimeCPUCCTNode tmpCh = children[j];
+//                children[j] = children[j - 1];
+//                children[j - 1] = tmpCh;
+//            }
+//        }
+//    }
 }
