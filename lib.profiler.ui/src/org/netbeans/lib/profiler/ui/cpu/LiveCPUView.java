@@ -47,6 +47,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -90,6 +91,11 @@ public abstract class LiveCPUView extends JPanel {
     
     private final ProfilerClient client;
     private final ResultsMonitor rm;
+    
+    private CPUResultsSnapshot snapshot;
+    private boolean sampled;
+    private boolean mergedThreads;
+    private Collection<Integer> selectedThreads;
     
     private DataView lastFocused;
     private CPUTableView hotSpotsView;
@@ -141,6 +147,17 @@ public abstract class LiveCPUView extends JPanel {
         reverseCallsView.setVisible(reverseCalls);
     }
     
+    public ThreadsSelector createThreadSelector() {
+        return new ThreadsSelector() {
+            public CPUResultsSnapshot getSnapshot() { return snapshot; }
+            public void selectionChanged(Collection<Integer> selected, boolean mergeThreads) {
+                mergedThreads = mergeThreads;
+                selectedThreads = selected;
+                setData();
+            }
+        };
+    }
+    
     public void setPaused(boolean paused) {
         this.paused = paused;
     }
@@ -155,28 +172,11 @@ public abstract class LiveCPUView extends JPanel {
             final CPUResultsSnapshot snapshotData =
                     client.getStatus().getInstrMethodClasses() == null ?
                     null : client.getCPUProfilingResultsSnapshot(false);
-
-            if (snapshotData != null) {
-                final FlatProfileContainer flatData = snapshotData.getFlatProfile(
-                        -1, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
-                
-                final Map<Integer, ClientUtils.SourceCodeSelection> idMap = new HashMap();
-                for (int i = 0; i < flatData.getNRows(); i++) // TODO: getNRows is filtered, may not work for tree data!
-                    idMap.put(flatData.getMethodIdAtRow(i), flatData.getSourceCodeSelectionAtRow(i));
-
-                final boolean sampled = client.getCurrentInstrType() == ProfilerClient.INSTR_NONE_SAMPLING;
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        forwardCallsView.setData(snapshotData, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, sampled);
-                        hotSpotsView.setData(flatData, idMap, sampled);
-                        reverseCallsView.setData(snapshotData, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, sampled);
-                    }
-                });
-                lastupdate = System.currentTimeMillis();
-
-            }
+            snapshot = snapshotData;
+            sampled = snapshotData == null ? true :
+                      client.getCurrentInstrType() == ProfilerClient.INSTR_NONE_SAMPLING;
+            setData();
+            lastupdate = System.currentTimeMillis();
             forceRefresh = false;
         } catch (CPUResultsSnapshot.NoDataAvailableException e) {
         } catch (Throwable t) {
@@ -185,6 +185,26 @@ public abstract class LiveCPUView extends JPanel {
             } else {
                 Logger.getLogger(LiveCPUView.class.getName()).log(Level.SEVERE, null, t);
             }
+        }
+    }
+    
+    private void setData() {
+        if (snapshot == null) {
+            resetData();
+        } else {
+            final FlatProfileContainer flatData = snapshot.getFlatProfile(selectedThreads, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
+
+            final Map<Integer, ClientUtils.SourceCodeSelection> idMap = new HashMap();
+            for (int i = 0; i < flatData.getNRows(); i++) // TODO: getNRows is filtered, may not work for tree data!
+                idMap.put(flatData.getMethodIdAtRow(i), flatData.getSourceCodeSelectionAtRow(i));
+
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    forwardCallsView.setData(snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled);
+                    hotSpotsView.setData(flatData, idMap, sampled);
+                    reverseCallsView.setData(snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled);
+                }
+            });
         }
     }
     
@@ -198,6 +218,9 @@ public abstract class LiveCPUView extends JPanel {
         forwardCallsView.resetData();
         hotSpotsView.resetData();
         reverseCallsView.resetData();
+        snapshot = null;
+        sampled = true;
+//        selectedThreads = null; // ???
     }
     
     
