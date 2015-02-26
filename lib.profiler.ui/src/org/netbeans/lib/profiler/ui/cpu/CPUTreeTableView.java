@@ -45,6 +45,7 @@ package org.netbeans.lib.profiler.ui.cpu;
 
 import java.awt.BorderLayout;
 import java.awt.Graphics;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.JLabel;
@@ -97,7 +98,7 @@ abstract class CPUTreeTableView extends CPUView {
     }
     
     
-    void setData(final CPUResultsSnapshot newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final int aggregation, final boolean _sampled) {
+    void setData(final CPUResultsSnapshot newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final int aggregation, final Collection<Integer> selectedThreads, final boolean mergeThreads, final boolean _sampled) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 boolean structureChange = sampled != _sampled;
@@ -106,8 +107,8 @@ abstract class CPUTreeTableView extends CPUView {
                 idMap = newIdMap;
                 if (treeTableModel != null) {
                     treeTableModel.setRoot(newData == null ? PrestimeCPUCCTNode.EMPTY :
-                                           !reverse ? newData.getRootNode(aggregation):
-                                           newData.getReverseRootNode(aggregation));
+                                           !reverse ? newData.getRootNode(aggregation, selectedThreads, mergeThreads):
+                                           newData.getReverseRootNode(aggregation, selectedThreads, mergeThreads));
                 }
                 if (structureChange) {
                     int col = treeTable.convertColumnIndexToView(selection == null ? 3 : 4);
@@ -120,7 +121,7 @@ abstract class CPUTreeTableView extends CPUView {
     }
     
     public void resetData() {
-        setData(null, null, -1, sampled);
+        setData(null, null, -1, null, false, sampled);
     }
     
     
