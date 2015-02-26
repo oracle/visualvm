@@ -52,8 +52,6 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -78,21 +76,19 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.swing.FilteringToolbar;
 import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.utils.formatting.DefaultMethodNameFormatter;
 import org.netbeans.lib.profiler.utils.formatting.Formattable;
@@ -108,7 +104,6 @@ import org.netbeans.modules.profiler.api.java.SourceMethodInfo;
 import org.netbeans.modules.profiler.api.java.SourcePackageInfo;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.SessionStorage;
-import org.netbeans.modules.profiler.v2.ui.InvisibleToolbar;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.filesystems.FileChooserBuilder;
@@ -509,7 +504,7 @@ public final class ClassMethodSelector {
             
             JLabel projectsLabel = new JLabel(Bundle.ClassMethodSelector_capFiles(), JLabel.LEADING);
             projectsLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
-            JToolBar fileTools = new FilteringToolBar() {
+            JToolBar fileTools = new FilteringToolbar(Bundle.ClassMethodSelector_lblFilterItems()) {
                 protected void filterChanged(String filter) {
                     filteredFiles.setFilter(filter);
                 }
@@ -662,7 +657,7 @@ public final class ClassMethodSelector {
             
             JLabel projectsLabel = new JLabel(Bundle.ClassMethodSelector_capProjects(), JLabel.LEADING);
             projectsLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
-            JToolBar projectsTools = new FilteringToolBar() {
+            JToolBar projectsTools = new FilteringToolbar(Bundle.ClassMethodSelector_lblFilterItems()) {
                 protected void filterChanged(String filter) {
                     filteredProjects.setFilter(filter);
                 }
@@ -816,7 +811,7 @@ public final class ClassMethodSelector {
             
             JLabel packagesLabel = new JLabel(Bundle.ClassMethodSelector_capPackages(), JLabel.LEADING);
             packagesLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
-            JToolBar packagesTools = new FilteringToolBar() {
+            JToolBar packagesTools = new FilteringToolbar(Bundle.ClassMethodSelector_lblFilterItems()) {
                 protected void filterChanged(String filter) {
                     filteredPackages.setFilter(filter);
                 }
@@ -997,7 +992,7 @@ public final class ClassMethodSelector {
             };
             classesAnonymousB.setToolTipText(Bundle.ClassMethodSelector_showAnonymousClasses());
             classesAnonymousB.setSelected(PREF.getBoolean("Profiler.CMS.classesAnonymousB", false)); // NOI18N
-            JToolBar classesTools = new FilteringToolBar() {
+            JToolBar classesTools = new FilteringToolbar(Bundle.ClassMethodSelector_lblFilterItems()) {
                 protected void filterChanged(String filter) {
                     filteredClasses.setFilter(filter);
                 }
@@ -1157,7 +1152,7 @@ public final class ClassMethodSelector {
             };
             methodsStaticB.setToolTipText(Bundle.ClassMethodSelector_showStaticMethods());
             methodsStaticB.setSelected(PREF.getBoolean("Profiler.CMS.methodsStaticB", true));
-            JToolBar methodsTools = new FilteringToolBar() {
+            JToolBar methodsTools = new FilteringToolbar(Bundle.ClassMethodSelector_lblFilterItems()) {
                 protected void filterChanged(String filter) {
                     filteredMethods.setFilter(filter);
                 }
@@ -1196,80 +1191,6 @@ public final class ClassMethodSelector {
             setSize(size);
         }
 
-    }
-    
-    private static abstract class FilteringToolBar extends InvisibleToolbar {
-        
-        private final List<Component> hiddenComponents = new ArrayList();
-        private final AbstractButton filterButton;
-        
-        public FilteringToolBar() {
-            setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
-            
-            filterButton = new JToggleButton(Icons.getIcon(GeneralIcons.FILTER)) {
-                protected void fireActionPerformed(ActionEvent e) {
-                    if (isSelected()) showFilter(); else hideFilter();
-                }
-            };
-            filterButton.setToolTipText(Bundle.ClassMethodSelector_lblFilterItems());
-            add(filterButton);
-        }
-        
-        
-        protected abstract void filterChanged(String filter);
-        
-        
-        private void showFilter() {
-            filterButton.setSelected(true);
-            
-            final JTextField f = new JTextField();
-            f.getDocument().addDocumentListener(new DocumentListener() {
-                public void insertUpdate(DocumentEvent e)  { changed(); }
-                public void removeUpdate(DocumentEvent e)  { changed(); }
-                public void changedUpdate(DocumentEvent e) { changed(); }
-                private void changed() { filterChanged(f.getText().trim()); }
-            });
-            f.addKeyListener(new KeyAdapter() {
-                public void keyPressed(KeyEvent e) { if (esc(e)) hideFilter(); }
-                public void keyReleased(KeyEvent e) { esc(e); }
-                private boolean esc(KeyEvent e) {
-                    boolean esc = e.getKeyCode() == KeyEvent.VK_ESCAPE;
-                    if (esc) e.consume();
-                    return esc;
-                }
-            });
-            
-            for (int i = 1; i < getComponentCount(); i++)
-                hiddenComponents.add(getComponent(i));
-            
-            for (Component c : hiddenComponents) remove(c);
-            
-            add(Box.createHorizontalStrut(3));
-            add(f);
-            f.requestFocusInWindow();
-            
-            invalidate();
-            revalidate();
-            doLayout();
-            repaint();
-        }
-        
-        private void hideFilter() {
-            filterChanged(null);
-            
-            remove(2);
-            remove(1);
-            for (Component c : hiddenComponents) add(c);
-            
-            filterButton.setSelected(false);
-            filterButton.requestFocusInWindow();
-            
-            invalidate();
-            revalidate();
-            doLayout();
-            repaint();
-        }
-        
     }
     
     
