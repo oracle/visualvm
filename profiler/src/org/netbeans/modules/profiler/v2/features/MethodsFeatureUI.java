@@ -45,6 +45,7 @@ package org.netbeans.modules.profiler.v2.features;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import java.util.Collection;
 import java.util.Set;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -53,8 +54,10 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
+import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.LiveCPUView;
+import org.netbeans.lib.profiler.ui.cpu.ThreadsSelector;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.MultiButtonGroup;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
@@ -303,6 +306,9 @@ abstract class MethodsFeatureUI extends FeatureUI {
         toolbar.add(forwardCalls);
         toolbar.add(hotSpots);
         toolbar.add(reverseCalls);
+        
+        toolbar.addSpace(5);
+        toolbar.add(cpuView.createThreadSelector());
 
         toolbar.addSpace(2);
         toolbar.addSeparator();

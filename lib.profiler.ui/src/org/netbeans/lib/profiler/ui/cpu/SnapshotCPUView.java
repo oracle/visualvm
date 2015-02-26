@@ -50,6 +50,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +108,8 @@ public abstract class SnapshotCPUView extends JPanel {
     private CPUResultsSnapshot snapshot;
     
     private int aggregation;
+    private boolean mergedThreads;
+    private Collection<Integer> selectedThreads;
     
     private DataView lastFocused;
     private CPUTableView hotSpotsView;
@@ -330,6 +333,18 @@ public abstract class SnapshotCPUView extends JPanel {
 //        };
 //        toolbar.add(new ActionPopupButton(2, aCallTree, aHotSpots, aCombined));
         
+        toolbar.addSpace(5);
+        ThreadsSelector threadsPopup = new ThreadsSelector() {
+            public CPUResultsSnapshot getSnapshot() { return snapshot; }
+            public void selectionChanged(Collection<Integer> selected, boolean mergeThreads) {
+                mergedThreads = mergeThreads;
+                selectedThreads = selected;
+                setAggregation(aggregation);
+            }
+            
+        };
+        toolbar.add(threadsPopup);
+        
         toolbar.addSpace(2);
         toolbar.addSeparator();
         toolbar.addSpace(5);
@@ -460,7 +475,7 @@ public abstract class SnapshotCPUView extends JPanel {
     private void setAggregation(int _aggregation) {
         aggregation = _aggregation;
         
-        final FlatProfileContainer flatData = snapshot.getFlatProfile(-1, aggregation);
+        final FlatProfileContainer flatData = snapshot.getFlatProfile(selectedThreads, aggregation);
 
         final Map<Integer, ClientUtils.SourceCodeSelection> idMap = new HashMap();
         for (int i = 0; i < flatData.getNRows(); i++) // TODO: getNRows is filtered, may not work for tree data!
@@ -474,9 +489,9 @@ public abstract class SnapshotCPUView extends JPanel {
 //            }
 //        });
         
-        forwardCallsView.setData(snapshot, idMap, aggregation, sampled);
+        forwardCallsView.setData(snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled);
         hotSpotsView.setData(flatData, idMap, sampled);
-        reverseCallsView.setData(snapshot, idMap, aggregation, sampled);
+        reverseCallsView.setData(snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled);
     }
     
     protected final void setSnapshot(CPUResultsSnapshot snapshot, boolean sampled) {

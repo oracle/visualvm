@@ -110,7 +110,7 @@ public class AllThreadsMergedCPUCCTContainer extends CPUCCTContainer {
 
         PrestimeCPUCCTNode[] children = (PrestimeCPUCCTNode[]) rootNode.getChildren();
 
-        for (int i = 0; i < children.length; i++) {
+        if (children != null) for (int i = 0; i < children.length; i++) {
             CPUCCTContainer childContainer = children[i].getContainer();
             childContainer.timePerMethodId0 = this.timePerMethodId0;
             childContainer.timePerMethodId1 = this.timePerMethodId1;
