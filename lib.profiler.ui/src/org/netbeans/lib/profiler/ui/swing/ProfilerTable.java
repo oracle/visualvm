@@ -42,6 +42,7 @@
  */
 package org.netbeans.lib.profiler.ui.swing;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -177,6 +178,11 @@ public class ProfilerTable extends JTable {
             public void focusGained(FocusEvent e) { ProfilerTable.this.focusGained(); }
             public void focusLost(FocusEvent e)   { ProfilerTable.this.focusLost(); }
         });
+    }
+    
+    public Color getBackground() {
+        return isEnabled() ? super.getBackground() :
+               UIManager.getColor("TextField.inactiveBackground"); // NOI18N
     }
     
     private void focusGained() {
