@@ -445,43 +445,58 @@ class ProfilerWindow extends ProfilerTopComponent {
         return attachSettings;
     }
     
-    private boolean configureAttachSettings() {
-        AttachSettings settings = AttachWizard.getDefault().configure(attachSettings);
-        if (settings != null) {
-            attachSettings = settings;
-            final AttachSettings as = attachSettings;
-            final Lookup.Provider lp = session.getProject();
-            RequestProcessor.getDefault().post(new Runnable() {
-                public void run() {
-                    Properties p = new Properties();
-                    attachSettings.store(p);
-                    try {
-                        ProfilerStorage.saveProjectProperties(p, lp, "attach"); // NOI18N
-                    } catch (IOException ex) {
-                        Exceptions.printStackTrace(ex);
-                    }
+    private boolean configureAttachSettings(boolean partially) {
+        AttachSettings settings = AttachWizard.getDefault().configure(attachSettings, partially);
+        if (settings == null) return false; // cancelled by the user
+        
+        attachSettings = settings;
+        final AttachSettings as = attachSettings;
+        final Lookup.Provider lp = session.getProject();
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                Properties p = new Properties();
+                as.store(p);
+                try {
+                    ProfilerStorage.saveProjectProperties(p, lp, "attach"); // NOI18N
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
                 }
-            });
-        }
-        return attachSettings != null;
+            }
+        });
+            
+        return true;
     }
     
     private void performStartImpl() {
         start.setPushed(true);
         
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                if (session.isAttach() && attachSettings == null) {
-                    configureAttachSettings();
-                    if (attachSettings == null) {
-                        start.setPushed(false);
-                        return;
+        final ProfilingSettings _profilingSettings = __profilingSettings();
+        
+        if (session.isAttach()) {
+            final AttachSettings _attachSettings = new AttachSettings();
+            attachSettings.copyInto(_attachSettings);
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    if (AttachWizard.getDefault().configured(_attachSettings)) {
+                        performDoStartImpl(_profilingSettings, _attachSettings);
+                    } else {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                if (!configureAttachSettings(false)) start.setPushed(false);
+                                else performDoStartImpl(_profilingSettings, attachSettings);
+                            }
+                        });
                     }
                 }
-
-                if (!session.doStart(__profilingSettings(), __attachSettings()))
-                    start.setPushed(false);
-            }
+            });
+        } else {
+            performDoStartImpl(_profilingSettings, null);
+        }
+    }
+    
+    private void performDoStartImpl(final ProfilingSettings ps, final AttachSettings as) {
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() { if (!session.doStart(ps, as)) start.setPushed(false); }
         });
     }
     
@@ -613,7 +628,7 @@ class ProfilerWindow extends ProfilerTopComponent {
                         setEnabled(!session.inProgress());
                     }
                     protected void fireActionPerformed(ActionEvent event) {
-                        configureAttachSettings();
+                        configureAttachSettings(true);
                     }
                 };
             }
