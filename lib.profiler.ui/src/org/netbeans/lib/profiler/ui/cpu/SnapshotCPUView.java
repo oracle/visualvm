@@ -44,10 +44,10 @@ package org.netbeans.lib.profiler.ui.cpu;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -76,7 +76,6 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
-import org.netbeans.lib.profiler.ui.swing.ExportUtils.ExportProvider;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.MultiButtonGroup;
@@ -116,8 +115,6 @@ public abstract class SnapshotCPUView extends JPanel {
     private CPUTreeTableView forwardCallsView;
     private CPUTreeTableView reverseCallsView;
     
-    private Component viewContainer;
-    
     public SnapshotCPUView(CPUResultsSnapshot snapshot, boolean sampled, Action... actions) {
         initUI(actions);
         registerActions();
@@ -127,27 +124,52 @@ public abstract class SnapshotCPUView extends JPanel {
     }
     
     
-    public ExportUtils.Exportable getExportable(final File sourceFile) {
-        return new ExportUtils.Exportable() {
-            public String getName() {
-                return CPUView.EXPORT_METHODS;
-            }
-            public ExportUtils.ExportProvider[] getProviders() {
-                ExportUtils.ExportProvider[] providers = null;
-                ExportProvider npsProvider = sourceFile == null ? null :
-                    new ExportUtils.NPSExportProvider(sourceFile);
-                
-                if (hotSpotsView.isVisible() && !forwardCallsView.isVisible()) {
-                    providers = hotSpotsView.getExportProviders();
-                } else if (!hotSpotsView.isVisible() && forwardCallsView.isVisible()) {
-                    providers = forwardCallsView.getExportProviders();
+    public ExportUtils.Exportable[] getExportables(final File sourceFile) {
+        return new ExportUtils.Exportable[] {
+            new ExportUtils.Exportable() {
+                public boolean isEnabled() {
+                    return forwardCallsView.isVisible();
                 }
-                
-                List<ExportUtils.ExportProvider> _providers = new ArrayList();
-                if (npsProvider != null) _providers.add(npsProvider);
-                if (providers != null) _providers.addAll(Arrays.asList(providers));
-                _providers.add(new ExportUtils.PNGExportProvider(viewContainer));
-                return _providers.toArray(new ExportUtils.ExportProvider[_providers.size()]);
+                public String getName() {
+                    return MessageFormat.format(CPUView.EXPORT_METHODS, CPUView.EXPORT_FORWARD_CALLS);
+                }
+                public ExportUtils.ExportProvider[] getProviders() {
+                    List<ExportUtils.ExportProvider> providers = new ArrayList();
+                    if (sourceFile != null) providers.add(new ExportUtils.NPSExportProvider(sourceFile));
+                    ExportUtils.ExportProvider[] _providers = forwardCallsView.getExportProviders();
+                    if (_providers != null) providers.addAll(Arrays.asList(_providers));
+                    return providers.toArray(new ExportUtils.ExportProvider[providers.size()]);
+                }
+            },
+            new ExportUtils.Exportable() {
+                public boolean isEnabled() {
+                    return hotSpotsView.isVisible();
+                }
+                public String getName() {
+                    return MessageFormat.format(CPUView.EXPORT_METHODS, CPUView.EXPORT_HOTSPOTS);
+                }
+                public ExportUtils.ExportProvider[] getProviders() {
+                    List<ExportUtils.ExportProvider> providers = new ArrayList();
+                    if (sourceFile != null) providers.add(new ExportUtils.NPSExportProvider(sourceFile));
+                    ExportUtils.ExportProvider[] _providers = hotSpotsView.getExportProviders();
+                    if (_providers != null) providers.addAll(Arrays.asList(_providers));
+                    return providers.toArray(new ExportUtils.ExportProvider[providers.size()]);
+                }
+            },
+            new ExportUtils.Exportable() {
+                public boolean isEnabled() {
+                    return reverseCallsView.isVisible();
+                }
+                public String getName() {
+                    return MessageFormat.format(CPUView.EXPORT_METHODS, CPUView.EXPORT_REVERSE_CALLS);
+                }
+                public ExportUtils.ExportProvider[] getProviders() {
+                    List<ExportUtils.ExportProvider> providers = new ArrayList();
+                    if (sourceFile != null) providers.add(new ExportUtils.NPSExportProvider(sourceFile));
+                    ExportUtils.ExportProvider[] _providers = reverseCallsView.getExportProviders();
+                    if (_providers != null) providers.addAll(Arrays.asList(_providers));
+                    return providers.toArray(new ExportUtils.ExportProvider[providers.size()]);
+                }
             }
         };
     }
@@ -252,7 +274,6 @@ public abstract class SnapshotCPUView extends JPanel {
         lowerSplit.setResizeWeight(0.66d);
         
         add(lowerSplit, BorderLayout.CENTER);
-        viewContainer = upperSplit;
         
         ProfilerToolbar toolbar = ProfilerToolbar.create(true);
         

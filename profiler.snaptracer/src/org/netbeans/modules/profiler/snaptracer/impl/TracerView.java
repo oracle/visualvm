@@ -279,7 +279,7 @@ final class TracerView {
                         
                         snapshotView = new SnapshotView(s, aExport, aCompare, null);
                         
-                        aExportPerformer[0] = ExportUtils.exportAction(snapshotView.getExportable(lsF.getFile()), "Export Data", snapshotView);
+                        aExportPerformer[0] = ExportUtils.exportAction(snapshotView, snapshotView.getExportables(lsF.getFile()));
                     } else {
                         snapshotView.setData(s);
                     }
