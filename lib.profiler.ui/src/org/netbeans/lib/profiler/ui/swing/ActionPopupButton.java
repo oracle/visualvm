@@ -68,6 +68,10 @@ public class ActionPopupButton extends PopupButton {
         selectAction(initial);
     }
     
+    public final Action[] getActions() {
+        return actions;
+    }
+    
     public final void selectAction(Action _action) {
         action = _action;
         setText(action == null ? "" : action.getValue(Action.NAME).toString()); // NOI18N
@@ -75,6 +79,16 @@ public class ActionPopupButton extends PopupButton {
     
     public final void selectAction(int index) {
         selectAction(actions[index]);
+    }
+    
+    public final Action getSelectedAction() {
+        return action;
+    }
+    
+    public final int getSelectedIndex() {
+        for (int i = 0; i < actions.length; i++)
+            if (actions[i] == action) return i;
+        return -1;
     }
     
     protected void populatePopup(JPopupMenu popup) {
