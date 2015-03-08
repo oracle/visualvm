@@ -241,22 +241,22 @@ public abstract class SnapshotMemoryView extends JPanel {
     }
     
     
-    public ExportUtils.Exportable getExportable(final File sourceFile) {
-        return new ExportUtils.Exportable() {
+    public ExportUtils.Exportable[] getExportables(final File sourceFile) {
+        return new ExportUtils.Exportable[] { new ExportUtils.Exportable() {
+            public boolean isEnabled() {
+                    return true;
+                }
             public String getName() {
                 return MemoryView.EXPORT_OBJECTS;
             }
             public ExportUtils.ExportProvider[] getProviders() {
-                ExportUtils.ExportProvider npsProvider = sourceFile == null ? null :
-                    new ExportUtils.NPSExportProvider(sourceFile);
-                ExportUtils.ExportProvider[] providers = dataView.getExportProviders();
-                
-                List<ExportUtils.ExportProvider> _providers = new ArrayList();
-                if (npsProvider != null) _providers.add(npsProvider);
-                if (providers != null) _providers.addAll(Arrays.asList(providers));
-                return _providers.toArray(new ExportUtils.ExportProvider[_providers.size()]);
+                List<ExportUtils.ExportProvider> providers = new ArrayList();
+                if (sourceFile != null) providers.add(new ExportUtils.NPSExportProvider(sourceFile));
+                ExportUtils.ExportProvider[] _providers = dataView.getExportProviders();
+                if (_providers != null) providers.addAll(Arrays.asList(_providers));
+                return providers.toArray(new ExportUtils.ExportProvider[providers.size()]);
             }
-        };
+        }};
     }
     
     

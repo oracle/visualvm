@@ -212,7 +212,7 @@ abstract class LivenessTreeTableView extends MemoryView {
             new ExportUtils.CSVExportProvider(treeTable),
             new ExportUtils.HTMLExportProvider(treeTable, EXPORT_ALLOCATED_LIVE),
             new ExportUtils.XMLExportProvider(treeTable, EXPORT_ALLOCATED_LIVE),
-            new ExportUtils.PNGExportProvider(treeTable.getParent())
+            new ExportUtils.PNGExportProvider(treeTable)
         };
     }
     

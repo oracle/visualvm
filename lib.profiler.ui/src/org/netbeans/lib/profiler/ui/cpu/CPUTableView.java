@@ -146,7 +146,7 @@ abstract class CPUTableView extends CPUView {
             new ExportUtils.CSVExportProvider(table),
             new ExportUtils.HTMLExportProvider(table, EXPORT_HOTSPOTS),
             new ExportUtils.XMLExportProvider(table, EXPORT_HOTSPOTS),
-            new ExportUtils.PNGExportProvider(table.getParent())
+            new ExportUtils.PNGExportProvider(table)
         };
     }
     

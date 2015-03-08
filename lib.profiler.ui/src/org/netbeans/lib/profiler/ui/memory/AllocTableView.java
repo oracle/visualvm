@@ -201,7 +201,7 @@ abstract class AllocTableView extends MemoryView {
             new ExportUtils.CSVExportProvider(table),
             new ExportUtils.HTMLExportProvider(table, EXPORT_ALLOCATED),
             new ExportUtils.XMLExportProvider(table, EXPORT_ALLOCATED),
-            new ExportUtils.PNGExportProvider(table.getParent())
+            new ExportUtils.PNGExportProvider(table)
         };
     }
     
