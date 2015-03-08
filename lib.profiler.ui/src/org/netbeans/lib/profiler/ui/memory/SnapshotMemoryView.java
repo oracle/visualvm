@@ -50,7 +50,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -66,10 +65,8 @@ import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.results.DataView;
-import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
-import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 
@@ -81,10 +78,10 @@ public abstract class SnapshotMemoryView extends JPanel {
     
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle"); // NOI18N
-    private static final String TOOLBAR_AGGREGATION = messages.getString("SnapshotMemoryView_ToolbarAggregation"); // NOI18N
-    private static final String AGGREGATION_CLASSES = messages.getString("SnapshotMemoryView_AggregationClasses"); // NOI18N
-    private static final String AGGREGATION_PACKAGES = messages.getString("SnapshotMemoryView_AggregationPackages"); // NOI18N
+//    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle"); // NOI18N
+//    private static final String TOOLBAR_AGGREGATION = messages.getString("SnapshotMemoryView_ToolbarAggregation"); // NOI18N
+//    private static final String AGGREGATION_CLASSES = messages.getString("SnapshotMemoryView_AggregationClasses"); // NOI18N
+//    private static final String AGGREGATION_PACKAGES = messages.getString("SnapshotMemoryView_AggregationPackages"); // NOI18N
     // -----
     
     private final MemoryView dataView;
@@ -170,49 +167,31 @@ public abstract class SnapshotMemoryView extends JPanel {
             }
         }
         
-        if (actions.length > 0) {
-            toolbar.addSpace(2);
-            toolbar.addSeparator();
-            toolbar.addSpace(5);
-        }
+//        if (actions.length > 0) {
+//            toolbar.addSpace(2);
+//            toolbar.addSeparator();
+//            toolbar.addSpace(5);
+//        }
         
-//        GrayLabel threadsL = new GrayLabel("Threads:");
-//        toolbar.add(threadsL);
+//        GrayLabel aggregationL = new GrayLabel(TOOLBAR_AGGREGATION);
+//        toolbar.add(aggregationL);
 //        
 //        toolbar.addSpace(2);
 //        
-//        PopupButton threads = new PopupButton("All threads") {
-//            protected void populatePopup(JPopupMenu popup) {
-//                popup.add(new JRadioButtonMenuItem("All threads"));
-//                popup.add(new JRadioButtonMenuItem("main"));
-//                popup.add(new JRadioButtonMenuItem("AWT-EventQueue-0"));
-//            }
+//        Action aClasses = new AbstractAction() {
+//            { putValue(NAME, AGGREGATION_CLASSES); }
+//            public void actionPerformed(ActionEvent e) { setAggregation(CPUResultsSnapshot.CLASS_LEVEL_VIEW); }
+//            
 //        };
-//        toolbar.add(threads);
+//        Action aPackages = new AbstractAction() {
+//            { putValue(NAME, AGGREGATION_PACKAGES); }
+//            public void actionPerformed(ActionEvent e) { setAggregation(CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); }
+//            
+//        };
 //        
-//        toolbar.addSpace(2);
-//        toolbar.addSeparator();
-//        toolbar.addSpace(5);
-        
-        GrayLabel aggregationL = new GrayLabel(TOOLBAR_AGGREGATION);
-        toolbar.add(aggregationL);
-        
-        toolbar.addSpace(2);
-        
-        Action aClasses = new AbstractAction() {
-            { putValue(NAME, AGGREGATION_CLASSES); }
-            public void actionPerformed(ActionEvent e) { setAggregation(CPUResultsSnapshot.CLASS_LEVEL_VIEW); }
-            
-        };
-        Action aPackages = new AbstractAction() {
-            { putValue(NAME, AGGREGATION_PACKAGES); }
-            public void actionPerformed(ActionEvent e) { setAggregation(CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); }
-            
-        };
-        
-        ActionPopupButton aggregation = new ActionPopupButton(0, aClasses, aPackages);
-        aggregation.setEnabled(supportsPackageAggregation);
-        toolbar.add(aggregation);
+//        ActionPopupButton aggregation = new ActionPopupButton(0, aClasses, aPackages);
+//        aggregation.setEnabled(supportsPackageAggregation);
+//        toolbar.add(aggregation);
         
         Action aInfo = actions.length > 0 ? actions[actions.length - 1] : null;
         if (aInfo != null) {
