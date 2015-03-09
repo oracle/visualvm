@@ -194,7 +194,7 @@ abstract class AllocTreeTableView extends MemoryView {
             new ExportUtils.CSVExportProvider(treeTable),
             new ExportUtils.HTMLExportProvider(treeTable, EXPORT_ALLOCATED),
             new ExportUtils.XMLExportProvider(treeTable, EXPORT_ALLOCATED),
-            new ExportUtils.PNGExportProvider(treeTable.getParent())
+            new ExportUtils.PNGExportProvider(treeTable)
         };
     }
     
