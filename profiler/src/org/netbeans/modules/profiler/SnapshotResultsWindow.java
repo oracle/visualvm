@@ -474,7 +474,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             
             registerActions(_cpuSnapshot);
             
-            aExportPerformer[0] = ExportUtils.exportAction(_cpuSnapshot.getExportable(ls.getFile()), "Export Data", SnapshotResultsWindow.this);
+            aExportPerformer[0] = ExportUtils.exportAction(SnapshotResultsWindow.this, _cpuSnapshot.getExportables(ls.getFile()));
             
             cpuSnapshot = _cpuSnapshot;
         }
@@ -553,7 +553,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             
             registerActions(_memorySnapshot);
             
-            aExportPerformer[0] = ExportUtils.exportAction(_memorySnapshot.getExportable(ls.getFile()), "Export Data", SnapshotResultsWindow.this);
+            aExportPerformer[0] = ExportUtils.exportAction(SnapshotResultsWindow.this, _memorySnapshot.getExportables(ls.getFile()));
             
             memorySnapshot = _memorySnapshot;
         }

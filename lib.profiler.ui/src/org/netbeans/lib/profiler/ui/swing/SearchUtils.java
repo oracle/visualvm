@@ -63,6 +63,8 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.CloseButton;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
@@ -103,43 +105,45 @@ public final class SearchUtils {
         
         text = text.toLowerCase();
         
-        int selectedRow = table.getSelectedRow();
-        boolean fromSelection = selectedRow != -1;
-        if (!fromSelection) selectedRow = next ? 0 : rowCount - 1;
-        else selectedRow = moveRow(selectedRow, rowCount, next, false);
-        
         int mainColumn = table.getMainColumn();
         
-        int searchSteps = fromSelection ? rowCount - 1 : rowCount;
-        for (int i = 0; i < searchSteps; i++) {
-            if (table.getStringValue(selectedRow, mainColumn).toLowerCase().contains(text)) {
-                table.selectRow(selectedRow, true);
-                return true;
+        if (table instanceof ProfilerTreeTable) {
+            ProfilerTreeTable treeTable = (ProfilerTreeTable)table;
+            TreePath selectedPath = treeTable.getSelectionPath();
+            if (selectedPath == null) selectedPath = treeTable.getRootPath();
+            TreePath startPath = selectedPath;
+            
+            do {
+                selectedPath = next ? treeTable.getNextPath(selectedPath) :
+                                      treeTable.getPreviousPath(selectedPath);
+                TreeNode node = (TreeNode)selectedPath.getLastPathComponent();
+                if (treeTable.getStringValue(node, mainColumn).toLowerCase().contains(text)) {
+                    treeTable.selectPath(selectedPath, true);
+                    return true;
+                }
+            } while (!selectedPath.equals(startPath));
+        } else {
+            int selectedRow = table.getSelectedRow();
+            boolean fromSelection = selectedRow != -1;
+        
+            if (!fromSelection) selectedRow = next ? 0 : rowCount - 1;
+            else selectedRow = next ? table.getNextRow(selectedRow) :
+                                      table.getPreviousRow(selectedRow);
+        
+            int searchSteps = fromSelection ? rowCount - 1 : rowCount;
+            for (int i = 0; i < searchSteps; i++) {
+                if (table.getStringValue(selectedRow, mainColumn).toLowerCase().contains(text)) {
+                    table.selectRow(selectedRow, true);
+                    return true;
+                }
+                selectedRow = next ? table.getNextRow(selectedRow) :
+                                     table.getPreviousRow(selectedRow);
             }
-            selectedRow = moveRow(selectedRow, rowCount, next, fromSelection && i < searchSteps - 1);
-            if (selectedRow == -1) return false;
         }
         
         ProfilerDialogs.displayInfo(MSG_NOTFOUND, ACTION_FIND, null);
         return false;
     }
-    
-    private static int moveRow(int row, int rowCount, boolean next, boolean notifyMargin) {
-        int newRow = next ? row + 1 : row - 1;
-        
-        if (newRow == -1 || newRow == rowCount) {
-//            if (notifyMargin && !ProfilerDialogs.displayConfirmation(getEndMessage(next), "Find")) newRow = -1;
-//            else newRow = next ? 0 : rowCount - 1;
-            newRow = next ? 0 : rowCount - 1;
-        }
-        
-        return newRow;
-    }
-    
-//    private static String getEndMessage(boolean next) {
-//        return next ? "Reached end of view. Continue from top?" :
-//                      "Reached top of view. Continue from end?";
-//    }
     
     
     public static JComponent createSearchPanel(final ProfilerTable table) {
@@ -207,7 +211,7 @@ public final class SearchUtils {
         
         combo.setOnTextChangeHandler(new Runnable() {
             public void run() {
-                boolean enable = !(table instanceof ProfilerTreeTable) && !combo.getText().trim().isEmpty();// NOTE: temporarily disabled for TreeTables
+                boolean enable = !combo.getText().trim().isEmpty();
                 prev.setEnabled(enable);
                 next.setEnabled(enable);
             }
