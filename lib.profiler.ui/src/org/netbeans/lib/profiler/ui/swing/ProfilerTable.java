@@ -373,7 +373,7 @@ public class ProfilerTable extends JTable {
     
     private boolean shadeUnfocusedSelection = false;
     
-    private boolean internal;
+    boolean internal;
     private Object selection;
     private ListSelectionListener selectionListener;
     
@@ -459,6 +459,16 @@ public class ProfilerTable extends JTable {
     
     public final boolean shadesUnfocusedSelection() {
         return shadeUnfocusedSelection;
+    }
+    
+    // --- Traversing rows -----------------------------------------------------
+    
+    int getNextRow(int row) {
+        return ++row == getRowCount() ? 0 : row;
+    }
+    
+    int getPreviousRow(int row) {
+        return --row == -1 ? getRowCount() - 1 : row;
     }
     
     // --- Column model --------------------------------------------------------

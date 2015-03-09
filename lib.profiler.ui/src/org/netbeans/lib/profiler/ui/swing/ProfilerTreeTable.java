@@ -127,6 +127,77 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
     
     
+    // --- Traversing nodes ---
+    
+    TreePath getRootPath() {
+        return new TreePath(model.treeModel.getRoot());
+    }
+    
+    TreePath getSelectionPath() {
+        return tree.getSelectionPath();
+    }
+    
+    TreePath getNextPath(TreePath path) {
+        return getNextPath(path, true);
+    }
+    
+    private TreePath getNextPath(TreePath path, boolean down) {
+        TreeModel _model = model.treeModel;
+        TreeNode node = (TreeNode)path.getLastPathComponent();
+        if (down && _model.getChildCount(node) > 0)
+            return path.pathByAddingChild(_model.getChild(node, 0));
+
+        TreePath parentPath = path.getParentPath();
+        TreeNode parent = (TreeNode)parentPath.getLastPathComponent();
+        int idx = _model.getIndexOfChild(parent, node) + 1;
+
+        if (_model.getChildCount(parent) > idx)
+            return parentPath.pathByAddingChild(_model.getChild(parent, idx));
+
+        if (!down && parentPath.getParentPath() == null) {
+            return parentPath.pathByAddingChild(_model.getChild(parent, 0));
+        } else {
+            return getNextPath(parentPath, false);
+        }
+    }
+    
+    TreePath getPreviousPath(TreePath path) {
+        TreeModel _model = model.treeModel;
+        TreeNode node = (TreeNode)path.getLastPathComponent();
+        TreePath parentPath = path.getParentPath();
+        TreeNode parent = (TreeNode)parentPath.getLastPathComponent();
+        int idx = _model.getIndexOfChild(parent, node);
+
+        if (idx == 0) {
+            if (parentPath.getParentPath() != null) return parentPath;
+            else return parentPath.pathByAddingChild(_model.getChild(parent, _model.getChildCount(parent) - 1));
+        } else {
+            node = (TreeNode)_model.getChild(parent, idx - 1);
+            path = parentPath.pathByAddingChild(node);
+
+            while (_model.getChildCount(node) != 0) {
+                node = (TreeNode)_model.getChild(node, _model.getChildCount(node) - 1);
+                path = path.pathByAddingChild(node);
+            }
+
+            return path;
+        }
+    }
+    
+    void selectPath(TreePath path, boolean scrollToVisible) {
+        internal = true;
+        try {
+            tree.expandPath(path);
+            tree.setSelectionPath(path);
+            saveSelection();
+        }
+        finally { internal = false; }
+        if (scrollToVisible) scrollRectToVisible(tree.getPathBounds(path));
+    }
+    
+    // ---
+    
+    
     public TreePath getPathForRow(int row) {
         return tree.getPathForRow(row);
     }
@@ -249,6 +320,26 @@ public class ProfilerTreeTable extends ProfilerTable {
     
     private void refreshFilter() {
         model.filter(_getRowSorter().getRowFilter());
+    }
+    
+    
+    // --- String value --------------------------------------------------------
+    
+    public String getStringValue(TreeNode node, int column) {
+        Object value = model.getValueAt(node, column);
+        if (getColumnClass(column) == JTree.class) {
+            TreeCellRenderer renderer = tree.getCellRenderer();
+            renderer.getTreeCellRendererComponent(tree, value, false, false, false, -1, false);
+            return renderer.toString();
+        } else {
+            TableCellRenderer renderer = getCellRenderer(-1, column);
+            if (renderer instanceof ProfilerRenderer) {
+                ((ProfilerRenderer)renderer).setValue(value, -1);
+            } else {
+                renderer.getTableCellRendererComponent(this, value, false, false, -1, column);
+            }
+            return renderer.toString();
+        }
     }
     
     
@@ -425,7 +516,7 @@ public class ProfilerTreeTable extends ProfilerTable {
             TreePath path = tree.getPathForRow(rowIndex);
             return path == null ? null : (TreeNode)path.getLastPathComponent();
         }
-
+        
         public int getRowCount() {
             return tree.getRowCount();
         }
