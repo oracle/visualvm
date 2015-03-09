@@ -135,11 +135,12 @@ abstract class CPUTreeTableView extends CPUView {
     
     
     ExportUtils.ExportProvider[] getExportProviders() {
+        final String name = reverse ? EXPORT_REVERSE_CALLS : EXPORT_FORWARD_CALLS;
         return treeTable.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
             new ExportUtils.CSVExportProvider(treeTable),
-            new ExportUtils.HTMLExportProvider(treeTable, EXPORT_CALLTREE),
-            new ExportUtils.XMLExportProvider(treeTable, EXPORT_CALLTREE),
-            new ExportUtils.PNGExportProvider(treeTable.getParent())
+            new ExportUtils.HTMLExportProvider(treeTable, name),
+            new ExportUtils.XMLExportProvider(treeTable, name),
+            new ExportUtils.PNGExportProvider(treeTable)
         };
     }
     
@@ -268,6 +269,7 @@ abstract class CPUTreeTableView extends CPUView {
     
     private long getMaxValue(int row, boolean secondary) {
         TreePath path = treeTable.getPathForRow(row);
+        if (path == null) return Long.MIN_VALUE; // TODO: prevents NPE from export but doesn't provide the actual value!
         if (path.getPathCount() < 2) return 1;
         
         PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)path.getPathComponent(1);

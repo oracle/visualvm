@@ -64,8 +64,10 @@ import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
-import javax.swing.SwingUtilities;
+import javax.swing.JTree;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 
@@ -127,6 +129,8 @@ public final class ExportUtils {
     public static abstract class Exportable {
         
         public abstract String getName();
+        
+        public abstract boolean isEnabled();
         
         public abstract ExportProvider[] getProviders();
         
@@ -259,26 +263,29 @@ public final class ExportUtils {
     }
     
     
-    public static Action exportAction(final Exportable exportable, final String name, final Component parent) {
+    public static Action exportAction(final Component parent, final Exportable... exportables) {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                ExportProvider[] providers = exportable == null ? null : exportable.getProviders();
-                
-                if (providers == null || providers.length == 0) {
-                    ProfilerDialogs.displayWarning(MSG_NODATA, name, null);
-                } else {
-                    JFileChooser fileChooser = new JFileChooser();
-                    fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-                    fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                    fileChooser.setMultiSelectionEnabled(false);
-                    fileChooser.setDialogTitle(name);
+                for (Exportable exportable : exportables) if (exportable.isEnabled()) {
+                    ExportProvider[] providers = exportable == null ? null : exportable.getProviders();
 
-                    fileChooser.removeChoosableFileFilter(fileChooser.getAcceptAllFileFilter());
+                    if (providers == null || providers.length == 0) {
+                        ProfilerDialogs.displayWarning(MSG_NODATA, exportable.getName(), null);
+                    } else {
+                        JFileChooser fileChooser = new JFileChooser();
+                        fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+                        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                        fileChooser.setMultiSelectionEnabled(false);
+                        fileChooser.setDialogTitle(exportable.getName());
 
-                    for (ExportProvider provider : providers)
-                        fileChooser.addChoosableFileFilter(provider.getFormatFilter());
+                        fileChooser.removeChoosableFileFilter(fileChooser.getAcceptAllFileFilter());
 
-                    showExportDialog(fileChooser, parent, providers);
+                        for (ExportProvider provider : providers)
+                            fileChooser.addChoosableFileFilter(provider.getFormatFilter());
+
+                        // returning true means exporting to .nps, don't export other views
+                        if (showExportDialog(fileChooser, parent, providers)) break;
+                    }
                 }
             }
         };
@@ -286,25 +293,23 @@ public final class ExportUtils {
         return action;
     }
     
-    private static void showExportDialog(final JFileChooser fileChooser, final Component parent, final ExportProvider[] providers) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                if (fileChooser.showDialog(parent, ACTION_EXPORT) != JFileChooser.APPROVE_OPTION) return;
+    private static boolean showExportDialog(final JFileChooser fileChooser, final Component parent, final ExportProvider[] providers) {
+        if (fileChooser.showDialog(parent, ACTION_EXPORT) != JFileChooser.APPROVE_OPTION) return false;
 
-                File targetFile = fileChooser.getSelectedFile();
-                FileFilter filter = fileChooser.getFileFilter();
+        File targetFile = fileChooser.getSelectedFile();
+        FileFilter filter = fileChooser.getFileFilter();
 
-                for (ExportProvider provider : providers) {
-                    FormatFilter format = provider.getFormatFilter();
-                    if (filter.equals(format)) {
-                        targetFile = checkFileExtesion(targetFile, format.getExtension());
-                        if (checkFileExists(targetFile)) provider.export(targetFile);
-                        else showExportDialog(fileChooser, parent, providers);
-                        break;
-                    }
-                }
+        for (ExportProvider provider : providers) {
+            FormatFilter format = provider.getFormatFilter();
+            if (filter.equals(format)) {
+                targetFile = checkFileExtesion(targetFile, format.getExtension());
+                if (checkFileExists(targetFile)) provider.export(targetFile);
+                else showExportDialog(fileChooser, parent, providers);
+                return provider instanceof NPSExportProvider;
             }
-        });
+        }
+        
+        return false;
     }
     
     private static boolean checkFileExists(File file) {
@@ -334,13 +339,35 @@ public final class ExportUtils {
                 else ex.writeln();
             }
             
-            for (int row = 0; row < rowCount; row++) {
-                for (int col = 0; col < columnCount; col++) {
-                    ex.write(doubleQuote);
-                    ex.write(table.getStringValue(row, col));
-                    ex.write(doubleQuote);
-                    if (col < columnCount - 1) ex.write(separator);
-                    else ex.writeln();
+            if (table instanceof ProfilerTreeTable) {
+                ProfilerTreeTable treeTable = (ProfilerTreeTable)table;
+                TreePath path = treeTable.getNextPath(treeTable.getRootPath());
+                TreeNode node = (TreeNode)path.getLastPathComponent();
+                int indent = path.getPathCount() - 2;
+                TreePath firstPath = path;
+                do {
+                    for (int col = 0; col < columnCount; col++) {
+                        ex.write(doubleQuote);
+                        if (table.getColumnClass(col) == JTree.class)
+                            for (int i = 0; i < indent; i++) ex.write(' '); // NOI18N
+                        ex.write  (treeTable.getStringValue(node, col));
+                        ex.write(doubleQuote);
+                        if (col < columnCount - 1) ex.write(separator);
+                        else ex.writeln();
+                    }
+                    path = treeTable.getNextPath(path);
+                    node = (TreeNode)path.getLastPathComponent();
+                    indent = path.getPathCount() - 2;
+                } while (!firstPath.equals(path));
+            } else {
+                for (int row = 0; row < rowCount; row++) {
+                    for (int col = 0; col < columnCount; col++) {
+                        ex.write(doubleQuote);
+                        ex.write(table.getStringValue(row, col));
+                        ex.write(doubleQuote);
+                        if (col < columnCount - 1) ex.write(separator);
+                        else ex.writeln();
+                    }
                 }
             }
         } finally {
@@ -353,7 +380,6 @@ public final class ExportUtils {
     public static boolean exportHTML(ProfilerTable table, String name, File file) {
         Exporter ex = new Exporter(file);
         
-        int rowCount = table.getRowCount();
         int columnCount = table.getColumnCount();
         
         try {
@@ -377,14 +403,37 @@ public final class ExportUtils {
             }
             ex.writeln("   </tr>"); // NOI18N
 
-            for (int row = 0; row < rowCount; row++) {
-                ex.writeln("   <tr>"); // NOI18N
-                for (int col = 0; col < columnCount; col++) {
-                    ex.write  ("    <td><pre>"); // NOI18N
-                    ex.write  (escapeHTML(table.getStringValue(row, col)));
-                    ex.writeln("</pre></td>"); // NOI18N
+            if (table instanceof ProfilerTreeTable) {
+                ProfilerTreeTable treeTable = (ProfilerTreeTable)table;
+                TreePath path = treeTable.getNextPath(treeTable.getRootPath());
+                TreeNode node = (TreeNode)path.getLastPathComponent();
+                int indent = path.getPathCount() - 2;
+                TreePath firstPath = path;
+                do {
+                    ex.writeln("   <tr>"); // NOI18N
+                    for (int col = 0; col < columnCount; col++) {
+                        ex.write  ("    <td><pre>"); // NOI18N
+                        if (table.getColumnClass(col) == JTree.class)
+                            for (int i = 0; i < indent; i++) ex.write('.'); // NOI18N
+                        ex.write  (escapeHTML(treeTable.getStringValue(node, col)));
+                        ex.writeln("</pre></td>"); // NOI18N
+                    }
+                    ex.writeln("   </tr>"); // NOI18N
+                    path = treeTable.getNextPath(path);
+                    node = (TreeNode)path.getLastPathComponent();
+                    indent = path.getPathCount() - 2;
+                } while (!firstPath.equals(path));
+            } else {
+                int rowCount = table.getRowCount();
+                for (int row = 0; row < rowCount; row++) {
+                    ex.writeln("   <tr>"); // NOI18N
+                    for (int col = 0; col < columnCount; col++) {
+                        ex.write  ("    <td><pre>"); // NOI18N
+                        ex.write  (escapeHTML(table.getStringValue(row, col)));
+                        ex.writeln("</pre></td>"); // NOI18N
+                    }
+                    ex.writeln("   </tr>"); // NOI18N
                 }
-                ex.writeln("   </tr>"); // NOI18N
             }
             
             ex.writeln("  </table>"); // NOI18N
@@ -400,48 +449,108 @@ public final class ExportUtils {
     public static boolean exportXML(ProfilerTable table, String name, File file) {
         Exporter ex = new Exporter(file);
         
-        int rowCount = table.getRowCount();
         int columnCount = table.getColumnCount();
         
         try {
             ex.writeln("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); // NOI18N
-            ex.write  ("<ExportedView Name=\""); // NOI18N
-            ex.write  (name);
-            ex.writeln("\" type=\"table\">"); // NOI18N
             
-            ex.write  (" <TableData NumRows=\""); // NOI18N
-            ex.write  (Integer.toString(rowCount));
-            ex.write  ("\" NumColumns=\""); // NOI18N
-            ex.write  (Integer.toString(columnCount));
-            ex.writeln("\">"); // NOI18N
-            
-            ex.writeln("  <TableHeader>"); // NOI18N
-            for (int col = 0; col < columnCount; col++) {
-                ex.write  ("   <TableColumn><![CDATA["); // NOI18N
-                ex.write  (escapeXML(table.getColumnName(col)));
-                ex.writeln("]]></TableColumn>"); // NOI18N
-            }
-            ex.writeln("  </TableHeader>"); // NOI18N
+            if (table instanceof ProfilerTreeTable) {
+                ProfilerTreeTable treeTable = (ProfilerTreeTable)table;
+                TreePath path = treeTable.getNextPath(treeTable.getRootPath());
+                TreeNode node = (TreeNode)path.getLastPathComponent();
+                int indent = path.getPathCount();
+                TreePath firstPath = path;
+                
+                ex.write  ("<dataview name=\""); // NOI18N
+                ex.write  (name);
+                ex.writeln("\" type=\"tree\">"); // NOI18N
+                ex.writeln(" <tree>"); // NOI18N
+                
+                do {
+                    ex.write  (indent(indent));
+                    ex.writeln("<node>"); // NOI18N
+                    for (int col = 0; col < columnCount; col++) {
+                        ex.write  (indent(indent));
+                        ex.write  (" <property name=\""); // NOI18N
+                        ex.write  (escapeXML(treeTable.getColumnName(col)));
+                        ex.write  ("\" value=\""); // NOI18N
+                        ex.write  (escapeXML(treeTable.getStringValue(node, col)));
+                        ex.writeln("\" />"); // NOI18N
+                    }
+                    
+                    path = treeTable.getNextPath(path);
+                    node = (TreeNode)path.getLastPathComponent();
+                    int oldIndent = indent;
+                    indent = path.getPathCount();
+                    for (int i = 0; i <= oldIndent - indent; i++) {
+                        ex.write  (indent(oldIndent - i));
+                        ex.writeln("</node>"); // NOI18N
+                    }
+                } while (!firstPath.equals(path));
+                
+                ex.writeln(" </tree>"); // NOI18N
+                ex.writeln("</dataview>"); // NOI18N
+            } else {
+                int rowCount = table.getRowCount();
+                
+                ex.write  ("<dataview name=\""); // NOI18N
+                ex.write  (name);
+                ex.writeln("\" type=\"table\">"); // NOI18N
 
-            ex.writeln("  <TableBody>"); // NOI18N
-            for (int row = 0; row < rowCount; row++) {
-                ex.writeln("   <TableRow>"); // NOI18N
+                ex.write  (" <table rows=\""); // NOI18N
+                ex.write  (Integer.toString(rowCount));
+                ex.write  ("\" columns=\""); // NOI18N
+                ex.write  (Integer.toString(columnCount));
+                ex.writeln("\">"); // NOI18N
+
+                ex.writeln("  <thead>"); // NOI18N
                 for (int col = 0; col < columnCount; col++) {
-                    ex.write  ("    <TableColumn><![CDATA["); // NOI18N
-                    ex.write  (escapeXML(table.getStringValue(row, col)));
-                    ex.writeln("]]></TableColumn>"); // NOI18N
+                    ex.write  ("   <th><![CDATA["); // NOI18N
+                    ex.write  (escapeXML(table.getColumnName(col)));
+                    ex.writeln("]]></th>"); // NOI18N
                 }
-                ex.writeln("   </TableRow>"); // NOI18N
+                ex.writeln("  </thead>"); // NOI18N
+
+                ex.writeln("  <tbody>"); // NOI18N
+                for (int row = 0; row < rowCount; row++) {
+                    ex.writeln("   <tr>"); // NOI18N
+                    for (int col = 0; col < columnCount; col++) {
+                        ex.write  ("    <td><![CDATA["); // NOI18N
+                        ex.write  (escapeXML(table.getStringValue(row, col)));
+                        ex.writeln("]]></td>"); // NOI18N
+                    }
+                    ex.writeln("   </tr>"); // NOI18N
+                }
+                ex.writeln("  </tbody>"); // NOI18N
+
+                ex.writeln(" </table>"); // NOI18N
+                ex.writeln("</dataview>"); // NOI18N
             }
-            ex.writeln("  </TableBody>"); // NOI18N
-            
-            ex.writeln(" </TableData>"); // NOI18N
-            ex.writeln("</ExportedView>"); // NOI18N
         } finally {
             ex.close();
         }
         
         return true;
+    }
+    
+    private static int LAST_indent = Integer.MIN_VALUE;
+    private static String LAST_INDENT;
+    private static String indent(int indent) {
+        if (LAST_indent == indent) return LAST_INDENT;
+        
+        if (indent == 0) return ""; // NOI18N
+        if (indent == 1) return " "; // NOI18N
+        if (indent == 2) return "  "; // NOI18N
+        if (indent == 3) return "   "; // NOI18N
+        if (indent == 4) return "    "; // NOI18N
+        if (indent == 5) return "     "; // NOI18N
+        
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < indent; i++) sb.append(" "); // NOI18N
+        LAST_indent = indent;
+        LAST_INDENT = sb.toString();
+        
+        return LAST_INDENT;
     }
     
     
