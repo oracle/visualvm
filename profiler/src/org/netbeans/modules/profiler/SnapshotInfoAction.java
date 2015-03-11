@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -45,14 +45,17 @@ package org.netbeans.modules.profiler;
 
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
-import javax.swing.*;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 
 @NbBundle.Messages({
     "SnapshotInfoAction_ActionName=Snapshot information",
-    "SnapshotInfoAction_ActionDescr=Snapshot information"
+    "SnapshotInfoAction_ActionDescr=Display snapshot information",
+    "SnapshotInfoAction_WindowCaption=Snapshot Information"
 })
 class SnapshotInfoAction extends AbstractAction {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -67,14 +70,16 @@ class SnapshotInfoAction extends AbstractAction {
         putValue(Action.SMALL_ICON, Icons.getIcon(GeneralIcons.INFO));
         putValue("iconBase", Icons.getResource(GeneralIcons.INFO)); // NOI18N
         this.snapshot = snapshot;
-        
-        // Temporarily disabled until fully implemented
-        setEnabled(false);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void actionPerformed(ActionEvent e) {
-        ProfilerDialogs.displayInfo("Snapshot information and settings");
+        DialogDescriptor dd = new DialogDescriptor(new SnapshotInfoPanel(snapshot),
+                              Bundle.SnapshotInfoAction_WindowCaption(), true,
+                              new Object[] { DialogDescriptor.OK_OPTION }, 
+                              DialogDescriptor.OK_OPTION, DialogDescriptor.DEFAULT_ALIGN,
+                              null, null);
+        DialogDisplayer.getDefault().createDialog(dd).setVisible(true);
     }
 }

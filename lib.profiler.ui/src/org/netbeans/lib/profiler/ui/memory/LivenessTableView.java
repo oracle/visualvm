@@ -159,12 +159,12 @@ abstract class LivenessTableView extends MemoryView {
         int _nTrackedItems = Math.min(_snapshot.getNProfiledClasses(), _classNames.length);
         _nTrackedItems = Math.min(_nTrackedItems, _nTotalAllocObjects.length);
         
+        // class names in VM format
+        for (int i = 0; i < _nTrackedItems; i++)
+            _classNames[i] = StringUtils.userFormClassName(_classNames[i]);
+            
         if (filter == null) { // old snapshot
             filterZeroItems = true;
-            
-            // class names in VM format
-            for (int i = 0; i < _nTrackedItems; i++)
-                _classNames[i] = StringUtils.userFormClassName(_classNames[i]);
             
             setData(_nTrackedItems, _classNames, _nTrackedLiveObjects, _trackedLiveObjectsSize,
                 _nTrackedAllocObjects, _avgObjectAge, _maxSurvGen, _nTotalAllocObjects);

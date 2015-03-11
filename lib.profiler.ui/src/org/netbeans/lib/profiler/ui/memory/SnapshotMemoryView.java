@@ -97,7 +97,7 @@ public abstract class SnapshotMemoryView extends JPanel {
         
         setLayout(new BorderLayout());
         
-        boolean supportsPackageAggregation = true;
+//        boolean supportsPackageAggregation = true;
         
         if (snapshot instanceof SampledMemoryResultsSnapshot) {
             dataView = new SampledTableView(null) {
@@ -118,7 +118,7 @@ public abstract class SnapshotMemoryView extends JPanel {
                         SnapshotMemoryView.this.populatePopup(this, popup, value, userValue);
                     }
                 };
-                supportsPackageAggregation = false;
+//                supportsPackageAggregation = false;
             } else {
                 dataView = new AllocTableView(null) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
@@ -139,7 +139,7 @@ public abstract class SnapshotMemoryView extends JPanel {
                         SnapshotMemoryView.this.populatePopup(this, popup, value, userValue);
                     }
                 };
-                supportsPackageAggregation = false;
+//                supportsPackageAggregation = false;
             } else {
                 dataView = new LivenessTableView(null) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
