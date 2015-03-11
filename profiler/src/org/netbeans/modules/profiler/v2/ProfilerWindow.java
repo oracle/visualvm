@@ -450,7 +450,8 @@ class ProfilerWindow extends ProfilerTopComponent {
         if (settings == null) return false; // cancelled by the user
         
         attachSettings = settings;
-        final AttachSettings as = attachSettings;
+        final AttachSettings as = new AttachSettings();
+        attachSettings.copyInto(as);
         final Lookup.Provider lp = session.getProject();
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
@@ -473,12 +474,10 @@ class ProfilerWindow extends ProfilerTopComponent {
         final ProfilingSettings _profilingSettings = __profilingSettings();
         
         if (session.isAttach()) {
-            final AttachSettings _attachSettings = new AttachSettings();
-            attachSettings.copyInto(_attachSettings);
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
-                    if (AttachWizard.getDefault().configured(_attachSettings)) {
-                        performDoStartImpl(_profilingSettings, _attachSettings);
+                    if (AttachWizard.getDefault().configured(attachSettings)) {
+                        performDoStartImpl(_profilingSettings, attachSettings);
                     } else {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
