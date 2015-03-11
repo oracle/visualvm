@@ -963,6 +963,7 @@ public class ProfilingSettings {
         props.put(prefix + PROP_INSTRUMENT_METHOD_INVOKE, Boolean.toString(getInstrumentMethodInvoke()));
         props.put(prefix + PROP_INSTRUMENT_SPAWNED_THREADS, Boolean.toString(getInstrumentSpawnedThreads()));
         props.put(prefix + PROP_N_PROFILED_THREADS_LIMIT, Integer.toString(getNProfiledThreadsLimit()));
+        props.put(prefix + PROP_STACK_DEPTH_LIMIT, Integer.toString(getStackDepthLimit()));
         props.put(prefix + PROP_SORT_RESULTS_BY_THREAD_CPU_TIME, Boolean.toString(getSortResultsByThreadCPUTime()));
         props.put(prefix + PROP_SAMPLING_FREQUENCY, Integer.toString(getSamplingFrequency()));
 
