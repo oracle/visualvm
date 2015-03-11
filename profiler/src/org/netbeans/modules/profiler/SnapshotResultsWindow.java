@@ -571,6 +571,8 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     }
     
     private void registerActions(final JComponent view) {
+        InputMap map = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        
         final String FILTER = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
         final ActionListener filter = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -578,25 +580,33 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                 if (action != null && action.isEnabled()) action.actionPerformed(e);
             }
         };
-        InputMap map = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        Action filterAction = new AbstractAction() {
+        getActionMap().put(FILTER, new AbstractAction() {
             public void actionPerformed(ActionEvent e) { filter.actionPerformed(e); }
-        };
-        getActionMap().put(FILTER, filterAction);
+        });
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK), FILTER);
         
+        final String FIND = SearchUtils.FIND_ACTION_KEY;
         final ActionListener find = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String FIND = SearchUtils.FIND_ACTION_KEY;
                 Action action = view.getActionMap().get(FIND);
                 if (action != null && action.isEnabled()) action.actionPerformed(null);
             }
         };
-        CallbackSystemAction globalFindAction = (CallbackSystemAction) SystemAction.get(FindAction.class);
-        Object findActionKey = globalFindAction.getActionMapKey();
-        getActionMap().put(findActionKey, new AbstractAction() {
-            public void actionPerformed(ActionEvent e) { find.actionPerformed(e); }
-        });
+        try {
+            // Let's use the global FindAction if available
+            Class findActionClass = Class.forName("org.openide.actions.FindAction"); // NOI18N
+            CallbackSystemAction globalFindAction = (CallbackSystemAction)SystemAction.get(findActionClass);
+            Object findActionKey = globalFindAction.getActionMapKey();
+            getActionMap().put(findActionKey, new AbstractAction() {
+                public void actionPerformed(ActionEvent e) { find.actionPerformed(e); }
+            });
+        } catch (ClassNotFoundException e) {
+            // Fallback to CTRL+F if global FindAction not available
+            getActionMap().put(FIND, new AbstractAction() {
+                public void actionPerformed(ActionEvent e) { find.actionPerformed(e); }
+            });
+            map.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK), FIND);
+        }
     }
 
     private void updateSaveState() {
