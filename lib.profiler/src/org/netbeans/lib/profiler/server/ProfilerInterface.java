@@ -495,6 +495,7 @@ public class ProfilerInterface implements CommonConstants {
         Classes.setWaitTrackingEnabled(false);
         Classes.setParkTrackingEnabled(false);
         Classes.setSleepTrackingEnabled(false);
+        Classes.setVMObjectAllocEnabled(false);
         Classes.disableClassLoadHook();
         ProfilerRuntimeCPU.setJavaLangReflectMethodInvokeInterceptEnabled(false);
         ClassLoaderManager.setNotifyToolAboutUnloadedClasses(false);
