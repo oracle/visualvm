@@ -150,7 +150,7 @@ public final class SearchUtils {
         JToolBar toolbar = new JToolBar(JToolBar.HORIZONTAL);
         if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel())
                 toolbar.setLayout(new BoxLayout(toolbar, BoxLayout.LINE_AXIS));
-        toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 0, 2));
+        toolbar.setBorder(BorderFactory.createEmptyBorder(getUpperMargin(), 2, 0, 2));
         toolbar.setBorderPainted(false);
         toolbar.setRollover(true);
         toolbar.setFloatable(false);
@@ -163,7 +163,13 @@ public final class SearchUtils {
         final EditableHistoryCombo combo = new EditableHistoryCombo();        
         final JTextComponent textC = combo.getTextComponent();
         
-        toolbar.add(combo);
+        JPanel comboContainer = new JPanel(new BorderLayout());
+        comboContainer.add(combo, BorderLayout.CENTER);
+        comboContainer.setMinimumSize(combo.getMinimumSize());
+        comboContainer.setPreferredSize(combo.getPreferredSize());
+        comboContainer.setMaximumSize(combo.getMaximumSize());
+        
+        toolbar.add(comboContainer);
         
         toolbar.add(Box.createHorizontalStrut(5));
         
@@ -277,6 +283,12 @@ public final class SearchUtils {
     private static String getSearchString(EditableHistoryCombo combo) {
         String search = combo.getText();
         return search == null ? null : search.trim();
+    }
+    
+    private static int getUpperMargin() {
+        if (UIUtils.isWindowsLookAndFeel() || UIUtils.isMetalLookAndFeel()) return 1;
+        if (UIUtils.isAquaLookAndFeel() || UIUtils.isNimbusLookAndFeel()) return 0;
+        return 2;
     }
     
 }
