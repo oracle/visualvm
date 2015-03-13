@@ -280,8 +280,10 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
         // set interfaces
         for (Object intIndex : allInterfacesIndexes) {
             int iidx = ((Integer)intIndex).intValue();
-            DynamicClassInfo iface = javaClassForName(loadedClasses[iidx], loadedClassLoaderIds[iidx]);
-            iface.setInterface();       
+            if (cachedClassFileBytes[iidx] != null) {
+                DynamicClassInfo iface = javaClassForName(loadedClasses[iidx], loadedClassLoaderIds[iidx]);
+                iface.setInterface();
+            }
         }
     }
 }
