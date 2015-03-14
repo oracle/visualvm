@@ -92,6 +92,7 @@ import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.RunGCAction;
 import org.netbeans.modules.profiler.actions.TakeThreadDumpAction;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
@@ -140,7 +141,8 @@ import org.openide.windows.WindowManager;
     "ProfilerWindow_profileSection=Profile:",
     "ProfilerWindow_settingsSection=Settings:",
     "#NOI18N",
-    "ProfilerWindow_mode=editor"
+    "ProfilerWindow_mode=editor",
+    "ProfilerWindow_noFeature=<html><b>No profiling feature selected.</b><br><br>Please select at least one profiling feature for the session.</html>"
 })
 class ProfilerWindow extends ProfilerTopComponent {    
     
@@ -482,6 +484,11 @@ class ProfilerWindow extends ProfilerTopComponent {
         start.setPushed(true);
         
         final ProfilingSettings _profilingSettings = __profilingSettings();
+        if (_profilingSettings == null) { // #250237 ?
+            ProfilerDialogs.displayError(Bundle.ProfilerWindow_noFeature());
+            start.setPushed(false);
+            return;
+        }
         
         if (session.isAttach()) {
             RequestProcessor.getDefault().post(new Runnable() {
