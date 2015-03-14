@@ -100,7 +100,10 @@ import org.openide.util.lookup.ServiceProvider;
     "SnapshotResultsWindow_SaveSnapshotDialogMsg=The results snapshot is not saved. Do you want to save it?",
     "SnapshotResultsWindow_CpuSnapshotAccessDescr=Profiler snapshot with CPU results",
     "SnapshotResultsWindow_FragmentSnapshotAccessDescr=Profiler snapshot with code fragment results",
-    "SnapshotResultsWindow_MemorySnapshotAccessDescr=Profiler snapshot with memory results"
+    "SnapshotResultsWindow_MemorySnapshotAccessDescr=Profiler snapshot with memory results",
+    "SnapshotResultsWindow_ExportData=Export data to file or image",
+    "SnapshotResultsWindow_ProfileClass=Profile Class",
+    "SnapshotResultsWindow_ProfileMethod=Profile Method"
 })
 public final class SnapshotResultsWindow extends ProfilerTopComponent {
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
@@ -436,8 +439,8 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             
             final Action[] aExportPerformer = new Action[1];
             Action aExport = new AbstractAction() {
-                { putValue(NAME, "Export data to file or image");
-                  putValue(SHORT_DESCRIPTION, "Export data to file or image");
+                { putValue(NAME, Bundle.SnapshotResultsWindow_ExportData());
+                  putValue(SHORT_DESCRIPTION, Bundle.SnapshotResultsWindow_ExportData());
                   putValue(SMALL_ICON, Icons.getIcon(GeneralIcons.SAVE_AS)); }
                 public void actionPerformed(ActionEvent e) {
                     aExportPerformer[0].actionPerformed(e);
@@ -465,7 +468,8 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                         public void run() {
                             Lookup.Provider project = ls.getProject();
                             String name = Wildcards.ALLWILDCARD.equals(value.getMethodName()) ?
-                                          "Profile Class" : "Profile Method";
+                                          Bundle.SnapshotResultsWindow_ProfileClass() :
+                                          Bundle.SnapshotResultsWindow_ProfileMethod();
                             ProfilerSession.findAndConfigure(Lookups.fixed(value), project, name);
                         }
                     });
@@ -517,8 +521,8 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             
             final Action[] aExportPerformer = new Action[1];
             Action aExport = new AbstractAction() {
-                { putValue(NAME, "Export data to file or image");
-                  putValue(SHORT_DESCRIPTION, "Export data to file or image");
+                { putValue(NAME, Bundle.SnapshotResultsWindow_ExportData());
+                  putValue(SHORT_DESCRIPTION, Bundle.SnapshotResultsWindow_ExportData());
                   putValue(SMALL_ICON, Icons.getIcon(GeneralIcons.SAVE_AS)); }
                 public void actionPerformed(ActionEvent e) {
                     aExportPerformer[0].actionPerformed(e);
@@ -545,7 +549,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                     RequestProcessor.getDefault().post(new Runnable() {
                         public void run() {
                             Lookup.Provider project = ls.getProject();
-                            ProfilerSession.findAndConfigure(Lookups.fixed(value), project, "Profile Class");
+                            ProfilerSession.findAndConfigure(Lookups.fixed(value), project, Bundle.SnapshotResultsWindow_ProfileClass());
                         }
                     });
                 }

@@ -313,7 +313,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
             heapSizeBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
             // Used heap
-            JLabel usedHeapBig = new JLabel("GC Intervals",
+            JLabel usedHeapBig = new JLabel(GraphsUI.GC_INTERVALS_NAME,
                                             new ColorIcon(GC_INTERVALS_COLOR, Color.
                                             BLACK, 18, 9), SwingConstants.LEADING);
             usedHeapBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
@@ -334,7 +334,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
 
             // Master UI
             setLayout(new BorderLayout());
-            JLabel caption = new JLabel("Generations", JLabel.CENTER);
+            JLabel caption = new JLabel(GraphsUI.GC_CAPTION, JLabel.CENTER);
             caption.setFont(caption.getFont().deriveFont(Font.BOLD));
             caption.setBorder(BorderFactory.createEmptyBorder(20, 0, 5, 0));
             caption.setOpaque(true);

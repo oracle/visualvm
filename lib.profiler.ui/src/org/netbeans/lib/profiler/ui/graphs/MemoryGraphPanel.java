@@ -327,7 +327,7 @@ public final class MemoryGraphPanel extends GraphPanel {
 
             // Master UI
             setLayout(new BorderLayout());
-            JLabel caption = new JLabel("Memory", JLabel.CENTER);
+            JLabel caption = new JLabel(GraphsUI.MEMORY_CAPTION, JLabel.CENTER);
             caption.setFont(caption.getFont().deriveFont(Font.BOLD));
             caption.setBorder(BorderFactory.createEmptyBorder(20, 0, 5, 0));
             caption.setOpaque(true);
