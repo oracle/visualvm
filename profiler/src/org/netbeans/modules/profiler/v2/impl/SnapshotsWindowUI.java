@@ -102,6 +102,7 @@ import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
+import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.windows.Mode;
@@ -137,6 +138,7 @@ import org.openide.windows.WindowManager;
 public final class SnapshotsWindowUI extends TopComponent {
     
     public static final String ID = "SnapshotsWindowUI"; // NOI18N
+    private static final HelpCtx HELP_CTX = new HelpCtx("SnapshotsWindow.HelpCtx"); // NOI18N
     
     
     // --- Instance ------------------------------------------------------------
@@ -605,6 +607,10 @@ public final class SnapshotsWindowUI extends TopComponent {
     
     protected String preferredID() {
         return ID;
+    }
+    
+    public HelpCtx getHelpCtx() {
+        return HELP_CTX;
     }
     
     

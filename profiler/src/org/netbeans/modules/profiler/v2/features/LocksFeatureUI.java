@@ -111,6 +111,8 @@ abstract class LocksFeatureUI extends FeatureUI {
         locksView = new LockContentionPanel();
         locksView.lockContentionEnabled();
         
+        locksView.putClientProperty("HelpCtx.Key", "ProfileLocks.HelpCtx"); // NOI18N
+        
         
         // --- Toolbar ---------------------------------------------------------
         

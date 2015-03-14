@@ -103,9 +103,9 @@ import org.netbeans.modules.profiler.v2.impl.WelcomePanel;
 import org.netbeans.modules.profiler.v2.ui.DropdownButton;
 import org.netbeans.modules.profiler.v2.ui.StayOpenPopupMenu;
 import org.netbeans.modules.profiler.v2.ui.ToggleButtonMenuItem;
-import org.openide.actions.FindAction;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
+import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -833,6 +833,20 @@ class ProfilerWindow extends ProfilerTopComponent {
     
     protected String preferredID() {
         return this.getClass().getName();
+    }
+    
+    public HelpCtx getHelpCtx() {
+        ProfilerFeature selected = featuresView == null ? null :
+                                   featuresView.getSelectedFeature();
+        
+        JPanel selectedUI = selected == null ? null : selected.getResultsUI();
+        if (selectedUI == null && selected != null) selectedUI = selected.getSettingsUI();
+        
+        String helpCtx = selectedUI == null ? null :
+                         (String)selectedUI.getClientProperty("HelpCtx.Key"); // NOI18N
+        if (helpCtx == null) helpCtx = "ProfileWindow.HelpCtx"; // NOI18N
+        
+        return new HelpCtx(helpCtx);
     }
     
     

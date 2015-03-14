@@ -83,6 +83,7 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.modules.OnStop;
+import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -156,11 +157,12 @@ final class ProfilerSessions {
             public void run() {
                 UI ui = UI.createAndConfigure(context, _project);
 
+                HelpCtx helpCtx = new HelpCtx("SelectFeatureDialog.HelpCtx"); // NOI18N
                 String caption = actionName == null ? Bundle.ProfilerSessions_selectProjectAndFeature() : actionName;
                 DialogDescriptor dd = new DialogDescriptor(ui, caption, true, new Object[]
                                                          { DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION },
                                                            DialogDescriptor.OK_OPTION, DialogDescriptor.BOTTOM_ALIGN,
-                                                           null, null);
+                                                           helpCtx, null);
                 Dialog d = DialogDisplayer.getDefault().createDialog(dd);
                 d.setVisible(true);
                 
@@ -193,11 +195,12 @@ final class ProfilerSessions {
     private static ProfilerFeature selectFeature(Set<ProfilerFeature> features, String actionName) {
         UI ui = UI.selectFeature(features);
 
+        HelpCtx helpCtx = new HelpCtx("SelectFeatureDialog.HelpCtx"); // NOI18N // TODO: should have a special one?
         String caption = actionName == null ? Bundle.ProfilerSessions_selectFeature() : actionName;
         DialogDescriptor dd = new DialogDescriptor(ui, caption, true, new Object[]
                                                  { DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION },
                                                    DialogDescriptor.OK_OPTION, DialogDescriptor.BOTTOM_ALIGN,
-                                                   null, null);
+                                                   helpCtx, null);
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
         
