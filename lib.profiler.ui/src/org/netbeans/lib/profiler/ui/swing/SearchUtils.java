@@ -291,4 +291,8 @@ public final class SearchUtils {
         return 2;
     }
     
+    
+    // Do not create instances of this class
+    private SearchUtils() {}
+    
 }
