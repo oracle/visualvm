@@ -63,9 +63,15 @@ public interface GraphsUI {
     public static final String HEAP_SIZE_NAME = messages.getString("GraphsUI_HeapSize"); // NOI18N
     public static final String USED_HEAP_NAME = messages.getString("GraphsUI_UsedHeap"); // NOI18N
     public static final String SURVGEN_NAME = messages.getString("GraphsUI_SurvGen"); // NOI18N
+    public static final String CPU_TIME_NAME = messages.getString("GraphsUI_CpuTime"); // NOI18N
     public static final String GC_TIME_NAME = messages.getString("GraphsUI_GcTime"); // NOI18N
+    public static final String GC_INTERVALS_NAME = messages.getString("GraphsUI_GcIntervals"); // NOI18N
     public static final String THREADS_NAME = messages.getString("GraphsUI_Threads"); // NOI18N
     public static final String LOADED_CLASSES_NAME = messages.getString("GraphsUI_LoadedClasses"); // NOI18N
+    public static final String CPU_GC_CAPTION = messages.getString("GraphsUI_CpuGcCaption"); // NOI18N
+    public static final String MEMORY_CAPTION = messages.getString("GraphsUI_MemoryCaption"); // NOI18N
+    public static final String GC_CAPTION = messages.getString("GraphsUI_GarbageCollectionCaption"); // NOI18N
+    public static final String THREADS_CLASSES_CAPTION = messages.getString("GraphsUI_ThreadsClassesCaption"); // NOI18N
     // -----
 
     // --- General colors definition -------------------------------------------

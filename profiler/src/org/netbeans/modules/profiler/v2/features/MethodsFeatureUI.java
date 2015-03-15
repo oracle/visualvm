@@ -194,6 +194,8 @@ abstract class MethodsFeatureUI extends FeatureUI {
             }
         };
         
+        cpuView.putClientProperty("HelpCtx.Key", "ProfileMethods.HelpCtx"); // NOI18N
+        
         
         // --- Toolbar ---------------------------------------------------------
         

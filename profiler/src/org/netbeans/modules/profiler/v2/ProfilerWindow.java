@@ -92,6 +92,7 @@ import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.RunGCAction;
 import org.netbeans.modules.profiler.actions.TakeThreadDumpAction;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
@@ -103,9 +104,9 @@ import org.netbeans.modules.profiler.v2.impl.WelcomePanel;
 import org.netbeans.modules.profiler.v2.ui.DropdownButton;
 import org.netbeans.modules.profiler.v2.ui.StayOpenPopupMenu;
 import org.netbeans.modules.profiler.v2.ui.ToggleButtonMenuItem;
-import org.openide.actions.FindAction;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
+import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -140,7 +141,8 @@ import org.openide.windows.WindowManager;
     "ProfilerWindow_profileSection=Profile:",
     "ProfilerWindow_settingsSection=Settings:",
     "#NOI18N",
-    "ProfilerWindow_mode=editor"
+    "ProfilerWindow_mode=editor",
+    "ProfilerWindow_noFeature=<html><b>No profiling feature selected.</b><br><br>Please select at least one profiling feature for the session.</html>"
 })
 class ProfilerWindow extends ProfilerTopComponent {    
     
@@ -482,6 +484,11 @@ class ProfilerWindow extends ProfilerTopComponent {
         start.setPushed(true);
         
         final ProfilingSettings _profilingSettings = __profilingSettings();
+        if (_profilingSettings == null) { // #250237 ?
+            ProfilerDialogs.displayError(Bundle.ProfilerWindow_noFeature());
+            start.setPushed(false);
+            return;
+        }
         
         if (session.isAttach()) {
             RequestProcessor.getDefault().post(new Runnable() {
@@ -833,6 +840,20 @@ class ProfilerWindow extends ProfilerTopComponent {
     
     protected String preferredID() {
         return this.getClass().getName();
+    }
+    
+    public HelpCtx getHelpCtx() {
+        ProfilerFeature selected = featuresView == null ? null :
+                                   featuresView.getSelectedFeature();
+        
+        JPanel selectedUI = selected == null ? null : selected.getResultsUI();
+        if (selectedUI == null && selected != null) selectedUI = selected.getSettingsUI();
+        
+        String helpCtx = selectedUI == null ? null :
+                         (String)selectedUI.getClientProperty("HelpCtx.Key"); // NOI18N
+        if (helpCtx == null) helpCtx = "ProfileWindow.HelpCtx"; // NOI18N
+        
+        return new HelpCtx(helpCtx);
     }
     
     
