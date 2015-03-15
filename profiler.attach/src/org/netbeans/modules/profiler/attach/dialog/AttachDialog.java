@@ -758,10 +758,11 @@ public class AttachDialog extends AttachWizard {
         area.setText(buffer.toString());
         area.setCaretPosition(0);
         
+        HelpCtx helpCtx = new HelpCtx("ProcessDetails.HelpCtx"); //NOI18N
         JButton close = new JButton(Bundle.AttachDialog_BtnClose());
         close.setDefaultCapable(true);
         DialogDescriptor dd = new DialogDescriptor(areaScroll, Bundle.AttachDialog_DetailsCaption(getProcessName(vm.getMainClass())),
-                              true, new Object[] { close }, close, DialogDescriptor.DEFAULT_ALIGN, null, null);
+                              true, new Object[] { close }, close, DialogDescriptor.DEFAULT_ALIGN, helpCtx, null);
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.pack();
         d.setVisible(true);

@@ -108,6 +108,8 @@ abstract class MonitorFeatureUI extends FeatureUI {
         
         monitorView = new MonitorView(getProfiler().getVMTelemetryManager());
         
+        monitorView.putClientProperty("HelpCtx.Key", "ProfileTelemetry.HelpCtx"); // NOI18N
+        
         
         // --- Toolbar ---------------------------------------------------------
         

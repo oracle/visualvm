@@ -171,6 +171,8 @@ abstract class ObjectsFeatureUI extends FeatureUI {
             }
         };
         
+        memoryView.putClientProperty("HelpCtx.Key", "ProfileObjects.HelpCtx"); // NOI18N
+        
         
         // --- Toolbar ---------------------------------------------------------
         

@@ -305,13 +305,13 @@ public final class CPUGraphPanel extends GraphPanel {
 //            chartContainer.add(hScrollBar, BorderLayout.SOUTH);
 
             // Heap Size
-            JLabel heapSizeBig = new JLabel("CPU Time",
+            JLabel heapSizeBig = new JLabel(GraphsUI.CPU_TIME_NAME,
                                             new ColorIcon(CPU_COLOR, Color.
                                             BLACK, 18, 9), SwingConstants.LEADING);
             heapSizeBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
             // Used heap
-            JLabel usedHeapBig = new JLabel("GC Time",
+            JLabel usedHeapBig = new JLabel(GraphsUI.GC_TIME_NAME,
                                             new ColorIcon(GC_COLOR, Color.
                                             BLACK, 18, 9), SwingConstants.LEADING);
             usedHeapBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
@@ -332,7 +332,7 @@ public final class CPUGraphPanel extends GraphPanel {
 
             // Master UI
             setLayout(new BorderLayout());
-            JLabel caption = new JLabel("CPU and GC", JLabel.CENTER);
+            JLabel caption = new JLabel(GraphsUI.CPU_GC_CAPTION, JLabel.CENTER);
             caption.setFont(caption.getFont().deriveFont(Font.BOLD));
             caption.setBorder(BorderFactory.createEmptyBorder(20, 0, 5, 0));
             caption.setOpaque(true);
@@ -365,7 +365,7 @@ public final class CPUGraphPanel extends GraphPanel {
             public String getRowName(int index) {
                 switch (index) {
                     case 0:
-                        return "CPU Time";
+                        return GraphsUI.CPU_TIME_NAME;
                     case 1:
                         return GraphsUI.GC_TIME_NAME;
                     default:

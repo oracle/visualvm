@@ -109,6 +109,7 @@ import org.openide.DialogDisplayer;
 import org.openide.filesystems.FileChooserBuilder;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.HelpCtx;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -155,9 +156,10 @@ public final class ClassMethodSelector {
         
         UI ui = UI.forSession(session, false);
 
+        HelpCtx helpCtx = new HelpCtx("SelectClassDialog.HelpCtx"); // NOI18N
         DialogDescriptor dd = new DialogDescriptor(ui, Bundle.ClassMethodSelector_selectClass(), true,
                                                    new Object[] { ui.getOKButton(), DialogDescriptor.CANCEL_OPTION },
-                                                   ui.getOKButton(), DialogDescriptor.BOTTOM_ALIGN, null, null);
+                                                   ui.getOKButton(), DialogDescriptor.BOTTOM_ALIGN, helpCtx, null);
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
         
@@ -169,9 +171,10 @@ public final class ClassMethodSelector {
         
         UI ui = UI.forSession(session, true);
 
+        HelpCtx helpCtx = new HelpCtx("SelectMethodDialog.HelpCtx"); // NOI18N
         DialogDescriptor dd = new DialogDescriptor(ui, Bundle.ClassMethodSelector_selectMethod(), true,
                                                    new Object[] { ui.getOKButton(), DialogDescriptor.CANCEL_OPTION },
-                                                   ui.getOKButton(), DialogDescriptor.BOTTOM_ALIGN, null, null);
+                                                   ui.getOKButton(), DialogDescriptor.BOTTOM_ALIGN, helpCtx, null);
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
         

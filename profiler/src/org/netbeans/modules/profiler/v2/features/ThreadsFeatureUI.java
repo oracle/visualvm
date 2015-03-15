@@ -128,6 +128,8 @@ abstract class ThreadsFeatureUI extends FeatureUI {
         threadsView = new ThreadsPanel(getProfiler().getThreadsManager(), null);
         threadsView.threadsMonitoringEnabled();
         
+        threadsView.putClientProperty("HelpCtx.Key", "ProfileThreads.HelpCtx"); // NOI18N
+        
         
         // --- Toolbar ---------------------------------------------------------
         
