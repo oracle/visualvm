@@ -207,7 +207,7 @@ final class ObjectsFeatureModes {
             int limit = Integer.parseInt(readFlag(LIMIT_ALLOCATIONS_FLAG, LIMIT_ALLOCATIONS_DEFAULT.toString()));
             settings.setAllocStackTraceLimit(alloc ? limit : 0); // TODO: should follow limit from Options
             
-//            settings.setAllocTrackEvery(1); // TODO: should follow value from Options
+            settings.setAllocTrackEvery(1); // TODO: should follow value from Options
 
             StringBuilder b = new StringBuilder();
             HashSet<ClientUtils.SourceCodeSelection> _sel = getSelection();
