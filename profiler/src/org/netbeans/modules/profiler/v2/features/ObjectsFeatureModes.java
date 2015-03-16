@@ -88,7 +88,7 @@ import org.openide.util.NbBundle;
     "ObjectsFeatureModes_projectClasses=Project classes",
     "ObjectsFeatureModes_selectedClasses=Selected classes",
     "ObjectsFeatureModes_editLink=<html><a href='#'>{0}, edit</a></html>",
-    "ObjectsFeatureModes_recordLifecycle=Record full lifecycle",
+    "ObjectsFeatureModes_recordLifecycle=Track only live objects",
     "ObjectsFeatureModes_recordAllocations=Record allocations",
     "ObjectsFeatureModes_limitAllocations=Limit allocation calls:",
     "ObjectsFeatureModes_noClassSelected=No classes selected, use Profile Class action in editor or results or click the Add button:",
@@ -199,7 +199,7 @@ final class ObjectsFeatureModes {
         void configureSettings(ProfilingSettings settings) {
             assert SwingUtilities.isEventDispatchThread();
             
-            boolean lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.FALSE.toString()));
+            boolean lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.TRUE.toString()));
             settings.setProfilingType(lifecycle ? ProfilingSettings.PROFILE_MEMORY_LIVENESS :
                                                   ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS);
 
@@ -227,7 +227,7 @@ final class ObjectsFeatureModes {
                 assert SwingUtilities.isEventDispatchThread();
                 
                 storeFlag(LIFECYCLE_FLAG,   lifecycleCheckbox.isSelected() ?
-                                            Boolean.TRUE.toString() : null);
+                                            null : Boolean.FALSE.toString());
                 storeFlag(ALLOCATIONS_FLAG, allocationsCheckbox.isSelected() ?
                                             null : Boolean.FALSE.toString());
                 int limit = (Integer)outgoingSpinner.getValue();
@@ -244,7 +244,7 @@ final class ObjectsFeatureModes {
                 assert SwingUtilities.isEventDispatchThread();
                 
                 boolean lifecycle = lifecycleCheckbox.isSelected();
-                boolean _lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.FALSE.toString()));
+                boolean _lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.TRUE.toString()));
                 if (lifecycle != _lifecycle) return true;
                 
                 boolean alloc = allocationsCheckbox.isSelected();
@@ -356,7 +356,7 @@ final class ObjectsFeatureModes {
 
                 selectionContent.add(Box.createHorizontalStrut(8));
 
-                boolean lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.FALSE.toString()));
+                boolean lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.TRUE.toString()));
                 lifecycleCheckbox = new JCheckBox(Bundle.ObjectsFeatureModes_recordLifecycle(), lifecycle) {
                     protected void fireActionPerformed(ActionEvent e) { super.fireActionPerformed(e); settingsChanged(); }
                 };

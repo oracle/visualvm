@@ -150,7 +150,7 @@ import org.openide.util.RequestProcessor;
     "SnapshotInfoPanel_ProjectClasses=Project Classes:",
     "SnapshotInfoPanel_SelectedClasses=Selected Classes:",
     "SnapshotInfoPanel_SelectedMethods=Selected Methods:",
-    "SnapshotInfoPanel_RecordLifecycle=Record full lifecycle:",
+    "SnapshotInfoPanel_RecordLifecycle=Track only live objects:",
     "SnapshotInfoPanel_RecordAllocations=Record allocations:",
     "SnapshotInfoPanel_LimitAllocations=Limit allocation calls:"
 })
