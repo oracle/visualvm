@@ -53,23 +53,25 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import javax.imageio.ImageIO;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
+import javax.swing.AbstractButton;
 import javax.swing.JFileChooser;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 /**
  *
@@ -80,7 +82,7 @@ public final class ExportUtils {
     // -----
     // I18N String constants
     private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.swing.Bundle"); // NOI18N
-    public static final String ACTION_EXPORT = messages.getString("ExportUtils_ActionExport"); // NOI18N
+    private static final String BUTTON_EXPORT = messages.getString("ExportUtils_ButtonExport"); // NOI18N
     private static final String NPS_FILE = messages.getString("ExportUtils_NpsFile"); // NOI18N
     private static final String CSV_FILE = messages.getString("ExportUtils_CsvFile"); // NOI18N
     private static final String HTML_FILE = messages.getString("ExportUtils_HtmlFile"); // NOI18N
@@ -88,9 +90,9 @@ public final class ExportUtils {
     private static final String PNG_FILE = messages.getString("ExportUtils_PngFile"); // NOI18N
     private static final String FILE_FILTER_DESCR = messages.getString("ExportUtils_FileFilterDescr"); // NOI18N
     private static final String MSG_CANNOT_OVERWRITE_SOURCE = messages.getString("ExportUtils_MsgCannotOverwriteSource"); // NOI18N
-    private static final String MSG_EXPORT_SNAPSHOT_FAILED = messages.getString("ExportUtils_MsgExportSnapshotFailed"); // NOI18N
+//    private static final String MSG_EXPORT_SNAPSHOT_FAILED = messages.getString("ExportUtils_MsgExportSnapshotFailed"); // NOI18N
     private static final String MSG_EXPORT_IMAGE_FAILED = messages.getString("ExportUtils_MsgExportImageFailed"); // NOI18N
-    private static final String MSG_NODATA = messages.getString("ExportUtils_MsgNoData"); // NOI18N
+//    private static final String MSG_NODATA = messages.getString("ExportUtils_MsgNoData"); // NOI18N
     private static final String TITLE_OVERWRITE_FILE = messages.getString("ExportUtils_TitleOverwriteFile"); // NOI18N
     private static final String MSG_OVERWRITE_FILE = messages.getString("ExportUtils_MsgOverwriteFile"); // NOI18N
     // -----
@@ -170,11 +172,11 @@ public final class ExportUtils {
         
     }
     
-    public static class NPSExportProvider extends BaseExportProvider {
+    public static abstract class AbstractNPSExportProvider extends BaseExportProvider {
         
         private final File sourceFile;
         
-        public NPSExportProvider(File sourceFile) {
+        public AbstractNPSExportProvider(File sourceFile) {
             super(NPS_FILTER);
             this.sourceFile = sourceFile;
         }
@@ -183,15 +185,11 @@ public final class ExportUtils {
             if (targetFile.isFile() && targetFile.equals(sourceFile)) {
                 ProfilerDialogs.displayError(MSG_CANNOT_OVERWRITE_SOURCE);
             } else {
-                try {
-                    Files.copy(sourceFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING,
-                                                                         StandardCopyOption.COPY_ATTRIBUTES);
-                } catch (IOException ex) {
-                    System.err.println(ex);
-                    ProfilerDialogs.displayError(MSG_EXPORT_SNAPSHOT_FAILED);
-                }
+                doExport(targetFile);
             }
         }
+        
+        protected abstract void doExport(File targetFile);
         
     }
     
@@ -263,53 +261,56 @@ public final class ExportUtils {
     }
     
     
-    public static Action exportAction(final Component parent, final Exportable... exportables) {
-        Action action = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                for (Exportable exportable : exportables) if (exportable.isEnabled()) {
-                    ExportProvider[] providers = exportable == null ? null : exportable.getProviders();
+    public static AbstractButton exportButton(final Component parent, String tooltip, final Exportable... exportables) {
+        PopupButton exportPopup = new PopupButton(Icons.getIcon(GeneralIcons.SAVE_AS)) {
+            protected void populatePopup(JPopupMenu popup) {
+                for (final Exportable exportable : exportables) {
+                    if (exportable != null && exportable.isEnabled()) {
+                        popup.add(new JMenuItem(exportable.getName()) {
+                            protected void fireActionPerformed(ActionEvent e) {
+                                JFileChooser fileChooser = new JFileChooser();
+                                fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+                                fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                                fileChooser.setMultiSelectionEnabled(false);
+                                fileChooser.setDialogTitle(exportable.getName());
 
-                    if (providers == null || providers.length == 0) {
-                        ProfilerDialogs.displayWarning(MSG_NODATA, exportable.getName(), null);
-                    } else {
-                        JFileChooser fileChooser = new JFileChooser();
-                        fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-                        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                        fileChooser.setMultiSelectionEnabled(false);
-                        fileChooser.setDialogTitle(exportable.getName());
+                                fileChooser.removeChoosableFileFilter(fileChooser.getAcceptAllFileFilter());
 
-                        fileChooser.removeChoosableFileFilter(fileChooser.getAcceptAllFileFilter());
+                                ExportProvider[] providers = exportable.getProviders();
+                                for (ExportProvider provider : providers)
+                                    fileChooser.addChoosableFileFilter(provider.getFormatFilter());
 
-                        for (ExportProvider provider : providers)
-                            fileChooser.addChoosableFileFilter(provider.getFormatFilter());
-
-                        // returning true means exporting to .nps, don't export other views
-                        if (showExportDialog(fileChooser, parent, providers)) break;
+                                // returning true means exporting to .nps, don't export other views
+                                showExportDialog(fileChooser, parent, providers);
+                            }
+                        });
                     }
                 }
             }
         };
-        
-        return action;
+        exportPopup.setToolTipText(tooltip);
+        return exportPopup;
     }
     
-    private static boolean showExportDialog(final JFileChooser fileChooser, final Component parent, final ExportProvider[] providers) {
-        if (fileChooser.showDialog(parent, ACTION_EXPORT) != JFileChooser.APPROVE_OPTION) return false;
+    private static void showExportDialog(final JFileChooser fileChooser, final Component parent, final ExportProvider[] providers) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (fileChooser.showDialog(parent, BUTTON_EXPORT) != JFileChooser.APPROVE_OPTION) return;
 
-        File targetFile = fileChooser.getSelectedFile();
-        FileFilter filter = fileChooser.getFileFilter();
+                File targetFile = fileChooser.getSelectedFile();
+                FileFilter filter = fileChooser.getFileFilter();
 
-        for (ExportProvider provider : providers) {
-            FormatFilter format = provider.getFormatFilter();
-            if (filter.equals(format)) {
-                targetFile = checkFileExtesion(targetFile, format.getExtension());
-                if (checkFileExists(targetFile)) provider.export(targetFile);
-                else showExportDialog(fileChooser, parent, providers);
-                return provider instanceof NPSExportProvider;
+                for (ExportProvider provider : providers) {
+                    FormatFilter format = provider.getFormatFilter();
+                    if (filter.equals(format)) {
+                        targetFile = checkFileExtesion(targetFile, format.getExtension());
+                        if (checkFileExists(targetFile)) provider.export(targetFile);
+                        else showExportDialog(fileChooser, parent, providers);
+                        break;
+                    }
+                }
             }
-        }
-        
-        return false;
+        });
     }
     
     private static boolean checkFileExists(File file) {
@@ -671,5 +672,9 @@ public final class ExportUtils {
         }
         
     }
+    
+    
+    // Do not create instances of this class
+    private ExportUtils() {}
     
 }

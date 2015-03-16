@@ -46,13 +46,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
@@ -115,63 +111,12 @@ public abstract class SnapshotCPUView extends JPanel {
     private CPUTreeTableView forwardCallsView;
     private CPUTreeTableView reverseCallsView;
     
-    public SnapshotCPUView(CPUResultsSnapshot snapshot, boolean sampled, Action... actions) {
-        initUI(actions);
+    public SnapshotCPUView(CPUResultsSnapshot snapshot, boolean sampled, Action saveAction, Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
+        initUI(saveAction, compareAction, infoAction, exportProvider);
         registerActions();
         
         aggregation = CPUResultsSnapshot.METHOD_LEVEL_VIEW;
         setSnapshot(snapshot, sampled);
-    }
-    
-    
-    public ExportUtils.Exportable[] getExportables(final File sourceFile) {
-        return new ExportUtils.Exportable[] {
-            new ExportUtils.Exportable() {
-                public boolean isEnabled() {
-                    return forwardCallsView.isVisible();
-                }
-                public String getName() {
-                    return MessageFormat.format(CPUView.EXPORT_METHODS, CPUView.EXPORT_FORWARD_CALLS);
-                }
-                public ExportUtils.ExportProvider[] getProviders() {
-                    List<ExportUtils.ExportProvider> providers = new ArrayList();
-                    if (sourceFile != null) providers.add(new ExportUtils.NPSExportProvider(sourceFile));
-                    ExportUtils.ExportProvider[] _providers = forwardCallsView.getExportProviders();
-                    if (_providers != null) providers.addAll(Arrays.asList(_providers));
-                    return providers.toArray(new ExportUtils.ExportProvider[providers.size()]);
-                }
-            },
-            new ExportUtils.Exportable() {
-                public boolean isEnabled() {
-                    return hotSpotsView.isVisible();
-                }
-                public String getName() {
-                    return MessageFormat.format(CPUView.EXPORT_METHODS, CPUView.EXPORT_HOTSPOTS);
-                }
-                public ExportUtils.ExportProvider[] getProviders() {
-                    List<ExportUtils.ExportProvider> providers = new ArrayList();
-                    if (sourceFile != null) providers.add(new ExportUtils.NPSExportProvider(sourceFile));
-                    ExportUtils.ExportProvider[] _providers = hotSpotsView.getExportProviders();
-                    if (_providers != null) providers.addAll(Arrays.asList(_providers));
-                    return providers.toArray(new ExportUtils.ExportProvider[providers.size()]);
-                }
-            },
-            new ExportUtils.Exportable() {
-                public boolean isEnabled() {
-                    return reverseCallsView.isVisible();
-                }
-                public String getName() {
-                    return MessageFormat.format(CPUView.EXPORT_METHODS, CPUView.EXPORT_REVERSE_CALLS);
-                }
-                public ExportUtils.ExportProvider[] getProviders() {
-                    List<ExportUtils.ExportProvider> providers = new ArrayList();
-                    if (sourceFile != null) providers.add(new ExportUtils.NPSExportProvider(sourceFile));
-                    ExportUtils.ExportProvider[] _providers = reverseCallsView.getExportProviders();
-                    if (_providers != null) providers.addAll(Arrays.asList(_providers));
-                    return providers.toArray(new ExportUtils.ExportProvider[providers.size()]);
-                }
-            }
-        };
     }
     
     
@@ -192,7 +137,7 @@ public abstract class SnapshotCPUView extends JPanel {
     }
     
     
-    private void initUI(Action... actions) {
+    private void initUI(Action saveAction, Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
         setLayout(new BorderLayout(0, 0));
         
         forwardCallsView = new CPUTreeTableView(null, false) {
@@ -277,22 +222,21 @@ public abstract class SnapshotCPUView extends JPanel {
         
         ProfilerToolbar toolbar = ProfilerToolbar.create(true);
         
-        for (int i = 0; i < actions.length - 1; i++) {
-            Action action = actions[i];
-            if (action != null) {
-                toolbar.add(action);
-            } else {
-                toolbar.addSpace(2);
-                toolbar.addSeparator();
-                toolbar.addSpace(2);
-            }
-        }
+        if (saveAction != null) toolbar.add(saveAction);
         
-        if (actions.length > 0) {
+        toolbar.add(ExportUtils.exportButton(this, CPUView.EXPORT_TOOLTIP, getExportables(exportProvider)));
+        
+        if (compareAction != null) {
             toolbar.addSpace(2);
             toolbar.addSeparator();
-            toolbar.addSpace(5);
+            toolbar.addSpace(2);
+        
+            toolbar.add(compareAction);
         }
+        
+        toolbar.addSpace(2);
+        toolbar.addSeparator();
+        toolbar.addSpace(5);
         
         GrayLabel viewL = new GrayLabel(TOOLBAR_VIEW);
         toolbar.add(viewL);
@@ -412,10 +356,9 @@ public abstract class SnapshotCPUView extends JPanel {
         ActionPopupButton aggregation = new ActionPopupButton(aMethods, aClasses, aPackages);
         toolbar.add(aggregation);
         
-        Action aInfo = actions.length > 0 ? actions[actions.length - 1] : null;
-        if (aInfo != null) {
+        if (infoAction != null) {
             toolbar.addFiller();
-            toolbar.add(aInfo);
+            toolbar.add(infoAction);
         }
         
         add(toolbar.getComponent(), BorderLayout.NORTH);
@@ -520,6 +463,45 @@ public abstract class SnapshotCPUView extends JPanel {
         this.sampled = sampled;
         
         setAggregation(aggregation);
+    }
+    
+    private ExportUtils.Exportable[] getExportables(final ExportUtils.Exportable snapshotExporter) {
+        return new ExportUtils.Exportable[] {
+            snapshotExporter,
+            new ExportUtils.Exportable() {
+                public boolean isEnabled() {
+                    return forwardCallsView.isVisible();
+                }
+                public String getName() {
+                    return MessageFormat.format(CPUView.EXPORT_METHODS, CPUView.EXPORT_FORWARD_CALLS);
+                }
+                public ExportUtils.ExportProvider[] getProviders() {
+                    return forwardCallsView.getExportProviders();
+                }
+            },
+            new ExportUtils.Exportable() {
+                public boolean isEnabled() {
+                    return hotSpotsView.isVisible();
+                }
+                public String getName() {
+                    return MessageFormat.format(CPUView.EXPORT_METHODS, CPUView.EXPORT_HOTSPOTS);
+                }
+                public ExportUtils.ExportProvider[] getProviders() {
+                    return hotSpotsView.getExportProviders();
+                }
+            },
+            new ExportUtils.Exportable() {
+                public boolean isEnabled() {
+                    return reverseCallsView.isVisible();
+                }
+                public String getName() {
+                    return MessageFormat.format(CPUView.EXPORT_METHODS, CPUView.EXPORT_REVERSE_CALLS);
+                }
+                public ExportUtils.ExportProvider[] getProviders() {
+                    return reverseCallsView.getExportProviders();
+                }
+            }
+        };
     }
     
 }

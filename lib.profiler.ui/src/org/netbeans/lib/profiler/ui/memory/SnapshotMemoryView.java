@@ -45,11 +45,7 @@ package org.netbeans.lib.profiler.ui.memory;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -91,7 +87,7 @@ public abstract class SnapshotMemoryView extends JPanel {
     private final MemoryResultsSnapshot snapshot;
     
     
-    public SnapshotMemoryView(MemoryResultsSnapshot snapshot, Collection filter, Action... actions) {
+    public SnapshotMemoryView(MemoryResultsSnapshot snapshot, Collection filter, Action saveAction, Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
         this.filter = filter;
         this.snapshot = snapshot;
         
@@ -156,22 +152,21 @@ public abstract class SnapshotMemoryView extends JPanel {
         
         ProfilerToolbar toolbar = ProfilerToolbar.create(true);
         
-        for (int i = 0; i < actions.length - 1; i++) {
-            Action action = actions[i];
-            if (action != null) {
-                toolbar.add(action);
-            } else {
-                toolbar.addSpace(2);
-                toolbar.addSeparator();
-                toolbar.addSpace(2);
-            }
+        if (saveAction != null) toolbar.add(saveAction);
+        
+        toolbar.add(ExportUtils.exportButton(this, MemoryView.EXPORT_TOOLTIP, getExportables(exportProvider)));
+        
+        if (compareAction != null) {
+            toolbar.addSpace(2);
+            toolbar.addSeparator();
+            toolbar.addSpace(2);
+        
+            toolbar.add(compareAction);
         }
         
-//        if (actions.length > 0) {
-//            toolbar.addSpace(2);
-//            toolbar.addSeparator();
-//            toolbar.addSpace(5);
-//        }
+//        toolbar.addSpace(2);
+//        toolbar.addSeparator();
+//        toolbar.addSpace(5);
         
 //        GrayLabel aggregationL = new GrayLabel(TOOLBAR_AGGREGATION);
 //        toolbar.add(aggregationL);
@@ -193,10 +188,9 @@ public abstract class SnapshotMemoryView extends JPanel {
 //        aggregation.setEnabled(supportsPackageAggregation);
 //        toolbar.add(aggregation);
         
-        Action aInfo = actions.length > 0 ? actions[actions.length - 1] : null;
-        if (aInfo != null) {
+        if (infoAction != null) {
             toolbar.addFiller();
-            toolbar.add(aInfo);
+            toolbar.add(infoAction);
         }
         
         if (dataView != null) add(dataView, BorderLayout.CENTER);
@@ -217,25 +211,6 @@ public abstract class SnapshotMemoryView extends JPanel {
         map.put(SearchUtils.FIND_ACTION_KEY, new AbstractAction() {
             public void actionPerformed(ActionEvent e) { dataView.activateSearch(); }
         });
-    }
-    
-    
-    public ExportUtils.Exportable[] getExportables(final File sourceFile) {
-        return new ExportUtils.Exportable[] { new ExportUtils.Exportable() {
-            public boolean isEnabled() {
-                    return true;
-                }
-            public String getName() {
-                return MemoryView.EXPORT_OBJECTS;
-            }
-            public ExportUtils.ExportProvider[] getProviders() {
-                List<ExportUtils.ExportProvider> providers = new ArrayList();
-                if (sourceFile != null) providers.add(new ExportUtils.NPSExportProvider(sourceFile));
-                ExportUtils.ExportProvider[] _providers = dataView.getExportProviders();
-                if (_providers != null) providers.addAll(Arrays.asList(_providers));
-                return providers.toArray(new ExportUtils.ExportProvider[providers.size()]);
-            }
-        }};
     }
     
     
@@ -304,6 +279,23 @@ public abstract class SnapshotMemoryView extends JPanel {
     private void setAggregation(int aggregation) {
         this.aggregation = aggregation;
         if (dataView != null) dataView.setData(snapshot, filter, aggregation);
+    }
+    
+    private ExportUtils.Exportable[] getExportables(final ExportUtils.Exportable snapshotExporter) {
+        return new ExportUtils.Exportable[] {
+            snapshotExporter,
+            new ExportUtils.Exportable() {
+                public boolean isEnabled() {
+                    return true;
+                }
+                public String getName() {
+                    return MemoryView.EXPORT_OBJECTS;
+                }
+                public ExportUtils.ExportProvider[] getProviders() {
+                    return dataView.getExportProviders();
+                }
+            }
+        };
     }
     
 }

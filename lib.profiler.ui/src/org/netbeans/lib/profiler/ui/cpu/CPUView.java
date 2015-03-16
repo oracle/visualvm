@@ -54,6 +54,7 @@ public abstract class CPUView extends DataView {
     // -----
     // I18N String constants
     private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.cpu.Bundle"); // NOI18N
+    protected static final String EXPORT_TOOLTIP = messages.getString("CPUView_ExportTooltip"); // NOI18N
     protected static final String EXPORT_METHODS = messages.getString("CPUView_ExportMethods"); // NOI18N
     protected static final String EXPORT_FORWARD_CALLS = messages.getString("CPUView_ExportForwardCalls"); // NOI18N
     protected static final String EXPORT_HOTSPOTS = messages.getString("CPUView_ExportHotSpots"); // NOI18N
