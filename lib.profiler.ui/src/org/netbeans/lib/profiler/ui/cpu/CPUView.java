@@ -70,6 +70,9 @@ public abstract class CPUView extends DataView {
     protected static final String ACTION_GOTOSOURCE = messages.getString("CPUView_ActionGoToSource"); // NOI18N
     protected static final String ACTION_PROFILE_METHOD = messages.getString("CPUView_ActionProfileMethod"); // NOI18N
     protected static final String ACTION_PROFILE_CLASS = messages.getString("CPUView_ActionProfileClass"); // NOI18N
+    protected static final String FIND_IN_FORWARDCALLS = messages.getString("CPUView_FindInForwardCalls"); // NOI18N
+    protected static final String FIND_IN_HOTSPOTS = messages.getString("CPUView_FindInHotSpots"); // NOI18N
+    protected static final String FIND_IN_REVERSECALLS = messages.getString("CPUView_FindInReverseCalls"); // NOI18N
     // -----
     
 }

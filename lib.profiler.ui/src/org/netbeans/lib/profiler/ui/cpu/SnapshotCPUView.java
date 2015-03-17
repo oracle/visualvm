@@ -63,6 +63,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
@@ -75,6 +76,8 @@ import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.MultiButtonGroup;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -417,6 +420,84 @@ public abstract class SnapshotCPUView extends JPanel {
         });
         
         customizeNodePopup(invoker, popup, value, userValue);
+        
+        popup.addSeparator();
+        if (invoker == forwardCallsView) {
+            ProfilerTreeTable ttable = (ProfilerTreeTable)forwardCallsView.getResultsComponent();
+            final String searchString = ttable.getStringValue((TreeNode)value, ttable.getMainColumn());
+            
+            popup.add(new JMenuItem(CPUView.FIND_IN_HOTSPOTS) {
+                { setEnabled(userValue != null); }
+                protected void fireActionPerformed(ActionEvent e) {
+                    ProfilerTable table = hotSpotsView.getResultsComponent();
+                    if (SearchUtils.findString(table, searchString, true)) {
+                        hotSpotsView.setVisible(true);
+                        table.requestFocusInWindow();
+                    }
+                }
+            });
+            
+            popup.add(new JMenuItem(CPUView.FIND_IN_REVERSECALLS) {
+                { setEnabled(userValue != null); }
+                protected void fireActionPerformed(ActionEvent e) {
+                    ProfilerTable table = reverseCallsView.getResultsComponent();
+                    if (SearchUtils.findString(table, searchString, true)) {
+                        reverseCallsView.setVisible(true);
+                        table.requestFocusInWindow();
+                    }
+                }
+            });
+        } else if (invoker == hotSpotsView) {
+            // Ugly hack - there's a space between method name and parameters
+            final String searchString = value.toString().replace("(", " ("); // NOI18N
+            
+            popup.add(new JMenuItem(CPUView.FIND_IN_FORWARDCALLS) {
+                { setEnabled(userValue != null); }
+                protected void fireActionPerformed(ActionEvent e) {
+                    ProfilerTable table = forwardCallsView.getResultsComponent();
+                    if (SearchUtils.findString(table, searchString, true)) {
+                        forwardCallsView.setVisible(true);
+                        table.requestFocusInWindow();
+                    }
+                }
+            });
+            
+            popup.add(new JMenuItem(CPUView.FIND_IN_REVERSECALLS) {
+                { setEnabled(userValue != null); }
+                protected void fireActionPerformed(ActionEvent e) {
+                    ProfilerTable table = reverseCallsView.getResultsComponent();
+                    if (SearchUtils.findString(table, searchString, true)) {
+                        reverseCallsView.setVisible(true);
+                        table.requestFocusInWindow();
+                    }
+                }
+            });
+        } else if (invoker == reverseCallsView) {
+            ProfilerTreeTable ttable = (ProfilerTreeTable)reverseCallsView.getResultsComponent();
+            final String searchString = ttable.getStringValue((TreeNode)value, ttable.getMainColumn());
+            
+            popup.add(new JMenuItem(CPUView.FIND_IN_FORWARDCALLS) {
+                { setEnabled(userValue != null); }
+                protected void fireActionPerformed(ActionEvent e) {
+                    ProfilerTable table = forwardCallsView.getResultsComponent();
+                    if (SearchUtils.findString(table, searchString, true)) {
+                        forwardCallsView.setVisible(true);
+                        table.requestFocusInWindow();
+                    }
+                }
+            });
+            
+            popup.add(new JMenuItem(CPUView.FIND_IN_HOTSPOTS) {
+                { setEnabled(userValue != null); }
+                protected void fireActionPerformed(ActionEvent e) {
+                    ProfilerTable table = hotSpotsView.getResultsComponent();
+                    if (SearchUtils.findString(table, searchString, true)) {
+                        hotSpotsView.setVisible(true);
+                        table.requestFocusInWindow();
+                    }
+                }
+            });
+        }
         
         popup.addSeparator();
         popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
