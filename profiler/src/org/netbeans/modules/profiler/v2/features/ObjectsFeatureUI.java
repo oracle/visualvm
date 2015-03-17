@@ -152,7 +152,10 @@ abstract class ObjectsFeatureUI extends FeatureUI {
                 return GoToSource.isAvailable();
             }
             public void showSource(ClientUtils.SourceCodeSelection value) {
-                GoToSource.openSource(getProject(), value.getClassName(), "", ""); // NOI18N
+                String className = value.getClassName();
+                String methodName = value.getMethodName();
+                String methodSig = value.getMethodSignature();
+                GoToSource.openSource(getProject(), className, methodName, methodSig);
             }
             public void selectForProfiling(ClientUtils.SourceCodeSelection value) {
                 ObjectsFeatureUI.this.selectForProfiling(value);

@@ -559,16 +559,23 @@ public final class SnapshotsWindowUI extends TopComponent {
         });
     }
     
-    private static void deleteSnapshots(final Collection<Snapshot> snapshots) {
+    private void deleteSnapshots(final Collection<Snapshot> snapshots) {
         SnapshotsWindowHelper.PROCESSOR.post(new Runnable() {
             public void run() {
                 if (ProfilerDialogs.displayConfirmation(Bundle.SnapshotsWindowUI_msgDeleteSnapshots(), Bundle.SnapshotsWindowUI_capDeleteSnapshots())) {
+                    ResultsManager rm = null;
                     for (Snapshot snapshot : snapshots) try {
+                        if (!snapshot.isHeapDump()) {
+                            if (rm == null) rm = ResultsManager.getDefault();
+                            LoadedSnapshot ls = rm.findLoadedSnapshot(FileUtil.toFile(snapshot.getFile()));
+                            if (ls != null) rm.closeSnapshot(ls);
+                        }
                         DataObject.find(snapshot.getFile()).delete();
                     } catch (Throwable t) {
                         ProfilerDialogs.displayError(Bundle.SnapshotsWindowUI_msgDeleteFailed(snapshot.getDisplayName()));
                         t.printStackTrace();
                     }
+                    refreshSnapshots();
                 }
             }
         });

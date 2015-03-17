@@ -57,7 +57,8 @@ public abstract class MemoryView extends DataView {
     // -----
     // I18N String constants
     private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle"); // NOI18N
-    protected static final String EXPORT_OBJECTS = messages.getString("CPUView_ExportObjects"); // NOI18N
+    protected static final String EXPORT_TOOLTIP = messages.getString("MemoryView_ExportTooltip"); // NOI18N
+    protected static final String EXPORT_OBJECTS = messages.getString("MemoryView_ExportObjects"); // NOI18N
     protected static final String EXPORT_LIVE = messages.getString("MemoryView_ExportLive"); // NOI18N
     protected static final String EXPORT_ALLOCATED = messages.getString("MemoryView_ExportAllocated"); // NOI18N
     protected static final String EXPORT_ALLOCATED_LIVE = messages.getString("MemoryView_ExportAllocatedLive"); // NOI18N
