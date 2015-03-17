@@ -1105,6 +1105,7 @@ public abstract class NetBeansProfiler extends Profiler {
 
         final ProfilerEngineSettings sharedSettings = getTargetAppRunner().getProfilerEngineSettings();
         profilingSettings.applySettings(sharedSettings);
+        sharedSettings.setInstrumentObjectInit(true);
 
         logActionConfig("modifyCurrentProfiling", profilingSettings, null, null, sharedSettings.getInstrumentationFilter()); //NOI18N
         

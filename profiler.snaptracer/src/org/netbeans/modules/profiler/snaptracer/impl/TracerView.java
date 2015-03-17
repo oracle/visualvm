@@ -71,11 +71,10 @@ import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.LoadedSnapshot;
+import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.SampledCPUSnapshot;
 import org.netbeans.modules.profiler.actions.CompareSnapshotsAction;
 import org.netbeans.modules.profiler.api.GoToSource;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
@@ -265,21 +264,9 @@ final class TracerView {
                 public void run() {
                     CPUResultsSnapshot s = (CPUResultsSnapshot)lsF.getSnapshot();
                     if (snapshotView == null) {
-                        final Action[] aExportPerformer = new Action[1];
-                        Action aExport = new AbstractAction() {
-                            { putValue(NAME, "Export data to file or image");
-                              putValue(SHORT_DESCRIPTION, "Export data to file or image");
-                              putValue(SMALL_ICON, Icons.getIcon(GeneralIcons.SAVE_AS)); }
-                            public void actionPerformed(ActionEvent e) {
-                                aExportPerformer[0].actionPerformed(e);
-                            }
-
-                        };
                         Action aCompare = new CompareSnapshotsAction(lsF);
-                        
-                        snapshotView = new SnapshotView(s, aExport, aCompare, null);
-                        
-                        aExportPerformer[0] = ExportUtils.exportAction(snapshotView, snapshotView.getExportables(lsF.getFile()));
+                        ExportUtils.Exportable exporter = ResultsManager.getDefault().createSnapshotExporter(lsF);
+                        snapshotView = new SnapshotView(s, aCompare, exporter);
                     } else {
                         snapshotView.setData(s);
                     }
@@ -345,8 +332,8 @@ final class TracerView {
     
     private final class SnapshotView extends SnapshotCPUView {
         
-        SnapshotView(CPUResultsSnapshot snapshot, Action... actions) {
-            super(snapshot, true, actions);
+        SnapshotView(CPUResultsSnapshot snapshot, Action compare, ExportUtils.Exportable exporter) {
+            super(snapshot, true, null, compare, null, exporter);
         }
         
         void setData(CPUResultsSnapshot snapshot) {

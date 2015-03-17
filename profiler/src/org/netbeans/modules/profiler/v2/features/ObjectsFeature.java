@@ -45,6 +45,7 @@ package org.netbeans.modules.profiler.v2.features;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.HashSet;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -65,6 +66,7 @@ import org.netbeans.lib.profiler.ui.swing.SmallButton;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -87,7 +89,10 @@ import org.openide.util.lookup.ServiceProvider;
     "ObjectsFeature_profileMode=Profile:",
     "ObjectsFeature_samplingModes=General (sampled)",
     "ObjectsFeature_instrModes=Focused (instrumented)",
-    "ObjectsFeature_applyButton=Apply"
+    "ObjectsFeature_applyButton=Apply",
+    "ObjectsFeature_arrayWarningCaption=Selected Array Warning",
+    "#HTML-formatted, line breaks using <br> to make the displaying dialog not too wide",
+    "ObjectsFeature_arrayWarningMsg=<html><b>Array object selected for profiling.</b><br><br>Configuring the target application for profiling arrays can<br>take a long time when attaching to a running process or<br>changing the settings during profiling.<br><br></html>"
 })
 final class ObjectsFeature extends ProfilerFeature.Basic {
     
@@ -286,6 +291,19 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     
     private void selectionChanged() {
         configurationChanged();
+        
+        if (getSession().inProgress() || getSession().isAttach()) checkArrays();
+    }
+    
+    private void checkArrays() {
+        HashSet<ClientUtils.SourceCodeSelection> sel = selectedClassesMode.getSelection();
+        for (ClientUtils.SourceCodeSelection s : sel)
+            if (s.getClassName().endsWith("[]")) { // NOI18N
+                ProfilerDialogs.displayWarningDNSA(Bundle.ObjectsFeature_arrayWarningMsg(),
+                                                   Bundle.ObjectsFeature_arrayWarningCaption(),
+                                                   null, "ObjectsFeature.arraysDNSA", true); // NOI18N
+                break;
+            }
     }
     
     

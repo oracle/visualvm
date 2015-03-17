@@ -246,4 +246,8 @@ public final class FilterUtils {
         return 2;
     }
     
+    
+    // Do not create instances of this class
+    private FilterUtils() {}
+    
 }
