@@ -409,7 +409,8 @@ public abstract class LiveCPUView extends JPanel {
         popup.addSeparator();
         if (invoker == forwardCallsView) {
             ProfilerTreeTable ttable = (ProfilerTreeTable)forwardCallsView.getResultsComponent();
-            final String searchString = ttable.getStringValue((TreeNode)value, ttable.getMainColumn());
+            int column = ttable.convertColumnIndexToView(ttable.getMainColumn());
+            final String searchString = ttable.getStringValue((TreeNode)value, column);
             
             popup.add(new JMenuItem(CPUView.FIND_IN_HOTSPOTS) {
                 { setEnabled(userValue != null); }
@@ -459,7 +460,8 @@ public abstract class LiveCPUView extends JPanel {
             });
         } else if (invoker == reverseCallsView) {
             ProfilerTreeTable ttable = (ProfilerTreeTable)reverseCallsView.getResultsComponent();
-            final String searchString = ttable.getStringValue((TreeNode)value, ttable.getMainColumn());
+            int column = ttable.convertColumnIndexToView(ttable.getMainColumn());
+            final String searchString = ttable.getStringValue((TreeNode)value, column);
             
             popup.add(new JMenuItem(CPUView.FIND_IN_FORWARDCALLS) {
                 { setEnabled(userValue != null); }
