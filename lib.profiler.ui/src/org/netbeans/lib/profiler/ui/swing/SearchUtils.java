@@ -105,7 +105,7 @@ public final class SearchUtils {
         
         text = text.toLowerCase();
         
-        int mainColumn = table.getMainColumn();
+        int mainColumn = table.convertColumnIndexToView(table.getMainColumn());
         
         if (table instanceof ProfilerTreeTable) {
             ProfilerTreeTable treeTable = (ProfilerTreeTable)table;
