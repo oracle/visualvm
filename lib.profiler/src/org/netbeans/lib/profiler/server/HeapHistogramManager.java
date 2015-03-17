@@ -338,7 +338,7 @@ class HeapHistogramManager {
                         name = jvmName;
                 }
                 for (int i = 0; i <= index; i++) {
-                    name.concat("[]");           // NOI18N
+                    name = name.concat("[]");           // NOI18N
                 }
             } else if (isPermGen()) {
                 name = (String) permGenNames.get(jvmName);

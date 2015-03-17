@@ -46,6 +46,8 @@ package org.netbeans.modules.profiler;
 import java.awt.Cursor;
 import java.awt.Window;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -74,6 +76,7 @@ import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerStorage;
@@ -114,7 +117,8 @@ import org.openide.windows.WindowManager;
     "ResultsManager_OverwriteFileDialogCaption=Overwrite Existing File?",
     "ResultsManager_OverwriteFileDialogMsg=The target folder already contains file {0}\n Do you want to overwrite this file?",
     "ResultsManager_FileDeleteFailedMsg=Cannot delete the existing file: {0}",
-    "ResultsManager_SnapshotExportFailedMsg=Failed to save snapshot: {0}",
+    "ResultsManager_SnapshotExportFailedMsg=Failed to export snapshot: {0}",
+    "ResultsManager_ExportSnapshotData=Export Snapshot Data",
     "ResultsManager_SelectFileOrDirDialogCaption=Select File or Directory",
     "ResultsManager_ProfilerSnapshotFileFilter=Profiler Snapshot File (*.{0})",
     "ResultsManager_ProfilerHeapdumpFileFilter=Heap Dump File (*.{0})",
@@ -898,6 +902,84 @@ public final class ResultsManager {
 
     public boolean resultsAvailable() {
         return resultsAvailable;
+    }
+    
+    public ExportUtils.Exportable createSnapshotExporter(final LoadedSnapshot snapshot) {
+        return new ExportUtils.Exportable() {
+            public String getName() {
+                return Bundle.ResultsManager_ExportSnapshotData();
+            }
+
+            public boolean isEnabled() {
+                return true;
+            }
+
+            public ExportUtils.ExportProvider[] getProviders() {
+                return new ExportUtils.ExportProvider[] {
+                    new ExportUtils.AbstractNPSExportProvider(snapshot.getFile()) {
+                        protected void doExport(File targetFile) {
+                            exportSnapshot(snapshot, targetFile);
+                        }
+                    }
+                };
+            }
+        };
+    }
+    
+    private boolean exportSnapshot(LoadedSnapshot snapshot, File targetFile) {
+        File sourceFile = snapshot.getFile();
+        if (sourceFile != null) {
+            try {
+                Files.copy(sourceFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING,
+                                                                     StandardCopyOption.COPY_ATTRIBUTES);
+                return true;
+            } catch (IOException ex) {
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotExportFailedMsg(ex.getMessage()));
+                return false;
+            }
+        } else {
+            FileLock lock = null;
+            FileObject target = null;
+            DataOutputStream dos = null;
+            
+            try {
+                targetFile = FileUtil.normalizeFile(targetFile);
+                target = targetFile.isFile() ? FileUtil.toFileObject(targetFile) :
+                                               FileUtil.createData(targetFile);
+            
+                lock = target.lock();
+
+                OutputStream os = target.getOutputStream(lock);
+                BufferedOutputStream bos = new BufferedOutputStream(os);
+                dos = new DataOutputStream(bos);
+                //      System.out.println("Saving snapshot [" + snapshot.getSnapshot().getTimeTaken() + "]");
+                snapshot.save(dos);
+                dos.close();
+            } catch (IOException e) {
+                try {
+                    if (dos != null) dos.close();
+                    if (lock != null) target.delete(lock);
+                } catch (Exception e2) {}
+
+                ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotSaveFailedMsg(e.getMessage()));
+
+                return false; // failure => we wont continue with firing the event
+            } catch (OutOfMemoryError e) {
+                try {
+                    if (dos != null) dos.close();
+                    if (lock != null) target.delete(lock);
+                } catch (Exception e2) {}
+
+                ProfilerDialogs.displayError(Bundle.ResultsManager_OutOfMemorySavingMsg());
+
+                return false; // failure => we wont continue with firing the event
+            } finally {
+                if (lock != null) lock.releaseLock();
+            }
+
+            return true;
+        }
     }
 
     public boolean saveSnapshot(LoadedSnapshot snapshot, FileObject profFile) {
