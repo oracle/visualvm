@@ -325,8 +325,9 @@ public class ProfilerTreeTable extends ProfilerTable {
     
     // --- String value --------------------------------------------------------
     
+    // column - view index
     public String getStringValue(TreeNode node, int column) {
-        Object value = model.getValueAt(node, column);
+        Object value = model.getValueAt(node, convertColumnIndexToModel(column));
         if (getColumnClass(column) == JTree.class) {
             TreeCellRenderer renderer = tree.getCellRenderer();
             renderer.getTreeCellRendererComponent(tree, value, false, false, false, -1, false);

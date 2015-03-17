@@ -347,10 +347,11 @@ public class ProfilerTable extends JTable {
     
     // --- String value --------------------------------------------------------
     
+    // row, column - view index
     public String getStringValue(int row, int column) {
         TableCellRenderer renderer = getCellRenderer(row, column);
         if (renderer instanceof ProfilerRenderer) {
-            ((ProfilerRenderer)renderer).setValue(renderer, row);
+            ((ProfilerRenderer)renderer).setValue(getValueAt(row, column), row);
         } else {
             prepareRenderer(renderer, row, column);
         }

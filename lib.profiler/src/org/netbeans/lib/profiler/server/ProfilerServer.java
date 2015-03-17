@@ -826,7 +826,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
         }
     }
 
-    static void loadNativeLibrary(String fullJFluidPath, boolean fullPathToLibSpecified) {
+    public static void loadNativeLibrary(String fullJFluidPath, boolean fullPathToLibSpecified) {
         String libFullName = Platform.getAgentNativeLibFullName(fullJFluidPath, fullPathToLibSpecified, null, -1);
         System.load(libFullName);
     }
