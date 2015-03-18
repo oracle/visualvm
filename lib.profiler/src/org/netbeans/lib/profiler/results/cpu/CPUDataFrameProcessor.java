@@ -64,6 +64,8 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void doProcessDataFrame(ByteBuffer buffer) {
+        hasMonitorInfo = (client != null) ? client.getSettings().isLockContentionMonitoringEnabled() : false;
+        
         try {
             while (buffer.hasRemaining()) {
                 byte eventType = buffer.get();
@@ -373,7 +375,6 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                             if (LOGGER.isLoggable(Level.FINEST)) {
                                 LOGGER.log(Level.FINEST, "Creating new monitor , monitorId={0} , className={1}", new Object[] {Integer.toHexString(hash), className}); // NOI18N
                             }
-                            hasMonitorInfo = true;
                             fireNewMonitor(hash, className);
                             break;
                         }
@@ -423,7 +424,6 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
 
     public void startup(ProfilerClient client) {
         super.startup(client);
-        hasMonitorInfo = false;
     }
 
     private void fireMethodEntry(final int methodId, final int threadId, final int methodType, final long timeStamp0,
