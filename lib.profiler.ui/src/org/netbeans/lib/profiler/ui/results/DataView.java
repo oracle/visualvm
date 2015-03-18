@@ -53,6 +53,7 @@ import java.awt.event.FocusEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.RowFilter;
 import javax.swing.UIManager;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
@@ -108,11 +109,15 @@ public abstract class DataView extends JPanel {
 //        return filterPanel == null ? false : filterPanel.isVisible();
 //    }
     
+    protected RowFilter getExcludesFilter() {
+        return null;
+    }
+    
     public void activateFilter() {
         JComponent panel = getBottomPanel();
         
         if (filterPanel == null) {
-            filterPanel = FilterUtils.createFilterPanel(getResultsComponent());
+            filterPanel = FilterUtils.createFilterPanel(getResultsComponent(), getExcludesFilter());
             panel.add(filterPanel);
             Container parent = panel.getParent();
             parent.invalidate();

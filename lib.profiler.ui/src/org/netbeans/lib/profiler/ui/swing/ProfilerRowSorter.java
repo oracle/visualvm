@@ -177,8 +177,14 @@ class ProfilerRowSorter extends TableRowSorter {
     }
     
     private void refreshRowFilter() {
-        setRowFilter(filterMode ? RowFilter.andFilter(filters) :
-                                  RowFilter.orFilter(filters));
+        if (filters == null || filters.isEmpty()) {
+            setRowFilter(null);
+        } else if (filters.size() == 1) {
+            setRowFilter(filters.iterator().next());
+        } else {
+            setRowFilter(filterMode ? RowFilter.andFilter(filters) :
+                                      RowFilter.orFilter(filters));
+        }
     }
     
     // --- Persistence ---------------------------------------------------------
