@@ -329,6 +329,14 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                         default: {
                             LOGGER.log(Level.SEVERE, "*** Profiler Engine: internal error: got unknown event type in CPUDataFrameProcessor: {0} at {1}", // NOI18N
                                                     new Object[]{(int) eventType, buffer.position()});
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("dataframe [");   // NOI18N
+                            buffer.rewind();
+                            while (buffer.hasRemaining()) {
+                                sb.append(buffer.get()).append(",");    // NOI18N
+                            }
+                            sb.append("]\n");   // NOI18N
+                            LOGGER.severe(sb.toString());
 
                             break;
                         }
@@ -403,6 +411,14 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                         default: {
                             LOGGER.log(Level.SEVERE, "*** Profiler Engine: internal error: got unknown event type in CPUDataFrameProcessor: {0} at {1}", // NOI18N
                                                       new Object[]{(int) eventType, buffer.position()});
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("dataframe [");   // NOI18N
+                            buffer.rewind();
+                            while (buffer.hasRemaining()) {
+                                sb.append(buffer.get()).append(",");    // NOI18N
+                            }
+                            sb.append("]\n");   // NOI18N
+                            LOGGER.severe(sb.toString());
 
                             break;
                         }
