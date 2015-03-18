@@ -130,6 +130,7 @@ class ThreadInfos {
         try {
             threadInfos = null;
             threadNames = null;
+            threadClassNames = null;
             threadInfosLastIdx = -1;
         } finally {
             endTrans();
