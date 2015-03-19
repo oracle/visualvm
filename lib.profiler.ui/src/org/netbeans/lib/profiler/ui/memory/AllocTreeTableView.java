@@ -69,7 +69,6 @@ import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
-import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
@@ -99,6 +98,15 @@ abstract class AllocTreeTableView extends MemoryView {
         initUI();
     }
     
+    
+    protected RowFilter getExcludesFilter() {
+        return new RowFilter() { // Do not filter first level nodes
+            public boolean include(RowFilter.Entry entry) {
+                PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)entry.getIdentifier();
+                return node.getParent() != null && node.getParent().getParent() == null;
+            }
+        };
+    }
     
     protected ProfilerTable getResultsComponent() { return treeTable; }
     
@@ -279,15 +287,6 @@ abstract class AllocTreeTableView extends MemoryView {
         
         setLayout(new BorderLayout());
         add(tableContainer, BorderLayout.CENTER);
-        
-        treeTable.setFiltersMode(false); // OR filter for results treetable
-        treeTable.addRowFilter(new RowFilter() { // Do not filter first level nodes
-            public boolean include(RowFilter.Entry entry) {
-                PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)entry.getIdentifier();
-                return node.getParent() != null && node.getParent().getParent() == null;
-            }
-        });
-        FilterUtils.filterContains(treeTable, null); // Installs filter accepting all nodes by default
     }
     
     protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {

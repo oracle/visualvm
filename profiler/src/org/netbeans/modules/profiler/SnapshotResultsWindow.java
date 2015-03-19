@@ -222,7 +222,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     private LoadedSnapshot snapshot;
     private InstanceContent ic = new InstanceContent();
     private SavePerformer savePerformer = new SavePerformer();
-    private SnapshotPanel displayedPanel;
+    private JPanel displayedPanel;
     private String tabName = ""; // NOI18N // default
     private SnapshotListener listener;
     private boolean forcedClose = false;
@@ -257,23 +257,30 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
 
         switch (snapshot.getType()) {
             case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
+                setIcon(WINDOW_ICON_CPU);
+                helpCtx = new HelpCtx(HELP_CTX_KEY_CPU);
                 getAccessibleContext().setAccessibleDescription(Bundle.SnapshotResultsWindow_CpuSnapshotAccessDescr());
-                displayCPUResults(ls, sortingColumn, sortingOrder);
+                setupCPUResultsView();
 
                 break;
-            case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
-                getAccessibleContext().setAccessibleDescription(Bundle.SnapshotResultsWindow_FragmentSnapshotAccessDescr());
-                displayCodeRegionResults(ls);
-
-                break;
+//            case LoadedSnapshot.SNAPSHOT_TYPE_CODEFRAGMENT:
+//                getAccessibleContext().setAccessibleDescription(Bundle.SnapshotResultsWindow_FragmentSnapshotAccessDescr());
+//                displayCodeRegionResults(ls);
+//
+//                break;
             case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
             case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
             case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_SAMPLED:
+                setIcon(WINDOWS_ICON_MEMORY);
+                helpCtx = new HelpCtx(HELP_CTX_KEY_MEM);
                 getAccessibleContext().setAccessibleDescription(Bundle.SnapshotResultsWindow_MemorySnapshotAccessDescr());
-                displayMemoryResults(ls, sortingColumn, sortingOrder);
+                setupMemoryResultsView();
 
                 break;
         }
+        
+        if (displayedPanel != null) add(displayedPanel, BorderLayout.CENTER);
+        
         listener = Lookup.getDefault().lookup(SnapshotListener.class);
         listener.registerSnapshotResultsWindow(this);
     }
@@ -410,39 +417,34 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     
     // --- Support for saving/restoring selected tabs, opened columns etc. -----
     public void setState(SnapshotPanel.State state) {
-        displayedPanel.setState(state);
+//        displayedPanel.setState(state);
     }
     
     public SnapshotPanel.State getState() {
-        return displayedPanel.getState();
+        return null;
+//        return displayedPanel.getState();
     }
     // -------------------------------------------------------------------------
 
     // -- Private methods --------------------------------------------------------------------------------------------------
 
-    private void displayCPUResults(final LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
-        CPUSnapshotPanel cpuPanel = new CPUSnapshotPanel(getLookup(), ls, sortingColumn, sortingOrder);
-        displayedPanel = cpuPanel;
-//        updateFind(true, cpuPanel);
-        
-        JPanel cpuSnapshot = null;
-        ResultsSnapshot _snapshot = ls.getSnapshot();
-        
+    private void setupCPUResultsView() {
+        ResultsSnapshot _snapshot = snapshot.getSnapshot();
         if (_snapshot instanceof CPUResultsSnapshot) {
-            CPUResultsSnapshot s = (CPUResultsSnapshot)ls.getSnapshot();
-            boolean sampling = Boolean.valueOf(ls.getSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED);
+            CPUResultsSnapshot s = (CPUResultsSnapshot)_snapshot;
+            boolean sampling = snapshot.getSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED;
             
-            Action aSave = new SaveSnapshotAction(ls);
-            Action aCompare = new CompareSnapshotsAction(ls);
-            Action aInfo = new SnapshotInfoAction(ls);
-            ExportUtils.Exportable exporter = ResultsManager.getDefault().createSnapshotExporter(ls);
+            Action aSave = new SaveSnapshotAction(snapshot);
+            Action aCompare = new CompareSnapshotsAction(snapshot);
+            Action aInfo = new SnapshotInfoAction(snapshot);
+            ExportUtils.Exportable exporter = ResultsManager.getDefault().createSnapshotExporter(snapshot);
             
             final SnapshotCPUView _cpuSnapshot = new SnapshotCPUView(s, sampling, aSave, aCompare, aInfo, exporter) {
                 public boolean showSourceSupported() {
                     return GoToSource.isAvailable();
                 }
                 public void showSource(ClientUtils.SourceCodeSelection value) {
-                    Lookup.Provider project = ls.getProject();
+                    Lookup.Provider project = snapshot.getProject();
                     String className = value.getClassName();
                     String methodName = value.getMethodName();
                     String methodSig = value.getMethodSignature();
@@ -451,7 +453,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                 public void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
                     RequestProcessor.getDefault().post(new Runnable() {
                         public void run() {
-                            Lookup.Provider project = ls.getProject();
+                            Lookup.Provider project = snapshot.getProject();
                             String name = Wildcards.ALLWILDCARD.equals(value.getMethodName()) ?
                                           Bundle.SnapshotResultsWindow_ProfileClass() :
                                           Bundle.SnapshotResultsWindow_ProfileMethod();
@@ -462,35 +464,22 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             };
             
             registerActions(_cpuSnapshot);
-            
-            cpuSnapshot = _cpuSnapshot;
+            displayedPanel = _cpuSnapshot;
         }
-        
-        if (cpuSnapshot != null) add(cpuSnapshot, BorderLayout.CENTER);
-        
-//        add(cpuPanel, BorderLayout.CENTER);
-        setIcon(WINDOW_ICON_CPU);
-        helpCtx = new HelpCtx(HELP_CTX_KEY_CPU);
     }
 
-    private void displayCodeRegionResults(LoadedSnapshot ls) {
-        FragmentSnapshotPanel codeRegionPanel = new FragmentSnapshotPanel(ls);
-        displayedPanel = codeRegionPanel;
-        add(codeRegionPanel, BorderLayout.CENTER);
-        setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-        setIcon(WINDOWS_ICON_FRAGMENT);
-    }
+//    private void displayCodeRegionResults(LoadedSnapshot ls) {
+//        FragmentSnapshotPanel codeRegionPanel = new FragmentSnapshotPanel(ls);
+//        displayedPanel = codeRegionPanel;
+//        add(codeRegionPanel, BorderLayout.CENTER);
+//        setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+//        setIcon(WINDOWS_ICON_FRAGMENT);
+//    }
 
-    private void displayMemoryResults(final LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
-        MemorySnapshotPanel memoryPanel = new MemorySnapshotPanel(getLookup(), ls, sortingColumn, sortingOrder);
-        displayedPanel = memoryPanel;
-//        updateFind(true, memoryPanel);
-        
-        JPanel memorySnapshot = null;
-        ResultsSnapshot _snapshot = ls.getSnapshot();
-        
+    private void setupMemoryResultsView() {
+        ResultsSnapshot _snapshot = snapshot.getSnapshot();
         if (_snapshot instanceof MemoryResultsSnapshot) {
-            Object f = ls.getSettings().getSelectedInstrumentationFilter();
+            Object f = snapshot.getSettings().getSelectedInstrumentationFilter();
             SimpleFilter sf = f instanceof SimpleFilter ? (SimpleFilter)f : null;
             String value = sf == null ? null : sf.getFilterValue();
             Collection filter = value == null || value.isEmpty() ? null :
@@ -498,19 +487,19 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             
             if (filter != null && filter.isEmpty()) filter = null;
             
-            MemoryResultsSnapshot s = (MemoryResultsSnapshot)ls.getSnapshot();
+            MemoryResultsSnapshot s = (MemoryResultsSnapshot)_snapshot;
             
-            Action aSave = new SaveSnapshotAction(ls);
-            Action aCompare = new CompareSnapshotsAction(ls);
-            Action aInfo = new SnapshotInfoAction(ls);
-            ExportUtils.Exportable exporter = ResultsManager.getDefault().createSnapshotExporter(ls);
+            Action aSave = new SaveSnapshotAction(snapshot);
+            Action aCompare = new CompareSnapshotsAction(snapshot);
+            Action aInfo = new SnapshotInfoAction(snapshot);
+            ExportUtils.Exportable exporter = ResultsManager.getDefault().createSnapshotExporter(snapshot);
             
             final SnapshotMemoryView _memorySnapshot = new SnapshotMemoryView(s, filter, aSave, aCompare, aInfo, exporter) {
                 public boolean showSourceSupported() {
                     return GoToSource.isAvailable();
                 }
                 public void showSource(ClientUtils.SourceCodeSelection value) {
-                    Lookup.Provider project = ls.getProject();
+                    Lookup.Provider project = snapshot.getProject();
                     String className = value.getClassName();
                     String methodName = value.getMethodName();
                     String methodSig = value.getMethodSignature();
@@ -519,7 +508,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                 public void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
                     RequestProcessor.getDefault().post(new Runnable() {
                         public void run() {
-                            Lookup.Provider project = ls.getProject();
+                            Lookup.Provider project = snapshot.getProject();
                             ProfilerSession.findAndConfigure(Lookups.fixed(value), project, Bundle.SnapshotResultsWindow_ProfileClass());
                         }
                     });
@@ -527,15 +516,8 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             };
             
             registerActions(_memorySnapshot);
-            
-            memorySnapshot = _memorySnapshot;
+            displayedPanel = _memorySnapshot;
         }
-        
-        if (memorySnapshot != null) add(memorySnapshot, BorderLayout.CENTER);
-        
-//        add(memoryPanel, BorderLayout.CENTER);
-        setIcon(WINDOWS_ICON_MEMORY);
-        helpCtx = new HelpCtx(HELP_CTX_KEY_MEM);
     }
 
     private void forcedClose() {
@@ -590,9 +572,9 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                 savePerformer.add();
             }
 
-            if (displayedPanel != null) {
-                displayedPanel.updateSavedState();
-            }
+//            if (displayedPanel != null) {
+//                displayedPanel.updateSavedState();
+//            }
         } else {
             // just to be sure
             savePerformer.remove();
