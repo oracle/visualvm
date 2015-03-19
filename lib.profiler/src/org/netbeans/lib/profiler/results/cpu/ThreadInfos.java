@@ -115,9 +115,11 @@ class ThreadInfos {
                 threadClassNames = newClassNames;
                 threadInfosLastIdx = threadId;
             }
-            threadInfos[threadId] = new ThreadInfo(threadId);
-            threadNames[threadId] = threadName;
-            threadClassNames[threadId] = threadClassName;
+            if (threadInfos[threadId] == null) {
+                threadInfos[threadId] = new ThreadInfo(threadId);
+                threadNames[threadId] = threadName;
+                threadClassNames[threadId] = threadClassName;
+            }
         } finally {
             endTrans();
         }
@@ -128,6 +130,7 @@ class ThreadInfos {
         try {
             threadInfos = null;
             threadNames = null;
+            threadClassNames = null;
             threadInfosLastIdx = -1;
         } finally {
             endTrans();
