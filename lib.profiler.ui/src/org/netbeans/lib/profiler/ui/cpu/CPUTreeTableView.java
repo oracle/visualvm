@@ -60,7 +60,6 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
-import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
@@ -250,17 +249,17 @@ abstract class CPUTreeTableView extends CPUView {
         
         setLayout(new BorderLayout());
         add(tableContainer, BorderLayout.CENTER);
-        
-        treeTable.setFiltersMode(false); // OR filter for results treetable
-        treeTable.addRowFilter(new RowFilter() { // Do not filter threads and self time nodes
+    }
+    
+    
+    protected RowFilter getExcludesFilter() {
+        return new RowFilter() { // Do not filter threads and self time nodes
             public boolean include(RowFilter.Entry entry) {
                 PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)entry.getIdentifier();
                 return node.isThreadNode() || node.isSelfTimeNode();
             }
-        });
-        FilterUtils.filterContains(treeTable, null); // Installs filter accepting all nodes by default
+        };
     }
-    
     
     protected ProfilerTable getResultsComponent() {
         return treeTable;
