@@ -1684,16 +1684,8 @@ public class ProfilerServer extends Thread implements CommonConstants {
     }
 
     private void doExit() {
-        // try to call Ide.quit in JDeveloper
-        try {
-            Class _class = Thread.currentThread().getContextClassLoader().loadClass("oracle.ide.Ide"); // NOI18N
-            Method _method = _class == null ? null : _class.getMethod("quit", new Class[0]); // NOI18N
-            if (_method != null) _method.invoke(_class, new Object[0]);
-        } catch (Exception ex) {
-            // ignore
-        }
 
-        // try to call LifecycleManager in NetBeans
+        // try Lookup.getDefault().lookup(ClassLoader.class)
         try {
             Class lookupClz = Thread.currentThread().getContextClassLoader().loadClass("org.openide.util.Lookup"); // NOI18N
             Method instMethod = lookupClz.getMethod("getDefault", new Class[0]); // NOI18N
@@ -1703,6 +1695,16 @@ public class ProfilerServer extends Thread implements CommonConstants {
             if (instance != null) {
                 ClassLoader clInstance = (ClassLoader)lookupMethod.invoke(instance, new Class[]{ClassLoader.class});
                 if (clInstance != null) {
+                    // try to call Ide.quit in JDeveloper
+                    try {
+                        Class oracleIde = clInstance.loadClass("oracle.ide.Ide"); // NOI18N
+                        Method ideQuitMethod = oracleIde.getMethod("quit", new Class[0]); // NOI18N
+                        ideQuitMethod.invoke(oracleIde, new Object[0]);
+                        return;
+                    } catch (Exception ex) {
+                        // ignore
+                    }
+                    // try to call LifecycleManager in NetBeans
                     Class lcmInstanceClz = clInstance.loadClass("org.openide.LifecycleManager"); // NOI18N
                     Method lcmInstMethod = lcmInstanceClz.getMethod("getDefault", new Class[0]); // NOI18N
                     Method lcmExitMethod = lcmInstanceClz.getMethod("exit", new Class[0]); // NOI18N
