@@ -86,17 +86,22 @@ public final class FilterUtils {
     public static final String FILTER_ACTION_KEY = "filter-action-key"; // NOI18N
     
     public static boolean filterContains(ProfilerTable table, String text) {
+        return filterContains(table, text, null);
+    }
+    
+    public static boolean filterContains(ProfilerTable table, String text, final RowFilter excludesFilter) {
         final int mainColumn = table.getMainColumn();
         
         final String textF = text == null ? null : text.toLowerCase();
         Filter filter = new Filter() {
             public boolean include(RowFilter.Entry entry) {
                 if (textF == null || textF.isEmpty()) return true;
+                if (excludesFilter != null && excludesFilter.include(entry)) return true;
                 else return (entry.getValue(mainColumn)).toString().toLowerCase().contains(textF);
             }
         };
         
-        if ((text != null && !text.isEmpty()) || table instanceof ProfilerTreeTable) {
+        if ((text != null && !text.isEmpty())) {
             table.addRowFilter(filter);
             return table.getRowCount() > 0;
         } else {
@@ -106,6 +111,10 @@ public final class FilterUtils {
     }
     
     public static JComponent createFilterPanel(final ProfilerTable table) {
+        return createFilterPanel(table, null);
+    }
+    
+    public static JComponent createFilterPanel(final ProfilerTable table, final RowFilter excludesFilter) {
         JToolBar toolbar = new JToolBar(JToolBar.HORIZONTAL);
         if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel())
                 toolbar.setLayout(new BoxLayout(toolbar, BoxLayout.LINE_AXIS));
@@ -144,7 +153,7 @@ public final class FilterUtils {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         String filterString = getFilterString(combo);
-                        if (filterContains(table, filterString)) combo.addItem(filterString);
+                        if (filterContains(table, filterString, excludesFilter)) combo.addItem(filterString);
                         activeFilter[0] = filterString;
                         updateFilterButton(_filter, activeFilter, filterString);
                     }
@@ -182,7 +191,7 @@ public final class FilterUtils {
             public void run() {
                 activeFilter[0] = null;
                 updateFilterButton(filter, activeFilter, getFilterString(combo));
-                filterContains(table, activeFilter[0]);
+                filterContains(table, activeFilter[0], excludesFilter);
                 panel.setVisible(false);
             }
         };
