@@ -162,7 +162,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
         }
 
         if (!ti.isInitialized()) {
-            ti.initialize(true);
+            ti.initialize();
         }
 
         ti.inProfilingRuntimeMethod++;
