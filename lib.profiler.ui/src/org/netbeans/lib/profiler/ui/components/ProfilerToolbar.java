@@ -190,6 +190,7 @@ public abstract class ProfilerToolbar {
         @Override
         public Component add(ProfilerToolbar toolbar, int index) {
             JToolBar implToolbar = ((Impl)toolbar).toolbar;
+            implToolbar.setFocusTraversalPolicyProvider(true);
             implToolbar.setBorder(BorderFactory.createEmptyBorder());
             implToolbar.setOpaque(false);
             return add(implToolbar, index);
