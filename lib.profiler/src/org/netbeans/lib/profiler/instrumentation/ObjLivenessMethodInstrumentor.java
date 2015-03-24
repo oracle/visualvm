@@ -262,7 +262,7 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
 
     protected boolean methodNeedsInstrumentation(ClassInfo clazz, int methodIdx) {
         // TODO: hasNewOpcodes must be called in any case, because it has side effects!
-        boolean ni = hasNewOpcodes(clazz, methodIdx, !instrObjectInit, instrArr);
+        boolean ni = hasNewOpcodes(clazz, methodIdx, !instrObjectInit, instrArr, instrFilter);
         boolean pp = getRuntimeProfilingPoints(engineSettings.getRuntimeProfilingPoints(), clazz, methodIdx).length > 0;
         boolean oi = instrObjectInit && isObjectConstructor(clazz, methodIdx);
         return ni || pp || oi;
