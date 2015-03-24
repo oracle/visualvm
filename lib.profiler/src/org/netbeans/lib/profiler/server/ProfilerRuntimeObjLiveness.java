@@ -251,7 +251,7 @@ public class ProfilerRuntimeObjLiveness extends ProfilerRuntimeMemory {
         ThreadInfo ti = ThreadInfo.getThreadInfo();
 
         if (!ti.isInitialized()) {
-            ti.initialize(true);
+            ti.initialize();
         }
 
         if (ti.inProfilingRuntimeMethod > 0) {
