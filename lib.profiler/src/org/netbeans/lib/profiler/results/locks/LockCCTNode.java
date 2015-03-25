@@ -150,6 +150,7 @@ public abstract class LockCCTNode extends CCTNode {
     public boolean isThreadLockNode() { return false; }
     public boolean isMonitorNode() { return false; }
     
+    public String toString() { return getNodeName(); }
     
 //    public void sortChildren(int sortBy, boolean sortOrder) {
 //        this.sortBy = sortBy;

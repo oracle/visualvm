@@ -708,9 +708,13 @@ public class ProfilerInterface implements CommonConstants {
         return resp;
     }
 
-    static byte[][] getClassFileBytes(String[] classes, int[] classLoaderIds) {
-        byte[][] bytes = new byte[classes.length][];
-        
+    static byte[][] getClassFileBytes(String[] classNames, int[] classLoaderIds) {
+        int MAX_CLASSES = 1000;
+        Class[] nonSystemClasses = new Class[MAX_CLASSES+1]; // classes loaded by classloaders other that bootstrap and system
+        int nonSystemIndex = 0;
+        byte[][] bytes = new byte[classNames.length][];
+        Class[] classes = new Class[classNames.length];
+
         for (int i = 0; i < loadedClassesArray.length; i++) {
             Class loadedClass = getOrdinaryClass(loadedClassesArray[i]);
             if (loadedClass == null) {
@@ -720,11 +724,25 @@ public class ProfilerInterface implements CommonConstants {
             int classLoaderId = loadedClassesLoaders[i];
             String name = loadedClass.getName();
             
-            for (int j = 0; j < classes.length; j++) {
-                if (classLoaderIds[j] == classLoaderId && classes[j].equals(name)) {
-                    bytes[j] = getClassFileBytes(loadedClass, classLoaderId);
+            for (int j = 0; j < classNames.length; j++) {
+                if (classLoaderIds[j] == classLoaderId && classNames[j].equals(name)) {
+                    classes[j] = loadedClass;
+                    nonSystemClasses[nonSystemIndex++] = loadedClass;
                     break;
                 }
+            }
+            if (nonSystemIndex == MAX_CLASSES) {
+                cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
+                nonSystemIndex = 0;
+                profilerServer.sendSimpleCmdToClient(Command.STILL_ALIVE);
+            }
+        }
+        if (nonSystemIndex > 0) {
+            cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
+        }
+        for (int i = 0; i < classes.length; i++) {
+            if (classes[i] != null) {
+                bytes[i] = getClassFileBytes(classes[i], classLoaderIds[i]);
             }
         }
         return bytes;
