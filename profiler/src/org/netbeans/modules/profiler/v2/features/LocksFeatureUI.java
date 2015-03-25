@@ -94,6 +94,10 @@ abstract class LocksFeatureUI extends FeatureUI {
             if (locksView != null) locksView.profilingSessionStarted();
         }
     }
+
+    void resetData() {
+        if (locksView != null) locksView.resetData();
+    }
     
     
     // --- UI ------------------------------------------------------------------
