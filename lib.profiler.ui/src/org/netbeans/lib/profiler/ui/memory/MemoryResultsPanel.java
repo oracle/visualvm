@@ -345,9 +345,7 @@ public abstract class MemoryResultsPanel extends ResultsPanel {
             return;
         }
 
-        String className = getClassName(classId);
-        className = className.replace("[", ""); // NOI18N
-        className = className.replace("/", "."); // NOI18N
+        String className = StringUtils.userFormClassName(getClassName(classId));
 
         actionsHandler.showSourceForMethod(className, null, null);
     }

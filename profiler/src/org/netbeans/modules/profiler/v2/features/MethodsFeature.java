@@ -524,7 +524,6 @@ final class MethodsFeature extends ProfilerFeature.Basic {
     
     private void resetResults() {
         if (ui != null) ui.resetData();
-        ResultsManager.getDefault().reset();
     }
     
     private void stopResults() {

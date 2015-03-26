@@ -104,24 +104,25 @@ final class LocksFeature extends ProfilerFeature.Basic {
         return ui;
     }
     
+    private void resetResults() {
+        if (ui != null) ui.resetData();
+    }
     
     // --- Session lifecycle ---------------------------------------------------
     
     public void notifyActivated() {
-        // TODO: reset only the Locks data!
-        ResultsManager.getDefault().reset();
+        resetResults();
     }
     
     public void notifyDeactivated() {
-        // TODO: reset only the Locks data!
-        ResultsManager.getDefault().reset();
+        resetResults();
     }
     
     
     protected void profilingStateChanged(int oldState, int newState) {
         // TODO: reset only the Locks data!
         if (newState == Profiler.PROFILING_STARTED)
-            ResultsManager.getDefault().reset();
+            resetResults();
         
         if (ui != null) ui.sessionStateChanged(getSessionState());
     }
