@@ -212,7 +212,7 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                                 String className = StringUtils.userFormClassName(refClazz.getName());
 
                                 if (!instrFilter.passesFilter(className)) {
-                                    continue;
+                                    break;
                                 }
                                 if ((allUnprofiledClassStatusArray == null) || !allUnprofiledClassStatusArray[classId]) {
                                     injectTraceObjAlloc(classId, bci + 2);
