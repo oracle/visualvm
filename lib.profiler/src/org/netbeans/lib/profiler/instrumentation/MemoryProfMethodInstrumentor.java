@@ -49,7 +49,10 @@ import org.netbeans.lib.profiler.classfile.BaseClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
+import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
+import org.netbeans.lib.profiler.utils.StringUtils;
+import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.lib.profiler.wireprotocol.RootClassLoadedCommand;
 
 
@@ -70,9 +73,11 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     static class MethodScanerForNewOpcodes extends SingleMethodScaner {
-        
-        MethodScanerForNewOpcodes(ClassInfo clazz, int methodIdx) {
+        private final InstrumentationFilter instrFilter;
+
+        MethodScanerForNewOpcodes(ClassInfo clazz, int methodIdx, InstrumentationFilter filter) {
             super(clazz, methodIdx);
+            instrFilter = filter;
         }
         
         //~ Methods --------------------------------------------------------------------------------------------------------------
@@ -88,37 +93,49 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
                 bc = (bytecodes[bci] & 0xFF);
 
                 if ((bc == opc_new) && checkForOpcNew) {
-                    found = true;
 
                     int classCPIdx = getU2(bci + 1);
                     String refClassName = clazz.getRefClassName(classCPIdx);
-                    BaseClassInfo refClazz = javaClassOrPlaceholderForName(refClassName, loaderId);
+                    if (instrFilter.passesFilter(refClassName)) {
+                        found = true;
+                        BaseClassInfo refClazz = javaClassOrPlaceholderForName(refClassName, loaderId);
 
-                    if (refClazz.getInstrClassId() == -1) {
-                        refClazz.setInstrClassId(minstr.getNextClassId(refClazz.getName()));
-                    }
+                        if (refClazz.getInstrClassId() == -1) {
+                            refClazz.setInstrClassId(minstr.getNextClassId(refClazz.getName()));
+                        }
+                    }                    
                 } else if ((bc == opc_anewarray || bc == opc_multianewarray) && checkForOpcNewArray) {
-                    found = true;
 
                     int classCPIdx = getU2(bci + 1);
                     String refClassName = clazz.getRefClassName(classCPIdx);
-                    BaseClassInfo refClazz = (bc == opc_anewarray) ? javaClassForObjectArrayType(refClassName)
-                                                                   : ClassRepository.lookupSpecialClass(refClassName);
+                    BaseClassInfo refClazz = null;
+                    if (bc == opc_anewarray) {
+                        if (instrFilter.passesFilter(refClassName.concat("[]"))) {    // NOI18N
+                            refClazz = javaClassForObjectArrayType(refClassName);
+                        }
+                    } else { // opc_multianewarray
+                        if (instrFilter.passesFilter(getMultiArrayClassName(refClassName))) {
+                            refClazz = ClassRepository.lookupSpecialClass(refClassName);
+                        }
+                    }
 
                     if (refClazz != null) { // Warning already issued
+                        found = true;
 
                         if (refClazz.getInstrClassId() == -1) {
                             refClazz.setInstrClassId(minstr.getNextClassId(refClazz.getName()));
                         }
                     }
                 } else if (bc == opc_newarray && checkForOpcNewArray) {
-                    found = true;
-
                     int arrayClassId = getByte(bci + 1);
                     BaseClassInfo refClazz = javaClassForPrimitiveArrayType(arrayClassId);
+                    String className = StringUtils.userFormClassName(refClazz.getName());
 
-                    if (refClazz.getInstrClassId() == -1) {
-                        refClazz.setInstrClassId(minstr.getNextClassId(refClazz.getName()));
+                    if (instrFilter.passesFilter(className)) {
+                        found = true;
+                        if (refClazz.getInstrClassId() == -1) {
+                            refClazz.setInstrClassId(minstr.getNextClassId(refClazz.getName()));
+                        }
                     }
                 }
 
@@ -126,6 +143,23 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
             }
 
             return found;
+        }
+
+        private static String getMultiArrayClassName(String refClassName) {
+            int dimension = refClassName.lastIndexOf('[');
+            String baseClass = refClassName.substring(dimension + 1);
+
+            if (VMUtils.isVMPrimitiveType(baseClass)) {
+                return StringUtils.userFormClassName(refClassName);
+            } else {
+                StringBuilder arrayClass = new StringBuilder(refClassName.length() + dimension + 1);
+                arrayClass.append(refClassName.substring(dimension + 1));
+
+                for (int i = 0; i <= dimension; i++) {
+                    arrayClass.append("[]");        // NOI18N
+                }
+                return arrayClass.toString();
+            }
         }
     }
 
@@ -256,8 +290,8 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
         return createInstrumentedMethodPack15();
     }
 
-    protected boolean hasNewOpcodes(ClassInfo clazz, int methodIdx, boolean checkForOpcNew, boolean checkForOpcNewArray) {
-        MethodScanerForNewOpcodes msfno = new MethodScanerForNewOpcodes(clazz, methodIdx);
+    protected boolean hasNewOpcodes(ClassInfo clazz, int methodIdx, boolean checkForOpcNew, boolean checkForOpcNewArray, InstrumentationFilter instrFilter) {
+        MethodScanerForNewOpcodes msfno = new MethodScanerForNewOpcodes(clazz, methodIdx, instrFilter);
 
         return msfno.hasNewOpcodes(this, checkForOpcNew, checkForOpcNewArray);
     }

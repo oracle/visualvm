@@ -101,7 +101,7 @@ public class ProfilerRuntimeObjAlloc extends ProfilerRuntimeMemory {
         }
 
         if (!ti.isInitialized()) {
-            ti.initialize(true);
+            ti.initialize();
         }
 
         ti.inProfilingRuntimeMethod++;

@@ -499,7 +499,6 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     
     private void resetResults() {
         if (ui != null) ui.resetData();
-        ResultsManager.getDefault().reset();
     }
     
     private void stopResults() {
