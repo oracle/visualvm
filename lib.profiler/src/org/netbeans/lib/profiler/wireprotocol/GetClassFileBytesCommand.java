@@ -110,6 +110,6 @@ public class GetClassFileBytesCommand extends Command {
     }
 
     public String toString() {
-        return super.toString() + " classes: "+Arrays.toString(classes);
+        return super.toString() + " "+classes.length+" classes(): "+Arrays.toString(classes);   // NOI18N
     }
 }

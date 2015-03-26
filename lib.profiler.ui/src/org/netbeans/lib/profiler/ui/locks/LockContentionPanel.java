@@ -402,6 +402,10 @@ public class LockContentionPanel extends DataView {
         return aggregation;
     }
     
+    public void resetData() {
+        root = null;
+        treeTableModel.setRoot(LockCCTNode.EMPTY);
+    }
     
     private class Listener implements LockCCTProvider.Listener {
 
@@ -415,6 +419,7 @@ public class LockContentionPanel extends DataView {
 
         @Override
         public void cctReset() {
+            resetData();
         }  
     }
     
