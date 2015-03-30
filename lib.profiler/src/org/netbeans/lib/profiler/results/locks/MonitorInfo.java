@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.netbeans.lib.profiler.utils.StringUtils;
 
 /**
  *
@@ -68,11 +69,11 @@ class MonitorInfo {
     
     MonitorInfo(int id, String cname) {
         this(id);
-        className = cname;
+        className = StringUtils.userFormClassName(cname);
     }
 
     void setClassName(String cname) {
-        className = cname;
+        className = StringUtils.userFormClassName(cname);
     }
     
    @Override
