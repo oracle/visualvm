@@ -57,7 +57,7 @@ public interface ProfilerXYTooltipModel {
     public String getRowName        (int index);
     public Color  getRowColor       (int index);
     public String getRowValue       (int index, long itemValue);
-    public String getRowUnits       (int index, long itemValue);
+    public String getRowUnits       (int index);
 
     public int    getExtraRowsCount ();
     public String getExtraRowName   (int index);

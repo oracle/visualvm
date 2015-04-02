@@ -52,9 +52,9 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.SwingConstants;
 import org.netbeans.lib.profiler.charts.ChartItem;
+import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.ItemsModel;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.axis.AxisComponent;
@@ -72,13 +72,14 @@ import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemMarker;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemPainter;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemPainter;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYSelectionOverlay;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipOverlay;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipPainter;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
 import org.netbeans.lib.profiler.ui.components.ColorIcon;
 import org.netbeans.lib.profiler.ui.memory.ClassHistoryModels;
 
@@ -196,27 +197,38 @@ public final class AllocationsHistoryGraphPanel extends GraphPanel {
                                               SwingConstants.SOUTH_WEST });
         chartPanel.add(cAxis, new Integer[] { SwingConstants.EAST,
                                               SwingConstants.SOUTH_EAST });
+        
+        // Tooltip support
+        ProfilerXYTooltipPainter tooltipPainter = new ProfilerXYTooltipPainter(createTooltipModel());
+        chart.addOverlayComponent(new ProfilerXYTooltipOverlay(chart, tooltipPainter));
+        chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_EACH_NEAREST);
 
-        // Setup tooltip painter
-        ProfilerXYTooltipPainter tooltipPainter = new ProfilerXYTooltipPainter(
-                                            GraphsUI.TOOLTIP_OVERLAY_LINE_WIDTH,
-                                            GraphsUI.TOOLTIP_OVERLAY_LINE_COLOR,
-                                            GraphsUI.TOOLTIP_OVERLAY_FILL_COLOR,
-                                            getTooltipModel());
+        // Hovering support
+        ProfilerXYSelectionOverlay selectionOverlay = new ProfilerXYSelectionOverlay();
+        chart.addOverlayComponent(selectionOverlay);
+        selectionOverlay.registerChart(chart);
+        chart.getSelectionModel().setMoveMode(ChartSelectionModel.SELECTION_LINE_V);
 
-        // Customize chart
-        chart.addOverlayComponent(new ProfilerXYTooltipOverlay(chart,
-                                                               tooltipPainter));
-
-        // Chart scrollbar
-        JScrollBar hScrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
-        chart.attachHorizontalScrollBar(hScrollBar);
+//        // Setup tooltip painter
+//        ProfilerXYTooltipPainter tooltipPainter = new ProfilerXYTooltipPainter(
+//                                            GraphsUI.TOOLTIP_OVERLAY_LINE_WIDTH,
+//                                            GraphsUI.TOOLTIP_OVERLAY_LINE_COLOR,
+//                                            GraphsUI.TOOLTIP_OVERLAY_FILL_COLOR,
+//                                            getTooltipModel());
+//
+//        // Customize chart
+//        chart.addOverlayComponent(new ProfilerXYTooltipOverlay(chart,
+//                                                               tooltipPainter));
+//
+//        // Chart scrollbar
+//        JScrollBar hScrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
+//        chart.attachHorizontalScrollBar(hScrollBar);
 
         // Chart container (chart panel & scrollbar)
         JPanel chartContainer = new JPanel(new BorderLayout());
         chartContainer.setBorder(BorderFactory.createEmptyBorder());
         chartContainer.add(chartPanel, BorderLayout.CENTER);
-        chartContainer.add(hScrollBar, BorderLayout.SOUTH);
+//        chartContainer.add(hScrollBar, BorderLayout.SOUTH);
 
         // Allocated Objects
         JLabel allocObjectsBig = new JLabel(GraphsUI.A_ALLOC_OBJECTS_NAME,
@@ -293,7 +305,7 @@ public final class AllocationsHistoryGraphPanel extends GraphPanel {
                 return INT_FORMATTER.format(itemValue);
             }
 
-            public String getRowUnits(int index, long itemValue) {
+            public String getRowUnits(int index) {
                 switch (index) {
                     case 0:
                         return ""; // NOI18N
@@ -322,7 +334,7 @@ public final class AllocationsHistoryGraphPanel extends GraphPanel {
             }
 
             public String getExtraRowUnits(int index) {
-                return getRowUnits(index, -1);
+                return getRowUnits(index);
             }
 
         };
@@ -330,8 +342,8 @@ public final class AllocationsHistoryGraphPanel extends GraphPanel {
 
     private PaintersModel createAllocPaintersModel() {
         // Allocated Objects
-        SynchronousXYItemPainter allocObjectsPainter =
-                SynchronousXYItemPainter.absolutePainter(GraphsUI.A_ALLOC_OBJECTS_PAINTER_LINE_WIDTH,
+        ProfilerXYItemPainter allocObjectsPainter =
+                ProfilerXYItemPainter.absolutePainter(GraphsUI.A_ALLOC_OBJECTS_PAINTER_LINE_WIDTH,
                                                       GraphsUI.A_ALLOC_OBJECTS_PAINTER_LINE_COLOR,
                                                       GraphsUI.A_ALLOC_OBJECTS_PAINTER_FILL_COLOR);
         SynchronousXYItemMarker allocObjectsMarker =
@@ -345,8 +357,8 @@ public final class AllocationsHistoryGraphPanel extends GraphPanel {
                                                       allocObjectsMarker);
 
         // Allocated Bytes
-        SynchronousXYItemPainter allocatedBytesPainter =
-                SynchronousXYItemPainter.relativePainter(GraphsUI.A_ALLOC_BYTES_PAINTER_LINE_WIDTH,
+        ProfilerXYItemPainter allocatedBytesPainter =
+                ProfilerXYItemPainter.relativePainter(GraphsUI.A_ALLOC_BYTES_PAINTER_LINE_WIDTH,
                                                       GraphsUI.A_ALLOC_BYTES_PAINTER_LINE_COLOR,
                                                       GraphsUI.A_ALLOC_BYTES_PAINTER_FILL_COLOR,
                                                       10);
