@@ -471,7 +471,7 @@ public final class ResultsManager {
                 idx1 = i;
                 break;
             }
-        if (idx1 == -1) return; // Should not happen
+        if (idx1 == -1 || counts1[idx1] == 0) return; // Should not happen
         
         int idx2 = -1;
         for (int i = 0; i < names2.length; i++)
@@ -479,7 +479,7 @@ public final class ResultsManager {
                 idx2 = i;
                 break;
             }
-        if (idx2 == -1) return; // Should not happen
+        if (idx2 == -1 || counts2[idx2] == 0) return; // Should not happen
         
         // Note: instrumented allocations not compared because of #236363
         long objsize1 = n1 == 1 ? sizes1[idx1] / counts1[idx1] : 0;
