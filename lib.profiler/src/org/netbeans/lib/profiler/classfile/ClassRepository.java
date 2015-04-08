@@ -245,28 +245,39 @@ public abstract class ClassRepository implements CommonConstants {
 
             int[] minAndMaxLines = clazz.getMinAndMaxLinesForMethod(methodIdx);
 
-            if (endLine <= minAndMaxLines[1]) {
-                endLine++; // That's because we will need to inject code after the *last bytecode corresponding to endLine*
-            }
+            int[] idxAndBCI1;
+            if (endLine == minAndMaxLines[1]) { // it's the last line of the same method
+                idxAndBCI1 = new int[2];
+                idxAndBCI1[0] = methodIdx;
 
-            int[] idxAndBCI1 = clazz.methodIdxAndBestBCIForLineNo(endLine);
+                // Need to find the bci of the last instruction in this method. It can only be a "return" or 'goto' ('goto_w').
+                // In either case, we should put the call before this instruction, since it would make no sense after it.
+                byte[] codeBytes = clazz.getMethodBytecode(methodIdx);
+                idxAndBCI1[1] = ClassInfo.findPreviousBCI(codeBytes, codeBytes.length);                
+            } else {
+                if (endLine < minAndMaxLines[1]) {
+                    endLine++; // That's because we will need to inject code after the *last bytecode corresponding to endLine*
+                }
 
-            // Now let's check if start and end lines are within the same method.
-            // If the end line is definitely within some other method, it's an error and we return.
-            // However, it may just cover one or more of '}'s in the end of this method, and these lines
-            // are just not within this method's line number table. If so, assume that the end line is
-            // the last line of the this method.
-            if (methodIdx != idxAndBCI1[0]) {
-                if (idxAndBCI1[0] != -1) { // Definitely this line belongs to some other method
+                idxAndBCI1 = clazz.methodIdxAndBestBCIForLineNo(endLine);
 
-                    return null;
-                } else { // Couldn't find the line - assume it's the last line of the same method
-                    idxAndBCI1[0] = methodIdx;
+                // Now let's check if start and end lines are within the same method.
+                // If the end line is definitely within some other method, it's an error and we return.
+                // However, it may just cover one or more of '}'s in the end of this method, and these lines
+                // are just not within this method's line number table. If so, assume that the end line is
+                // the last line of the this method.
+                if (methodIdx != idxAndBCI1[0]) {
+                    if (idxAndBCI1[0] != -1) { // Definitely this line belongs to some other method
 
-                    // Need to find the bci of the last instruction in this method. It can only be a "return" or 'goto' ('goto_w').
-                    // In either case, we should put the call before this instruction, since it would make no sense after it.
-                    byte[] codeBytes = clazz.getMethodBytecode(methodIdx);
-                    idxAndBCI1[1] = ClassInfo.findPreviousBCI(codeBytes, codeBytes.length);
+                        return null;
+                    } else { // Couldn't find the line - assume it's the last line of the same method
+                        idxAndBCI1[0] = methodIdx;
+
+                        // Need to find the bci of the last instruction in this method. It can only be a "return" or 'goto' ('goto_w').
+                        // In either case, we should put the call before this instruction, since it would make no sense after it.
+                        byte[] codeBytes = clazz.getMethodBytecode(methodIdx);
+                        idxAndBCI1[1] = ClassInfo.findPreviousBCI(codeBytes, codeBytes.length);
+                    }
                 }
             }
 
