@@ -71,6 +71,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
     private static int stackDepth;
     private static int[] stackFrameIds;
     private static Map classIdMap;
+    private static volatile boolean resultsAvailable;
     private static final boolean DEBUG = false;
 
     // -------------------------------------- Miscellaneous support routines ------------------------------------------
@@ -145,6 +146,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
         }
 
         classIdMap = new HashMap();
+        resultsAvailable = false;
     }
 
     public static void traceVMObjectAlloc(Object instance, Class clazz) {
@@ -288,6 +290,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
         stackFrameIds = new int[MAX_STACK_FRAMES];
         Stacks.createNativeStackFrameBuffer(MAX_STACK_FRAMES);
         classIdMap = new HashMap();
+        resultsAvailable = false;
     }
 
     protected static void enableProfiling(boolean v) {
@@ -349,7 +352,8 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
             stackDepth -= NO_OF_PROFILER_FRAMES; // Top frames are our own methods
         }
 
-        if (globalEvBufPos == 0) {
+        if (!resultsAvailable) {
+            resultsAvailable = true;
             ProfilerServer.notifyClientOnResultsAvailability();
         }
 
@@ -410,7 +414,8 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
             stackDepth -= NO_OF_PROFILER_FRAMES; // Top 4 frames are our own methods
         }
 
-        if (globalEvBufPos == 0) {
+        if (!resultsAvailable) {
+            resultsAvailable = true;
             ProfilerServer.notifyClientOnResultsAvailability();
         }
 

@@ -75,7 +75,7 @@ public class ProfilerRuntimeObjLiveness extends ProfilerRuntimeMemory {
     static class ReferenceManagerThread extends Thread {
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
-        private boolean terminated;
+        private volatile boolean terminated;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
 
@@ -91,7 +91,7 @@ public class ProfilerRuntimeObjLiveness extends ProfilerRuntimeMemory {
                 try {
                     ProfilerRuntimeObjLivenessWeakRef wr = (ProfilerRuntimeObjLivenessWeakRef) rq.remove(200);
 
-                    if (wr != null) {
+                    if (wr != null && !terminated) {
                         signalObjGC(wr);
                     }
                 } catch (InterruptedException ex) { /* Should not happen */
@@ -103,11 +103,6 @@ public class ProfilerRuntimeObjLiveness extends ProfilerRuntimeMemory {
 
         public void terminate() {
             terminated = true;
-
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException ex) { /* Should not happen */
-            }
         }
     }
 
