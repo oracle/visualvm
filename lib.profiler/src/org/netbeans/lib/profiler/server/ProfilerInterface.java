@@ -46,10 +46,13 @@ package org.netbeans.lib.profiler.server;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
 import org.netbeans.lib.profiler.global.CommonConstants;
@@ -85,7 +88,7 @@ public class ProfilerInterface implements CommonConstants {
 
         public void run() {
             RootClassLoadedCommand cmd = new RootClassLoadedCommand(new String[] { "*FAKE_CLASS_1*", "*FAKE_CLASS_2*" }, // NOI18N
-                                                                    new int[] { 0, 0 }, null, 2, new int[] { -1 }); // NOI18N
+                                                                    new int[] { 0, 0 }, null, new int[] { 0, 0 }, new int[2][], 2, new int[] { -1 });
             profilerServer.sendComplexCmdToClient(cmd);
 
             InstrumentMethodGroupResponse imgr = (InstrumentMethodGroupResponse) profilerServer.getLastResponse();
@@ -198,7 +201,7 @@ public class ProfilerInterface implements CommonConstants {
 
             Classes.enableClassLoadHook();
 
-            boolean instrSpawnedThreads = cmd.getInstrSpawnedThreads();
+            instrSpawnedThreads = cmd.getInstrSpawnedThreads();
 
             if (targetAppRunning || hasAnyCoreClassNames(cmd.getRootClassNames()) || instrSpawnedThreads
                     || (instrType == INSTR_OBJECT_ALLOCATIONS) || (instrType == INSTR_OBJECT_LIVENESS)) {
@@ -238,6 +241,10 @@ public class ProfilerInterface implements CommonConstants {
 
                     rootClassLoaded = true; // See the comment in classLoadHook why it's worth setting rootClassLoaded
                                             // to true after the first instrumentation, not before
+                } else {
+                    // if root class is not loaded, reset loadedClassesArray so that next time it contains current loaded classes
+                    loadedClassesArray = null;
+                    loadedClassesLoaders = null;
                 }
             }
             Monitors.exitServerState();
@@ -292,17 +299,20 @@ public class ProfilerInterface implements CommonConstants {
     private static final boolean DEBUG = Boolean.getBoolean("org.netbeans.lib.profiler.server.ProfilerInterface.classLoadHook"); // NOI18N
     private static final boolean INSTRUMENT_JFLUID_CLASSES = Boolean.getBoolean("org.netbeans.lib.profiler.server.instrumentJFluidClasses"); // NOI18N
 
+    private static final byte[] EMPTY = new byte[0];
+    
     // The lock used to serialize requests from server to client. May be used outside this class.
     public static final TransactionalSupport serialClientOperationsLock = new TransactionalSupport();
     private static ProfilerServer profilerServer;
     private static ProfilingSessionStatus status;
     private static EventBufferManager evBufManager;
-    private static Class[] loadedClassesArray; // Temporary array, used to send all loaded class names to client
+    private static WeakReference[] loadedClassesArray; // Temporary array, used to send all loaded class names to client
                                                // on instrumentation initiation.
     private static int[] loadedClassesLoaders; // Ditto, for loaders
     private static WeakHashMap reflectMethods; // Cache of methods called using reflection
     private static boolean targetAppSuspended = false;
     private static boolean instrumentReflection = false;
+    private static boolean instrSpawnedThreads;
     private static int[] packedArrayOffsets;
     private static int nSystemThreads;
     private static Thread initInstrumentationThread;
@@ -485,6 +495,7 @@ public class ProfilerInterface implements CommonConstants {
         Classes.setWaitTrackingEnabled(false);
         Classes.setParkTrackingEnabled(false);
         Classes.setSleepTrackingEnabled(false);
+        Classes.setVMObjectAllocEnabled(false);
         Classes.disableClassLoadHook();
         ProfilerRuntimeCPU.setJavaLangReflectMethodInvokeInterceptEnabled(false);
         ClassLoaderManager.setNotifyToolAboutUnloadedClasses(false);
@@ -521,6 +532,7 @@ public class ProfilerInterface implements CommonConstants {
         Threads.initialize();
         HeapDump.initialize(jdk15);
         ThreadDump.initialize(jdk15);
+        loadedClassesArray = null;
         ClassLoaderManager.initialize(profilerServer);
         ClassLoaderManager.addLoader(ClassLoader.getSystemClassLoader());
         reflectMethods = new WeakHashMap();
@@ -696,6 +708,46 @@ public class ProfilerInterface implements CommonConstants {
         return resp;
     }
 
+    static byte[][] getClassFileBytes(String[] classNames, int[] classLoaderIds) {
+        int MAX_CLASSES = 1000;
+        Class[] nonSystemClasses = new Class[MAX_CLASSES+1]; // classes loaded by classloaders other that bootstrap and system
+        int nonSystemIndex = 0;
+        byte[][] bytes = new byte[classNames.length][];
+        Class[] classes = new Class[classNames.length];
+
+        for (int i = 0; i < loadedClassesArray.length; i++) {
+            Class loadedClass = getOrdinaryClass(loadedClassesArray[i]);
+            if (loadedClass == null) {
+                // class was unloaded or has special name
+                continue;
+            }
+            int classLoaderId = loadedClassesLoaders[i];
+            String name = loadedClass.getName();
+            
+            for (int j = 0; j < classNames.length; j++) {
+                if (classLoaderIds[j] == classLoaderId && classNames[j].equals(name)) {
+                    classes[j] = loadedClass;
+                    nonSystemClasses[nonSystemIndex++] = loadedClass;
+                    break;
+                }
+            }
+            if (nonSystemIndex == MAX_CLASSES) {
+                cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
+                nonSystemIndex = 0;
+                profilerServer.sendSimpleCmdToClient(Command.STILL_ALIVE);
+            }
+        }
+        if (nonSystemIndex > 0) {
+            cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
+        }
+        for (int i = 0; i < classes.length; i++) {
+            if (classes[i] != null) {
+                bytes[i] = getClassFileBytes(classes[i], classLoaderIds[i]);
+            }
+        }
+        return bytes;
+    }
+    
     private static boolean getAndInstrumentClasses(boolean rootClassInstrumentation) {
         Response r = profilerServer.getLastResponse();
 
@@ -790,10 +842,10 @@ public class ProfilerInterface implements CommonConstants {
             int MAX_CLASSES = 1000;
             Class[] nonSystemClasses = new Class[MAX_CLASSES+1]; // classes loaded by classloaders other that bootstrap and system
             boolean dynamic = profilerServer.isDynamic();
-
-            loadedClassesArray = Classes.getAllLoadedClasses();
-            loadedClassesLoaders = new int[loadedClassesArray.length];
-
+            Class[] allClasses = Classes.getAllLoadedClasses();
+            loadedClassesArray = new WeakReference[allClasses.length];
+            loadedClassesLoaders = new int[allClasses.length];
+            
             Monitors.DeterminateProgress progress = Monitors.enterServerState(CommonConstants.SERVER_PREPARING, loadedClassesArray.length);
             try {
                 for (int i = 0; i < loadedClassesArray.length; i++) {
@@ -801,22 +853,9 @@ public class ProfilerInterface implements CommonConstants {
                     if(detachStarted) {
                         return;
                     }
-                    Class clazz = loadedClassesArray[i];
+                    Class clazz = allClasses[i];
+                    loadedClassesArray[i] = new WeakReference(clazz);
                     loadedClassesLoaders[i] = ClassLoaderManager.registerLoader(clazz);
-
-                    if (dynamic) {
-                        if (loadedClassesLoaders[i] > 0) { // bootstrap classloader has index -1 and system classloader has index 0
-                            nonSystemClasses[nonSystemIndex++] = clazz;
-                        }
-                        if (nonSystemIndex == MAX_CLASSES) {
-                            cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
-                            nonSystemIndex = 0;
-                        }
-                    }
-                }
-
-                if (nonSystemIndex > 0) {
-                    cacheLoadedClasses(nonSystemClasses,nonSystemIndex);
                 }
             } finally {
                 Monitors.exitServerState();
@@ -883,7 +922,8 @@ public class ProfilerInterface implements CommonConstants {
 
     private static boolean checkForLoadedRootClasses() {
         for (int i = 0; i < loadedClassesArray.length; i++) {
-            if (isRootClass(loadedClassesArray[i].getName())) {
+            Class loadedClass = (Class) loadedClassesArray[i].get();
+            if (loadedClass != null && isRootClass(loadedClass.getName())) {
                 return true;
             }
         }
@@ -1395,6 +1435,10 @@ public class ProfilerInterface implements CommonConstants {
     * classLoaderId = 0 means that it is a system or bootstrap classloader
     */
     private static byte[] getClassFileBytes(Class clazz, int classLoaderId) {
+        return getClassFileBytes(clazz, classLoaderId, true);
+    }
+
+    private static byte[] getClassFileBytes(Class clazz, int classLoaderId, boolean force) {
         byte[] classFileBytes = null;
         URL classURL = null;
         
@@ -1404,6 +1448,7 @@ public class ProfilerInterface implements CommonConstants {
                 if (DEBUG) {
                     System.err.println("Cannot get classbytes for "+clazz.getName()+" loader "+classLoaderId);
                 }
+                if (!force) return EMPTY;
                 cacheLoadedClass(clazz);
                 classFileBytes = getCachedClassFileBytes(clazz);
                 if (classFileBytes == null) {
@@ -1428,27 +1473,81 @@ public class ProfilerInterface implements CommonConstants {
         String[] loadedClassNames = new String[len];
         int[] loaders = new int[len];
         byte[][] cachedClassFileBytes = new byte[len][];
-        int idx = 0;
+        int[] loadedClassesSuper = new int[len];
+        int[][] loadedClassesInterfaces = new int[len][];
+        int instrType = getCurrentInstrType();
+        boolean isLazyInstrType = profilerServer.isDynamic()
+                && (instrType == INSTR_RECURSIVE_FULL || instrType == INSTR_RECURSIVE_SAMPLED)
+                && status.instrScheme == INSTRSCHEME_LAZY 
+                && !instrSpawnedThreads;
+        boolean isMemoryProfiling = profilerServer.isDynamic()
+                && (instrType == INSTR_OBJECT_ALLOCATIONS || instrType == INSTR_OBJECT_LIVENESS);
+        Map classIndex = new HashMap(loadedClassesArray.length*4/3);
+        Class[] classesArray = new Class[len];
 
-        for (int i = 0; i < loadedClassesArray.length; i++) {
-            String name = loadedClassesArray[i].getName();
-
-            if (name.startsWith("[") || internalClassName(name)) { // NOI18N
+        for (int i = 0; i < len; i++) {
+            Class clazz = getOrdinaryClass(loadedClassesArray[i]);
+            if (clazz == null) {
+                // class was unloaded or has special name
                 continue;
             }
-
-            loadedClassNames[idx] = name;
-            loaders[idx] = loadedClassesLoaders[i];
-            cachedClassFileBytes[idx] = getClassFileBytes(loadedClassesArray[i], loaders[idx]);
-            idx++;
+            int index = classIndex.size();
+            classesArray[index] = clazz;
+            loaders[index] = loadedClassesLoaders[i];
+            classIndex.put(clazz, new Integer(index));
         }
-        RootClassLoadedCommand cmd = new RootClassLoadedCommand(loadedClassNames, loaders, cachedClassFileBytes, idx,
-                                                                ClassLoaderManager.getParentLoaderIdTable());
+        for (int i = 0; i < classIndex.size(); i++) {
+            Class clazz = classesArray[i];
+            String name = clazz.getName();
+            boolean forceClassFile = (!isLazyInstrType && !isMemoryProfiling) || isRootClass(name);
+            loadedClassNames[i] = name;
+            cachedClassFileBytes[i] = getClassFileBytes(clazz, loaders[i], forceClassFile);
+
+            if (!forceClassFile) {
+                Class superClass = clazz.getSuperclass();
+                Class[] interfaces = clazz.getInterfaces();
+                
+                if (superClass != null) {
+                    Integer clsId = (Integer) classIndex.get(superClass);
+                    if (clsId != null) {
+                        loadedClassesSuper[i] = clsId.intValue();
+                    } else {
+                        //System.out.println("Super class of class "+name+" not found: "+superClass.getName());
+                        loadedClassesSuper[i] = -1;
+                    }
+                } else {
+                    loadedClassesSuper[i] = -1;
+                }
+                loadedClassesInterfaces[i] = new int[interfaces.length];
+                for (int j = 0; j < interfaces.length; j++) {
+                    Integer clsId = (Integer)classIndex.get(interfaces[j]);
+                    if (clsId != null) {
+                        loadedClassesInterfaces[i][j] = clsId.intValue();
+                    } else {
+                        //System.out.println("Interface of class "+name+" not found: "+interfaces[j].getName());
+                        loadedClassesSuper[i] = -1;
+                    }
+                }
+            }
+        }
+        RootClassLoadedCommand cmd = new RootClassLoadedCommand(loadedClassNames, loaders, cachedClassFileBytes, 
+                                                loadedClassesSuper, loadedClassesInterfaces, classIndex.size(),
+                                                ClassLoaderManager.getParentLoaderIdTable());
         profilerServer.sendComplexCmdToClient(cmd);
-        loadedClassesArray = null; // Free memory
-        loadedClassesLoaders = null; // Ditto
     }
 
+    private static Class getOrdinaryClass(WeakReference classRef) {
+        Class clazz = (Class) classRef.get();
+        if (clazz != null) {
+            String name = clazz.getName();
+
+            if (!name.startsWith("[") && !internalClassName(name)) {
+                return clazz;
+            }             
+        }
+        return null;
+    }
+    
     private static void updateInstrClassAndMethodNames(InstrumentMethodGroupData imgb, boolean firstTime) {
         status.beginTrans(false);
 

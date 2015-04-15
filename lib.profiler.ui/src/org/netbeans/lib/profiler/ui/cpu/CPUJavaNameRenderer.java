@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.ui.cpu;
 
 import javax.swing.Icon;
+import javax.swing.UIManager;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -54,6 +55,19 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  * @author Jiri Sedlacek
  */
 public class CPUJavaNameRenderer extends JavaNameRenderer {
+    
+    private static final Icon THREAD_ICON = Icons.getIcon(ProfilerIcons.THREAD);
+    private static final Icon LEAF_ICON = Icons.getIcon(ProfilerIcons.NODE_LEAF);
+    
+    private final Icon icon;
+    
+    public CPUJavaNameRenderer() {
+        this(ProfilerIcons.NODE_FORWARD);
+    }
+    
+    public CPUJavaNameRenderer(String iconKey) {
+        this.icon = Icons.getIcon(iconKey);
+    }
     
     public void setValue(Object value, int row) {
         if (value instanceof PrestimeCPUCCTNode) {
@@ -67,17 +81,23 @@ public class CPUJavaNameRenderer extends JavaNameRenderer {
                 setNormalValue(""); // NOI18N
                 setBoldValue(node.getNodeName());
                 setGrayValue(""); // NOI18N
+            } else if (node.isFiltered()) {
+                setNormalValue(""); // NOI18N
+                setBoldValue("");
+                setGrayValue(node.getNodeName()); // NOI18N
             } else {
                 super.setValue(node.getNodeName(), row);
             }
             
-            Icon icon = null;
+            Icon _icon = null;
             
-            if (node.isThreadNode()) icon = Icons.getIcon(ProfilerIcons.THREAD);
-            else if (node.isLeaf()) icon = Icons.getIcon(ProfilerIcons.NODE_LEAF);
-            else icon = Icons.getIcon(ProfilerIcons.NODE_FORWARD);
+            if (node.isThreadNode()) _icon = THREAD_ICON;
+            else if (node.isLeaf()) _icon = LEAF_ICON;
+            else _icon = icon;
             
-            setIcon(icon);
+            if (node.isFiltered()) _icon = UIManager.getLookAndFeel().getDisabledIcon(this, _icon);
+            
+            setIcon(_icon);
         } else {
             super.setValue(value, row);
         }

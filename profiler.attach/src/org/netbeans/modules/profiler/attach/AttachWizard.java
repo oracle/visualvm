@@ -55,8 +55,10 @@ public abstract class AttachWizard {
     }
     
     public static boolean isAvailable() {
-        return Lookup.getDefault().lookup(AttachWizard.class) != null;
+        return getDefault() != null;
     }
     
-    public abstract AttachSettings configure(AttachSettings initialSettings);
+    public abstract boolean configured(AttachSettings initialSettings);
+    
+    public abstract AttachSettings configure(AttachSettings initialSettings, boolean partially);
 }

@@ -43,13 +43,14 @@
 
 package org.netbeans.lib.profiler.instrumentation;
 
+import java.io.IOException;
+import java.util.*;
 import org.netbeans.lib.profiler.classfile.*;
 import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.utils.MiscUtils;
-import java.io.IOException;
-import java.util.*;
+import org.netbeans.lib.profiler.wireprotocol.RootClassLoadedCommand;
 
 
 /**
@@ -239,13 +240,49 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
      * Given a list of classes (normally all classes currently loaded by the JVM), determine those that are loaded using
      * custom classloaders, get their cached bytecodes from the JVM, and put them into ClassRepository.
      */
-    protected static void storeClassFileBytesForCustomLoaderClasses(String[] loadedClasses, int[] loadedClassLoaderIds,
-                                                                    byte[][] cachedClassFileBytes) {
+    protected static void storeClassFileBytesForCustomLoaderClasses(RootClassLoadedCommand rootLoaded) {
+        String[] loadedClasses = rootLoaded.getAllLoadedClassNames();
+        byte[][] cachedClassFileBytes = rootLoaded.getCachedClassFileBytes();
+        int[] loadedClassLoaderIds = rootLoaded.getAllLoadedClassLoaderIds();
+        int[] superClasses = rootLoaded.getAllLoaderSuperClassIds();
+        int[][] interfaceNames = rootLoaded.getAllLoadedInterfaceIds();
         int nClasses = loadedClasses.length;
+        Set allInterfacesIndexes = new HashSet();
 
         for (int i = 0; i < nClasses; i++) {
             if (cachedClassFileBytes[i] != null) {
-                ClassRepository.addVMSuppliedClassFile(loadedClasses[i], loadedClassLoaderIds[i], cachedClassFileBytes[i]);
+                String name = loadedClasses[i];
+                int loaderId = loadedClassLoaderIds[i];
+                byte[] bytes = cachedClassFileBytes[i];
+                if (bytes != null && bytes.length == 0) {
+                    String superClass;
+                    int sidx = superClasses[i];
+                    if (sidx != -1 ) {
+                        superClass = loadedClasses[sidx];
+                    } else {
+                        superClass = OBJECT_SLASHED_CLASS_NAME;
+                    }
+                    int[] interfaceNamedIdxs = interfaceNames[i];
+                    List interfaces = new ArrayList();
+                    for (int j = 0; j < interfaceNamedIdxs.length; j++) {
+                        int iidx = interfaceNamedIdxs[j];
+                        if (iidx != -1) {
+                            interfaces.add(loadedClasses[iidx]);
+                            allInterfacesIndexes.add(Integer.valueOf(iidx));
+                        }
+                    }
+                    ClassRepository.addVMSuppliedClassFile(name, loaderId, bytes, superClass, (String[])interfaces.toArray(new String[0]));
+                } else {
+                    ClassRepository.addVMSuppliedClassFile(name, loaderId, bytes);            
+                }
+            }
+        }
+        // set interfaces
+        for (Object intIndex : allInterfacesIndexes) {
+            int iidx = ((Integer)intIndex).intValue();
+            if (cachedClassFileBytes[iidx] != null) {
+                DynamicClassInfo iface = javaClassForName(loadedClasses[iidx], loadedClassLoaderIds[iidx]);
+                iface.setInterface();
             }
         }
     }

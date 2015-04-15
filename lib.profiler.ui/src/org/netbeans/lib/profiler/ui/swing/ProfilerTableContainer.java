@@ -51,6 +51,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -297,6 +299,9 @@ public class ProfilerTableContainer extends JPanel {
         return new JViewport() {
             {
                 setBackground(table.getBackground());
+                table.addPropertyChangeListener("enabled", new PropertyChangeListener() { // NOI18N
+                    public void propertyChange(PropertyChangeEvent evt) { setBackground(table.getBackground()); }
+                });
             }
             public void paint(Graphics g) {
                 super.paint(g);

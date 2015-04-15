@@ -51,22 +51,30 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
 import javax.swing.MenuElement;
 import javax.swing.MenuSelectionManager;
 import javax.swing.SwingUtilities;
@@ -78,10 +86,13 @@ import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.swing.GrayLabel;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
 import org.netbeans.modules.profiler.actions.RunGCAction;
 import org.netbeans.modules.profiler.actions.TakeThreadDumpAction;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
@@ -91,14 +102,16 @@ import org.netbeans.modules.profiler.attach.AttachWizard;
 import org.netbeans.modules.profiler.v2.impl.FeaturesView;
 import org.netbeans.modules.profiler.v2.impl.WelcomePanel;
 import org.netbeans.modules.profiler.v2.ui.DropdownButton;
-import org.netbeans.modules.profiler.v2.ui.GrayLabel;
 import org.netbeans.modules.profiler.v2.ui.StayOpenPopupMenu;
 import org.netbeans.modules.profiler.v2.ui.ToggleButtonMenuItem;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
+import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
+import org.openide.util.actions.CallbackSystemAction;
+import org.openide.util.actions.SystemAction;
 import org.openide.windows.Mode;
 import org.openide.windows.WindowManager;
 
@@ -128,7 +141,8 @@ import org.openide.windows.WindowManager;
     "ProfilerWindow_profileSection=Profile:",
     "ProfilerWindow_settingsSection=Settings:",
     "#NOI18N",
-    "ProfilerWindow_mode=editor"
+    "ProfilerWindow_mode=editor",
+    "ProfilerWindow_noFeature=<html><b>No profiling feature selected.</b><br><br>Please select at least one profiling feature for the session.</html>"
 })
 class ProfilerWindow extends ProfilerTopComponent {    
     
@@ -277,6 +291,55 @@ class ProfilerWindow extends ProfilerTopComponent {
             }
         });
         updateButtons();
+        
+        registerActions();
+    }
+    
+    private void registerActions() {
+        InputMap map = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        
+        final String FILTER = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        final ActionListener filter = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ProfilerFeature feature = featuresView.getSelectedFeature();
+                JPanel resultsUI = feature == null ? null : feature.getResultsUI();
+                if (resultsUI == null) return;
+                
+                Action action = resultsUI.getActionMap().get(FILTER);
+                if (action != null && action.isEnabled()) action.actionPerformed(e);
+            }
+        };
+        getActionMap().put(FILTER, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { filter.actionPerformed(e); }
+        });
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK), FILTER);
+        
+        final String FIND = SearchUtils.FIND_ACTION_KEY;
+        final ActionListener find = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ProfilerFeature feature = featuresView.getSelectedFeature();
+                JPanel resultsUI = feature == null ? null : feature.getResultsUI();
+                if (resultsUI == null) return;
+                
+                Action action = resultsUI.getActionMap().get(FIND);
+                if (action != null && action.isEnabled()) action.actionPerformed(null);
+            }
+        };
+        try {
+            // Let's use the global FindAction if available
+            Class findActionClass = Class.forName("org.openide.actions.FindAction"); // NOI18N
+            CallbackSystemAction globalFindAction = (CallbackSystemAction)SystemAction.get(findActionClass);
+            Object findActionKey = globalFindAction.getActionMapKey();
+            getActionMap().put(findActionKey, new AbstractAction() {
+                public void actionPerformed(ActionEvent e) { find.actionPerformed(e); }
+            });
+        } catch (ClassNotFoundException e) {
+            // Fallback to CTRL+F if global FindAction not available
+            getActionMap().put(FIND, new AbstractAction() {
+                public void actionPerformed(ActionEvent e) { find.actionPerformed(e); }
+            });
+            map.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK), FIND);
+        }
     }
     
     
@@ -394,43 +457,62 @@ class ProfilerWindow extends ProfilerTopComponent {
         return attachSettings;
     }
     
-    private boolean configureAttachSettings() {
-        AttachSettings settings = AttachWizard.getDefault().configure(attachSettings);
-        if (settings != null) {
-            attachSettings = settings;
-            final AttachSettings as = attachSettings;
-            final Lookup.Provider lp = session.getProject();
-            RequestProcessor.getDefault().post(new Runnable() {
-                public void run() {
-                    Properties p = new Properties();
-                    attachSettings.store(p);
-                    try {
-                        ProfilerStorage.saveProjectProperties(p, lp, "attach"); // NOI18N
-                    } catch (IOException ex) {
-                        Exceptions.printStackTrace(ex);
-                    }
+    private boolean configureAttachSettings(boolean partially) {
+        AttachSettings settings = AttachWizard.getDefault().configure(attachSettings, partially);
+        if (settings == null) return false; // cancelled by the user
+        
+        attachSettings = settings;
+        final AttachSettings as = new AttachSettings();
+        attachSettings.copyInto(as);
+        final Lookup.Provider lp = session.getProject();
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                Properties p = new Properties();
+                as.store(p);
+                try {
+                    ProfilerStorage.saveProjectProperties(p, lp, "attach"); // NOI18N
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
                 }
-            });
-        }
-        return attachSettings != null;
+            }
+        });
+            
+        return true;
     }
     
     private void performStartImpl() {
         start.setPushed(true);
         
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                if (session.isAttach() && attachSettings == null) {
-                    configureAttachSettings();
-                    if (attachSettings == null) {
-                        start.setPushed(false);
-                        return;
+        final ProfilingSettings _profilingSettings = __profilingSettings();
+        if (_profilingSettings == null) { // #250237 ?
+            ProfilerDialogs.displayError(Bundle.ProfilerWindow_noFeature());
+            start.setPushed(false);
+            return;
+        }
+        
+        if (session.isAttach()) {
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    if (AttachWizard.getDefault().configured(attachSettings)) {
+                        performDoStartImpl(_profilingSettings, attachSettings);
+                    } else {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                if (!configureAttachSettings(false)) start.setPushed(false);
+                                else performDoStartImpl(_profilingSettings, attachSettings);
+                            }
+                        });
                     }
                 }
-
-                if (!session.doStart(__profilingSettings(), __attachSettings()))
-                    start.setPushed(false);
-            }
+            });
+        } else {
+            performDoStartImpl(_profilingSettings, null);
+        }
+    }
+    
+    private void performDoStartImpl(final ProfilingSettings ps, final AttachSettings as) {
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() { if (!session.doStart(ps, as)) start.setPushed(false); }
         });
     }
     
@@ -562,7 +644,7 @@ class ProfilerWindow extends ProfilerTopComponent {
                         setEnabled(!session.inProgress());
                     }
                     protected void fireActionPerformed(ActionEvent event) {
-                        configureAttachSettings();
+                        configureAttachSettings(true);
                     }
                 };
             }
@@ -758,6 +840,20 @@ class ProfilerWindow extends ProfilerTopComponent {
     
     protected String preferredID() {
         return this.getClass().getName();
+    }
+    
+    public HelpCtx getHelpCtx() {
+        ProfilerFeature selected = featuresView == null ? null :
+                                   featuresView.getSelectedFeature();
+        
+        JPanel selectedUI = selected == null ? null : selected.getResultsUI();
+        if (selectedUI == null && selected != null) selectedUI = selected.getSettingsUI();
+        
+        String helpCtx = selectedUI == null ? null :
+                         (String)selectedUI.getClientProperty("HelpCtx.Key"); // NOI18N
+        if (helpCtx == null) helpCtx = "ProfileWindow.HelpCtx"; // NOI18N
+        
+        return new HelpCtx(helpCtx);
     }
     
     

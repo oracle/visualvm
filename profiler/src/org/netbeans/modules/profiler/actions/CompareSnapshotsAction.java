@@ -70,8 +70,6 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
-import org.openide.awt.ActionRegistration;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.windows.WindowManager;

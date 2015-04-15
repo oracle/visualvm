@@ -43,7 +43,7 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
-import javax.swing.JButton;
+import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
@@ -51,9 +51,10 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.monitor.MonitorView;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.lib.profiler.ui.swing.GrayLabel;
+import org.netbeans.lib.profiler.ui.swing.MultiButtonGroup;
 import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.v2.ui.GrayLabel;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.NbBundle;
 
 /**
@@ -61,7 +62,11 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "MonitorFeatureUI_graphs=Graphs:"
+    "MonitorFeatureUI_graphs=View:",
+    "MonitorFeatureUI_cpuGraph=CPU and GC",
+    "MonitorFeatureUI_memoryGraph=Memory",
+    "MonitorFeatureUI_gcGraph=Garbage Collection",
+    "MonitorFeatureUI_threadsGraph=Threads and Classes"
 })
 abstract class MonitorFeatureUI extends FeatureUI {
     
@@ -95,9 +100,6 @@ abstract class MonitorFeatureUI extends FeatureUI {
     // --- UI ------------------------------------------------------------------
     
     private JLabel grLabel;
-    private JButton grZoomInButton;
-    private JButton grZoomOutButton;
-    private JToggleButton grFitWidthButton;
     
     
     private void initUI() {
@@ -108,19 +110,12 @@ abstract class MonitorFeatureUI extends FeatureUI {
         
         monitorView = new MonitorView(getProfiler().getVMTelemetryManager());
         
+        monitorView.putClientProperty("HelpCtx.Key", "ProfileTelemetry.HelpCtx"); // NOI18N
+        
         
         // --- Toolbar ---------------------------------------------------------
         
-        grLabel = new GrayLabel(Bundle.MonitorFeatureUI_graphs());
-            
-        grZoomInButton = new JButton(Icons.getIcon(GeneralIcons.ZOOM_IN));
-        grZoomInButton.setEnabled(false);
-
-        grZoomOutButton = new JButton(Icons.getIcon(GeneralIcons.ZOOM_OUT));
-        grZoomOutButton.setEnabled(false);
-
-        grFitWidthButton = new JToggleButton(Icons.getIcon(GeneralIcons.SCALE_TO_FIT));
-        grFitWidthButton.setEnabled(false);
+        MultiButtonGroup group = new MultiButtonGroup();
 
         toolbar = ProfilerToolbar.create(true);
 
@@ -128,11 +123,58 @@ abstract class MonitorFeatureUI extends FeatureUI {
         toolbar.addSeparator();
         toolbar.addSpace(5);
 
+        grLabel = new GrayLabel(Bundle.MonitorFeatureUI_graphs());
         toolbar.add(grLabel);
+        
         toolbar.addSpace(2);
-        toolbar.add(grZoomInButton);
-        toolbar.add(grZoomOutButton);
-        toolbar.add(grFitWidthButton);
+        
+        JToggleButton cpuView = new JToggleButton(Icons.getIcon(ProfilerIcons.CPU)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                monitorView.setupCPUView(isSelected());
+            }
+        };
+        cpuView.setToolTipText(Bundle.MonitorFeatureUI_cpuGraph());
+        group.add(cpuView);
+        monitorView.setupCPUView(true);
+        cpuView.setSelected(true);
+        toolbar.add(cpuView);
+        
+        JToggleButton memoryView = new JToggleButton(Icons.getIcon(ProfilerIcons.MEMORY)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                monitorView.setupMemoryView(isSelected());
+            }
+        };
+        memoryView.setToolTipText(Bundle.MonitorFeatureUI_memoryGraph());
+        group.add(memoryView);
+        monitorView.setupMemoryView(true);
+        memoryView.setSelected(true);
+        toolbar.add(memoryView);
+        
+        JToggleButton gcView = new JToggleButton(Icons.getIcon(ProfilerIcons.RUN_GC)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                monitorView.setupGCView(isSelected());
+            }
+        };
+        gcView.setToolTipText(Bundle.MonitorFeatureUI_gcGraph());
+        group.add(gcView);
+        monitorView.setupGCView(true);
+        gcView.setSelected(true);
+        toolbar.add(gcView);
+        
+        JToggleButton threadsView = new JToggleButton(Icons.getIcon(ProfilerIcons.WINDOW_THREADS)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                monitorView.setupThreadsView(isSelected());
+            }
+        };
+        threadsView.setToolTipText(Bundle.MonitorFeatureUI_threadsGraph());
+        group.add(threadsView);
+        monitorView.setupThreadsView(true);
+        threadsView.setSelected(true);
+        toolbar.add(threadsView);
         
         
         // --- Sync UI ---------------------------------------------------------

@@ -43,10 +43,13 @@
 package org.netbeans.lib.profiler.ui.swing;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.table.TableModel;
@@ -59,19 +62,18 @@ import javax.swing.table.TableRowSorter;
  */
 class ProfilerRowSorter extends TableRowSorter {
     
-    private SortOrder defaultSortOrder = SortOrder.ASCENDING;
-    private Map<Integer, SortOrder> defaultSortOrders;
-    
-    private int secondarySortColumn;
-    
-    
     // --- Package-private constructor -----------------------------------------
     
     ProfilerRowSorter(TableModel model) {
         super(model);
     }
     
-    // --- Public API implementation -------------------------------------------
+    // --- Sorting support -----------------------------------------------------
+    
+    private SortOrder defaultSortOrder = SortOrder.ASCENDING;
+    private Map<Integer, SortOrder> defaultSortOrders;
+    
+    private int secondarySortColumn;
     
     public void setSortKeys(List newKeys) {
         RowSorter.SortKey oldKey = getSortKey();
@@ -143,6 +145,46 @@ class ProfilerRowSorter extends TableRowSorter {
         SortOrder order = defaultSortOrders == null ? null :
                           defaultSortOrders.get(column);
         return order == null ? defaultSortOrder : order;
+    }
+    
+    
+    // --- Filtering support ---------------------------------------------------
+    
+    private boolean filterMode = true; // AND filter by default
+    private Collection<RowFilter<Object, Object>> filters;
+    
+    // false = OR, true = AND
+    void setFiltersMode(boolean mode) {
+        this.filterMode = mode;
+        if (filters != null) refreshRowFilter();
+    }
+    
+    boolean getFiltersMode() {
+        return filterMode;
+    }
+    
+    void addRowFilter(RowFilter filter) {
+        if (filters == null) filters = new HashSet();
+        if (filters.contains(filter)) filters.remove(filter);
+        filters.add(filter);
+        refreshRowFilter();
+    }
+    
+    void removeRowFilter(RowFilter filter) {
+        if (filters == null) return;
+        filters.remove(filter);
+        refreshRowFilter();
+    }
+    
+    private void refreshRowFilter() {
+        if (filters == null || filters.isEmpty()) {
+            setRowFilter(null);
+        } else if (filters.size() == 1) {
+            setRowFilter(filters.iterator().next());
+        } else {
+            setRowFilter(filterMode ? RowFilter.andFilter(filters) :
+                                      RowFilter.orFilter(filters));
+        }
     }
     
     // --- Persistence ---------------------------------------------------------

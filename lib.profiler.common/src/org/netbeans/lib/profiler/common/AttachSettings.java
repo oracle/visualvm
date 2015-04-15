@@ -63,6 +63,9 @@ public final class AttachSettings {
     public static final String PROP_ATTACH_DYNAMIC_JDK16 = "profiler.attach.dynamic.jdk16"; //NOI18N
     public static final String PROP_ATTACH_HOST = "profiler.attach.host"; //NOI18N
     public static final String PROP_ATTACH_PORT = "profiler.attach.port"; //NOI18N
+    public static final String PROP_ATTACH_DYNAMIC_PID = "profiler.attach.dynamic.pid"; //NOI18N
+    public static final String PROP_ATTACH_DYNAMIC_PROCESS_NAME = "profiler.attach.dynamic.processName"; //NOI18N
+    public static final String PROP_ATTACH_DYNAMIC_AUTO = "profiler.attach.dynamic.auto"; //NOI18N
 
     // following items are for settings persistency only, they don't affect attaching at all
     public static final String PROP_ATTACH_TARGET_TYPE = "profiler.attach.target.type"; //NOI18N
@@ -98,6 +101,8 @@ public final class AttachSettings {
     private boolean remote_dbl = remote;
     private int pid = -1;
     private int pid_dbl = pid;
+    private String processName;
+    private boolean autoSelect;
     private int transientPort = -1;
     private int transientPort_dbl = transientPort;
 
@@ -164,10 +169,26 @@ public final class AttachSettings {
     public int getPid() {
         return pid;
     }
+    
+    public void setProcessName(String processName) {
+        this.processName = processName;
+    }
+    
+    public String getProcessName() {
+        return processName;
+    }
+    
+    public void setAutoSelectProcess(boolean autoSelect) {
+        this.autoSelect = autoSelect;
+    }
+    
+    public boolean isAutoSelectProcess() {
+        return autoSelect;
+    }
 
     /** This is only intended to be used to handle AttachSettings defined via ant.
      *
-     * @param port A port to use insteead of globally defined port. The value is transient and will not be persisted.
+     * @param port A port to use instead of globally defined port. The value is transient and will not be persisted.
      */
     public void setPort(final int port) {
         this.transientPort = port;
@@ -212,6 +233,11 @@ public final class AttachSettings {
             sharedSettings.setRemoteHost(host);
         } else {
             sharedSettings.setRemoteHost(""); // NOI18N
+        }
+        if (isDynamic16()) {
+            sharedSettings.setInstrumentObjectInit(true);
+        } else {
+            sharedSettings.setInstrumentObjectInit(false);            
         }
     }
 
@@ -275,6 +301,8 @@ public final class AttachSettings {
         as.dynamic16_dbl = dynamic16_dbl;
         as.pid = pid;
         as.pid_dbl = pid_dbl;
+        as.processName = processName;
+        as.autoSelect = autoSelect;
         as.host = host;
         as.host_dbl = host_dbl;
         as.targetType = targetType;
@@ -298,6 +326,9 @@ public final class AttachSettings {
         targetType = ProfilingSettings.getProperty(props, PROP_ATTACH_TARGET_TYPE, ""); //NOI18N
         serverType = ProfilingSettings.getProperty(props, PROP_ATTACH_SERVER_TYPE, ""); //NOI18N
         remoteHostOS = ProfilingSettings.getProperty(props, PROP_ATTACH_HOST_OS, IntegrationUtils.getLocalPlatform(-1)); //NOI18N
+        pid = Integer.parseInt(ProfilingSettings.getProperty(props, PROP_ATTACH_DYNAMIC_PID, "-1")); //NOI18N
+        processName = ProfilingSettings.getProperty(props, PROP_ATTACH_DYNAMIC_PROCESS_NAME, null); //NOI18
+        autoSelect = Boolean.valueOf(ProfilingSettings.getProperty(props, PROP_ATTACH_DYNAMIC_AUTO, "false")).booleanValue(); //NOI18N
     }
 
     public void store(final Map props) {
@@ -308,6 +339,12 @@ public final class AttachSettings {
         props.put(PROP_ATTACH_TARGET_TYPE, targetType);
         props.put(PROP_ATTACH_SERVER_TYPE, serverType);
         props.put(PROP_ATTACH_HOST_OS, hostOS);
+        if (pid == -1) props.remove(PROP_ATTACH_DYNAMIC_PID);
+        else props.put(PROP_ATTACH_DYNAMIC_PID, Integer.toString(pid));
+        if (processName == null) props.remove(PROP_ATTACH_DYNAMIC_PROCESS_NAME);
+        else props.put(PROP_ATTACH_DYNAMIC_PROCESS_NAME, processName);
+        if (!autoSelect) props.remove(PROP_ATTACH_DYNAMIC_AUTO);
+        else props.put(PROP_ATTACH_DYNAMIC_AUTO, Boolean.TRUE.toString());
     }
 
     public String toString() {
@@ -323,6 +360,10 @@ public final class AttachSettings {
         sb.append("dynamic JDK16 =").append(dynamic16); //NOI18N
         sb.append("\n"); //NOI18N
         sb.append("pid =").append(pid); //NOI18N
+        sb.append("\n"); //NOI18N
+        sb.append("process name =").append(processName); //NOI18N
+        sb.append("\n"); //NOI18N
+        sb.append("auto select =").append(autoSelect); //NOI18N
         sb.append("\n"); //NOI18N
         sb.append("host =").append(host); //NOI18N
         sb.append("\n"); //NOI18N

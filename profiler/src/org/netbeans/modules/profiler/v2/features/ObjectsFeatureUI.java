@@ -54,13 +54,13 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.memory.MemoryView;
+import org.netbeans.lib.profiler.ui.memory.LiveMemoryView;
+import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.v2.ui.GrayLabel;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -69,16 +69,16 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "ObjectsFeatureUI_liveResults=Live results:",
+    "ObjectsFeatureUI_liveResults=Results:",
     "ObjectsFeatureUI_pauseResults=Pause live results",
     "ObjectsFeatureUI_updateResults=Update live results",
-    "ObjectsFeatureUI_profilingData=Profiling data:",
+    "ObjectsFeatureUI_profilingData=Collected data:",
     "ObjectsFeatureUI_snapshot=Snapshot"
 })
 abstract class ObjectsFeatureUI extends FeatureUI {
     
     private ProfilerToolbar toolbar;
-    private MemoryView memoryView;
+    private LiveMemoryView memoryView;
 
     
     // --- External implementation ---------------------------------------------
@@ -147,9 +147,15 @@ abstract class ObjectsFeatureUI extends FeatureUI {
         
         // --- Results ---------------------------------------------------------
         
-        memoryView = new MemoryView(getProfiler().getTargetAppRunner().getProfilerClient(), getSelection(), GoToSource.isAvailable()) {
+        memoryView = new LiveMemoryView(getProfiler().getTargetAppRunner().getProfilerClient(), getSelection()) {
+            public boolean showSourceSupported() {
+                return GoToSource.isAvailable();
+            }
             public void showSource(ClientUtils.SourceCodeSelection value) {
-                GoToSource.openSource(getProject(), value.getClassName(), "", ""); // NOI18N
+                String className = value.getClassName();
+                String methodName = value.getMethodName();
+                String methodSig = value.getMethodSignature();
+                GoToSource.openSource(getProject(), className, methodName, methodSig);
             }
             public void selectForProfiling(ClientUtils.SourceCodeSelection value) {
                 ObjectsFeatureUI.this.selectForProfiling(value);
@@ -167,6 +173,8 @@ abstract class ObjectsFeatureUI extends FeatureUI {
                 }
             }
         };
+        
+        memoryView.putClientProperty("HelpCtx.Key", "ProfileObjects.HelpCtx"); // NOI18N
         
         
         // --- Toolbar ---------------------------------------------------------

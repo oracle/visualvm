@@ -111,7 +111,7 @@ public class BasicTest extends CommonWireIOTestCase {
             log("sending command " + cmd);
             wireIO.sendComplexCommand(cmd);
 
-            cmd = new RootClassLoadedCommand(new String[] { "java.lang.String" }, new int[1], new byte[1][0], 1, new int[1]);
+            cmd = new RootClassLoadedCommand(new String[] { "java.lang.String" }, new int[1], new byte[1][0], new int[1], new int[1][], 1, new int[1]);
             log("sending command " + cmd);
             wireIO.sendComplexCommand(cmd);
 

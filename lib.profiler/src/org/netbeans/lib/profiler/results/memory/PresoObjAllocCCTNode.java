@@ -43,7 +43,11 @@
 
 package org.netbeans.lib.profiler.results.memory;
 
-import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.CCTNode;
@@ -51,8 +55,8 @@ import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import java.util.ResourceBundle;
-import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.results.FilterSortSupport;
+import org.netbeans.lib.profiler.utils.Wildcards;
 
 
 /**
@@ -65,7 +69,7 @@ import org.netbeans.lib.profiler.results.FilterSortSupport;
  * @author Tomas Hurka
  * @author Misha Dmitriev
  */
-public class PresoObjAllocCCTNode implements CCTNode {
+public class PresoObjAllocCCTNode extends CCTNode {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     public static final String VM_ALLOC_CLASS = "org.netbeans.lib.profiler.server.ProfilerRuntimeMemory"; // NOI18N
@@ -78,24 +82,40 @@ public class PresoObjAllocCCTNode implements CCTNode {
     public static final int SORT_BY_ALLOC_OBJ_SIZE = 2;
     public static final int SORT_BY_ALLOC_OBJ_NUMBER = 3;
     
-    protected static final char MASK_FILTERED_NODE = 0x8;
+//    protected static final char MASK_FILTERED_NODE = 0x8;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     public long nCalls;
     public long totalObjSize;
-    PresoObjAllocCCTNode parent;
+    protected PresoObjAllocCCTNode parent;
     String className;
     String methodName;
     String methodSig;
     String nodeName;
-    PresoObjAllocCCTNode[] children;
+    protected PresoObjAllocCCTNode[] children;
     int methodId;
     
     protected char flags;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
+    
+    public static PresoObjAllocCCTNode rootNode(PresoObjAllocCCTNode[] children) {
+        PresoObjAllocCCTNode root = new PresoObjAllocCCTNode();
+        root.setChildren(children);
+        return root;
+    }
+    
+    public PresoObjAllocCCTNode(String className, long nCalls, long totalObjSize) {
+        this.className = className;
+        this.nCalls = nCalls;
+        this.totalObjSize = totalObjSize;
+        
+        methodName = Wildcards.ALLWILDCARD;
+    }
+    
+    PresoObjAllocCCTNode() {}
+    
     protected PresoObjAllocCCTNode(RuntimeMemoryCCTNode rtNode) {
         methodId = rtNode.methodId;
 
@@ -106,41 +126,62 @@ public class PresoObjAllocCCTNode implements CCTNode {
         }
     }
     
-    //--- TreeNode adapter ---
-    public Enumeration<PresoObjAllocCCTNode> children() {
-        return new Enumeration<PresoObjAllocCCTNode>() {
-            private int index = 0;
-            
-            public boolean hasMoreElements() {
-                return getChildren() != null && index < getChildren().length;
-            }
+    
+    protected final void setChildren(PresoObjAllocCCTNode[] children) {
+        this.children = children;
+        for (PresoObjAllocCCTNode child : children) child.parent = this;
+    }
+    
+    
+    // --- Filtering support
+    
+    public CCTNode createFilteredNode() {
+        PresoObjAllocCCTNode filtered = new PresoObjAllocCCTNode();
+        setupFilteredNode(filtered);        
+        return filtered;
+    }
+    
+    protected void setupFilteredNode(PresoObjAllocCCTNode filtered) {
+        filtered.setFilteredNode();
+         
+        filtered.parent = parent;
 
-            public PresoObjAllocCCTNode nextElement() {
-                return (PresoObjAllocCCTNode)getChildren()[index++];
+        filtered.nCalls = nCalls;
+        filtered.totalObjSize = totalObjSize;
+
+        Collection<PresoObjAllocCCTNode> _childrenL = resolveChildren(this);
+        filtered.children = _childrenL.toArray(new PresoObjAllocCCTNode[_childrenL.size()]);
+    }
+    
+    public void merge(CCTNode node) {
+        if (node instanceof PresoObjAllocCCTNode) {
+            PresoObjAllocCCTNode _node = (PresoObjAllocCCTNode)node;
+            
+            nCalls += _node.nCalls;
+            totalObjSize += _node.totalObjSize;
+
+            List<CCTNode> ch = new ArrayList();
+            
+            // Include current children
+            if (children != null) ch.addAll(Arrays.asList(children));
+            
+            // Add or merge new children
+            for (PresoObjAllocCCTNode child : resolveChildren(_node)) {
+                int idx = ch.indexOf(child);
+                if (idx == -1) ch.add(child);
+                else ch.get(idx).merge(child);
             }
-        };
+            
+            children = ch.toArray(new PresoObjAllocCCTNode[ch.size()]);
+        }
+    }
+
+    protected static Collection<PresoObjAllocCCTNode> resolveChildren(PresoObjAllocCCTNode node) {
+        PresoObjAllocCCTNode[] chldrn = (PresoObjAllocCCTNode[])node.getChildren();
+        return chldrn == null ? Collections.EMPTY_LIST : Arrays.asList(chldrn);
     }
     
-    public boolean isLeaf() {
-        return getChildCount() == 0;
-    }
-    
-    public boolean getAllowsChildren() {
-        return true;
-    }
-    
-    public int getIndex(TreeNode node) {
-        return getIndexOfChild(node);
-    }
-    
-    public int getChildCount() {
-        return getNChildren();
-    }
-    
-    public TreeNode getChildAt(int index) {
-        return getChild(index);
-    }
-    //---
+    // ---
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -212,7 +253,7 @@ public class PresoObjAllocCCTNode implements CCTNode {
     }
 
     public String getNodeName() {
-        if (isFilteredNode()) {
+        if (isFiltered()) {
             return FilterSortSupport.FILTERED_OUT_LBL;
         } else if (methodId != 0) {
             return nodeName;
@@ -228,66 +269,66 @@ public class PresoObjAllocCCTNode implements CCTNode {
     }
 
     public void sortChildren(int sortBy, boolean sortOrder) {
-        int nChildren = getNChildren();
-
-        if (nChildren == 0) {
-            return;
-        }
-
-        for (int i = 0; i < nChildren; i++) {
-            children[i].sortChildren(sortBy, sortOrder);
-        }
-
-        if (nChildren > 1) {
-            switch (sortBy) {
-                case SORT_BY_NAME:
-                    sortChildrenByName(sortOrder);
-
-                    break;
-                case SORT_BY_ALLOC_OBJ_SIZE:
-                    sortChildrenByAllocObjSize(sortOrder);
-
-                    break;
-                case SORT_BY_ALLOC_OBJ_NUMBER:
-                    sortChildrenByAllocObjNumber(sortOrder);
-
-                    break;
-            }
-        }
+//        int nChildren = getNChildren();
+//
+//        if (nChildren == 0) {
+//            return;
+//        }
+//
+//        for (int i = 0; i < nChildren; i++) {
+//            children[i].sortChildren(sortBy, sortOrder);
+//        }
+//
+//        if (nChildren > 1) {
+//            switch (sortBy) {
+//                case SORT_BY_NAME:
+//                    sortChildrenByName(sortOrder);
+//
+//                    break;
+//                case SORT_BY_ALLOC_OBJ_SIZE:
+//                    sortChildrenByAllocObjSize(sortOrder);
+//
+//                    break;
+//                case SORT_BY_ALLOC_OBJ_NUMBER:
+//                    sortChildrenByAllocObjNumber(sortOrder);
+//
+//                    break;
+//            }
+//        }
     }
 
     public String toString() {
         return getNodeName();
     }
     
-    public void setFilteredNode() {
-        flags |= MASK_FILTERED_NODE;
-    }
+//    public void setFilteredNode() {
+//        flags |= MASK_FILTERED_NODE;
+//    }
+//    
+//    public void resetFilteredNode() {
+//        flags &= ~MASK_FILTERED_NODE;
+//    }
+//
+//    public boolean isFilteredNode() {
+//        return (flags & MASK_FILTERED_NODE) != 0;
+//    }
     
-    public void resetFilteredNode() {
-        flags &= ~MASK_FILTERED_NODE;
-    }
-
-    public boolean isFilteredNode() {
-        return (flags & MASK_FILTERED_NODE) != 0;
-    }
-    
-    void merge(PresoObjAllocCCTNode node) {
-        nCalls += node.nCalls;
-        totalObjSize += totalObjSize;
-        
-        if (node.children != null) {
-            for (PresoObjAllocCCTNode ch : node.children)
-                ch.parent = this;
-            
-            int chl = children == null ? 0 : children.length;
-            int newchl = node.children.length;
-            PresoObjAllocCCTNode[] newch = new PresoObjAllocCCTNode[chl + newchl];
-            if (children != null) System.arraycopy(children, 0, newch, 0, chl);
-            System.arraycopy(node.children, 0, newch, chl, newchl);
-            children = newch;
-        }
-    }
+//    void merge(PresoObjAllocCCTNode node) {
+//        nCalls += node.nCalls;
+//        totalObjSize += totalObjSize;
+//        
+//        if (node.children != null) {
+//            for (PresoObjAllocCCTNode ch : node.children)
+//                ch.parent = this;
+//            
+//            int chl = children == null ? 0 : children.length;
+//            int newchl = node.children.length;
+//            PresoObjAllocCCTNode[] newch = new PresoObjAllocCCTNode[chl + newchl];
+//            if (children != null) System.arraycopy(children, 0, newch, 0, chl);
+//            System.arraycopy(node.children, 0, newch, chl, newchl);
+//            children = newch;
+//        }
+//    }
     
     public boolean equals(Object o) {
         if (!(o instanceof PresoObjAllocCCTNode)) return false;
@@ -433,109 +474,109 @@ public class PresoObjAllocCCTNode implements CCTNode {
         }
     }
 
-    protected void sortChildrenByAllocObjNumber(boolean sortOrder) {
-        int len = children.length;
-        long[] values = new long[len];
-
-        for (int i = 0; i < len; i++) {
-            values[i] = children[i].nCalls;
-        }
-
-        sortLongs(values, sortOrder);
-    }
-
-    protected void sortChildrenByAllocObjSize(boolean sortOrder) {
-        int len = children.length;
-        long[] values = new long[len];
-
-        for (int i = 0; i < len; i++) {
-            values[i] = children[i].totalObjSize;
-        }
-
-        sortLongs(values, sortOrder);
-    }
-
-    protected void sortChildrenByName(boolean sortOrder) {
-        int len = children.length;
-        String[] values = new String[len];
-
-        for (int i = 0; i < len; i++) {
-            values[i] = children[i].getNodeName();
-        }
-
-        sortStrings(values, sortOrder);
-    }
-
-    protected void sortFloats(float[] values, boolean sortOrder) {
-        int len = values.length;
-
-        // Just the insertion sort - we will never get really large arrays here
-        for (int i = 0; i < len; i++) {
-            for (int j = i; (j > 0) && ((sortOrder == false) ? (values[j - 1] < values[j]) : (values[j - 1] > values[j])); j--) {
-                float tmp = values[j];
-                values[j] = values[j - 1];
-                values[j - 1] = tmp;
-
-                PresoObjAllocCCTNode tmpCh = children[j];
-                children[j] = children[j - 1];
-                children[j - 1] = tmpCh;
-            }
-        }
-    }
-
-    protected void sortInts(int[] values, boolean sortOrder) {
-        int len = values.length;
-
-        // Just the insertion sort - we will never get really large arrays here
-        for (int i = 0; i < len; i++) {
-            for (int j = i; (j > 0) && ((sortOrder == false) ? (values[j - 1] < values[j]) : (values[j - 1] > values[j])); j--) {
-                int tmp = values[j];
-                values[j] = values[j - 1];
-                values[j - 1] = tmp;
-
-                PresoObjAllocCCTNode tmpCh = children[j];
-                children[j] = children[j - 1];
-                children[j - 1] = tmpCh;
-            }
-        }
-    }
-
-    protected void sortLongs(long[] values, boolean sortOrder) {
-        int len = values.length;
-
-        // Just the insertion sort - we will never get really large arrays here
-        for (int i = 0; i < len; i++) {
-            for (int j = i; (j > 0) && ((sortOrder == false) ? (values[j - 1] < values[j]) : (values[j - 1] > values[j])); j--) {
-                long tmp = values[j];
-                values[j] = values[j - 1];
-                values[j - 1] = tmp;
-
-                PresoObjAllocCCTNode tmpCh = children[j];
-                children[j] = children[j - 1];
-                children[j - 1] = tmpCh;
-            }
-        }
-    }
-
-    protected void sortStrings(String[] values, boolean sortOrder) {
-        int len = values.length;
-
-        // Just the insertion sort - we will never get really large arrays here
-        for (int i = 0; i < len; i++) {
-            for (int j = i;
-                     (j > 0)
-                     && ((sortOrder == false) ? (values[j - 1].compareTo(values[j]) < 0) : (values[j - 1].compareTo(values[j]) > 0));
-                     j--) {
-                String tmp = values[j];
-                values[j] = values[j - 1];
-                values[j - 1] = tmp;
-
-                PresoObjAllocCCTNode tmpCh = children[j];
-                children[j] = children[j - 1];
-                children[j - 1] = tmpCh;
-            }
-        }
-    }
+//    protected void sortChildrenByAllocObjNumber(boolean sortOrder) {
+//        int len = children.length;
+//        long[] values = new long[len];
+//
+//        for (int i = 0; i < len; i++) {
+//            values[i] = children[i].nCalls;
+//        }
+//
+//        sortLongs(values, sortOrder);
+//    }
+//
+//    protected void sortChildrenByAllocObjSize(boolean sortOrder) {
+//        int len = children.length;
+//        long[] values = new long[len];
+//
+//        for (int i = 0; i < len; i++) {
+//            values[i] = children[i].totalObjSize;
+//        }
+//
+//        sortLongs(values, sortOrder);
+//    }
+//
+//    protected void sortChildrenByName(boolean sortOrder) {
+//        int len = children.length;
+//        String[] values = new String[len];
+//
+//        for (int i = 0; i < len; i++) {
+//            values[i] = children[i].getNodeName();
+//        }
+//
+//        sortStrings(values, sortOrder);
+//    }
+//
+//    protected void sortFloats(float[] values, boolean sortOrder) {
+//        int len = values.length;
+//
+//        // Just the insertion sort - we will never get really large arrays here
+//        for (int i = 0; i < len; i++) {
+//            for (int j = i; (j > 0) && ((sortOrder == false) ? (values[j - 1] < values[j]) : (values[j - 1] > values[j])); j--) {
+//                float tmp = values[j];
+//                values[j] = values[j - 1];
+//                values[j - 1] = tmp;
+//
+//                PresoObjAllocCCTNode tmpCh = children[j];
+//                children[j] = children[j - 1];
+//                children[j - 1] = tmpCh;
+//            }
+//        }
+//    }
+//
+//    protected void sortInts(int[] values, boolean sortOrder) {
+//        int len = values.length;
+//
+//        // Just the insertion sort - we will never get really large arrays here
+//        for (int i = 0; i < len; i++) {
+//            for (int j = i; (j > 0) && ((sortOrder == false) ? (values[j - 1] < values[j]) : (values[j - 1] > values[j])); j--) {
+//                int tmp = values[j];
+//                values[j] = values[j - 1];
+//                values[j - 1] = tmp;
+//
+//                PresoObjAllocCCTNode tmpCh = children[j];
+//                children[j] = children[j - 1];
+//                children[j - 1] = tmpCh;
+//            }
+//        }
+//    }
+//
+//    protected void sortLongs(long[] values, boolean sortOrder) {
+//        int len = values.length;
+//
+//        // Just the insertion sort - we will never get really large arrays here
+//        for (int i = 0; i < len; i++) {
+//            for (int j = i; (j > 0) && ((sortOrder == false) ? (values[j - 1] < values[j]) : (values[j - 1] > values[j])); j--) {
+//                long tmp = values[j];
+//                values[j] = values[j - 1];
+//                values[j - 1] = tmp;
+//
+//                PresoObjAllocCCTNode tmpCh = children[j];
+//                children[j] = children[j - 1];
+//                children[j - 1] = tmpCh;
+//            }
+//        }
+//    }
+//
+//    protected void sortStrings(String[] values, boolean sortOrder) {
+//        int len = values.length;
+//
+//        // Just the insertion sort - we will never get really large arrays here
+//        for (int i = 0; i < len; i++) {
+//            for (int j = i;
+//                     (j > 0)
+//                     && ((sortOrder == false) ? (values[j - 1].compareTo(values[j]) < 0) : (values[j - 1].compareTo(values[j]) > 0));
+//                     j--) {
+//                String tmp = values[j];
+//                values[j] = values[j - 1];
+//                values[j - 1] = tmp;
+//
+//                PresoObjAllocCCTNode tmpCh = children[j];
+//                children[j] = children[j - 1];
+//                children[j - 1] = tmpCh;
+//            }
+//        }
+//    }
 
     public void exportXMLData(ExportDataDumper eDD,String indent) {
         String newline = System.getProperty("line.separator"); // NOI18N

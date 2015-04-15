@@ -59,8 +59,8 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service=DetailsProvider.class)
 public class PlatformDetailsProvider extends DetailsProvider.Basic {
 
-    private static final String STANDARD_MODULE = "org.netbeans.StandardModule+"; // NOI18N
-    private static final String STANDARD_MODULE_DATA = "org.netbeans.StandardModuleData"; // NOI18N
+    private static final String STANDARD_MODULE = "org.netbeans.Module+"; // NOI18N
+    private static final String MODULE_DATA = "org.netbeans.ModuleData+"; // NOI18N
     private static final String SPECIFICATION_VERSION = "org.openide.modules.SpecificationVersion"; // NOI18N
     private static final String ABSTRACT_NODE = "org.openide.nodes.AbstractNode+"; // NOI18N
     private static final String MULTI_FILE_ENTRY = "org.openide.loaders.MultiDataObject$Entry+"; // NOI18N
@@ -91,7 +91,7 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
     };
     
     public PlatformDetailsProvider() {
-        super(STANDARD_MODULE,STANDARD_MODULE_DATA,SPECIFICATION_VERSION,
+        super(STANDARD_MODULE,MODULE_DATA,SPECIFICATION_VERSION,
               ABSTRACT_NODE,MULTI_FILE_ENTRY,DATA_OBJECT,JAR_FILESYSTEM,
               FILE_OBJ,FOLDER_OBJ, FILE_NAME,FOLDER_NAME,ABSTRACT_FOLDER,
               BFS_BASE,
@@ -130,8 +130,11 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
                 }
                 return specVersion.substring(0, specVersion.length()-1);
             }
-        } else if (STANDARD_MODULE_DATA.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "codeName", heap);     // NOI18N
+        } else if (MODULE_DATA.equals(className)) {
+            String name = DetailsUtils.getInstanceFieldString(instance, "codeName", heap);     // NOI18N
+            String version = DetailsUtils.getInstanceFieldString(instance, "specVers", heap);     // NOI18N
+            String implVer = DetailsUtils.getInstanceFieldString(instance, "implVersion", heap);       // NOI18N
+            return String.format("%s [%s %s]", name, version, implVer);
         } else if (ABSTRACT_NODE.equals(className)) {
             String name = DetailsUtils.getInstanceFieldString(instance, "displayName", heap); // NOI18N
 

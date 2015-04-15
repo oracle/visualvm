@@ -128,4 +128,9 @@ public class NumberPercentRenderer extends MultiRenderer {
         return numberRenderer;
     }
     
+    
+    public String toString() {
+        return valueRenderer.toString() + " " + percentRenderer.toString(); // NOI18N
+    }
+    
 }

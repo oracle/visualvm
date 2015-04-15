@@ -81,6 +81,7 @@ public class DynamicClassInfo extends ClassInfo {
     private boolean allMethodsRoots = false;
     private boolean hasUninstrumentedMarkerMethods;
     private boolean hasUninstrumentedRootMethods;
+    private boolean hasMethodReachable;
     private boolean isLoaded;
 
     // true if class was scanned for for HttpServlet.do*() methods
@@ -96,29 +97,16 @@ public class DynamicClassInfo extends ClassInfo {
 
     public DynamicClassInfo(String className, int loaderId, String classFileLocation)
                      throws IOException, ClassFormatError {
+        this(className, loaderId, classFileLocation, true);
+    }
+    
+    DynamicClassInfo(String className, int loaderId, String classFileLocation, boolean parseClass)
+                     throws IOException, ClassFormatError {
         super(className, loaderId);
         this.classFileLocation = classFileLocation;
-
-        byte[] classFileBytes = getClassFileBytes();
-
-        try {
-            new ClassFileParser().parseClassFile(classFileBytes, this);
-
-            if (!className.equals(name)) {
-                throw new ClassFormatError("Mismatch between name in .class file and location for " + className // NOI18N
-                                           + "\nYour class path setting may be incorrect."); // NOI18N
-            }
-        } catch (ClassFileParser.ClassFileReadException ex) {
-            throw new ClassFormatError(ex.getMessage());
-        }
-
-        methodScanStatus = new char[methodNames.length];
-        instrMethodIds = new char[methodNames.length];
-        currentCPoolCount = origCPoolCount;
-        baseCPoolCount = new int[INJ_MAXNUMBER];
-
-        for (int i = 0; i < INJ_MAXNUMBER; i++) {
-            baseCPoolCount[i] = -1;
+        
+        if (parseClass) {
+            parseClassFile(className);
         }
     }
 
@@ -339,7 +327,12 @@ public class DynamicClassInfo extends ClassInfo {
         return allMethodsMarkers || ((methodScanStatus[i] & 256) != 0);
     }
 
+    public boolean hasMethodReachable() {
+        return hasMethodReachable;
+    }
+
     public void setMethodReachable(int i) {
+        hasMethodReachable = true;
         methodScanStatus[i] |= 1;
     }
 
@@ -444,16 +437,27 @@ public class DynamicClassInfo extends ClassInfo {
 
     public void addSubclass(DynamicClassInfo subclass) {
         if (subclasses == null) {
-            if (name == "java/lang/Object") {  // NOI18N
+            if (name == OBJECT_SLASHED_CLASS_NAME) {
                 subclasses = new ArrayList(500);
             } else {
                 subclasses = new ArrayList();
             }
         }
+        if (isInterface() && subclasses.contains(subclass)) {
+            return; // prevent duplicate classes in subclasses list
+        }
 
         subclasses.add(subclass);
     }
 
+    public void preloadBytecode() {
+        // NO-OP bytecode is loaded from file/jar
+    }
+
+    public void setInterface() {
+        // NO-OP, information is read from class file
+    }
+    
     public boolean hasInstrumentedMethods() {
         return (nInstrumentedMethods > 0);
     }
@@ -499,7 +503,7 @@ public class DynamicClassInfo extends ClassInfo {
 
         DynamicClassInfo superClass = getSuperClass();
 
-        if ((superClass == null) || (superClass.getName() == "java/lang/Object")) {  // NOI18N
+        if ((superClass == null) || (superClass.getName() == OBJECT_SLASHED_CLASS_NAME)) {
             return false;
         }
 
@@ -561,6 +565,28 @@ public class DynamicClassInfo extends ClassInfo {
                 }
             }
             getStackMapTables().addFullStackMapFrameEntry(methodIdx, endPC, localsCPIdx, stacksCPIdx);
+        }
+    }
+
+    final void parseClassFile(String className) throws ClassFormatError, IOException {
+        byte[] classFileBytes = getClassFileBytes();
+        try {
+            new ClassFileParser().parseClassFile(classFileBytes, this);
+            
+            if (!className.equals(name)) {
+                throw new ClassFormatError("Mismatch between name in .class file and location for " + className // NOI18N
+                        + "\nYour class path setting may be incorrect."); // NOI18N
+            }
+        } catch (ClassFileParser.ClassFileReadException ex) {
+            throw new ClassFormatError(ex.getMessage());
+        }
+        methodScanStatus = new char[methodNames.length];
+        instrMethodIds = new char[methodNames.length];
+        currentCPoolCount = origCPoolCount;
+        baseCPoolCount = new int[INJ_MAXNUMBER];
+
+        for (int i = 0; i < INJ_MAXNUMBER; i++) {
+            baseCPoolCount[i] = -1;
         }
     }
 
