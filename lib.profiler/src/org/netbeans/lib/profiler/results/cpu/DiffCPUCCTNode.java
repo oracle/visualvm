@@ -151,6 +151,12 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
     public int getNChildren() {
         return getChildren().length;
     }
+    
+    public boolean isLeaf() {
+        boolean leaf1 = node1 == null || node1.isLeaf();
+        boolean leaf2 = node2 == null || node2.isLeaf();
+        return leaf1 && leaf2;
+    }
 
     @Override
     public long getSleepTime0() {
@@ -201,9 +207,9 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
 
     @Override
     public void sortChildren(int sortBy, boolean sortOrder) {
-        if (node1 != null) node1.sortChildren(sortBy, sortOrder);
-        if (node2 != null) node2.sortChildren(sortBy, sortOrder);
-        super.sortChildren(sortBy, sortOrder);
+//        if (node1 != null) node1.sortChildren(sortBy, sortOrder);
+//        if (node2 != null) node2.sortChildren(sortBy, sortOrder);
+//        super.sortChildren(sortBy, sortOrder);
     }    
     
     
@@ -248,7 +254,8 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
 //    }
     
     public boolean equals(Object o) {
-        return getNodeName().equals(((DiffCPUCCTNode)o).getNodeName());
+        if (!(o instanceof PrestimeCPUCCTNode)) return false;
+        return getNodeName().equals(((PrestimeCPUCCTNode)o).getNodeName());
     }
     
     public int hashCode() {

@@ -230,6 +230,11 @@ public class LivenessMemoryResultsSnapshot extends MemoryResultsSnapshot {
 
         currentEpoch = provider.getCurrentEpoch();
     }
+    
+    public LivenessMemoryResultsSnapshot createDiff(MemoryResultsSnapshot snapshot) {
+        if (!(snapshot instanceof LivenessMemoryResultsSnapshot)) return null;
+        return new LivenessMemoryResultsDiff(this, (LivenessMemoryResultsSnapshot)snapshot);
+    }
 
     public void readFromStream(DataInputStream in) throws IOException {
         super.readFromStream(in);
@@ -337,8 +342,12 @@ public class LivenessMemoryResultsSnapshot extends MemoryResultsSnapshot {
         out.writeInt(nTotalTracked);
         out.writeInt(currentEpoch);
     }
+    
+    public PresoObjLivenessCCTNode createPresentationCCT(int classId, boolean dontShowZeroLiveObjAllocPaths) {
+        return (PresoObjLivenessCCTNode)super.createPresentationCCT(classId, dontShowZeroLiveObjAllocPaths);
+    }
 
-    protected PresoObjAllocCCTNode createPresentationCCT(RuntimeMemoryCCTNode rootNode, int classId,
+    protected PresoObjLivenessCCTNode createPresentationCCT(RuntimeMemoryCCTNode rootNode, int classId,
                                                          boolean dontShowZeroLiveObjAllocPaths) {
         return PresoObjLivenessCCTNode.createPresentationCCTFromSnapshot(this, rootNode, getClassName(classId), currentEpoch,
                                                                          dontShowZeroLiveObjAllocPaths);
