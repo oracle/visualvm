@@ -406,8 +406,8 @@ public final class ResultsManager {
             ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotsLoadFailedMsg());
         }
     }
-
-    public void compareSnapshots(LoadedSnapshot s1, LoadedSnapshot s2) {
+    
+    public ResultsSnapshot createDiffSnapshot(LoadedSnapshot s1, LoadedSnapshot s2) {
         ResultsSnapshot snap1 = s1.getSnapshot();
         ResultsSnapshot snap2 = s2.getSnapshot();
         ResultsSnapshot diff = null;
@@ -431,8 +431,7 @@ public final class ResultsManager {
                              sn2.getClassNames(), sn2.getObjectsCounts(), sn2.getObjectsSizePerClass(), Integer.MAX_VALUE);
             diff = new AllocMemoryResultsDiff((AllocMemoryResultsSnapshot)snap1,
                                               (AllocMemoryResultsSnapshot)snap2);
-        }
-        else if (snap1 instanceof LivenessMemoryResultsSnapshot && snap2 instanceof LivenessMemoryResultsSnapshot) {
+        } else if (snap1 instanceof LivenessMemoryResultsSnapshot && snap2 instanceof LivenessMemoryResultsSnapshot) {
             LivenessMemoryResultsSnapshot sn1 = (LivenessMemoryResultsSnapshot)snap1;
             LivenessMemoryResultsSnapshot sn2 = (LivenessMemoryResultsSnapshot)snap2;
 // Note: using track each 1 object to prevent unnecessary division, the data are always correct for liveness results
@@ -444,10 +443,17 @@ public final class ResultsManager {
                              sn2.getClassNames(), sn2.getNTrackedLiveObjects(), sn2.getTrackedLiveObjectsSize(), 1);
             diff = new LivenessMemoryResultsDiff((LivenessMemoryResultsSnapshot)snap1,
                                                  (LivenessMemoryResultsSnapshot)snap2);
-        }
-        else if (snap1 instanceof CPUResultsSnapshot && snap2 instanceof CPUResultsSnapshot) {
+        } else if (snap1 instanceof CPUResultsSnapshot && snap2 instanceof CPUResultsSnapshot) {
             diff = new CPUResultsDiff((CPUResultsSnapshot)snap1, (CPUResultsSnapshot)snap2);
         }
+        
+        return diff;
+    }
+
+    public void compareSnapshots(LoadedSnapshot s1, LoadedSnapshot s2) {
+//        ResultsSnapshot snap1 = s1.getSnapshot();
+//        ResultsSnapshot snap2 = s2.getSnapshot();
+        ResultsSnapshot diff = createDiffSnapshot(s1, s2);
 
         if (diff != null) {
             SnapshotsDiffWindow sdw = SnapshotsDiffWindow.get(diff, s1, s2);

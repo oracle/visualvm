@@ -97,13 +97,16 @@ abstract class CPUTreeTableView extends CPUView {
     }
     
     
-    void setData(final CPUResultsSnapshot newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final int aggregation, final Collection<Integer> selectedThreads, final boolean mergeThreads, final boolean _sampled) {
+    void setData(final CPUResultsSnapshot newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final int aggregation, final Collection<Integer> selectedThreads, final boolean mergeThreads, final boolean _sampled, final boolean _diff) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 boolean structureChange = sampled != _sampled;
                 sampled = _sampled;
                 twoTimeStamps = newData == null ? false : newData.isCollectingTwoTimeStamps();
                 idMap = newIdMap;
+                renderers[0].setDiffMode(_diff);
+                renderers[1].setDiffMode(_diff);
+                renderers[2].setDiffMode(_diff);
                 if (treeTableModel != null) {
                     treeTableModel.setRoot(newData == null ? PrestimeCPUCCTNode.EMPTY :
                                            !reverse ? newData.getRootNode(aggregation, selectedThreads, mergeThreads):
@@ -120,7 +123,7 @@ abstract class CPUTreeTableView extends CPUView {
     }
     
     public void resetData() {
-        setData(null, null, -1, null, false, sampled);
+        setData(null, null, -1, null, false, sampled, false);
     }
     
     
@@ -272,7 +275,7 @@ abstract class CPUTreeTableView extends CPUView {
         if (path.getPathCount() < 2) return 1;
         
         PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)path.getPathComponent(1);
-        return secondary ? node.getTotalTime1() : node.getTotalTime0();
+        return Math.abs(secondary ? node.getTotalTime1() : node.getTotalTime0());
     }
     
     protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {

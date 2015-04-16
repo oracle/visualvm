@@ -55,6 +55,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -65,6 +66,7 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.results.cpu.CPUResultsDiff;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -100,10 +102,13 @@ public abstract class SnapshotCPUView extends JPanel {
     private static final String AGGREGATION_METHODS = messages.getString("SnapshotCPUView_AggregationMethods"); // NOI18N
     private static final String AGGREGATION_CLASSES = messages.getString("SnapshotCPUView_AggregationClasses"); // NOI18N
     private static final String AGGREGATION_PACKAGES = messages.getString("SnapshotCPUView_AggregationPackages"); // NOI18N
+    private static final String COMPARE_SNAPSHOTS = messages.getString("SnapshotCPUView_CompareSnapshots"); // NOI18N
+    private static final String RESET_COMPARE_SNAPSHOTS = messages.getString("SnapshotCPUView_ResetCompareSnapshots"); // NOI18N
     // -----
     
     private boolean sampled;
     private CPUResultsSnapshot snapshot;
+    private CPUResultsSnapshot refSnapshot;
     
     private int aggregation;
     private boolean mergedThreads;
@@ -120,6 +125,12 @@ public abstract class SnapshotCPUView extends JPanel {
         
         aggregation = CPUResultsSnapshot.METHOD_LEVEL_VIEW;
         setSnapshot(snapshot, sampled);
+    }
+    
+    
+    public void setRefSnapshot(CPUResultsSnapshot snapshot) {
+        refSnapshot = snapshot;
+        setAggregation(aggregation);
     }
     
     
@@ -140,7 +151,7 @@ public abstract class SnapshotCPUView extends JPanel {
     }
     
     
-    private void initUI(Action saveAction, Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
+    private void initUI(Action saveAction, final Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
         setLayout(new BorderLayout(0, 0));
         
         forwardCallsView = new CPUTreeTableView(null, false) {
@@ -234,7 +245,22 @@ public abstract class SnapshotCPUView extends JPanel {
             toolbar.addSeparator();
             toolbar.addSpace(2);
         
-            toolbar.add(compareAction);
+            Icon icon = (Icon)compareAction.getValue(Action.SMALL_ICON);
+            JToggleButton compareButton = new JToggleButton(icon) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    boolean sel = isSelected();
+                    if (sel) {
+                        compareAction.actionPerformed(e);
+                        if (refSnapshot == null) setSelected(false);
+                    } else {
+                        setRefSnapshot(null);
+                    }
+                    setToolTipText(isSelected() ? RESET_COMPARE_SNAPSHOTS :
+                                                  COMPARE_SNAPSHOTS);
+                }
+            };
+            compareButton.setToolTipText(COMPARE_SNAPSHOTS);
+            toolbar.add(compareButton);
         }
         
         toolbar.addSpace(2);
@@ -522,7 +548,10 @@ public abstract class SnapshotCPUView extends JPanel {
     private void setAggregation(int _aggregation) {
         aggregation = _aggregation;
         
-        final FlatProfileContainer flatData = snapshot.getFlatProfile(selectedThreads, aggregation);
+        CPUResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
+                                       snapshot.createDiff(refSnapshot);
+        
+        final FlatProfileContainer flatData = _snapshot.getFlatProfile(selectedThreads, aggregation);
 
         final Map<Integer, ClientUtils.SourceCodeSelection> idMap = new HashMap();
         for (int i = 0; i < flatData.getNRows(); i++) // TODO: getNRows is filtered, may not work for tree data!
@@ -536,9 +565,10 @@ public abstract class SnapshotCPUView extends JPanel {
 //            }
 //        });
         
-        forwardCallsView.setData(snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled);
-        hotSpotsView.setData(flatData, idMap, sampled);
-        reverseCallsView.setData(snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled);
+        boolean diff = _snapshot instanceof CPUResultsDiff;
+        forwardCallsView.setData(_snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled, diff);
+        hotSpotsView.setData(flatData, idMap, sampled, diff);
+        reverseCallsView.setData(_snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled, diff);
     }
     
     protected final void setSnapshot(CPUResultsSnapshot snapshot, boolean sampled) {
