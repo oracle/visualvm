@@ -434,9 +434,9 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             CPUResultsSnapshot s = (CPUResultsSnapshot)_snapshot;
             boolean sampling = snapshot.getSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED;
             
-            Action aSave = new SaveSnapshotAction(snapshot);
-            Action aCompare = new CompareSnapshotsAction(snapshot);
-            Action aInfo = new SnapshotInfoAction(snapshot);
+            SaveSnapshotAction aSave = new SaveSnapshotAction(snapshot);
+            CompareSnapshotsAction aCompare = new CompareSnapshotsAction(snapshot);
+            SnapshotInfoAction aInfo = new SnapshotInfoAction(snapshot);
             ExportUtils.Exportable exporter = ResultsManager.getDefault().createSnapshotExporter(snapshot);
             
             final SnapshotCPUView _cpuSnapshot = new SnapshotCPUView(s, sampling, aSave, aCompare, aInfo, exporter) {
@@ -462,6 +462,12 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                     });
                 }
             };
+            
+            aCompare.setPerformer(new CompareSnapshotsAction.Performer() {
+                public void compare(LoadedSnapshot snapshot) {
+                    _cpuSnapshot.setRefSnapshot((CPUResultsSnapshot)snapshot.getSnapshot());
+                }
+            });
             
             registerActions(_cpuSnapshot);
             displayedPanel = _cpuSnapshot;
@@ -489,9 +495,9 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             
             MemoryResultsSnapshot s = (MemoryResultsSnapshot)_snapshot;
             
-            Action aSave = new SaveSnapshotAction(snapshot);
-            Action aCompare = new CompareSnapshotsAction(snapshot);
-            Action aInfo = new SnapshotInfoAction(snapshot);
+            SaveSnapshotAction aSave = new SaveSnapshotAction(snapshot);
+            CompareSnapshotsAction aCompare = new CompareSnapshotsAction(snapshot);
+            SnapshotInfoAction aInfo = new SnapshotInfoAction(snapshot);
             ExportUtils.Exportable exporter = ResultsManager.getDefault().createSnapshotExporter(snapshot);
             
             final SnapshotMemoryView _memorySnapshot = new SnapshotMemoryView(s, filter, aSave, aCompare, aInfo, exporter) {
@@ -514,6 +520,12 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                     });
                 }
             };
+            
+            aCompare.setPerformer(new CompareSnapshotsAction.Performer() {
+                public void compare(LoadedSnapshot snapshot) {
+                    _memorySnapshot.setRefSnapshot((MemoryResultsSnapshot)snapshot.getSnapshot());
+                }
+            });
             
             registerActions(_memorySnapshot);
             displayedPanel = _memorySnapshot;

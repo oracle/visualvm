@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -40,50 +40,17 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.lib.profiler.ui.swing.renderer;
 
-import java.text.Format;
-import javax.swing.SwingConstants;
-import org.netbeans.lib.profiler.ui.Formatters;
-
 /**
+ * Interface to be implemented by renderers supporting relative (diff) values.
  *
  * @author Jiri Sedlacek
  */
-public class NumberRenderer extends FormattedLabelRenderer implements RelativeRenderer {
+public interface RelativeRenderer {
     
-    private final Format outputFormat;
+    public void setDiffMode(boolean diffMode);
     
-    protected boolean renderingDiff;
-    
-    public NumberRenderer() {
-        this(null);
-    }
-    
-    public NumberRenderer(Format outputFormat) {
-        super(Formatters.numberFormat());
-        
-        this.outputFormat = outputFormat;
-        
-        setHorizontalAlignment(SwingConstants.TRAILING);
-    }
-    
-    public void setDiffMode(boolean diffMode) {
-        renderingDiff = diffMode;
-    }
-
-    public boolean isDiffMode() {
-        return renderingDiff;
-    }
-    
-    protected String getValueString(Object value, int row, Format format) {
-        if (value == null) return "-"; // NOI18N
-        String s = super.getValueString(value, row, format);
-        s = outputFormat == null ? s : formatImpl(outputFormat, s);
-        if (renderingDiff && value instanceof Number)
-            if (((Number)value).doubleValue() >= 0) s = '+' + s; // NOI18N
-        return s;
-    }
+    public boolean isDiffMode();
     
 }
