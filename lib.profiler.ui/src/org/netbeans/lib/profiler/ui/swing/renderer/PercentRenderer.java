@@ -50,12 +50,14 @@ import org.netbeans.lib.profiler.ui.Formatters;
  *
  * @author Jiri Sedlacek
  */
-public class PercentRenderer extends FormattedLabelRenderer {
+public class PercentRenderer extends FormattedLabelRenderer implements RelativeRenderer {
     
     private static final String NUL = Formatters.percentFormat().format(0);
     private static final String NAN = NUL.replace("0", "-");  // NOI18N
     
     private long maxValue = 100;
+    
+    protected boolean renderingDiff;
 
     
     public PercentRenderer() {
@@ -72,6 +74,15 @@ public class PercentRenderer extends FormattedLabelRenderer {
     }
     
     
+    public void setDiffMode(boolean diffMode) {
+        renderingDiff = diffMode;
+    }
+
+    public boolean isDiffMode() {
+        return renderingDiff;
+    }
+    
+    
     protected String getValueString(Object value, int row, Format format) {
         if (value == null) return "-"; // NOI18N
         
@@ -81,11 +92,14 @@ public class PercentRenderer extends FormattedLabelRenderer {
         if (maxValue == 0) {
             s.append(NAN);
         } else {
-            Number number = (Number)value;
-            if (number.doubleValue() == 0) {
+            double number = ((Number)value).doubleValue();
+            if (number == 0) {
+                if (renderingDiff) s.append('+'); // NOI18N
                 s.append(NUL);
             } else {
-                s.append(format.format(number.doubleValue() / maxValue));
+                number = number / maxValue;
+                if (renderingDiff && number > 0) s.append('+'); // NOI18N
+                s.append(format.format(number));
             }
         }
         

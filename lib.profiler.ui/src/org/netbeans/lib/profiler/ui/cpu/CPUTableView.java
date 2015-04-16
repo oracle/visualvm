@@ -89,7 +89,7 @@ abstract class CPUTableView extends CPUView {
     }
     
     
-    void setData(final FlatProfileContainer newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final boolean _sampled) {
+    void setData(final FlatProfileContainer newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final boolean _sampled, final boolean _diff) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 boolean structureChange = sampled != _sampled;
@@ -99,21 +99,56 @@ abstract class CPUTableView extends CPUView {
                 if (tableModel != null) {
                     data = newData;
                     
-                    long[] maxTimes = new long[4];
-                    int maxInvocations = 0;
-                    for (int row = 0; row < tableModel.getRowCount(); row++) {
-                        maxTimes[0] += data.getTimeInMcs0AtRow(row);
-                        if (twoTimeStamps) maxTimes[1] += data.getTimeInMcs1AtRow(row);
-                        maxTimes[2] += data.getTotalTimeInMcs0AtRow(row);
-                        if (twoTimeStamps) maxTimes[3] += data.getTotalTimeInMcs1AtRow(row);
-                        maxInvocations += data.getNInvocationsAtRow(row);
+                    if (_diff) {
+                        long[] maxTimes = new long[4];
+                        long[] minTimes = new long[4];
+                        int maxInvocations = 0;
+                        int minInvocations = 0;
+                        for (int row = 0; row < tableModel.getRowCount(); row++) {
+                            maxTimes[0] = Math.max(maxTimes[0], data.getTimeInMcs0AtRow(row));
+                            minTimes[0] = Math.min(minTimes[0], data.getTimeInMcs0AtRow(row));
+                            if (twoTimeStamps) {
+                                maxTimes[1] = Math.max(maxTimes[1], data.getTimeInMcs1AtRow(row));
+                                minTimes[1] = Math.min(minTimes[1], data.getTimeInMcs1AtRow(row));
+                            }
+                            maxTimes[2] = Math.max(maxTimes[2], data.getTotalTimeInMcs0AtRow(row));
+                            minTimes[2] = Math.min(minTimes[2], data.getTotalTimeInMcs0AtRow(row));
+                            if (twoTimeStamps) {
+                                maxTimes[3] = Math.max(maxTimes[3], data.getTotalTimeInMcs1AtRow(row));
+                                minTimes[3] = Math.min(minTimes[3], data.getTotalTimeInMcs1AtRow(row));
+                            }
+                            maxInvocations = Math.max(maxInvocations, data.getNInvocationsAtRow(row));
+                            minInvocations = Math.min(minInvocations, data.getNInvocationsAtRow(row));
+                        }
+                        
+                        renderers[0].setMaxValue(Math.max(Math.abs(maxTimes[0]), Math.abs(minTimes[0])));
+                        renderers[1].setMaxValue(Math.max(Math.abs(maxTimes[1]), Math.abs(minTimes[1])));
+                        renderers[2].setMaxValue(Math.max(Math.abs(maxTimes[2]), Math.abs(minTimes[2])));
+                        renderers[3].setMaxValue(Math.max(Math.abs(maxTimes[3]), Math.abs(minTimes[3])));
+                        renderers[4].setMaxValue(Math.max(Math.abs(maxInvocations), Math.abs(minInvocations)));
+                    } else {
+                        long[] maxTimes = new long[4];
+                        int maxInvocations = 0;
+                        for (int row = 0; row < tableModel.getRowCount(); row++) {
+                            maxTimes[0] += data.getTimeInMcs0AtRow(row);
+                            if (twoTimeStamps) maxTimes[1] += data.getTimeInMcs1AtRow(row);
+                            maxTimes[2] += data.getTotalTimeInMcs0AtRow(row);
+                            if (twoTimeStamps) maxTimes[3] += data.getTotalTimeInMcs1AtRow(row);
+                            maxInvocations += data.getNInvocationsAtRow(row);
+                        }
+                        
+                        renderers[0].setMaxValue(maxTimes[0]);
+                        renderers[1].setMaxValue(maxTimes[1]);
+                        renderers[2].setMaxValue(maxTimes[2]);
+                        renderers[3].setMaxValue(maxTimes[3]);
+                        renderers[4].setMaxValue(maxInvocations);
                     }
                     
-                    renderers[0].setMaxValue(maxTimes[0]);
-                    renderers[1].setMaxValue(maxTimes[1]);
-                    renderers[2].setMaxValue(maxTimes[2]);
-                    renderers[3].setMaxValue(maxTimes[3]);
-                    renderers[4].setMaxValue(maxInvocations);
+                    renderers[0].setDiffMode(_diff);
+                    renderers[1].setDiffMode(_diff);
+                    renderers[2].setDiffMode(_diff);
+                    renderers[3].setDiffMode(_diff);
+                    renderers[4].setDiffMode(_diff);
                     
                     tableModel.fireTableDataChanged();
                 }
@@ -128,7 +163,7 @@ abstract class CPUTableView extends CPUView {
     }
     
     public void resetData() {
-        setData(null, null, sampled);
+        setData(null, null, sampled, false);
     }
     
     

@@ -62,6 +62,9 @@ import java.util.Map;
 public class AllocMemoryResultsDiff extends AllocMemoryResultsSnapshot {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
+    private final AllocMemoryResultsSnapshot snapshot1;
+    private final AllocMemoryResultsSnapshot snapshot2;
+    
     private String[] classNames;
     private int[] objectsCounts;
     private long[] objectsSizePerClass;
@@ -72,6 +75,9 @@ public class AllocMemoryResultsDiff extends AllocMemoryResultsSnapshot {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public AllocMemoryResultsDiff(AllocMemoryResultsSnapshot snapshot1, AllocMemoryResultsSnapshot snapshot2) {
+        this.snapshot1 = snapshot1;
+        this.snapshot2 = snapshot2;
+        
         computeDiff(snapshot1, snapshot2);
     }
 
@@ -82,7 +88,7 @@ public class AllocMemoryResultsDiff extends AllocMemoryResultsSnapshot {
     }
 
     public String getClassName(int classId) {
-        return null;
+        return classNames[classId];
     }
 
     public String[] getClassNames() {
@@ -118,11 +124,13 @@ public class AllocMemoryResultsDiff extends AllocMemoryResultsSnapshot {
     }
 
     public boolean containsStacks() {
-        return false;
+        return snapshot1.containsStacks() && snapshot2.containsStacks();
     }
 
     public PresoObjAllocCCTNode createPresentationCCT(int classId, boolean dontShowZeroLiveObjAllocPaths) {
-        return null;
+        PresoObjAllocCCTNode node1 = snapshot1.createPresentationCCT(classId1(classId), dontShowZeroLiveObjAllocPaths);
+        PresoObjAllocCCTNode node2 = snapshot2.createPresentationCCT(classId2(classId), dontShowZeroLiveObjAllocPaths);
+        return new DiffObjAllocCCTNode(node1, node2);
     }
 
     public void readFromStream(DataInputStream in) throws IOException {
@@ -136,7 +144,30 @@ public class AllocMemoryResultsDiff extends AllocMemoryResultsSnapshot {
 
     protected PresoObjAllocCCTNode createPresentationCCT(RuntimeMemoryCCTNode rootNode, int classId,
                                                          boolean dontShowZeroLiveObjAllocPaths) {
-        return null;
+        PresoObjAllocCCTNode node1 = snapshot1.createPresentationCCT(rootNode, classId1(classId), dontShowZeroLiveObjAllocPaths);
+        PresoObjAllocCCTNode node2 = snapshot2.createPresentationCCT(rootNode, classId2(classId), dontShowZeroLiveObjAllocPaths);
+        return new DiffObjAllocCCTNode(node1, node2);
+    }
+    
+    private int classId1(int classId) {
+        return classId(classId, snapshot1);
+    }
+    
+    private int classId2(int classId) {
+        return classId(classId, snapshot2);
+    }
+    
+    private int classId(int classId, AllocMemoryResultsSnapshot snapshot) {
+        if (snapshot == null) return -1;
+        
+        String className = getClassName(classId);
+        String[] classNames = snapshot.getClassNames();
+        if (classNames == null) return -1;
+        
+        for (int i = 0; i < classNames.length; i++)
+            if (classNames[i].equals(className)) return i;
+        
+        return -1;
     }
 
     private void computeDiff(AllocMemoryResultsSnapshot snapshot1, AllocMemoryResultsSnapshot snapshot2) {
