@@ -45,8 +45,8 @@ package org.netbeans.modules.profiler.v2.features;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
-import java.util.Collection;
 import java.util.Set;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -54,10 +54,8 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.LiveCPUView;
-import org.netbeans.lib.profiler.ui.cpu.ThreadsSelector;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.MultiButtonGroup;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
@@ -87,7 +85,9 @@ import org.openide.util.NbBundle;
     "MethodsFeatureUI_viewReverse=Reverse calls",
     "MethodsFeatureUI_resultsMode=Results mode",
     "MethodsFeatureUI_profilingData=Collected data:",
-    "MethodsFeatureUI_snapshot=Snapshot"
+    "MethodsFeatureUI_snapshot=Snapshot",
+    "MethodsFeatureUI_showAbsolute=Show absolute values",
+    "MethodsFeatureUI_showDeltas=Show delta values"
 })
 abstract class MethodsFeatureUI extends FeatureUI {
     
@@ -140,7 +140,13 @@ abstract class MethodsFeatureUI extends FeatureUI {
     }
     
     void resetData() {
-        if (cpuView != null) cpuView.resetData();
+        if (lrDeltasButton != null) {
+            lrDeltasButton.setSelected(false);
+        }
+        if (cpuView != null) {
+            cpuView.resetData();
+            cpuView.setDiffView(false);
+        }
     }
     
     
@@ -151,6 +157,7 @@ abstract class MethodsFeatureUI extends FeatureUI {
     private JLabel lrLabel;
     private JToggleButton lrPauseButton;
     private JButton lrRefreshButton;
+    private JToggleButton lrDeltasButton;
 //    private ActionPopupButton lrView;
     
     private JLabel pdLabel;
@@ -218,6 +225,16 @@ abstract class MethodsFeatureUI extends FeatureUI {
             }
         };
         lrRefreshButton.setToolTipText(Bundle.MethodsFeatureUI_updateResults());
+        
+        Icon icon = Icons.getIcon(ProfilerIcons.DELTA_RESULTS);
+        lrDeltasButton = new JToggleButton(icon) {
+            protected void fireActionPerformed(ActionEvent e) {
+                if (!cpuView.setDiffView(isSelected())) setSelected(false);
+                setToolTipText(isSelected() ? Bundle.MethodsFeatureUI_showAbsolute() :
+                                              Bundle.MethodsFeatureUI_showDeltas());
+            }
+        };
+        lrDeltasButton.setToolTipText(Bundle.MethodsFeatureUI_showDeltas());
         
         MultiButtonGroup group = new MultiButtonGroup();
         final JToggleButton[] toggles = new JToggleButton[3];
@@ -298,6 +315,7 @@ abstract class MethodsFeatureUI extends FeatureUI {
         toolbar.addSpace(2);
         toolbar.add(lrPauseButton);
         toolbar.add(lrRefreshButton);
+        toolbar.add(lrDeltasButton);
         
         toolbar.addSpace(2);
 //        toolbar.addSeparator();
@@ -337,6 +355,7 @@ abstract class MethodsFeatureUI extends FeatureUI {
                 boolean running = state == Profiler.PROFILING_RUNNING;
                 lrPauseButton.setEnabled(running);
                 lrRefreshButton.setEnabled(!popupPause && running && lrPauseButton.isSelected());
+                lrDeltasButton.setEnabled(running);
             }
         });
     }

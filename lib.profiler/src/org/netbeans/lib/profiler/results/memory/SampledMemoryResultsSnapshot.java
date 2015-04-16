@@ -103,6 +103,11 @@ public class SampledMemoryResultsSnapshot extends MemoryResultsSnapshot {
             i++;
         }
     }
+    
+    public SampledMemoryResultsSnapshot createDiff(MemoryResultsSnapshot snapshot) {
+        if (!(snapshot instanceof SampledMemoryResultsSnapshot)) return null;
+        return new SampledMemoryResultsDiff(this, (SampledMemoryResultsSnapshot)snapshot);
+    }
 
     public void readFromStream(DataInputStream in) throws IOException {
         super.readFromStream(in);

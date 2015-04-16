@@ -264,9 +264,14 @@ final class TracerView {
                 public void run() {
                     CPUResultsSnapshot s = (CPUResultsSnapshot)lsF.getSnapshot();
                     if (snapshotView == null) {
-                        Action aCompare = new CompareSnapshotsAction(lsF);
+                        CompareSnapshotsAction aCompare = new CompareSnapshotsAction(lsF);
                         ExportUtils.Exportable exporter = ResultsManager.getDefault().createSnapshotExporter(lsF);
                         snapshotView = new SnapshotView(s, aCompare, exporter);
+                        aCompare.setPerformer(new CompareSnapshotsAction.Performer() {
+                            public void compare(LoadedSnapshot snapshot) {
+                                snapshotView.setRefSnapshot((CPUResultsSnapshot)snapshot.getSnapshot());
+                            }
+                        });
                     } else {
                         snapshotView.setData(s);
                     }
