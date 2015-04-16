@@ -133,7 +133,7 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public static PresoObjAllocCCTNode createPresentationCCTFromSnapshot(LivenessMemoryResultsSnapshot snapshot,
+    public static PresoObjLivenessCCTNode createPresentationCCTFromSnapshot(LivenessMemoryResultsSnapshot snapshot,
                                                                          RuntimeMemoryCCTNode rootRuntimeNode,
                                                                          String classTypeName, int curEpoch,
                                                                          boolean dontShowZeroLiveObjAllocPaths) {
@@ -142,7 +142,7 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
 
         SurvGenSet survGens = new SurvGenSet();
 
-        PresoObjAllocCCTNode rootNode = generateMirrorNode(rootRuntimeNode, survGens);
+        PresoObjLivenessCCTNode rootNode = generateMirrorNode(rootRuntimeNode, survGens);
 
         if (rootNode != null) { // null means there are no live objects for any allocation path
             assignNamesToNodesFromSnapshot(snapshot, rootNode, classTypeName);
@@ -220,7 +220,7 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
 //        }
     }
 
-    protected static PresoObjAllocCCTNode generateMirrorNode(RuntimeMemoryCCTNode rtNode, SurvGenSet survGens) {
+    protected static PresoObjLivenessCCTNode generateMirrorNode(RuntimeMemoryCCTNode rtNode, SurvGenSet survGens) {
         PresoObjLivenessCCTNode thisNode = null;
 
         if (rtNode instanceof RuntimeObjLivenessTermCCTNode) { // A "terminal" node may occur even in the middle of the call chain

@@ -323,7 +323,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         for (PrestimeCPUCCTNode node : nodes)
             for (CCTNode n : node.getChildren()) {
                 int idx = merged.indexOf(n);
-                if (idx == -1) merged.add((PrestimeCPUCCTNode)n);
+                if (idx == -1) merged.add((PrestimeCPUCCTNode)n); // TODO: add node copy !!!
                 else merged.get(idx).merge(n);
             }
         
@@ -496,6 +496,11 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         }
 
         return ret;
+    }
+    
+    public CPUResultsSnapshot createDiff(CPUResultsSnapshot snapshot) {
+        if (!(snapshot instanceof CPUResultsSnapshot)) return null;
+        return new CPUResultsDiff(this, (CPUResultsSnapshot)snapshot);
     }
     
     void readFromSnapshot(CPUResultsSnapshot s) {
