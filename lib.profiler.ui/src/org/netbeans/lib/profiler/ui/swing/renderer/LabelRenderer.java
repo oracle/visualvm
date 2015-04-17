@@ -91,7 +91,8 @@ public class LabelRenderer extends JLabel implements ProfilerRenderer {
     // --- Renderer ------------------------------------------------------------
     
     public void setValue(Object value, int row) {
-        setText(value.toString());
+        if (value == null) setText(""); // NOI18N
+        else setText(value.toString());
     }
     
     public JComponent getComponent() {

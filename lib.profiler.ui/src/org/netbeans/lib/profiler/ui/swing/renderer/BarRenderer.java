@@ -86,7 +86,8 @@ public class BarRenderer extends BaseRenderer implements RelativeRenderer {
     }
     
     public void setValue(Object value, int row) {
-        this.value = maxValue == 0 ? 0 : ((Number)value).floatValue() / maxValue;
+        if (value == null) this.value = 0;
+        else this.value = maxValue == 0 ? 0 : ((Number)value).floatValue() / maxValue;
     }
     
     
