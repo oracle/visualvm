@@ -69,7 +69,7 @@ public class McsTimeRenderer extends FormattedLabelRenderer implements RelativeR
     }
     
     public void setValue(Object value, int row) {
-        long lvalue = ((Number)value).longValue();
+        long lvalue = value == null ? 0 : ((Number)value).longValue();
         String s = StringUtils.mcsTimeToString(lvalue);
         if (renderingDiff && lvalue >= 0) s = '+' + s; // NOI18N
         super.setValue(s, row);

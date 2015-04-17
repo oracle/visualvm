@@ -46,6 +46,7 @@ package org.netbeans.modules.profiler.v2.impl;
 import java.io.File;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.netbeans.modules.profiler.SnapshotResultsWindow;
 import org.netbeans.modules.profiler.SnapshotsListener;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.v2.SnapshotsWindow;
@@ -86,6 +87,7 @@ public final class SnapshotsWindowHelper implements SnapshotsListener {
     }
 
     public void snapshotRemoved(LoadedSnapshot snapshot) {
+        SnapshotResultsWindow.closeWindow(snapshot);
         refreshSnapshots(snapshot);
     }
 
