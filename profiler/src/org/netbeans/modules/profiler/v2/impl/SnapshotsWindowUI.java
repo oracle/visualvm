@@ -437,7 +437,6 @@ public final class SnapshotsWindowUI extends TopComponent {
         actions.add(deleteB);
         add(actions, BorderLayout.SOUTH);
         
-        refreshSnapshots();
         updateButtons(Collections.EMPTY_LIST);
     }
     
@@ -595,6 +594,8 @@ public final class SnapshotsWindowUI extends TopComponent {
     
     protected void componentOpened() {
         super.componentOpened();
+        
+        refreshSnapshots();
         
         openProjectsListener = new ChangeListener() {
             public void stateChanged(ChangeEvent e) { selector.resetModel(); }
