@@ -611,7 +611,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         private List filteredChildren(Object parent) {
             if (cache == null) cache = new HashMap();
             
-            TreePath parentPath = new TreePath(getPathToRoot((TreeNode)parent));
+            TreePath parentPath = treePath(getPathToRoot((TreeNode)parent));
             List children = cache.get(parentPath);
             
             if (children == null) {
@@ -658,6 +658,16 @@ public class ProfilerTreeTable extends ProfilerTable {
             }
             
             return children;
+        }
+        
+        
+        // creates a TreePath with exact hashCode
+        // uses Arrays.deepHashCode instead getLastPathComponent().hashCode()
+        protected static TreePath treePath(final TreeNode[] pathToRoot) {
+            return new TreePath(pathToRoot) {
+                private final int hashCode = Arrays.deepHashCode(pathToRoot);
+                public int hashCode() { return hashCode; }
+            };
         }
         
         
@@ -724,7 +734,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         private int[] viewToModel(Object parent) {
             if (viewToModel == null) viewToModel = new HashMap();
             
-            TreePath parentPath = new TreePath(getPathToRoot((TreeNode)parent));
+            TreePath parentPath = treePath(getPathToRoot((TreeNode)parent));
             int[] indexes = viewToModel.get(parentPath);
             
             if (indexes == null) {

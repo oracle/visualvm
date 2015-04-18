@@ -111,8 +111,8 @@ public final class SearchUtils {
             ProfilerTreeTable treeTable = (ProfilerTreeTable)table;
             TreePath selectedPath = treeTable.getSelectionPath();
             if (selectedPath == null) selectedPath = treeTable.getRootPath();
-            TreePath startPath = selectedPath;
-            
+            boolean firstPath = true;
+            TreePath startPath = null;
             do {
                 selectedPath = next ? treeTable.getNextPath(selectedPath) :
                                       treeTable.getPreviousPath(selectedPath);
@@ -121,7 +121,9 @@ public final class SearchUtils {
                     treeTable.selectPath(selectedPath, true);
                     return true;
                 }
-            } while (!selectedPath.equals(startPath));
+                if (startPath == null) startPath = selectedPath;
+                else if (firstPath) firstPath = false;
+            } while (firstPath || !selectedPath.equals(startPath));
         } else {
             int selectedRow = table.getSelectedRow();
             boolean fromSelection = selectedRow != -1;
