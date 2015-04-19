@@ -107,6 +107,8 @@ public abstract class LiveCPUView extends JPanel {
     private CPUTreeTableView forwardCallsView;
     private CPUTreeTableView reverseCallsView;
     
+    private ThreadsSelector threadsSelector;
+    
     private long lastupdate;
     private volatile boolean paused;
     private volatile boolean forceRefresh;
@@ -153,14 +155,20 @@ public abstract class LiveCPUView extends JPanel {
     }
     
     public ThreadsSelector createThreadSelector() {
-        return new ThreadsSelector() {
+        threadsSelector = new ThreadsSelector() {
             public CPUResultsSnapshot getSnapshot() { return snapshot; }
             public void selectionChanged(Collection<Integer> selected, boolean mergeThreads) {
                 mergedThreads = mergeThreads;
                 selectedThreads = selected;
                 setData();
             }
+            void reset() {
+                super.reset();
+                mergedThreads = false;
+                selectedThreads = null;
+            }
         };
+        return threadsSelector;
     }
     
     public void setPaused(boolean paused) {
@@ -237,7 +245,7 @@ public abstract class LiveCPUView extends JPanel {
         snapshot = null;
         refSnapshot = null;
         sampled = true;
-//        selectedThreads = null; // ???
+        if (threadsSelector != null) threadsSelector.reset();
     }
     
     
