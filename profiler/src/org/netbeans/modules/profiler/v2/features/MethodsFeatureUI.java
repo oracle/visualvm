@@ -165,6 +165,7 @@ abstract class MethodsFeatureUI extends FeatureUI {
     private JButton pdResetResultsButton;
     
     private boolean popupPause;
+    private JToggleButton[] toggles;
     
     
     private void initUI() {
@@ -198,6 +199,18 @@ abstract class MethodsFeatureUI extends FeatureUI {
                     popupPause = false;
                     lrPauseButton.setSelected(false);
                 }
+            }
+            protected void foundInForwardCalls() {
+                super.foundInForwardCalls();
+                toggles[0].setSelected(true);
+            }
+            protected void foundInHotSpots() {
+                super.foundInHotSpots();
+                toggles[1].setSelected(true);
+            }
+            protected void foundInReverseCalls() {
+                super.foundInReverseCalls();
+                toggles[2].setSelected(true);
             }
         };
         
@@ -237,7 +250,7 @@ abstract class MethodsFeatureUI extends FeatureUI {
         lrDeltasButton.setToolTipText(Bundle.MethodsFeatureUI_showDeltas());
         
         MultiButtonGroup group = new MultiButtonGroup();
-        final JToggleButton[] toggles = new JToggleButton[3];
+        toggles = new JToggleButton[3];
         
         JToggleButton forwardCalls = new JToggleButton(Icons.getIcon(ProfilerIcons.NODE_FORWARD)) {
             protected void fireActionPerformed(ActionEvent e) {

@@ -165,23 +165,24 @@ public class ProfilerTreeTable extends ProfilerTable {
         TreeModel _model = model.treeModel;
         TreeNode node = (TreeNode)path.getLastPathComponent();
         TreePath parentPath = path.getParentPath();
+        if (parentPath == null) parentPath = path;
         TreeNode parent = (TreeNode)parentPath.getLastPathComponent();
-        int idx = _model.getIndexOfChild(parent, node);
+        int idx = parent == node ? parent.getChildCount() : _model.getIndexOfChild(parent, node);
 
         if (idx == 0) {
-            if (parentPath.getParentPath() != null) return parentPath;
-            else return parentPath.pathByAddingChild(_model.getChild(parent, _model.getChildCount(parent) - 1));
-        } else {
-            node = (TreeNode)_model.getChild(parent, idx - 1);
-            path = parentPath.pathByAddingChild(node);
-
-            while (_model.getChildCount(node) != 0) {
-                node = (TreeNode)_model.getChild(node, _model.getChildCount(node) - 1);
-                path = path.pathByAddingChild(node);
-            }
-
-            return path;
+            if (parent != model.treeModel.getRoot()) return parentPath;
+            else idx = parent.getChildCount();
         }
+        
+        node = (TreeNode)_model.getChild(parent, idx - 1);
+        path = parentPath.pathByAddingChild(node);
+
+        while (_model.getChildCount(node) != 0) {
+            node = (TreeNode)_model.getChild(node, _model.getChildCount(node) - 1);
+            path = path.pathByAddingChild(node);
+        }
+
+        return path;
     }
     
     void selectPath(TreePath path, boolean scrollToVisible) {
