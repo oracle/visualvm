@@ -328,7 +328,6 @@ abstract class MethodsFeatureUI extends FeatureUI {
         toolbar.addSpace(2);
         toolbar.add(lrPauseButton);
         toolbar.add(lrRefreshButton);
-        toolbar.add(lrDeltasButton);
         
         toolbar.addSpace(2);
 //        toolbar.addSeparator();
@@ -341,6 +340,7 @@ abstract class MethodsFeatureUI extends FeatureUI {
         toolbar.add(reverseCalls);
         
         toolbar.addSpace(5);
+        toolbar.add(lrDeltasButton);
         toolbar.add(cpuView.createThreadSelector());
 
         toolbar.addSpace(2);
