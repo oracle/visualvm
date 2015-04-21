@@ -114,6 +114,13 @@ public abstract class ThreadsSelector extends PopupButton {
     public abstract void selectionChanged(Collection<Integer> selected, boolean mergeThreads);
     
     
+    void reset() {
+        displayAllThreads = true;
+        mergeSelectedThreads = false;
+        selection.clear();
+    }
+    
+    
     public String getToolTipText() {
         return displayAllThreads ? SELECTED_THREADS_ALL :
                MessageFormat.format(SELECTED_THREADS, selection.size());
