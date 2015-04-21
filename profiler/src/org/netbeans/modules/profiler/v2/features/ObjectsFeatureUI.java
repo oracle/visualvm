@@ -239,6 +239,7 @@ abstract class ObjectsFeatureUI extends FeatureUI {
         toolbar.addSpace(2);
         toolbar.add(lrPauseButton);
         toolbar.add(lrRefreshButton);
+        toolbar.addSpace(5);
         toolbar.add(lrDeltasButton);
 
         toolbar.addSpace(2);
