@@ -51,11 +51,11 @@ import org.netbeans.lib.profiler.results.CCTNode;
  */
 class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
     
-    final PrestimeCPUCCTNodeBacked node1;
-    final PrestimeCPUCCTNodeBacked node2;
+    final PrestimeCPUCCTNode node1;
+    final PrestimeCPUCCTNode node2;
     
     
-    DiffCPUCCTNode(PrestimeCPUCCTNodeBacked n1, PrestimeCPUCCTNodeBacked n2) {
+    DiffCPUCCTNode(PrestimeCPUCCTNode n1, PrestimeCPUCCTNode n2) {
         node1 = n1;
         node2 = n2;
         container = node1 == null ? node2.container : node1.container;
@@ -63,9 +63,10 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
     
     
     public DiffCPUCCTNode createRootCopy() {
-        PrestimeCPUCCTNodeBacked copy1 = node1.createRootCopy();
-        PrestimeCPUCCTNodeBacked copy2 = node2.createRootCopy();
-        return new DiffCPUCCTNode(copy1, copy2);
+//        PrestimeCPUCCTNodeBacked copy1 = node1.createRootCopy();
+//        PrestimeCPUCCTNodeBacked copy2 = node2.createRootCopy();
+//        return new DiffCPUCCTNode(copy1, copy2);
+        return null; // Subtrees currently not supported
     }
     
 
@@ -97,36 +98,36 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
         return children;
     }
     
-    private static PrestimeCPUCCTNodeBacked[] computeChildren(PrestimeCPUCCTNode[] children1, PrestimeCPUCCTNode[] children2, PrestimeCPUCCTNode parent) {        
+    private static PrestimeCPUCCTNode[] computeChildren(PrestimeCPUCCTNode[] children1, PrestimeCPUCCTNode[] children2, PrestimeCPUCCTNode parent) {        
         Map<String, PrestimeCPUCCTNode> nodes1 = new HashMap();
         for (PrestimeCPUCCTNode node : children1) {
             String name = node.getNodeName();
-            PrestimeCPUCCTNodeBacked sameNode = (PrestimeCPUCCTNodeBacked)nodes1.get(name);
+            PrestimeCPUCCTNode sameNode = nodes1.get(name);
             if (sameNode == null) nodes1.put(name, node);
-            else sameNode.merge((PrestimeCPUCCTNodeBacked)node); // Merge same-named items
+            else sameNode.merge(node); // Merge same-named items
         }
         
         Map<String, PrestimeCPUCCTNode> nodes2 = new HashMap();
         for (PrestimeCPUCCTNode node : children2) {
             String name = node.getNodeName();
-            PrestimeCPUCCTNodeBacked sameNode = (PrestimeCPUCCTNodeBacked)nodes2.get(name);
+            PrestimeCPUCCTNode sameNode = nodes2.get(name);
             if (sameNode == null) nodes2.put(name, node);
-            else sameNode.merge((PrestimeCPUCCTNodeBacked)node); // Merge same-named items
+            else sameNode.merge(node); // Merge same-named items
         }
         
-        List<PrestimeCPUCCTNodeBacked> children = new ArrayList();
+        List<PrestimeCPUCCTNode> children = new ArrayList();
         for (PrestimeCPUCCTNode node1 : nodes1.values()) {
             PrestimeCPUCCTNode node2 = nodes2.get(node1.getNodeName());
-            if (node2 != null) children.add(new DiffCPUCCTNode((PrestimeCPUCCTNodeBacked)node1, (PrestimeCPUCCTNodeBacked)node2));
-            else children.add(new DiffCPUCCTNode((PrestimeCPUCCTNodeBacked)node1, null));
+            if (node2 != null) children.add(new DiffCPUCCTNode(node1, node2));
+            else children.add(new DiffCPUCCTNode(node1, null));
         }
         for (PrestimeCPUCCTNode node2 : nodes2.values()) {
-            if (!nodes1.containsKey(node2.getNodeName())) children.add(new DiffCPUCCTNode(null, (PrestimeCPUCCTNodeBacked)node2));
+            if (!nodes1.containsKey(node2.getNodeName())) children.add(new DiffCPUCCTNode(null, node2));
         }
         
-        for (PrestimeCPUCCTNodeBacked child : children) child.parent = parent;
+        for (PrestimeCPUCCTNode child : children) child.parent = parent;
         
-        return children.toArray(new PrestimeCPUCCTNodeBacked[children.size()]);
+        return children.toArray(new PrestimeCPUCCTNode[children.size()]);
     }
     
     protected void resetChildren() {

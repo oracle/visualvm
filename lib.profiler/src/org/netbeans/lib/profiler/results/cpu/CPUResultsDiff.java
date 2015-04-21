@@ -117,28 +117,28 @@ public class CPUResultsDiff extends CPUResultsSnapshot {
 
     public PrestimeCPUCCTNode getReverseCCT(int threadId, int methodId, int view) {
         // TODO: resolve correct threadId for snapshot2
-        PrestimeCPUCCTNodeBacked root1 = (PrestimeCPUCCTNodeBacked)snapshot1.getReverseCCT(threadId, methodId, view);
-        PrestimeCPUCCTNodeBacked root2 = (PrestimeCPUCCTNodeBacked)snapshot2.getReverseCCT(threadId, methodId, view);
+        PrestimeCPUCCTNode root1 = snapshot1.getReverseCCT(threadId, methodId, view);
+        PrestimeCPUCCTNode root2 = snapshot2.getReverseCCT(threadId, methodId, view);
         return new DiffCPUCCTNode(root1, root2);
     }
 
     public PrestimeCPUCCTNode getRootNode(int view) {
-        PrestimeCPUCCTNodeBacked root1 = (PrestimeCPUCCTNodeBacked)snapshot1.getRootNode(view);
-        PrestimeCPUCCTNodeBacked root2 = (PrestimeCPUCCTNodeBacked)snapshot2.getRootNode(view);
+        PrestimeCPUCCTNode root1 = snapshot1.getRootNode(view);
+        PrestimeCPUCCTNode root2 = snapshot2.getRootNode(view);
         return new DiffCPUCCTNode(root1, root2);
     }
     
     public PrestimeCPUCCTNode getRootNode(int view, Collection<Integer> threads, boolean merge) {
         // TODO: resolve correct threads for snapshot2
-        PrestimeCPUCCTNodeBacked root1 = (PrestimeCPUCCTNodeBacked)snapshot1.getRootNode(view, threads, merge);
-        PrestimeCPUCCTNodeBacked root2 = (PrestimeCPUCCTNodeBacked)snapshot2.getRootNode(view, threads, merge);
+        PrestimeCPUCCTNode root1 = snapshot1.getRootNode(view, threads, merge);
+        PrestimeCPUCCTNode root2 = snapshot2.getRootNode(view, threads, merge);
         return new DiffCPUCCTNode(root1, root2);
     }
     
     public PrestimeCPUCCTNode getReverseRootNode(int view, Collection<Integer> threads, boolean merge) {
         // TODO: resolve correct threads for snapshot2
-        PrestimeCPUCCTNodeBacked root1 = (PrestimeCPUCCTNodeBacked)snapshot1.getReverseRootNode(view, threads, merge);
-        PrestimeCPUCCTNodeBacked root2 = (PrestimeCPUCCTNodeBacked)snapshot2.getReverseRootNode(view, threads, merge);
+        PrestimeCPUCCTNode root1 = snapshot1.getReverseRootNode(view, threads, merge);
+        PrestimeCPUCCTNode root2 = snapshot2.getReverseRootNode(view, threads, merge);
         return new DiffCPUCCTNode(root1, root2);
     }
     
