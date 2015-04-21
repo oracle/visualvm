@@ -319,7 +319,17 @@ public abstract class SnapshotMemoryView extends JPanel {
     
     private ExportUtils.Exportable[] getExportables(final ExportUtils.Exportable snapshotExporter) {
         return new ExportUtils.Exportable[] {
-            snapshotExporter,
+            new ExportUtils.Exportable() {
+                public boolean isEnabled() {
+                    return refSnapshot == null && snapshotExporter.isEnabled();
+                }
+                public String getName() {
+                    return snapshotExporter.getName();
+                }
+                public ExportUtils.ExportProvider[] getProviders() {
+                    return snapshotExporter.getProviders();
+                }
+            },
             new ExportUtils.Exportable() {
                 public boolean isEnabled() {
                     return true;

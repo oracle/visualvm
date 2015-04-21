@@ -118,7 +118,7 @@ public final class FilterUtils {
         JToolBar toolbar = new JToolBar(JToolBar.HORIZONTAL);
         if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel())
                 toolbar.setLayout(new BoxLayout(toolbar, BoxLayout.LINE_AXIS));
-        toolbar.setBorder(BorderFactory.createEmptyBorder(getUpperMargin(), 2, 0, 2));
+        toolbar.setBorder(BorderFactory.createEmptyBorder(getTopMargin(), 2, getBottomMargin(), 2));
         toolbar.setBorderPainted(false);
         toolbar.setRollover(true);
         toolbar.setFloatable(false);
@@ -249,10 +249,15 @@ public final class FilterUtils {
     
     }
     
-    private static int getUpperMargin() {
+    private static int getTopMargin() {
         if (UIUtils.isWindowsLookAndFeel() || UIUtils.isMetalLookAndFeel()) return 1;
-        if (UIUtils.isAquaLookAndFeel() || UIUtils.isNimbusLookAndFeel()) return 0;
+        if (UIUtils.isAquaLookAndFeel() || UIUtils.isNimbusLookAndFeel() || UIUtils.isOracleLookAndFeel()) return 0;
         return 2;
+    }
+    
+    private static int getBottomMargin() {
+        if (UIUtils.isOracleLookAndFeel()) return 1;
+        return 0;
     }
     
     
