@@ -50,6 +50,7 @@ import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -70,6 +71,8 @@ import org.netbeans.lib.profiler.ui.components.CloseButton;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.spi.ActionsSupportProvider;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -301,5 +304,20 @@ public final class SearchUtils {
     
     // Do not create instances of this class
     private SearchUtils() {}
+    
+    
+    // Default keybinding Ctrl+F for Find action
+    private static interface Support { @ServiceProvider(service=ActionsSupportProvider.class, position=100)
+        public static final class SearchActionProvider extends ActionsSupportProvider {
+            public boolean registerAction(String actionKey, Action action, ActionMap actionMap, InputMap inputMap) {
+                if (!FIND_ACTION_KEY.equals(actionKey)) return false;
+
+                actionMap.put(actionKey, action);
+                inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK), actionKey);
+
+                return true;
+            }
+        }
+    }
     
 }
