@@ -72,6 +72,7 @@ import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.actions.CompareSnapshotsAction;
+import org.netbeans.modules.profiler.api.ActionsSupport;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
@@ -538,42 +539,26 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     }
     
     private void registerActions(final JComponent view) {
-        InputMap map = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        ActionMap actionMap = getActionMap();
         
-        final String FILTER = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
-        final ActionListener filter = new ActionListener() {
+        final String filterKey = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        Action filterAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                Action action = view.getActionMap().get(FILTER);
+                Action action = view.getActionMap().get(filterKey);
                 if (action != null && action.isEnabled()) action.actionPerformed(e);
             }
         };
-        getActionMap().put(FILTER, new AbstractAction() {
-            public void actionPerformed(ActionEvent e) { filter.actionPerformed(e); }
-        });
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK), FILTER);
+        ActionsSupport.registerAction(filterKey, filterAction, actionMap, inputMap);
         
-        final String FIND = SearchUtils.FIND_ACTION_KEY;
-        final ActionListener find = new ActionListener() {
+        final String findKey = SearchUtils.FIND_ACTION_KEY;
+        Action findAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                Action action = view.getActionMap().get(FIND);
-                if (action != null && action.isEnabled()) action.actionPerformed(null);
+                Action action = view.getActionMap().get(findKey);
+                if (action != null && action.isEnabled()) action.actionPerformed(e);
             }
         };
-        try {
-            // Let's use the global FindAction if available
-            Class findActionClass = Class.forName("org.openide.actions.FindAction"); // NOI18N
-            CallbackSystemAction globalFindAction = (CallbackSystemAction)SystemAction.get(findActionClass);
-            Object findActionKey = globalFindAction.getActionMapKey();
-            getActionMap().put(findActionKey, new AbstractAction() {
-                public void actionPerformed(ActionEvent e) { find.actionPerformed(e); }
-            });
-        } catch (ClassNotFoundException e) {
-            // Fallback to CTRL+F if global FindAction not available
-            getActionMap().put(FIND, new AbstractAction() {
-                public void actionPerformed(ActionEvent e) { find.actionPerformed(e); }
-            });
-            map.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK), FIND);
-        }
+        ActionsSupport.registerAction(findKey, findAction, actionMap, inputMap);
     }
 
     private void updateSaveState() {
