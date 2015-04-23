@@ -57,10 +57,14 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
@@ -90,11 +94,13 @@ import org.openide.util.NbBundle;
     "ObjectsFeatureModes_editLink=<html><a href='#'>{0}, edit</a></html>",
     "ObjectsFeatureModes_recordLifecycle=Track only live objects",
     "ObjectsFeatureModes_recordAllocations=Record allocations",
-    "ObjectsFeatureModes_limitAllocations=Limit allocation calls:",
+    "ObjectsFeatureModes_limitAllocations=Limit allocations depth:",
     "ObjectsFeatureModes_noClassSelected=No classes selected, use Profile Class action in editor or results or click the Add button:",
     "ObjectsFeatureModes_oneClassSelected=Selected 1 class",
     "ObjectsFeatureModes_multipleClassesSelected=Selected {0} classes",
-    "ObjectsFeatureModes_addClass=Select class"
+    "ObjectsFeatureModes_addClass=Select class",
+    "ObjectsFeatureModes_lblUnlimited=unlimited",
+    "ObjectsFeatureModes_lblNoAllocations=(no allocations)"
 })
 final class ObjectsFeatureModes {
     
@@ -205,7 +211,7 @@ final class ObjectsFeatureModes {
 
             boolean alloc = Boolean.parseBoolean(readFlag(ALLOCATIONS_FLAG, Boolean.TRUE.toString()));
             int limit = Integer.parseInt(readFlag(LIMIT_ALLOCATIONS_FLAG, LIMIT_ALLOCATIONS_DEFAULT.toString()));
-            settings.setAllocStackTraceLimit(alloc ? limit : 0); // TODO: should follow limit from Options
+            settings.setAllocStackTraceLimit(!alloc ? -10 : limit); // TODO: should follow limit from Options
             
             settings.setAllocTrackEvery(1); // TODO: should follow value from Options
 
@@ -228,13 +234,11 @@ final class ObjectsFeatureModes {
                 
                 storeFlag(LIFECYCLE_FLAG,   lifecycleCheckbox.isSelected() ?
                                             null : Boolean.FALSE.toString());
-                storeFlag(ALLOCATIONS_FLAG, allocationsCheckbox.isSelected() ?
+                storeFlag(ALLOCATIONS_FLAG, outgoingCheckbox.isSelected() ?
                                             null : Boolean.FALSE.toString());
-                int limit = (Integer)outgoingSpinner.getValue();
-                if (!outgoingSpinner.isEnabled()) limit = -limit;
-                String limitS = Integer.toString(limit);
-                boolean deflimit = LIMIT_ALLOCATIONS_DEFAULT.equals(limitS);
-                storeFlag(LIMIT_ALLOCATIONS_FLAG, deflimit ? null : limitS);
+                String limit = ((Integer)outgoingSpinner.getValue()).toString();
+                boolean deflimit = LIMIT_ALLOCATIONS_DEFAULT.equals(limit);
+                storeFlag(LIMIT_ALLOCATIONS_FLAG, deflimit ? null : limit);
                 saveSelection();
             }
         }
@@ -247,13 +251,12 @@ final class ObjectsFeatureModes {
                 boolean _lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.TRUE.toString()));
                 if (lifecycle != _lifecycle) return true;
                 
-                boolean alloc = allocationsCheckbox.isSelected();
+                boolean alloc = outgoingCheckbox.isSelected();
                 boolean _alloc = Boolean.parseBoolean(readFlag(ALLOCATIONS_FLAG, Boolean.TRUE.toString()));
                 if (alloc != _alloc) return true;
                 
                 int limit = Integer.parseInt(readFlag(LIMIT_ALLOCATIONS_FLAG, LIMIT_ALLOCATIONS_DEFAULT.toString()));
                 int _limit = (Integer)outgoingSpinner.getValue();
-                if (!outgoingSpinner.isEnabled()) _limit = -_limit;
                 if (limit != _limit) return true;
                 
                 if (!initSelection(false).equals(getSelection())) return true;
@@ -307,7 +310,6 @@ final class ObjectsFeatureModes {
         private JPanel selectionContent;
         private JPanel noSelectionContent;
         private JCheckBox lifecycleCheckbox;
-        private JCheckBox allocationsCheckbox;
         private JButton addSelectionButton;
         private JButton editSelectionLink;
         private JCheckBox outgoingCheckbox;
@@ -364,43 +366,59 @@ final class ObjectsFeatureModes {
                 selectionContent.add(lifecycleCheckbox);
                 
                 selectionContent.add(Box.createHorizontalStrut(3));
-
+                
+                final JLabel unlimited = new GrayLabel(Bundle.ObjectsFeatureModes_lblUnlimited());
+                final JLabel noAllocs = new GrayLabel(Bundle.ObjectsFeatureModes_lblNoAllocations());
+                
                 boolean alloc = Boolean.parseBoolean(readFlag(ALLOCATIONS_FLAG, Boolean.TRUE.toString()));
-                allocationsCheckbox = new JCheckBox(Bundle.ObjectsFeatureModes_recordAllocations(), alloc) {
+                outgoingCheckbox = new JCheckBox(Bundle.ObjectsFeatureModes_limitAllocations(), alloc) {
                     protected void fireActionPerformed(ActionEvent e) {
                         super.fireActionPerformed(e);
-                        outgoingCheckbox.setVisible(isSelected());
-                        outgoingSpinner.setVisible(isSelected());
-                        settingsChanged();
-                    }
-                };
-                allocationsCheckbox.setOpaque(false);
-                selectionContent.add(allocationsCheckbox);
-                
-                selectionContent.add(Box.createHorizontalStrut(3));
-                
-                int limit = Integer.parseInt(readFlag(LIMIT_ALLOCATIONS_FLAG, LIMIT_ALLOCATIONS_DEFAULT.toString()));
-                outgoingCheckbox = new JCheckBox(Bundle.ObjectsFeatureModes_limitAllocations(), limit > 0) {
-                    protected void fireActionPerformed(ActionEvent e) {
-                        super.fireActionPerformed(e);
-                        outgoingSpinner.setEnabled(isSelected());
+                        boolean selected = isSelected();
+                        unlimited.setVisible(!selected);
+                        outgoingSpinner.setVisible(selected);
+                        noAllocs.setVisible(selected && (Integer)outgoingSpinner.getValue() == 0);
                         settingsChanged();
                     }
                 };
                 outgoingCheckbox.setOpaque(false);
-                outgoingCheckbox.setVisible(allocationsCheckbox.isSelected());
                 selectionContent.add(outgoingCheckbox);
+                
+                unlimited.setVisible(!outgoingCheckbox.isSelected());
+                selectionContent.add(unlimited);
                 
                 selectionContent.add(Box.createHorizontalStrut(1));
                 
-                outgoingSpinner = new JExtendedSpinner(new SpinnerNumberModel(Math.abs(limit), 1, 99, 1)) {
+                int limit = Integer.parseInt(readFlag(LIMIT_ALLOCATIONS_FLAG, LIMIT_ALLOCATIONS_DEFAULT.toString()));
+                outgoingSpinner = new JExtendedSpinner(new SpinnerNumberModel(Math.abs(limit), 0, 99, 1)) {
                     public Dimension getPreferredSize() { return getMinimumSize(); }
                     public Dimension getMaximumSize() { return getMinimumSize(); }
                     protected void fireStateChanged() { settingsChanged(); super.fireStateChanged(); }
                 };
-                outgoingSpinner.setEnabled(outgoingCheckbox.isSelected());
-                outgoingSpinner.setVisible(allocationsCheckbox.isSelected());
+                JComponent editor = outgoingSpinner.getEditor();
+                JTextField field = editor instanceof JSpinner.DefaultEditor ?
+                        ((JSpinner.DefaultEditor)editor).getTextField() : null;
+                if (field != null) field.getDocument().addDocumentListener(new DocumentListener() {
+                    public void insertUpdate(DocumentEvent e) { change(); }
+                    public void removeUpdate(DocumentEvent e) { change(); }
+                    public void changedUpdate(DocumentEvent e) { change(); }
+                    private void change() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                noAllocs.setVisible(outgoingSpinner.isVisible() &&
+                                                    (Integer)outgoingSpinner.getValue() == 0);
+                            }
+                        });
+//                            settingsChanged();
+                    }
+                });
+                outgoingSpinner.setVisible(outgoingCheckbox.isSelected());
                 selectionContent.add(outgoingSpinner);
+                
+                selectionContent.add(Box.createHorizontalStrut(5));
+                
+                noAllocs.setVisible(outgoingSpinner.isVisible() && (Integer)outgoingSpinner.getValue() == 0);
+                selectionContent.add(noAllocs);
 
                 noSelectionContent = new JPanel();
                 noSelectionContent.setLayout(new BoxLayout(noSelectionContent, BoxLayout.LINE_AXIS));
