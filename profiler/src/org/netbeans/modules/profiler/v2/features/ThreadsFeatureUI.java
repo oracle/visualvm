@@ -125,7 +125,12 @@ abstract class ThreadsFeatureUI extends FeatureUI {
         
         // --- Results ---------------------------------------------------------
         
-        threadsView = new ThreadsPanel(getProfiler().getThreadsManager(), null);
+        threadsView = new ThreadsPanel(getProfiler().getThreadsManager(), null) {
+            protected void filterSelected(ThreadsPanel.Filter filter) {
+                super.filterSelected(filter);
+                shFilter.selectAction(filter.ordinal());
+            }
+        };
         threadsView.threadsMonitoringEnabled();
         
         threadsView.putClientProperty("HelpCtx.Key", "ProfileThreads.HelpCtx"); // NOI18N
@@ -205,13 +210,13 @@ abstract class ThreadsFeatureUI extends FeatureUI {
             setFilter(ThreadsPanel.Filter.SELECTED);
         } else {
             threadsView.showSelectedColumn();
+            shFilter.selectAction(threadsView.getFilter().ordinal());
             ProfilerDialogs.displayWarning(Bundle.ThreadsFeatureUI_noThreadsMsg());
         }
     }
 
     private void setFilter(ThreadsPanel.Filter filter) {
         threadsView.setFilter(filter);
-        shFilter.selectAction(filter.ordinal());
     }
     
 }
