@@ -157,15 +157,15 @@ final class TracerView {
         
         map.put(FilterUtils.FILTER_ACTION_KEY, new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                if (snapshotView.isShowing()) snapshotView.getActionMap().get
-                            (FilterUtils.FILTER_ACTION_KEY).actionPerformed(e);
+                if (snapshotView != null && snapshotView.isShowing())
+                    snapshotView.getActionMap().get(FilterUtils.FILTER_ACTION_KEY).actionPerformed(e);
             }
         });
         
         map.put(SearchUtils.FIND_ACTION_KEY, new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                if (snapshotView.isShowing()) snapshotView.getActionMap().get
-                            (SearchUtils.FIND_ACTION_KEY).actionPerformed(e);
+                if (snapshotView != null && snapshotView.isShowing())
+                    snapshotView.getActionMap().get(SearchUtils.FIND_ACTION_KEY).actionPerformed(e);
             }
         });
 
@@ -265,7 +265,10 @@ final class TracerView {
                     CPUResultsSnapshot s = (CPUResultsSnapshot)lsF.getSnapshot();
                     if (snapshotView == null) {
                         CompareSnapshotsAction aCompare = new CompareSnapshotsAction(lsF);
-                        ExportUtils.Exportable exporter = ResultsManager.getDefault().createSnapshotExporter(lsF);
+                        ResultsManager.SnapshotHandle handle = new ResultsManager.SnapshotHandle() {
+                            public LoadedSnapshot getSnapshot() { return lsF; }
+                        };
+                        ExportUtils.Exportable exporter = ResultsManager.getDefault().createSnapshotExporter(handle);
                         snapshotView = new SnapshotView(s, aCompare, exporter);
                         aCompare.setPerformer(new CompareSnapshotsAction.Performer() {
                             public void compare(LoadedSnapshot snapshot) {
@@ -356,11 +359,15 @@ final class TracerView {
             GoToSource.openSource(null, className, methodName, methodSig);
         }
         
+        @NbBundle.Messages({
+            "LBL_ProfileClass=Profile Class",
+            "LBL_ProfileMethod=Profile Method"                
+        })
         public void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
                     String name = Wildcards.ALLWILDCARD.equals(value.getMethodName()) ?
-                                  "Profile Class" : "Profile Method";
+                                  Bundle.LBL_ProfileClass() : Bundle.LBL_ProfileMethod();
                     ProfilerSession.findAndConfigure(Lookups.fixed(value), null, name);
                 }
             });
