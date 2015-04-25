@@ -910,7 +910,18 @@ public final class ResultsManager {
         return resultsAvailable;
     }
     
+    
+    public static interface SnapshotHandle {
+        public LoadedSnapshot getSnapshot();
+    }
+    
     public ExportUtils.Exportable createSnapshotExporter(final LoadedSnapshot snapshot) {
+        return createSnapshotExporter(new SnapshotHandle() {
+            public LoadedSnapshot getSnapshot() { return snapshot; }
+        });
+    }
+    
+    public ExportUtils.Exportable createSnapshotExporter(final SnapshotHandle handle) {
         return new ExportUtils.Exportable() {
             public String getName() {
                 return Bundle.ResultsManager_ExportSnapshotData();
@@ -921,6 +932,7 @@ public final class ResultsManager {
             }
 
             public ExportUtils.ExportProvider[] getProviders() {
+                final LoadedSnapshot snapshot = handle.getSnapshot();
                 return new ExportUtils.ExportProvider[] {
                     new ExportUtils.AbstractNPSExportProvider(snapshot.getFile()) {
                         protected void doExport(File targetFile) {
