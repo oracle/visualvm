@@ -81,6 +81,11 @@ class DiffObjAllocCCTNode extends PresoObjAllocCCTNode {
         return node1 == null ? node2.getNodeName() : node1.getNodeName();
     }
     
+    public String[] getMethodClassNameAndSig() {
+        return node1 == null ? node2.getMethodClassNameAndSig() :
+                               node1.getMethodClassNameAndSig();
+    }
+    
     
     public boolean isLeaf() {
         boolean leaf1 = node1 == null || node1.isLeaf();
