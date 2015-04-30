@@ -403,16 +403,22 @@ public class LockContentionPanel extends DataView {
     }
     
     public void resetData() {
-        root = null;
-        treeTableModel.setRoot(LockCCTNode.EMPTY);
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                root = null;
+                treeTableModel.setRoot(LockCCTNode.EMPTY);
+            }
+        });
     }
     
     private class Listener implements LockCCTProvider.Listener {
 
         @Override
-        public void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
+        public void cctEstablished(final RuntimeCCTNode appRootNode, boolean empty) {
             if (!empty && appRootNode instanceof LockRuntimeCCTNode) {
-                root = (LockRuntimeCCTNode)appRootNode;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { root = (LockRuntimeCCTNode)appRootNode; }
+                });
                 prepareResults();
             }
         }
