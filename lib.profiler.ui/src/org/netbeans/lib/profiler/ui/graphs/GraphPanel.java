@@ -142,7 +142,7 @@ public abstract class GraphPanel extends JPanel {
         }
         
         chart.addPreDecorator(new XYBackground());
-        chart.setFitsWidth(true);
+        chart.setFitsWidth(false);
 
         chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_EACH_NEAREST);
         return chart;
