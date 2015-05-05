@@ -224,7 +224,7 @@ abstract class ObjectsFeatureUI extends FeatureUI {
 
         pdSnapshotButton = new JButton(TakeSnapshotAction.getInstance());
         pdSnapshotButton.setHideActionText(true);
-        pdSnapshotButton.setText(Bundle.ObjectsFeatureUI_snapshot());
+//        pdSnapshotButton.setText(Bundle.ObjectsFeatureUI_snapshot());
 
         pdResetResultsButton = new JButton(ResetResultsAction.getInstance());
         pdResetResultsButton.setHideActionText(true);
@@ -249,6 +249,7 @@ abstract class ObjectsFeatureUI extends FeatureUI {
         toolbar.add(pdLabel);
         toolbar.addSpace(2);
         toolbar.add(pdSnapshotButton);
+        toolbar.addSpace(3);
         toolbar.add(pdResetResultsButton);
         
         

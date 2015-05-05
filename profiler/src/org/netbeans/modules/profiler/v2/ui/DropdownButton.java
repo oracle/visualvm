@@ -52,6 +52,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultButtonModel;
 import javax.swing.Icon;
@@ -187,7 +188,17 @@ public class DropdownButton extends JPanel {
     
     
     public void setText(String text) {
-        if (button != null) button.setText(text);
+        if (button != null) {
+            String _text = button.getText();
+            button.setText(text);
+            
+            Component parent = getParent();
+            if (!Objects.equals(text, _text) && parent != null) {
+                parent.invalidate();
+                parent.revalidate();
+                parent.repaint();
+            }
+        }
     }
     
     public String getText() {
@@ -195,7 +206,17 @@ public class DropdownButton extends JPanel {
     }
     
     public void setIcon(Icon icon) {
-        if (button != null) button.setIcon(icon);
+        if (button != null) {
+            Icon _icon = button.getIcon();
+            button.setIcon(icon);
+            
+            Component parent = getParent();
+            if (!Objects.equals(icon, _icon) && parent != null) {
+                parent.invalidate();
+                parent.revalidate();
+                parent.repaint();
+            }
+        }
     }
     
     public Icon getIcon() {
