@@ -44,6 +44,8 @@ package org.netbeans.lib.profiler.ui.components;
 
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -114,6 +116,24 @@ public abstract class ProfilerToolbar {
                 protected void addImpl(Component comp, Object constraints, int index) {
                     if (comp instanceof JButton)
                         UIUtils.fixButtonUI((JButton) comp);
+                    if (UIUtils.isMetalLookAndFeel()) {
+                        if (comp instanceof AbstractButton && !(comp instanceof JCheckBox) && !(comp instanceof JRadioButton)) {
+                            final AbstractButton ab = (AbstractButton) comp;
+                            ab.setMargin(new Insets(1, 1, 1, 1));
+                            if (ab.getClientProperty("MetalListener") == null) { // NOI18N
+                                final ButtonModel bm = ab.getModel();
+                                ChangeListener cl = new ChangeListener() {
+                                    public void stateChanged(ChangeEvent e) {
+                                        ab.setBorderPainted(bm.isArmed() || bm.isPressed() || bm.isRollover() || bm.isSelected());
+                                        ab.setContentAreaFilled(bm.isArmed() || bm.isPressed() || bm.isRollover() || bm.isSelected());
+                                    }
+                                };
+                                cl.stateChanged(null); // initialize the appearance tweaks
+                                ab.getModel().addChangeListener(cl);
+                                ab.putClientProperty("MetalListener", cl); // NOI18N
+                            }
+                        }
+                    }
                     super.addImpl(comp, constraints, index);
                 }
                 public Dimension getPreferredSize() {
@@ -126,8 +146,10 @@ public abstract class ProfilerToolbar {
                         tb.setFloatable(toolbar.isFloatable());
                         Icon icon = Icons.getIcon(GeneralIcons.SAVE);
                         JButton b = new JButton("Button", icon); // NOI18N
+                        if (UIUtils.isMetalLookAndFeel()) b.setMargin(new Insets(1, 1, 1, 1));
                         tb.add(b);
                         JToggleButton t = new JToggleButton("Button", icon); // NOI18N
+                        if (UIUtils.isMetalLookAndFeel()) t.setMargin(new Insets(1, 1, 1, 1));
                         tb.add(t);
                         JComboBox c = new JComboBox();
                         c.setEditor(new BasicComboBoxEditor());
@@ -224,7 +246,27 @@ public abstract class ProfilerToolbar {
 
         @Override
         public void addSeparator() {
-            toolbar.addSeparator();
+            if (!UIUtils.isMetalLookAndFeel()) {
+                toolbar.addSeparator();
+            } else {
+                final JSeparator separator = new JSeparator(JSeparator.VERTICAL);
+                final int WDTH = separator.getPreferredSize().width;
+                final Dimension SIZE = new Dimension(new JToolBar.Separator().getSeparatorSize().width, 12);
+                JPanel panel = new JPanel(null) {
+                    public Dimension getPreferredSize() { return SIZE; }
+                    public Dimension getMaximumSize() { return SIZE; }
+                    public Dimension getMinimumSize() { return SIZE; }
+                    
+                    public void doLayout() {
+                        int x = (getWidth() - WDTH) / 2;
+                        int y = (getHeight()- SIZE.height) / 2;
+                        separator.setBounds(x, y, WDTH, SIZE.height);
+                    }
+                };
+                panel.setOpaque(false);
+                panel.add(separator);
+                toolbar.add(panel);
+            }
             toolbar.repaint();
         }
         
