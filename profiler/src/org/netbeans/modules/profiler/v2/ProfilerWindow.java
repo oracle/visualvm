@@ -116,7 +116,7 @@ import org.openide.windows.WindowManager;
     "ProfilerWindow_captionProject={0}",
     "ProfilerWindow_captionFile={0} | {1}",
     "ProfilerWindow_captionExternal=Profile External Process",
-    "ProfilerWindow_configure=Configure session",
+    "ProfilerWindow_configure=Configure Session",
     "ProfilerWindow_profile=Profile",
     "ProfilerWindow_attach=Attach",
     "ProfilerWindow_terminateCaption=Terminate Profiling Session",

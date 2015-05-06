@@ -48,7 +48,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -64,6 +63,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.swing.GenericToolbar;
 import org.netbeans.lib.profiler.ui.swing.SmallButton;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -127,7 +127,7 @@ public class DropdownButton extends JPanel {
         setOpaque(false);
         
         if (toolbar) {
-            JToolBar tb = new JToolBar() {
+            JToolBar tb = new GenericToolbar() {
                 public void doLayout() {
                     for (Component c : getComponents())
                         c.setBounds(0, 0, getWidth(), getHeight());
@@ -349,9 +349,12 @@ public class DropdownButton extends JPanel {
         Button(String text, Icon icon) {
             super(text, icon);
             
+            // See GenericToolbar.addImpl()
+            putClientProperty("MetalListener", new Object()); // NOI18N
+            
             setModel(new DefaultButtonModel() {
                 public boolean isRollover() {
-                    return super.isRollover() || (isEnabled() && popup.getModel().isRollover());
+                    return super.isRollover() || (isEnabled() && (popup != null && popup.getModel().isRollover()));
                 }
                 public boolean isPressed() {
                     return pushed || super.isPressed();
@@ -363,8 +366,6 @@ public class DropdownButton extends JPanel {
             
             setHorizontalAlignment(LEADING);
             setDefaultCapable(false);
-            
-            if (UIUtils.isMetalLookAndFeel()) setMargin(new Insets(1, 1, 1, 1));
         }
         
         protected void fireActionPerformed(ActionEvent e) {
@@ -404,6 +405,9 @@ public class DropdownButton extends JPanel {
         Popup() {
             super(" "); // NOI18N
             
+            // See GenericToolbar.addImpl()
+            putClientProperty("MetalListener", new Object()); // NOI18N
+            
             setModel(new DefaultButtonModel() {
                 public boolean isRollover() {
                     return super.isRollover() || pushed;
@@ -412,8 +416,6 @@ public class DropdownButton extends JPanel {
             
             setHorizontalAlignment(LEADING);
             setDefaultCapable(false);
-            
-            if (UIUtils.isMetalLookAndFeel()) setMargin(new Insets(1, 1, 1, 1));
             
             getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), NO_ACTION);
             getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true), NO_ACTION);
