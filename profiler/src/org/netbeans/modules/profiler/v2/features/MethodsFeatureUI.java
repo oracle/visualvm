@@ -313,7 +313,7 @@ abstract class MethodsFeatureUI extends FeatureUI {
 
         pdSnapshotButton = new JButton(TakeSnapshotAction.getInstance());
         pdSnapshotButton.setHideActionText(true);
-        pdSnapshotButton.setText(Bundle.MethodsFeatureUI_snapshot());
+//        pdSnapshotButton.setText(Bundle.MethodsFeatureUI_snapshot());
 
         pdResetResultsButton = new JButton(ResetResultsAction.getInstance());
         pdResetResultsButton.setHideActionText(true);
@@ -329,6 +329,9 @@ abstract class MethodsFeatureUI extends FeatureUI {
         toolbar.add(lrPauseButton);
         toolbar.add(lrRefreshButton);
         
+        toolbar.addSpace(5);
+        toolbar.add(lrDeltasButton);
+        
         toolbar.addSpace(2);
 //        toolbar.addSeparator();
         toolbar.addSpace(5);
@@ -340,7 +343,6 @@ abstract class MethodsFeatureUI extends FeatureUI {
         toolbar.add(reverseCalls);
         
         toolbar.addSpace(5);
-        toolbar.add(lrDeltasButton);
         toolbar.add(cpuView.createThreadSelector());
 
         toolbar.addSpace(2);
@@ -350,6 +352,7 @@ abstract class MethodsFeatureUI extends FeatureUI {
         toolbar.add(pdLabel);
         toolbar.addSpace(2);
         toolbar.add(pdSnapshotButton);
+        toolbar.addSpace(3);
         toolbar.add(pdResetResultsButton);
         
         

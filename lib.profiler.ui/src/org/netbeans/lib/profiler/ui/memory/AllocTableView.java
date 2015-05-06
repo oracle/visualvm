@@ -67,6 +67,8 @@ import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.utils.Wildcards;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 
 /**
  *
@@ -287,7 +289,7 @@ abstract class AllocTableView extends MemoryView {
         renderers[1].setMaxValue(12345678);
         
         if (selection != null) table.setColumnRenderer(0, new CheckBoxRenderer());
-        table.setColumnRenderer(1 + offset, new JavaNameRenderer());
+        table.setColumnRenderer(1 + offset, new JavaNameRenderer(Icons.getIcon(LanguageIcons.CLASS)));
         table.setColumnRenderer(2 + offset, renderers[0]);
         table.setColumnRenderer(3 + offset, renderers[1]);
         

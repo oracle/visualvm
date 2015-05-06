@@ -64,7 +64,7 @@ import org.openide.util.NbBundle;
  */
 @NbBundle.Messages({
     "LBL_RunGCAction=Run &GC",
-    "HINT_RunGCAction=Request garbage collection in the profiled application"
+    "HINT_RunGCAction=Request garbage collection in the profiled process"
 })
 public final class RunGCAction extends ProfilingAwareAction {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
