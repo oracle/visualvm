@@ -65,7 +65,7 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "WelcomePanel_howtoCaption=Configure and start profiling",
+    "WelcomePanel_howtoCaption=Configure and Start Profiling",
     "WelcomePanel_clickForSetings=Click the {0} button in toolbar and select the desired profiling mode:",
     "WelcomePanel_startProfiling=Click the {0} button in toolbar once the session is configured to start profiling.",
     "WelcomePanel_modifyProfiling=Use the {0} <b>dropdown arrow</b> to change profiling settings for the session."
@@ -197,6 +197,8 @@ public abstract class WelcomePanel extends JPanel {
             setShowPopup(false);
             setBackground(background);
             if (UIUtils.isNimbus()) setOpaque(false);
+            
+            setFocusable(false);
             
             setFont(new JToolTip().getFont());
             setText(setupText(text, caption, captionSizeDiff));
