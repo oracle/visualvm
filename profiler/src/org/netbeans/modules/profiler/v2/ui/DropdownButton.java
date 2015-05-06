@@ -48,10 +48,12 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultButtonModel;
 import javax.swing.Icon;
@@ -187,7 +189,17 @@ public class DropdownButton extends JPanel {
     
     
     public void setText(String text) {
-        if (button != null) button.setText(text);
+        if (button != null) {
+            String _text = button.getText();
+            button.setText(text);
+            
+            Component parent = getParent();
+            if (!Objects.equals(text, _text) && parent != null) {
+                parent.invalidate();
+                parent.revalidate();
+                parent.repaint();
+            }
+        }
     }
     
     public String getText() {
@@ -195,7 +207,17 @@ public class DropdownButton extends JPanel {
     }
     
     public void setIcon(Icon icon) {
-        if (button != null) button.setIcon(icon);
+        if (button != null) {
+            Icon _icon = button.getIcon();
+            button.setIcon(icon);
+            
+            Component parent = getParent();
+            if (!Objects.equals(icon, _icon) && parent != null) {
+                parent.invalidate();
+                parent.revalidate();
+                parent.repaint();
+            }
+        }
     }
     
     public Icon getIcon() {
@@ -341,6 +363,8 @@ public class DropdownButton extends JPanel {
             
             setHorizontalAlignment(LEADING);
             setDefaultCapable(false);
+            
+            if (UIUtils.isMetalLookAndFeel()) setMargin(new Insets(1, 1, 1, 1));
         }
         
         protected void fireActionPerformed(ActionEvent e) {
@@ -388,6 +412,8 @@ public class DropdownButton extends JPanel {
             
             setHorizontalAlignment(LEADING);
             setDefaultCapable(false);
+            
+            if (UIUtils.isMetalLookAndFeel()) setMargin(new Insets(1, 1, 1, 1));
             
             getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), NO_ACTION);
             getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true), NO_ACTION);

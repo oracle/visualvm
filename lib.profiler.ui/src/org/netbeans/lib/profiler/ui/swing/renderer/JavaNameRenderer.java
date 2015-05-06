@@ -43,11 +43,23 @@
 
 package org.netbeans.lib.profiler.ui.swing.renderer;
 
+import javax.swing.Icon;
+
 /**
  *
  * @author Jiri Sedlacek
  */
 public class JavaNameRenderer extends NormalBoldGrayRenderer {
+    
+    private final Icon icon;
+    
+    public JavaNameRenderer() {
+        this(null);
+    }
+    
+    public JavaNameRenderer(Icon icon) {
+        this.icon = icon;
+    }
     
     public void setValue(Object value, int row) {
         if (value == null) {
@@ -69,6 +81,7 @@ public class JavaNameRenderer extends NormalBoldGrayRenderer {
             setBoldValue(name.substring(dotIndex + 1));
             setGrayValue(gray);
         }
+        setIcon(icon);
     }
     
 }
