@@ -47,6 +47,7 @@ import javax.swing.UIManager;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 /**
@@ -55,6 +56,7 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  */
 public class MemoryJavaNameRenderer extends JavaNameRenderer {
     
+    private static final Icon CLASS_ICON = Icons.getIcon(LanguageIcons.CLASS);
     private static final Icon REVERSE_ICON = Icons.getIcon(ProfilerIcons.NODE_REVERSE);
     
     public void setValue(Object value, int row) {
@@ -70,7 +72,7 @@ public class MemoryJavaNameRenderer extends JavaNameRenderer {
             }
             
             if (node.isFiltered()) setIcon(UIManager.getLookAndFeel().getDisabledIcon(this, REVERSE_ICON));
-            else if (node.getMethodClassNameAndSig()[2] == null) setIcon(null); // class name
+            else if (node.getMethodClassNameAndSig()[2] == null) setIcon(CLASS_ICON); // class name
             else setIcon(REVERSE_ICON); // method name
         }
         

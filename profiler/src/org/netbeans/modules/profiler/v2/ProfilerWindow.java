@@ -45,7 +45,6 @@ package org.netbeans.modules.profiler.v2;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -70,10 +69,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
-import javax.swing.MenuElement;
-import javax.swing.MenuSelectionManager;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -84,6 +80,7 @@ import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
+import org.netbeans.lib.profiler.ui.swing.PopupButton;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
@@ -119,19 +116,20 @@ import org.openide.windows.WindowManager;
     "ProfilerWindow_captionProject={0}",
     "ProfilerWindow_captionFile={0} | {1}",
     "ProfilerWindow_captionExternal=Profile External Process",
+    "ProfilerWindow_configure=Configure session",
     "ProfilerWindow_profile=Profile",
     "ProfilerWindow_attach=Attach",
     "ProfilerWindow_terminateCaption=Terminate Profiling Session",
     "ProfilerWindow_terminateMsg=Terminate profiling session?",
-    "ProfilerWindow_loadingSession=Configuring session...",
+    "ProfilerWindow_loadingSession=Creating session...",
     "ProfilerWindow_settings=Settings",
-    "ProfilerWindow_application=Application:",
+    "ProfilerWindow_application=Process:",
     "ProfilerWindow_threadDump=Thread Dump",
     "ProfilerWindow_heapDump=Heap Dump",
     "ProfilerWindow_gc=GC",
     "ProfilerWindow_setupAttachProject=Setup attach to project...",
     "ProfilerWindow_setupAttachProcess=Setup attach to process...",
-    "ProfilerWindow_multipleFeatures=Profile multiple features",
+    "ProfilerWindow_multipleFeatures=Enable multiple modes",
     "ProfilerWindow_usePPoints=Use defined Profiling Points",
     "ProfilerWindow_targetSection=Target:",
     "ProfilerWindow_profileSection=Profile:",
@@ -179,12 +177,14 @@ class ProfilerWindow extends ProfilerTopComponent {
     private JPanel container;
     private FeaturesView featuresView;
     
+    private PopupButton configure;
     private DropdownButton start;
+    private JButton stop;
     private SettingsPresenter settingsButton;
     
     private AttachSettings attachSettings;
     
-    private String preselectItem;
+//    private String preselectItem;
     
     
     private void createUI() {
@@ -227,17 +227,20 @@ class ProfilerWindow extends ProfilerTopComponent {
     }
     
     private void popupulateUI() {  
-        String _name = session.isAttach() ? Bundle.ProfilerWindow_attach() :
+        configure = new PopupButton(Bundle.ProfilerWindow_configure()) {
+            protected void displayPopup() { displayPopupImpl(); }
+        };
+        toolbar.add(configure);
+        
+        String command = session.isAttach() ? Bundle.ProfilerWindow_attach() :
                                             Bundle.ProfilerWindow_profile();
-//        String _name = Bundle.ProfilerWindow_profile();
-        start = new DropdownButton(_name, Icons.getIcon(GeneralIcons.START), true) {
+        start = new DropdownButton(command, Icons.getIcon(GeneralIcons.START), true) {
             public void displayPopup() { displayPopupImpl(); }
             protected void performAction() { performStartImpl(); }
         };
-//        updateProfileIcon();
         toolbar.add(start);
         
-        JButton stop = new JButton(ProfilerSessions.StopAction.getInstance());
+        stop = new JButton(ProfilerSessions.StopAction.getInstance());
         stop.setHideActionText(true);
         toolbar.add(stop);
         
@@ -253,17 +256,15 @@ class ProfilerWindow extends ProfilerTopComponent {
         container = new JPanel(new BorderLayout(0, 0));
         add(container, BorderLayout.CENTER);
         
-        JPanel welcomePanel = new WelcomePanel(session.getProject() != null, session.isAttach(), features.getAvailable()) {
+        JPanel welcomePanel = new WelcomePanel(configure.getText(), start.getText(), features.getAvailable()) {
             public void highlightItem(final String text) {
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        preselectItem = text;
-                        start.clickPopup();
-                    }
+                    public void run() { configure.doClick(85); }
                 });
             }
         };
-        featuresView = new FeaturesView(welcomePanel);
+        
+        featuresView = new FeaturesView(welcomePanel, command);
         container.add(featuresView, BorderLayout.CENTER);
         
         features.addListener(new ProfilerFeatures.Listener() {
@@ -347,7 +348,6 @@ class ProfilerWindow extends ProfilerTopComponent {
     private void updateButtons() {
         int state = session.getState();
         start.setPushed(state != Profiler.PROFILING_INACTIVE);
-//        start.setEnabled(state != Profiler.PROFILING_IN_TRANSITION);
         start.setPopupEnabled(state != Profiler.PROFILING_IN_TRANSITION);
     }
     
@@ -366,7 +366,13 @@ class ProfilerWindow extends ProfilerTopComponent {
     
     private void updateSettings(boolean valid) {
         start.setEnabled(valid);
-        if (session.inProgress()) session.doModify(__profilingSettings());
+        
+        boolean _configure = features.getActivated().isEmpty();
+        start.setVisible(!_configure);
+        stop.setVisible(!_configure);
+        configure.setVisible(_configure);
+        
+        if (session.inProgress()) session.doModify(features.getSettings());
     }
     
     private void updateFeatureToolbar() {
@@ -394,47 +400,30 @@ class ProfilerWindow extends ProfilerTopComponent {
             applicationToolbar.addSpace(5);
 
             JLabel apLabel = new GrayLabel(Bundle.ProfilerWindow_application());
-//            apLabel.setEnabled(false);
             applicationToolbar.add(apLabel);
             
             applicationToolbar.addSpace(2);
             
             JButton apThreadDumpButton = new JButton(TakeThreadDumpAction.getInstance());
             apThreadDumpButton.setHideActionText(true);
-            apThreadDumpButton.setText(Bundle.ProfilerWindow_threadDump());
+//            apThreadDumpButton.setText(Bundle.ProfilerWindow_threadDump());
             applicationToolbar.add(apThreadDumpButton);
+            
+            applicationToolbar.addSpace(3);
             
             JButton apHeapDumpButton = new JButton(HeapDumpAction.getInstance());
             apHeapDumpButton.setHideActionText(true);
-            apHeapDumpButton.setText(Bundle.ProfilerWindow_heapDump());
+//            apHeapDumpButton.setText(Bundle.ProfilerWindow_heapDump());
             applicationToolbar.add(apHeapDumpButton);
+            
+            applicationToolbar.addSpace(3);
             
             JButton apGCButton = new JButton(RunGCAction.getInstance());
             apGCButton.setHideActionText(true);
-            apGCButton.setText(Bundle.ProfilerWindow_gc());
+//            apGCButton.setText(Bundle.ProfilerWindow_gc());
             applicationToolbar.add(apGCButton);
         }
         return applicationToolbar;
-    }
-    
-    private ProfilingSettings __profilingSettings() {
-        ProfilingSettings settings = features.getSettings();
-//        System.err.println();
-//        System.err.println("=================================================");
-//        System.err.print(settings == null ? "no settings" : settings.debug());
-//        System.err.println("=================================================");
-//        System.err.println();
-        return settings;
-    }
-    
-    private AttachSettings __attachSettings() {
-        if (!session.isAttach()) return null;
-//        System.err.println();
-//        System.err.println("=================================================");
-//        System.err.print(attachSettings == null ? "no settings" : attachSettings.debug());
-//        System.err.println("=================================================");
-//        System.err.println();
-        return attachSettings;
     }
     
     private boolean configureAttachSettings(boolean partially) {
@@ -461,9 +450,11 @@ class ProfilerWindow extends ProfilerTopComponent {
     }
     
     private void performStartImpl() {
+        featuresView.resetNoDataHint();
+        
         start.setPushed(true);
         
-        final ProfilingSettings _profilingSettings = __profilingSettings();
+        final ProfilingSettings _profilingSettings = features.getSettings();
         if (_profilingSettings == null) { // #250237 ?
             ProfilerDialogs.displayError(Bundle.ProfilerWindow_noFeature());
             start.setPushed(false);
@@ -556,79 +547,20 @@ class ProfilerWindow extends ProfilerTopComponent {
         final boolean _project = session.getProject() != null;
 //        final boolean _file = session.getFile() != null;
         final boolean _attach = session.isAttach();
-        
-//        String nameP = !_file ? "Run project" :
-//                                "Run file";
-//        JRadioButtonMenuItem startProject = new StayOpenPopupMenu.RadioButtonItem(nameP) {
-//            {
-//                setEnabled(!session.inProgress());
-//            }
-//            protected void fireItemStateChanged(ItemEvent event) {
-//                if (isSelected()) {
-//                    if (session.isAttach()) {
-//                        session.setAttach(false);
-//                        updateProfileIcon();
-//                        session.getStorage().saveFlag(FLAG_ATTACH, "false");
-//                    }
-//                }
-//            }
-//        };
 //        
         JMenuItem attachProject = null;
-//        if (_project) {
-//            final String nameX = _project ? "Attach to project" :
-//                                            "Attach to process";
-//
-//            attachProject = new StayOpenPopupMenu.RadioButtonItem(nameX) {
-//                private boolean extendedAction;
-//                {
-//                    setEnabled(!session.inProgress());
-//                }
-//                protected void fireItemStateChanged(ItemEvent e) {
-//                    super.fireItemStateChanged(e);
-//
-//                    if (isSelected()) {
-//                        if (!session.isAttach()) {
-//                            session.setAttach(true);
-//                            updateProfileIcon();
-//                            session.getStorage().saveFlag(FLAG_ATTACH, "true");
-//                        }
-//                    }
-//
-//                    SwingUtilities.invokeLater(new Runnable() {
-//                        public void run() {
-//                            extendedAction = isSelected();
-//                            setText(nameX + (extendedAction ? " | Setup..." : ""));
-//                            repaint();
-//                        }
-//                    });
-//                }
-//                public void actionPerformed(ActionEvent event) {
-//                    if (extendedAction) configureAttachSettings();
-//                }
-//            };
-//
-//            ButtonGroup grp = new ButtonGroup();
-//            grp.add(startProject);
-//            grp.add(attachProject);
-//
-//            if (_project && (!_attach || _file)) startProject.setSelected(true);
-//            else attachProject.setSelected(true);
-//            if (_file) attachProject.setEnabled(false);
-//        } else {
-            if (_attach) {
-                String nameA = _project ? Bundle.ProfilerWindow_setupAttachProject() :
-                                          Bundle.ProfilerWindow_setupAttachProcess();
-                attachProject = new JMenuItem(nameA) {
-                    {
-                        setEnabled(!session.inProgress());
-                    }
-                    protected void fireActionPerformed(ActionEvent event) {
-                        configureAttachSettings(true);
-                    }
-                };
-            }
-//        }
+        if (_attach) {
+            String nameA = _project ? Bundle.ProfilerWindow_setupAttachProject() :
+                                      Bundle.ProfilerWindow_setupAttachProcess();
+            attachProject = new JMenuItem(nameA) {
+                {
+                    setEnabled(!session.inProgress());
+                }
+                protected void fireActionPerformed(ActionEvent event) {
+                    configureAttachSettings(true);
+                }
+            };
+        }
         
         JCheckBoxMenuItem singleFeature = new StayOpenPopupMenu.CheckBoxItem(Bundle.ProfilerWindow_multipleFeatures()) {
             { setSelected(!features.isSingleFeatured()); }
@@ -668,14 +600,6 @@ class ProfilerWindow extends ProfilerTopComponent {
             c.insets = new Insets(5, labl, 5, 5);
             c.fill = GridBagConstraints.HORIZONTAL;
             popup.add(projectL, c);
-
-//            if (_project) {
-//                c = new GridBagConstraints();
-//                c.gridy = y++;
-//                c.insets = new Insets(0, left, 0, 5);
-//                c.fill = GridBagConstraints.HORIZONTAL;
-//                popup.add(startProject, c);
-//            }
 
             c = new GridBagConstraints();
             c.gridy = y++;
@@ -726,20 +650,6 @@ class ProfilerWindow extends ProfilerTopComponent {
         c.fill = GridBagConstraints.HORIZONTAL;
         popup.add(singleFeature, c);
 
-//        c = new GridBagConstraints();
-//        c.gridy = y++;
-//        c.insets = new Insets(0, left, 0, 5);
-//        c.fill = GridBagConstraints.HORIZONTAL;
-//        popup.add(showStatus, c);
-//
-//        JLabel ppointsL = new JLabel("Profiling Points:", JLabel.LEADING);
-//        ppointsL.setFont(popup.getFont().deriveFont(Font.BOLD));
-//        c = new GridBagConstraints();
-//        c.gridy = y++;
-//        c.insets = new Insets(8, labl, 5, 5);
-//        c.fill = GridBagConstraints.HORIZONTAL;
-//        popup.add(ppointsL, c);
-
         if (_project) {
             c = new GridBagConstraints();
             c.gridy = y++;
@@ -759,27 +669,28 @@ class ProfilerWindow extends ProfilerTopComponent {
         c.fill = GridBagConstraints.BOTH;
         popup.add(footer, c);
         
-        MenuElement preselect = null;
-        if (preselectItem != null) {
-            for (Component comp : popup.getComponents()) {
-                if (comp instanceof JMenuItem) {
-                    JMenuItem mi = (JMenuItem)comp;
-                    if (mi.getText().contains(preselectItem)) {
-                        preselect = mi;
-                        break;
-                    }
-                }
-            }
-            preselectItem = null;
-        }
+//        MenuElement preselect = null;
+//        if (preselectItem != null) {
+//            for (Component comp : popup.getComponents()) {
+//                if (comp instanceof JMenuItem) {
+//                    JMenuItem mi = (JMenuItem)comp;
+//                    if (mi.getText().contains(preselectItem)) {
+//                        preselect = mi;
+//                        break;
+//                    }
+//                }
+//            }
+//            preselectItem = null;
+//        }
+//        
+//        if (preselect instanceof JRadioButtonMenuItem)
+//            ((JRadioButtonMenuItem)preselect).setSelected(true);
         
-        if (preselect instanceof JRadioButtonMenuItem)
-            ((JRadioButtonMenuItem)preselect).setSelected(true);
+        JComponent button = start.isVisible() ? start : configure;
+        popup.show(button, 0, button.getHeight());
         
-        popup.show(start, 0, start.getHeight());
-        
-        if (preselect != null) MenuSelectionManager.defaultManager().setSelectedPath(
-                               new MenuElement[] { popup, preselect });
+//        if (preselect != null) MenuSelectionManager.defaultManager().setSelectedPath(
+//                               new MenuElement[] { popup, preselect });
     }
     
     
