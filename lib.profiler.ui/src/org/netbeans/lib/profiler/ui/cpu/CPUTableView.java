@@ -63,6 +63,8 @@ import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.McsTimeRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 /**
  *
@@ -259,7 +261,7 @@ abstract class CPUTableView extends CPUView {
                 }
             }
         });
-        table.setColumnRenderer(1 + offset, new JavaNameRenderer());
+        table.setColumnRenderer(1 + offset, new JavaNameRenderer(Icons.getIcon(ProfilerIcons.NODE_LEAF)));
         table.setColumnRenderer(2 + offset, renderers[0]);
         table.setColumnRenderer(3 + offset, renderers[1]);
         table.setColumnRenderer(4 + offset, renderers[2]);

@@ -42,9 +42,20 @@
  */
 package org.netbeans.lib.profiler.ui.swing;
 
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Insets;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonModel;
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSeparator;
 import javax.swing.JToolBar;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
@@ -59,6 +70,54 @@ public class InvisibleToolbar extends JToolBar {
     public InvisibleToolbar(String name) { super(name); tweak(); }
     
     public InvisibleToolbar(String name, int orientation) { super(name, orientation); tweak(); }
+    
+    
+    public void addSeparator() {
+        if (!UIUtils.isMetalLookAndFeel()) {
+            super.addSeparator();
+        } else {
+            final JSeparator separator = new JSeparator(JSeparator.VERTICAL);
+            final int WDTH = separator.getPreferredSize().width;
+            final Dimension SIZE = new Dimension(new JToolBar.Separator().getSeparatorSize().width, 12);
+            JPanel panel = new JPanel(null) {
+                public Dimension getPreferredSize() { return SIZE; }
+                public Dimension getMaximumSize() { return SIZE; }
+                public Dimension getMinimumSize() { return SIZE; }
+
+                public void doLayout() {
+                    int x = (getWidth() - WDTH) / 2;
+                    int y = (getHeight()- SIZE.height) / 2;
+                    separator.setBounds(x, y, WDTH, SIZE.height);
+                }
+            };
+            panel.setOpaque(false);
+            panel.add(separator);
+            super.add(panel);
+        }
+    }
+    
+    protected void addImpl(Component comp, Object constraints, int index) {
+        if (UIUtils.isMetalLookAndFeel()) {
+            if (comp instanceof AbstractButton && !(comp instanceof JCheckBox) && !(comp instanceof JRadioButton)) {
+                final AbstractButton ab = (AbstractButton) comp;
+                ab.setMargin(new Insets(1, 1, 1, 1));
+                if (ab.getClientProperty("MetalListener") == null) { // NOI18N
+                    final ButtonModel bm = ab.getModel();
+                    ChangeListener cl = new ChangeListener() {
+                        public void stateChanged(ChangeEvent e) {
+                            ab.setBorderPainted(bm.isArmed() || bm.isPressed() || bm.isRollover() || bm.isSelected());
+                            ab.setContentAreaFilled(bm.isArmed() || bm.isPressed() || bm.isRollover() || bm.isSelected());
+                        }
+                    };
+                    cl.stateChanged(null); // initialize the appearance tweaks
+                    ab.getModel().addChangeListener(cl);
+                    ab.putClientProperty("MetalListener", cl); // NOI18N
+                }
+            }
+        }
+        super.addImpl(comp, constraints, index);
+    }
+    
     
     private void tweak() {
         setBorder(BorderFactory.createEmptyBorder());
