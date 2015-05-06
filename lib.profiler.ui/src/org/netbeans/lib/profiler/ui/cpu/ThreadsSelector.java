@@ -65,6 +65,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.FilteringToolbar;
 import org.netbeans.lib.profiler.ui.swing.PopupButton;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
@@ -115,9 +116,13 @@ public abstract class ThreadsSelector extends PopupButton {
     
     
     void reset() {
-        displayAllThreads = true;
-        mergeSelectedThreads = false;
-        selection.clear();
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                displayAllThreads = true;
+                mergeSelectedThreads = false;
+                selection.clear();
+            }
+        });
     }
     
     
