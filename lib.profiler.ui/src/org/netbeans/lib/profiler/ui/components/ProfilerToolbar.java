@@ -120,18 +120,14 @@ public abstract class ProfilerToolbar {
                 public Dimension getPreferredSize() {
                     Dimension dim = super.getPreferredSize();
                     if (PREFERRED_HEIGHT == -1) {
-                        JToolBar tb = new JToolBar();
+                        JToolBar tb = new GenericToolbar();
                         tb.setBorder(toolbar.getBorder());
                         tb.setBorderPainted(toolbar.isBorderPainted());
                         tb.setRollover(toolbar.isRollover());
                         tb.setFloatable(toolbar.isFloatable());
                         Icon icon = Icons.getIcon(GeneralIcons.SAVE);
-                        JButton b = new JButton("Button", icon); // NOI18N
-                        if (UIUtils.isMetalLookAndFeel()) b.setMargin(new Insets(1, 1, 1, 1));
-                        tb.add(b);
-                        JToggleButton t = new JToggleButton("Button", icon); // NOI18N
-                        if (UIUtils.isMetalLookAndFeel()) t.setMargin(new Insets(1, 1, 1, 1));
-                        tb.add(t);
+                        tb.add(new JButton("Button", icon)); // NOI18N
+                        tb.add(new JToggleButton("Button", icon)); // NOI18N
                         JComboBox c = new JComboBox();
                         c.setEditor(new BasicComboBoxEditor());
                         c.setRenderer(new BasicComboBoxRenderer());
