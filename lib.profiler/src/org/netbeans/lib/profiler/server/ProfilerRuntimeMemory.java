@@ -165,6 +165,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
 
         if (!ti.isInitialized()) {
             ti.initialize();
+            if (lockContentionMonitoringEnabled) writeThreadCreationEvent(ti);
         }
 
         ti.inProfilingRuntimeMethod++;
