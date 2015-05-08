@@ -247,6 +247,7 @@ public class ProfilerRuntimeObjLiveness extends ProfilerRuntimeMemory {
 
         if (!ti.isInitialized()) {
             ti.initialize();
+            if (lockContentionMonitoringEnabled) writeThreadCreationEvent(ti);
         }
 
         if (ti.inProfilingRuntimeMethod > 0) {
