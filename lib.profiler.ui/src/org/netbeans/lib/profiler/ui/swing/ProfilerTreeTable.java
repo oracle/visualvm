@@ -203,10 +203,9 @@ public class ProfilerTreeTable extends ProfilerTable {
         return tree.getPathForRow(row);
     }
     
-    public Object getValueForRow(int row) {
+    public TreeNode getValueForRow(int row) {
         if (row == -1) return null;
-        TreePath path = getPathForRow(row);
-        return path == null ? null : path.getLastPathComponent();
+        return model.nodeForRow(row);
     }
     
     
