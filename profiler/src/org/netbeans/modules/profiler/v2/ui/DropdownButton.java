@@ -188,6 +188,19 @@ public class DropdownButton extends JPanel {
     }
     
     
+    public void setToolTipText(String text) {
+        button.setToolTipText(text);
+    }
+    
+    public void setPushedToolTipText(String text) {
+        button.putClientProperty("PUSHED_TOOLTIP", text); // NOI18N
+    }
+    
+    public void setPopupToolTipText(String text) {
+        popup.setToolTipText(text);
+    }
+    
+    
     public void setText(String text) {
         if (button != null) {
             String _text = button.getText();
@@ -366,6 +379,14 @@ public class DropdownButton extends JPanel {
             
             setHorizontalAlignment(LEADING);
             setDefaultCapable(false);
+        }
+        
+        public String getToolTipText() {
+            if (pushed) {
+                Object pushedTT = getClientProperty("PUSHED_TOOLTIP"); // NOI18N
+                if (pushedTT != null) return pushedTT.toString();
+            }
+            return super.getToolTipText();
         }
         
         protected void fireActionPerformed(ActionEvent e) {
