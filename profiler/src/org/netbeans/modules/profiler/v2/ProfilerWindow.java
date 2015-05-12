@@ -119,6 +119,9 @@ import org.openide.windows.WindowManager;
     "ProfilerWindow_configure=Configure Session",
     "ProfilerWindow_profile=Profile",
     "ProfilerWindow_attach=Attach",
+    "ProfilerWindow_profileTooltip=Start profiling session",
+    "ProfilerWindow_profileRunningTooltip=Start profiling session (already running)",
+    "ProfilerWindow_configureTooltip=Configure profiling session",
     "ProfilerWindow_terminateCaption=Terminate Profiling Session",
     "ProfilerWindow_terminateMsg=Terminate profiling session?",
     "ProfilerWindow_loadingSession=Creating session...",
@@ -230,6 +233,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         configure = new PopupButton(Bundle.ProfilerWindow_configure()) {
             protected void displayPopup() { displayPopupImpl(); }
         };
+        configure.setToolTipText(Bundle.ProfilerWindow_configureTooltip());
         toolbar.add(configure);
         
         String command = session.isAttach() ? Bundle.ProfilerWindow_attach() :
@@ -238,6 +242,9 @@ class ProfilerWindow extends ProfilerTopComponent {
             public void displayPopup() { displayPopupImpl(); }
             protected void performAction() { performStartImpl(); }
         };
+        start.setToolTipText(Bundle.ProfilerWindow_profileTooltip());
+        start.setPushedToolTipText(Bundle.ProfilerWindow_profileRunningTooltip());
+        start.setPopupToolTipText(Bundle.ProfilerWindow_configureTooltip());
         toolbar.add(start);
         
         stop = new JButton(ProfilerSessions.StopAction.getInstance());
