@@ -99,19 +99,25 @@ public final class SearchUtils {
     public static boolean findString(ProfilerTable table, String text, boolean next) {
         int rowCount = table.getRowCount();
         
+        ProfilerTreeTable treeTable = null;
+        
         if (rowCount == 0) {
             ProfilerDialogs.displayWarning(MSG_NODATA, ACTION_FIND, null);
             return false;
         } else if (rowCount == 1) {
-            return false;
+            if (!(table instanceof ProfilerTreeTable)) return false;
+            
+            treeTable = (ProfilerTreeTable)table;
+            TreeNode node = treeTable.getValueForRow(0);
+            if (node == null || node.isLeaf()) return false;
         }
         
         text = text.toLowerCase();
         
         int mainColumn = table.convertColumnIndexToView(table.getMainColumn());
         
-        if (table instanceof ProfilerTreeTable) {
-            ProfilerTreeTable treeTable = (ProfilerTreeTable)table;
+        if (treeTable != null || table instanceof ProfilerTreeTable) {
+            if (treeTable == null) treeTable = (ProfilerTreeTable)table;
             TreePath selectedPath = treeTable.getSelectionPath();
             if (selectedPath == null) selectedPath = treeTable.getRootPath();
             boolean firstPath = true;
