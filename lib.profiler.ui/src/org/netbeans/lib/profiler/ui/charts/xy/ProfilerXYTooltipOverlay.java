@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2007-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2007-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -70,9 +70,10 @@ import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
  */
 public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionListener {
 
-    private static final int TOOLTIP_OFFSET = 20;
+    private static final int TOOLTIP_OFFSET = 15;
+    private static final int TOOLTIP_MARGIN = 10;
     private static final int TOOLTIP_RESPONSE = 50;
-    private static final int ANIMATION_STEPS = 7;
+    private static final int ANIMATION_STEPS = 5;
 
     private ProfilerXYTooltipPainter tooltipPainter;
 
@@ -199,10 +200,7 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
                                painter.getSelectionBounds(selection,
                                chartContext));
             if (tooltipX == -1) tooltipX += bounds.x + bounds.width / 2;
-//            tooltipY += bounds.y + bounds.height / 2;
         }
-
-//        tooltipY /= selectedItems.size();
 
         setPosition(normalizePosition(new Point(tooltipX, tooltipY)));
     }
@@ -213,19 +211,17 @@ public class ProfilerXYTooltipOverlay extends ChartOverlay implements ActionList
         int cw = tooltipPainter.getWidth();
         int ch = tooltipPainter.getHeight();
 
-        basePoint.x -= cw + TOOLTIP_OFFSET;
-//        basePoint.y -= ch / 2;
-        basePoint.y -= ch + TOOLTIP_OFFSET;
-
+        basePoint.x += TOOLTIP_OFFSET;
+        if (basePoint.x + cw + TOOLTIP_MARGIN > w)
+            basePoint.x -= TOOLTIP_OFFSET + cw + TOOLTIP_MARGIN;
         if (basePoint.x < TOOLTIP_OFFSET)
-            basePoint.x += 2 * TOOLTIP_OFFSET + cw;
-        if (basePoint.x + cw + TOOLTIP_OFFSET > w)
-            basePoint.x = w - cw - TOOLTIP_OFFSET;
+            basePoint.x = TOOLTIP_OFFSET;
 
-        if (basePoint.y < TOOLTIP_OFFSET)
-            basePoint.y = TOOLTIP_OFFSET;
-        if (basePoint.y + ch + TOOLTIP_OFFSET > h)
-            basePoint.y = h - ch - TOOLTIP_OFFSET;
+        basePoint.y -= ch + TOOLTIP_MARGIN;
+        if (basePoint.y + ch + TOOLTIP_MARGIN > h)
+            basePoint.y = h - ch - TOOLTIP_MARGIN;
+        if (basePoint.y < TOOLTIP_MARGIN)
+            basePoint.y = TOOLTIP_MARGIN;
 
         return basePoint;
     }

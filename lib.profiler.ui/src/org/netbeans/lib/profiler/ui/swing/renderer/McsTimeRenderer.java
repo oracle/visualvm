@@ -51,20 +51,28 @@ import org.netbeans.lib.profiler.utils.StringUtils;
  *
  * @author Jiri Sedlacek
  */
-public class McsTimeRenderer extends FormattedLabelRenderer {
+public class McsTimeRenderer extends FormattedLabelRenderer implements RelativeRenderer {
+    
+    protected boolean renderingDiff;
     
     public McsTimeRenderer() {
         super(Formatters.millisecondsFormat());
         setHorizontalAlignment(SwingConstants.TRAILING);
-        
-        // NOTE: Configured as value renderer for NumberPercentRenderer
-        //       Should be changed when used as a standalone renderer
-        setMargin(3, 3, 3, 0);
+    }
+    
+    public void setDiffMode(boolean diffMode) {
+        renderingDiff = diffMode;
+    }
+
+    public boolean isDiffMode() {
+        return renderingDiff;
     }
     
     public void setValue(Object value, int row) {
-        long lvalue = ((Number)value).longValue();
-        super.setValue(StringUtils.mcsTimeToString(lvalue), row);
+        long lvalue = value == null ? 0 : ((Number)value).longValue();
+        String s = StringUtils.mcsTimeToString(lvalue);
+        if (renderingDiff && lvalue >= 0) s = '+' + s; // NOI18N
+        super.setValue(s, row);
     }
     
 }

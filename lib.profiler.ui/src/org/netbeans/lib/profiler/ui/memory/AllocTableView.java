@@ -44,18 +44,22 @@
 package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
-import javax.swing.AbstractAction;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
+import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.Formatters;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
@@ -63,12 +67,14 @@ import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.utils.Wildcards;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-abstract class AllocTableView extends JPanel {
+abstract class AllocTableView extends MemoryView {
     
     private MemoryTableModel tableModel;
     private ProfilerTable table;
@@ -80,6 +86,8 @@ abstract class AllocTableView extends JPanel {
     
     private final Set<ClientUtils.SourceCodeSelection> selection;
     
+    private boolean filterZeroItems = true;
+    
     
     public AllocTableView(Set<ClientUtils.SourceCodeSelection> selection) {
         this.selection = selection;
@@ -88,8 +96,14 @@ abstract class AllocTableView extends JPanel {
     }
     
     
-    void setData(final int _nTrackedItems, final String[] _classNames,
-                 final int[] _nTotalAllocObjects, final long[] _totalAllocObjectsSize) {
+    protected ProfilerTable getResultsComponent() { return table; }
+    
+    
+    private void setData(final int _nTrackedItems, final String[] _classNames,
+                 final int[] _nTotalAllocObjects, final long[] _totalAllocObjectsSize, final boolean diff) {
+        
+        // TODO: show classes with zero instances in live results!
+        
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if (tableModel != null) {
@@ -101,13 +115,31 @@ abstract class AllocTableView extends JPanel {
                     totalAllocObjectsSize = _totalAllocObjectsSize;
                     
                     long totalObjects = 0;
+                    long _totalObjects = 0;
                     long totalBytes = 0;
+                    long _totalBytes = 0;
+                    
                     for (int i = 0; i < nTrackedItems; i++) {
-                        totalObjects += nTotalAllocObjects[i];
-                        totalBytes += totalAllocObjectsSize[i];
+                        if (diff) {
+                            totalObjects = Math.max(totalObjects, nTotalAllocObjects[i]);
+                            _totalObjects = Math.min(_totalObjects, nTotalAllocObjects[i]);
+                            totalBytes = Math.max(totalBytes, totalAllocObjectsSize[i]);
+                            _totalBytes = Math.min(_totalBytes, totalAllocObjectsSize[i]);
+                        } else {
+                            totalObjects += nTotalAllocObjects[i];
+                            totalBytes += totalAllocObjectsSize[i];
+                        }
                     }
-                    renderers[0].setMaxValue(totalBytes);
-                    renderers[1].setMaxValue(totalObjects);
+                    if (diff) {
+                        renderers[0].setMaxValue(Math.max(Math.abs(totalBytes), Math.abs(_totalBytes)));
+                        renderers[1].setMaxValue(Math.max(Math.abs(totalObjects), Math.abs(_totalObjects)));
+                    } else {
+                        renderers[0].setMaxValue(totalBytes);
+                        renderers[1].setMaxValue(totalObjects);
+                    }
+                    
+                    renderers[0].setDiffMode(diff);
+                    renderers[1].setDiffMode(diff);
                     
                     tableModel.fireTableDataChanged();
                 }
@@ -115,13 +147,65 @@ abstract class AllocTableView extends JPanel {
         });
     }
     
-    void resetData() {
+    public void setData(MemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
+        AllocMemoryResultsSnapshot _snapshot = (AllocMemoryResultsSnapshot)snapshot;
+        boolean diff = _snapshot instanceof AllocMemoryResultsDiff;
+        
+        String[] _classNames = _snapshot.getClassNames();
+        int[] _nTotalAllocObjects = _snapshot.getObjectsCounts();
+        long[] _totalAllocObjectsSize = _snapshot.getObjectsSizePerClass();
+        
+        int _nTrackedItems = Math.min(_snapshot.getNProfiledClasses(), _classNames.length);
+        _nTrackedItems = Math.min(_nTrackedItems, _nTotalAllocObjects.length);
+        
+//        // class names in VM format
+//        for (int i = 0; i < _nTrackedItems; i++)
+//            _classNames[i] = StringUtils.userFormClassName(_classNames[i]);
+        
+        if (filter == null) { // old snapshot or live results
+            filterZeroItems = !diff;
+            
+            setData(_nTrackedItems, _classNames, _nTotalAllocObjects, _totalAllocObjectsSize, diff);
+        } else { // new snapshot
+            filterZeroItems = false;
+            
+            List<String> fClassNames = new ArrayList();
+            List<Integer> fTotalAllocObjects = new ArrayList();
+            List<Long> fTotalAllocObjectsSize = new ArrayList();
+            
+            for (int i = 0; i < _nTrackedItems; i++) {
+                if (filter.contains(_classNames[i])) {
+                    fClassNames.add(_classNames[i]);
+                    fTotalAllocObjects.add(_nTotalAllocObjects[i]);
+                    fTotalAllocObjectsSize.add(_totalAllocObjectsSize[i]);
+                }
+            }
+            
+            int trackedItems = fClassNames.size();
+            String[] aClassNames = fClassNames.toArray(new String[trackedItems]);
+            
+            int[] aTotalAllocObjects = new int[trackedItems];
+            for (int i = 0; i < trackedItems; i++) aTotalAllocObjects[i] = fTotalAllocObjects.get(i);
+            
+            long[] aTotalAllocObjectsSize = new long[trackedItems];
+            for (int i = 0; i < trackedItems; i++) aTotalAllocObjectsSize[i] = fTotalAllocObjectsSize.get(i);
+            
+            setData(trackedItems, aClassNames, aTotalAllocObjects, aTotalAllocObjectsSize, diff);
+        }
+    }
+    
+    public void resetData() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 nTrackedItems = 0;
                 classNames = null;
                 nTotalAllocObjects = null;
                 totalAllocObjectsSize = null;
+                
+                renderers[0].setMaxValue(0);
+                renderers[1].setMaxValue(0);
+                renderers[0].setDiffMode(false);
+                renderers[1].setDiffMode(false);
                 
                 tableModel.fireTableDataChanged();
             }
@@ -138,26 +222,38 @@ abstract class AllocTableView extends JPanel {
     }
     
     
-    protected abstract void performDefaultAction(ClientUtils.SourceCodeSelection value);
+    public ExportUtils.ExportProvider[] getExportProviders() {
+        return table.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
+            new ExportUtils.CSVExportProvider(table),
+            new ExportUtils.HTMLExportProvider(table, EXPORT_ALLOCATED),
+            new ExportUtils.XMLExportProvider(table, EXPORT_ALLOCATED),
+            new ExportUtils.PNGExportProvider(table)
+        };
+    }
     
-    protected abstract void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value);
     
-    protected abstract void popupShowing();
+    protected abstract void performDefaultAction(ClientUtils.SourceCodeSelection userValue);
     
-    protected abstract void popupHidden();
+    protected abstract void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue);
+    
+    protected void popupShowing() {};
+    
+    protected void popupHidden()  {};
     
     
     private HideableBarRenderer[] renderers;
     
     private void initUI() {
+        final int offset = selection == null ? -1 : 0;
+        
         tableModel = new MemoryTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null) {
-            protected ClientUtils.SourceCodeSelection getValueForPopup(int row) {
-                return valueForRow(row);
+            public ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
+                return AllocTableView.this.getUserValueForRow(row);
             }
-            protected void populatePopup(JPopupMenu popup, Object value) {
-                AllocTableView.this.populatePopup(popup, (ClientUtils.SourceCodeSelection)value);
+            protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
+                AllocTableView.this.populatePopup(popup, value, (ClientUtils.SourceCodeSelection)userValue);
             }
             protected void popupShowing() {
                 AllocTableView.this.popupShowing();
@@ -168,26 +264,20 @@ abstract class AllocTableView extends JPanel {
         };
         
         table.providePopupMenu(true);
-        table.setDefaultAction(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                int row = table.getSelectedRow();
-                ClientUtils.SourceCodeSelection value = valueForRow(row);
-                if (value != null) performDefaultAction(value);
-            }
-        });
+        installDefaultAction();
         
-        table.setMainColumn(1);
-        table.setFitWidthColumn(1);
+        table.setMainColumn(1 + offset);
+        table.setFitWidthColumn(1 + offset);
         
-        table.setSortColumn(2);
-        table.setDefaultSortOrder(1, SortOrder.ASCENDING);
+        table.setSortColumn(2 + offset);
+        table.setDefaultSortOrder(1 + offset, SortOrder.ASCENDING);
         
-        table.setColumnVisibility(0, false);
+        if (selection != null) table.setColumnVisibility(0, false);
         
         // Filter out classes with no instances
-        table.setRowFilter(new RowFilter() {
+        table.addRowFilter(new RowFilter() {
             public boolean include(RowFilter.Entry entry) {
-                return ((Number)entry.getValue(3)).intValue() > 0;
+                return !filterZeroItems || ((Number)entry.getValue(3 + offset)).intValue() > 0;
             }
         });
         
@@ -198,15 +288,17 @@ abstract class AllocTableView extends JPanel {
         renderers[0].setMaxValue(123456789);
         renderers[1].setMaxValue(12345678);
         
-        table.setColumnRenderer(0, new CheckBoxRenderer());
-        table.setColumnRenderer(1, new JavaNameRenderer());
-        table.setColumnRenderer(2, renderers[0]);
-        table.setColumnRenderer(3, renderers[1]);
+        if (selection != null) table.setColumnRenderer(0, new CheckBoxRenderer());
+        table.setColumnRenderer(1 + offset, new JavaNameRenderer(Icons.getIcon(LanguageIcons.CLASS)));
+        table.setColumnRenderer(2 + offset, renderers[0]);
+        table.setColumnRenderer(3 + offset, renderers[1]);
         
-        int w = new JLabel(table.getColumnName(0)).getPreferredSize().width;
-        table.setDefaultColumnWidth(0, w + 15);
-        table.setDefaultColumnWidth(2, renderers[0].getOptimalWidth());
-        table.setDefaultColumnWidth(3, renderers[1].getMaxNoBarWidth());
+        if (selection != null) {
+            int w = new JLabel(table.getColumnName(0)).getPreferredSize().width;
+            table.setDefaultColumnWidth(0, w + 15);
+        }
+        table.setDefaultColumnWidth(2 + offset, renderers[0].getOptimalWidth());
+        table.setDefaultColumnWidth(3 + offset, renderers[1].getMaxNoBarWidth());
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(table, false, null);
         
@@ -215,7 +307,7 @@ abstract class AllocTableView extends JPanel {
     }
     
     
-    private ClientUtils.SourceCodeSelection valueForRow(int row) {
+    protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
         if (nTrackedItems == 0 || row == -1) return null;
         if (row >= tableModel.getRowCount()) return null; // #239936
         return classNames[table.convertRowIndexToModel(row)];
@@ -225,19 +317,23 @@ abstract class AllocTableView extends JPanel {
     private class MemoryTableModel extends AbstractTableModel {
         
         public String getColumnName(int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             if (columnIndex == 1) {
-                return "Name";
+                return COLUMN_NAME;
             } else if (columnIndex == 2) {
-                return "Allocated Bytes";
+                return COLUMN_ALLOCATED_BYTES;
             } else if (columnIndex == 3) {
-                return "Allocated Objects";
+                return COLUMN_ALLOCATED_OBJECTS;
             } else if (columnIndex == 0) {
-                return "Selected";
+                return COLUMN_SELECTED;
             }
             return null;
         }
 
         public Class<?> getColumnClass(int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             if (columnIndex == 1) {
                 return String.class;
             } else if (columnIndex == 2) {
@@ -255,11 +351,13 @@ abstract class AllocTableView extends JPanel {
         }
 
         public int getColumnCount() {
-            return 4;
+            return selection == null ? 3 : 4;
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
             if (nTrackedItems == 0) return null;
+            
+            if (selection == null) columnIndex++;
             
             if (columnIndex == 1) {
                 return classNames[rowIndex].getClassName();
@@ -276,6 +374,8 @@ abstract class AllocTableView extends JPanel {
         }
 
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             if (columnIndex == 0) {
                 if (Boolean.FALSE.equals(aValue)) selection.remove(classNames[rowIndex]);
                 else selection.add(classNames[rowIndex]);
@@ -283,6 +383,8 @@ abstract class AllocTableView extends JPanel {
         }
 
         public boolean isCellEditable(int rowIndex, int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             return columnIndex == 0;
         }
         

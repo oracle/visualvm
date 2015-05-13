@@ -115,17 +115,29 @@ public class NumberPercentRenderer extends MultiRenderer {
     }
     
     
+    public void setDiffMode(boolean diffMode) {
+        percentRenderer.setVisible(!diffMode);
+        super.setDiffMode(diffMode);
+    }
+    
+    
     public Dimension getPreferredSize() {
         Dimension dim = valueRenderer.getComponent().getPreferredSize();
-        dim.width += percentRenderer.getPreferredSize().width;
+        if (percentRenderer.isVisible()) dim.width += percentRenderer.getPreferredSize().width;
         return sharedDimension(dim);
     }
     
     
     private static ProfilerRenderer createNumberRenderer(Format customFormat) {
         NumberRenderer numberRenderer = new NumberRenderer(customFormat);
-        numberRenderer.setMargin(3, 3, 3, 0);
+        numberRenderer.setMargin(3, 3, 3, 3);
         return numberRenderer;
+    }
+    
+    
+    public String toString() {
+        if (!percentRenderer.isVisible()) return valueRenderer.toString();
+        else return valueRenderer.toString() + " " + percentRenderer.toString(); // NOI18N
     }
     
 }

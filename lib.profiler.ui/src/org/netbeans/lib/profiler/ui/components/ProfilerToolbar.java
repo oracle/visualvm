@@ -47,6 +47,7 @@ import javax.swing.*;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.swing.GenericToolbar;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.openide.util.Lookup;
@@ -110,7 +111,7 @@ public abstract class ProfilerToolbar {
         protected final JToolBar toolbar;
         
         protected Impl(boolean showSeparator) {
-            toolbar = new JToolBar() {
+            toolbar = new GenericToolbar() {
                 protected void addImpl(Component comp, Object constraints, int index) {
                     if (comp instanceof JButton)
                         UIUtils.fixButtonUI((JButton) comp);
@@ -119,16 +120,14 @@ public abstract class ProfilerToolbar {
                 public Dimension getPreferredSize() {
                     Dimension dim = super.getPreferredSize();
                     if (PREFERRED_HEIGHT == -1) {
-                        JToolBar tb = new JToolBar();
+                        JToolBar tb = new GenericToolbar();
                         tb.setBorder(toolbar.getBorder());
                         tb.setBorderPainted(toolbar.isBorderPainted());
                         tb.setRollover(toolbar.isRollover());
                         tb.setFloatable(toolbar.isFloatable());
                         Icon icon = Icons.getIcon(GeneralIcons.SAVE);
-                        JButton b = new JButton("Button", icon); // NOI18N
-                        tb.add(b);
-                        JToggleButton t = new JToggleButton("Button", icon); // NOI18N
-                        tb.add(t);
+                        tb.add(new JButton("Button", icon)); // NOI18N
+                        tb.add(new JToggleButton("Button", icon)); // NOI18N
                         JComboBox c = new JComboBox();
                         c.setEditor(new BasicComboBoxEditor());
                         c.setRenderer(new BasicComboBoxRenderer());
@@ -190,6 +189,7 @@ public abstract class ProfilerToolbar {
         @Override
         public Component add(ProfilerToolbar toolbar, int index) {
             JToolBar implToolbar = ((Impl)toolbar).toolbar;
+            implToolbar.setFocusTraversalPolicyProvider(true);
             implToolbar.setBorder(BorderFactory.createEmptyBorder());
             implToolbar.setOpaque(false);
             return add(implToolbar, index);

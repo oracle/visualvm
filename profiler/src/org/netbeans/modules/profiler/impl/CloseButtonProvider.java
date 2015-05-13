@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -40,33 +40,28 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.profiler.v2.ui;
+package org.netbeans.modules.profiler.impl;
 
-import java.awt.Insets;
-import javax.swing.BorderFactory;
-import javax.swing.JToolBar;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import org.netbeans.lib.profiler.ui.components.CloseButton;
+import org.openide.awt.CloseButtonFactory;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class InvisibleToolbar extends JToolBar {
-    
-    public InvisibleToolbar() { super(); tweak(); }
-    
-    public InvisibleToolbar(int orientation) { super(orientation); tweak(); }
-    
-    public InvisibleToolbar(String name) { super(name); tweak(); }
-    
-    public InvisibleToolbar(String name, int orientation) { super(name, orientation); tweak(); }
-    
-    private void tweak() {
-        setBorder(BorderFactory.createEmptyBorder());
-        setBorderPainted(false);
-        setFloatable(false);
-        setRollover(true);
-        setOpaque(false);
-        setMargin(new Insets(0, 0, 0, 0));
+@ServiceProvider(service = CloseButton.Provider.class)
+public class CloseButtonProvider extends CloseButton.Provider {
+
+    public JButton create(final Runnable onClose) {
+        JButton close = CloseButtonFactory.createBigCloseButton();
+        if (onClose != null) close.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) { onClose.run(); }
+        });
+        return close;
     }
     
 }

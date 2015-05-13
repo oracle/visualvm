@@ -51,7 +51,7 @@ import org.netbeans.lib.profiler.heap.*;
  *
  * @author Jiri Sedlacek
  */
-public interface HeapWalkerInstanceNode extends HeapWalkerNode {
+public interface HeapWalkerInstanceNode {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public boolean isArray();

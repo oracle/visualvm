@@ -237,17 +237,9 @@ public class ThreadInfo {
     }
 
     final void initialize() {
-        initialize(false);
-    }
-
-    final void initialize(boolean trackResultsAvailability) {
         inProfilingRuntimeMethod++;
 
         if (!isProfilerServerThread(thread)) {
-            if (trackResultsAvailability && (nProfiledAppThreads == 0)) {
-                ProfilerServer.notifyClientOnResultsAvailability();
-            }
-
             nProfiledAppThreads++;
         }
 

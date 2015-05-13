@@ -47,7 +47,6 @@ import javax.swing.JPanel;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.v2.ProfilerFeature;
@@ -61,7 +60,7 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @NbBundle.Messages({
     "LocksFeature_name=Locks",
-    "LocksFeature_description=Collect lock contention data",
+    "LocksFeature_description=Collect lock contention statistics",
     "LocksFeature_show=View by:",
     "LocksFeature_aggregationByThreads=Threads",
     "LocksFeature_aggregationByMonitors=Monitors",
@@ -104,24 +103,25 @@ final class LocksFeature extends ProfilerFeature.Basic {
         return ui;
     }
     
+    private void resetResults() {
+        if (ui != null) ui.resetData();
+    }
     
     // --- Session lifecycle ---------------------------------------------------
     
     public void notifyActivated() {
-        // TODO: reset only the Locks data!
-        ResultsManager.getDefault().reset();
+        resetResults();
     }
     
     public void notifyDeactivated() {
-        // TODO: reset only the Locks data!
-        ResultsManager.getDefault().reset();
+        resetResults();
     }
     
     
     protected void profilingStateChanged(int oldState, int newState) {
         // TODO: reset only the Locks data!
         if (newState == Profiler.PROFILING_STARTED)
-            ResultsManager.getDefault().reset();
+            resetResults();
         
         if (ui != null) ui.sessionStateChanged(getSessionState());
     }

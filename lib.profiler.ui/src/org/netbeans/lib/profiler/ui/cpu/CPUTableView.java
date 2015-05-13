@@ -45,35 +45,32 @@ package org.netbeans.lib.profiler.ui.cpu;
 
 import java.awt.BorderLayout;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
 import java.util.Map;
 import java.util.Set;
-import javax.swing.AbstractAction;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
-import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.McsTimeRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-abstract class CPUTableView extends JPanel {
-    
-//    private final ProfilerClient client;
+abstract class CPUTableView extends CPUView {
     
     private CPUTableModel tableModel;
     private ProfilerTable table;
@@ -87,15 +84,14 @@ abstract class CPUTableView extends JPanel {
     private boolean twoTimeStamps;
     
     
-    public CPUTableView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection) {
-//        this.client = client;
+    public CPUTableView(Set<ClientUtils.SourceCodeSelection> selection) {
         this.selection = selection;
         
         initUI();
     }
     
     
-    void setData(final FlatProfileContainer newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final boolean _sampled) {
+    void setData(final FlatProfileContainer newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final boolean _sampled, final boolean _diff) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 boolean structureChange = sampled != _sampled;
@@ -105,27 +101,62 @@ abstract class CPUTableView extends JPanel {
                 if (tableModel != null) {
                     data = newData;
                     
-                    long[] maxTimes = new long[4];
-                    int maxInvocations = 0;
-                    for (int row = 0; row < tableModel.getRowCount(); row++) {
-                        maxTimes[0] += data.getTimeInMcs0AtRow(row);
-                        if (twoTimeStamps) maxTimes[1] += data.getTimeInMcs1AtRow(row);
-                        maxTimes[2] += data.getTotalTimeInMcs0AtRow(row);
-                        if (twoTimeStamps) maxTimes[3] += data.getTotalTimeInMcs1AtRow(row);
-                        maxInvocations += data.getNInvocationsAtRow(row);
+                    if (_diff) {
+                        long[] maxTimes = new long[4];
+                        long[] minTimes = new long[4];
+                        int maxInvocations = 0;
+                        int minInvocations = 0;
+                        for (int row = 0; row < tableModel.getRowCount(); row++) {
+                            maxTimes[0] = Math.max(maxTimes[0], data.getTimeInMcs0AtRow(row));
+                            minTimes[0] = Math.min(minTimes[0], data.getTimeInMcs0AtRow(row));
+                            if (twoTimeStamps) {
+                                maxTimes[1] = Math.max(maxTimes[1], data.getTimeInMcs1AtRow(row));
+                                minTimes[1] = Math.min(minTimes[1], data.getTimeInMcs1AtRow(row));
+                            }
+                            maxTimes[2] = Math.max(maxTimes[2], data.getTotalTimeInMcs0AtRow(row));
+                            minTimes[2] = Math.min(minTimes[2], data.getTotalTimeInMcs0AtRow(row));
+                            if (twoTimeStamps) {
+                                maxTimes[3] = Math.max(maxTimes[3], data.getTotalTimeInMcs1AtRow(row));
+                                minTimes[3] = Math.min(minTimes[3], data.getTotalTimeInMcs1AtRow(row));
+                            }
+                            maxInvocations = Math.max(maxInvocations, data.getNInvocationsAtRow(row));
+                            minInvocations = Math.min(minInvocations, data.getNInvocationsAtRow(row));
+                        }
+                        
+                        renderers[0].setMaxValue(Math.max(Math.abs(maxTimes[0]), Math.abs(minTimes[0])));
+                        renderers[1].setMaxValue(Math.max(Math.abs(maxTimes[1]), Math.abs(minTimes[1])));
+                        renderers[2].setMaxValue(Math.max(Math.abs(maxTimes[2]), Math.abs(minTimes[2])));
+                        renderers[3].setMaxValue(Math.max(Math.abs(maxTimes[3]), Math.abs(minTimes[3])));
+                        renderers[4].setMaxValue(Math.max(Math.abs(maxInvocations), Math.abs(minInvocations)));
+                    } else {
+                        long[] maxTimes = new long[4];
+                        int maxInvocations = 0;
+                        for (int row = 0; row < tableModel.getRowCount(); row++) {
+                            maxTimes[0] += data.getTimeInMcs0AtRow(row);
+                            if (twoTimeStamps) maxTimes[1] += data.getTimeInMcs1AtRow(row);
+                            maxTimes[2] += data.getTotalTimeInMcs0AtRow(row);
+                            if (twoTimeStamps) maxTimes[3] += data.getTotalTimeInMcs1AtRow(row);
+                            maxInvocations += data.getNInvocationsAtRow(row);
+                        }
+                        
+                        renderers[0].setMaxValue(maxTimes[0]);
+                        renderers[1].setMaxValue(maxTimes[1]);
+                        renderers[2].setMaxValue(maxTimes[2]);
+                        renderers[3].setMaxValue(maxTimes[3]);
+                        renderers[4].setMaxValue(maxInvocations);
                     }
                     
-                    renderers[0].setMaxValue(maxTimes[0]);
-                    renderers[1].setMaxValue(maxTimes[1]);
-                    renderers[2].setMaxValue(maxTimes[2]);
-                    renderers[3].setMaxValue(maxTimes[3]);
-                    renderers[4].setMaxValue(maxInvocations);
+                    renderers[0].setDiffMode(_diff);
+                    renderers[1].setDiffMode(_diff);
+                    renderers[2].setDiffMode(_diff);
+                    renderers[3].setDiffMode(_diff);
+                    renderers[4].setDiffMode(_diff);
                     
                     tableModel.fireTableDataChanged();
                 }
                 if (structureChange) {
-                    int col = table.convertColumnIndexToView(6);
-                    String colN = tableModel.getColumnName(6);
+                    int col = table.convertColumnIndexToView(selection == null ? 5 : 6);
+                    String colN = tableModel.getColumnName(selection == null ? 5 : 6);
                     table.getColumnModel().getColumn(col).setHeaderValue(colN);
                     repaint();
                 }
@@ -134,7 +165,7 @@ abstract class CPUTableView extends JPanel {
     }
     
     public void resetData() {
-        setData(null, null, sampled);
+        setData(null, null, sampled, false);
     }
     
     
@@ -147,13 +178,21 @@ abstract class CPUTableView extends JPanel {
     }
     
     
-    protected abstract void performDefaultAction(ClientUtils.SourceCodeSelection value);
+    ExportUtils.ExportProvider[] getExportProviders() {
+        return table.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
+            new ExportUtils.CSVExportProvider(table),
+            new ExportUtils.HTMLExportProvider(table, EXPORT_HOTSPOTS),
+            new ExportUtils.XMLExportProvider(table, EXPORT_HOTSPOTS),
+            new ExportUtils.PNGExportProvider(table)
+        };
+    }
     
-    protected abstract void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value);
     
-    protected abstract void popupShowing();
+    protected abstract void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue);
     
-    protected abstract void popupHidden();
+    protected void popupShowing() {};
+    
+    protected void popupHidden()  {};
     
     
     private HideableBarRenderer[] renderers;
@@ -162,11 +201,11 @@ abstract class CPUTableView extends JPanel {
         tableModel = new CPUTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null) {
-            protected ClientUtils.SourceCodeSelection getValueForPopup(int row) {
-                return valueForRow(row);
+            public ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
+                return CPUTableView.this.getUserValueForRow(row);
             }
-            protected void populatePopup(JPopupMenu popup, Object value) {
-                CPUTableView.this.populatePopup(popup, (ClientUtils.SourceCodeSelection)value);
+            protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
+                CPUTableView.this.populatePopup(popup, value, (ClientUtils.SourceCodeSelection)userValue);
             }
             protected void popupShowing() {
                 CPUTableView.this.popupShowing();
@@ -177,24 +216,20 @@ abstract class CPUTableView extends JPanel {
         };
         
         table.providePopupMenu(true);
-        table.setDefaultAction(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                int row = table.getSelectedRow();
-                ClientUtils.SourceCodeSelection value = valueForRow(row);
-                if (value != null) performDefaultAction(value);
-            }
-        });
+        installDefaultAction();
         
-        table.setMainColumn(1);
-        table.setFitWidthColumn(1);
+        int offset = selection == null ? -1 : 0;
         
-        table.setSortColumn(3);
-        table.setDefaultSortOrder(1, SortOrder.ASCENDING);
+        table.setMainColumn(1 + offset);
+        table.setFitWidthColumn(1 + offset);
         
-        table.setColumnVisibility(0, false);
-        table.setColumnVisibility(2, false);
-        table.setColumnVisibility(4, false);
-        table.setColumnVisibility(6, false);
+        table.setSortColumn(3 + offset);
+        table.setDefaultSortOrder(1 + offset, SortOrder.ASCENDING);
+        
+        if (selection != null) table.setColumnVisibility(0, false);
+        table.setColumnVisibility(2 + offset, false);
+        table.setColumnVisibility(4 + offset, false);
+        table.setColumnVisibility(6 + offset, false);
         
         renderers = new HideableBarRenderer[5];
         
@@ -211,7 +246,7 @@ abstract class CPUTableView extends JPanel {
         renderers[3].setMaxValue(refTime);
         renderers[4].setMaxValue(refTime);
         
-        table.setColumnRenderer(0, new CheckBoxRenderer() {
+        if (selection != null) table.setColumnRenderer(0, new CheckBoxRenderer() {
             private boolean visible;
             public void setValue(Object value, int row) {
                 visible = isSelectable(idMap.get(data.getMethodIdAtRow(row)));
@@ -226,25 +261,28 @@ abstract class CPUTableView extends JPanel {
                 }
             }
         });
-        table.setColumnRenderer(1, new JavaNameRenderer());
-        table.setColumnRenderer(2, renderers[0]);
-        table.setColumnRenderer(3, renderers[1]);
-        table.setColumnRenderer(4, renderers[2]);
-        table.setColumnRenderer(5, renderers[3]);
-        table.setColumnRenderer(6, renderers[4]);
+        table.setColumnRenderer(1 + offset, new JavaNameRenderer(Icons.getIcon(ProfilerIcons.NODE_LEAF)));
+        table.setColumnRenderer(2 + offset, renderers[0]);
+        table.setColumnRenderer(3 + offset, renderers[1]);
+        table.setColumnRenderer(4 + offset, renderers[2]);
+        table.setColumnRenderer(5 + offset, renderers[3]);
+        table.setColumnRenderer(6 + offset, renderers[4]);
         
-        int w = new JLabel(table.getColumnName(0)).getPreferredSize().width;
-        table.setDefaultColumnWidth(0, w + 15);
-        table.setDefaultColumnWidth(2, renderers[0].getMaxNoBarWidth());
-        table.setDefaultColumnWidth(3, renderers[1].getOptimalWidth());
-        table.setDefaultColumnWidth(4, renderers[2].getMaxNoBarWidth());
-        table.setDefaultColumnWidth(5, renderers[3].getMaxNoBarWidth());
+        int w;
+        if (selection != null) {
+            w = new JLabel(table.getColumnName(0)).getPreferredSize().width;
+            table.setDefaultColumnWidth(0, w + 15);
+        }
+        table.setDefaultColumnWidth(2 + offset, renderers[0].getMaxNoBarWidth());
+        table.setDefaultColumnWidth(3 + offset, renderers[1].getOptimalWidth());
+        table.setDefaultColumnWidth(4 + offset, renderers[2].getMaxNoBarWidth());
+        table.setDefaultColumnWidth(5 + offset, renderers[3].getMaxNoBarWidth());
         
         sampled = !sampled;
-        w = new JLabel(table.getColumnName(6)).getPreferredSize().width;
+        w = new JLabel(table.getColumnName(6 + offset)).getPreferredSize().width;
         sampled = !sampled;
-        w = Math.max(w, new JLabel(table.getColumnName(6)).getPreferredSize().width);
-        table.setDefaultColumnWidth(6, Math.max(renderers[4].getNoBarWidth(), w + 15));
+        w = Math.max(w, new JLabel(table.getColumnName(6 + offset)).getPreferredSize().width);
+        table.setDefaultColumnWidth(6 + offset, Math.max(renderers[4].getNoBarWidth(), w + 15));
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(table, false, null);
         
@@ -252,8 +290,12 @@ abstract class CPUTableView extends JPanel {
         add(tableContainer, BorderLayout.CENTER);
     }
     
+    protected ProfilerTable getResultsComponent() {
+        return table;
+    }
     
-    private ClientUtils.SourceCodeSelection valueForRow(int row) {
+    
+    protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
         if (data == null || row == -1) return null;
         if (row >= tableModel.getRowCount()) return null; // #239936
         row = table.convertRowIndexToModel(row);
@@ -282,25 +324,29 @@ abstract class CPUTableView extends JPanel {
     private class CPUTableModel extends AbstractTableModel {
         
         public String getColumnName(int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             if (columnIndex == 1) {
-                return "Name";
+                return COLUMN_NAME;
             } else if (columnIndex == 2) {
-                return "Self Time";
+                return COLUMN_SELFTIME;
             } else if (columnIndex == 3) {
-                return "Self Time (CPU)";
+                return COLUMN_SELFTIME_CPU;
             } else if (columnIndex == 4) {
-                return "Total Time";
+                return COLUMN_TOTALTIME;
             } else if (columnIndex == 5) {
-                return "Total Time (CPU)";
+                return COLUMN_TOTALTIME_CPU;
             } else if (columnIndex == 6) {
-                return sampled ? "Hits" : "Invocations";
+                return sampled ? COLUMN_HITS : COLUMN_INVOCATIONS;
             } else if (columnIndex == 0) {
-                return "Selected";
+                return COLUMN_SELECTED;
             }
             return null;
         }
 
         public Class<?> getColumnClass(int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             if (columnIndex == 1) {
                 return String.class;
             } else if (columnIndex == 6) {
@@ -317,11 +363,13 @@ abstract class CPUTableView extends JPanel {
         }
 
         public int getColumnCount() {
-            return 7;
+            return selection == null ? 6 : 7;
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
             if (data == null) return null;
+            
+            if (selection == null) columnIndex++;
             
             if (columnIndex == 1) {
                 return data.getMethodNameAtRow(rowIndex);
@@ -344,6 +392,8 @@ abstract class CPUTableView extends JPanel {
         }
         
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             if (columnIndex == 0) {
                 int methodId = data.getMethodIdAtRow(rowIndex);
                 if (Boolean.TRUE.equals(aValue)) selection.add(idMap.get(methodId));
@@ -352,6 +402,8 @@ abstract class CPUTableView extends JPanel {
         }
 
         public boolean isCellEditable(int rowIndex, int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             if (columnIndex != 0) return false;
             return isSelectable(idMap.get(data.getMethodIdAtRow(rowIndex)));
         }

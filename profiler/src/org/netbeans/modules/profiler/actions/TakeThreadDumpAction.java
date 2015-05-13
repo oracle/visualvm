@@ -66,7 +66,7 @@ import org.openide.util.NbBundle;
  */
 @NbBundle.Messages({
     "LBL_TakeThreadDumpAction=&Take Thread Dump",
-    "HINT_TakeThreadDumpAction=Take thread dump from the profiled application"
+    "HINT_TakeThreadDumpAction=Take thread dump from the profiled process"
 })
 public class TakeThreadDumpAction extends ProfilingAwareAction {
 

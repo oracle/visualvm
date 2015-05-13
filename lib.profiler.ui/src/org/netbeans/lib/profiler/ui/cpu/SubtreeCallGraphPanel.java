@@ -775,7 +775,7 @@ public class SubtreeCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     }
     
     private void enableDisablePopup(PrestimeCPUCCTNode node) {
-        boolean regularNode = node.getThreadId() != -1 && node.getMethodId() != 0 && !node.isFilteredNode();
+        boolean regularNode = node.getThreadId() != -1 && node.getMethodId() != 0 && !node.isFiltered();
         if (popupShowSource != null) popupShowSource.setEnabled(regularNode && isShowSourceAvailable());
         if (popupShowSubtree != null) popupShowSubtree.setEnabled(regularNode);
         if (popupShowReverse != null) popupShowReverse.setEnabled(regularNode);

@@ -46,6 +46,8 @@ package org.netbeans.modules.profiler;
 import java.awt.Cursor;
 import java.awt.Window;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -74,6 +76,7 @@ import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerStorage;
@@ -114,7 +117,8 @@ import org.openide.windows.WindowManager;
     "ResultsManager_OverwriteFileDialogCaption=Overwrite Existing File?",
     "ResultsManager_OverwriteFileDialogMsg=The target folder already contains file {0}\n Do you want to overwrite this file?",
     "ResultsManager_FileDeleteFailedMsg=Cannot delete the existing file: {0}",
-    "ResultsManager_SnapshotExportFailedMsg=Failed to save snapshot: {0}",
+    "ResultsManager_SnapshotExportFailedMsg=Failed to export snapshot: {0}",
+    "ResultsManager_ExportSnapshotData=Export Snapshot Data",
     "ResultsManager_SelectFileOrDirDialogCaption=Select File or Directory",
     "ResultsManager_ProfilerSnapshotFileFilter=Profiler Snapshot File (*.{0})",
     "ResultsManager_ProfilerHeapdumpFileFilter=Heap Dump File (*.{0})",
@@ -402,8 +406,8 @@ public final class ResultsManager {
             ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotsLoadFailedMsg());
         }
     }
-
-    public void compareSnapshots(LoadedSnapshot s1, LoadedSnapshot s2) {
+    
+    public ResultsSnapshot createDiffSnapshot(LoadedSnapshot s1, LoadedSnapshot s2) {
         ResultsSnapshot snap1 = s1.getSnapshot();
         ResultsSnapshot snap2 = s2.getSnapshot();
         ResultsSnapshot diff = null;
@@ -427,8 +431,7 @@ public final class ResultsManager {
                              sn2.getClassNames(), sn2.getObjectsCounts(), sn2.getObjectsSizePerClass(), Integer.MAX_VALUE);
             diff = new AllocMemoryResultsDiff((AllocMemoryResultsSnapshot)snap1,
                                               (AllocMemoryResultsSnapshot)snap2);
-        }
-        else if (snap1 instanceof LivenessMemoryResultsSnapshot && snap2 instanceof LivenessMemoryResultsSnapshot) {
+        } else if (snap1 instanceof LivenessMemoryResultsSnapshot && snap2 instanceof LivenessMemoryResultsSnapshot) {
             LivenessMemoryResultsSnapshot sn1 = (LivenessMemoryResultsSnapshot)snap1;
             LivenessMemoryResultsSnapshot sn2 = (LivenessMemoryResultsSnapshot)snap2;
 // Note: using track each 1 object to prevent unnecessary division, the data are always correct for liveness results
@@ -440,10 +443,17 @@ public final class ResultsManager {
                              sn2.getClassNames(), sn2.getNTrackedLiveObjects(), sn2.getTrackedLiveObjectsSize(), 1);
             diff = new LivenessMemoryResultsDiff((LivenessMemoryResultsSnapshot)snap1,
                                                  (LivenessMemoryResultsSnapshot)snap2);
-        }
-        else if (snap1 instanceof CPUResultsSnapshot && snap2 instanceof CPUResultsSnapshot) {
+        } else if (snap1 instanceof CPUResultsSnapshot && snap2 instanceof CPUResultsSnapshot) {
             diff = new CPUResultsDiff((CPUResultsSnapshot)snap1, (CPUResultsSnapshot)snap2);
         }
+        
+        return diff;
+    }
+
+    public void compareSnapshots(LoadedSnapshot s1, LoadedSnapshot s2) {
+//        ResultsSnapshot snap1 = s1.getSnapshot();
+//        ResultsSnapshot snap2 = s2.getSnapshot();
+        ResultsSnapshot diff = createDiffSnapshot(s1, s2);
 
         if (diff != null) {
             SnapshotsDiffWindow sdw = SnapshotsDiffWindow.get(diff, s1, s2);
@@ -467,7 +477,7 @@ public final class ResultsManager {
                 idx1 = i;
                 break;
             }
-        if (idx1 == -1) return; // Should not happen
+        if (idx1 == -1 || counts1[idx1] == 0) return; // Should not happen
         
         int idx2 = -1;
         for (int i = 0; i < names2.length; i++)
@@ -475,7 +485,7 @@ public final class ResultsManager {
                 idx2 = i;
                 break;
             }
-        if (idx2 == -1) return; // Should not happen
+        if (idx2 == -1 || counts2[idx2] == 0) return; // Should not happen
         
         // Note: instrumented allocations not compared because of #236363
         long objsize1 = n1 == 1 ? sizes1[idx1] / counts1[idx1] : 0;
@@ -898,6 +908,96 @@ public final class ResultsManager {
 
     public boolean resultsAvailable() {
         return resultsAvailable;
+    }
+    
+    
+    public static interface SnapshotHandle {
+        public LoadedSnapshot getSnapshot();
+    }
+    
+    public ExportUtils.Exportable createSnapshotExporter(final LoadedSnapshot snapshot) {
+        return createSnapshotExporter(new SnapshotHandle() {
+            public LoadedSnapshot getSnapshot() { return snapshot; }
+        });
+    }
+    
+    public ExportUtils.Exportable createSnapshotExporter(final SnapshotHandle handle) {
+        return new ExportUtils.Exportable() {
+            public String getName() {
+                return Bundle.ResultsManager_ExportSnapshotData();
+            }
+
+            public boolean isEnabled() {
+                return true;
+            }
+
+            public ExportUtils.ExportProvider[] getProviders() {
+                final LoadedSnapshot snapshot = handle.getSnapshot();
+                return new ExportUtils.ExportProvider[] {
+                    new ExportUtils.AbstractNPSExportProvider(snapshot.getFile()) {
+                        protected void doExport(File targetFile) {
+                            exportSnapshot(snapshot, targetFile);
+                        }
+                    }
+                };
+            }
+        };
+    }
+    
+    private boolean exportSnapshot(LoadedSnapshot snapshot, File targetFile) {
+        File sourceFile = snapshot.getFile();
+        if (sourceFile != null) {
+            try {
+                Files.copy(sourceFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING,
+                                                                     StandardCopyOption.COPY_ATTRIBUTES);
+                return true;
+            } catch (IOException ex) {
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotExportFailedMsg(ex.getMessage()));
+                return false;
+            }
+        } else {
+            FileLock lock = null;
+            FileObject target = null;
+            DataOutputStream dos = null;
+            
+            try {
+                targetFile = FileUtil.normalizeFile(targetFile);
+                target = targetFile.isFile() ? FileUtil.toFileObject(targetFile) :
+                                               FileUtil.createData(targetFile);
+            
+                lock = target.lock();
+
+                OutputStream os = target.getOutputStream(lock);
+                BufferedOutputStream bos = new BufferedOutputStream(os);
+                dos = new DataOutputStream(bos);
+                //      System.out.println("Saving snapshot [" + snapshot.getSnapshot().getTimeTaken() + "]");
+                snapshot.save(dos);
+                dos.close();
+            } catch (IOException e) {
+                try {
+                    if (dos != null) dos.close();
+                    if (lock != null) target.delete(lock);
+                } catch (Exception e2) {}
+
+                ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotSaveFailedMsg(e.getMessage()));
+
+                return false; // failure => we wont continue with firing the event
+            } catch (OutOfMemoryError e) {
+                try {
+                    if (dos != null) dos.close();
+                    if (lock != null) target.delete(lock);
+                } catch (Exception e2) {}
+
+                ProfilerDialogs.displayError(Bundle.ResultsManager_OutOfMemorySavingMsg());
+
+                return false; // failure => we wont continue with firing the event
+            } finally {
+                if (lock != null) lock.releaseLock();
+            }
+
+            return true;
+        }
     }
 
     public boolean saveSnapshot(LoadedSnapshot snapshot, FileObject profFile) {

@@ -44,9 +44,7 @@ package org.netbeans.lib.profiler.results.locks;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.results.CCTNode;
 
 /**
@@ -54,7 +52,7 @@ import org.netbeans.lib.profiler.results.CCTNode;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
-public abstract class LockCCTNode implements CCTNode, TreeNode {
+public abstract class LockCCTNode extends CCTNode {
     
 //    public static final int SORT_BY_NAME = 1;
 //    public static final int SORT_BY_TIME = 2;
@@ -80,43 +78,6 @@ public abstract class LockCCTNode implements CCTNode, TreeNode {
     LockCCTNode(LockCCTNode p) {
         parent = p;
     }
-    
-    
-    //--- TreeNode adapter ---
-    public Enumeration<LockCCTNode> children() {
-        return new Enumeration<LockCCTNode>() {
-            private int index = 0;
-            
-            public boolean hasMoreElements() {
-                return getChildren() != null && index < getChildren().length;
-            }
-
-            public LockCCTNode nextElement() {
-                return getChildren()[index++];
-            }
-        };
-    }
-    
-    public boolean isLeaf() {
-        return getChildCount() == 0;
-    }
-    
-    public boolean getAllowsChildren() {
-        return true;
-    }
-    
-    public int getIndex(TreeNode node) {
-        return getIndexOfChild(node);
-    }
-    
-    public int getChildCount() {
-        return getNChildren();
-    }
-    
-    public TreeNode getChildAt(int index) {
-        return getChild(index);
-    }
-    //---
     
 
     @Override
@@ -189,6 +150,7 @@ public abstract class LockCCTNode implements CCTNode, TreeNode {
     public boolean isThreadLockNode() { return false; }
     public boolean isMonitorNode() { return false; }
     
+    public String toString() { return getNodeName(); }
     
 //    public void sortChildren(int sortBy, boolean sortOrder) {
 //        this.sortBy = sortBy;

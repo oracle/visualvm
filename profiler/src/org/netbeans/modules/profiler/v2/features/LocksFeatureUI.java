@@ -44,16 +44,16 @@
 package org.netbeans.modules.profiler.v2.features;
 
 import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.locks.LockContentionPanel;
-import org.netbeans.modules.profiler.v2.ui.GrayLabel;
-import org.netbeans.modules.profiler.v2.ui.PopupButton;
+import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
+import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.openide.util.NbBundle;
 
 /**
@@ -94,12 +94,16 @@ abstract class LocksFeatureUI extends FeatureUI {
             if (locksView != null) locksView.profilingSessionStarted();
         }
     }
+
+    void resetData() {
+        if (locksView != null) locksView.resetData();
+    }
     
     
     // --- UI ------------------------------------------------------------------
     
     private JLabel shLabel;
-    private PopupButton shAggregation;
+    private ActionPopupButton shAggregation;
     
     
     private void initUI() {
@@ -111,14 +115,24 @@ abstract class LocksFeatureUI extends FeatureUI {
         locksView = new LockContentionPanel();
         locksView.lockContentionEnabled();
         
+        locksView.putClientProperty("HelpCtx.Key", "ProfileLocks.HelpCtx"); // NOI18N
+        
         
         // --- Toolbar ---------------------------------------------------------
         
         shLabel = new GrayLabel(Bundle.LocksFeatureUI_show());
-
-        shAggregation = new PopupButton(Bundle.LocksFeatureUI_aggregationByThreads()) {
-            protected void populatePopup(JPopupMenu popup) { populateFilters(popup); }
+        
+        Action aThreads = new AbstractAction() {
+            { putValue(NAME, Bundle.LocksFeatureUI_aggregationByThreads()); }
+            public void actionPerformed(ActionEvent e) { setAggregation(LockContentionPanel.Aggregation.BY_THREADS); }
+            
         };
+        Action aMonitors = new AbstractAction() {
+            { putValue(NAME, Bundle.LocksFeatureUI_aggregationByMonitors()); }
+            public void actionPerformed(ActionEvent e) { setAggregation(LockContentionPanel.Aggregation.BY_MONITORS); }
+            
+        };
+        shAggregation = new ActionPopupButton(aThreads, aMonitors);
         shAggregation.setToolTipText(Bundle.LocksFeatureUI_aggregationHint());
 
         toolbar = ProfilerToolbar.create(true);
@@ -148,27 +162,7 @@ abstract class LocksFeatureUI extends FeatureUI {
     
     private void setAggregation(LockContentionPanel.Aggregation aggregation) {
         locksView.setAggregation(aggregation);
-        
-        switch (aggregation) {
-            case BY_THREADS:
-                shAggregation.setText(Bundle.LocksFeatureUI_aggregationByThreads());
-                break;
-            case BY_MONITORS:
-                shAggregation.setText(Bundle.LocksFeatureUI_aggregationByMonitors());
-                break;
-        }
-    }
-    
-    private void populateFilters(JPopupMenu popup) {
-        LockContentionPanel.Aggregation a = locksView.getAggregation();
-        
-        popup.add(new JRadioButtonMenuItem(Bundle.LocksFeatureUI_aggregationByThreads(), a == LockContentionPanel.Aggregation.BY_THREADS) {
-            protected void fireActionPerformed(ActionEvent e) { setAggregation(LockContentionPanel.Aggregation.BY_THREADS); }
-        });
-        
-        popup.add(new JRadioButtonMenuItem(Bundle.LocksFeatureUI_aggregationByMonitors(), a == LockContentionPanel.Aggregation.BY_MONITORS) {
-            protected void fireActionPerformed(ActionEvent e) { setAggregation(LockContentionPanel.Aggregation.BY_MONITORS); }
-        });
+        shAggregation.selectAction(aggregation.ordinal());
     }
     
 }

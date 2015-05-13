@@ -175,11 +175,12 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(ProfilerIcons.FRAGMENT, "fragment.png");
         cache.put(ProfilerIcons.MEMORY, "memory.png");
         cache.put(ProfilerIcons.MEMORY_32, "memory32.png");
-        cache.put(ProfilerIcons.HEAP_DUMP, "memory.png");
+        cache.put(ProfilerIcons.HEAP_DUMP, "memoryResultsTab.png");
         cache.put(ProfilerIcons.CUSTOM_32, "custom32.png");
         cache.put(ProfilerIcons.MONITORING, "monitoring.png");
         cache.put(ProfilerIcons.MONITORING_32, "monitoring32.png");
         cache.put(ProfilerIcons.STARTUP_32, "startup32.png");
+        cache.put(ProfilerIcons.DELTA_RESULTS, "deltaValues.png");
         
         cache.put(LanguageIcons.CLASS, "class.png");
         cache.put(LanguageIcons.CLASS_ANONYMOUS, "classAnonymous.png");

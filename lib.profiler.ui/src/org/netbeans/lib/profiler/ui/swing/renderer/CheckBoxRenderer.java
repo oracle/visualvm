@@ -67,7 +67,8 @@ public class CheckBoxRenderer extends JCheckBox implements ProfilerRenderer {
     // --- Renderer ------------------------------------------------------------
 
     public void setValue(Object value, int row) {
-        setSelected(((Boolean)value).booleanValue());
+        if (value == null) setSelected(false);
+        else setSelected(((Boolean)value).booleanValue());
     }
 
     public JComponent getComponent() {

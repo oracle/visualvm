@@ -98,6 +98,11 @@ public class AllocMemoryResultsSnapshot extends MemoryResultsSnapshot {
             debugValues();
         }
     }
+    
+    public AllocMemoryResultsSnapshot createDiff(MemoryResultsSnapshot snapshot) {
+        if (!(snapshot instanceof AllocMemoryResultsSnapshot)) return null;
+        return new AllocMemoryResultsDiff(this, (AllocMemoryResultsSnapshot)snapshot);
+    }
 
     public void readFromStream(DataInputStream in) throws IOException {
         super.readFromStream(in);

@@ -112,10 +112,10 @@ public final class MethodNameFormatterTest extends TestCase {
     "", // paramsString
     "", // returnType
     "foo.bar.Constr", // formattedClass
-    "foo.bar.Constr.<clinit>", // formattedClassAndMethod
-    "<clinit>", // formattedMethod
-    "foo.bar.Constr.<clinit>", // fullFormattedClassAndMethod
-    "<clinit>", // fullFormattedMethod
+    "foo.bar.Constr.<clinit>()", // formattedClassAndMethod
+    "<clinit>()", // formattedMethod
+    "foo.bar.Constr.<clinit>()", // fullFormattedClassAndMethod
+    "<clinit>()", // fullFormattedMethod
     "", // paramsString
     "", // returnType
                                                    };

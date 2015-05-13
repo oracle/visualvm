@@ -79,18 +79,20 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
 
     protected boolean[] allUnprofiledClassStatusArray;
     private final InstrumentationFilter instrFilter;
-    private final boolean trackAllAllocations;
+    private final boolean checkForOpcNew;
+    private final boolean checkForOpcNewArray;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public ObjLivenessInstrCallsInjector(DynamicClassInfo clazz, int baseCPoolCount, int methodIdx,
                                          boolean[] allUnprofiledClassStatusArray, InstrumentationFilter instrFilter,
-                                         boolean trackAllAllocations) {
+                                         boolean checkForOpcNew, boolean checkForOpcNewArray) {
         super(clazz, methodIdx);
         this.baseCPoolCount = baseCPoolCount;
         this.allUnprofiledClassStatusArray = allUnprofiledClassStatusArray;
         this.instrFilter = instrFilter;
-        this.trackAllAllocations = trackAllAllocations;
+        this.checkForOpcNew = checkForOpcNew;
+        this.checkForOpcNewArray = checkForOpcNewArray;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -119,7 +121,7 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                 while (bci < bytecodesLength && bytecodesLength + injectedCodeLen < 65535) {
                     bc = (bytecodes[bci] & 0xFF);
 
-                    if ((bc == opc_new && !trackAllAllocations) || (bc == opc_anewarray) || (bc == opc_newarray) || (bc == opc_multianewarray)) {
+                    if ((bc == opc_new && checkForOpcNew) || (checkForOpcNewArray && (bc == opc_anewarray || bc == opc_newarray || bc == opc_multianewarray))) {
                         opcNewToInstr--;
 
                         if (opcNewToInstr == 0) {
@@ -210,7 +212,7 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                                 String className = StringUtils.userFormClassName(refClazz.getName());
 
                                 if (!instrFilter.passesFilter(className)) {
-                                    continue;
+                                    break;
                                 }
                                 if ((allUnprofiledClassStatusArray == null) || !allUnprofiledClassStatusArray[classId]) {
                                     injectTraceObjAlloc(classId, bci + 2);

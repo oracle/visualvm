@@ -44,18 +44,23 @@
 package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
+import java.text.Format;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
-import javax.swing.AbstractAction;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
+import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.Formatters;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
@@ -63,13 +68,16 @@ import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
+import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-abstract class LivenessTableView extends JPanel {
+abstract class LivenessTableView extends MemoryView {
     
     private MemoryTableModel tableModel;
     private ProfilerTable table;
@@ -85,6 +93,8 @@ abstract class LivenessTableView extends JPanel {
     
     private final Set<ClientUtils.SourceCodeSelection> selection;
     
+    private boolean filterZeroItems = true;
+    
     
     public LivenessTableView(Set<ClientUtils.SourceCodeSelection> selection) {
         this.selection = selection;
@@ -93,10 +103,16 @@ abstract class LivenessTableView extends JPanel {
     }
     
     
-    void setData(final int _nTrackedItems, final String[] _classNames,
+    protected ProfilerTable getResultsComponent() { return table; }
+    
+    
+    private void setData(final int _nTrackedItems, final String[] _classNames,
                  final int[] _nTrackedLiveObjects, final long[] _trackedLiveObjectsSize,
                  final long[] _nTrackedAllocObjects, final float[] _avgObjectAge,
-                 final int[] _maxSurvGen, final int[] _nTotalAllocObjects) {
+                 final int[] _maxSurvGen, final int[] _nTotalAllocObjects, final boolean diff) {
+        
+        // TODO: show classes with zero instances in live results!
+        
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if (tableModel != null) {
@@ -112,19 +128,49 @@ abstract class LivenessTableView extends JPanel {
                     nTotalAllocObjects = _nTotalAllocObjects;
                     
                     long liveBytes = 0;
+                    long _liveBytes = 0;
                     long liveObjects = 0;
+                    long _liveObjects = 0;
                     long allocObjects = 0;
+                    long _allocObjects = 0;
                     long totalAllocObjects = 0;
+                    long _totalAllocObjects = 0;
                     for (int i = 0; i < nTrackedItems; i++) {
-                        liveBytes += trackedLiveObjectsSize[i];
-                        liveObjects += nTrackedLiveObjects[i];
-                        allocObjects += nTrackedAllocObjects[i];
-                        totalAllocObjects += nTotalAllocObjects[i];
+                        if (diff) {
+                            liveBytes = Math.max(liveBytes, trackedLiveObjectsSize[i]);
+                            _liveBytes = Math.min(_liveBytes, trackedLiveObjectsSize[i]);
+                            liveObjects = Math.max(liveObjects, nTrackedLiveObjects[i]);
+                            _liveObjects = Math.min(_liveObjects, nTrackedLiveObjects[i]);
+                            allocObjects = Math.max(allocObjects, nTrackedAllocObjects[i]);
+                            _allocObjects = Math.min(_allocObjects, nTrackedAllocObjects[i]);
+                            totalAllocObjects = Math.max(totalAllocObjects, nTotalAllocObjects[i]);
+                            _totalAllocObjects = Math.min(_totalAllocObjects, nTotalAllocObjects[i]);
+                        } else {
+                            liveBytes += trackedLiveObjectsSize[i];
+                            liveObjects += nTrackedLiveObjects[i];
+                            allocObjects += nTrackedAllocObjects[i];
+                            totalAllocObjects += nTotalAllocObjects[i];
+                        }
                     }
-                    renderers[0].setMaxValue(liveBytes);
-                    renderers[1].setMaxValue(liveObjects);
-                    renderers[2].setMaxValue(allocObjects);
-                    renderers[3].setMaxValue(totalAllocObjects);
+                    if (diff) {
+                        renderers[0].setMaxValue(Math.max(Math.abs(liveBytes), Math.abs(_liveBytes)));
+                        renderers[1].setMaxValue(Math.max(Math.abs(liveObjects), Math.abs(_liveObjects)));
+                        renderers[2].setMaxValue(Math.max(Math.abs(allocObjects), Math.abs(_allocObjects)));
+                        renderers[3].setMaxValue(Math.max(Math.abs(totalAllocObjects), Math.abs(_totalAllocObjects)));
+                    } else {
+                        renderers[0].setMaxValue(liveBytes);
+                        renderers[1].setMaxValue(liveObjects);
+                        renderers[2].setMaxValue(allocObjects);
+                        renderers[3].setMaxValue(totalAllocObjects);
+                    }
+                    
+                    renderers[0].setDiffMode(diff);
+                    renderers[1].setDiffMode(diff);
+                    renderers[2].setDiffMode(diff);
+                    renderers[3].setDiffMode(diff);
+                    
+                    renderersEx[0].setDiffMode(diff);
+                    renderersEx[1].setDiffMode(diff);
                     
                     tableModel.fireTableDataChanged();
                 }
@@ -132,7 +178,80 @@ abstract class LivenessTableView extends JPanel {
         });
     }
     
-    void resetData() {
+    public void setData(MemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
+        LivenessMemoryResultsSnapshot _snapshot = (LivenessMemoryResultsSnapshot)snapshot;
+        boolean diff = _snapshot instanceof LivenessMemoryResultsDiff;
+        
+        String[] _classNames = _snapshot.getClassNames();
+        int[] _nTrackedLiveObjects = _snapshot.getNTrackedLiveObjects();
+        long[] _trackedLiveObjectsSize = _snapshot.getTrackedLiveObjectsSize();
+        long[] _nTrackedAllocObjects = _snapshot.getTrackedLiveObjectsSize();
+        float[] _avgObjectAge = _snapshot.getAvgObjectAge();
+        int[] _maxSurvGen = _snapshot.getMaxSurvGen();
+        int[] _nTotalAllocObjects = _snapshot.getnTotalAllocObjects();
+        
+        int _nTrackedItems = Math.min(_snapshot.getNProfiledClasses(), _classNames.length);
+        _nTrackedItems = Math.min(_nTrackedItems, _nTotalAllocObjects.length);
+        
+//        // class names in VM format
+//        for (int i = 0; i < _nTrackedItems; i++)
+//            _classNames[i] = StringUtils.userFormClassName(_classNames[i]);
+            
+        if (filter == null) { // old snapshot or live results
+            filterZeroItems = !diff;
+            
+            setData(_nTrackedItems, _classNames, _nTrackedLiveObjects, _trackedLiveObjectsSize,
+                _nTrackedAllocObjects, _avgObjectAge, _maxSurvGen, _nTotalAllocObjects, diff);
+        } else { // new snapshot
+            filterZeroItems = false;
+            
+            List<String> fClassNames = new ArrayList();
+            List<Integer> fTrackedLiveObjects = new ArrayList();
+            List<Long> fTrackedLiveObjectsSize = new ArrayList();
+            List<Long> fTrackedAllocObjects = new ArrayList();
+            List<Float> fAvgObjectAge = new ArrayList();
+            List<Integer> fMaxSurvGen = new ArrayList();
+            List<Integer> fTotalAllocObjects = new ArrayList();
+            
+            for (int i = 0; i < _nTrackedItems; i++) {
+                if (filter.contains(_classNames[i])) {
+                    fClassNames.add(_classNames[i]);
+                    fTrackedLiveObjects.add(_nTrackedLiveObjects[i]);
+                    fTrackedLiveObjectsSize.add(_trackedLiveObjectsSize[i]);
+                    fTrackedAllocObjects.add(_nTrackedAllocObjects[i]);
+                    fAvgObjectAge.add(_avgObjectAge[i]);
+                    fMaxSurvGen.add(_maxSurvGen[i]);
+                    fTotalAllocObjects.add(_nTotalAllocObjects[i]);
+                }
+            }
+            
+            int trackedItems = fClassNames.size();
+            String[] aClassNames = fClassNames.toArray(new String[trackedItems]);
+            
+            int[] aTrackedLiveObjects = new int[trackedItems];
+            for (int i = 0; i < trackedItems; i++) aTrackedLiveObjects[i] = fTrackedLiveObjects.get(i);
+            
+            long[] aTrackedLiveObjectsSize = new long[trackedItems];
+            for (int i = 0; i < trackedItems; i++) aTrackedLiveObjectsSize[i] = fTrackedLiveObjectsSize.get(i);
+            
+            long[] aTrackedAllocObjects = new long[trackedItems];
+            for (int i = 0; i < trackedItems; i++) aTrackedAllocObjects[i] = fTrackedAllocObjects.get(i);
+            
+            float[] aAvgObjectAge = new float[trackedItems];
+            for (int i = 0; i < trackedItems; i++) aAvgObjectAge[i] = fAvgObjectAge.get(i);
+            
+            int[] aTotalAllocObjectsSize = new int[trackedItems];
+            for (int i = 0; i < trackedItems; i++) aTotalAllocObjectsSize[i] = fTotalAllocObjects.get(i);
+            
+            int[] aMaxSurvGen = new int[trackedItems];
+            for (int i = 0; i < trackedItems; i++) aMaxSurvGen[i] = fMaxSurvGen.get(i);
+            
+            setData(trackedItems, aClassNames, aTrackedLiveObjects, aTrackedLiveObjectsSize,
+                aTrackedAllocObjects, aAvgObjectAge, aMaxSurvGen, aTotalAllocObjectsSize, diff);
+        }
+    }
+    
+    public void resetData() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 nTrackedItems = 0;
@@ -143,6 +262,19 @@ abstract class LivenessTableView extends JPanel {
                 avgObjectAge = null;
                 maxSurvGen = null;
                 nTotalAllocObjects = null;
+                
+                renderers[0].setMaxValue(0);
+                renderers[1].setMaxValue(0);
+                renderers[2].setMaxValue(0);
+                renderers[3].setMaxValue(0);
+
+                renderers[0].setDiffMode(false);
+                renderers[1].setDiffMode(false);
+                renderers[2].setDiffMode(false);
+                renderers[3].setDiffMode(false);
+
+                renderersEx[0].setDiffMode(false);
+                renderersEx[1].setDiffMode(false);
                 
                 tableModel.fireTableDataChanged();
             }
@@ -159,26 +291,39 @@ abstract class LivenessTableView extends JPanel {
     }
     
     
-    protected abstract void performDefaultAction(ClientUtils.SourceCodeSelection value);
+    public ExportUtils.ExportProvider[] getExportProviders() {
+        return table.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
+            new ExportUtils.CSVExportProvider(table),
+            new ExportUtils.HTMLExportProvider(table, EXPORT_ALLOCATED_LIVE),
+            new ExportUtils.XMLExportProvider(table, EXPORT_ALLOCATED_LIVE),
+            new ExportUtils.PNGExportProvider(table)
+        };
+    }
     
-    protected abstract void populatePopup(JPopupMenu popup, ClientUtils.SourceCodeSelection value);
     
-    protected abstract void popupShowing();
+    protected abstract void performDefaultAction(ClientUtils.SourceCodeSelection userValue);
     
-    protected abstract void popupHidden();
+    protected abstract void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue);
+    
+    protected void popupShowing() {};
+    
+    protected void popupHidden()  {};
     
     
     private HideableBarRenderer[] renderers;
+    private NumberRenderer[] renderersEx;
     
     private void initUI() {
+        final int offset = selection == null ? -1 : 0;
+        
         tableModel = new MemoryTableModel();
         
         table = new ProfilerTable(tableModel, true, true, null) {
-            protected ClientUtils.SourceCodeSelection getValueForPopup(int row) {
-                return valueForRow(row);
+            public ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
+                return LivenessTableView.this.getUserValueForRow(row);
             }
-            protected void populatePopup(JPopupMenu popup, Object value) {
-                LivenessTableView.this.populatePopup(popup, (ClientUtils.SourceCodeSelection)value);
+            protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
+                LivenessTableView.this.populatePopup(popup, value, (ClientUtils.SourceCodeSelection)userValue);
             }
             protected void popupShowing() {
                 LivenessTableView.this.popupShowing();
@@ -189,28 +334,22 @@ abstract class LivenessTableView extends JPanel {
         };
         
         table.providePopupMenu(true);
-        table.setDefaultAction(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                int row = table.getSelectedRow();
-                ClientUtils.SourceCodeSelection value = valueForRow(row);
-                if (value != null) performDefaultAction(value);
-            }
-        });
+        installDefaultAction();
         
-        table.setMainColumn(1);
-        table.setFitWidthColumn(1);
+        table.setMainColumn(1 + offset);
+        table.setFitWidthColumn(1 + offset);
         
-        table.setSortColumn(2);
-        table.setDefaultSortOrder(1, SortOrder.ASCENDING);
+        table.setSortColumn(2 + offset);
+        table.setDefaultSortOrder(1 + offset, SortOrder.ASCENDING);
         
-        table.setColumnVisibility(0, false);
-        table.setColumnVisibility(5, false);
-        table.setColumnVisibility(6, false);
+        if (selection != null) table.setColumnVisibility(0, false);
+        table.setColumnVisibility(5 + offset, false);
+        table.setColumnVisibility(6 + offset, false);
         
         // Filter out classes with no instances
-        table.setRowFilter(new RowFilter() {
+        table.addRowFilter(new RowFilter() {
             public boolean include(RowFilter.Entry entry) {
-                return ((Number)entry.getValue(5)).intValue() > 0;
+                return !filterZeroItems || ((Number)entry.getValue(5 + offset)).intValue() > 0;
             }
         });
         
@@ -225,23 +364,37 @@ abstract class LivenessTableView extends JPanel {
         renderers[2].setMaxValue(12345678);
         renderers[3].setMaxValue(12345678);
         
-        table.setColumnRenderer(0, new CheckBoxRenderer());
-        table.setColumnRenderer(1, new JavaNameRenderer());
-        table.setColumnRenderer(2, renderers[0]);
-        table.setColumnRenderer(3, renderers[1]);
-        table.setColumnRenderer(4, renderers[2]);
-        table.setColumnRenderer(5, renderers[3]);
-        table.setColumnRenderer(6, new NumberRenderer());
-        table.setColumnRenderer(7, new NumberRenderer());
+        renderersEx = new NumberRenderer[2];
+        renderersEx[0] = new NumberRenderer() {
+            protected String getValueString(Object value, int row, Format format) {
+                if (value == null) return "-"; // NOI18N
+                float _value = ((Float)value).floatValue();
+                String s = StringUtils.floatPerCentToString(_value);
+                if (renderingDiff && _value >= 0) s = '+' + s; // NOI18N
+                return s;
+            }
+        };
+        renderersEx[1] = new NumberRenderer();
         
-        int w = new JLabel(table.getColumnName(0)).getPreferredSize().width;
-        table.setDefaultColumnWidth(0, w + 15);
-        table.setDefaultColumnWidth(2, renderers[0].getOptimalWidth());
-        table.setDefaultColumnWidth(3, renderers[1].getMaxNoBarWidth());
-        table.setDefaultColumnWidth(4, renderers[2].getMaxNoBarWidth());
-        table.setDefaultColumnWidth(5, renderers[3].getMaxNoBarWidth());
-        table.setDefaultColumnWidth(6, renderers[3].getNoBarWidth() - 25);
-        table.setDefaultColumnWidth(7, renderers[3].getNoBarWidth() - 25);
+        if (selection != null) table.setColumnRenderer(0, new CheckBoxRenderer());
+        table.setColumnRenderer(1 + offset, new JavaNameRenderer(Icons.getIcon(LanguageIcons.CLASS)));
+        table.setColumnRenderer(2 + offset, renderers[0]);
+        table.setColumnRenderer(3 + offset, renderers[1]);
+        table.setColumnRenderer(4 + offset, renderers[2]);
+        table.setColumnRenderer(5 + offset, renderers[3]);
+        table.setColumnRenderer(6 + offset, renderersEx[0]);
+        table.setColumnRenderer(7 + offset, renderersEx[1]);
+        
+        if (selection != null) {
+            int w = new JLabel(table.getColumnName(0)).getPreferredSize().width;
+            table.setDefaultColumnWidth(0, w + 15);
+        }
+        table.setDefaultColumnWidth(2 + offset, renderers[0].getOptimalWidth());
+        table.setDefaultColumnWidth(3 + offset, renderers[1].getMaxNoBarWidth());
+        table.setDefaultColumnWidth(4 + offset, renderers[2].getMaxNoBarWidth());
+        table.setDefaultColumnWidth(5 + offset, renderers[3].getMaxNoBarWidth());
+        table.setDefaultColumnWidth(6 + offset, renderers[3].getNoBarWidth() - 25);
+        table.setDefaultColumnWidth(7 + offset, renderers[3].getNoBarWidth() - 25);
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(table, false, null);
         
@@ -250,7 +403,7 @@ abstract class LivenessTableView extends JPanel {
     }
     
     
-    private ClientUtils.SourceCodeSelection valueForRow(int row) {
+    protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
         if (nTrackedItems == 0 || row == -1) return null;
         if (row >= tableModel.getRowCount()) return null; // #239936
         return classNames[table.convertRowIndexToModel(row)];
@@ -260,27 +413,31 @@ abstract class LivenessTableView extends JPanel {
     private class MemoryTableModel extends AbstractTableModel {
         
         public String getColumnName(int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             if (columnIndex == 1) {
-                return "Name";
+                return COLUMN_NAME;
             } else if (columnIndex == 2) {
-                return "Live Bytes";
+                return COLUMN_LIVE_BYTES;
             } else if (columnIndex == 3) {
-                return "Live Objects";
+                return COLUMN_LIVE_OBJECTS;
             } else if (columnIndex == 4) {
-                return "Allocated Objects";
+                return COLUMN_ALLOCATED_OBJECTS;
             } else if (columnIndex == 5) {
-                return "Total Alloc. Obj.";
+                return COLUMN_TOTAL_ALLOCATED_OBJECTS;
             } else if (columnIndex == 6) {
-                return "Avg. Age";
+                return COLUMN_AVG_AGE;
             } else if (columnIndex == 7) {
-                return "Generations";
+                return COLUMN_GENERATIONS;
             } else if (columnIndex == 0) {
-                return "Selected";
+                return COLUMN_SELECTED;
             }
             return null;
         }
 
         public Class<?> getColumnClass(int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             if (columnIndex == 1) {
                 return String.class;
             } else if (columnIndex == 2) {
@@ -306,11 +463,13 @@ abstract class LivenessTableView extends JPanel {
         }
 
         public int getColumnCount() {
-            return 8;
+            return selection == null ? 7 : 8;
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
             if (nTrackedItems == 0) return null;
+            
+            if (selection == null) columnIndex++;
             
             if (columnIndex == 1) {
                 return classNames[rowIndex].getClassName();
@@ -335,6 +494,8 @@ abstract class LivenessTableView extends JPanel {
         }
 
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             if (columnIndex == 0) {
                 if (Boolean.FALSE.equals(aValue)) selection.remove(classNames[rowIndex]);
                 else selection.add(classNames[rowIndex]);
@@ -342,6 +503,8 @@ abstract class LivenessTableView extends JPanel {
         }
 
         public boolean isCellEditable(int rowIndex, int columnIndex) {
+            if (selection == null) columnIndex++;
+            
             return columnIndex == 0;
         }
         

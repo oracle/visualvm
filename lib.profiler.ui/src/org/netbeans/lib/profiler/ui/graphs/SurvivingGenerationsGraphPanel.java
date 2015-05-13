@@ -48,8 +48,6 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.Date;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -57,8 +55,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.border.LineBorder;
 import org.netbeans.lib.profiler.charts.ChartItem;
 import org.netbeans.lib.profiler.charts.axis.AxisComponent;
 import org.netbeans.lib.profiler.charts.ChartSelectionModel;
@@ -67,26 +63,25 @@ import org.netbeans.lib.profiler.charts.swing.LongRect;
 import org.netbeans.lib.profiler.charts.swing.CrossBorderLayout;
 import org.netbeans.lib.profiler.charts.PaintersModel;
 import org.netbeans.lib.profiler.charts.xy.DecimalXYItemMarksComputer;
-import org.netbeans.lib.profiler.charts.axis.PercentLongMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.SimpleLongMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.TimeMarksPainter;
 import org.netbeans.lib.profiler.charts.axis.TimelineMarksComputer;
 import org.netbeans.lib.profiler.charts.xy.XYItem;
 import org.netbeans.lib.profiler.charts.xy.XYItemPainter;
-import org.netbeans.lib.profiler.charts.xy.CompoundXYItemPainter;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItem;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemMarker;
-import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemPainter;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerGCXYItemPainter;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYChart;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYItemPainter;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYSelectionOverlay;
+import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipOverlay;
 import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipPainter;
-import org.netbeans.lib.profiler.ui.charts.xy.ProfilerXYTooltipModel;
 import org.netbeans.lib.profiler.ui.components.ColorIcon;
 import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
+import org.netbeans.lib.profiler.ui.swing.InvisibleToolbar;
 
 
 /**
@@ -191,120 +186,71 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
                          models.generationsItemsModel().getTimeline(),
                          chart.getChartContext(), SwingConstants.HORIZONTAL),
                          new TimeMarksPainter(),
-                         SwingConstants.SOUTH, AxisComponent.MESH_FOREGROUND);
+                         SwingConstants.NORTH, AxisComponent.MESH_FOREGROUND);
+        hAxis.setForeground(Color.GRAY);
 
         // Surviving generations axis
         XYItem survgenItem = models.generationsItemsModel().getItem(1);
         XYItemPainter survgenPainter = (XYItemPainter)paintersModel.getPainter(survgenItem);
         SimpleLongMarksPainter survgenMarksPainter = new SimpleLongMarksPainter();
-//        survgenMarksPainter.setForeground(GraphsUI.SURVGEN_PAINTER_LINE_COLOR);
         AxisComponent sAxis =
                 new AxisComponent(chart, new DecimalXYItemMarksComputer(
                          survgenItem, survgenPainter, chart.getChartContext(),
                          SwingConstants.VERTICAL),
                          survgenMarksPainter, SwingConstants.WEST,
                          AxisComponent.MESH_FOREGROUND);
-
-        // GC time axis
-//        XYItem gcTimeItem = models.generationsItemsModel().getItem(2);
-//        XYItemPainter gcTimePainter = (XYItemPainter)paintersModel.getPainter(gcTimeItem);
-//        PercentLongMarksPainter gcTimeMarksPainter = new PercentLongMarksPainter(0, 1000);
-//        gcTimeMarksPainter.setForeground(GraphsUI.GC_TIME_PAINTER_LINE_COLOR);
-//        AxisComponent gAxis =
-//                new AxisComponent(chart, new DecimalXYItemMarksComputer(
-//                         gcTimeItem, gcTimePainter, chart.getChartContext(),
-//                         SwingConstants.VERTICAL),
-//                         gcTimeMarksPainter, SwingConstants.EAST,
-//                         AxisComponent.NO_MESH);
+        sAxis.setForeground(Color.GRAY);
 
         // Chart panel (chart & axes)
         JPanel chartPanel = new JPanel(new CrossBorderLayout());
         chartPanel.setBackground(GraphsUI.CHART_BACKGROUND_COLOR);
         chartPanel.setBorder(BorderFactory.createMatteBorder(
-                             10, 10, 10, 10, GraphsUI.CHART_BACKGROUND_COLOR));
+                             10, 10, 5, 5, GraphsUI.CHART_BACKGROUND_COLOR));
         chartPanel.add(chart, new Integer[] { SwingConstants.CENTER });
-        chartPanel.add(hAxis, new Integer[] { SwingConstants.SOUTH,
-                                              SwingConstants.SOUTH_EAST,
-                                              SwingConstants.SOUTH_WEST });
+        chartPanel.add(hAxis, new Integer[] { SwingConstants.NORTH,
+                                              SwingConstants.NORTH_EAST,
+                                              SwingConstants.NORTH_WEST });
         chartPanel.add(sAxis, new Integer[] { SwingConstants.WEST,
                                               SwingConstants.SOUTH_WEST });
-//        chartPanel.add(gAxis, new Integer[] { SwingConstants.EAST,
-//                                              SwingConstants.SOUTH_EAST });
+        
+        JScrollBar scroller = new JScrollBar(JScrollBar.HORIZONTAL);
+        chart.attachHorizontalScrollBar(scroller);
+        chartPanel.add(scroller, new Integer[] { SwingConstants.SOUTH });
 
         // Small panel UI
         if (smallPanel) {
-
-//            // Customize chart
-//            chart.setMouseZoomingEnabled(false);
-//            chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_NONE);
-//
-//            // Heap Size
-//            JLabel heapSizeSmall = new JLabel(GraphsUI.SURVGEN_NAME,
-//                                              new ColorIcon(GraphsUI.
-//                                              SURVGEN_PAINTER_LINE_COLOR, null,
-//                                              8, 8), SwingConstants.LEADING);
-//            heapSizeSmall.setFont(getFont().deriveFont((float)(getFont().getSize()) - 1));
-//            heapSizeSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-//
-//            // Used heap
-//            JLabel usedHeapSmall = new JLabel(GraphsUI.GC_TIME_NAME,
-//                                              new ColorIcon(GraphsUI.
-//                                              GC_TIME_PAINTER_LINE_COLOR, null,
-//                                              8, 8), SwingConstants.LEADING);
-//            usedHeapSmall.setFont(getFont().deriveFont((float) (getFont().getSize()) - 1));
-//            usedHeapSmall.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-//
-//            // Legend container
-//            JPanel smallLegendPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 1));
-//            smallLegendPanel.setBackground(GraphsUI.SMALL_LEGEND_BACKGROUND_COLOR);
-//            smallLegendPanel.setBorder(new LineBorder(GraphsUI.SMALL_LEGEND_BORDER_COLOR, 1));
-//            smallLegendPanel.add(heapSizeSmall);
-//            smallLegendPanel.add(usedHeapSmall);
-//            JPanel smallLegendContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
-//            smallLegendContainer.setBackground(GraphsUI.SMALL_LEGEND_BACKGROUND_COLOR);
-//            smallLegendContainer.add(smallLegendPanel);
-//
-//            // Master UI
-//            setLayout(new BorderLayout());
-//            add(chartPanel, BorderLayout.CENTER);
-//            add(smallLegendContainer, BorderLayout.SOUTH);
-//
-//
-//            // Doubleclick action
-//            chart.addMouseListener(new MouseAdapter() {
-//                public void mouseClicked(MouseEvent e) {
-//                    if (SwingUtilities.isLeftMouseButton(e) &&
-//                        e.getClickCount() == 2)
-//                            chartAction.actionPerformed(null);
-//                }
-//            });
-//
-//            // Toolbar actions
-//            chartActions = new Action[] {};
-
+            
         // Big panel UI
         } else {
+            
+            // Tooltip support
+            ProfilerXYTooltipPainter tooltipPainter = new ProfilerXYTooltipPainter(createTooltipModel());
+            chart.addOverlayComponent(new ProfilerXYTooltipOverlay(chart, tooltipPainter));
+            chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_EACH_NEAREST);
 
-            // Setup tooltip painter
-            ProfilerXYTooltipPainter tooltipPainter = new ProfilerXYTooltipPainter(
-                                                GraphsUI.TOOLTIP_OVERLAY_LINE_WIDTH,
-                                                GENERATIONS_COLOR,
-                                                null,
-                                                getTooltipModel());
-
-            // Customize chart
-            chart.addOverlayComponent(new ProfilerXYTooltipOverlay(chart,
-                                                                   tooltipPainter));
-
-            // Chart scrollbar
-            JScrollBar hScrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
-            chart.attachHorizontalScrollBar(hScrollBar);
+            // Hovering support
+            ProfilerXYSelectionOverlay selectionOverlay = new ProfilerXYSelectionOverlay();
+            chart.addOverlayComponent(selectionOverlay);
+            selectionOverlay.registerChart(chart);
+            chart.getSelectionModel().setMoveMode(ChartSelectionModel.SELECTION_LINE_V);
 
             // Chart container (chart panel & scrollbar)
             JPanel chartContainer = new JPanel(new BorderLayout());
             chartContainer.setBorder(BorderFactory.createEmptyBorder());
             chartContainer.add(chartPanel, BorderLayout.CENTER);
-//            chartContainer.add(hScrollBar, BorderLayout.SOUTH);
+            
+            // Side panel
+            JPanel sidePanel = new JPanel(new BorderLayout());
+            sidePanel.setOpaque(false);
+            int h = new JLabel("XXX").getPreferredSize().height; // NOI18N
+            sidePanel.setBorder(BorderFactory.createEmptyBorder(h + 17, 0, 0, 10));
+            InvisibleToolbar toolbar = new InvisibleToolbar(InvisibleToolbar.VERTICAL);
+            toolbar.setOpaque(true);
+            toolbar.setBackground(UIUtils.getProfilerResultsBackground());
+            toolbar.add(chart.toggleViewAction()).setBackground(UIUtils.getProfilerResultsBackground());
+            toolbar.add(chart.zoomInAction()).setBackground(UIUtils.getProfilerResultsBackground());
+            toolbar.add(chart.zoomOutAction()).setBackground(UIUtils.getProfilerResultsBackground());
+            sidePanel.add(toolbar, BorderLayout.CENTER);       
 
             // Heap Size
             JLabel heapSizeBig = new JLabel(GraphsUI.SURVGEN_NAME,
@@ -313,36 +259,31 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
             heapSizeBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
             // Used heap
-            JLabel usedHeapBig = new JLabel("GC Intervals",
+            JLabel usedHeapBig = new JLabel(GraphsUI.GC_INTERVALS_NAME,
                                             new ColorIcon(GC_INTERVALS_COLOR, Color.
                                             BLACK, 18, 9), SwingConstants.LEADING);
             usedHeapBig.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
             // Legend container
             JPanel bigLegendPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 7, 0));
-            bigLegendPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 15));
-            bigLegendPanel.setOpaque(false);
+            bigLegendPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 8, 30));
+            bigLegendPanel.setOpaque(true);
+            bigLegendPanel.setBackground(UIUtils.getProfilerResultsBackground());
             bigLegendPanel.add(heapSizeBig);
             bigLegendPanel.add(usedHeapBig);
-            
-            JPanel legendContainer = new JPanel(new BorderLayout(0, 0));
-            legendContainer.setOpaque(true);
-            legendContainer.setBackground(UIUtils.getProfilerResultsBackground());
-//            UIUtils.decorateProfilerPanel(legendContainer);
-//            legendContainer.add(UIUtils.createHorizontalLine(legendContainer.getBackground()), BorderLayout.NORTH);
-            legendContainer.add(bigLegendPanel, BorderLayout.CENTER);
 
             // Master UI
             setLayout(new BorderLayout());
-            JLabel caption = new JLabel("Generations", JLabel.CENTER);
+            setBackground(UIUtils.getProfilerResultsBackground());
+            JLabel caption = new JLabel(GraphsUI.GC_CAPTION, JLabel.CENTER);
             caption.setFont(caption.getFont().deriveFont(Font.BOLD));
-            caption.setBorder(BorderFactory.createEmptyBorder(20, 0, 5, 0));
+            caption.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
             caption.setOpaque(true);
             caption.setBackground(UIUtils.getProfilerResultsBackground());
             add(caption, BorderLayout.NORTH);
             add(chartContainer, BorderLayout.CENTER);
-            add(legendContainer, BorderLayout.SOUTH);
-
+            add(bigLegendPanel, BorderLayout.SOUTH);
+            add(sidePanel, BorderLayout.EAST);
 
             // Toolbar actions
             chartActions = new Action[] { chart.zoomInAction(),
@@ -361,7 +302,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
             }
 
             public int getRowsCount() {
-                return 2;
+                return 1;
             }
 
             public String getRowName(int index) {
@@ -398,7 +339,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
                 }
             }
 
-            public String getRowUnits(int index, long itemValue) {
+            public String getRowUnits(int index) {
                 switch (index) {
                     case 0:
                         return ""; // NOI18N
@@ -436,7 +377,7 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
             }
 
             public String getExtraRowUnits(int index) {
-                return getRowUnits(index, -1);
+                return getRowUnits(index);
             }
 
             private String trimPercents(String percents) {
@@ -449,40 +390,14 @@ public final class SurvivingGenerationsGraphPanel extends GraphPanel {
 
     private PaintersModel createGenerationsPaintersModel() {
         // Surviving generations
-        SynchronousXYItemPainter survgenPainter =
-                SynchronousXYItemPainter.absolutePainter(GraphsUI.SURVGEN_PAINTER_LINE_WIDTH,
+        ProfilerXYItemPainter survgenPainter =
+                ProfilerXYItemPainter.absolutePainter(GraphsUI.SURVGEN_PAINTER_LINE_WIDTH,
                                                       GENERATIONS_COLOR,
                                                       null);
-//        SynchronousXYItemMarker survgenMarker =
-//                 SynchronousXYItemMarker.absolutePainter(GraphsUI.SURVGEN_MARKER_RADIUS,
-//                                                      GraphsUI.SURVGEN_MARKER_LINE1_WIDTH,
-//                                                      GraphsUI.SURVGEN_MARKER_LINE1_COLOR,
-//                                                      GraphsUI.SURVGEN_MARKER_LINE2_WIDTH,
-//                                                      GraphsUI.SURVGEN_MARKER_LINE2_COLOR,
-//                                                      GraphsUI.SURVGEN_MARKER_FILL_COLOR);
-//        XYItemPainter sgp = new CompoundXYItemPainter(survgenPainter,
-//                                                      survgenMarker);
         XYItemPainter sgp = survgenPainter;
 
-//        // Relative time spent in GC
-//        SynchronousXYItemPainter gcTimePainter =
-//                SynchronousXYItemPainter.relativePainter(GraphsUI.GC_TIME_PAINTER_LINE_WIDTH,
-//                                                      GraphsUI.GC_TIME_PAINTER_LINE_COLOR,
-//                                                      GraphsUI.GC_TIME_PAINTER_FILL_COLOR,
-//                                                      10);
-//        SynchronousXYItemMarker gcTimeMarker =
-//                 SynchronousXYItemMarker.relativePainter(GraphsUI.GC_TIME_MARKER_RADIUS,
-//                                                      GraphsUI.GC_TIME_MARKER_LINE1_WIDTH,
-//                                                      GraphsUI.GC_TIME_MARKER_LINE1_COLOR,
-//                                                      GraphsUI.GC_TIME_MARKER_LINE2_WIDTH,
-//                                                      GraphsUI.GC_TIME_MARKER_LINE2_COLOR,
-//                                                      GraphsUI.GC_TIME_MARKER_FILL_COLOR,
-//                                                      10);
-//        XYItemPainter gtp = new CompoundXYItemPainter(gcTimePainter,
-//                                                      gcTimeMarker);
-
         // GC events painter
-        XYItemPainter gep = ProfilerGCXYItemPainter.painter(GC_INTERVALS_COLOR.brighter());
+        XYItemPainter gep = ProfilerGCXYItemPainter.painter(GC_INTERVALS_COLOR);
 
         // Model
         ItemsModel items = models.generationsItemsModel();

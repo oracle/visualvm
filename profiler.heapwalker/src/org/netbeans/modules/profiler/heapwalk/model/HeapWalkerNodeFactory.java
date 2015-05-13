@@ -146,7 +146,7 @@ public class HeapWalkerNodeFactory {
         return new ClassNode(javaClass, name, parent, (parent == null) ? HeapWalkerNode.MODE_FIELDS : parent.getMode());
     }
 
-    public static HeapWalkerFieldNode createFieldNode(FieldValue fieldValue, HeapWalkerNode parent) {
+    public static HeapWalkerNode createFieldNode(FieldValue fieldValue, HeapWalkerNode parent) {
         if (fieldValue instanceof ObjectFieldValue) {
             Instance instance = ((ObjectFieldValue) fieldValue).getInstance();
 
@@ -413,7 +413,7 @@ public class HeapWalkerNodeFactory {
         };
     }
 
-    public static HeapWalkerInstanceNode createRootInstanceNode(Instance instance, String name, final Runnable refresher,
+    public static HeapWalkerNode createRootInstanceNode(Instance instance, String name, final Runnable refresher,
                                                                 final Runnable repainter, int mode, final Heap heap) {
         if (instance instanceof PrimitiveArrayInstance) {
             return new PrimitiveArrayNode.RootNode((PrimitiveArrayInstance) instance, name, null, mode) {

@@ -51,9 +51,11 @@ import org.netbeans.lib.profiler.ui.Formatters;
  *
  * @author Jiri Sedlacek
  */
-public class NumberRenderer extends FormattedLabelRenderer {
+public class NumberRenderer extends FormattedLabelRenderer implements RelativeRenderer {
     
     private final Format outputFormat;
+    
+    protected boolean renderingDiff;
     
     public NumberRenderer() {
         this(null);
@@ -67,9 +69,21 @@ public class NumberRenderer extends FormattedLabelRenderer {
         setHorizontalAlignment(SwingConstants.TRAILING);
     }
     
+    public void setDiffMode(boolean diffMode) {
+        renderingDiff = diffMode;
+    }
+
+    public boolean isDiffMode() {
+        return renderingDiff;
+    }
+    
     protected String getValueString(Object value, int row, Format format) {
-        String string = super.getValueString(value, row, format);
-        return outputFormat == null ? string : formatImpl(outputFormat, string);
+        if (value == null) return "-"; // NOI18N
+        String s = super.getValueString(value, row, format);
+        s = outputFormat == null ? s : formatImpl(outputFormat, s);
+        if (renderingDiff && value instanceof Number)
+            if (((Number)value).doubleValue() >= 0) s = '+' + s; // NOI18N
+        return s;
     }
     
 }

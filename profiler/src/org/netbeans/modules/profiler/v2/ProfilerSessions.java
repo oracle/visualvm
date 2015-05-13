@@ -82,7 +82,9 @@ import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
+import org.openide.awt.Mnemonics;
 import org.openide.modules.OnStop;
+import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -96,13 +98,15 @@ import org.openide.windows.WindowManager;
 @NbBundle.Messages({
     "ProfilerSessions_actionNotSupported=Action not supported by the current profiling session.",
     "ProfilerSessions_loadingFeatures=Loading project features...",
-    "ProfilerSessions_selectProject=Select the project to profile:",
+    "ProfilerSessions_selectProject=&Select the project to profile:",
     "ProfilerSessions_selectFeature=Select Feature",
     "ProfilerSessions_selectHandlingFeature=Select the feature to handle the action:",
     "ProfilerSessions_selectProjectAndFeature=Select Project and Feature",
     "ProfilerSessions_finishingSession=Finishing previous session...",
     "ProfilerSessions_finishSessionCaption=Profile",
-    "ProfilerSessions_cancel=Cancel"
+    "ProfilerSessions_cancel=Cancel",
+    "ProfilerSessions_profileProject=&Profile project",
+    "ProfilerSessions_attachProject=&Attach to project"
 })
 final class ProfilerSessions {
     
@@ -156,11 +160,12 @@ final class ProfilerSessions {
             public void run() {
                 UI ui = UI.createAndConfigure(context, _project);
 
+                HelpCtx helpCtx = new HelpCtx("SelectFeatureDialog.HelpCtx"); // NOI18N
                 String caption = actionName == null ? Bundle.ProfilerSessions_selectProjectAndFeature() : actionName;
                 DialogDescriptor dd = new DialogDescriptor(ui, caption, true, new Object[]
                                                          { DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION },
                                                            DialogDescriptor.OK_OPTION, DialogDescriptor.BOTTOM_ALIGN,
-                                                           null, null);
+                                                           helpCtx, null);
                 Dialog d = DialogDisplayer.getDefault().createDialog(dd);
                 d.setVisible(true);
                 
@@ -193,11 +198,12 @@ final class ProfilerSessions {
     private static ProfilerFeature selectFeature(Set<ProfilerFeature> features, String actionName) {
         UI ui = UI.selectFeature(features);
 
+        HelpCtx helpCtx = new HelpCtx("SelectFeatureDialog.HelpCtx"); // NOI18N // TODO: should have a special one?
         String caption = actionName == null ? Bundle.ProfilerSessions_selectFeature() : actionName;
         DialogDescriptor dd = new DialogDescriptor(ui, caption, true, new Object[]
                                                  { DialogDescriptor.OK_OPTION, DialogDescriptor.CANCEL_OPTION },
                                                    DialogDescriptor.OK_OPTION, DialogDescriptor.BOTTOM_ALIGN,
-                                                   null, null);
+                                                   helpCtx, null);
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
         
@@ -224,6 +230,8 @@ final class ProfilerSessions {
         }
         
         ProfilerSession selectedSession() {
+            if (selectedSession != null)
+                selectedSession.setAttach(attachProject.isSelected());
             return selectedSession;
         }
         
@@ -272,6 +280,8 @@ final class ProfilerSessions {
         }
         
         private JPanel contents;
+        private JRadioButton profileProject;
+        private JRadioButton attachProject;
         private void repaintContents() {
             contents.invalidate();
             contents.revalidate();
@@ -284,37 +294,80 @@ final class ProfilerSessions {
             int y = 0;
             GridBagConstraints c;
             
-            JLabel l = new JLabel(Bundle.ProfilerSessions_selectProject());
+            JLabel l = new JLabel();
+            Mnemonics.setLocalizedText(l, Bundle.ProfilerSessions_selectProject());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
+            c.gridwidth = GridBagConstraints.REMAINDER;
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(10, 10, 10, 10);
             add(l, c);
             
             contents = new JPanel(new GridBagLayout());
             
-            // TODO: should also include External Process!
             ProjectSelector.Populator populator = new ProjectSelector.Populator() {
                 protected Lookup.Provider initialProject() { return project; }
             };
             ProjectSelector selector = new ProjectSelector(populator) {
                 protected void selectionChanged() {
-                    refreshFeatures(context, (Lookup.Provider)getSelectedItem());
+                    Lookup.Provider project = getProject();
+                    refreshProfileAttach(project);
+                    refreshFeatures(context, project);
                 }
             };
+            l.setLabelFor(selector);
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
+            c.gridwidth = GridBagConstraints.REMAINDER;
             c.anchor = GridBagConstraints.WEST;
             c.fill = GridBagConstraints.HORIZONTAL;
-            c.insets = new Insets(0, 20, 10, 10);
+            c.insets = new Insets(0, 20, 4, 10);
             add(selector, c);
             
-            JLabel ll = new JLabel(Bundle.ProfilerSessions_selectHandlingFeature());
+            ButtonGroup bg = new ButtonGroup();
+            
+            profileProject = new JRadioButton();
+            bg.add(profileProject);
+            profileProject.setSelected(true);
+            Mnemonics.setLocalizedText(profileProject, Bundle.ProfilerSessions_profileProject());
+            c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = y;
+            c.weightx = 0;
+            c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.NONE;
+            c.insets = new Insets(0, 20, 10, 5);
+            add(profileProject, c);
+            
+            attachProject = new JRadioButton();
+            bg.add(attachProject);
+            Mnemonics.setLocalizedText(attachProject, Bundle.ProfilerSessions_attachProject());
+            c = new GridBagConstraints();
+            c.gridx = 1;
+            c.gridy = y;
+            c.weightx = 0;
+            c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.NONE;
+            c.insets = new Insets(0, 0, 10, 10);
+            add(attachProject, c);
+            
+            c = new GridBagConstraints();
+            c.gridx = 2;
+            c.gridy = y++;
+            c.weightx = 1;
+            c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.insets = new Insets(0, 0, 10, 0);
+            add(UIUtils.createFillerPanel(), c);
+            
+            JLabel ll = new JLabel();
+            Mnemonics.setLocalizedText(ll, Bundle.ProfilerSessions_selectHandlingFeature());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
+            c.gridwidth = GridBagConstraints.REMAINDER;
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(10, 10, 10, 10);
             add(ll, c);
@@ -322,6 +375,7 @@ final class ProfilerSessions {
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
+            c.gridwidth = GridBagConstraints.REMAINDER;
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(0, 0, 0, 0);
             add(contents, c);
@@ -337,6 +391,7 @@ final class ProfilerSessions {
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
+            c.gridwidth = GridBagConstraints.REMAINDER;
             c.weightx = 1;
             c.weighty = 1;
             c.fill = GridBagConstraints.BOTH;
@@ -344,7 +399,16 @@ final class ProfilerSessions {
             c.insets = new Insets(15, 0, 0, 0);
             add(filler, c);
             
-            refreshFeatures(context, (Lookup.Provider)selector.getSelectedItem());
+            Lookup.Provider _project = selector.getProject();
+            refreshProfileAttach(_project);
+            refreshFeatures(context, _project);
+        }
+        
+        private void refreshProfileAttach(Lookup.Provider project) {
+            boolean fromExternal = !profileProject.isEnabled();
+            profileProject.setEnabled(project != null);
+            if (project == null) attachProject.setSelected(true);
+            else if (fromExternal) profileProject.setSelected(true);
         }
         
         private void refreshFeatures(final Lookup context, final Lookup.Provider project) {
@@ -368,7 +432,8 @@ final class ProfilerSessions {
                     
                     if (selectedSession != null) selectedSession.close();
                     
-                    Lookup projectContext = Lookups.fixed(project);
+                    Lookup projectContext = project == null ? Lookup.EMPTY :
+                                            Lookups.fixed(project);
                     selectedSession = ProfilerSession.forContext(projectContext);
                     final ProfilerFeatures features = selectedSession.getFeatures();
                     

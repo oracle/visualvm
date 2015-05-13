@@ -70,8 +70,6 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
-import org.openide.awt.ActionRegistration;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.windows.WindowManager;
@@ -855,6 +853,8 @@ public class CompareSnapshotsAction extends AbstractAction {
     private LoadedSnapshot snapshot;
     private SelectExternalSnapshotsPanel externalSnapshotsSelector;
     private SelectSecondSnapshotPanel secondSnapshotSelector;
+    
+    private Performer performer;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -871,9 +871,14 @@ public class CompareSnapshotsAction extends AbstractAction {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    public void setPerformer(Performer _performer) {
+        performer = _performer;
+    }
 
     public void actionPerformed(ActionEvent e) {
         if (snapshot != null) {
+            assert performer != null;
             compareDefinedSnapshot();
         } else {
             compareExternalSnapshots();
@@ -1017,18 +1022,23 @@ public class CompareSnapshotsAction extends AbstractAction {
             Object selectedSnapshot = getSecondSnapshotSelector().getSnapshot();
 
             if (selectedSnapshot instanceof LoadedSnapshot) {
-                ResultsManager.getDefault().compareSnapshots(snapshot, (LoadedSnapshot) selectedSnapshot);
+                performer.compare((LoadedSnapshot)selectedSnapshot);
+//                ResultsManager.getDefault().compareSnapshots(snapshot, (LoadedSnapshot) selectedSnapshot);
             } else if (selectedSnapshot instanceof FileObject) {
-                if (snapshot.getFile() == null) {
-                    LoadedSnapshot snapshot2 = ResultsManager.getDefault().getSnapshotFromFileObject((FileObject) selectedSnapshot);
-
-                    if (snapshot2 != null) {
-                        ResultsManager.getDefault().compareSnapshots(snapshot, snapshot2);
-                    }
-                } else {
-                    ResultsManager.getDefault()
-                                  .compareSnapshots(FileUtil.toFileObject(snapshot.getFile()), (FileObject) selectedSnapshot);
-                }
+                // TODO: seems to eventually load the snapshot in EDT
+                LoadedSnapshot snapshot2 = ResultsManager.getDefault().
+                        getSnapshotFromFileObject((FileObject)selectedSnapshot);
+                if (snapshot2 != null) performer.compare(snapshot2);
+//                if (snapshot.getFile() == null) {
+//                    LoadedSnapshot snapshot2 = ResultsManager.getDefault().getSnapshotFromFileObject((FileObject) selectedSnapshot);
+//
+//                    if (snapshot2 != null) {
+//                        ResultsManager.getDefault().compareSnapshots(snapshot, snapshot2);
+//                    }
+//                } else {
+//                    ResultsManager.getDefault()
+//                                  .compareSnapshots(FileUtil.toFileObject(snapshot.getFile()), (FileObject) selectedSnapshot);
+//                }
             }
         }
     }
@@ -1047,4 +1057,12 @@ public class CompareSnapshotsAction extends AbstractAction {
                                             FileUtil.toFileObject(new File(getExternalSnapshotsSelector().getSnapshot2Filename())));
         }
     }
+    
+    
+    public static interface Performer {
+        
+        void compare(LoadedSnapshot snapshot);
+        
+    }
+    
 }

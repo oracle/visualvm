@@ -45,6 +45,7 @@ package org.netbeans.modules.profiler.v2.features;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.HashSet;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -60,9 +61,12 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.swing.PopupButton;
+import org.netbeans.lib.profiler.ui.swing.SmallButton;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -70,8 +74,6 @@ import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.impl.WeakProcessor;
-import org.netbeans.modules.profiler.v2.ui.PopupButton;
-import org.netbeans.modules.profiler.v2.ui.SmallButton;
 import org.netbeans.modules.profiler.v2.ui.TitledMenuSeparator;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -87,7 +89,10 @@ import org.openide.util.lookup.ServiceProvider;
     "ObjectsFeature_profileMode=Profile:",
     "ObjectsFeature_samplingModes=General (sampled)",
     "ObjectsFeature_instrModes=Focused (instrumented)",
-    "ObjectsFeature_applyButton=Apply"
+    "ObjectsFeature_applyButton=Apply",
+    "ObjectsFeature_arrayWarningCaption=Selected Array Warning",
+    "#HTML-formatted, line breaks using <br> to make the displaying dialog not too wide",
+    "ObjectsFeature_arrayWarningMsg=<html><b>Array object selected for profiling.</b><br><br>Configuring the target application for profiling arrays can<br>take a long time when attaching to a running process or<br>changing the settings during profiling.<br><br></html>"
 })
 final class ObjectsFeature extends ProfilerFeature.Basic {
     
@@ -119,13 +124,20 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     // --- Configuration -------------------------------------------------------
     
     public boolean supportsConfiguration(Lookup configuration) {
-        return configuration.lookup(SourceClassInfo.class) != null;
+        if (configuration.lookup(SourceClassInfo.class) != null) return true;
+        
+        ClientUtils.SourceCodeSelection sel = configuration.lookup(ClientUtils.SourceCodeSelection.class);
+        return sel != null && Wildcards.ALLWILDCARD.equals(sel.getMethodName());
     }
     
     public void configure(Lookup configuration) {
-        // Handle Profile Class action
+        // Handle Profile Class action from editor
         SourceClassInfo classInfo = configuration.lookup(SourceClassInfo.class);
         if (classInfo != null) selectClassForProfiling(classInfo);
+        
+        // Handle Profile Class action from snapshot
+        ClientUtils.SourceCodeSelection sel = configuration.lookup(ClientUtils.SourceCodeSelection.class);
+        if (sel != null && Wildcards.ALLWILDCARD.equals(sel.getMethodName())) selectForProfiling(sel);
     }
     
     
@@ -267,12 +279,31 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
         currentMode.confirmSettings();
     }
     
+    private void confirmAllSettings() {
+        if (allClassesMode != null) allClassesMode.confirmSettings();
+        if (projectClassesMode != null) projectClassesMode.confirmSettings();
+        if (selectedClassesMode != null) selectedClassesMode.confirmSettings();
+    }
+    
     private void settingsChanged() {
         configurationChanged();
     }
     
     private void selectionChanged() {
         configurationChanged();
+        
+        if (getSession().inProgress() || getSession().isAttach()) checkArrays();
+    }
+    
+    private void checkArrays() {
+        HashSet<ClientUtils.SourceCodeSelection> sel = selectedClassesMode.getSelection();
+        for (ClientUtils.SourceCodeSelection s : sel)
+            if (s.getClassName().endsWith("[]")) { // NOI18N
+                ProfilerDialogs.displayWarningDNSA(Bundle.ObjectsFeature_arrayWarningMsg(),
+                                                   Bundle.ObjectsFeature_arrayWarningCaption(),
+                                                   null, "ObjectsFeature.arraysDNSA", true); // NOI18N
+                break;
+            }
     }
     
     
@@ -468,7 +499,6 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     
     private void resetResults() {
         if (ui != null) ui.resetData();
-        ResultsManager.getDefault().reset();
     }
     
     private void stopResults() {
@@ -507,6 +537,7 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     protected void profilingStateChanged(int oldState, int newState) {
         if (newState == Profiler.PROFILING_INACTIVE || newState == Profiler.PROFILING_IN_TRANSITION) {
             stopResults();
+            confirmAllSettings();
         } else if (isActivated() && newState == Profiler.PROFILING_RUNNING) {
             startResults();
         } else if (newState == Profiler.PROFILING_STARTED) {

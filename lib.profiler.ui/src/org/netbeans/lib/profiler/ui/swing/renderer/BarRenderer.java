@@ -52,11 +52,10 @@ import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
  *
  * @author Jiri Sedlacek
  */
-public class BarRenderer extends BaseRenderer {
+public class BarRenderer extends BaseRenderer implements RelativeRenderer {
     
-//    private static final Color COLOR = new Color(195, 41, 41);
-    private static final Color COLOR = new Color(225, 130, 130);
-//    private static final Color COLOR = new Color(130, 225, 130);
+    private static final Color COLOR_POS = new Color(225, 130, 130);
+    private static final Color COLOR_NEG = new Color(130, 225, 130);
     
     private static final int X_MARGIN = 2;
     private static final int Y_MARGIN = 3;
@@ -65,6 +64,8 @@ public class BarRenderer extends BaseRenderer {
     
     private long maxValue;
     private float value;
+    
+    protected boolean renderingDiff;
     
     
     public BarRenderer() {
@@ -85,7 +86,17 @@ public class BarRenderer extends BaseRenderer {
     }
     
     public void setValue(Object value, int row) {
-        this.value = maxValue == 0 ? 0 : ((Number)value).floatValue() / maxValue;
+        if (value == null) this.value = 0;
+        else this.value = maxValue == 0 ? 0 : ((Number)value).floatValue() / maxValue;
+    }
+    
+    
+    public void setDiffMode(boolean diffMode) {
+        renderingDiff = diffMode;
+    }
+
+    public boolean isDiffMode() {
+        return renderingDiff;
     }
     
     
@@ -97,17 +108,50 @@ public class BarRenderer extends BaseRenderer {
         BAR_RECT.height = size.height - Y_MARGIN * 2;
         
         int width = size.width - X_MARGIN * 2;
-        BAR_RECT.width = (int)(width * Math.min(value, 1));
-        if (BAR_RECT.width > 0) {
-            g.setColor(COLOR);
-            g.fillRect(BAR_RECT.x, BAR_RECT.y, BAR_RECT.width, BAR_RECT.height);
-        }
         
-        if (BAR_RECT.width < width) {
-            BAR_RECT.x += BAR_RECT.width;
-            BAR_RECT.width = width - BAR_RECT.x + location.x;
-            g.setColor(brighter(COLOR));
-            g.fillRect(BAR_RECT.x, BAR_RECT.y, BAR_RECT.width, BAR_RECT.height);
+        if (renderingDiff) {
+            Color color = value < 0 ? COLOR_NEG : COLOR_POS;
+            int width2 = width / 2;
+            
+            if (value <= -1) {
+                g.setColor(color);
+                g.fillRect(BAR_RECT.x, BAR_RECT.y, width2, BAR_RECT.height);
+                
+                g.setColor(brighter(color));
+                g.fillRect(BAR_RECT.x + width2, BAR_RECT.y, width - width2, BAR_RECT.height);
+            } else if (value >= 1) {
+                g.setColor(brighter(color));
+                g.fillRect(BAR_RECT.x, BAR_RECT.y, width2, BAR_RECT.height);
+                
+                g.setColor(color);
+                g.fillRect(BAR_RECT.x + width2, BAR_RECT.y, width - width2, BAR_RECT.height);
+            } else {
+                g.setColor(brighter(color));
+                g.fillRect(BAR_RECT.x, BAR_RECT.y, width, BAR_RECT.height);
+
+                BAR_RECT.width = (int)(width2 * Math.min(Math.abs(value), 1));
+                if (BAR_RECT.width > 0) {
+                    g.setColor(color);
+                    if (value < 0) {
+                        g.fillRect(BAR_RECT.x + width2 - BAR_RECT.width, BAR_RECT.y, BAR_RECT.width, BAR_RECT.height);
+                    } else {
+                        g.fillRect(BAR_RECT.x + width2, BAR_RECT.y, BAR_RECT.width, BAR_RECT.height);
+                    }
+                }
+            }
+        } else {
+            BAR_RECT.width = (int)(width * Math.min(value, 1));
+            if (BAR_RECT.width > 0) {
+                g.setColor(COLOR_POS);
+                g.fillRect(BAR_RECT.x, BAR_RECT.y, BAR_RECT.width, BAR_RECT.height);
+            }
+
+            if (BAR_RECT.width < width) {
+                BAR_RECT.x += BAR_RECT.width;
+                BAR_RECT.width = width - BAR_RECT.width;
+                g.setColor(brighter(COLOR_POS));
+                g.fillRect(BAR_RECT.x, BAR_RECT.y, BAR_RECT.width, BAR_RECT.height);
+            }
         }
     }
     

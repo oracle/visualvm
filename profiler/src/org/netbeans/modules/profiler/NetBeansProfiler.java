@@ -945,6 +945,7 @@ public abstract class NetBeansProfiler extends Profiler {
             
             sessionSettings.applySettings(sSettings);
             profilingSettings.applySettings(sSettings); // can override the session settings
+            sSettings.setInstrumentObjectInit(false); // clear instrument object.<init>
             //sSettings.setRemoteHost(""); // NOI18N // clear remote profiling host
 
             //getThreadsManager().setSupportsSleepingStateMonitoring(
@@ -1104,6 +1105,7 @@ public abstract class NetBeansProfiler extends Profiler {
 
         final ProfilerEngineSettings sharedSettings = getTargetAppRunner().getProfilerEngineSettings();
         profilingSettings.applySettings(sharedSettings);
+        sharedSettings.setInstrumentObjectInit(true);
 
         logActionConfig("modifyCurrentProfiling", profilingSettings, null, null, sharedSettings.getInstrumentationFilter()); //NOI18N
         
@@ -1201,6 +1203,7 @@ public abstract class NetBeansProfiler extends Profiler {
         sessionSettings.applySettings(sSettings);
         profilingSettings.applySettings(sSettings); // can override the session settings
         sSettings.setRemoteHost(""); // NOI18N // clear remote profiling host
+        sSettings.setInstrumentObjectInit(false); // clear instrument object.<init>
 
         //getThreadsManager().setSupportsSleepingStateMonitoring(
         // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));

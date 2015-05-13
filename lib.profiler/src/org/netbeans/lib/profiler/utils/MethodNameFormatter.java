@@ -107,7 +107,7 @@ public class MethodNameFormatter {
             this.className = "<unknown class>"; // NOI18N
         }
 
-        if (mname == null) {
+        if (mname == null /*|| mname.isEmpty() || mname.equals("*")*/) { // NOI18N // breaks tests, not sure why added
             // methodName can be null when class- or package-level view is used
             params = ""; // NOI18N
             returnType = ""; // NOI18N
@@ -275,8 +275,7 @@ public class MethodNameFormatter {
         if (methodName == null) {
             return ""; // NOI18N  // Understanding is that class-level view is used
         } else if ("<clinit>".equals(methodName)) { // NOI18N
-
-            return methodName;
+            return methodName + "()"; // NOI18N
         } else {
             return methodName + "(" + getParamsString() + ")"; // NOI18N
         }
@@ -302,10 +301,8 @@ public class MethodNameFormatter {
         if (methodName == null) {
             return ""; // NOI18N  // Understanding is that class-level view is used
         } else if ("<clinit>".equals(methodName)) { // NOI18N
-
-            return methodName;
+            return methodName + "()"; // NOI18N
         } else if ("<init>".equals(methodName)) { // NOI18N
-
             return methodName + "(" + getParamsString() + ")"; // NOI18N
         } else {
             return methodName + "(" + getParamsString() + ") : " + getReturnType(); // NOI18N

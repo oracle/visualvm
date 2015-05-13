@@ -72,7 +72,7 @@ public class ClassLoaderTable {
         }
 
         if (loader >= parentLoaderIds.length) {
-            // very stranmge situation: loader not known on tool side, seems like this can happen when using
+            // very strange situation: loader not known on tool side, seems like this can happen when using
             // instrumentation for Method.invoke, where the MethodLoadedCommand comes for class sun.reflect.misc.Trampoline
             // although the ClassLoadedCommand never is issued for this class
             return -1;

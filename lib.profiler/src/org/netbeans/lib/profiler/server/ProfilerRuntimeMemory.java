@@ -71,6 +71,8 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
     private static int stackDepth;
     private static int[] stackFrameIds;
     private static Map classIdMap;
+    private static volatile boolean resultsAvailable;
+    private static final boolean DEBUG = false;
 
     // -------------------------------------- Miscellaneous support routines ------------------------------------------
     private static long randSeed;
@@ -144,6 +146,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
         }
 
         classIdMap = new HashMap();
+        resultsAvailable = false;
     }
 
     public static void traceVMObjectAlloc(Object instance, Class clazz) {
@@ -161,7 +164,8 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
         }
 
         if (!ti.isInitialized()) {
-            ti.initialize(true);
+            ti.initialize();
+            if (lockContentionMonitoringEnabled) writeThreadCreationEvent(ti);
         }
 
         ti.inProfilingRuntimeMethod++;
@@ -201,7 +205,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
                 classIdMap.put(classNameId, classIdInt);
             }
             if (newClassId == -1) {
-                System.err.println("*** JFluid warning: Invalid classId for class:"+classNameId);
+                if (DEBUG) System.out.println("ProfilerRuntimeMemory.DEBUG: Invalid classId for class:"+classNameId);
 //                if (classNameId.startsWith("org.netbeans.lib.profiler")) Thread.dumpStack();
 //                if (classNameId.startsWith("[")) Thread.dumpStack();
             }
@@ -287,6 +291,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
         stackFrameIds = new int[MAX_STACK_FRAMES];
         Stacks.createNativeStackFrameBuffer(MAX_STACK_FRAMES);
         classIdMap = new HashMap();
+        resultsAvailable = false;
     }
 
     protected static void enableProfiling(boolean v) {
@@ -348,7 +353,8 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
             stackDepth -= NO_OF_PROFILER_FRAMES; // Top frames are our own methods
         }
 
-        if (globalEvBufPos == 0) {
+        if (!resultsAvailable) {
+            resultsAvailable = true;
             ProfilerServer.notifyClientOnResultsAvailability();
         }
 
@@ -409,7 +415,8 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
             stackDepth -= NO_OF_PROFILER_FRAMES; // Top 4 frames are our own methods
         }
 
-        if (globalEvBufPos == 0) {
+        if (!resultsAvailable) {
+            resultsAvailable = true;
             ProfilerServer.notifyClientOnResultsAvailability();
         }
 

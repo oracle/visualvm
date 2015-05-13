@@ -47,6 +47,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.instrumentation.BadLocationException;
@@ -243,28 +245,39 @@ public abstract class ClassRepository implements CommonConstants {
 
             int[] minAndMaxLines = clazz.getMinAndMaxLinesForMethod(methodIdx);
 
-            if (endLine <= minAndMaxLines[1]) {
-                endLine++; // That's because we will need to inject code after the *last bytecode corresponding to endLine*
-            }
+            int[] idxAndBCI1;
+            if (endLine == minAndMaxLines[1]) { // it's the last line of the same method
+                idxAndBCI1 = new int[2];
+                idxAndBCI1[0] = methodIdx;
 
-            int[] idxAndBCI1 = clazz.methodIdxAndBestBCIForLineNo(endLine);
+                // Need to find the bci of the last instruction in this method. It can only be a "return" or 'goto' ('goto_w').
+                // In either case, we should put the call before this instruction, since it would make no sense after it.
+                byte[] codeBytes = clazz.getMethodBytecode(methodIdx);
+                idxAndBCI1[1] = ClassInfo.findPreviousBCI(codeBytes, codeBytes.length);                
+            } else {
+                if (endLine < minAndMaxLines[1]) {
+                    endLine++; // That's because we will need to inject code after the *last bytecode corresponding to endLine*
+                }
 
-            // Now let's check if start and end lines are within the same method.
-            // If the end line is definitely within some other method, it's an error and we return.
-            // However, it may just cover one or more of '}'s in the end of this method, and these lines
-            // are just not within this method's line number table. If so, assume that the end line is
-            // the last line of the this method.
-            if (methodIdx != idxAndBCI1[0]) {
-                if (idxAndBCI1[0] != -1) { // Definitely this line belongs to some other method
+                idxAndBCI1 = clazz.methodIdxAndBestBCIForLineNo(endLine);
 
-                    return null;
-                } else { // Couldn't find the line - assume it's the last line of the same method
-                    idxAndBCI1[0] = methodIdx;
+                // Now let's check if start and end lines are within the same method.
+                // If the end line is definitely within some other method, it's an error and we return.
+                // However, it may just cover one or more of '}'s in the end of this method, and these lines
+                // are just not within this method's line number table. If so, assume that the end line is
+                // the last line of the this method.
+                if (methodIdx != idxAndBCI1[0]) {
+                    if (idxAndBCI1[0] != -1) { // Definitely this line belongs to some other method
 
-                    // Need to find the bci of the last instruction in this method. It can only be a "return" or 'goto' ('goto_w').
-                    // In either case, we should put the call before this instruction, since it would make no sense after it.
-                    byte[] codeBytes = clazz.getMethodBytecode(methodIdx);
-                    idxAndBCI1[1] = ClassInfo.findPreviousBCI(codeBytes, codeBytes.length);
+                        return null;
+                    } else { // Couldn't find the line - assume it's the last line of the same method
+                        idxAndBCI1[0] = methodIdx;
+
+                        // Need to find the bci of the last instruction in this method. It can only be a "return" or 'goto' ('goto_w').
+                        // In either case, we should put the call before this instruction, since it would make no sense after it.
+                        byte[] codeBytes = clazz.getMethodBytecode(methodIdx);
+                        idxAndBCI1[1] = ClassInfo.findPreviousBCI(codeBytes, codeBytes.length);
+                    }
                 }
             }
 
@@ -354,8 +367,23 @@ public abstract class ClassRepository implements CommonConstants {
 
     /** Adds a VM-supplied class file to the class file cache, but not to this repository's hashtable yet. */
     public static void addVMSuppliedClassFile(String className, int classLoaderId, byte[] buf) {
-        className = className.replace('.', '/').intern(); // NOI18N
+        assert buf != null && buf.length > 0;
+        addVMSuppliedClassFile(className, classLoaderId, buf, null, null);
+    }
+    
+    /** Adds a VM-supplied class file to the class file cache, but not to this repository's hashtable yet. */
+    public static void addVMSuppliedClassFile(String className, int classLoaderId, byte[] buf, String superClassName, String[] interfaceNames) {
         ClassFileCache.getDefault().addVMSuppliedClassFile(className, classLoaderId, buf);
+        if (buf != null && buf.length == 0) {
+            // register lazy dynamic class
+            try {
+                String location = getClassFileLoc(classLoaderId);
+                DynamicClassInfo lazyClass = new LazyDynamicClassInfo(className, classLoaderId, location, superClassName, interfaceNames);
+                classes.put(className, lazyClass);
+            } catch (IOException ex) { // this should not happen
+                Logger.getLogger(ClassRepository.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     /** Should be called after profiling finishes to cleanup any static data, close opened files, etc. */
@@ -609,11 +637,15 @@ public abstract class ClassRepository implements CommonConstants {
         int realLoaderId = ClassFileCache.getDefault().hasVMSuppliedClassFile(className, classLoaderId);
 
         if (realLoaderId != -1) {
-            String classFileLoc = (LOCATION_VMSUPPLIED + realLoaderId).intern();
+            String classFileLoc = getClassFileLoc(realLoaderId);
             return new DynamicClassInfo(className, classLoaderId, classFileLoc);
         } else {
             return null;
         }
+    }
+
+    static String getClassFileLoc(int realLoaderId) {
+        return (LOCATION_VMSUPPLIED + realLoaderId).intern();
     }
 
     private static DynamicClassInfo lookupClass(String className, int classLoaderId, boolean reportIfNotFound)

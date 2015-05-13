@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.instrumentation;
 
+import java.util.ArrayList;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.classfile.BaseClassInfo;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
@@ -50,7 +51,7 @@ import org.netbeans.lib.profiler.classfile.PlaceholderClassInfo;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.instrumentation.RecursiveMethodInstrumentor.ReachableMethodPlaceholder;
 import org.netbeans.lib.profiler.utils.Wildcards;
-import java.util.ArrayList;
+import org.netbeans.lib.profiler.wireprotocol.RootClassLoadedCommand;
 
 
 /**
@@ -92,10 +93,8 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    Object[] getInitialMethodsToInstrument(String[] loadedClasses, int[] loadedClassLoaderIds,
-                                                  byte[][] cachedClassFileBytes, RootMethods roots) {
-        DynamicClassInfo[] loadedClassInfos = preGetInitialMethodsToInstrument(loadedClasses, loadedClassLoaderIds,
-                                                                               cachedClassFileBytes);
+    Object[] getInitialMethodsToInstrument(RootClassLoadedCommand rootLoaded, RootMethods roots) {
+        DynamicClassInfo[] loadedClassInfos = preGetInitialMethodsToInstrument(rootLoaded);
 
         rootMethods = roots;
 
@@ -387,7 +386,7 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
 
                 if (clazz.isMethodNative(idx) || clazz.isMethodAbstract(idx)
                         || (!clazz.isMethodRoot(idx) && !clazz.isMethodMarker(idx) && !instrFilter.passesFilter(className))
-                        || (className == "java/lang/Object")) { // NOI18N  // Actually, just the Object.<init> method?
+                        || (className == OBJECT_SLASHED_CLASS_NAME)) {  // Actually, just the Object.<init> method?
                     clazz.setMethodUnscannable(idx);
                 } else {
                     bytecode = clazz.getMethodBytecode(idx);
@@ -479,20 +478,20 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
     }
 
     //----------------------------------- Private implementation ------------------------------------------------
-    private DynamicClassInfo[] preGetInitialMethodsToInstrument(String[] loadedClasses, int[] loadedClassLoaderIds,
-                                                                byte[][] cachedClassFileBytes) {
+    private DynamicClassInfo[] preGetInitialMethodsToInstrument(RootClassLoadedCommand rootLoaded) {
         //System.out.println("*** MS2: instr. initial");
         resetLoadedClassData();
-        storeClassFileBytesForCustomLoaderClasses(loadedClasses, loadedClassLoaderIds, cachedClassFileBytes);
+        storeClassFileBytesForCustomLoaderClasses(rootLoaded);
         initInstrMethodData();
 
-        DynamicClassInfo[] loadedClassInfos = null;
+        DynamicClassInfo[] loadedClassInfos;
+        String[] loadedClasses = rootLoaded.getAllLoadedClassNames();
+        int[] loadedClassLoaderIds = rootLoaded.getAllLoadedClassLoaderIds();
         //if (instrumentSpawnedThreads) tmpClassInfos = new DynamicClassInfo[loadedClasses.length];
         loadedClassInfos = new DynamicClassInfo[loadedClasses.length]; //EJB Work: removed the condition in the above line as we need to return the temp array anyway (used to check for multiple roots, see the overloaded getInitialMethodsToInstrument )
 
         for (int i = 0; i < loadedClasses.length; i++) {
-            String className = loadedClasses[i].replace('.', '/').intern(); // NOI18N
-            DynamicClassInfo clazz = javaClassForName(className, loadedClassLoaderIds[i]);
+            DynamicClassInfo clazz = javaClassForName(loadedClasses[i], loadedClassLoaderIds[i]);
 
             if (clazz == null) {
                 continue;

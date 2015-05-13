@@ -94,11 +94,11 @@ public class MethodNameTreeCellRenderer extends EnhancedTreeCellRenderer {
                 } else {
                     return threadIcon;
                 }
-            } else if (cct.isFilteredNode()) {
+            } else if (cct.isFiltered()) {
                 return UIManager.getLookAndFeel().getDisabledIcon(this, super.getClosedIcon(value));
             }
         } else if (value instanceof PresoObjAllocCCTNode) {
-            if (((PresoObjAllocCCTNode)value).isFilteredNode()) {
+            if (((PresoObjAllocCCTNode)value).isFiltered()) {
                 return UIManager.getLookAndFeel().getDisabledIcon(this, super.getClosedIcon(value));
             }
         }
@@ -110,10 +110,10 @@ public class MethodNameTreeCellRenderer extends EnhancedTreeCellRenderer {
     protected String getLabel1Text(Object node, String value) {
         if (node instanceof PrestimeCPUCCTNode) {
             if (((PrestimeCPUCCTNode)node).isThreadNode() ||
-                ((PrestimeCPUCCTNode)node).isFilteredNode())
+                ((PrestimeCPUCCTNode)node).isFiltered())
                 return ""; //NOI18N
         } else if (node instanceof PresoObjAllocCCTNode) {
-            if (((PresoObjAllocCCTNode)node).isFilteredNode())
+            if (((PresoObjAllocCCTNode)node).isFiltered())
                 return ""; //NOI18N
         }
         
@@ -136,10 +136,10 @@ public class MethodNameTreeCellRenderer extends EnhancedTreeCellRenderer {
         if (node instanceof PrestimeCPUCCTNode) {
             if (((PrestimeCPUCCTNode)node).isThreadNode())
                 return value;
-            else if (((PrestimeCPUCCTNode)node).isFilteredNode())
+            else if (((PrestimeCPUCCTNode)node).isFiltered())
                 return ""; // NOI18N
         } else if (node instanceof PresoObjAllocCCTNode) {
-            if (((PresoObjAllocCCTNode)node).isFilteredNode())
+            if (((PresoObjAllocCCTNode)node).isFiltered())
                 return ""; //NOI18N
         }
         
@@ -162,10 +162,10 @@ public class MethodNameTreeCellRenderer extends EnhancedTreeCellRenderer {
         if (node instanceof PrestimeCPUCCTNode) {
             if (((PrestimeCPUCCTNode)node).isThreadNode())
                 return ""; //NOI18N
-            else if (((PrestimeCPUCCTNode)node).isFilteredNode())
+            else if (((PrestimeCPUCCTNode)node).isFiltered())
                 return value;
         } else if (node instanceof PresoObjAllocCCTNode) {
-            if (((PresoObjAllocCCTNode)node).isFilteredNode())
+            if (((PresoObjAllocCCTNode)node).isFiltered())
                 return value;
         }
         
@@ -188,11 +188,11 @@ public class MethodNameTreeCellRenderer extends EnhancedTreeCellRenderer {
                 } else {
                     return threadIcon;
                 }
-            } else if (cct.isFilteredNode()) {
+            } else if (cct.isFiltered()) {
                 return UIManager.getLookAndFeel().getDisabledIcon(this, super.getLeafIcon(value));
             }
         } else if (value instanceof PresoObjAllocCCTNode) {
-            if (((PresoObjAllocCCTNode)value).isFilteredNode()) {
+            if (((PresoObjAllocCCTNode)value).isFiltered()) {
                 return UIManager.getLookAndFeel().getDisabledIcon(this, super.getLeafIcon(value));
             }
         }
@@ -211,11 +211,11 @@ public class MethodNameTreeCellRenderer extends EnhancedTreeCellRenderer {
                 } else {
                     return threadIcon;
                 }
-            } else if (cct.isFilteredNode()) {
+            } else if (cct.isFiltered()) {
                 return UIManager.getLookAndFeel().getDisabledIcon(this, super.getOpenIcon(value));
             }
         } else if (value instanceof PresoObjAllocCCTNode) {
-            if (((PresoObjAllocCCTNode)value).isFilteredNode()) {
+            if (((PresoObjAllocCCTNode)value).isFiltered()) {
                 return UIManager.getLookAndFeel().getDisabledIcon(this, super.getOpenIcon(value));
             }
         }

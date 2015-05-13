@@ -42,6 +42,7 @@
  */
 package org.netbeans.lib.profiler.results.cpu;
 
+import java.util.Collection;
 import org.netbeans.lib.profiler.results.CCTNode;
 
 /**
@@ -55,10 +56,14 @@ public class CPUResultsDiff extends CPUResultsSnapshot {
     
     
     public CPUResultsDiff(CPUResultsSnapshot snapshot1, CPUResultsSnapshot snapshot2) {
-        this.snapshot1 = new CPUResultsSnapshot();
-        this.snapshot1.readFromSnapshot(snapshot1);
-        this.snapshot2 = new CPUResultsSnapshot();
-        this.snapshot2.readFromSnapshot(snapshot2);
+//        this.snapshot1 = new CPUResultsSnapshot();
+//        this.snapshot1.readFromSnapshot(snapshot1);
+//        this.snapshot2 = new CPUResultsSnapshot();
+//        this.snapshot2.readFromSnapshot(snapshot2);
+        this.snapshot1 = snapshot1;
+        this.snapshot2 = snapshot2;
+        
+        threadCCTContainers = snapshot1.threadCCTContainers;
     }
     
     public boolean isCollectingTwoTimeStamps() {
@@ -73,6 +78,7 @@ public class CPUResultsDiff extends CPUResultsSnapshot {
 
     public DiffFlatProfileContainer getFlatProfile(int threadId, int view) {
         // NOTE: only works correctly for threadId == -1 (All Threads)
+        // TODO: resolve correct threadId for snapshot2 !!!
         FlatProfileContainer fpc1 = snapshot1.getFlatProfile(threadId, view);
         FlatProfileContainer fpc2 = snapshot2.getFlatProfile(threadId, view);
         return DiffFlatProfileContainer.create(fpc1, fpc2);
@@ -109,14 +115,30 @@ public class CPUResultsDiff extends CPUResultsSnapshot {
         return snapshot1.getNThreads();
     }
 
-    // Not used for diff
     public PrestimeCPUCCTNode getReverseCCT(int threadId, int methodId, int view) {
-        return null;
+        // TODO: resolve correct threadId for snapshot2
+        PrestimeCPUCCTNode root1 = snapshot1.getReverseCCT(threadId, methodId, view);
+        PrestimeCPUCCTNode root2 = snapshot2.getReverseCCT(threadId, methodId, view);
+        return new DiffCPUCCTNode(root1, root2);
     }
 
     public PrestimeCPUCCTNode getRootNode(int view) {
-        PrestimeCPUCCTNodeBacked root1 = (PrestimeCPUCCTNodeBacked)snapshot1.getRootNode(view);
-        PrestimeCPUCCTNodeBacked root2 = (PrestimeCPUCCTNodeBacked)snapshot2.getRootNode(view);
+        PrestimeCPUCCTNode root1 = snapshot1.getRootNode(view);
+        PrestimeCPUCCTNode root2 = snapshot2.getRootNode(view);
+        return new DiffCPUCCTNode(root1, root2);
+    }
+    
+    public PrestimeCPUCCTNode getRootNode(int view, Collection<Integer> threads, boolean merge) {
+        // TODO: resolve correct threads for snapshot2
+        PrestimeCPUCCTNode root1 = snapshot1.getRootNode(view, threads, merge);
+        PrestimeCPUCCTNode root2 = snapshot2.getRootNode(view, threads, merge);
+        return new DiffCPUCCTNode(root1, root2);
+    }
+    
+    public PrestimeCPUCCTNode getReverseRootNode(int view, Collection<Integer> threads, boolean merge) {
+        // TODO: resolve correct threads for snapshot2
+        PrestimeCPUCCTNode root1 = snapshot1.getReverseRootNode(view, threads, merge);
+        PrestimeCPUCCTNode root2 = snapshot2.getReverseRootNode(view, threads, merge);
         return new DiffCPUCCTNode(root1, root2);
     }
     
@@ -132,23 +154,23 @@ public class CPUResultsDiff extends CPUResultsSnapshot {
     }
     
     public void filterForward(final String filter, final int filterType, final PrestimeCPUCCTNodeBacked root) {
-        PrestimeCPUCCTNodeBacked node1 = ((DiffCPUCCTNode)root).node1;
-        if (node1 != null) snapshot1.filterForward(filter, filterType, node1);
-        
-        PrestimeCPUCCTNodeBacked node2 = ((DiffCPUCCTNode)root).node2;
-        if (node2 != null) snapshot2.filterForward(filter, filterType, node2);
-        
-        super.filterForward(filter, filterType, root);
+//        PrestimeCPUCCTNodeBacked node1 = ((DiffCPUCCTNode)root).node1;
+//        if (node1 != null) snapshot1.filterForward(filter, filterType, node1);
+//        
+//        PrestimeCPUCCTNodeBacked node2 = ((DiffCPUCCTNode)root).node2;
+//        if (node2 != null) snapshot2.filterForward(filter, filterType, node2);
+//        
+//        super.filterForward(filter, filterType, root);
     }
     
     public void saveSortParams(int sortBy, boolean sortOrder, CCTNode node) {
-        PrestimeCPUCCTNodeBacked node1 = ((DiffCPUCCTNode)node).node1;
-        if (node1 != null) snapshot1.saveSortParams(sortBy, sortOrder, node1);
-        
-        PrestimeCPUCCTNodeBacked node2 = ((DiffCPUCCTNode)node).node2;
-        if (node2 != null) snapshot2.saveSortParams(sortBy, sortOrder, node2);
-        
-        super.saveSortParams(sortBy, sortOrder, node);
+//        PrestimeCPUCCTNodeBacked node1 = ((DiffCPUCCTNode)node).node1;
+//        if (node1 != null) snapshot1.saveSortParams(sortBy, sortOrder, node1);
+//        
+//        PrestimeCPUCCTNodeBacked node2 = ((DiffCPUCCTNode)node).node2;
+//        if (node2 != null) snapshot2.saveSortParams(sortBy, sortOrder, node2);
+//        
+//        super.saveSortParams(sortBy, sortOrder, node);
     }
     
     // TODO: used by CPUDiffPanel, fix!

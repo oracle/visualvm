@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -40,40 +40,39 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+package org.netbeans.lib.profiler.ui.components;
 
-package org.netbeans.modules.profiler.v2.ui;
-
-import java.awt.Color;
-import javax.swing.Icon;
-import javax.swing.JLabel;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import org.openide.util.Lookup;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class GrayLabel extends JLabel {
+public class CloseButton {
     
-    public GrayLabel() { super(); }
-    
-    public GrayLabel(Icon icon) { super(icon); }
-    
-    public GrayLabel(String text) { super(text); }
-    
-    public GrayLabel(Icon icon, int alignment) { super(icon, alignment); }
-    
-    public GrayLabel(String text, int alignment) { super(text, alignment); }
-    
-    public GrayLabel(String text, Icon icon, int alignment) { super(text, icon, alignment); }
+    public static JButton create(Runnable onClose) {
+        Provider provider = Lookup.getDefault().lookup(Provider.class);
+        return provider != null ? provider.create(onClose) : new Impl(onClose);
+    }
+    protected CloseButton() {}
     
     
-    public Color getForeground() {
-        return UIUtils.getDisabledLineColor();
+    public static abstract class Provider {
+        
+        public abstract JButton create(Runnable onClose);
+        
     }
     
-    
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(true); // To workaround the 3D look on some LaFs
+    public static class Impl extends JButton {
+        public Impl(final Runnable onClose) {
+            super("Close");
+            if (onClose != null) addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) { onClose.run(); }
+            });
+        }
     }
     
 }

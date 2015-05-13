@@ -47,11 +47,18 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.netbeans.modules.profiler.api.ActionsSupport;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -114,8 +121,30 @@ public final class IdeSnapshotAction implements ActionListener {
             npssFilePath = f.getAbsolutePath();
         }
         TopComponent tc = new IdeSnapshotComponent(npssFileName, npssFilePath);
-        TracerView tracer = new TracerView(model, controller);
-        tc.add(tracer.createComponent(), BorderLayout.CENTER);
+        final JComponent tracer = new TracerView(model, controller).createComponent();
+        tc.add(tracer, BorderLayout.CENTER);
+        
+        InputMap inputMap = tc.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        ActionMap actionMap = tc.getActionMap();
+        
+        final String filterKey = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        Action filterAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                Action action = tracer.getActionMap().get(filterKey);
+                if (action != null && action.isEnabled()) action.actionPerformed(e);
+            }
+        };
+        ActionsSupport.registerAction(filterKey, filterAction, actionMap, inputMap);
+        
+        final String findKey = SearchUtils.FIND_ACTION_KEY;
+        Action findAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                Action action = tracer.getActionMap().get(findKey);
+                if (action != null && action.isEnabled()) action.actionPerformed(e);
+            }
+        };
+        ActionsSupport.registerAction(findKey, findAction, actionMap, inputMap);
+        
         return tc;
     }
 

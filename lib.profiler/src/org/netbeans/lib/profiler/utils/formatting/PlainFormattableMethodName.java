@@ -125,7 +125,7 @@ public class PlainFormattableMethodName implements Formattable {
             this.className = this.className + "*";  // NOI18N
         }
 
-        if (mname == null) {
+        if (mname == null || mname.isEmpty() || mname.equals("*")) { // NOI18N
             // methodName can be null when class- or package-level view is used
             params = ""; // NOI18N
             returnType = ""; // NOI18N
@@ -313,8 +313,8 @@ public class PlainFormattableMethodName implements Formattable {
 
         if ((methodName == null) || (methodName.length() == 0)) {
             return ""; // NOI18N  // Understanding is that class-level view is used
-        } else if ("<clinit>".equals(methodName)) { // NOI18N
-            return methodName;
+//        } else if ("<clinit>".equals(methodName)) { // NOI18N
+//            return methodName;
         } else {
             return methodName + "(" + getParamsString() + ")"; // NOI18N
         }
@@ -344,7 +344,7 @@ public class PlainFormattableMethodName implements Formattable {
         if ((methodName == null) || (methodName.length() == 0)) {
             return ""; // NOI18N  // Understanding is that class-level view is used
         } else if ("<clinit>".equals(methodName)) { // NOI18N
-            return methodName;
+            return methodName + "()";
         } else if ("<init>".equals(methodName)) { // NOI18N
             return methodName + "(" + getParamsString() + ")"; // NOI18N
         } else if ("*".equals(methodName)) { // NOI18N

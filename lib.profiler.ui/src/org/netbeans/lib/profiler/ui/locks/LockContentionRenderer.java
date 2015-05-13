@@ -55,6 +55,9 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  */
 public class LockContentionRenderer extends NormalBoldGrayRenderer {
     
+    private static final Icon THREAD_ICON = Icons.getIcon(ProfilerIcons.THREAD);
+    private static final Icon LOCK_ICON = Icons.getIcon(ProfilerIcons.WINDOW_LOCKS);
+    
     public void setValue(Object value, int row) {
         LockCCTNode node = (LockCCTNode)value;
         
@@ -74,8 +77,8 @@ public class LockContentionRenderer extends NormalBoldGrayRenderer {
         setGrayValue(grayValue);
         
         Icon icon = null;
-        if (lockNode) icon = Icons.getIcon(ProfilerIcons.THREAD);
-        else if (monitorNode) icon = Icons.getIcon(ProfilerIcons.WINDOW_LOCKS);
+        if (lockNode) icon = THREAD_ICON;
+        else if (monitorNode) icon = LOCK_ICON;
         
         setIcon(icon);
     }

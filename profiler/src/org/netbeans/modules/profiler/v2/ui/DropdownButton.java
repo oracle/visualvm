@@ -52,6 +52,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultButtonModel;
 import javax.swing.Icon;
@@ -62,6 +63,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.swing.GenericToolbar;
+import org.netbeans.lib.profiler.ui.swing.SmallButton;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 
@@ -124,7 +127,7 @@ public class DropdownButton extends JPanel {
         setOpaque(false);
         
         if (toolbar) {
-            JToolBar tb = new JToolBar() {
+            JToolBar tb = new GenericToolbar() {
                 public void doLayout() {
                     for (Component c : getComponents())
                         c.setBounds(0, 0, getWidth(), getHeight());
@@ -185,8 +188,31 @@ public class DropdownButton extends JPanel {
     }
     
     
+    public void setToolTipText(String text) {
+        button.setToolTipText(text);
+    }
+    
+    public void setPushedToolTipText(String text) {
+        button.putClientProperty("PUSHED_TOOLTIP", text); // NOI18N
+    }
+    
+    public void setPopupToolTipText(String text) {
+        popup.setToolTipText(text);
+    }
+    
+    
     public void setText(String text) {
-        if (button != null) button.setText(text);
+        if (button != null) {
+            String _text = button.getText();
+            button.setText(text);
+            
+            Component parent = getParent();
+            if (!Objects.equals(text, _text) && parent != null) {
+                parent.invalidate();
+                parent.revalidate();
+                parent.repaint();
+            }
+        }
     }
     
     public String getText() {
@@ -194,7 +220,17 @@ public class DropdownButton extends JPanel {
     }
     
     public void setIcon(Icon icon) {
-        if (button != null) button.setIcon(icon);
+        if (button != null) {
+            Icon _icon = button.getIcon();
+            button.setIcon(icon);
+            
+            Component parent = getParent();
+            if (!Objects.equals(icon, _icon) && parent != null) {
+                parent.invalidate();
+                parent.revalidate();
+                parent.repaint();
+            }
+        }
     }
     
     public Icon getIcon() {
@@ -326,9 +362,12 @@ public class DropdownButton extends JPanel {
         Button(String text, Icon icon) {
             super(text, icon);
             
+            // See GenericToolbar.addImpl()
+            putClientProperty("MetalListener", new Object()); // NOI18N
+            
             setModel(new DefaultButtonModel() {
                 public boolean isRollover() {
-                    return super.isRollover() || (isEnabled() && popup.getModel().isRollover());
+                    return super.isRollover() || (isEnabled() && (popup != null && popup.getModel().isRollover()));
                 }
                 public boolean isPressed() {
                     return pushed || super.isPressed();
@@ -340,6 +379,14 @@ public class DropdownButton extends JPanel {
             
             setHorizontalAlignment(LEADING);
             setDefaultCapable(false);
+        }
+        
+        public String getToolTipText() {
+            if (pushed) {
+                Object pushedTT = getClientProperty("PUSHED_TOOLTIP"); // NOI18N
+                if (pushedTT != null) return pushedTT.toString();
+            }
+            return super.getToolTipText();
         }
         
         protected void fireActionPerformed(ActionEvent e) {
@@ -378,6 +425,9 @@ public class DropdownButton extends JPanel {
         
         Popup() {
             super(" "); // NOI18N
+            
+            // See GenericToolbar.addImpl()
+            putClientProperty("MetalListener", new Object()); // NOI18N
             
             setModel(new DefaultButtonModel() {
                 public boolean isRollover() {

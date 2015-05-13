@@ -60,6 +60,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import javax.swing.*;
+import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.openide.DialogDescriptor;
@@ -134,7 +136,23 @@ import org.openide.util.RequestProcessor;
     "SnapshotInfoPanel_SummaryString=Summary:",
     "SnapshotInfoPanel_CommentsString=User comments:",
     "SnapshotInfoPanel_EditCommentsLink=edit...",
-    "SnapshotInfoPanel_NoCommentsString=none"
+    "SnapshotInfoPanel_NoCommentsString=none",
+    "SnapshotInfoPanel_ProfilingMode=Profiling Mode:",
+    "SnapshotInfoPanel_MethodsAllClasses=Methods - All Classes",
+    "SnapshotInfoPanel_MethodsProjectClasses=Methods - Project Classes",
+    "SnapshotInfoPanel_MethodsSelectedClasses=Methods - Selected Classes",
+    "SnapshotInfoPanel_MethodsSelectedMethods=Methods - Selected Methods",
+    "SnapshotInfoPanel_ObjectsAllClasses=Objects - All Classes",
+    "SnapshotInfoPanel_ObjectsProjectClasses=Objects - Project Classes",
+    "SnapshotInfoPanel_ObjectsSelectedClasses=Objects - Selected Classes",
+    "SnapshotInfoPanel_ProfilingTypeSampling=Sampling",
+    "SnapshotInfoPanel_ProfilingTypeInstrumentation=Instrumentation",
+    "SnapshotInfoPanel_ProjectClasses=Project Classes:",
+    "SnapshotInfoPanel_SelectedClasses=Selected Classes:",
+    "SnapshotInfoPanel_SelectedMethods=Selected Methods:",
+    "SnapshotInfoPanel_RecordLifecycle=Track only live objects:",
+    "SnapshotInfoPanel_RecordAllocations=Record allocations:",
+    "SnapshotInfoPanel_LimitAllocations=Limit allocation calls:"
 })
 public class SnapshotInfoPanel extends JPanel {
 
@@ -325,17 +343,17 @@ public class SnapshotInfoPanel extends JPanel {
         String settingsRes = Icons.getResource(GeneralIcons.INFO);
         htmlText.append("<b><img border='0' align='bottom' src='nbresloc:/").append(settingsRes).append("'>&nbsp;&nbsp;").append(Bundle.SnapshotInfoPanel_SettingsString()).append("</b><br><hr>"); // NOI18N
         htmlText.append("<div style='margin-left: 10px;'>"); // NOI18N
-        htmlText.append("<strong>"); // NOI18N
-        htmlText.append(Bundle.SnapshotInfoPanel_SettingsNameString()).append(" "); // NOI18N
-        htmlText.append("</strong>"); // NOI18N
-        htmlText.append(ps.getSettingsName());
-        htmlText.append("<br>"); // NOI18N
-        htmlText.append("<strong>"); // NOI18N
-        htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
-        htmlText.append("</strong>"); // NOI18N
-
+        
         switch (ps.getProfilingType()) {
             case ProfilingSettings.PROFILE_CPU_STOPWATCH:
+                htmlText.append("<strong>"); // NOI18N
+                htmlText.append(Bundle.SnapshotInfoPanel_SettingsNameString()).append(" "); // NOI18N
+                htmlText.append("</strong>"); // NOI18N
+                htmlText.append(ps.getSettingsName());
+                htmlText.append("<br>"); // NOI18N
+                htmlText.append("<strong>"); // NOI18N
+                htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
+                htmlText.append("</strong>"); // NOI18N
                 htmlText.append(Bundle.SnapshotInfoPanel_CodeRegionString());
                 htmlText.append("<br>"); // NOI18N
                 htmlText.append("<br>"); // NOI18N
@@ -368,45 +386,219 @@ public class SnapshotInfoPanel extends JPanel {
 
                 break;
             case ProfilingSettings.PROFILE_CPU_SAMPLING:
-                htmlText.append(Bundle.SnapshotInfoPanel_CpuSamplingString());
-                htmlText.append("<br>"); // NOI18N
-                htmlText.append("<br>"); // NOI18N
-                appendCPUText(htmlText, ps);
+                Object filter = ps.getSelectedInstrumentationFilter();
+                SimpleFilter sFilter = filter instanceof SimpleFilter ? (SimpleFilter)filter : null;
+                if (filter == null || SimpleFilter.NO_FILTER.equals(sFilter)) {
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_MethodsAllClasses());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeSampling());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<br>"); // NOI18N
+                    appendSampledCPUText(htmlText, false, ps);
+                } else if (sFilter.getFilterType() == SimpleFilter.SIMPLE_FILTER_INCLUSIVE &&
+                                                      "".equals(sFilter.getFilterName())) { // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_MethodsProjectClasses());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeSampling());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<br>"); // NOI18N
+                    appendSampledCPUText(htmlText, true, ps);
+                } else {
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_SettingsNameString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(ps.getSettingsName());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    
+                    htmlText.append(Bundle.SnapshotInfoPanel_CpuSamplingString());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<br>"); // NOI18N
+                    appendCPUText(htmlText, ps);
+                }
 
                 break;
             case ProfilingSettings.PROFILE_CPU_ENTIRE:
-                htmlText.append(Bundle.SnapshotInfoPanel_CpuEntireString());
-                htmlText.append("<br>"); // NOI18N
-                htmlText.append("<br>"); // NOI18N
-                appendCPUText(htmlText, ps);
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_SettingsNameString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(ps.getSettingsName());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    
+                    htmlText.append(Bundle.SnapshotInfoPanel_CpuEntireString());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<br>"); // NOI18N
+                    appendCPUText(htmlText, ps);
 
                 break;
             case ProfilingSettings.PROFILE_CPU_PART:
-                htmlText.append(Bundle.SnapshotInfoPanel_CpuPartString());
-                htmlText.append("<br>"); // NOI18N
-                htmlText.append("<br>"); // NOI18N
-                appendCPUText(htmlText, ps);
+                ClientUtils.SourceCodeSelection[] roots = ps.getInstrumentationRootMethods();
+                if (ps.getStackDepthLimit() != Integer.MAX_VALUE && roots != null && roots.length > 0) {
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    boolean classes;
+                    if (Wildcards.ALLWILDCARD.equals(roots[0].getMethodName())) {
+                        htmlText.append(Bundle.SnapshotInfoPanel_MethodsSelectedClasses());
+                        classes = true;
+                    } else {
+                        htmlText.append(Bundle.SnapshotInfoPanel_MethodsSelectedMethods());
+                        classes = false;
+                    }
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeInstrumentation());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<br>"); // NOI18N
+                    appendInstrumentedCPUText(htmlText, classes, ps);
+                } else {
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_SettingsNameString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(ps.getSettingsName());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    
+                    htmlText.append(Bundle.SnapshotInfoPanel_CpuPartString());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<br>"); // NOI18N
+                    appendCPUText(htmlText, ps);
+                }
 
                 break;
             case ProfilingSettings.PROFILE_MEMORY_SAMPLING:
-                htmlText.append(Bundle.SnapshotInfoPanel_MemorySamplingString());
-                htmlText.append("<br>"); // NOI18N
-                htmlText.append("<br>"); // NOI18N
-                appendMemoryText(htmlText, ps);
+                filter = ps.getSelectedInstrumentationFilter();
+                sFilter = filter instanceof SimpleFilter ? (SimpleFilter)filter : null;
+                if (filter == null || SimpleFilter.NO_FILTER.equals(sFilter)) {
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ObjectsAllClasses());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeSampling());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<br>"); // NOI18N
+                    appendSampledMemoryText(htmlText, false, ps);
+                } else if (sFilter.getFilterType() == SimpleFilter.SIMPLE_FILTER_INCLUSIVE &&
+                           "".equals(sFilter.getFilterName())) { // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ObjectsProjectClasses());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeSampling());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<br>"); // NOI18N
+                    appendSampledMemoryText(htmlText, true, ps);
+                } else {
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_SettingsNameString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(ps.getSettingsName());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_MemorySamplingString());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<br>"); // NOI18N
+                    appendMemoryText(htmlText, ps);
+                }
 
                 break;
             case ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS:
-                htmlText.append(Bundle.SnapshotInfoPanel_MemoryAllocString());
-                htmlText.append("<br>"); // NOI18N
-                htmlText.append("<br>"); // NOI18N
-                appendMemoryText(htmlText, ps);
+                filter = ps.getSelectedInstrumentationFilter();
+                sFilter = filter instanceof SimpleFilter ? (SimpleFilter)filter : null;
+                if (sFilter.getFilterType() == SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT &&
+                                               "".equals(sFilter.getFilterName())) { // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ObjectsSelectedClasses());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeInstrumentation());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<br>"); // NOI18N
+                    appendInstrumentedMemoryText(htmlText, ps);
+                } else {
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_SettingsNameString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(ps.getSettingsName());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+
+                    htmlText.append(Bundle.SnapshotInfoPanel_MemoryAllocString());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<br>"); // NOI18N
+                    appendMemoryText(htmlText, ps);
+                }
 
                 break;
             case ProfilingSettings.PROFILE_MEMORY_LIVENESS:
-                htmlText.append(Bundle.SnapshotInfoPanel_MemoryLivenessString());
-                htmlText.append("<br>"); // NOI18N
-                htmlText.append("<br>"); // NOI18N
-                appendMemoryText(htmlText, ps);
+                filter = ps.getSelectedInstrumentationFilter();
+                sFilter = filter instanceof SimpleFilter ? (SimpleFilter)filter : null;
+                if (sFilter.getFilterType() == SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT &&
+                                               "".equals(sFilter.getFilterName())) { // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ObjectsSelectedClasses());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeInstrumentation());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<br>"); // NOI18N
+                    appendInstrumentedMemoryText(htmlText, ps);
+                } else {
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_SettingsNameString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+                    htmlText.append(ps.getSettingsName());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<strong>"); // NOI18N
+                    htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
+                    htmlText.append("</strong>"); // NOI18N
+
+                    htmlText.append(Bundle.SnapshotInfoPanel_MemoryLivenessString());
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<br>"); // NOI18N
+                    appendMemoryText(htmlText, ps);
+                }
 
                 break;
         }
@@ -452,6 +644,103 @@ public class SnapshotInfoPanel extends JPanel {
             default:
                 return Bundle.SnapshotInfoPanel_InvalidString();
         }
+    }
+    
+    private static void formattedRow(StringBuffer htmlText, String caption, String text) {
+        htmlText.append("<table cellspacing='0' cellpadding='0'>"); // NOI18N
+        
+        htmlText.append("<tr>"); // NOI18N
+        
+        htmlText.append("<td valign='top' align='left'><nobr><b>"); // NOI18N
+        htmlText.append(caption);
+        htmlText.append("</b>&nbsp;&nbsp;</nobr></td>"); // NOI18N
+        
+        htmlText.append("<td valign='top' align='left' width='500'>"); // NOI18N
+        htmlText.append(text);
+        htmlText.append("</td>"); // NOI18N
+        
+        htmlText.append("</tr>"); // NOI18N
+        
+        htmlText.append("</table>"); // NOI18N
+    }
+    
+    private void appendSampledCPUText(StringBuffer htmlText, boolean project, ProfilingSettings ps) {
+        if (project && ps.getSelectedInstrumentationFilter() instanceof SimpleFilter) {
+            String filter = ((SimpleFilter)ps.getSelectedInstrumentationFilter()).getFilterValue();
+            formattedRow(htmlText, Bundle.SnapshotInfoPanel_ProjectClasses(), filter);
+            htmlText.append("<br>"); // NOI18N
+        }
+        
+        htmlText.append("<strong>"); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_SamplingPeriodString()).append(" "); // NOI18N
+        htmlText.append("</strong>"); // NOI18N
+        htmlText.append(ps.getSamplingInterval());
+        htmlText.append(" ms<br>"); // NOI18N
+    }
+    
+    private void appendInstrumentedCPUText(StringBuffer htmlText, boolean classes, ProfilingSettings ps) {
+        String roots = formatRootMethods(ps.getInstrumentationRootMethods());
+        formattedRow(htmlText, classes ? Bundle.SnapshotInfoPanel_SelectedClasses() :
+                                         Bundle.SnapshotInfoPanel_SelectedMethods(), roots);
+        htmlText.append("<br>"); // NOI18N // TODO: formatting
+        
+        htmlText.append("<strong>"); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_CpuTimerString()).append(" "); // NOI18N
+        htmlText.append("</strong>"); // NOI18N
+        htmlText.append(getOnOff(ps.getThreadCPUTimerOn()));
+        htmlText.append("<br>"); // NOI18N
+        htmlText.append("<strong>"); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_ExcludeSleepWaitString()).append(" "); // NOI18N
+        htmlText.append("</strong>"); // NOI18N
+        htmlText.append(getYesNo(ps.getExcludeWaitTime()));
+        htmlText.append("<br>"); // NOI18N
+        htmlText.append("<strong>"); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_LimitProfiledThreadsString()).append(" "); // NOI18N
+        htmlText.append("</strong>"); // NOI18N
+
+        if (ps.getNProfiledThreadsLimit() < 0) {
+            htmlText.append(Bundle.SnapshotInfoPanel_UnlimitedString());
+        } else {
+            htmlText.append(ps.getNProfiledThreadsLimit());
+        }
+
+        htmlText.append("<br>"); // NOI18N
+        htmlText.append("<strong>"); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_StackDepthLimitString()).append(" "); // NOI18N
+        htmlText.append("</strong>"); // NOI18N
+        if (ps.getStackDepthLimit() == Integer.MAX_VALUE) {
+            htmlText.append(Bundle.SnapshotInfoPanel_UnlimitedString());
+        } else {
+            htmlText.append(ps.getStackDepthLimit());
+        }
+
+        htmlText.append("<br>"); // NOI18N
+        
+        htmlText.append("<strong>"); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_InstrumentationSchemeString()).append(" "); // NOI18N
+        htmlText.append("</strong>"); // NOI18N
+        htmlText.append(getCPUProfilingScheme(ps.getInstrScheme()));
+        htmlText.append("<br>"); // NOI18N
+        htmlText.append("<strong>"); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_InstrumentMethodInvokeString()).append(" "); // NOI18N
+        htmlText.append("</strong>"); // NOI18N
+        htmlText.append(getYesNo(ps.getInstrumentMethodInvoke()));
+        htmlText.append("<br>"); //NOI18N
+        htmlText.append("<strong>"); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_InstrumentNewThreadsString()).append(" "); // NOI18N
+        htmlText.append("</strong>"); // NOI18N
+        htmlText.append(getYesNo(ps.getInstrumentSpawnedThreads()));
+        htmlText.append("<br>"); // NOI18N
+        htmlText.append("<strong>"); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_InstrumentGettersSettersString()).append(" "); // NOI18N
+        htmlText.append("</strong>"); // NOI18N
+        htmlText.append(getYesNo(ps.getInstrumentGetterSetterMethods()));
+        htmlText.append("<br>"); // NOI18N
+        htmlText.append("<strong>"); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_InstrumentEmptyMethodsString()).append(" "); // NOI18N
+        htmlText.append("</strong>"); // NOI18N
+        htmlText.append(getYesNo(ps.getInstrumentEmptyMethods()));
+        htmlText.append("<br>"); // NOI18N
     }
 
     private void appendCPUText(StringBuffer htmlText, ProfilingSettings ps) {
@@ -541,6 +830,58 @@ public class SnapshotInfoPanel extends JPanel {
             htmlText.append(getYesNo(ps.getInstrumentEmptyMethods()));
             htmlText.append("<br>"); // NOI18N
         }
+    }
+    
+    private void appendSampledMemoryText(StringBuffer htmlText, boolean project, ProfilingSettings ps) {
+        if (project && ps.getSelectedInstrumentationFilter() instanceof SimpleFilter) {
+            String filter = ((SimpleFilter)ps.getSelectedInstrumentationFilter()).getFilterValue();
+            formattedRow(htmlText, Bundle.SnapshotInfoPanel_ProjectClasses(), filter);
+            htmlText.append("<br>"); // NOI18N
+        }
+        
+//        htmlText.append("<strong>"); // NOI18N
+//        htmlText.append(Bundle.SnapshotInfoPanel_SamplingPeriodString()).append(" "); // NOI18N
+//        htmlText.append("</strong>"); // NOI18N
+//        htmlText.append(ps.getSamplingInterval());
+//        htmlText.append(" ms<br>"); // NOI18N
+    }
+    
+    private void appendInstrumentedMemoryText(StringBuffer htmlText, ProfilingSettings ps) {
+        htmlText.append("<strong>"); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_RecordLifecycle()).append(" "); // NOI18N
+        htmlText.append("</strong>"); // NOI18N
+        htmlText.append(getYesNo(ps.getProfilingType() == ProfilingSettings.PROFILE_MEMORY_LIVENESS));
+        htmlText.append("<br>"); //NOI18N
+        htmlText.append("<strong>"); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_RecordAllocations()).append(" "); // NOI18N
+        htmlText.append("</strong>"); // NOI18N
+        int allocLimit = ps.getAllocStackTraceLimit();
+        htmlText.append(getYesNo(allocLimit != 0));
+        htmlText.append("<br>"); //NOI18N
+        htmlText.append("<strong>"); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_LimitAllocations()).append(" "); // NOI18N
+        htmlText.append("</strong>"); // NOI18N
+        htmlText.append(allocLimit < 0 ? "No" : allocLimit);
+        htmlText.append("<br>"); //NOI18N
+        htmlText.append("<br>"); //NOI18N
+        
+        if (ps.getAllocTrackEvery() == 1) {
+            htmlText.append("<strong>"); // NOI18N
+            htmlText.append(Bundle.SnapshotInfoPanel_TrackingAllInstancesString()).append(" "); // NOI18N
+            htmlText.append("</strong>"); // NOI18N
+        } else {
+            htmlText.append("<strong>"); // NOI18N
+            htmlText.append(Bundle.SnapshotInfoPanel_TrackEveryString()).append(" "); // NOI18N
+            htmlText.append("</strong>"); // NOI18N
+            htmlText.append(Bundle.SnapshotInfoPanel_InstancesCountString("" + ps.getAllocTrackEvery())); // NOI18N
+        }
+        htmlText.append("<br>"); //NOI18N
+
+        htmlText.append("<strong>"); // NOI18N
+        htmlText.append(Bundle.SnapshotInfoPanel_RunGcString()).append(" "); // NOI18N
+        htmlText.append("</strong>"); // NOI18N
+        htmlText.append(getYesNo(ps.getRunGCOnGetResultsInMemoryProfiling()));
+        htmlText.append("<br>"); // NOI18N
     }
 
     private void appendMemoryText(StringBuffer htmlText, ProfilingSettings ps) {

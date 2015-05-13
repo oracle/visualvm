@@ -46,6 +46,7 @@ package org.netbeans.modules.profiler.v2.features;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.util.Set;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -54,13 +55,14 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.memory.MemoryView;
+import org.netbeans.lib.profiler.ui.memory.LiveMemoryView;
+import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.v2.ui.GrayLabel;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -69,16 +71,18 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "ObjectsFeatureUI_liveResults=Live results:",
+    "ObjectsFeatureUI_liveResults=Results:",
     "ObjectsFeatureUI_pauseResults=Pause live results",
     "ObjectsFeatureUI_updateResults=Update live results",
-    "ObjectsFeatureUI_profilingData=Profiling data:",
-    "ObjectsFeatureUI_snapshot=Snapshot"
+    "ObjectsFeatureUI_profilingData=Collected data:",
+    "ObjectsFeatureUI_snapshot=Snapshot",
+    "ObjectsFeatureUI_showAbsolute=Show absolute values",
+    "ObjectsFeatureUI_showDeltas=Show delta values"
 })
 abstract class ObjectsFeatureUI extends FeatureUI {
     
     private ProfilerToolbar toolbar;
-    private MemoryView memoryView;
+    private LiveMemoryView memoryView;
 
     
     // --- External implementation ---------------------------------------------
@@ -124,7 +128,13 @@ abstract class ObjectsFeatureUI extends FeatureUI {
     }
     
     void resetData() {
-        if (memoryView != null) memoryView.resetData();
+        if (lrDeltasButton != null) {
+            lrDeltasButton.setSelected(false);
+        }
+        if (memoryView != null) {
+            memoryView.resetData();
+            memoryView.setDiffView(false);
+        }
     }
     
     
@@ -133,6 +143,7 @@ abstract class ObjectsFeatureUI extends FeatureUI {
     private JLabel lrLabel;
     private JToggleButton lrPauseButton;
     private JButton lrRefreshButton;
+    private JToggleButton lrDeltasButton;
     
     private JLabel pdLabel;
     private JButton pdSnapshotButton;
@@ -147,9 +158,15 @@ abstract class ObjectsFeatureUI extends FeatureUI {
         
         // --- Results ---------------------------------------------------------
         
-        memoryView = new MemoryView(getProfiler().getTargetAppRunner().getProfilerClient(), getSelection(), GoToSource.isAvailable()) {
+        memoryView = new LiveMemoryView(getProfiler().getTargetAppRunner().getProfilerClient(), getSelection()) {
+            public boolean showSourceSupported() {
+                return GoToSource.isAvailable();
+            }
             public void showSource(ClientUtils.SourceCodeSelection value) {
-                GoToSource.openSource(getProject(), value.getClassName(), "", ""); // NOI18N
+                String className = value.getClassName();
+                String methodName = value.getMethodName();
+                String methodSig = value.getMethodSignature();
+                GoToSource.openSource(getProject(), className, methodName, methodSig);
             }
             public void selectForProfiling(ClientUtils.SourceCodeSelection value) {
                 ObjectsFeatureUI.this.selectForProfiling(value);
@@ -167,6 +184,8 @@ abstract class ObjectsFeatureUI extends FeatureUI {
                 }
             }
         };
+        
+        memoryView.putClientProperty("HelpCtx.Key", "ProfileObjects.HelpCtx"); // NOI18N
         
         
         // --- Toolbar ---------------------------------------------------------
@@ -190,12 +209,22 @@ abstract class ObjectsFeatureUI extends FeatureUI {
             }
         };
         lrRefreshButton.setToolTipText(Bundle.ObjectsFeatureUI_updateResults());
+        
+        Icon icon = Icons.getIcon(ProfilerIcons.DELTA_RESULTS);
+        lrDeltasButton = new JToggleButton(icon) {
+            protected void fireActionPerformed(ActionEvent e) {
+                if (!memoryView.setDiffView(isSelected())) setSelected(false);
+                setToolTipText(isSelected() ? Bundle.ObjectsFeatureUI_showAbsolute() :
+                                              Bundle.ObjectsFeatureUI_showDeltas());
+            }
+        };
+        lrDeltasButton.setToolTipText(Bundle.ObjectsFeatureUI_showDeltas());
 
         pdLabel = new GrayLabel(Bundle.ObjectsFeatureUI_profilingData());
 
         pdSnapshotButton = new JButton(TakeSnapshotAction.getInstance());
         pdSnapshotButton.setHideActionText(true);
-        pdSnapshotButton.setText(Bundle.ObjectsFeatureUI_snapshot());
+//        pdSnapshotButton.setText(Bundle.ObjectsFeatureUI_snapshot());
 
         pdResetResultsButton = new JButton(ResetResultsAction.getInstance());
         pdResetResultsButton.setHideActionText(true);
@@ -210,6 +239,8 @@ abstract class ObjectsFeatureUI extends FeatureUI {
         toolbar.addSpace(2);
         toolbar.add(lrPauseButton);
         toolbar.add(lrRefreshButton);
+        toolbar.addSpace(5);
+        toolbar.add(lrDeltasButton);
 
         toolbar.addSpace(2);
         toolbar.addSeparator();
@@ -218,6 +249,7 @@ abstract class ObjectsFeatureUI extends FeatureUI {
         toolbar.add(pdLabel);
         toolbar.addSpace(2);
         toolbar.add(pdSnapshotButton);
+        toolbar.addSpace(3);
         toolbar.add(pdResetResultsButton);
         
         
@@ -234,6 +266,7 @@ abstract class ObjectsFeatureUI extends FeatureUI {
                 boolean running = state == Profiler.PROFILING_RUNNING;
                 lrPauseButton.setEnabled(running);
                 lrRefreshButton.setEnabled(!popupPause && running && lrPauseButton.isSelected());
+                lrDeltasButton.setEnabled(running);
             }
         });
     }

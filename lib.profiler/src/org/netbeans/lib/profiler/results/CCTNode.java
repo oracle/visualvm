@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.results;
 
+import java.util.Enumeration;
 import javax.swing.tree.TreeNode;
 
 
@@ -51,18 +52,70 @@ import javax.swing.tree.TreeNode;
  *
  * @author Jiri Sedlacek
  */
-public interface CCTNode extends TreeNode {
+public abstract class CCTNode implements TreeNode {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public CCTNode getChild(int index);
+    public abstract CCTNode getChild(int index);
 
-    public CCTNode[] getChildren();
+    public abstract CCTNode[] getChildren();
 
-    public int getIndexOfChild(Object child);
+    public abstract int getIndexOfChild(Object child);
 
-    public int getNChildren();
+    public abstract int getNChildren();
 
-    public CCTNode getParent();
+    public abstract CCTNode getParent();
 
     //public boolean hasChildren();
+    
+    
+    // --- Filtering support ---
+    
+    private boolean filtered;
+    
+    public CCTNode createFilteredNode() { return null; }
+    
+    protected void setFilteredNode() { filtered = true; }
+    
+    public boolean isFiltered() { return filtered; }
+    
+    public void merge(CCTNode node) {}
+    
+    // ---
+    
+    
+    //--- TreeNode adapter ---
+    public Enumeration<CCTNode> children() {
+        return new Enumeration<CCTNode>() {
+            private int index = 0;
+            
+            public boolean hasMoreElements() {
+                return getChildren() != null && index < getChildren().length;
+            }
+
+            public CCTNode nextElement() {
+                return getChildren()[index++];
+            }
+        };
+    }
+    
+    public boolean isLeaf() {
+        return getChildCount() == 0;
+    }
+    
+    public boolean getAllowsChildren() {
+        return true;
+    }
+    
+    public int getIndex(TreeNode node) {
+        return getIndexOfChild(node);
+    }
+    
+    public int getChildCount() {
+        return getNChildren();
+    }
+    
+    public TreeNode getChildAt(int index) {
+        return getChild(index);
+    }
+    //---
 }

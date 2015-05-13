@@ -74,7 +74,8 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
             unprofiledClassStatusArray = v;
         }
 
-        boolean hasNewOpcodes(boolean checkForOpcNew) {
+        boolean hasNewOpcodes(boolean checkForOpcNew, boolean checkForOpcNewArray) {
+            if (!checkForOpcNew && !checkForOpcNewArray) return false;
             int loaderId = clazz.getLoaderId();
             int bc;
             int bci = 0;
@@ -82,7 +83,8 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
             while (bci < bytecodesLength) {
                 bc = (bytecodes[bci] & 0xFF);
 
-                if ((bc == opc_new && checkForOpcNew) || (bc == opc_anewarray) || (bc == opc_multianewarray)) {
+                if ((bc == opc_new && checkForOpcNew) || 
+                   ((bc == opc_anewarray || (bc == opc_multianewarray) && checkForOpcNewArray))) {
                     int classCPIdx = getU2(bci + 1);
                     String refClassName = clazz.getRefClassName(classCPIdx);
                     BaseClassInfo refClazz;
@@ -102,7 +104,7 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
                             return true;
                         }
                     }
-                } else if (bc == opc_newarray) {
+                } else if (bc == opc_newarray && checkForOpcNewArray) {
                     int arrayClassId = getByte(bci + 1);
                     BaseClassInfo refClazz = javaClassForPrimitiveArrayType(arrayClassId);
                     int classId = refClazz.getInstrClassId();
@@ -133,6 +135,8 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
     protected int operationCode; // Depending on this value, use different methods to mark/determine if a method needs rewriting
     private final ProfilerEngineSettings engineSettings;
     private final InstrumentationFilter instrFilter;
+    private final boolean instrObjectInit;
+    private final boolean instrArr;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -141,6 +145,8 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
         this.engineSettings = engineSettings;
         instrFilter = engineSettings.getInstrumentationFilter();
         operationCode = STANDARD_INSTRUMENTATION;
+        instrObjectInit = engineSettings.isInstrumentObjectInit();
+        instrArr = engineSettings.isInstrumentArrayAllocation();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -153,13 +159,11 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
      */
     public Object[] getMethodsToInstrumentUponClassUnprofiling(boolean[] unprofiledClassStatusArray) {
         MethodScanerForBannedInstantiations msbi;
-        boolean allAllocations;
         
         operationCode = SELECTIVE_INSTR_REMOVAL;
         initInstrumentationPackData();
         msbi = new MethodScanerForBannedInstantiations();
         msbi.setUnprofiledClassStatusArray(unprofiledClassStatusArray);
-        allAllocations = trackAllAllocations();
         setAllUnprofiledClassStatusArray(unprofiledClassStatusArray);
 
         for (Enumeration e = ClassRepository.getClassEnumerationWithAllVersions(); e.hasMoreElements();) {
@@ -189,7 +193,7 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
 
                 msbi.setClassAndMethod(clazz, i);
 
-                if (msbi.hasNewOpcodes(!allAllocations)) {
+                if (msbi.hasNewOpcodes(!instrObjectInit, instrArr)) {
                     found = true;
                     clazz.setMethodSpecial(i);
                     nInstrMethods++;
@@ -240,15 +244,27 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
     protected byte[] instrumentMethod(DynamicClassInfo clazz, int methodIdx) {
         return InstrumentationFactory.instrumentForMemoryProfiling(clazz, methodIdx, allUnprofiledClassStatusArray, injType,
                                              getRuntimeProfilingPoints(engineSettings.getRuntimeProfilingPoints(),clazz, methodIdx),
-                                             instrFilter, trackAllAllocations());
+                                             instrFilter, !instrObjectInit, instrArr);
+    }
+
+    protected boolean classNeedsInstrumentation(ClassInfo clazz) {
+        if (clazz == null) {
+            return false;
+        }
+        if (!instrObjectInit || instrArr) {
+            return true;
+        }
+        if (instrObjectInit && OBJECT_SLASHED_CLASS_NAME.equals(clazz.getName()) && clazz.getLoaderId() <= 0) {
+            return true;
+        }
+        return false;
     }
 
     protected boolean methodNeedsInstrumentation(ClassInfo clazz, int methodIdx) {
         // TODO: hasNewOpcodes must be called in any case, because it has side effects!
-        boolean all = trackAllAllocations();
-        boolean ni = hasNewOpcodes(clazz, methodIdx, !all);
+        boolean ni = hasNewOpcodes(clazz, methodIdx, !instrObjectInit, instrArr, instrFilter);
         boolean pp = getRuntimeProfilingPoints(engineSettings.getRuntimeProfilingPoints(), clazz, methodIdx).length > 0;
-        boolean oi = all && isObjectConstructor(clazz, methodIdx);
+        boolean oi = instrObjectInit && isObjectConstructor(clazz, methodIdx);
         return ni || pp || oi;
     }
 
@@ -270,7 +286,7 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
     }
     
     static boolean isObjectConstructor(ClassInfo clazz, int methodIdx) {
-        if ("java/lang/Object".equals(clazz.getName())  // NOI18N
+        if (OBJECT_SLASHED_CLASS_NAME.equals(clazz.getName())
                 && clazz.getLoaderId() <= 0
                 && "<init>".equals(clazz.getMethodName(methodIdx))) {   // NOI18N
             return true;

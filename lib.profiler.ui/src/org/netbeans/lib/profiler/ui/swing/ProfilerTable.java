@@ -42,6 +42,7 @@
  */
 package org.netbeans.lib.profiler.ui.swing;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -179,6 +180,11 @@ public class ProfilerTable extends JTable {
         });
     }
     
+    public Color getBackground() {
+        return isEnabled() ? super.getBackground() :
+               UIManager.getColor("TextField.inactiveBackground"); // NOI18N
+    }
+    
     private void focusGained() {
         repaint();
     }
@@ -202,6 +208,9 @@ public class ProfilerTable extends JTable {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 renderer.setValue(value, table.convertRowIndexToModel(row));
                 return renderer.getComponent();
+            }
+            public String toString() {
+                return renderer.toString();
             }
         };
     }
@@ -336,6 +345,19 @@ public class ProfilerTable extends JTable {
         return isCustomRendering;
     }
     
+    // --- String value --------------------------------------------------------
+    
+    // row, column - view index
+    public String getStringValue(int row, int column) {
+        TableCellRenderer renderer = getCellRenderer(row, column);
+        if (renderer instanceof ProfilerRenderer) {
+            ((ProfilerRenderer)renderer).setValue(getValueAt(row, column), row);
+        } else {
+            prepareRenderer(renderer, row, column);
+        }
+        return renderer.toString();
+    }
+    
     // --- Main column ---------------------------------------------------------
     
     private int mainColumn = 0;
@@ -352,7 +374,7 @@ public class ProfilerTable extends JTable {
     
     private boolean shadeUnfocusedSelection = false;
     
-    private boolean internal;
+    boolean internal;
     private Object selection;
     private ListSelectionListener selectionListener;
     
@@ -440,6 +462,16 @@ public class ProfilerTable extends JTable {
         return shadeUnfocusedSelection;
     }
     
+    // --- Traversing rows -----------------------------------------------------
+    
+    int getNextRow(int row) {
+        return ++row == getRowCount() ? 0 : row;
+    }
+    
+    int getPreviousRow(int row) {
+        return --row == -1 ? getRowCount() - 1 : row;
+    }
+    
     // --- Column model --------------------------------------------------------
     
     private boolean columnWidthsValid;
@@ -501,7 +533,15 @@ public class ProfilerTable extends JTable {
     }
     
     protected void updateColumnsPreferredWidth() {
-        if (scrolling || scrollableColumns == null || getRowCount() == 0) return;
+        if (scrolling || scrollableColumns == null) return;
+        
+        ProfilerColumnModel cModel = _getColumnModel();
+        
+        if (getRowCount() == 0) {
+            for (int column : scrollableColumns)
+                cModel.setColumnPreferredWidth(column, 0);
+            return;
+        }
         
         Rectangle visible = getVisibleRect();
         if (visible.isEmpty()) return;
@@ -510,8 +550,6 @@ public class ProfilerTable extends JTable {
         int first = rowAtPoint(visibleP);
         visibleP.translate(0, visible.height - 1);
         int last = rowAtPoint(visibleP);
-        
-        ProfilerColumnModel cModel = _getColumnModel();
         
         for (int column : scrollableColumns) {
             int _column = convertColumnIndexToView(column);
@@ -762,6 +800,23 @@ public class ProfilerTable extends JTable {
     
     // --- Row filter ----------------------------------------------------------
     
+    // false = OR, true = AND
+    public void setFiltersMode(boolean mode) {
+        _getRowSorter().setFiltersMode(mode);
+    }
+    
+    public boolean getFiltersMode() {
+        return _getRowSorter().getFiltersMode();
+    }
+    
+    public void addRowFilter(RowFilter filter) {
+        _getRowSorter().addRowFilter(filter);
+    }
+    
+    public void removeRowFilter(RowFilter filter) {
+        _getRowSorter().removeRowFilter(filter);
+    }
+    
     public void setRowFilter(RowFilter filter) {
         _getRowSorter().setRowFilter(filter);
     }
@@ -796,7 +851,7 @@ public class ProfilerTable extends JTable {
         return providesPopupMenu;
     }
     
-    protected void populatePopup(JPopupMenu popup, Object value) {
+    protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
         // Implementation here
     }
     
@@ -804,10 +859,14 @@ public class ProfilerTable extends JTable {
     
     protected void popupHidden() {}
     
-    protected Object getValueForPopup(int row) {
+    public Object getValueForRow(int row) {
         if (row == -1) return null;
         if (row >= getModel().getRowCount()) return null; // #239936
         return getValueAt(row, convertColumnIndexToView(mainColumn));
+    }
+    
+    public Object getUserValueForRow(int row) {
+        return getValueForRow(row);
     }
     
     protected void processMouseEvent(MouseEvent e) {
@@ -886,8 +945,9 @@ public class ProfilerTable extends JTable {
         };
         
         int row = getSelectedRow();
-        Object value = getValueForPopup(row);
-        populatePopup(popup, value);
+        Object value = getValueForRow(row);
+        Object userValue = getUserValueForRow(row);
+        populatePopup(popup, value, userValue);
         
         if (popup.getComponentCount() > 0) {
             if (e == null) {

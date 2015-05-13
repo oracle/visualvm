@@ -61,17 +61,22 @@ public class RootClassLoadedCommand extends Command {
     private int[] allLoadedClassLoaderIds;
     private String[] allLoadedClassNames;
     private byte[][] cachedClassFileBytes;
+    private int[] allLoadedClassesSuper;
+    private int[][] allLoadedClassesInterfaces;
     private int[] parentLoaderIds; // An index into this table is a loader id, and the value at this index is this loader's parent loader id.
     private int classCount;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    public RootClassLoadedCommand(String[] allLoadedClassNames, int[] loaderIds, byte[][] cachedClassFileBytes, int classCount,
-                                  int[] parentLoaderIds) {
+    public RootClassLoadedCommand(String[] allLoadedClassNames, int[] loaderIds, byte[][] cachedClassFileBytes, 
+                                int[] loadedClassesSuper, int[][] loadedClassesInterfaces,int classCount,
+                                int[] parentLoaderIds) {
         super(ROOT_CLASS_LOADED);
         this.allLoadedClassNames = allLoadedClassNames;
         this.allLoadedClassLoaderIds = loaderIds;
         this.cachedClassFileBytes = cachedClassFileBytes;
+        this.allLoadedClassesSuper = loadedClassesSuper;
+        this.allLoadedClassesInterfaces = loadedClassesInterfaces;
         this.classCount = classCount;
         this.parentLoaderIds = parentLoaderIds;
     }
@@ -98,6 +103,14 @@ public class RootClassLoadedCommand extends Command {
         return res;
     }
 
+    public int[] getAllLoaderSuperClassIds() {
+        return allLoadedClassesSuper;
+    }
+
+    public int[][] getAllLoadedInterfaceIds() {
+        return allLoadedClassesInterfaces;
+    }
+    
     public int[] getParentLoaderIds() {
         // Return a copy, just in case, since this instance of parentLoaderIds is reused when this command is received
         int[] newParentLoaderIds = new int[parentLoaderIds.length];
@@ -108,24 +121,25 @@ public class RootClassLoadedCommand extends Command {
 
     // for debugging
     public String toString() {
-        return super.toString();
+        return "RootClassLoadedCommand, classes: " + classCount + ", " + super.toString();  // NOI18N
     }
 
     void readObject(ObjectInputStream in) throws IOException {
-        int len = in.readInt();
-        allLoadedClassNames = new String[len];
+        byte[] EMPTY = new byte[0];
+        classCount = in.readInt();
+        allLoadedClassNames = new String[classCount];
 
-        for (int i = 0; i < len; i++) {
-            allLoadedClassNames[i] = in.readUTF();
+        for (int i = 0; i < classCount; i++) {
+            allLoadedClassNames[i] = in.readUTF().replace('.', '/').intern();   // NOI18N
         }
 
-        allLoadedClassLoaderIds = new int[len];
+        allLoadedClassLoaderIds = new int[classCount];
 
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < classCount; i++) {
             allLoadedClassLoaderIds[i] = in.readInt();
         }
 
-        len = in.readInt();
+        int len = in.readInt();
 
         if (len == 0) {
             cachedClassFileBytes = null;
@@ -135,15 +149,32 @@ public class RootClassLoadedCommand extends Command {
             for (int i = 0; i < len; i++) {
                 int bytesLen = in.readInt();
 
-                if (bytesLen == 0) {
+                if (bytesLen == -1) {
                     continue;
-                } else {
-                    cachedClassFileBytes[i] = new byte[bytesLen];
-                    in.readFully(cachedClassFileBytes[i]);
                 }
+                if (bytesLen == 0) {
+                   cachedClassFileBytes[i] = EMPTY;
+                   continue;
+                }
+                cachedClassFileBytes[i] = new byte[bytesLen];
+                in.readFully(cachedClassFileBytes[i]);
             }
         }
 
+        allLoadedClassesSuper = new int[classCount];
+        for (int i = 0; i < classCount; i++) {
+            allLoadedClassesSuper[i] = in.readInt();
+        }
+
+        allLoadedClassesInterfaces = new int[classCount][];
+        for (int i = 0; i < classCount; i++) {
+            int ilen = in.readInt();
+            allLoadedClassesInterfaces[i] = new int[ilen];
+            for (int j = 0; j < ilen; j++) {
+                allLoadedClassesInterfaces[i][j] = in.readInt();
+            }
+        }
+        
         len = in.readInt();
         parentLoaderIds = new int[len];
 
@@ -177,14 +208,32 @@ public class RootClassLoadedCommand extends Command {
 
             for (int i = 0; i < classCount; i++) {
                 if (cachedClassFileBytes[i] == null) {
-                    out.writeInt(0);
+                    out.writeInt(-1);
                 } else {
                     out.writeInt(cachedClassFileBytes[i].length);
-                    out.write(cachedClassFileBytes[i]);
+                    if (cachedClassFileBytes[i].length > 0) {
+                        out.write(cachedClassFileBytes[i]);
+                    }
                 }
             }
         }
 
+        for (int i = 0; i < classCount; i++) {
+            out.writeInt(allLoadedClassesSuper[i]);
+        }
+
+        for (int i = 0; i < classCount; i++) {
+            int[] ifacesIds = allLoadedClassesInterfaces[i];
+            if (ifacesIds != null) {
+                out.writeInt(ifacesIds.length);
+                for (int j = 0; j < ifacesIds.length; j++) {
+                    out.writeInt(ifacesIds[j]);
+                }
+            } else {
+                out.writeInt(0);
+            } 
+        }
+        
         out.writeInt(parentLoaderIds.length);
 
         for (int i = 0; i < parentLoaderIds.length; i++) {
@@ -195,6 +244,8 @@ public class RootClassLoadedCommand extends Command {
         allLoadedClassNames = null;
         allLoadedClassLoaderIds = null;
         cachedClassFileBytes = null;
+        allLoadedClassesSuper = null;
+        allLoadedClassesInterfaces = null;
         parentLoaderIds = null;
     }
 }

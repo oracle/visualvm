@@ -51,6 +51,7 @@ import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
@@ -63,6 +64,7 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
@@ -70,6 +72,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
@@ -88,7 +91,6 @@ import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.locks.LockCCTNode;
 import org.netbeans.lib.profiler.results.locks.LockCCTProvider;
 import org.netbeans.lib.profiler.results.locks.LockRuntimeCCTNode;
-import org.netbeans.lib.profiler.ui.ResultsPanel;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.FlatToolBar;
 //import org.netbeans.lib.profiler.ui.components.JTreeTable;
@@ -97,9 +99,12 @@ import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRender
 import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
 import org.netbeans.lib.profiler.ui.components.tree.EnhancedTreeCellRenderer;
+import org.netbeans.lib.profiler.ui.results.DataView;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.McsTimeRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
@@ -113,7 +118,7 @@ import org.openide.util.Lookup;
  *
  * @author Jiri Sedlacek
  */
-public class LockContentionPanel extends ResultsPanel {
+public class LockContentionPanel extends DataView {
     
     // -----
     // I18N String constants
@@ -217,9 +222,41 @@ public class LockContentionPanel extends ResultsPanel {
 //        realTreeTableModel = new LocksTreeTableModel();
         treeTableModel = new LocksTreeTableModel();
         
-        treeTable = new ProfilerTreeTable(treeTableModel, true, true, new int[] { 0 });
+        treeTable = new ProfilerTreeTable(treeTableModel, true, true, new int[] { 0 }) {
+//            protected Object getValueForPopup(int row) {
+//                if (row == -1) return null;
+//                if (row >= getModel().getRowCount()) return null; // #239936
+//                return Integer.valueOf(convertRowIndexToModel(row));
+//            }
+            protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
+//                if (value != null) {
+//                    final int row = ((Integer)value).intValue();
+//                    final boolean sel = selected.contains(row);
+//                    popup.add(new JMenuItem(sel ? BUNDLE().getString("ACT_UnselectThread") :
+//                                                  BUNDLE().getString("ACT_SelectThread")) { // NOI18N
+//                        protected void fireActionPerformed(ActionEvent e) {
+//                            if (sel) selected.remove(row);
+//                            else selected.add(row);
+//                            threadsTableModel.fireTableDataChanged();
+//                            if (!sel) showSelectedColumn();
+//                        }
+//                    });
+//
+//                    popup.addSeparator();
+//                }
+                
+//                popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
+//                    protected void fireActionPerformed(ActionEvent e) { activateFilter(); }
+//                });
+                popup.add(new JMenuItem(SearchUtils.ACTION_FIND) {
+                    protected void fireActionPerformed(ActionEvent e) { activateSearch(); }
+                });
+            }
+        };
         treeTable.setRootVisible(false);
         treeTable.setShowsRootHandles(true);
+        
+        treeTable.providePopupMenu(true);
 //        treeTable.addMouseListener(new MouseListener());
 //        treeTable.addKeyListener(new KeyListener());
 //        treeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -331,6 +368,28 @@ public class LockContentionPanel extends ResultsPanel {
         
         setDefaultSorting();
         prepareResults(); // Disables combo
+        
+        registerActions();
+    }
+    
+    private void registerActions() {
+        ActionMap map = getActionMap();
+        
+//        map.put(FilterUtils.FILTER_ACTION_KEY, new AbstractAction() {
+//            public void actionPerformed(ActionEvent e) { activateFilter(); }
+//        });
+        
+        map.put(SearchUtils.FIND_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) { activateSearch(); }
+        });
+    }
+    
+    protected ProfilerTable getResultsComponent() {
+        return treeTable;
+    }
+    
+    protected boolean hasBottomFilterFindMargin() {
+        return true;
     }
     
     
@@ -343,19 +402,30 @@ public class LockContentionPanel extends ResultsPanel {
         return aggregation;
     }
     
+    public void resetData() {
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                root = null;
+                treeTableModel.setRoot(LockCCTNode.EMPTY);
+            }
+        });
+    }
     
     private class Listener implements LockCCTProvider.Listener {
 
         @Override
-        public void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
+        public void cctEstablished(final RuntimeCCTNode appRootNode, boolean empty) {
             if (!empty && appRootNode instanceof LockRuntimeCCTNode) {
-                root = (LockRuntimeCCTNode)appRootNode;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { root = (LockRuntimeCCTNode)appRootNode; }
+                });
                 prepareResults();
             }
         }
 
         @Override
         public void cctReset() {
+            resetData();
         }  
     }
     

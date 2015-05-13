@@ -56,14 +56,12 @@ import org.openide.util.NbBundle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.heap.GCRoot;
 import org.netbeans.lib.profiler.heap.Instance;
@@ -432,7 +430,7 @@ public class InstancesListController extends AbstractController {
         }
     }
 
-    public static class InstancesListInstanceNode implements HeapWalkerNode, InstancesListNode {
+    public static class InstancesListInstanceNode extends HeapWalkerNode implements InstancesListNode {
 
         private static final NumberFormat numberFormat = NumberFormat.getInstance();
         
@@ -455,38 +453,6 @@ public class InstancesListController extends AbstractController {
 
             this.name = "#" + instance.getInstanceNumber(); // NOI18N
         }
-        
-        //--- TreeNode adapter ---
-        public Enumeration<HeapWalkerNode> children() {
-            return new Enumeration<HeapWalkerNode>() {
-                private int index = 0;
-
-                public boolean hasMoreElements() {
-                    return getChildren() != null && index < getChildren().length;
-                }
-
-                public HeapWalkerNode nextElement() {
-                    return getChildren()[index++];
-                }
-            };
-        }
-
-        public boolean getAllowsChildren() {
-            return false;
-        }
-
-        public int getIndex(TreeNode node) {
-            return getIndexOfChild(node);
-        }
-
-        public int getChildCount() {
-            return getNChildren();
-        }
-
-        public TreeNode getChildAt(int index) {
-            return getChild(index);
-        }
-        //---
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
         

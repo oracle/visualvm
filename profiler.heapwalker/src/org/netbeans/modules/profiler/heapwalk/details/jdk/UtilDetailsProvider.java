@@ -63,10 +63,11 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
     private static final String TIMEZONE_MASK = "java.util.TimeZone+";          // NOI18N
     private static final String PATTERN_MASK = "java.util.regex.Pattern";       // NOI18N
     private static final String CURRENCY_MASK = "java.util.Currency";           // NOI18N
+    private static final String ZIPENTRY_MASK = "java.util.zip.ZipEntry+";           // NOI18N
     
     public UtilDetailsProvider() {
         super(LOGGER_MASK, LEVEL_MASK, LOCALE_MASK, DATE_MASK, TIMEZONE_MASK,
-              PATTERN_MASK, CURRENCY_MASK);
+              PATTERN_MASK, CURRENCY_MASK, ZIPENTRY_MASK);
     }
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -99,6 +100,15 @@ public final class UtilDetailsProvider extends DetailsProvider.Basic {
         } else if (CURRENCY_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(
                     instance, "currencyCode", heap);                            // NOI18N
+        } else if (ZIPENTRY_MASK.equals(className)) {
+            String name = DetailsUtils.getInstanceFieldString(
+                    instance, "name", heap);                                    // NOI18N
+            long size = DetailsUtils.getLongFieldValue(
+                    instance, "size", -1);                                      // NOI18N
+            if (name != null && size != -1) {
+                return String.format("%s, size=%d", name, size);               // NOI18N
+            }
+            return name;
         }
         return null;
     }

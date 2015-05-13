@@ -295,7 +295,7 @@ public final class ProfilingSupport {
 //                            attachWizard.finish(); // wizard correctly finished
 //
 //                            as = attachWizard.getAttachSettings();
-                as = AttachWizard.getDefault().configure(as);
+                as = AttachWizard.getDefault().configure(as, false);
                 if (as == null) return; // cancelled by the user
 //                ProjectStorage.saveAttachSettings(project, as);
             }

@@ -44,6 +44,7 @@
 package org.netbeans.modules.profiler.v2.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -54,6 +55,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.UIManager;
 import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
@@ -112,9 +114,17 @@ public class ToggleButtonMenuItem extends StayOpenPopupMenu.Item {
                 if (UIUtils.isAquaLookAndFeel())
                     putClientProperty("JButton.buttonType", "textured"); // NOI18N
             }
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (UIUtils.isOracleLookAndFeel()) {
+                    Color c = UIManager.getColor("List.selectionBackground"); // NOI18N
+                    g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 140));
+                    g.fillRect(1, 1, getWidth() - 3, getHeight() - 2);
+                }
+            }
         };
 
-        if (UIUtils.isWindowsLookAndFeel() || UIUtils.isMetalLookAndFeel()) {
+        if (UIUtils.isWindowsLookAndFeel() || UIUtils.isMetalLookAndFeel() || UIUtils.isOracleLookAndFeel()) {
             JToolBar t = new JToolBar() {
                 {
                     setLayout(null);
@@ -135,7 +145,7 @@ public class ToggleButtonMenuItem extends StayOpenPopupMenu.Item {
 
         return createMenuIcon(icon, c);
     }
-
+    
     private static Icon createUnselectedIcon(Icon icon) {
         return createMenuIcon(icon, null);
     }
@@ -162,7 +172,7 @@ public class ToggleButtonMenuItem extends StayOpenPopupMenu.Item {
         if (UIUtils.isAquaLookAndFeel()) return 26;
         if (UIUtils.isGTKLookAndFeel()) return 24;
         if (UIUtils.isNimbus()) return 25;
-        if (UIUtils.isOracleLookAndFeel()) return 20;
+        if (UIUtils.isOracleLookAndFeel()) return 21;
         return 22;
     }
 

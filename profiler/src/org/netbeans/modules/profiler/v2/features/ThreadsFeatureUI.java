@@ -45,17 +45,17 @@ package org.netbeans.modules.profiler.v2.features;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
+import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.v2.ui.GrayLabel;
-import org.netbeans.modules.profiler.v2.ui.PopupButton;
 import org.openide.util.NbBundle;
 
 /**
@@ -111,7 +111,7 @@ abstract class ThreadsFeatureUI extends FeatureUI {
     // --- UI ------------------------------------------------------------------
     
     private JLabel shLabel;
-    private PopupButton shFilter;
+    private ActionPopupButton shFilter;
     
     private JLabel tlLabel;
     private Component tlZoomInButton;
@@ -125,17 +125,42 @@ abstract class ThreadsFeatureUI extends FeatureUI {
         
         // --- Results ---------------------------------------------------------
         
-        threadsView = new ThreadsPanel(getProfiler().getThreadsManager(), null);
+        threadsView = new ThreadsPanel(getProfiler().getThreadsManager(), null) {
+            protected void filterSelected(ThreadsPanel.Filter filter) {
+                super.filterSelected(filter);
+                shFilter.selectAction(filter.ordinal());
+            }
+        };
         threadsView.threadsMonitoringEnabled();
+        
+        threadsView.putClientProperty("HelpCtx.Key", "ProfileThreads.HelpCtx"); // NOI18N
         
         
         // --- Toolbar ---------------------------------------------------------
         
         shLabel = new GrayLabel(Bundle.ThreadsFeatureUI_show());
 
-        shFilter = new PopupButton(Bundle.ThreadsFeatureUI_filterAll()) {
-            protected void populatePopup(JPopupMenu popup) { populateFilters(popup); }
+        Action aAll = new AbstractAction() {
+            { putValue(NAME, Bundle.ThreadsFeatureUI_filterAll()); }
+            public void actionPerformed(ActionEvent e) { setFilter(ThreadsPanel.Filter.ALL); }
+            
         };
+        Action aLive = new AbstractAction() {
+            { putValue(NAME, Bundle.ThreadsFeatureUI_filterLive()); }
+            public void actionPerformed(ActionEvent e) { setFilter(ThreadsPanel.Filter.LIVE); }
+            
+        };
+        Action aFinished = new AbstractAction() {
+            { putValue(NAME, Bundle.ThreadsFeatureUI_filterFinished()); }
+            public void actionPerformed(ActionEvent e) { setFilter(ThreadsPanel.Filter.FINISHED); }
+            
+        };
+        Action aSelected = new AbstractAction() {
+            { putValue(NAME, Bundle.ThreadsFeatureUI_filterSelected()); }
+            public void actionPerformed(ActionEvent e) { setSelectedFilter(); }
+            
+        };
+        shFilter = new ActionPopupButton(aAll, aLive, aFinished, aSelected);
         shFilter.setToolTipText(Bundle.ThreadsFeatureUI_threadsFilter());
 
         tlLabel = new GrayLabel(Bundle.ThreadsFeatureUI_timeline());
@@ -180,52 +205,18 @@ abstract class ThreadsFeatureUI extends FeatureUI {
 //        });
     }
     
-    private void populateFilters(JPopupMenu popup) {
-        ThreadsPanel.Filter f = threadsView.getFilter();
-        
-        popup.add(new JRadioButtonMenuItem(Bundle.ThreadsFeatureUI_filterAll(), f == ThreadsPanel.Filter.ALL) {
-            protected void fireActionPerformed(ActionEvent e) { setFilter(ThreadsPanel.Filter.ALL); }
-        });
-        
-        popup.add(new JRadioButtonMenuItem(Bundle.ThreadsFeatureUI_filterLive(), f == ThreadsPanel.Filter.LIVE) {
-            protected void fireActionPerformed(ActionEvent e) { setFilter(ThreadsPanel.Filter.LIVE); }
-        });
-        
-        popup.add(new JRadioButtonMenuItem(Bundle.ThreadsFeatureUI_filterFinished(), f == ThreadsPanel.Filter.FINISHED) {
-            protected void fireActionPerformed(ActionEvent e) { setFilter(ThreadsPanel.Filter.FINISHED); }
-        });
-        
-        popup.add(new JRadioButtonMenuItem(Bundle.ThreadsFeatureUI_filterSelected(), f == ThreadsPanel.Filter.SELECTED) {
-            protected void fireActionPerformed(ActionEvent e) { setSelectedFilter(); }
-        });
-    }
-    
     private void setSelectedFilter() {
         if (threadsView.hasSelectedThreads()) {
             setFilter(ThreadsPanel.Filter.SELECTED);
         } else {
             threadsView.showSelectedColumn();
+            shFilter.selectAction(threadsView.getFilter().ordinal());
             ProfilerDialogs.displayWarning(Bundle.ThreadsFeatureUI_noThreadsMsg());
         }
     }
 
     private void setFilter(ThreadsPanel.Filter filter) {
         threadsView.setFilter(filter);
-        
-        switch (filter) {
-            case ALL:
-                shFilter.setText(Bundle.ThreadsFeatureUI_filterAll());
-                break;
-            case LIVE:
-                shFilter.setText(Bundle.ThreadsFeatureUI_filterLive());
-                break;
-            case FINISHED:
-                shFilter.setText(Bundle.ThreadsFeatureUI_filterFinished());
-                break;
-            case SELECTED:
-                shFilter.setText(Bundle.ThreadsFeatureUI_filterSelected());
-                break;
-        }
     }
     
 }

@@ -95,12 +95,24 @@ public class NormalBoldGrayRenderer extends MultiRenderer {
         normalRenderer.setText(value);
     }
     
+    protected final String getNormalValue() {
+        return normalRenderer.getText();
+    }
+    
     protected void setBoldValue(String value) {
         boldRenderer.setText(value);
     }
     
+    protected final String getBoldValue() {
+        return boldRenderer.getText();
+    }
+    
     protected void setGrayValue(String value) {
         grayRenderer.setText(value);
+    }
+    
+    protected final String getGrayValue() {
+        return grayRenderer.getText();
     }
     
     // Invoke after values are set!
@@ -121,6 +133,11 @@ public class NormalBoldGrayRenderer extends MultiRenderer {
             boldRenderer.setIcon(null);
             grayRenderer.setIcon(null);
         }
+    }
+    
+    
+    public String toString() {
+        return normalRenderer.toString() + boldRenderer.toString() + grayRenderer.toString();
     }
     
 }

@@ -61,6 +61,9 @@ import java.util.Map;
  */
 public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
+    
+    private final LivenessMemoryResultsSnapshot snapshot1;
+    private final LivenessMemoryResultsSnapshot snapshot2;
 
     private float[] avgObjectAge;
     private String[] classNames;
@@ -68,7 +71,7 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
     private int[] nTotalAllocObjects;
 
     //  private int[] objectsCounts;
-    //  private long[] objectsSizePerClass;
+    private long[] objectsSizePerClass;
     private long[] nTrackedAllocObjects;
     private int[] nTrackedLiveObjects;
     private long[] trackedLiveObjectsSize;
@@ -79,6 +82,9 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public LivenessMemoryResultsDiff(LivenessMemoryResultsSnapshot snapshot1, LivenessMemoryResultsSnapshot snapshot2) {
+        this.snapshot1 = snapshot1;
+        this.snapshot2 = snapshot2;
+        
         computeDiff(snapshot1, snapshot2);
     }
 
@@ -93,7 +99,7 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
     }
 
     public String getClassName(int classId) {
-        return null;
+        return classNames[classId];
     }
 
     public String[] getClassNames() {
@@ -154,9 +160,8 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
         return nTrackedLiveObjects;
     }
 
-    //---
     public long[] getObjectsSizePerClass() {
-        return null;
+        return objectsSizePerClass;
     }
 
     public long getTimeTaken() {
@@ -171,8 +176,10 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
         return false;
     }
 
-    public PresoObjAllocCCTNode createPresentationCCT(int classId, boolean dontShowZeroLiveObjAllocPaths) {
-        return null;
+    public PresoObjLivenessCCTNode createPresentationCCT(int classId, boolean dontShowZeroLiveObjAllocPaths) {
+        PresoObjLivenessCCTNode node1 = snapshot1.createPresentationCCT(classId1(classId), dontShowZeroLiveObjAllocPaths);
+        PresoObjLivenessCCTNode node2 = snapshot2.createPresentationCCT(classId2(classId), dontShowZeroLiveObjAllocPaths);
+        return new DiffObjLivenessCCTNode(node1, node2);
     }
 
     public int[] getnTotalAllocObjects() {
@@ -188,9 +195,32 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
         throw new UnsupportedOperationException("Persistence not supported for snapshot comparison"); // NOI18N
     }
 
-    protected PresoObjAllocCCTNode createPresentationCCT(RuntimeMemoryCCTNode rootNode, int classId,
+    protected PresoObjLivenessCCTNode createPresentationCCT(RuntimeMemoryCCTNode rootNode, int classId,
                                                          boolean dontShowZeroLiveObjAllocPaths) {
-        return null;
+        PresoObjLivenessCCTNode node1 = snapshot1.createPresentationCCT(rootNode, classId1(classId), dontShowZeroLiveObjAllocPaths);
+        PresoObjLivenessCCTNode node2 = snapshot2.createPresentationCCT(rootNode, classId2(classId), dontShowZeroLiveObjAllocPaths);
+        return new DiffObjLivenessCCTNode(node1, node2);
+    }
+    
+    private int classId1(int classId) {
+        return classId(classId, snapshot1);
+    }
+    
+    private int classId2(int classId) {
+        return classId(classId, snapshot2);
+    }
+    
+    private int classId(int classId, LivenessMemoryResultsSnapshot snapshot) {
+        if (snapshot == null) return -1;
+        
+        String className = getClassName(classId);
+        String[] classNames = snapshot.getClassNames();
+        if (classNames == null) return -1;
+        
+        for (int i = 0; i < classNames.length; i++)
+            if (classNames[i].equals(className)) return i;
+        
+        return -1;
     }
 
     private void computeDiff(LivenessMemoryResultsSnapshot snapshot1, LivenessMemoryResultsSnapshot snapshot2) {
@@ -201,6 +231,7 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
         // temporary cache for creating diff
         HashMap classNamesIdxMap = new HashMap(s1nClasses);
         ArrayList nTrackedAllocObjectsArr = new ArrayList(s1nClasses);
+        ArrayList objectsSizePerClassArr = new ArrayList(s1nClasses);
         ArrayList nTrackedLiveObjectsArr = new ArrayList(s1nClasses);
         ArrayList maxSurvGenArr = new ArrayList(s1nClasses);
         ArrayList avgObjectAgeArr = new ArrayList(s1nClasses);
@@ -210,6 +241,7 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
         // fill the cache with negative values from snapshot1
         String[] s1ClassNames = snapshot1.getClassNames();
         long[] s1NTrackedAllocObjects = snapshot1.getNTrackedAllocObjects();
+        long[] s1ObjectsSizePerClass = snapshot1.getObjectsSizePerClass();
         int[] s1NTrackedLiveObjects = snapshot1.getNTrackedLiveObjects();
         int[] s1MaxSurvGen = snapshot1.getMaxSurvGen();
         float[] s1AvgObjectAge = snapshot1.getAvgObjectAge();
@@ -226,6 +258,7 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
 
                     int classIndex = classIdx.intValue();
                     long nTrackedAllocObjects = ((Long) nTrackedAllocObjectsArr.get(classIndex)).longValue();
+                    long objectsSizePerClass = ((Long) objectsSizePerClassArr.get(classIndex)).longValue();
                     int nTrackedLiveObjects = ((Integer) nTrackedLiveObjectsArr.get(classIndex)).intValue();
                     int maxSurvGen = ((Integer) maxSurvGenArr.get(classIndex)).intValue();
                     float avgObjectAge = ((Float) avgObjectAgeArr.get(classIndex)).floatValue();
@@ -233,6 +266,7 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
                     int nTotalAllocObjects = ((Integer) nTotalAllocObjectsArr.get(classIndex)).intValue();
 
                     nTrackedAllocObjectsArr.set(classIndex, new Long(nTrackedAllocObjects - s1NTrackedAllocObjects[i]));
+                    objectsSizePerClassArr.set(classIndex, new Long(objectsSizePerClass - s1ObjectsSizePerClass[i]));
                     nTrackedLiveObjectsArr.set(classIndex, Integer.valueOf(nTrackedLiveObjects - s1NTrackedLiveObjects[i]));
                     maxSurvGenArr.set(classIndex, Integer.valueOf(maxSurvGen - s1MaxSurvGen[i]));
                     avgObjectAgeArr.set(classIndex, new Float(avgObjectAge - s1AvgObjectAge[i]));
@@ -241,6 +275,7 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
                 } else {
                     classNamesIdxMap.put(s1ClassNames[i], Integer.valueOf(idx));
                     nTrackedAllocObjectsArr.add(new Long(0 - s1NTrackedAllocObjects[i]));
+                    objectsSizePerClassArr.add(new Long(0 - s1ObjectsSizePerClass[i]));
                     nTrackedLiveObjectsArr.add(Integer.valueOf(0 - s1NTrackedLiveObjects[i]));
                     maxSurvGenArr.add(Integer.valueOf(0 - s1MaxSurvGen[i]));
                     avgObjectAgeArr.add(new Float(0 - s1AvgObjectAge[i]));
@@ -254,6 +289,7 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
         // create diff using values from snapshot2
         String[] s2ClassNames = snapshot2.getClassNames();
         long[] s2NTrackedAllocObjects = snapshot2.getNTrackedAllocObjects();
+        long[] s2ObjectsSizePerClass = snapshot2.getObjectsSizePerClass();
         int[] s2NTrackedLiveObjects = snapshot2.getNTrackedLiveObjects();
         int[] s2MaxSurvGen = snapshot2.getMaxSurvGen();
         float[] s2AvgObjectAge = snapshot2.getAvgObjectAge();
@@ -263,6 +299,7 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
         for (int i = 0; i < s2nClasses; i++) {
             String className = s2ClassNames[i];
             long nTrackedAllocObject = s2NTrackedAllocObjects[i];
+            long objectSizePerClass = s2ObjectsSizePerClass[i];
             int nTrackedLiveObject = s2NTrackedLiveObjects[i];
             int maxSGen = s2MaxSurvGen[i];
             float avtOAge = s2AvgObjectAge[i];
@@ -279,6 +316,9 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
                     nTrackedAllocObjectsArr.set(classIndex,
                                                 new Long(((Long) nTrackedAllocObjectsArr.get(classIndex)).longValue()
                                                          + nTrackedAllocObject));
+                    objectsSizePerClassArr.set(classIndex,
+                                                new Long(((Long) objectsSizePerClassArr.get(classIndex)).longValue()
+                                                         + objectSizePerClass));
                     nTrackedLiveObjectsArr.set(classIndex,
                                                Integer.valueOf(((Integer) nTrackedLiveObjectsArr.get(classIndex)).intValue()
                                                            + nTrackedLiveObject));
@@ -294,6 +334,7 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
                     // class not present in snapshot1
                     classNamesIdxMap.put(className, Integer.valueOf(nTrackedAllocObjectsArr.size()));
                     nTrackedAllocObjectsArr.add(new Long(nTrackedAllocObject));
+                    objectsSizePerClassArr.add(new Long(objectSizePerClass));
                     nTrackedLiveObjectsArr.add(Integer.valueOf(nTrackedLiveObject));
                     maxSurvGenArr.add(Integer.valueOf(maxSGen));
                     avgObjectAgeArr.add(new Float(avtOAge));
@@ -307,6 +348,7 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
         nClasses = classNamesIdxMap.size();
         classNames = new String[nClasses];
         nTrackedAllocObjects = new long[nClasses];
+        objectsSizePerClass = new long[nClasses];
         nTrackedLiveObjects = new int[nClasses];
         maxSurvGen = new int[nClasses];
         avgObjectAge = new float[nClasses];
@@ -325,6 +367,7 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
 
             classNames[index] = className;
             nTrackedAllocObjects[index] = ((Long) nTrackedAllocObjectsArr.get(classIndex)).longValue();
+            objectsSizePerClass[index] = ((Long) objectsSizePerClassArr.get(classIndex)).longValue();
             nTrackedLiveObjects[index] = ((Integer) nTrackedLiveObjectsArr.get(classIndex)).intValue();
             maxSurvGen[index] = ((Integer) maxSurvGenArr.get(classIndex)).intValue();
             avgObjectAge[index] = ((Float) avgObjectAgeArr.get(classIndex)).floatValue();

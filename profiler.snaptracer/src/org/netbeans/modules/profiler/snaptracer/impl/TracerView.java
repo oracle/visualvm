@@ -53,28 +53,33 @@ import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
-import java.lang.ref.WeakReference;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.*;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.modules.profiler.snaptracer.TracerPackage;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
-import org.netbeans.lib.profiler.ui.cpu.CCTDisplay;
-import org.netbeans.modules.profiler.CPUSnapshotPanel;
+import org.netbeans.lib.profiler.ui.cpu.SnapshotCPUView;
+import org.netbeans.lib.profiler.ui.results.DataView;
+import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.ui.swing.FilterUtils;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
+import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.LoadedSnapshot;
+import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.SampledCPUSnapshot;
-import org.netbeans.modules.profiler.SnapshotPanel;
-import org.netbeans.modules.profiler.SnapshotResultsWindow;
+import org.netbeans.modules.profiler.actions.CompareSnapshotsAction;
 import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.Lookups;
 
 /**
  *
@@ -82,21 +87,16 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Tomas Hurka
  */
 final class TracerView {
-
-    private static List<WeakReference<TracerView>> views = new ArrayList();
-
+    
     private final TracerModel model;
     private final TracerController controller;
     private LoadedSnapshot lsF;
     private TimelineView timelineView;
-    private FindMethodAction findMethod;
-    
-    private SnapshotPanel.State lastState;
+    private SnapshotView snapshotView;
     
     TracerView(TracerModel model, TracerController controller) {
         this.model = model;
         this.controller = controller;
-        findMethod = new FindMethodAction();
     }
 
     protected JComponent createComponent() {
@@ -150,6 +150,22 @@ final class TracerView {
                 initData(component, container);
                 // init required listeners - timeline selection
                 initListeners(component);
+            }
+        });
+        
+        ActionMap map = component.getActionMap();
+        
+        map.put(FilterUtils.FILTER_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                if (snapshotView != null && snapshotView.isShowing())
+                    snapshotView.getActionMap().get(FilterUtils.FILTER_ACTION_KEY).actionPerformed(e);
+            }
+        });
+        
+        map.put(SearchUtils.FIND_ACTION_KEY, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                if (snapshotView != null && snapshotView.isShowing())
+                    snapshotView.getActionMap().get(SearchUtils.FIND_ACTION_KEY).actionPerformed(e);
             }
         });
 
@@ -244,11 +260,25 @@ final class TracerView {
         lsF = ls;
 
         if (lsF != null) {
-            register(this);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    SnapshotResultsWindow w = new SnapshotResultsWindow(lsF, 1, false);
-                    addContents(p, w);
+                    CPUResultsSnapshot s = (CPUResultsSnapshot)lsF.getSnapshot();
+                    if (snapshotView == null) {
+                        CompareSnapshotsAction aCompare = new CompareSnapshotsAction(lsF);
+                        ResultsManager.SnapshotHandle handle = new ResultsManager.SnapshotHandle() {
+                            public LoadedSnapshot getSnapshot() { return lsF; }
+                        };
+                        ExportUtils.Exportable exporter = ResultsManager.getDefault().createSnapshotExporter(handle);
+                        snapshotView = new SnapshotView(s, aCompare, exporter);
+                        aCompare.setPerformer(new CompareSnapshotsAction.Performer() {
+                            public void compare(LoadedSnapshot snapshot) {
+                                snapshotView.setRefSnapshot((CPUResultsSnapshot)snapshot.getSnapshot());
+                            }
+                        });
+                    } else {
+                        snapshotView.setData(s);
+                    }
+                    addContents(p, snapshotView);
                 }
             });
         }
@@ -288,17 +318,13 @@ final class TracerView {
     private void addContents(JComponent container, JComponent contents) {
         BorderLayout layout = (BorderLayout)container.getLayout();
         Component oldContents = layout.getLayoutComponent(BorderLayout.CENTER);
-        if (oldContents != null) {
-            if (oldContents instanceof SnapshotResultsWindow)
-                lastState = ((SnapshotResultsWindow)oldContents).getState();
-            container.remove(oldContents);
+        if (oldContents != contents) {
+            if (oldContents != null) container.remove(oldContents);
+            container.add(contents, BorderLayout.CENTER);
+            contents.requestFocusInWindow();
+            container.revalidate();
+            container.repaint();
         }
-        if (contents instanceof SnapshotResultsWindow)
-            ((SnapshotResultsWindow)contents).setState(lastState);
-        container.add(contents, BorderLayout.CENTER);
-        contents.requestFocusInWindow();
-        container.revalidate();
-        container.repaint();
     }
 
     void showURL(String urls) {
@@ -311,65 +337,65 @@ final class TracerView {
             GoToSource.openSource(null, className, method, linenumber);
         }
     }
-
-    private static void register(TracerView view) {
-        views.add(new WeakReference(view));
-    }
     
-    private static TracerView getTracerView(LoadedSnapshot ls) {
-        Iterator<WeakReference<TracerView>> it = views.iterator();
+    private final class SnapshotView extends SnapshotCPUView {
         
-        while(it.hasNext()) {
-            TracerView view = it.next().get();
-            
-            if (view == null) {
-                it.remove();
-            } else {
-                if (view.lsF == ls) {
-                    return view;
+        SnapshotView(CPUResultsSnapshot snapshot, Action compare, ExportUtils.Exportable exporter) {
+            super(snapshot, true, null, compare, null, exporter);
+        }
+        
+        void setData(CPUResultsSnapshot snapshot) {
+            super.setSnapshot(snapshot, true);
+        }
+
+        public boolean showSourceSupported() {
+            return GoToSource.isAvailable();
+        }
+        
+        public void showSource(ClientUtils.SourceCodeSelection value) {
+            String className = value.getClassName();
+            String methodName = value.getMethodName();
+            String methodSig = value.getMethodSignature();
+            GoToSource.openSource(null, className, methodName, methodSig);
+        }
+        
+        @NbBundle.Messages({
+            "LBL_ProfileClass=Profile Class",
+            "LBL_ProfileMethod=Profile Method"                
+        })
+        public void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    String name = Wildcards.ALLWILDCARD.equals(value.getMethodName()) ?
+                                  Bundle.LBL_ProfileClass() : Bundle.LBL_ProfileMethod();
+                    ProfilerSession.findAndConfigure(Lookups.fixed(value), null, name);
                 }
+            });
+        }
+        
+        protected void customizeNodePopup(DataView invoker, JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
+            if (value instanceof PrestimeCPUCCTNode) {
+                popup.addSeparator();
+                popup.add(new FindMethodAction((PrestimeCPUCCTNode)value));
             }
         }
-        return null;
-    }
-    
-    @ServiceProvider(service=CPUSnapshotPanel.CCTPopupEnhancer.class)
-    public static final class CCTEnhancer implements CPUSnapshotPanel.CCTPopupEnhancer {
-
-        @Override
-        public void enhancePopup(JPopupMenu popup, LoadedSnapshot snapshot, CCTDisplay cctDisplay) {
-            TracerView tv = getTracerView(snapshot);
-            
-            if (tv != null) {
-                tv.findMethod.enhancePopup(popup,cctDisplay);
-            }
-        }
-
-        @Override
-        public void enableDisablePopup(LoadedSnapshot snapshot, PrestimeCPUCCTNode node) {
-            TracerView tv = getTracerView(snapshot);
-            
-            if (tv != null) {
-                tv.findMethod.enableDisablePopup(node);
-            }
-        }
-
+        
     }
     
     private class FindMethodAction extends AbstractAction {
         
-        private CCTDisplay cctDisplay;
-        private PrestimeCPUCCTNode node;
+        private final PrestimeCPUCCTNode node;
         
         @NbBundle.Messages("LBL_FindMethod=Select intervals")
-        private FindMethodAction() {
+        private FindMethodAction(PrestimeCPUCCTNode node) {
             super(Bundle.LBL_FindMethod());
+            this.node = node;
+            setEnabled(isRegular(node));
         }
         
         @NbBundle.Messages("LBL_SelectingIntervals=Selecting method intervals...")
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            assert cctDisplay != null;
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
                     ProgressHandle pHandle = null;
@@ -402,19 +428,8 @@ final class TracerView {
             });
         }
 
-        private void enhancePopup(JPopupMenu popup, CCTDisplay cctd) {
-            popup.add(new JPopupMenu.Separator());
-            popup.add(new JMenuItem(findMethod));
-            cctDisplay = cctd;
-        }
-
         private boolean isRegular(PrestimeCPUCCTNode n) {
-            return  n.getThreadId() != -1 && n.getMethodId() != 0 && !n.isFilteredNode();
-        }
-        
-        private void enableDisablePopup(PrestimeCPUCCTNode n) {
-            node = n;
-            setEnabled(isRegular(node));
+            return n.getThreadId() != -1 && n.getMethodId() != 0 && !n.isFiltered();
         }
 
     }

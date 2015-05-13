@@ -47,6 +47,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 
 
@@ -74,16 +75,65 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
     public float avgObjectAge;
     public int nLiveObjects;
     public int survGen;
+    public int nTotalAllocObjects = -1; // Only populated for root nodes
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
+    public static PresoObjLivenessCCTNode rootNode(PresoObjLivenessCCTNode[] children) {
+        PresoObjLivenessCCTNode root = new PresoObjLivenessCCTNode();
+        root.setChildren(children);
+        return root;
+    }
+    
+    public PresoObjLivenessCCTNode(String className, long nCalls, long totalObjSize, int nLiveObjects, int nTotalAllocObjects, float avgObjectAge, int survGen) {
+        super(className, nCalls, totalObjSize);
+        this.nLiveObjects = nLiveObjects;
+        this.nTotalAllocObjects = nTotalAllocObjects;
+        this.avgObjectAge = avgObjectAge;
+        this.survGen = survGen;
+    }
+    
+    PresoObjLivenessCCTNode() {}
+    
     protected PresoObjLivenessCCTNode(RuntimeMemoryCCTNode rtNode) {
         super(rtNode);
     }
+    
+    
+    // --- Filtering support
+    
+    public PresoObjLivenessCCTNode createFilteredNode() {
+        PresoObjLivenessCCTNode filtered = new PresoObjLivenessCCTNode();
+        setupFilteredNode(filtered);        
+        return filtered;
+    }
+    
+     protected void setupFilteredNode(PresoObjLivenessCCTNode filtered) {
+        super.setupFilteredNode(filtered);
+        
+        filtered.nLiveObjects = nLiveObjects;
+        filtered.avgObjectAge = avgObjectAge;
+        filtered.survGen = survGen;
+    }
+    
+    public void merge(CCTNode node) {
+        if (node instanceof PresoObjLivenessCCTNode) {
+            PresoObjLivenessCCTNode _node = (PresoObjLivenessCCTNode)node;
+            
+            nLiveObjects += _node.nLiveObjects;
+            // TODO: use a more precise aggregation algorithm!!!
+            avgObjectAge = Math.max(avgObjectAge, _node.avgObjectAge);
+            survGen = Math.max(survGen, _node.survGen);
+            
+            super.merge(node);
+        }
+    }
+    
+    // ---
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    public static PresoObjAllocCCTNode createPresentationCCTFromSnapshot(LivenessMemoryResultsSnapshot snapshot,
+    public static PresoObjLivenessCCTNode createPresentationCCTFromSnapshot(LivenessMemoryResultsSnapshot snapshot,
                                                                          RuntimeMemoryCCTNode rootRuntimeNode,
                                                                          String classTypeName, int curEpoch,
                                                                          boolean dontShowZeroLiveObjAllocPaths) {
@@ -92,7 +142,7 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
 
         SurvGenSet survGens = new SurvGenSet();
 
-        PresoObjAllocCCTNode rootNode = generateMirrorNode(rootRuntimeNode, survGens);
+        PresoObjLivenessCCTNode rootNode = generateMirrorNode(rootRuntimeNode, survGens);
 
         if (rootNode != null) { // null means there are no live objects for any allocation path
             assignNamesToNodesFromSnapshot(snapshot, rootNode, classTypeName);
@@ -119,58 +169,58 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
         return rootNode;
     }
     
-    void merge(PresoObjAllocCCTNode node) {
-        PresoObjLivenessCCTNode nodel = (PresoObjLivenessCCTNode)node;
-        nLiveObjects += nodel.nLiveObjects;
-        // TODO: use a more precise aggregation algorithm!!!
-        avgObjectAge = Math.max(avgObjectAge, nodel.avgObjectAge);
-        survGen = Math.max(survGen, nodel.survGen);
-        
-        super.merge(node);
-    }
+//    void merge(PresoObjAllocCCTNode node) {
+//        PresoObjLivenessCCTNode nodel = (PresoObjLivenessCCTNode)node;
+//        nLiveObjects += nodel.nLiveObjects;
+//        // TODO: use a more precise aggregation algorithm!!!
+//        avgObjectAge = Math.max(avgObjectAge, nodel.avgObjectAge);
+//        survGen = Math.max(survGen, nodel.survGen);
+//        
+//        super.merge(node);
+//    }
 
     public void sortChildren(int sortBy, boolean sortOrder) {
-        int nChildren = getNChildren();
-
-        if (nChildren == 0) {
-            return;
-        }
-
-        for (int i = 0; i < nChildren; i++) {
-            children[i].sortChildren(sortBy, sortOrder);
-        }
-
-        if (nChildren > 1) {
-            switch (sortBy) {
-                case SORT_BY_LIVE_OBJ_SIZE:
-                    sortChildrenByLiveObjSize(sortOrder);
-
-                    break;
-                case SORT_BY_LIVE_OBJ_NUMBER:
-                    sortChildrenByLiveObjNumber(sortOrder);
-
-                    break;
-                case SORT_BY_ALLOC_OBJ:
-                    sortChildrenByAllocObjNumber(sortOrder);
-
-                    break;
-                case SORT_BY_AVG_AGE:
-                    sortChildrenByAvgAge(sortOrder);
-
-                    break;
-                case SORT_BY_SURV_GEN:
-                    sortChildrenBySurvGen(sortOrder);
-
-                    break;
-                case SORT_BY_NAME:
-                    sortChildrenByName(sortOrder);
-
-                    break;
-            }
-        }
+//        int nChildren = getNChildren();
+//
+//        if (nChildren == 0) {
+//            return;
+//        }
+//
+//        for (int i = 0; i < nChildren; i++) {
+//            children[i].sortChildren(sortBy, sortOrder);
+//        }
+//
+//        if (nChildren > 1) {
+//            switch (sortBy) {
+//                case SORT_BY_LIVE_OBJ_SIZE:
+//                    sortChildrenByLiveObjSize(sortOrder);
+//
+//                    break;
+//                case SORT_BY_LIVE_OBJ_NUMBER:
+//                    sortChildrenByLiveObjNumber(sortOrder);
+//
+//                    break;
+//                case SORT_BY_ALLOC_OBJ:
+//                    sortChildrenByAllocObjNumber(sortOrder);
+//
+//                    break;
+//                case SORT_BY_AVG_AGE:
+//                    sortChildrenByAvgAge(sortOrder);
+//
+//                    break;
+//                case SORT_BY_SURV_GEN:
+//                    sortChildrenBySurvGen(sortOrder);
+//
+//                    break;
+//                case SORT_BY_NAME:
+//                    sortChildrenByName(sortOrder);
+//
+//                    break;
+//            }
+//        }
     }
 
-    protected static PresoObjAllocCCTNode generateMirrorNode(RuntimeMemoryCCTNode rtNode, SurvGenSet survGens) {
+    protected static PresoObjLivenessCCTNode generateMirrorNode(RuntimeMemoryCCTNode rtNode, SurvGenSet survGens) {
         PresoObjLivenessCCTNode thisNode = null;
 
         if (rtNode instanceof RuntimeObjLivenessTermCCTNode) { // A "terminal" node may occur even in the middle of the call chain
@@ -256,42 +306,42 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
         return thisNode;
     }
 
-    protected void sortChildrenByAvgAge(boolean sortOrder) {
-        int len = children.length;
-        float[] values = new float[len];
-
-        for (int i = 0; i < len; i++) {
-            values[i] = ((PresoObjLivenessCCTNode) children[i]).avgObjectAge;
-        }
-
-        sortFloats(values, sortOrder);
-    }
-
-    protected void sortChildrenByLiveObjNumber(boolean sortOrder) {
-        int len = children.length;
-        int[] values = new int[len];
-
-        for (int i = 0; i < len; i++) {
-            values[i] = ((PresoObjLivenessCCTNode) children[i]).nLiveObjects;
-        }
-
-        sortInts(values, sortOrder);
-    }
-
-    protected void sortChildrenByLiveObjSize(boolean sortOrder) {
-        sortChildrenByAllocObjSize(sortOrder);
-    }
-
-    protected void sortChildrenBySurvGen(boolean sortOrder) {
-        int len = children.length;
-        int[] values = new int[len];
-
-        for (int i = 0; i < len; i++) {
-            values[i] = ((PresoObjLivenessCCTNode) children[i]).survGen;
-        }
-
-        sortInts(values, sortOrder);
-    }
+//    protected void sortChildrenByAvgAge(boolean sortOrder) {
+//        int len = children.length;
+//        float[] values = new float[len];
+//
+//        for (int i = 0; i < len; i++) {
+//            values[i] = ((PresoObjLivenessCCTNode) children[i]).avgObjectAge;
+//        }
+//
+//        sortFloats(values, sortOrder);
+//    }
+//
+//    protected void sortChildrenByLiveObjNumber(boolean sortOrder) {
+//        int len = children.length;
+//        int[] values = new int[len];
+//
+//        for (int i = 0; i < len; i++) {
+//            values[i] = ((PresoObjLivenessCCTNode) children[i]).nLiveObjects;
+//        }
+//
+//        sortInts(values, sortOrder);
+//    }
+//
+//    protected void sortChildrenByLiveObjSize(boolean sortOrder) {
+//        sortChildrenByAllocObjSize(sortOrder);
+//    }
+//
+//    protected void sortChildrenBySurvGen(boolean sortOrder) {
+//        int len = children.length;
+//        int[] values = new int[len];
+//
+//        for (int i = 0; i < len; i++) {
+//            values[i] = ((PresoObjLivenessCCTNode) children[i]).survGen;
+//        }
+//
+//        sortInts(values, sortOrder);
+//    }
 
     @Override
     public void exportXMLData(ExportDataDumper eDD,String indent) {

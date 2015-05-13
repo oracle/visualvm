@@ -66,6 +66,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
@@ -92,6 +93,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
@@ -125,8 +127,85 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
     
     
+    // --- Traversing nodes ---
+    
+    TreePath getRootPath() {
+        return new TreePath(model.treeModel.getRoot());
+    }
+    
+    TreePath getSelectionPath() {
+        return tree.getSelectionPath();
+    }
+    
+    TreePath getNextPath(TreePath path) {
+        return getNextPath(path, true);
+    }
+    
+    private TreePath getNextPath(TreePath path, boolean down) {
+        TreeModel _model = model.treeModel;
+        TreeNode node = (TreeNode)path.getLastPathComponent();
+        if (down && _model.getChildCount(node) > 0)
+            return path.pathByAddingChild(_model.getChild(node, 0));
+
+        TreePath parentPath = path.getParentPath();
+        TreeNode parent = (TreeNode)parentPath.getLastPathComponent();
+        int idx = _model.getIndexOfChild(parent, node) + 1;
+
+        if (_model.getChildCount(parent) > idx)
+            return parentPath.pathByAddingChild(_model.getChild(parent, idx));
+
+        if (!down && parentPath.getParentPath() == null) {
+            return parentPath.pathByAddingChild(_model.getChild(parent, 0));
+        } else {
+            return getNextPath(parentPath, false);
+        }
+    }
+    
+    TreePath getPreviousPath(TreePath path) {
+        TreeModel _model = model.treeModel;
+        TreeNode node = (TreeNode)path.getLastPathComponent();
+        TreePath parentPath = path.getParentPath();
+        if (parentPath == null) parentPath = path;
+        TreeNode parent = (TreeNode)parentPath.getLastPathComponent();
+        int idx = parent == node ? parent.getChildCount() : _model.getIndexOfChild(parent, node);
+
+        if (idx == 0) {
+            if (parent != model.treeModel.getRoot()) return parentPath;
+            else idx = parent.getChildCount();
+        }
+        
+        node = (TreeNode)_model.getChild(parent, idx - 1);
+        path = parentPath.pathByAddingChild(node);
+
+        while (_model.getChildCount(node) != 0) {
+            node = (TreeNode)_model.getChild(node, _model.getChildCount(node) - 1);
+            path = path.pathByAddingChild(node);
+        }
+
+        return path;
+    }
+    
+    void selectPath(TreePath path, boolean scrollToVisible) {
+        internal = true;
+        try {
+            tree.expandPath(path);
+            tree.setSelectionPath(path);
+            saveSelection();
+        }
+        finally { internal = false; }
+        if (scrollToVisible) scrollRectToVisible(tree.getPathBounds(path));
+    }
+    
+    // ---
+    
+    
     public TreePath getPathForRow(int row) {
         return tree.getPathForRow(row);
+    }
+    
+    public TreeNode getValueForRow(int row) {
+        if (row == -1) return null;
+        return model.nodeForRow(row);
     }
     
     
@@ -150,7 +229,10 @@ public class ProfilerTreeTable extends ProfilerTable {
     
     
     public void setCellRenderer(TreeCellRenderer renderer) {
-        if (tree != null) tree.setCellRenderer(renderer);
+        if (tree != null) {
+            tree.setCellRenderer(renderer);
+            model.setRenderer(renderer);
+        }
     }
     
     public void setTreeCellRenderer(ProfilerRenderer renderer) {
@@ -163,8 +245,11 @@ public class ProfilerTreeTable extends ProfilerTable {
                 renderer.setValue(value, row);
                 JComponent comp = renderer.getComponent();
                 comp.setOpaque(false);
-                comp.setForeground(tree.getForeground());
+                if (tree != null) comp.setForeground(tree.getForeground());
                 return comp;
+            }
+            public String toString() {
+                return renderer.toString();
             }
         };
     }
@@ -206,14 +291,56 @@ public class ProfilerTreeTable extends ProfilerTable {
                                                e.getModifiers(), treeX, e.getY(),
                                                e.getClickCount(), e.isPopupTrigger());
                     
-                    // Prevent invoking default action on doubleclick
-                    e = clearClicks(e);
+                    // Prevent invoking default action on expanding a node
+                    Object value = getValueForRow(row);
+                    if (value instanceof TreeNode && !((TreeNode)value).isLeaf()) e = clearClicks(e);
                 }
             }
         }
         
         super.processMouseEvent(e);
         if (treeEvent != null) tree.dispatchEvent(treeEvent);
+    }
+    
+    
+    public void addRowFilter(RowFilter filter) {
+        super.addRowFilter(filter);
+        refreshFilter();
+    }
+    
+    public void removeRowFilter(RowFilter filter) {
+        super.removeRowFilter(filter);
+        refreshFilter();
+    }
+    
+    public void setRowFilter(RowFilter filter) {
+        super.setRowFilter(filter);
+        refreshFilter();
+    }
+    
+    private void refreshFilter() {
+        model.filter(_getRowSorter().getRowFilter());
+    }
+    
+    
+    // --- String value --------------------------------------------------------
+    
+    // column - view index
+    public String getStringValue(TreeNode node, int column) {
+        Object value = model.getValueAt(node, convertColumnIndexToModel(column));
+        if (getColumnClass(column) == JTree.class) {
+            TreeCellRenderer renderer = tree.getCellRenderer();
+            renderer.getTreeCellRendererComponent(tree, value, false, false, false, -1, false);
+            return renderer.toString();
+        } else {
+            TableCellRenderer renderer = getCellRenderer(-1, column);
+            if (renderer instanceof ProfilerRenderer) {
+                ((ProfilerRenderer)renderer).setValue(value, -1);
+            } else {
+                renderer.getTableCellRendererComponent(this, value, false, false, -1, column);
+            }
+            return renderer.toString();
+        }
     }
     
     
@@ -237,6 +364,8 @@ public class ProfilerTreeTable extends ProfilerTable {
         private final TableModelImpl model;
         private List<RowSorter.SortKey> sortKeys;
         
+        private boolean sorting;
+        
         ProfilerTreeTableSorter(TableModel model) {
             super(model);
             this.model = (TableModelImpl)model;
@@ -256,6 +385,16 @@ public class ProfilerTreeTable extends ProfilerTable {
         
         public int getModelRowCount() {
             return model.getRowCount();
+        }
+        
+        public void sort() {
+            sorting = true;
+            super.sort();
+            sorting = false;
+        }
+        
+        public RowFilter getRowFilter() {
+            return sorting ? null : super.getRowFilter();
         }
         
         protected void setSortKeysImpl(List newKeys) {
@@ -301,13 +440,13 @@ public class ProfilerTreeTable extends ProfilerTable {
     private static class TableModelImpl extends AbstractTableModel {
         
         private final ProfilerTreeTableTree tree;
-        private TreeModelImpl treeModel;
+        private SortedFilteredTreeModel treeModel;
         private final ProfilerTreeTableModel treeTableModel;
         
         TableModelImpl(ProfilerTreeTableModel model) {
             this.treeTableModel = model;
             
-            treeModel = treeModelImpl(model.getRoot(), null);
+            treeModel = treeModelImpl(model.getRoot(), null, null);
             
             model.addListener(new ProfilerTreeTableModel.Adapter() {
                 public void dataChanged() {
@@ -324,7 +463,8 @@ public class ProfilerTreeTable extends ProfilerTable {
                         UIState uiState = getUIState(tree);
 
                         Comparator comparator = treeModel != null ? treeModel.getComparator() : null;
-                        treeModel = treeModelImpl(newRoot, comparator);
+                        RowFilter filter = treeModel != null ? treeModel.getFilter() : null;
+                        treeModel = treeModelImpl(newRoot, comparator, filter);
                         tree.setModel(treeModel);
                         fireTableDataChanged();
 
@@ -338,8 +478,8 @@ public class ProfilerTreeTable extends ProfilerTable {
             tree = new ProfilerTreeTableTree(treeModel);
         }
         
-        private TreeModelImpl treeModelImpl(TreeNode root, Comparator comparator) {
-            return new TreeModelImpl(root, comparator) {
+        private SortedFilteredTreeModel treeModelImpl(TreeNode root, Comparator comparator, RowFilter filter) {
+            return new SortedFilteredTreeModel(root, tree == null ? null : tree.getCellRenderer(), comparator, filter) {
                 protected void fireTreeStructureChanged(Object source, Object[] path,
                                         int[] childIndices,
                                         Object[] children) {
@@ -356,6 +496,18 @@ public class ProfilerTreeTable extends ProfilerTable {
             treeModel.setComparator(comparator);
         }
         
+        void filter(RowFilter filter) {
+            treeModel.setFilter(filter);
+        }
+        
+        RowFilter getFilter() {
+            return treeModel.getFilter();
+        }
+        
+        void setRenderer(TreeCellRenderer renderer) {
+            treeModel.setRenderer(renderer);
+        }
+        
         
         ProfilerTreeTableTree getTree() {
             return tree;
@@ -365,7 +517,7 @@ public class ProfilerTreeTable extends ProfilerTable {
             TreePath path = tree.getPathForRow(rowIndex);
             return path == null ? null : (TreeNode)path.getLastPathComponent();
         }
-
+        
         public int getRowCount() {
             return tree.getRowCount();
         }
@@ -401,21 +553,151 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
     
     
-    private static class TreeModelImpl extends DefaultTreeModel {
+    private static class FilteredTreeModel extends DefaultTreeModel {
+        
+        private TreeCellRenderer renderer;
+        
+        private RowFilter filter;
+        private Map<Object, List> cache;
+        
+        FilteredTreeModel(TreeNode root, TreeCellRenderer r, RowFilter f) {
+            super(root);
+            renderer = r;
+            filter = f;
+        }
+        
+        void setRenderer(TreeCellRenderer r) {
+            renderer = r;
+            reload();
+        }
+        
+        TreeCellRenderer getRenderer() {
+            return renderer;
+        }
+        
+        void setFilter(RowFilter f) {
+            filter = f;
+            reload();
+        }
+        
+        RowFilter getFilter() {
+            return filter;
+        }
+        
+        public Object getChild(Object parent, int index) {
+            if (renderer == null || filter == null) return super.getChild(parent, index);
+            return filteredChildren(parent).get(index);
+        }
+        
+        public int getIndexOfChild(Object parent, Object child) {
+            if (renderer == null || filter == null) return super.getIndexOfChild(parent, child);
+            return filteredChildren(parent).indexOf(child);
+        }
+        
+        public int getChildCount(Object parent) {
+            if (renderer == null || filter == null) return super.getChildCount(parent);
+            return filteredChildren(parent).size();
+        }
+        
+        
+        protected void fireTreeStructureChanged(Object source, Object[] path,
+                                                int[] childIndices,
+                                                Object[] children) {
+            cache = null;
+            super.fireTreeStructureChanged(source, path, childIndices, children);
+        }
+        
+        
+        private List filteredChildren(Object parent) {
+            if (cache == null) cache = new HashMap();
+            
+            TreePath parentPath = treePath(getPathToRoot((TreeNode)parent));
+            List children = cache.get(parentPath);
+            
+            if (children == null) {
+                
+                class Entry extends RowFilter.Entry {
+                    private Object value; private Object identifier;
+                    void setContext(Object _value, Object _identifier) { value = _value; identifier = _identifier; }
+                    public Object getValue(int index) { return value; }
+                    public Object getModel() { return null; }
+                    public int getValueCount() { return 1; }
+                    public Object getIdentifier() { return identifier; }
+                }
+                Entry entry = null;
+                
+                children = new ArrayList();
+                CCTNode filtered = null;
+                boolean createdFiltered = false;
+                Enumeration childrenE = ((TreeNode)parent).children();
+                if (childrenE != null) while (childrenE.hasMoreElements()) {
+                    final Object child = childrenE.nextElement();
+                    renderer.getTreeCellRendererComponent(null, child, false, false, false, -1, false);
+                    if (entry == null) entry = new Entry();
+                    entry.setContext(renderer.toString(), child);
+                    if (filter.include(entry)) {
+                        children.add(child);
+                    } else if (parent instanceof CCTNode) {
+                        if (!createdFiltered) {
+                            filtered = ((CCTNode)child).createFilteredNode();
+                            createdFiltered = true;
+                        } else if (filtered != null) {
+                            filtered.merge((CCTNode)child);
+                        }
+                    }
+                }
+                
+                if (filtered != null) {
+                    List filteredChildren = filteredChildren(filtered);
+                    if (!((CCTNode)parent).isFiltered()) children.add(filtered);
+                    else if (!children.isEmpty()) children.add(filtered);
+                    else children.addAll(filteredChildren);
+                }
+                
+                cache.put(parentPath, children);
+            }
+            
+            return children;
+        }
+        
+        
+        // creates a TreePath with exact hashCode
+        // uses Arrays.deepHashCode instead getLastPathComponent().hashCode()
+        protected static TreePath treePath(final TreeNode[] pathToRoot) {
+            return new TreePath(pathToRoot) {
+                private final int hashCode = Arrays.deepHashCode(pathToRoot);
+                public int hashCode() { return hashCode; }
+            };
+        }
+        
+        
+        // NOTE: use the alternative implementation if facing StackOverflows
+//        public TreeNode[] getPathToRoot(TreeNode node) {
+//            List<TreeNode> path = new ArrayList();
+//            while (node != null) {
+//                path.add(node);
+//                node = node.getParent();
+//            }
+//            return path.toArray(new TreeNode[path.size()]);
+//        }
+        
+    }
+    
+    
+    private static class SortedFilteredTreeModel extends FilteredTreeModel {
         
         private Comparator comparator;
         private Map<Object, int[]> viewToModel;
         
         
-        TreeModelImpl(TreeNode root, Comparator comp) {
-            super(root);
+        SortedFilteredTreeModel(TreeNode root, TreeCellRenderer r, Comparator comp, RowFilter filter) {
+            super(root, r, filter);
             comparator = comp;
         }
         
         
         void setComparator(Comparator comp) {
             comparator = comp;
-            viewToModel = null;
             reload();
         }
         
@@ -441,10 +723,18 @@ public class ProfilerTreeTable extends ProfilerTable {
         }
         
         
+        protected void fireTreeStructureChanged(Object source, Object[] path,
+                                                int[] childIndices,
+                                                Object[] children) {
+            viewToModel = null;
+            super.fireTreeStructureChanged(source, path, childIndices, children);
+        }
+        
+        
         private int[] viewToModel(Object parent) {
             if (viewToModel == null) viewToModel = new HashMap();
             
-            TreePath parentPath = new TreePath(getPathToRoot((TreeNode)parent));
+            TreePath parentPath = treePath(getPathToRoot((TreeNode)parent));
             int[] indexes = viewToModel.get(parentPath);
             
             if (indexes == null) {
@@ -582,7 +872,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         private SynthLikeTreeUI synthLikeUI;
 
         
-        ProfilerTreeTableTree(TreeModelImpl model) {
+        ProfilerTreeTableTree(SortedFilteredTreeModel model) {
             super(model);
             
             setOpaque(false);
@@ -716,6 +1006,10 @@ public class ProfilerTreeTable extends ProfilerTable {
         
         boolean isChangingModel() {
             return changingModel;
+        }
+        
+        public String toString() {
+            return getCellRenderer().toString();
         }
         
     }

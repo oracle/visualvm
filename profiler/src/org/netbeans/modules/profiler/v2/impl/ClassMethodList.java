@@ -54,18 +54,23 @@ import java.util.Set;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.swing.SmallButton;
+import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.lib.profiler.utils.formatting.DefaultMethodNameFormatter;
@@ -75,7 +80,6 @@ import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.api.java.SourceMethodInfo;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
-import org.netbeans.modules.profiler.v2.ui.SmallButton;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
@@ -144,17 +148,31 @@ public final class ClassMethodList {
             final JList list = new JList(xmodel) {
                 public Dimension getPreferredScrollableViewportSize() {
                     Dimension dim = super.getPreferredScrollableViewportSize();
-                    dim.width = 350;
+                    dim.width = 420;
                     return dim;
                 }
             };
+            list.setBackground(UIUtils.getProfilerResultsBackground());
             int format = methods ? DefaultMethodNameFormatter.VERBOSITY_CLASSMETHOD :
                                    DefaultMethodNameFormatter.VERBOSITY_CLASS;
             final MethodNameFormatter formatter = new DefaultMethodNameFormatter(format);
-            list.setCellRenderer(new DefaultListCellRenderer() {
+            final JavaNameRenderer renderer = new JavaNameRenderer();
+            list.setCellRenderer(new ListCellRenderer() {
                 public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                    String name = formatter.formatMethodName((ClientUtils.SourceCodeSelection)value).toFormatted();
-                    return super.getListCellRendererComponent(list, name, index, isSelected, cellHasFocus);
+                    renderer.setValue(formatter.formatMethodName((ClientUtils.SourceCodeSelection)value).toFormatted(), index);
+                    JComponent c = renderer.getComponent();
+                    if (isSelected && isEnabled()) {
+                        c.setForeground(list.getSelectionForeground());
+                        c.setBackground(list.getSelectionBackground());
+                    } else if (!isEnabled()) {
+                        c.setForeground(UIManager.getColor("TextField.inactiveForeground")); // NOI18N
+                        c.setBackground(UIManager.getColor("TextField.inactiveBackground")); // NOI18N
+                    } else {
+                        c.setForeground(list.getForeground());
+                        c.setBackground((index & 0x1) == 0 ? list.getBackground() :
+                                         UIUtils.getDarker(list.getBackground()));
+                    }
+                    return c;
                 }
             });
             

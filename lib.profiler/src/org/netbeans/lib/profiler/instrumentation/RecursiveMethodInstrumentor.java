@@ -43,15 +43,16 @@
 
 package org.netbeans.lib.profiler.instrumentation;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.classfile.PlaceholderClassInfo;
 import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import org.netbeans.lib.profiler.wireprotocol.RootClassLoadedCommand;
 
 /**
  * Base class for two "recursive" method scanners, implementing the "eager" and "lazy" transitive call subgraph revelation and
@@ -155,8 +156,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
      * This method should initialize instrumentation-related data structures, register given classes as loaded, and return
      * the initial set of methods to instrument in the format given by createInstrumentedMethodPack().
      */
-    abstract Object[] getInitialMethodsToInstrument(String[] loadedClasses, int[] loadedClassLoaderIds,
-                                                           byte[][] cachedClassFileBytes, RootMethods rootMethods);
+    abstract Object[] getInitialMethodsToInstrument(RootClassLoadedCommand rootLoaded, RootMethods rootMethods);
 
     public abstract Object[] getMethodsToInstrumentUponClassLoad(String className, int classLoaderId, boolean threadInCallGraph);
 
@@ -190,7 +190,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
                 findAndMarkOverridingMethodsReachable(superClass, addedClassInfo);
             }
 
-            if (superClassName != "java/lang/Object") { // NOI18N
+            if (superClassName != OBJECT_SLASHED_CLASS_NAME) {
                 addToSubclassList(superClass, addedClassInfo);
             }
         }
@@ -466,7 +466,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
                 }
             }
             if (reflectMethodClassIdx == -1) {
-                reflectMethodClass = javaClassForName(JAVA_LANG_REFLECT_METHOD_DOTTED_CLASS_NAME, 0);
+                reflectMethodClass = javaClassForName(JAVA_LANG_REFLECT_METHOD_SLASHED_CLASS_NAME, 0);
                 if (reflectMethodClass != null) {
                     nInstrClasses++;
                 }

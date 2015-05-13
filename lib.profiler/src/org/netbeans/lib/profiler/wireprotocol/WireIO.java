@@ -169,6 +169,10 @@ public class WireIO {
                         cmd = new GetClassIdCommand();
 
                         break;
+                    case Command.GET_CLASS_FILE_BYTES:
+                        cmd = new GetClassFileBytesCommand();
+
+                        break;                        
                     default:
                         throw new IOException("JFluid wire protocol error: received unknown command type. Value: " // NOI18N
                                               + cmdType);
@@ -263,6 +267,10 @@ public class WireIO {
                         break;
                     case Response.THREAD_DUMP:
                         resp = new ThreadDumpResponse();
+                        
+                        break;
+                    case Response.GET_CLASS_FILE_BYTES_RESPONSE:
+                        resp = new GetClassFileBytesResponse();
                         
                         break;
                     default:

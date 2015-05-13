@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.ui;
+package org.netbeans.lib.profiler.ui.swing;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -50,6 +50,7 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -65,6 +66,7 @@ public class PopupButton extends SmallButton {
     private static final int DROPDOWN_ICON_HEIGHT = DROPDOWN_ICON.getIconHeight();
     
     private int iconOffset;
+    private int popupAlign = SwingConstants.LEADING;
     
     
     {
@@ -84,6 +86,15 @@ public class PopupButton extends SmallButton {
     public PopupButton(String text, Icon icon) { super(text, icon); }
     
     
+    public void setPopupAlign(int align) {
+        popupAlign = align;
+    }
+    
+    public int getPopupAlign() {
+        return popupAlign;
+    }
+    
+    
     protected void fireActionPerformed(ActionEvent e) {
         super.fireActionPerformed(e);
         displayPopup();
@@ -96,7 +107,11 @@ public class PopupButton extends SmallButton {
             Dimension size = menu.getPreferredSize();
             size.width = Math.max(size.width, getWidth());
             menu.setPreferredSize(size);
-            menu.show(this, 0, getHeight());
+            int align = getPopupAlign();
+            int x = align == SwingConstants.TRAILING ||
+                    align == SwingConstants.RIGHT ?
+                    getWidth() - size.width : 0;
+            menu.show(this, x, getHeight());
         }
     }
     

@@ -96,7 +96,7 @@ public abstract class GraphPanel extends JPanel {
 
     static {
         String format = MessageFormat.format(TimeAxisUtils.TIME_DATE_FORMAT,
-                                             new Object[] { TimeAxisUtils.TIME_MSEC,
+                                             new Object[] { TimeAxisUtils.TIME_SEC,
                                                             TimeAxisUtils.DATE_YEAR });
         DATE_FORMATTER = new SimpleDateFormat(format);
 
@@ -142,7 +142,7 @@ public abstract class GraphPanel extends JPanel {
         }
         
         chart.addPreDecorator(new XYBackground());
-        chart.setFitsWidth(true);
+        chart.setFitsWidth(false);
 
         chart.getSelectionModel().setHoverMode(ChartSelectionModel.HOVER_EACH_NEAREST);
         return chart;
@@ -280,7 +280,7 @@ public abstract class GraphPanel extends JPanel {
                 long itemValue = sel.getItem().getYValue(sel.getValueIndex());
                 builder.append(model.getRowValue(i, itemValue));
                 builder.append("&nbsp;"); // NOI18N
-                builder.append(model.getRowUnits(i, itemValue));
+                builder.append(model.getRowUnits(i));
                 builder.append("&nbsp;&nbsp;<br>"); // NOI18N
             }
 
@@ -317,4 +317,5 @@ public abstract class GraphPanel extends JPanel {
                                          List<ItemSelection> removedItems) {}
 
     }
+    
 }

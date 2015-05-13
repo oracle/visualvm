@@ -614,7 +614,7 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     }
     
     private void enableDisablePopup(PrestimeCPUCCTNode node) {
-        boolean regularNode = node.getMethodId() != 0 && !node.isFilteredNode();
+        boolean regularNode = node.getMethodId() != 0 && !node.isFiltered();
         if (popupShowSource != null) popupShowSource.setEnabled(regularNode && isShowSourceAvailable());
         popupAddToRoots.setEnabled(regularNode && isAddToRootsAvailable());
     }

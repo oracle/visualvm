@@ -56,6 +56,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -67,6 +68,8 @@ import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
+import org.netbeans.lib.profiler.ui.swing.GrayLabel;
+import org.netbeans.lib.profiler.ui.swing.SmallButton;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
@@ -76,8 +79,6 @@ import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.impl.ClassMethodList;
 import org.netbeans.modules.profiler.v2.impl.ClassMethodSelector;
-import org.netbeans.modules.profiler.v2.ui.GrayLabel;
-import org.netbeans.modules.profiler.v2.ui.SmallButton;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -92,7 +93,8 @@ import org.openide.util.NbBundle;
     "MethodsFeatureModes_selectedClasses=Selected classes",
     "MethodsFeatureModes_selectedMethods=Selected methods",
     "MethodsFeatureModes_editLink=<html><a href='#'>{0}, edit</a></html>",
-    "MethodsFeatureModes_outgoingCalls=Outgoing calls:",
+    "MethodsFeatureModes_outgoingCalls=Limit outgoing calls:",
+    "MethodsFeatureModes_skipJavaClasses=Skip Java core classes",
     "MethodsFeatureModes_noClassSelected=No classes selected, use Profile Class action in editor or results or click the Add button:",
     "MethodsFeatureModes_oneClassSelected=Selected 1 class",
     "MethodsFeatureModes_multipleClassesSelected=Selected {0} classes",
@@ -195,8 +197,10 @@ final class MethodsFeatureModes {
         
         
         // --- API implementation ----------------------------------------------
+        private static final String CORE_JAVA_FILTER = "apple.laf., apple.awt., com.apple., com.sun., java., javax., sun., sunw., org.omg.CORBA, org.omg.CosNaming., COM.rsa."; // NOI18N
         
         private static final String OUTGOING_CALLS_FLAG = "OUTGOING_CALLS_FLAG"; // NOI18N
+        private static final String SKIP_JAVA_FLAG = "SKIP_JAVA_FLAG"; // NOI18N
         private static final String SELECTION_FLAG = "SELECTION_FLAG"; // NOI18N
         
         private static final Integer OUTGOING_CALLS_DEFAULT = 5;
@@ -214,6 +218,10 @@ final class MethodsFeatureModes {
             settings.setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
             settings.setInstrumentSpawnedThreads(false);
             
+            boolean filter = Boolean.parseBoolean(readFlag(SKIP_JAVA_FLAG, Boolean.TRUE.toString()));
+            settings.setSelectedInstrumentationFilter(!filter ? SimpleFilter.NO_FILTER :
+                    new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_EXCLUSIVE, CORE_JAVA_FILTER)); // NOI18N
+            
             StringBuilder b = new StringBuilder();
             HashSet<ClientUtils.SourceCodeSelection> _sel = getSelection();
             ClientUtils.SourceCodeSelection[] classes = _sel.toArray(
@@ -226,8 +234,6 @@ final class MethodsFeatureModes {
             
             String o = readFlag(OUTGOING_CALLS_FLAG, OUTGOING_CALLS_DEFAULT.toString());
             settings.setStackDepthLimit(Integer.parseInt(o));
-
-            settings.setSelectedInstrumentationFilter(null);
         }
         
         void confirmSettings() {
@@ -236,6 +242,8 @@ final class MethodsFeatureModes {
                 
                 String outgoingCalls = outgoingSpinner.getValue().toString();
                 storeFlag(OUTGOING_CALLS_FLAG, OUTGOING_CALLS_DEFAULT.toString().equals(outgoingCalls) ? null : outgoingCalls);
+                
+                storeFlag(SKIP_JAVA_FLAG, filterJava.isSelected() ? null : Boolean.FALSE.toString());
                 
                 saveSelection();
             }
@@ -246,6 +254,9 @@ final class MethodsFeatureModes {
                 assert SwingUtilities.isEventDispatchThread();
                 
                 if (!outgoingSpinner.getValue().toString().equals(readFlag(OUTGOING_CALLS_FLAG, OUTGOING_CALLS_DEFAULT.toString())))
+                    return true;
+                
+                if (Boolean.parseBoolean(readFlag(SKIP_JAVA_FLAG, Boolean.TRUE.toString())) != filterJava.isSelected())
                     return true;
                 
                 if (!initSelection(false).equals(getSelection())) return true;
@@ -299,9 +310,12 @@ final class MethodsFeatureModes {
         private JPanel selectionContent;
         private JPanel noSelectionContent;
         private JSpinner outgoingSpinner;
+        private JCheckBox filterJava;
         private JButton addSelectionButton;
         private JButton editSelectionLink;
         
+        
+        protected abstract int getOutgoingCallsMaximum();
         
         protected abstract String noSelectionString();
         
@@ -367,12 +381,24 @@ final class MethodsFeatureModes {
                 selectionContent.add(Box.createHorizontalStrut(5));
 
                 int outgoingCalls = Integer.parseInt(readFlag(OUTGOING_CALLS_FLAG, OUTGOING_CALLS_DEFAULT.toString()));
-                outgoingSpinner = new JExtendedSpinner(new SpinnerNumberModel(outgoingCalls, 1, 10, 1)) {
+                outgoingSpinner = new JExtendedSpinner(new SpinnerNumberModel(outgoingCalls, 1, getOutgoingCallsMaximum(), 1)) {
                     public Dimension getPreferredSize() { return getMinimumSize(); }
                     public Dimension getMaximumSize() { return getMinimumSize(); }
                     protected void fireStateChanged() { settingsChanged(); super.fireStateChanged(); }
                 };
                 selectionContent.add(outgoingSpinner);
+                
+                selectionContent.add(Box.createHorizontalStrut(6));
+                
+                boolean filter = Boolean.parseBoolean(readFlag(SKIP_JAVA_FLAG, Boolean.TRUE.toString()));
+                filterJava = new JCheckBox(Bundle.MethodsFeatureModes_skipJavaClasses(), filter) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        settingsChanged();
+                    }
+                };
+                filterJava.setOpaque(false);
+                selectionContent.add(filterJava);
 
                 noSelectionContent = new JPanel();
                 noSelectionContent.setLayout(new BoxLayout(noSelectionContent, BoxLayout.LINE_AXIS));
@@ -437,6 +463,10 @@ final class MethodsFeatureModes {
         }
         
         
+        protected int getOutgoingCallsMaximum() {
+            return 10;
+        }
+        
         protected String noSelectionString() {
             return Bundle.MethodsFeatureModes_noClassSelected();
         }
@@ -487,6 +517,10 @@ final class MethodsFeatureModes {
             return Bundle.MethodsFeatureModes_selectedMethods();
         }
         
+        
+        protected int getOutgoingCallsMaximum() {
+            return 99;
+        }
         
         protected String noSelectionString() {
             return Bundle.MethodsFeatureModes_noMethodSelected();
