@@ -107,7 +107,7 @@ public abstract class LiveMemoryView extends JPanel {
                 try {
                     view.refreshData(appRootNode);
                 } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    Logger.getLogger(LiveMemoryView.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(LiveMemoryView.class.getName()).log(Level.FINE, null, ex);
                 }
             }
         }
