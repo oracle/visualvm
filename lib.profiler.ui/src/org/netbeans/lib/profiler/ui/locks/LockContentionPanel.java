@@ -452,8 +452,7 @@ public class LockContentionPanel extends DataView {
         }
     }
     
-    private void
-            exportCSV(String separator, ExportDataDumper eDD) {
+    private void exportCSV(String separator, ExportDataDumper eDD) {
         // Header
         StringBuffer result = new StringBuffer();
         String newLine = "\r\n"; // NOI18N
