@@ -49,6 +49,7 @@ import javax.swing.Action;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.locks.LockContentionPanel;
@@ -71,7 +72,13 @@ abstract class LocksFeatureUI extends FeatureUI {
     private ProfilerToolbar toolbar;
     private LockContentionPanel locksView;
     
+    // --- External implementation ---------------------------------------------
+        
+    abstract Profiler getProfiler();
     
+    abstract void refreshResults();
+    
+   
     // --- API implementation --------------------------------------------------
     
     ProfilerToolbar getToolbar() {
@@ -95,6 +102,18 @@ abstract class LocksFeatureUI extends FeatureUI {
         }
     }
 
+    void resetPause() {
+//        if (lrPauseButton != null) lrPauseButton.setSelected(false);
+    }
+    
+    void setForceRefresh() {
+        if (locksView != null) locksView.setForceRefresh(true);
+    }
+    
+    void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
+        if (locksView != null) locksView.refreshData();
+    }
+        
     void resetData() {
         if (locksView != null) locksView.resetData();
     }
@@ -112,7 +131,7 @@ abstract class LocksFeatureUI extends FeatureUI {
         
         // --- Results ---------------------------------------------------------
 
-        locksView = new LockContentionPanel();
+        locksView = new LockContentionPanel(getProfiler().getTargetAppRunner().getProfilerClient());
         locksView.lockContentionEnabled();
         
         locksView.putClientProperty("HelpCtx.Key", "ProfileLocks.HelpCtx"); // NOI18N
