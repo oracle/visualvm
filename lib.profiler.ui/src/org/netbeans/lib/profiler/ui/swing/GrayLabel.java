@@ -54,6 +54,9 @@ import org.netbeans.lib.profiler.ui.UIUtils;
  */
 public class GrayLabel extends JLabel {
     
+    { setFocusable(false); }
+    
+    
     public GrayLabel() { super(); }
     
     public GrayLabel(Icon icon) { super(icon); }
