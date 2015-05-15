@@ -99,7 +99,7 @@ public final class LockContentionWindow extends ProfilerTopComponent {
         lockView = new ResultsView();
         add(lockView, BorderLayout.CENTER);
 
-        locksPanel = new LockContentionPanel();
+        locksPanel = new LockContentionPanel(null);
         locksPanel.addSaveViewAction(new SaveViewAction(new SaveView()));
         locksPanel.addExportAction(new ExportAction(new Exporter(),null));
 
