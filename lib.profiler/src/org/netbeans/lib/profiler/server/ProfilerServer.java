@@ -355,12 +355,14 @@ public class ProfilerServer extends Thread implements CommonConstants {
     private static String WAITING_ON_PORT_MSG = "Profiler Agent: Waiting for connection on port {0} (Protocol version: {1})"; // NOI18N
     private static String WAITING_ON_PORT_TIMEOUT_MSG = "Profiler Agent: Waiting for connection on port {0}, timeout {1} seconds (Protocol version: {2})"; // NOI18N
     private static String CONNECTION_EXCEPTION_MSG = "Profiler Agent Error: Exception when trying to establish connection with client:\n{0}"; // NOI18N
+    private static String CONNECTION_EXCEPTION_BIND_MSG = "Profiler Agent Error: Make sure the previously profiled process has been fully terminated"; // NOI18N
     private static String CONNECTION_TIMEOUT_MSG = "Profiler Agent Error: Timed out trying to establish connection with client"; // NOI18N
     private static String AGENT_ERROR_MSG = "Profiler Agent Error: {0}"; // NOI18N
     private static String CONNECTION_INTERRUPTED_MSG = "Profiler Agent Error: Connection with client interrupted"; // NOI18N
     private static String COMMAND_EXCEPTION_MSG = "Profiler Agent Error: Exception when handling command from client:\n{0}"; // NOI18N
     private static String RESPONSE_EXCEPTION_MSG = "Profiler Agent Error: Exception when trying to send response or command to client:\n{0}"; // NOI18N
     private static String CONNECTION_CLOSED_MSG = "Profiler Agent: Connection with agent closed"; // NOI18N
+    private static String CONNECTION_CLOSED_EX_MSG = "Profiler Agent: Connection with agent closed (ProfilingSessionStatus was null)"; // NOI18N
     private static String INCORRECT_AGENT_ID_MSG = "Profiler Agent Warning: Wrong agentId specified: {0}"; // NOI18N
     private static String THREAD_EXCEPTION_MSG = "Profiler Agent Error: Exception in executeInSeparateThread()"; // NOI18N
     private static String THREAD_WAIT_EXCEPTION_MSG = "Profiler Agent Error: Exception in wait in SeparateCmdExecutionThread"; // NOI18N
@@ -811,12 +813,14 @@ public class ProfilerServer extends Thread implements CommonConstants {
             WAITING_ON_PORT_MSG = messages.getString("ProfilerServer_WaitingOnPortMsg"); // NOI18N
             WAITING_ON_PORT_TIMEOUT_MSG = messages.getString("ProfilerServer_WaitingOnPortTimeoutMsg"); // NOI18N
             CONNECTION_EXCEPTION_MSG = messages.getString("ProfilerServer_ConnectionExceptionMsg"); // NOI18N
+            CONNECTION_EXCEPTION_BIND_MSG = messages.getString("ProfilerServer_ConnectionExceptionBindMsg"); // NOI18N
             CONNECTION_TIMEOUT_MSG = messages.getString("ProfilerServer_ConnectionTimeoutMsg"); // NOI18N
             AGENT_ERROR_MSG = messages.getString("ProfilerServer_AgentErrorMsg"); // NOI18N
             CONNECTION_INTERRUPTED_MSG = messages.getString("ProfilerServer_ConnectionInterruptedMsg"); // NOI18N
             COMMAND_EXCEPTION_MSG = messages.getString("ProfilerServer_CommandExceptionMsg"); // NOI18N
             RESPONSE_EXCEPTION_MSG = messages.getString("ProfilerServer_ResponseExceptionMsg"); // NOI18N
             CONNECTION_CLOSED_MSG = messages.getString("ProfilerServer_ConnectionClosedMsg"); // NOI18N
+            CONNECTION_CLOSED_EX_MSG = messages.getString("ProfilerServer_ConnectionClosedExMsg"); // NOI18N
             INCORRECT_AGENT_ID_MSG = messages.getString("ProfilerServer_IncorrectAgentIdMsg"); // NOI18N
             THREAD_EXCEPTION_MSG = messages.getString("ProfilerServer_ThreadExceptionMsg"); // NOI18N
             THREAD_WAIT_EXCEPTION_MSG = messages.getString("ProfilerServer_ThreadWaitExceptionMsg"); // NOI18N
@@ -1229,7 +1233,9 @@ public class ProfilerServer extends Thread implements CommonConstants {
 
     private synchronized void closeConnection() {
         connectionOpen = false;
-        status.targetAppRunning = false;
+        if (status != null) {
+            status.targetAppRunning = false;
+        }
         removeInfoFile();
 
         try {
@@ -1240,7 +1246,9 @@ public class ProfilerServer extends Thread implements CommonConstants {
         } catch (IOException ex) {
         }
 
-        if (status.runningInAttachedMode) {
+        if (status == null) {
+            System.out.println(CONNECTION_CLOSED_EX_MSG);
+        } else if (status.runningInAttachedMode) {
             System.out.println(CONNECTION_CLOSED_MSG);
         }
 
@@ -1278,6 +1286,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
             connectionFailed = true;
         } catch (IOException ex) {
             System.err.println(MessageFormat.format(CONNECTION_EXCEPTION_MSG, new Object[] { ex }));
+            if (ex instanceof BindException) System.err.println(CONNECTION_EXCEPTION_BIND_MSG);
             connectionFailed = true;
         } finally {
             //removeInfoFile ();
