@@ -88,6 +88,9 @@ abstract class CPUTreeTableView extends CPUView {
     private boolean sampled = true;
     private boolean twoTimeStamps;
     
+    private boolean hitsVisible = false;
+    private boolean invocationsVisible = true;
+    
     
     public CPUTreeTableView(Set<ClientUtils.SourceCodeSelection> selection, boolean reverse) {
         this.selection = selection;
@@ -113,9 +116,20 @@ abstract class CPUTreeTableView extends CPUView {
                                            newData.getReverseRootNode(aggregation, selectedThreads, mergeThreads));
                 }
                 if (structureChange) {
+                    // Resolve Hits/Invocations column
                     int col = treeTable.convertColumnIndexToView(selection == null ? 3 : 4);
                     String colN = treeTableModel.getColumnName(selection == null ? 3 : 4);
+                    
+                    // Persist current Hits/Invocations column visibility
+                    if (sampled) invocationsVisible = treeTable.isColumnVisible(col);
+                    else hitsVisible = treeTable.isColumnVisible(col);
+                    
+                    // Update Hits/Invocations column name
                     treeTable.getColumnModel().getColumn(col).setHeaderValue(colN);
+                    
+                    // Set new Hits/Invocations column visibility
+                    treeTable.setColumnVisibility(col, sampled ? hitsVisible : invocationsVisible);
+                    
                     repaint();
                 }
             }
