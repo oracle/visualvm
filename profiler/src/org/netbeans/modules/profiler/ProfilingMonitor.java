@@ -131,8 +131,7 @@ public final class ProfilingMonitor {
                                             final Profiler profiler = Profiler.getDefault();
                                             final ProfilerClient client = profiler.getTargetAppRunner().getProfilerClient();
                                             final int instrType = client.getCurrentInstrType();
-                                            if ((NetBeansProfiler.getDefaultNB().processesProfilingPoints()
-                                                    || instrType == ProfilerEngineSettings.INSTR_NONE_SAMPLING)
+                                            if ((NetBeansProfiler.getDefaultNB().processesProfilingPoints())
                                                 && (!doUpdateLiveResults /*|| !LiveResultsWindow.hasDefault()*/)) {
                                                 ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
                                                         public void run() {
