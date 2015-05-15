@@ -876,7 +876,7 @@ public final class ResultsManager {
                     runner.resetTimers(); // reset the server data
                 } catch (ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated) {
                     // the target app has died; clean up all client data
-                    runner.getProfilerClient().resetClientData();
+                    client.resetClientData();
                 }
 
                 LOGGER.log(Level.SEVERE, Bundle.ResultsManager_OutOfMemoryMsg(), e);
