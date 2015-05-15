@@ -210,17 +210,22 @@ abstract class CPUTreeTableView extends CPUView {
         
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer())) {
             public void setValue(Object value, int row) {
-                super.setMaxValue(getMaxValue(row, false));
+                super.setMaxValue(getMaxValue(row, 0));
                 super.setValue(value, row);
             }
         };
         renderers[1] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer())) {
             public void setValue(Object value, int row) {
-                super.setMaxValue(getMaxValue(row, true));
+                super.setMaxValue(getMaxValue(row, 1));
                 super.setValue(value, row);
             }
         };
-        renderers[2] = new HideableBarRenderer(new NumberRenderer());
+        renderers[2] = new HideableBarRenderer(new NumberRenderer()) {
+            public void setValue(Object value, int row) {
+                super.setMaxValue(getMaxValue(row, 2));
+                super.setValue(value, row);
+            }
+        };
         
         long refTime = 123456;
         renderers[0].setMaxValue(refTime);
@@ -283,13 +288,15 @@ abstract class CPUTreeTableView extends CPUView {
     }
     
     
-    private long getMaxValue(int row, boolean secondary) {
+    private long getMaxValue(int row, int val) {
         TreePath path = treeTable.getPathForRow(row);
         if (path == null) return Long.MIN_VALUE; // TODO: prevents NPE from export but doesn't provide the actual value!
         if (path.getPathCount() < 2) return 1;
         
         PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)path.getPathComponent(1);
-        return Math.abs(secondary ? node.getTotalTime1() : node.getTotalTime0());
+        if (val == 0) return Math.abs(node.getTotalTime0());
+        else if (val == 1) return Math.abs(node.getTotalTime1());
+        else return Math.abs(node.getNCalls());
     }
     
     protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
