@@ -101,7 +101,10 @@ import org.openide.util.NbBundle;
     "ObjectsFeatureModes_multipleClassesSelected=Selected {0} classes",
     "ObjectsFeatureModes_addClass=Select class",
     "ObjectsFeatureModes_lblUnlimited=unlimited",
-    "ObjectsFeatureModes_lblNoAllocations=(no allocations)"
+    "ObjectsFeatureModes_lblNoAllocations=(no allocation calls)",
+    "ObjectsFeatureModes_profileAllObjectsToolTip=Unselect to profile all created objects (including already released)",
+    "ObjectsFeatureModes_collectFullStacksToolTip=Unselect to collect full depth allocations call tree",
+    "ObjectsFeatureModes_limitAllocationsDepthToolTip=Limit depth of allocations call tree (select 0 for no allocation calls)"
 })
 final class ObjectsFeatureModes {
     
@@ -363,6 +366,7 @@ final class ObjectsFeatureModes {
                 lifecycleCheckbox = new JCheckBox(Bundle.ObjectsFeatureModes_recordLifecycle(), lifecycle) {
                     protected void fireActionPerformed(ActionEvent e) { super.fireActionPerformed(e); settingsChanged(); }
                 };
+                lifecycleCheckbox.setToolTipText(Bundle.ObjectsFeatureModes_profileAllObjectsToolTip());
                 lifecycleCheckbox.setOpaque(false);
                 selectionContent.add(lifecycleCheckbox);
                 
@@ -383,6 +387,7 @@ final class ObjectsFeatureModes {
                         settingsChanged();
                     }
                 };
+                outgoingCheckbox.setToolTipText(Bundle.ObjectsFeatureModes_collectFullStacksToolTip());
                 outgoingCheckbox.setOpaque(false);
                 selectionContent.add(outgoingCheckbox);
                 
@@ -398,6 +403,7 @@ final class ObjectsFeatureModes {
                     public Dimension getMaximumSize() { return getMinimumSize(); }
                     protected void fireStateChanged() { settingsChanged(); super.fireStateChanged(); }
                 };
+                outgoingSpinner.setToolTipText(Bundle.ObjectsFeatureModes_limitAllocationsDepthToolTip());
                 JComponent editor = outgoingSpinner.getEditor();
                 JTextField field = editor instanceof JSpinner.DefaultEditor ?
                         ((JSpinner.DefaultEditor)editor).getTextField() : null;
