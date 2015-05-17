@@ -84,7 +84,9 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.TreeNode;
+import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.TargetAppRunner;
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
@@ -93,7 +95,6 @@ import org.netbeans.lib.profiler.results.locks.LockCCTProvider;
 import org.netbeans.lib.profiler.results.locks.LockRuntimeCCTNode;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.FlatToolBar;
-//import org.netbeans.lib.profiler.ui.components.JTreeTable;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
@@ -178,9 +179,18 @@ public class LockContentionPanel extends DataView {
     
     private final HideableBarRenderer hbrTime;
     private final HideableBarRenderer hbrWaits;
+
+    private static final int MIN_UPDATE_DIFF = 900;
+    private static final int MAX_UPDATE_DIFF = 1400;
+
+    private final ProfilerClient client;
+    private long lastupdate;
+    private volatile boolean paused;
+    private volatile boolean forceRefresh;
     
+    public LockContentionPanel(ProfilerClient clnt) { 
     
-    public LockContentionPanel() {        
+        client = clnt;
         toolbar = ProfilerToolbar.create(true);
         
         JLabel modeLabel = new JLabel(DISPLAY_MODE);
@@ -402,6 +412,31 @@ public class LockContentionPanel extends DataView {
         return aggregation;
     }
     
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
+
+    public void setForceRefresh(boolean forceRefresh) {
+        this.forceRefresh = forceRefresh;
+    }
+
+    private void refreshData(final LockRuntimeCCTNode appRootNode) {
+        if ((lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis() || paused) && !forceRefresh) return;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                root = appRootNode;
+            }
+        });
+        prepareResults();
+        forceRefresh = false;
+    }
+
+    public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
+        if ((lastupdate + MAX_UPDATE_DIFF < System.currentTimeMillis() && !paused) || forceRefresh) {
+            client.forceObtainedResultsDump(true);
+        }
+    }
+    
     public void resetData() {
         UIUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
@@ -416,10 +451,7 @@ public class LockContentionPanel extends DataView {
         @Override
         public void cctEstablished(final RuntimeCCTNode appRootNode, boolean empty) {
             if (!empty && appRootNode instanceof LockRuntimeCCTNode) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() { root = (LockRuntimeCCTNode)appRootNode; }
-                });
-                prepareResults();
+                refreshData((LockRuntimeCCTNode)appRootNode);
             }
         }
 
@@ -452,8 +484,7 @@ public class LockContentionPanel extends DataView {
         }
     }
     
-    private void
-            exportCSV(String separator, ExportDataDumper eDD) {
+    private void exportCSV(String separator, ExportDataDumper eDD) {
         // Header
         StringBuffer result = new StringBuffer();
         String newLine = "\r\n"; // NOI18N
@@ -673,6 +704,7 @@ public class LockContentionPanel extends DataView {
                 hbrTime.setMaxValue(getTimeInMicroSec(newRoot));
                 hbrWaits.setMaxValue(newRoot.getWaits());
                 treeTableModel.setRoot(newRoot);
+                lastupdate = System.currentTimeMillis();
             }
         });
     }

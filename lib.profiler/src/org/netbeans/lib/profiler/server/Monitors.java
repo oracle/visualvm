@@ -357,7 +357,7 @@ public class Monitors implements CommonConstants {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void getThreadsData(MonitoredNumbersResponse mresp) {
-            if (explicitThreads != null) {
+            if (explPos > 0) {
                 // pass the collected explicit thread state changes
                 int[] msgExplicitThreads = new int[explPos];
                 System.arraycopy(explicitThreads, 0, msgExplicitThreads, 0, explPos);
@@ -369,11 +369,9 @@ public class Monitors implements CommonConstants {
                 mresp.setExplicitDataOnThreads(msgExplicitThreads, msgExplicitStates, msgExplicitTimeStamps);
                 
                 // and reset the arrays/pos
-                if (explPos > 0) {
-                    explicitStates = new byte[explPos];
-                    explicitThreads = new int[explPos];
-                    explicitTimeStamps = new long[explPos];
-                }
+                explicitStates = new byte[explPos];
+                explicitThreads = new int[explPos];
+                explicitTimeStamps = new long[explPos];
                 explPos = 0;
             } else {
                 // explicit Threads states not supported
@@ -487,7 +485,7 @@ public class Monitors implements CommonConstants {
                 nFilledSlots++;
             }
 
-            if (explicitThreads != null) {
+            if (explPos > 0) {
                 // we are actually using exact thread states tracking, so make use of zombie state that we otherwise do
                 // not get
                 if (status == CommonConstants.THREAD_STATUS_ZOMBIE || threadNew[pos]) {
@@ -515,7 +513,7 @@ public class Monitors implements CommonConstants {
         }
 
         private void findDeathThreads() {
-            if (explicitThreads == null) return;
+            if (explPos == 0) return;
             // we are actually using exact thread states tracking, so make use zombie state that we otherwise do
             for (int i = 0; i < size; i++) {
                 if ((threads[i] == null) || (threads[i] == dummyObj)) {
