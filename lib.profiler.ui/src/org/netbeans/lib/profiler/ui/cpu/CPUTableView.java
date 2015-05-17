@@ -83,6 +83,9 @@ abstract class CPUTableView extends CPUView {
     private boolean sampled = true;
     private boolean twoTimeStamps;
     
+    private boolean hitsVisible = false;
+    private boolean invocationsVisible = true;
+    
     
     public CPUTableView(Set<ClientUtils.SourceCodeSelection> selection) {
         this.selection = selection;
@@ -155,9 +158,20 @@ abstract class CPUTableView extends CPUView {
                     tableModel.fireTableDataChanged();
                 }
                 if (structureChange) {
+                    // Resolve Hits/Invocations column
                     int col = table.convertColumnIndexToView(selection == null ? 5 : 6);
                     String colN = tableModel.getColumnName(selection == null ? 5 : 6);
+                    
+                    // Persist current Hits/Invocations column visibility
+                    if (sampled) invocationsVisible = table.isColumnVisible(col);
+                    else hitsVisible = table.isColumnVisible(col);
+                    
+                    // Update Hits/Invocations column name
                     table.getColumnModel().getColumn(col).setHeaderValue(colN);
+                    
+                    // Set new Hits/Invocations column visibility
+                    table.setColumnVisibility(col, sampled ? hitsVisible : invocationsVisible);
+                    
                     repaint();
                 }
             }
