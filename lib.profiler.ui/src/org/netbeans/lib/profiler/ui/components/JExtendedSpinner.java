@@ -44,6 +44,8 @@
 package org.netbeans.lib.profiler.ui.components;
 
 import java.awt.Font;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
@@ -84,6 +86,7 @@ public class JExtendedSpinner extends JSpinner {
                     }
                 }
             });
+        configureWheelListener();
     }
 
     public JExtendedSpinner(SpinnerModel model) {
@@ -96,6 +99,7 @@ public class JExtendedSpinner extends JSpinner {
                     }
                 }
             });
+        configureWheelListener();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -119,5 +123,18 @@ public class JExtendedSpinner extends JSpinner {
             ((JSpinner.DefaultEditor) getEditor()).getTextField().getAccessibleContext()
              .setAccessibleDescription(getAccessibleContext().getAccessibleDescription());
         }
+    }
+    
+    
+    private void configureWheelListener() {
+        addMouseWheelListener(new MouseWheelListener() {
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if (e.getScrollType() != MouseWheelEvent.WHEEL_UNIT_SCROLL) return;
+                Object newValue = (e.getWheelRotation() < 0 ?
+                                   JExtendedSpinner.this.getNextValue() :
+                                   JExtendedSpinner.this.getPreviousValue());
+                if (newValue != null) JExtendedSpinner.this.setValue(newValue);
+            }
+        });
     }
 }

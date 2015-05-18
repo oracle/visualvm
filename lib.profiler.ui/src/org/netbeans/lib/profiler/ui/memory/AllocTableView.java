@@ -55,6 +55,7 @@ import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.Formatters;
@@ -65,8 +66,9 @@ import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 
 /**
  *
@@ -97,8 +99,8 @@ abstract class AllocTableView extends MemoryView {
     protected ProfilerTable getResultsComponent() { return table; }
     
     
-    void setData(final int _nTrackedItems, final String[] _classNames,
-                 final int[] _nTotalAllocObjects, final long[] _totalAllocObjectsSize) {
+    private void setData(final int _nTrackedItems, final String[] _classNames,
+                 final int[] _nTotalAllocObjects, final long[] _totalAllocObjectsSize, final boolean diff) {
         
         // TODO: show classes with zero instances in live results!
         
@@ -113,13 +115,31 @@ abstract class AllocTableView extends MemoryView {
                     totalAllocObjectsSize = _totalAllocObjectsSize;
                     
                     long totalObjects = 0;
+                    long _totalObjects = 0;
                     long totalBytes = 0;
+                    long _totalBytes = 0;
+                    
                     for (int i = 0; i < nTrackedItems; i++) {
-                        totalObjects += nTotalAllocObjects[i];
-                        totalBytes += totalAllocObjectsSize[i];
+                        if (diff) {
+                            totalObjects = Math.max(totalObjects, nTotalAllocObjects[i]);
+                            _totalObjects = Math.min(_totalObjects, nTotalAllocObjects[i]);
+                            totalBytes = Math.max(totalBytes, totalAllocObjectsSize[i]);
+                            _totalBytes = Math.min(_totalBytes, totalAllocObjectsSize[i]);
+                        } else {
+                            totalObjects += nTotalAllocObjects[i];
+                            totalBytes += totalAllocObjectsSize[i];
+                        }
                     }
-                    renderers[0].setMaxValue(totalBytes);
-                    renderers[1].setMaxValue(totalObjects);
+                    if (diff) {
+                        renderers[0].setMaxValue(Math.max(Math.abs(totalBytes), Math.abs(_totalBytes)));
+                        renderers[1].setMaxValue(Math.max(Math.abs(totalObjects), Math.abs(_totalObjects)));
+                    } else {
+                        renderers[0].setMaxValue(totalBytes);
+                        renderers[1].setMaxValue(totalObjects);
+                    }
+                    
+                    renderers[0].setDiffMode(diff);
+                    renderers[1].setDiffMode(diff);
                     
                     tableModel.fireTableDataChanged();
                 }
@@ -129,6 +149,7 @@ abstract class AllocTableView extends MemoryView {
     
     public void setData(MemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
         AllocMemoryResultsSnapshot _snapshot = (AllocMemoryResultsSnapshot)snapshot;
+        boolean diff = _snapshot instanceof AllocMemoryResultsDiff;
         
         String[] _classNames = _snapshot.getClassNames();
         int[] _nTotalAllocObjects = _snapshot.getObjectsCounts();
@@ -137,14 +158,14 @@ abstract class AllocTableView extends MemoryView {
         int _nTrackedItems = Math.min(_snapshot.getNProfiledClasses(), _classNames.length);
         _nTrackedItems = Math.min(_nTrackedItems, _nTotalAllocObjects.length);
         
-        // class names in VM format
-        for (int i = 0; i < _nTrackedItems; i++)
-            _classNames[i] = StringUtils.userFormClassName(_classNames[i]);
+//        // class names in VM format
+//        for (int i = 0; i < _nTrackedItems; i++)
+//            _classNames[i] = StringUtils.userFormClassName(_classNames[i]);
         
-        if (filter == null) { // old snapshot
-            filterZeroItems = true;
+        if (filter == null) { // old snapshot or live results
+            filterZeroItems = !diff;
             
-            setData(_nTrackedItems, _classNames, _nTotalAllocObjects, _totalAllocObjectsSize);
+            setData(_nTrackedItems, _classNames, _nTotalAllocObjects, _totalAllocObjectsSize, diff);
         } else { // new snapshot
             filterZeroItems = false;
             
@@ -169,7 +190,7 @@ abstract class AllocTableView extends MemoryView {
             long[] aTotalAllocObjectsSize = new long[trackedItems];
             for (int i = 0; i < trackedItems; i++) aTotalAllocObjectsSize[i] = fTotalAllocObjectsSize.get(i);
             
-            setData(trackedItems, aClassNames, aTotalAllocObjects, aTotalAllocObjectsSize);
+            setData(trackedItems, aClassNames, aTotalAllocObjects, aTotalAllocObjectsSize, diff);
         }
     }
     
@@ -180,6 +201,11 @@ abstract class AllocTableView extends MemoryView {
                 classNames = null;
                 nTotalAllocObjects = null;
                 totalAllocObjectsSize = null;
+                
+                renderers[0].setMaxValue(0);
+                renderers[1].setMaxValue(0);
+                renderers[0].setDiffMode(false);
+                renderers[1].setDiffMode(false);
                 
                 tableModel.fireTableDataChanged();
             }
@@ -263,7 +289,7 @@ abstract class AllocTableView extends MemoryView {
         renderers[1].setMaxValue(12345678);
         
         if (selection != null) table.setColumnRenderer(0, new CheckBoxRenderer());
-        table.setColumnRenderer(1 + offset, new JavaNameRenderer());
+        table.setColumnRenderer(1 + offset, new JavaNameRenderer(Icons.getIcon(LanguageIcons.CLASS)));
         table.setColumnRenderer(2 + offset, renderers[0]);
         table.setColumnRenderer(3 + offset, renderers[1]);
         

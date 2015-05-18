@@ -533,7 +533,15 @@ public class ProfilerTable extends JTable {
     }
     
     protected void updateColumnsPreferredWidth() {
-        if (scrolling || scrollableColumns == null || getRowCount() == 0) return;
+        if (scrolling || scrollableColumns == null) return;
+        
+        ProfilerColumnModel cModel = _getColumnModel();
+        
+        if (getRowCount() == 0) {
+            for (int column : scrollableColumns)
+                cModel.setColumnPreferredWidth(column, 0);
+            return;
+        }
         
         Rectangle visible = getVisibleRect();
         if (visible.isEmpty()) return;
@@ -542,8 +550,6 @@ public class ProfilerTable extends JTable {
         int first = rowAtPoint(visibleP);
         visibleP.translate(0, visible.height - 1);
         int last = rowAtPoint(visibleP);
-        
-        ProfilerColumnModel cModel = _getColumnModel();
         
         for (int column : scrollableColumns) {
             int _column = convertColumnIndexToView(column);

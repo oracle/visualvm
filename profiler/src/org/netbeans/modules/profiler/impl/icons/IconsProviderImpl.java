@@ -180,6 +180,7 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(ProfilerIcons.MONITORING, "monitoring.png");
         cache.put(ProfilerIcons.MONITORING_32, "monitoring32.png");
         cache.put(ProfilerIcons.STARTUP_32, "startup32.png");
+        cache.put(ProfilerIcons.DELTA_RESULTS, "deltaValues.png");
         
         cache.put(LanguageIcons.CLASS, "class.png");
         cache.put(LanguageIcons.CLASS_ANONYMOUS, "classAnonymous.png");

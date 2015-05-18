@@ -301,7 +301,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
     public PrestimeCPUCCTNode getRootNode(int view, Collection<Integer> threads, boolean merge) {
         if (threads == null) {
             if (merge == false) {
-                return getRootNode(view);
+                return fixNCalls(getRootNode(view));
             } else {
                 int[] _threads = getThreadIds();
                 threads = new ArrayList(_threads.length);
@@ -314,7 +314,19 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         for (int i = 0; i < nodes.length; i++)
             nodes[i] = getContainerForThread(threadIds.next(), view).getRootNode();
         
-        return new PrestimeCPUCCTNodeBacked(threadCCTContainers[view][0], merge ? mergedChildren(nodes) : nodes);
+        return merge ? new PrestimeCPUCCTNodeBacked(threadCCTContainers[view][0], mergedChildren(nodes)) :
+                       fixNCalls(new PrestimeCPUCCTNodeBacked(threadCCTContainers[view][0], nodes));
+    }
+    
+    // Workaround to display sum of invocations of all children for thread nodes
+    private PrestimeCPUCCTNode fixNCalls(PrestimeCPUCCTNode root) {
+        for (CCTNode node : root.getChildren()) {
+            PrestimeCPUCCTNode _root = (PrestimeCPUCCTNode)node;
+            _root.nCalls = 0;
+            for (CCTNode child : _root.getChildren())
+                _root.addNCalls(((PrestimeCPUCCTNode)child).getNCalls());
+        }
+        return root;
     }
     
     private PrestimeCPUCCTNode[] mergedChildren(PrestimeCPUCCTNode[] nodes) {
@@ -323,7 +335,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         for (PrestimeCPUCCTNode node : nodes)
             for (CCTNode n : node.getChildren()) {
                 int idx = merged.indexOf(n);
-                if (idx == -1) merged.add((PrestimeCPUCCTNode)n);
+                if (idx == -1) merged.add((PrestimeCPUCCTNode)n); // TODO: add node copy !!!
                 else merged.get(idx).merge(n);
             }
         
@@ -496,6 +508,11 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         }
 
         return ret;
+    }
+    
+    public CPUResultsSnapshot createDiff(CPUResultsSnapshot snapshot) {
+        if (!(snapshot instanceof CPUResultsSnapshot)) return null;
+        return new CPUResultsDiff(this, (CPUResultsSnapshot)snapshot);
     }
     
     void readFromSnapshot(CPUResultsSnapshot s) {

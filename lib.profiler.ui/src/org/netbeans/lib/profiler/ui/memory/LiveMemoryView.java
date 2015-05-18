@@ -68,6 +68,7 @@ import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
+import org.netbeans.lib.profiler.utils.StringUtils;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -91,6 +92,9 @@ public abstract class LiveMemoryView extends JPanel {
     private final Set<ClientUtils.SourceCodeSelection> selection;
     private final ResultsMonitor rm;
     
+    private MemoryResultsSnapshot snapshot;
+    private MemoryResultsSnapshot refSnapshot;
+    
     
     @ServiceProvider(service=MemoryCCTProvider.Listener.class)
     public static final class ResultsMonitor implements MemoryCCTProvider.Listener {
@@ -103,7 +107,7 @@ public abstract class LiveMemoryView extends JPanel {
                 try {
                     view.refreshData(appRootNode);
                 } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    Logger.getLogger(LiveMemoryView.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(LiveMemoryView.class.getName()).log(Level.FINE, null, ex);
                 }
             }
         }
@@ -128,17 +132,39 @@ public abstract class LiveMemoryView extends JPanel {
     private void refreshData(RuntimeCCTNode appRootNode) throws ClientUtils.TargetAppOrVMTerminated {
         if ((lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis() || paused) && !forceRefresh) return;
         
-        final MemoryResultsSnapshot snapshot = client.getMemoryProfilingResultsSnapshot(false);
+        final MemoryResultsSnapshot _snapshot = client.getMemoryProfilingResultsSnapshot(false);
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                MemoryView _dataView = getDataView(snapshot);
-                if (_dataView != null) dataView.setData(snapshot, null, CPUResultsSnapshot.CLASS_LEVEL_VIEW);
-            }
+            public void run() { refreshDataImpl(_snapshot); }
         });
         
         lastupdate = System.currentTimeMillis();
         forceRefresh = false;
-    }    
+    }
+    
+    private void refreshDataImpl(MemoryResultsSnapshot _snapshot) {
+        assert SwingUtilities.isEventDispatchThread();
+        
+        snapshot = _snapshot;
+        
+        // class names in VM format
+        String[] classNames = snapshot == null ? null : snapshot.getClassNames();
+        if (classNames != null) for (int i = 0; i < classNames.length; i++)
+            classNames[i] = StringUtils.userFormClassName(classNames[i]);
+        
+        updateDataView(snapshot);
+        
+        if (dataView != null && snapshot != null) {
+            if (refSnapshot == null) dataView.setData(snapshot, null, CPUResultsSnapshot.CLASS_LEVEL_VIEW);
+            else dataView.setData(refSnapshot.createDiff(snapshot), null, CPUResultsSnapshot.CLASS_LEVEL_VIEW);
+        }
+    }
+    
+    public boolean setDiffView(boolean diff) {
+        if (snapshot == null) return false;
+        refSnapshot = diff ? snapshot : null;
+        refreshDataImpl(snapshot);
+        return true;
+    }
 
     public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
         if (paused && !forceRefresh) return;
@@ -159,6 +185,8 @@ public abstract class LiveMemoryView extends JPanel {
     
     public void resetData() {
         if (dataView != null) dataView.resetData();
+        snapshot = null;
+        refSnapshot = null;
     }
 
     public void setPaused(boolean paused) {
@@ -190,10 +218,11 @@ public abstract class LiveMemoryView extends JPanel {
     public void popupHidden() {};
     
     
-    private MemoryView getDataView(MemoryResultsSnapshot snapshot) {
+    private void updateDataView(MemoryResultsSnapshot snapshot) {
         if (snapshot == null || snapshot instanceof SampledMemoryResultsSnapshot) {
-            if (dataView instanceof SampledTableView) return dataView;
-            else dataView = new SampledTableView(selection) {
+            if (dataView instanceof SampledTableView) return;
+            
+            dataView = new SampledTableView(selection) {
                 protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                     if (showSourceSupported()) showSource(userValue);
                 }
@@ -206,8 +235,9 @@ public abstract class LiveMemoryView extends JPanel {
             };
         } else if (snapshot instanceof AllocMemoryResultsSnapshot) {
             if (snapshot.containsStacks()) {
-                if (dataView instanceof AllocTreeTableView) return dataView;
-                else dataView = new AllocTreeTableView(selection) {
+                if (dataView instanceof AllocTreeTableView) return;
+                
+                dataView = new AllocTreeTableView(selection) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
@@ -219,8 +249,9 @@ public abstract class LiveMemoryView extends JPanel {
                     protected boolean hasBottomFilterFindMargin() { return true; }
                 };
             } else {
-                if (dataView instanceof AllocTableView) return dataView;
-                else dataView = new AllocTableView(selection) {
+                if (dataView instanceof AllocTableView) return;
+                
+                dataView = new AllocTableView(selection) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
@@ -234,8 +265,9 @@ public abstract class LiveMemoryView extends JPanel {
             }
         } else if (snapshot instanceof LivenessMemoryResultsSnapshot) {
             if (snapshot.containsStacks()) {
-                if (dataView instanceof LivenessTreeTableView) return dataView;
-                else dataView = new LivenessTreeTableView(selection) {
+                if (dataView instanceof LivenessTreeTableView) return;
+                
+                dataView = new LivenessTreeTableView(selection) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
@@ -247,8 +279,9 @@ public abstract class LiveMemoryView extends JPanel {
                     protected boolean hasBottomFilterFindMargin() { return true; }
                 };
             } else {
-                if (dataView instanceof LivenessTableView) return dataView;
-                else dataView = new LivenessTableView(selection) {
+                if (dataView instanceof LivenessTableView) return;
+                
+                dataView = new LivenessTableView(selection) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
@@ -264,15 +297,9 @@ public abstract class LiveMemoryView extends JPanel {
             dataView = null;
         }
         
-        updateDataView(dataView);
-        
-        return dataView;
-    }
-
-    private void updateDataView(MemoryView _dataView) {
         removeAll();
         resetData();
-        if (_dataView != null) add(_dataView, BorderLayout.CENTER);
+        if (dataView != null) add(dataView, BorderLayout.CENTER);
         revalidate();
         repaint();
     }
@@ -305,7 +332,7 @@ public abstract class LiveMemoryView extends JPanel {
         setLayout(new BorderLayout(0, 0));
         
         // TODO: read last state?
-        updateDataView(getDataView(null));
+        updateDataView(null);
         
         registerActions();
     }

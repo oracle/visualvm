@@ -50,6 +50,7 @@ import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -70,6 +71,8 @@ import org.netbeans.lib.profiler.ui.components.CloseButton;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.spi.ActionsSupportProvider;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -96,23 +99,29 @@ public final class SearchUtils {
     public static boolean findString(ProfilerTable table, String text, boolean next) {
         int rowCount = table.getRowCount();
         
+        ProfilerTreeTable treeTable = null;
+        
         if (rowCount == 0) {
             ProfilerDialogs.displayWarning(MSG_NODATA, ACTION_FIND, null);
             return false;
         } else if (rowCount == 1) {
-            return false;
+            if (!(table instanceof ProfilerTreeTable)) return false;
+            
+            treeTable = (ProfilerTreeTable)table;
+            TreeNode node = treeTable.getValueForRow(0);
+            if (node == null || node.isLeaf()) return false;
         }
         
         text = text.toLowerCase();
         
         int mainColumn = table.convertColumnIndexToView(table.getMainColumn());
         
-        if (table instanceof ProfilerTreeTable) {
-            ProfilerTreeTable treeTable = (ProfilerTreeTable)table;
+        if (treeTable != null || table instanceof ProfilerTreeTable) {
+            if (treeTable == null) treeTable = (ProfilerTreeTable)table;
             TreePath selectedPath = treeTable.getSelectionPath();
             if (selectedPath == null) selectedPath = treeTable.getRootPath();
-            TreePath startPath = selectedPath;
-            
+            boolean firstPath = true;
+            TreePath startPath = null;
             do {
                 selectedPath = next ? treeTable.getNextPath(selectedPath) :
                                       treeTable.getPreviousPath(selectedPath);
@@ -121,7 +130,9 @@ public final class SearchUtils {
                     treeTable.selectPath(selectedPath, true);
                     return true;
                 }
-            } while (!selectedPath.equals(startPath));
+                if (startPath == null) startPath = selectedPath;
+                else if (firstPath) firstPath = false;
+            } while (firstPath || !selectedPath.equals(startPath));
         } else {
             int selectedRow = table.getSelectedRow();
             boolean fromSelection = selectedRow != -1;
@@ -150,7 +161,7 @@ public final class SearchUtils {
         JToolBar toolbar = new JToolBar(JToolBar.HORIZONTAL);
         if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel())
                 toolbar.setLayout(new BoxLayout(toolbar, BoxLayout.LINE_AXIS));
-        toolbar.setBorder(BorderFactory.createEmptyBorder(getUpperMargin(), 2, 0, 2));
+        toolbar.setBorder(BorderFactory.createEmptyBorder(getTopMargin(), 2, getBottomMargin(), 2));
         toolbar.setBorderPainted(false);
         toolbar.setRollover(true);
         toolbar.setFloatable(false);
@@ -285,14 +296,34 @@ public final class SearchUtils {
         return search == null ? null : search.trim();
     }
     
-    private static int getUpperMargin() {
+    private static int getTopMargin() {
         if (UIUtils.isWindowsLookAndFeel() || UIUtils.isMetalLookAndFeel()) return 1;
-        if (UIUtils.isAquaLookAndFeel() || UIUtils.isNimbusLookAndFeel()) return 0;
+        if (UIUtils.isAquaLookAndFeel() || UIUtils.isNimbusLookAndFeel() || UIUtils.isOracleLookAndFeel()) return 0;
         return 2;
+    }
+    
+    private static int getBottomMargin() {
+        if (UIUtils.isOracleLookAndFeel()) return 1;
+        return 0;
     }
     
     
     // Do not create instances of this class
     private SearchUtils() {}
+    
+    
+    // Default keybinding Ctrl+F for Find action
+    private static interface Support { @ServiceProvider(service=ActionsSupportProvider.class, position=100)
+        public static final class SearchActionProvider extends ActionsSupportProvider {
+            public boolean registerAction(String actionKey, Action action, ActionMap actionMap, InputMap inputMap) {
+                if (!FIND_ACTION_KEY.equals(actionKey)) return false;
+
+                actionMap.put(actionKey, action);
+                inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK), actionKey);
+
+                return true;
+            }
+        }
+    }
     
 }

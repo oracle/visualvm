@@ -46,12 +46,15 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
+import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
+import javax.swing.Icon;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JToggleButton;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
@@ -64,6 +67,7 @@ import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
+import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 
 /**
@@ -74,7 +78,9 @@ public abstract class SnapshotMemoryView extends JPanel {
     
     // -----
     // I18N String constants
-//    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.memory.Bundle"); // NOI18N
+    private static final String COMPARE_SNAPSHOTS = messages.getString("SnapshotMemoryView_CompareSnapshots"); // NOI18N
+    private static final String RESET_COMPARE_SNAPSHOTS = messages.getString("SnapshotMemoryView_ResetCompareSnapshots"); // NOI18N
 //    private static final String TOOLBAR_AGGREGATION = messages.getString("SnapshotMemoryView_ToolbarAggregation"); // NOI18N
 //    private static final String AGGREGATION_CLASSES = messages.getString("SnapshotMemoryView_AggregationClasses"); // NOI18N
 //    private static final String AGGREGATION_PACKAGES = messages.getString("SnapshotMemoryView_AggregationPackages"); // NOI18N
@@ -85,11 +91,17 @@ public abstract class SnapshotMemoryView extends JPanel {
     private int aggregation;
     private final Collection filter;
     private final MemoryResultsSnapshot snapshot;
+    private MemoryResultsSnapshot refSnapshot;
     
     
-    public SnapshotMemoryView(MemoryResultsSnapshot snapshot, Collection filter, Action saveAction, Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
+    public SnapshotMemoryView(MemoryResultsSnapshot snapshot, Collection filter, Action saveAction, final Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
         this.filter = filter;
         this.snapshot = snapshot;
+        
+        // class names in VM format
+        String[] classNames = snapshot == null ? null : snapshot.getClassNames();
+        if (classNames != null) for (int i = 0; i < classNames.length; i++)
+            classNames[i] = StringUtils.userFormClassName(classNames[i]);
         
         setLayout(new BorderLayout());
         
@@ -161,7 +173,22 @@ public abstract class SnapshotMemoryView extends JPanel {
             toolbar.addSeparator();
             toolbar.addSpace(2);
         
-            toolbar.add(compareAction);
+            Icon icon = (Icon)compareAction.getValue(Action.SMALL_ICON);
+            JToggleButton compareButton = new JToggleButton(icon) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    boolean sel = isSelected();
+                    if (sel) {
+                        compareAction.actionPerformed(e);
+                        if (refSnapshot == null) setSelected(false);
+                    } else {
+                        setRefSnapshot(null);
+                    }
+                    setToolTipText(isSelected() ? RESET_COMPARE_SNAPSHOTS :
+                                                  COMPARE_SNAPSHOTS);
+                }
+            };
+            compareButton.setToolTipText(COMPARE_SNAPSHOTS);
+            toolbar.add(compareButton);
         }
         
 //        toolbar.addSpace(2);
@@ -214,6 +241,12 @@ public abstract class SnapshotMemoryView extends JPanel {
     }
     
     
+    public void setRefSnapshot(MemoryResultsSnapshot snapshot) {
+        refSnapshot = snapshot;
+        setAggregation(aggregation);
+    }
+    
+    
     public abstract boolean showSourceSupported();
     
     public abstract void showSource(ClientUtils.SourceCodeSelection value);
@@ -239,7 +272,7 @@ public abstract class SnapshotMemoryView extends JPanel {
         String className = value.getClassName();
         String methodName = value.getMethodName();
         
-        if (method && methodName.endsWith("[native]")) return false;
+        if (method && methodName.endsWith("[native]")) return false; // NOI18N
         
         if (PresoObjAllocCCTNode.VM_ALLOC_CLASS.equals(className) && PresoObjAllocCCTNode.VM_ALLOC_METHOD.equals(methodName)) return false;
         
@@ -278,12 +311,25 @@ public abstract class SnapshotMemoryView extends JPanel {
     
     private void setAggregation(int aggregation) {
         this.aggregation = aggregation;
-        if (dataView != null) dataView.setData(snapshot, filter, aggregation);
+        if (dataView != null) {
+            if (refSnapshot == null) dataView.setData(snapshot, filter, aggregation);
+            else dataView.setData(snapshot.createDiff(refSnapshot), filter, aggregation);
+        }
     }
     
     private ExportUtils.Exportable[] getExportables(final ExportUtils.Exportable snapshotExporter) {
         return new ExportUtils.Exportable[] {
-            snapshotExporter,
+            new ExportUtils.Exportable() {
+                public boolean isEnabled() {
+                    return refSnapshot == null && snapshotExporter.isEnabled();
+                }
+                public String getName() {
+                    return snapshotExporter.getName();
+                }
+                public ExportUtils.ExportProvider[] getProviders() {
+                    return snapshotExporter.getProviders();
+                }
+            },
             new ExportUtils.Exportable() {
                 public boolean isEnabled() {
                     return true;

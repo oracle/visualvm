@@ -65,6 +65,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.FilteringToolbar;
 import org.netbeans.lib.profiler.ui.swing.PopupButton;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
@@ -90,6 +91,9 @@ public abstract class ThreadsSelector extends PopupButton {
     private static final String ALL_THREADS = messages.getString("ThreadsSelector_AllThreads"); // NOI18N
     private static final String FILTER_THREADS = messages.getString("ThreadsSelector_FilterThreads"); // NOI18N
     private static final String MERGE_THREADS = messages.getString("ThreadsSelector_MergeThreads"); // NOI18N
+    private static final String ALL_THREADS_TOOLTIP = messages.getString("ThreadsSelector_AllThreadsToolTip"); // NOI18N
+    private static final String MERGE_THREADS_TOOLTIP = messages.getString("ThreadsSelector_MergeThreadsToolTip"); // NOI18N
+    private static final String MERGE_THREADS_TOOLTIP_DISABLED = messages.getString("ThreadsSelector_MergeThreadsToolTipDisabled"); // NOI18N
     private static final String COLUMN_SELECTED = messages.getString("ThreadsSelector_ColumnSelected"); // NOI18N
     private static final String COLUMN_THREAD = messages.getString("ThreadsSelector_ColumnThread"); // NOI18N
     // -----
@@ -112,6 +116,17 @@ public abstract class ThreadsSelector extends PopupButton {
     public abstract CPUResultsSnapshot getSnapshot();
     
     public abstract void selectionChanged(Collection<Integer> selected, boolean mergeThreads);
+    
+    
+    void reset() {
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                displayAllThreads = true;
+                mergeSelectedThreads = false;
+                selection.clear();
+            }
+        });
+    }
     
     
     public String getToolTipText() {
@@ -173,6 +188,17 @@ public abstract class ThreadsSelector extends PopupButton {
             controls.addSeparator();
             controls.add(Box.createHorizontalStrut(3));
             
+            final JCheckBox mergeThreads = new JCheckBox(MERGE_THREADS, mergeSelectedThreads) {
+                protected void fireItemStateChanged(ItemEvent e) {
+                    mergeSelectedThreads = isSelected() && !displayAllThreads;
+                    fireSelectionChanged();
+                }
+                public String getToolTipText() {
+                    return isEnabled() ? super.getToolTipText() : MERGE_THREADS_TOOLTIP_DISABLED;
+                }
+            };
+            mergeThreads.setToolTipText(MERGE_THREADS_TOOLTIP);
+            
             final boolean[] resetterEvent = new boolean[1];
             final JCheckBox allThreads = new JCheckBox(ALL_THREADS, displayAllThreads) {
                 protected void fireItemStateChanged(ItemEvent e) {
@@ -183,14 +209,21 @@ public abstract class ThreadsSelector extends PopupButton {
                         for (int i = 0; i < snapshot.getNThreads(); i++)
                             selection.add(snapshot.getThreadIds()[i]);
                     else selection.clear();
+                    mergeThreads.setEnabled(!displayAllThreads);
+                    if (displayAllThreads) {
+                        mergeThreads.setSelected(false);
+                        mergeSelectedThreads = false;
+                    }
                     threadsModel.fireTableDataChanged();
                     fireSelectionChanged();
                 }
             };
+            allThreads.setToolTipText(ALL_THREADS_TOOLTIP);
             allThreadsResetter = new Runnable() {
                 public void run() {
                     resetterEvent[0] = true;
                     allThreads.setSelected(false);
+                    mergeThreads.setEnabled(true);
                     resetterEvent[0] = false;
                 }
             };
@@ -198,12 +231,6 @@ public abstract class ThreadsSelector extends PopupButton {
             
             controls.add(Box.createHorizontalStrut(7));
             
-            JCheckBox mergeThreads = new JCheckBox(MERGE_THREADS, mergeSelectedThreads) {
-                protected void fireItemStateChanged(ItemEvent e) {
-                    mergeSelectedThreads = isSelected();
-                    fireSelectionChanged();
-                }
-            };
             controls.add(mergeThreads);
             
             controls.add(Box.createHorizontalStrut(20));
@@ -221,6 +248,7 @@ public abstract class ThreadsSelector extends PopupButton {
                 popup.removePopupMenuListener(this);
                 if (!displayAllThreads && selection.isEmpty()) {
                     displayAllThreads = true;
+                    mergeSelectedThreads = false;
                     fireSelectionChanged();
                 }
                 allThreadsResetter = null;

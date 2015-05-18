@@ -63,6 +63,7 @@ import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
+import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTManager;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
@@ -76,7 +77,6 @@ import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 
 /**
@@ -113,6 +113,7 @@ abstract class AllocTreeTableView extends MemoryView {
     
     public void setData(MemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
         final boolean includeEmpty = filter != null;
+        final boolean diff = snapshot instanceof AllocMemoryResultsDiff;
         final AllocMemoryResultsSnapshot _snapshot = (AllocMemoryResultsSnapshot)snapshot;
         
         String[] _classNames = _snapshot.getClassNames();
@@ -126,13 +127,23 @@ abstract class AllocTreeTableView extends MemoryView {
         final Map<TreeNode, ClientUtils.SourceCodeSelection> _nodesMap = new HashMap();
         
         long totalObjects = 0;
+        long _totalObjects = 0;
         long totalBytes = 0;
+        long _totalBytes = 0;
         
         for (int i = 0; i < _nTrackedItems; i++) {
-            totalObjects += _nTotalAllocObjects[i];
-            totalBytes += _totalAllocObjectsSize[i];
+            if (diff) {
+                totalObjects = Math.max(totalObjects, _nTotalAllocObjects[i]);
+                _totalObjects = Math.min(_totalObjects, _nTotalAllocObjects[i]);
+                totalBytes = Math.max(totalBytes, _totalAllocObjectsSize[i]);
+                _totalBytes = Math.min(_totalBytes, _totalAllocObjectsSize[i]);
+            } else {
+                totalObjects += _nTotalAllocObjects[i];
+                totalBytes += _totalAllocObjectsSize[i];
+            }
             
-            String className = StringUtils.userFormClassName(_classNames[i]);
+//            String className = StringUtils.userFormClassName(_classNames[i]);
+            String className = _classNames[i];
             
             if ((!includeEmpty && _nTotalAllocObjects[i] > 0) || (includeEmpty && filter.contains(className))) {
                 final int _i = i;
@@ -160,15 +171,19 @@ abstract class AllocTreeTableView extends MemoryView {
             }
         }
         
-        final long _totalBytes = totalBytes;
-        final long _totalObjects = totalObjects;
+        final long __totalBytes = !diff ? totalBytes :
+                Math.max(Math.abs(totalBytes), Math.abs(_totalBytes));
+        final long __totalObjects = !diff ? totalObjects :
+                Math.max(Math.abs(totalObjects), Math.abs(_totalObjects));
         final PresoObjAllocCCTNode root = PresoObjAllocCCTNode.rootNode(nodes.toArray(new PresoObjAllocCCTNode[nodes.size()]));
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 nodesMap = _nodesMap;
-                renderers[0].setMaxValue(_totalBytes);
-                renderers[1].setMaxValue(_totalObjects);
+                renderers[0].setMaxValue(__totalBytes);
+                renderers[1].setMaxValue(__totalObjects);
+                renderers[0].setDiffMode(diff);
+                renderers[1].setDiffMode(diff);
                 treeTableModel.setRoot(root);
             }
         });
@@ -180,8 +195,12 @@ abstract class AllocTreeTableView extends MemoryView {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 nodesMap = null;
+                
                 renderers[0].setMaxValue(0);
                 renderers[1].setMaxValue(0);
+                renderers[0].setDiffMode(false);
+                renderers[1].setDiffMode(false);
+                
                 treeTableModel.setRoot(root);
             }
         });

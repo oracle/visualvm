@@ -109,7 +109,7 @@ import org.openide.windows.WindowManager;
     "ResultsManager_SnapshotDeleteFailedMsg=Failed to delete the snapshot file: {0}",
     "ResultsManager_CantFindSnapshotLocationMsg=Cannot find default location for snapshot in project: {0}",
     "ResultsManager_SnapshotCreateInProjectFailedMsg=Failed to create snapshot file in project: {0}",
-    "ResultsManager_SnapshotLoadFailedMsg=Error while loading snapshot: {0}",
+    "ResultsManager_SnapshotLoadFailed=Error while loading snapshot: {0}",
     "ResultsManager_SnapshotsLoadFailedMsg=Loading snapshots failed.",
     "ResultsManager_ObtainSavedSnapshotsFailedMsg=Failed to obtain list of saved snaphshots for project: {0}",
     "ResultsManager_SelectDirDialogCaption=Select Target Directory",
@@ -126,7 +126,7 @@ import org.openide.windows.WindowManager;
     "ResultsManager_CannotCompareSnapshotsMsg=<html><b>Cannot compare snapshots:</b><br><br>  {0}<br>  {1}<br><br>Make sure that both snaphots are the same type.</html>",
     "ResultsManager_DirectoryDoesntExistCaption=Selected Directory Does Not Exist",
     "ResultsManager_DirectoryDoesntExistMsg=The directory you have selected does not exist.\nDo you want to create the directory?",
-    "ResultsManager_SnapshotLoadFailed=<html>Snapshot <b>{0}</b> failed to load</html>",
+    "ResultsManager_SnapshotLoadFailedMsg=<html><b>Snapshot {0} failed to load.</b><br><br>{1}</html>",
     "ResultsManager_CannotOpenSnapshotMsg=<html><b>Cannot open profiler snapshot.</b><br><br>Attempting to open null snapshot.<br>Check the logfile for details.</html>",
     "ResultsManager_CpuSnapshotDisplayName=cpu: {0}",
     "ResultsManager_MemorySnapshotDisplayName=mem: {0}",
@@ -381,6 +381,8 @@ public final class ResultsManager {
     public void compareSnapshots(FileObject snapshot1FO, FileObject snapshot2FO) {
         LoadedSnapshot s1 = null;
         LoadedSnapshot s2 = null;
+        
+        FileObject snapshotFO = snapshot1FO;
 
         try {
             s1 = findAlreadyLoadedSnapshot(snapshot1FO);
@@ -388,6 +390,8 @@ public final class ResultsManager {
             if (s1 == null) {
                 s1 = loadSnapshotFromFileObject(snapshot1FO);
             }
+            
+            snapshotFO = snapshot2FO;
 
             s2 = findAlreadyLoadedSnapshot(snapshot2FO);
 
@@ -395,7 +399,8 @@ public final class ResultsManager {
                 s2 = loadSnapshotFromFileObject(snapshot2FO);
             }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, Bundle.ResultsManager_SnapshotLoadFailed(e.getMessage()), e);
+            LOGGER.log(Level.INFO, Bundle.ResultsManager_SnapshotLoadFailed(snapshotFO.getPath()), e);
+            ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotLoadFailedMsg(snapshotFO.getNameExt(), e.getMessage()));
 
             return;
         }
@@ -406,8 +411,8 @@ public final class ResultsManager {
             ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotsLoadFailedMsg());
         }
     }
-
-    public void compareSnapshots(LoadedSnapshot s1, LoadedSnapshot s2) {
+    
+    public ResultsSnapshot createDiffSnapshot(LoadedSnapshot s1, LoadedSnapshot s2) {
         ResultsSnapshot snap1 = s1.getSnapshot();
         ResultsSnapshot snap2 = s2.getSnapshot();
         ResultsSnapshot diff = null;
@@ -431,8 +436,7 @@ public final class ResultsManager {
                              sn2.getClassNames(), sn2.getObjectsCounts(), sn2.getObjectsSizePerClass(), Integer.MAX_VALUE);
             diff = new AllocMemoryResultsDiff((AllocMemoryResultsSnapshot)snap1,
                                               (AllocMemoryResultsSnapshot)snap2);
-        }
-        else if (snap1 instanceof LivenessMemoryResultsSnapshot && snap2 instanceof LivenessMemoryResultsSnapshot) {
+        } else if (snap1 instanceof LivenessMemoryResultsSnapshot && snap2 instanceof LivenessMemoryResultsSnapshot) {
             LivenessMemoryResultsSnapshot sn1 = (LivenessMemoryResultsSnapshot)snap1;
             LivenessMemoryResultsSnapshot sn2 = (LivenessMemoryResultsSnapshot)snap2;
 // Note: using track each 1 object to prevent unnecessary division, the data are always correct for liveness results
@@ -444,10 +448,17 @@ public final class ResultsManager {
                              sn2.getClassNames(), sn2.getNTrackedLiveObjects(), sn2.getTrackedLiveObjectsSize(), 1);
             diff = new LivenessMemoryResultsDiff((LivenessMemoryResultsSnapshot)snap1,
                                                  (LivenessMemoryResultsSnapshot)snap2);
-        }
-        else if (snap1 instanceof CPUResultsSnapshot && snap2 instanceof CPUResultsSnapshot) {
+        } else if (snap1 instanceof CPUResultsSnapshot && snap2 instanceof CPUResultsSnapshot) {
             diff = new CPUResultsDiff((CPUResultsSnapshot)snap1, (CPUResultsSnapshot)snap2);
         }
+        
+        return diff;
+    }
+
+    public void compareSnapshots(LoadedSnapshot s1, LoadedSnapshot s2) {
+//        ResultsSnapshot snap1 = s1.getSnapshot();
+//        ResultsSnapshot snap2 = s2.getSnapshot();
+        ResultsSnapshot diff = createDiffSnapshot(s1, s2);
 
         if (diff != null) {
             SnapshotsDiffWindow sdw = SnapshotsDiffWindow.get(diff, s1, s2);
@@ -743,7 +754,8 @@ public final class ResultsManager {
         try {
             return loadSnapshotImpl(selectedFile);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, Bundle.ResultsManager_SnapshotLoadFailed(e.getMessage()), e);
+            LOGGER.log(Level.INFO, Bundle.ResultsManager_SnapshotLoadFailed(selectedFile.getPath()), e);
+            ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotLoadFailedMsg(selectedFile.getNameExt(), e.getMessage()));
 
             return null;
         }
@@ -758,7 +770,8 @@ public final class ResultsManager {
                     ret[i] = loadSnapshotImpl(selectedFiles[i]);
                 }
             } catch (IOException e) {
-                ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotLoadFailedMsg(selectedFiles[i].getNameExt()));
+                LOGGER.log(Level.INFO, Bundle.ResultsManager_SnapshotLoadFailed(selectedFiles[i].getPath()), e);
+                ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotLoadFailedMsg(selectedFiles[i].getNameExt(), e.getMessage()));
             }
         }
 
@@ -817,10 +830,8 @@ public final class ResultsManager {
                 srw.requestActive(); // activate the last one
             }
         } catch (Exception e) {
-            ProfilerLogger.log(e);
-
-            ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotLoadFailed(
-                    loadedSnapshot.getFile().getAbsolutePath()));
+            LOGGER.log(Level.INFO, Bundle.ResultsManager_SnapshotLoadFailed(loadedSnapshot.getFile().getAbsoluteFile()), e);
+            ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotLoadFailedMsg(loadedSnapshot.getFile().getName(), e.getMessage()));
         }
     }
 
@@ -870,7 +881,7 @@ public final class ResultsManager {
                     runner.resetTimers(); // reset the server data
                 } catch (ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated) {
                     // the target app has died; clean up all client data
-                    runner.getProfilerClient().resetClientData();
+                    client.resetClientData();
                 }
 
                 LOGGER.log(Level.SEVERE, Bundle.ResultsManager_OutOfMemoryMsg(), e);
@@ -904,7 +915,18 @@ public final class ResultsManager {
         return resultsAvailable;
     }
     
+    
+    public static interface SnapshotHandle {
+        public LoadedSnapshot getSnapshot();
+    }
+    
     public ExportUtils.Exportable createSnapshotExporter(final LoadedSnapshot snapshot) {
+        return createSnapshotExporter(new SnapshotHandle() {
+            public LoadedSnapshot getSnapshot() { return snapshot; }
+        });
+    }
+    
+    public ExportUtils.Exportable createSnapshotExporter(final SnapshotHandle handle) {
         return new ExportUtils.Exportable() {
             public String getName() {
                 return Bundle.ResultsManager_ExportSnapshotData();
@@ -915,6 +937,7 @@ public final class ResultsManager {
             }
 
             public ExportUtils.ExportProvider[] getProviders() {
+                final LoadedSnapshot snapshot = handle.getSnapshot();
                 return new ExportUtils.ExportProvider[] {
                     new ExportUtils.AbstractNPSExportProvider(snapshot.getFile()) {
                         protected void doExport(File targetFile) {

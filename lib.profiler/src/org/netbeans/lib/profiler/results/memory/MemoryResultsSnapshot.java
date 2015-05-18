@@ -154,6 +154,8 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
     }
     
     
+    public abstract MemoryResultsSnapshot createDiff(MemoryResultsSnapshot snapshot);
+    
     public void filterReverse(String filter, int filterType, int sortBy, boolean sortOrder, PresoObjAllocCCTNode root, int classId, boolean dontShowZeroLiveObjAllocPaths) {
         PresoObjAllocCCTNode rev =
                 (PresoObjAllocCCTNode)createPresentationCCT(classId, dontShowZeroLiveObjAllocPaths);

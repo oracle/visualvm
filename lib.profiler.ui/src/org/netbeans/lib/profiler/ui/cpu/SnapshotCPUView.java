@@ -55,6 +55,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -65,6 +66,7 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.results.cpu.CPUResultsDiff;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -100,10 +102,13 @@ public abstract class SnapshotCPUView extends JPanel {
     private static final String AGGREGATION_METHODS = messages.getString("SnapshotCPUView_AggregationMethods"); // NOI18N
     private static final String AGGREGATION_CLASSES = messages.getString("SnapshotCPUView_AggregationClasses"); // NOI18N
     private static final String AGGREGATION_PACKAGES = messages.getString("SnapshotCPUView_AggregationPackages"); // NOI18N
+    private static final String COMPARE_SNAPSHOTS = messages.getString("SnapshotCPUView_CompareSnapshots"); // NOI18N
+    private static final String RESET_COMPARE_SNAPSHOTS = messages.getString("SnapshotCPUView_ResetCompareSnapshots"); // NOI18N
     // -----
     
     private boolean sampled;
     private CPUResultsSnapshot snapshot;
+    private CPUResultsSnapshot refSnapshot;
     
     private int aggregation;
     private boolean mergedThreads;
@@ -114,6 +119,9 @@ public abstract class SnapshotCPUView extends JPanel {
     private CPUTreeTableView forwardCallsView;
     private CPUTreeTableView reverseCallsView;
     
+    private JToggleButton[] toggles;
+    
+    
     public SnapshotCPUView(CPUResultsSnapshot snapshot, boolean sampled, Action saveAction, Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
         initUI(saveAction, compareAction, infoAction, exportProvider);
         registerActions();
@@ -123,11 +131,28 @@ public abstract class SnapshotCPUView extends JPanel {
     }
     
     
+    public void setRefSnapshot(CPUResultsSnapshot snapshot) {
+        refSnapshot = snapshot;
+        setAggregation(aggregation);
+    }
+    
+    
     public abstract boolean showSourceSupported();
     
     public abstract void showSource(ClientUtils.SourceCodeSelection value);
     
     public abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
+    
+    
+    protected void foundInForwardCalls() {
+        toggles[0].setSelected(true);
+    }
+    protected void foundInHotSpots() {
+        toggles[1].setSelected(true);
+    }
+    protected void foundInReverseCalls() {
+        toggles[2].setSelected(true);
+    }
     
     
     private void profileMethod(ClientUtils.SourceCodeSelection value) {
@@ -140,7 +165,7 @@ public abstract class SnapshotCPUView extends JPanel {
     }
     
     
-    private void initUI(Action saveAction, Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
+    private void initUI(Action saveAction, final Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
         setLayout(new BorderLayout(0, 0));
         
         forwardCallsView = new CPUTreeTableView(null, false) {
@@ -234,7 +259,22 @@ public abstract class SnapshotCPUView extends JPanel {
             toolbar.addSeparator();
             toolbar.addSpace(2);
         
-            toolbar.add(compareAction);
+            Icon icon = (Icon)compareAction.getValue(Action.SMALL_ICON);
+            JToggleButton compareButton = new JToggleButton(icon) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    boolean sel = isSelected();
+                    if (sel) {
+                        compareAction.actionPerformed(e);
+                        if (refSnapshot == null) setSelected(false);
+                    } else {
+                        setRefSnapshot(null);
+                    }
+                    setToolTipText(isSelected() ? RESET_COMPARE_SNAPSHOTS :
+                                                  COMPARE_SNAPSHOTS);
+                }
+            };
+            compareButton.setToolTipText(COMPARE_SNAPSHOTS);
+            toolbar.add(compareButton);
         }
         
         toolbar.addSpace(2);
@@ -247,42 +287,43 @@ public abstract class SnapshotCPUView extends JPanel {
         toolbar.addSpace(5);
         
         MultiButtonGroup group = new MultiButtonGroup();
+        toggles = new JToggleButton[3];
         
-        JToggleButton forwardCalls = new JToggleButton(Icons.getIcon(ProfilerIcons.NODE_FORWARD)) {
+        toggles[0] = new JToggleButton(Icons.getIcon(ProfilerIcons.NODE_FORWARD)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 setView(isSelected(), hotSpotsView.isVisible(), reverseCallsView.isVisible());
             }
         };
-        forwardCalls.setToolTipText(VIEW_FORWARD);
-        group.add(forwardCalls);
-        toolbar.add(forwardCalls);
+        toggles[0].setToolTipText(VIEW_FORWARD);
+        group.add(toggles[0]);
+        toolbar.add(toggles[0]);
         forwardCallsView.setVisible(true);
-        forwardCalls.setSelected(true);
+        toggles[0].setSelected(true);
         
-        JToggleButton hotSpots = new JToggleButton(Icons.getIcon(ProfilerIcons.TAB_HOTSPOTS)) {
+        toggles[1] = new JToggleButton(Icons.getIcon(ProfilerIcons.TAB_HOTSPOTS)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 setView(forwardCallsView.isVisible(), isSelected(), reverseCallsView.isVisible());
             }
         };
-        hotSpots.setToolTipText(VIEW_HOTSPOTS);
-        group.add(hotSpots);
-        toolbar.add(hotSpots);
+        toggles[1].setToolTipText(VIEW_HOTSPOTS);
+        group.add(toggles[1]);
+        toolbar.add(toggles[1]);
         hotSpotsView.setVisible(false);
-        hotSpots.setSelected(false);
+        toggles[1].setSelected(false);
         
-        JToggleButton reverseCalls = new JToggleButton(Icons.getIcon(ProfilerIcons.NODE_REVERSE)) {
+        toggles[2] = new JToggleButton(Icons.getIcon(ProfilerIcons.NODE_REVERSE)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 setView(forwardCallsView.isVisible(), hotSpotsView.isVisible(), isSelected());
             }
         };
-        reverseCalls.setToolTipText(VIEW_REVERSE);
-        group.add(reverseCalls);
-        toolbar.add(reverseCalls);
+        toggles[2].setToolTipText(VIEW_REVERSE);
+        group.add(toggles[2]);
+        toolbar.add(toggles[2]);
         reverseCallsView.setVisible(false);
-        reverseCalls.setSelected(false);
+        toggles[2].setSelected(false);
         
 //        Action aCallTree = new AbstractAction() {
 //            { putValue(NAME, VIEW_CALLTREE); }
@@ -432,6 +473,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = hotSpotsView.getResultsComponent();
                     if (SearchUtils.findString(table, searchString, true)) {
+                        toggles[1].setSelected(true);
                         hotSpotsView.setVisible(true);
                         table.requestFocusInWindow();
                     }
@@ -443,6 +485,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = reverseCallsView.getResultsComponent();
                     if (SearchUtils.findString(table, searchString, true)) {
+                        toggles[2].setSelected(true);
                         reverseCallsView.setVisible(true);
                         table.requestFocusInWindow();
                     }
@@ -457,6 +500,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = forwardCallsView.getResultsComponent();
                     if (SearchUtils.findString(table, searchString, true)) {
+                        toggles[0].setSelected(true);
                         forwardCallsView.setVisible(true);
                         table.requestFocusInWindow();
                     }
@@ -468,6 +512,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = reverseCallsView.getResultsComponent();
                     if (SearchUtils.findString(table, searchString, true)) {
+                        toggles[2].setSelected(true);
                         reverseCallsView.setVisible(true);
                         table.requestFocusInWindow();
                     }
@@ -483,6 +528,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = forwardCallsView.getResultsComponent();
                     if (SearchUtils.findString(table, searchString, true)) {
+                        toggles[0].setSelected(true);
                         forwardCallsView.setVisible(true);
                         table.requestFocusInWindow();
                     }
@@ -494,6 +540,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = hotSpotsView.getResultsComponent();
                     if (SearchUtils.findString(table, searchString, true)) {
+                        toggles[1].setSelected(true);
                         hotSpotsView.setVisible(true);
                         table.requestFocusInWindow();
                     }
@@ -522,7 +569,10 @@ public abstract class SnapshotCPUView extends JPanel {
     private void setAggregation(int _aggregation) {
         aggregation = _aggregation;
         
-        final FlatProfileContainer flatData = snapshot.getFlatProfile(selectedThreads, aggregation);
+        CPUResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
+                                       snapshot.createDiff(refSnapshot);
+        
+        final FlatProfileContainer flatData = _snapshot.getFlatProfile(selectedThreads, aggregation);
 
         final Map<Integer, ClientUtils.SourceCodeSelection> idMap = new HashMap();
         for (int i = 0; i < flatData.getNRows(); i++) // TODO: getNRows is filtered, may not work for tree data!
@@ -536,9 +586,10 @@ public abstract class SnapshotCPUView extends JPanel {
 //            }
 //        });
         
-        forwardCallsView.setData(snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled);
-        hotSpotsView.setData(flatData, idMap, sampled);
-        reverseCallsView.setData(snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled);
+        boolean diff = _snapshot instanceof CPUResultsDiff;
+        forwardCallsView.setData(_snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled, diff);
+        hotSpotsView.setData(flatData, idMap, sampled, diff);
+        reverseCallsView.setData(_snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled, diff);
     }
     
     protected final void setSnapshot(CPUResultsSnapshot snapshot, boolean sampled) {
@@ -550,7 +601,17 @@ public abstract class SnapshotCPUView extends JPanel {
     
     private ExportUtils.Exportable[] getExportables(final ExportUtils.Exportable snapshotExporter) {
         return new ExportUtils.Exportable[] {
-            snapshotExporter,
+            new ExportUtils.Exportable() {
+                public boolean isEnabled() {
+                    return refSnapshot == null && snapshotExporter.isEnabled();
+                }
+                public String getName() {
+                    return snapshotExporter.getName();
+                }
+                public ExportUtils.ExportProvider[] getProviders() {
+                    return snapshotExporter.getProviders();
+                }
+            },
             new ExportUtils.Exportable() {
                 public boolean isEnabled() {
                     return forwardCallsView.isVisible();

@@ -42,11 +42,30 @@
  */
 package org.netbeans.lib.profiler.ui.components;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FocusTraversalPolicy;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.swing.GenericToolbar;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.openide.util.Lookup;
@@ -110,7 +129,7 @@ public abstract class ProfilerToolbar {
         protected final JToolBar toolbar;
         
         protected Impl(boolean showSeparator) {
-            toolbar = new JToolBar() {
+            toolbar = new GenericToolbar() {
                 protected void addImpl(Component comp, Object constraints, int index) {
                     if (comp instanceof JButton)
                         UIUtils.fixButtonUI((JButton) comp);
@@ -119,16 +138,14 @@ public abstract class ProfilerToolbar {
                 public Dimension getPreferredSize() {
                     Dimension dim = super.getPreferredSize();
                     if (PREFERRED_HEIGHT == -1) {
-                        JToolBar tb = new JToolBar();
+                        JToolBar tb = new GenericToolbar();
                         tb.setBorder(toolbar.getBorder());
                         tb.setBorderPainted(toolbar.isBorderPainted());
                         tb.setRollover(toolbar.isRollover());
                         tb.setFloatable(toolbar.isFloatable());
                         Icon icon = Icons.getIcon(GeneralIcons.SAVE);
-                        JButton b = new JButton("Button", icon); // NOI18N
-                        tb.add(b);
-                        JToggleButton t = new JToggleButton("Button", icon); // NOI18N
-                        tb.add(t);
+                        tb.add(new JButton("Button", icon)); // NOI18N
+                        tb.add(new JToggleButton("Button", icon)); // NOI18N
                         JComboBox c = new JComboBox();
                         c.setEditor(new BasicComboBoxEditor());
                         c.setRenderer(new BasicComboBoxRenderer());
@@ -154,6 +171,9 @@ public abstract class ProfilerToolbar {
             toolbar.setBorderPainted(false);
             toolbar.setRollover(true);
             toolbar.setFloatable(false);
+            
+            toolbar.setFocusTraversalPolicyProvider(true);
+            toolbar.setFocusTraversalPolicy(new SimpleFocusTraversalPolicy());
             
             if (showSeparator) {
                 component = new JPanel(new BorderLayout(0, 0));
@@ -190,7 +210,6 @@ public abstract class ProfilerToolbar {
         @Override
         public Component add(ProfilerToolbar toolbar, int index) {
             JToolBar implToolbar = ((Impl)toolbar).toolbar;
-            implToolbar.setFocusTraversalPolicyProvider(true);
             implToolbar.setBorder(BorderFactory.createEmptyBorder());
             implToolbar.setOpaque(false);
             return add(implToolbar, index);
@@ -257,6 +276,60 @@ public abstract class ProfilerToolbar {
         @Override
         public int getComponentCount() {
             return toolbar.getComponentCount();
+        }
+        
+    }
+    
+    
+    public static class SimpleFocusTraversalPolicy extends FocusTraversalPolicy {
+        
+        public Component getComponentAfter(Container aContainer, Component aComponent) {
+            List<Component> l = components(topContainer(aContainer));
+            int i = l.indexOf(aComponent);
+            return i == -1 || i == l.size() - 1 ? null : l.get(i + 1);
+        }
+
+        public Component getComponentBefore(Container aContainer, Component aComponent) {
+            List<Component> l = components(topContainer(aContainer));
+            int i = l.indexOf(aComponent);
+            return i == -1 || i == 0 ? null : l.get(i - 1);
+        }
+
+        public Component getFirstComponent(Container aContainer) {
+            List<Component> l = components(topContainer(aContainer));
+            return l.isEmpty() ? null : l.get(0);
+        }
+
+        public Component getLastComponent(Container aContainer) {
+            List<Component> l = components(topContainer(aContainer));
+            return l.isEmpty() ? null : l.get(l.size() - 1);
+        }
+
+        public Component getDefaultComponent(Container aContainer) {
+            return getFirstComponent(aContainer);
+        }
+
+        protected Container topContainer(Container aContainer) {
+            while (aContainer.getParent() instanceof JToolBar)
+                aContainer = aContainer.getParent();
+            return aContainer;
+        }
+
+        protected List<Component> components(Container aContainer) {
+            List<Component> l = new ArrayList();
+
+            for (int i = 0; i < aContainer.getComponentCount(); i++) {
+                Component c = aContainer.getComponent(i);
+                if (c instanceof JToolBar || c instanceof JPanel)
+                    l.addAll(components((Container)c));
+                else if (focusable(c)) l.add(c);
+            }
+
+            return l;
+        }
+        
+        protected boolean focusable(Component c) {
+            return c.isVisible() && c.isEnabled() && c.isFocusable();
         }
         
     }

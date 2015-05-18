@@ -173,11 +173,15 @@ public class ThreadsPanel extends DataView {
         TableRowSorter sorter = (TableRowSorter)threadsTable.getRowSorter();
         sorter.setRowFilter(_filter);
         this.filter = filter;
+        
+        filterSelected(filter);
     }
     
     public Filter getFilter() {
         return filter;
     }
+    
+    protected void filterSelected(Filter filter) {}
     
     public boolean hasSelectedThreads() {
         return !selected.isEmpty();
@@ -534,6 +538,8 @@ public class ThreadsPanel extends DataView {
     }
     
     public void profilingSessionStarted() {
+        selected.clear();
+        if (!selectedApplied.isEmpty()) setFilter(Filter.LIVE);
     }
     
     public void profilingSessionFinished() {

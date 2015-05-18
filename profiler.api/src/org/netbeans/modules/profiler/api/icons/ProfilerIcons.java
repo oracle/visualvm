@@ -120,4 +120,6 @@ public interface ProfilerIcons extends Icons.Keys {
     public static final String MONITORING_32 = "ProfilerIcons.Monitoring32"; // NOI18N
     public static final String STARTUP_32 = "ProfilerIcons.Startup32"; // NOI18N
     
+    public static final String DELTA_RESULTS = "ProfilerIcons.DeltaResults"; // NOI18N
+    
 }

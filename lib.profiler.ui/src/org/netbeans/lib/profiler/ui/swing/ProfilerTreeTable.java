@@ -165,23 +165,24 @@ public class ProfilerTreeTable extends ProfilerTable {
         TreeModel _model = model.treeModel;
         TreeNode node = (TreeNode)path.getLastPathComponent();
         TreePath parentPath = path.getParentPath();
+        if (parentPath == null) parentPath = path;
         TreeNode parent = (TreeNode)parentPath.getLastPathComponent();
-        int idx = _model.getIndexOfChild(parent, node);
+        int idx = parent == node ? parent.getChildCount() : _model.getIndexOfChild(parent, node);
 
         if (idx == 0) {
-            if (parentPath.getParentPath() != null) return parentPath;
-            else return parentPath.pathByAddingChild(_model.getChild(parent, _model.getChildCount(parent) - 1));
-        } else {
-            node = (TreeNode)_model.getChild(parent, idx - 1);
-            path = parentPath.pathByAddingChild(node);
-
-            while (_model.getChildCount(node) != 0) {
-                node = (TreeNode)_model.getChild(node, _model.getChildCount(node) - 1);
-                path = path.pathByAddingChild(node);
-            }
-
-            return path;
+            if (parent != model.treeModel.getRoot()) return parentPath;
+            else idx = parent.getChildCount();
         }
+        
+        node = (TreeNode)_model.getChild(parent, idx - 1);
+        path = parentPath.pathByAddingChild(node);
+
+        while (_model.getChildCount(node) != 0) {
+            node = (TreeNode)_model.getChild(node, _model.getChildCount(node) - 1);
+            path = path.pathByAddingChild(node);
+        }
+
+        return path;
     }
     
     void selectPath(TreePath path, boolean scrollToVisible) {
@@ -202,10 +203,9 @@ public class ProfilerTreeTable extends ProfilerTable {
         return tree.getPathForRow(row);
     }
     
-    public Object getValueForRow(int row) {
+    public TreeNode getValueForRow(int row) {
         if (row == -1) return null;
-        TreePath path = getPathForRow(row);
-        return path == null ? null : path.getLastPathComponent();
+        return model.nodeForRow(row);
     }
     
     
@@ -611,7 +611,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         private List filteredChildren(Object parent) {
             if (cache == null) cache = new HashMap();
             
-            TreePath parentPath = new TreePath(getPathToRoot((TreeNode)parent));
+            TreePath parentPath = treePath(getPathToRoot((TreeNode)parent));
             List children = cache.get(parentPath);
             
             if (children == null) {
@@ -658,6 +658,16 @@ public class ProfilerTreeTable extends ProfilerTable {
             }
             
             return children;
+        }
+        
+        
+        // creates a TreePath with exact hashCode
+        // uses Arrays.deepHashCode instead getLastPathComponent().hashCode()
+        protected static TreePath treePath(final TreeNode[] pathToRoot) {
+            return new TreePath(pathToRoot) {
+                private final int hashCode = Arrays.deepHashCode(pathToRoot);
+                public int hashCode() { return hashCode; }
+            };
         }
         
         
@@ -724,7 +734,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         private int[] viewToModel(Object parent) {
             if (viewToModel == null) viewToModel = new HashMap();
             
-            TreePath parentPath = new TreePath(getPathToRoot((TreeNode)parent));
+            TreePath parentPath = treePath(getPathToRoot((TreeNode)parent));
             int[] indexes = viewToModel.get(parentPath);
             
             if (indexes == null) {

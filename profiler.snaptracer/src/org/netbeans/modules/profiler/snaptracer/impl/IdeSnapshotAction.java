@@ -46,28 +46,23 @@ import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
-import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.netbeans.modules.profiler.api.ActionsSupport;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.openide.actions.FindAction;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
-import org.openide.util.actions.CallbackSystemAction;
-import org.openide.util.actions.SystemAction;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
@@ -129,42 +124,26 @@ public final class IdeSnapshotAction implements ActionListener {
         final JComponent tracer = new TracerView(model, controller).createComponent();
         tc.add(tracer, BorderLayout.CENTER);
         
-        InputMap map = tc.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        InputMap inputMap = tc.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        ActionMap actionMap = tc.getActionMap();
         
-        final String FILTER = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
-        final ActionListener filter = new ActionListener() {
+        final String filterKey = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        Action filterAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                Action action = tracer.getActionMap().get(FILTER);
+                Action action = tracer.getActionMap().get(filterKey);
                 if (action != null && action.isEnabled()) action.actionPerformed(e);
             }
         };
-        tc.getActionMap().put(FILTER, new AbstractAction() {
-            public void actionPerformed(ActionEvent e) { filter.actionPerformed(e); }
-        });
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK), FILTER);
+        ActionsSupport.registerAction(filterKey, filterAction, actionMap, inputMap);
         
-        final String FIND = SearchUtils.FIND_ACTION_KEY;
-        final ActionListener find = new ActionListener() {
+        final String findKey = SearchUtils.FIND_ACTION_KEY;
+        Action findAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                Action action = tracer.getActionMap().get(FIND);
-                if (action != null && action.isEnabled()) action.actionPerformed(null);
+                Action action = tracer.getActionMap().get(findKey);
+                if (action != null && action.isEnabled()) action.actionPerformed(e);
             }
         };
-        try {
-            // Let's use the global FindAction if available
-            Class findActionClass = Class.forName("org.openide.actions.FindAction"); // NOI18N
-            CallbackSystemAction globalFindAction = (CallbackSystemAction)SystemAction.get(findActionClass);
-            Object findActionKey = globalFindAction.getActionMapKey();
-            tc.getActionMap().put(findActionKey, new AbstractAction() {
-                public void actionPerformed(ActionEvent e) { find.actionPerformed(e); }
-            });
-        } catch (ClassNotFoundException e) {
-            // Fallback to CTRL+F if global FindAction not available
-            tc.getActionMap().put(FIND, new AbstractAction() {
-                public void actionPerformed(ActionEvent e) { find.actionPerformed(e); }
-            });
-            map.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK), FIND);
-        }
+        ActionsSupport.registerAction(findKey, findAction, actionMap, inputMap);
         
         return tc;
     }

@@ -45,6 +45,7 @@ package org.netbeans.lib.profiler.ui.memory;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -63,6 +64,7 @@ import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
+import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTManager;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
@@ -76,8 +78,8 @@ import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 
@@ -116,6 +118,7 @@ abstract class LivenessTreeTableView extends MemoryView {
     public void setData(MemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
 //        final boolean includeEmpty = filter != null;
         final boolean includeEmpty = false;
+        final boolean diff = snapshot instanceof LivenessMemoryResultsDiff;
         final LivenessMemoryResultsSnapshot _snapshot = (LivenessMemoryResultsSnapshot)snapshot;
         
         String[] _classNames = _snapshot.getClassNames();
@@ -133,17 +136,33 @@ abstract class LivenessTreeTableView extends MemoryView {
         final Map<TreeNode, ClientUtils.SourceCodeSelection> _nodesMap = new HashMap();
         
         long totalLiveBytes = 0;
+        long _totalLiveBytes = 0;
         long totalLiveObjects = 0;
+        long _totalLiveObjects = 0;
         long totalTrackedAlloc = 0;
+        long _totalTrackedAlloc = 0;
         long totalTotalAlloc = 0;
+        long _totalTotalAlloc = 0;
         
         for (int i = 0; i < _nTrackedItems; i++) {
-            totalLiveBytes += _objectsSizePerClass[i];
-            totalLiveObjects += _nTrackedLiveObjects[i];
-            totalTrackedAlloc += _nTrackedAllocObjects[i];
-            totalTotalAlloc += _nTotalAllocObjects[i];
+            if (diff) {
+                totalLiveBytes = Math.max(totalLiveBytes, _objectsSizePerClass[i]);
+                _totalLiveBytes = Math.min(_totalLiveBytes, _objectsSizePerClass[i]);
+                totalLiveObjects = Math.max(totalLiveObjects, _nTrackedLiveObjects[i]);
+                _totalLiveObjects = Math.min(_totalLiveObjects, _nTrackedLiveObjects[i]);
+                totalTrackedAlloc = Math.max(totalTrackedAlloc, _nTrackedAllocObjects[i]);
+                _totalTrackedAlloc = Math.min(_totalTrackedAlloc, _nTrackedAllocObjects[i]);
+                totalTotalAlloc = Math.max(totalTotalAlloc, _nTotalAllocObjects[i]);
+                _totalTotalAlloc = Math.min(_totalTotalAlloc, _nTotalAllocObjects[i]);
+            } else {
+                totalLiveBytes += _objectsSizePerClass[i];
+                totalLiveObjects += _nTrackedLiveObjects[i];
+                totalTrackedAlloc += _nTrackedAllocObjects[i];
+                totalTotalAlloc += _nTotalAllocObjects[i];
+            }
             
-            String className = StringUtils.userFormClassName(_classNames[i]);
+//            String className = StringUtils.userFormClassName(_classNames[i]);
+            String className = _classNames[i];
             
             if ((!includeEmpty && _nTotalAllocObjects[i] > 0) || (includeEmpty && filter.contains(className))) {
                 final int _i = i;
@@ -171,19 +190,32 @@ abstract class LivenessTreeTableView extends MemoryView {
             }
         }
         
-        final long _totalLiveBytes = totalLiveBytes;
-        final long _totalLiveObjects = totalLiveObjects;
-        final long _totalTrackedAlloc = totalTrackedAlloc;
-        final long _totalTotalAlloc = totalTotalAlloc;
+        final long __totalLiveBytes = !diff ? totalLiveBytes :
+                Math.max(Math.abs(totalLiveBytes), Math.abs(_totalLiveBytes));
+        final long __totalLiveObjects = !diff ? totalLiveObjects :
+                Math.max(Math.abs(totalLiveObjects), Math.abs(_totalLiveObjects));
+        final long __totalTrackedAlloc = !diff ? totalTrackedAlloc :
+                Math.max(Math.abs(totalTrackedAlloc), Math.abs(_totalTrackedAlloc));
+        final long __totalTotalAlloc = !diff ? totalTotalAlloc :
+                Math.max(Math.abs(totalTotalAlloc), Math.abs(_totalTotalAlloc));
         final PresoObjLivenessCCTNode root = PresoObjLivenessCCTNode.rootNode(nodes.toArray(new PresoObjLivenessCCTNode[nodes.size()]));
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 nodesMap = _nodesMap;
-                renderers[0].setMaxValue(_totalLiveBytes);
-                renderers[1].setMaxValue(_totalLiveObjects);
-                renderers[2].setMaxValue(_totalTrackedAlloc);
-                renderers[3].setMaxValue(_totalTotalAlloc);
+                renderers[0].setMaxValue(__totalLiveBytes);
+                renderers[1].setMaxValue(__totalLiveObjects);
+                renderers[2].setMaxValue(__totalTrackedAlloc);
+                renderers[3].setMaxValue(__totalTotalAlloc);
+                
+                renderers[0].setDiffMode(diff);
+                renderers[1].setDiffMode(diff);
+                renderers[2].setDiffMode(diff);
+                renderers[3].setDiffMode(diff);
+                
+                renderersEx[0].setDiffMode(diff);
+                renderersEx[1].setDiffMode(diff);
+                    
                 treeTableModel.setRoot(root);
             }
         });
@@ -196,10 +228,20 @@ abstract class LivenessTreeTableView extends MemoryView {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 nodesMap = null;
+                
                 renderers[0].setMaxValue(0);
                 renderers[1].setMaxValue(0);
                 renderers[2].setMaxValue(0);
                 renderers[3].setMaxValue(0);
+
+                renderers[0].setDiffMode(false);
+                renderers[1].setDiffMode(false);
+                renderers[2].setDiffMode(false);
+                renderers[3].setDiffMode(false);
+
+                renderersEx[0].setDiffMode(false);
+                renderersEx[1].setDiffMode(false);
+                
                 treeTableModel.setRoot(root);
             }
         });
@@ -231,6 +273,7 @@ abstract class LivenessTreeTableView extends MemoryView {
     
     
     private HideableBarRenderer[] renderers;
+    private NumberRenderer[] renderersEx;
     
     private void initUI() {
         final int offset = selection == null ? -1 : 0;
@@ -288,6 +331,18 @@ abstract class LivenessTreeTableView extends MemoryView {
         renderers[2].setMaxValue(12345678);
         renderers[3].setMaxValue(12345678);
         
+        renderersEx = new NumberRenderer[2];
+        renderersEx[0] = new NumberRenderer() {
+            protected String getValueString(Object value, int row, Format format) {
+                if (value == null) return "-"; // NOI18N
+                float _value = ((Float)value).floatValue();
+                String s = StringUtils.floatPerCentToString(_value);
+                if (renderingDiff && _value >= 0) s = '+' + s; // NOI18N
+                return s;
+            }
+        };
+        renderersEx[1] = new NumberRenderer();
+        
         if (selection != null) treeTable.setColumnRenderer(0, new CheckBoxRenderer() {
             private boolean visible;
             public void setValue(Object value, int row) {
@@ -309,14 +364,8 @@ abstract class LivenessTreeTableView extends MemoryView {
         treeTable.setColumnRenderer(3 + offset, renderers[1]);
         treeTable.setColumnRenderer(4 + offset, renderers[2]);
         treeTable.setColumnRenderer(5 + offset, renderers[3]);
-        treeTable.setColumnRenderer(6 + offset, new LabelRenderer() {
-            public void setValue(Object value, int row) {
-                super.setValue(StringUtils.floatPerCentToString(((Float)value).floatValue()), row);
-            }
-            public int getHorizontalAlignment() {
-                return LabelRenderer.TRAILING;
-            }
-        });
+        treeTable.setColumnRenderer(6 + offset, renderersEx[0]);
+        treeTable.setColumnRenderer(7 + offset, renderersEx[1]);
 
         if (selection != null) {
             int w = new JLabel(treeTable.getColumnName(0)).getPreferredSize().width;

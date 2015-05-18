@@ -53,7 +53,7 @@ import javax.swing.SwingConstants;
  *
  * @author Jiri Sedlacek
  */
-public abstract class MultiRenderer extends BaseRenderer {
+public abstract class MultiRenderer extends BaseRenderer implements RelativeRenderer {
     
     private Dimension preferredSize;
     
@@ -61,6 +61,27 @@ public abstract class MultiRenderer extends BaseRenderer {
     protected int renderersGap() { return 0; }
     
     protected abstract ProfilerRenderer[] valueRenderers();
+    
+    
+    public void setDiffMode(boolean diffMode) {
+        ProfilerRenderer[] valueRenderers = valueRenderers();
+        if (valueRenderers == null) return;
+        
+        for (ProfilerRenderer renderer : valueRenderers)
+            if (renderer instanceof RelativeRenderer)
+                ((RelativeRenderer)renderer).setDiffMode(diffMode);
+    }
+
+    public boolean isDiffMode() {
+        ProfilerRenderer[] valueRenderers = valueRenderers();
+        if (valueRenderers == null) return false;
+        
+        for (ProfilerRenderer renderer : valueRenderers)
+            if (renderer instanceof RelativeRenderer)
+                return ((RelativeRenderer)renderer).isDiffMode();
+        
+        return false;
+    }
     
     
     public void setOpaque(boolean isOpaque) {
@@ -99,12 +120,17 @@ public abstract class MultiRenderer extends BaseRenderer {
         
         ProfilerRenderer[] valueRenderers = valueRenderers();
         if (valueRenderers != null) {
+            int visible = 0;
             for (ProfilerRenderer renderer : valueRenderers) {
-                Dimension rendererSize = renderer.getComponent().getPreferredSize();
-                preferredSize.width += rendererSize.width;
-                preferredSize.height = Math.max(preferredSize.height, rendererSize.height);
+                JComponent component = renderer.getComponent();
+                if (component.isVisible()) {
+                    Dimension rendererSize = component.getPreferredSize();
+                    preferredSize.width += rendererSize.width;
+                    preferredSize.height = Math.max(preferredSize.height, rendererSize.height);
+                    visible++;
+                }
             }
-            preferredSize.width += renderersGap() * (valueRenderers.length - 1);
+            preferredSize.width += renderersGap() * (visible - 1);
         }
         
         return sharedDimension(preferredSize);
@@ -123,11 +149,13 @@ public abstract class MultiRenderer extends BaseRenderer {
             
             for (ProfilerRenderer renderer : valueRenderers()) {
                 JComponent component = renderer.getComponent();
-                int componentWidth = component.getPreferredSize().width;
-                component.setSize(componentWidth, size.height);
-                renderer.move(xx, location.y);
-                component.paint(g);
-                xx += componentWidth + renderersGap;
+                if (component.isVisible()) {
+                    int componentWidth = component.getPreferredSize().width;
+                    component.setSize(componentWidth, size.height);
+                    renderer.move(xx, location.y);
+                    component.paint(g);
+                    xx += componentWidth + renderersGap;
+                }
             }
             
         } else {
@@ -138,12 +166,14 @@ public abstract class MultiRenderer extends BaseRenderer {
             for (int i = valueRenderers.length - 1; i >= 0; i--) {
                 ProfilerRenderer renderer = valueRenderers[i];
                 JComponent component = renderer.getComponent();
-                int componentWidth = component.getPreferredSize().width;
-                component.setSize(componentWidth, size.height);
-                xx -= componentWidth;
-                renderer.move(xx, location.y);
-                component.paint(g);
-                xx -= renderersGap;
+                if (component.isVisible()) {
+                    int componentWidth = component.getPreferredSize().width;
+                    component.setSize(componentWidth, size.height);
+                    xx -= componentWidth;
+                    renderer.move(xx, location.y);
+                    component.paint(g);
+                    xx -= renderersGap;
+                }
             }
             
         }

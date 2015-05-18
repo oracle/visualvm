@@ -43,8 +43,11 @@
 package org.netbeans.modules.profiler.v2.impl;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
@@ -52,29 +55,41 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
+import javax.swing.JToolTip;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.v2.ProfilerFeature;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "FeaturesView_noData=No data collected yet. Click the {0} button in toolbar to start profiling."
+})
 public class FeaturesView extends JPanel {
     
     private JTabbedPane tabs;
     private final Component defaultView;
     
+    private JLabel hintLabel;
+    private final Color hintColor;
+    
     private final Set<ChangeListener> listeners = new HashSet();
     
     
-    public FeaturesView(Component defaultView) {
+    public FeaturesView(Component defaultView, String buttonString) {
         if (UIUtils.isOracleLookAndFeel()) {
             setOpaque(true);
             setBackground(UIUtils.getProfilerResultsBackground());
@@ -97,6 +112,30 @@ public class FeaturesView extends JPanel {
         } else {
             this.defaultView = null;
         }
+        
+        if (buttonString != null) {
+            hintLabel = new JLabel();
+            hintLabel.setIcon(Icons.getIcon(GeneralIcons.INFO));
+            hintLabel.setIconTextGap(hintLabel.getIconTextGap() + 1);
+            hintLabel.setOpaque(false);
+            
+            Font font = new JToolTip().getFont();
+            hintLabel.setText("<html><body text=\"rgb(70, 70, 70)\" style=\"font-size: " + //NOI18N
+                              (font.getSize()) + "pt; font-family: " + font.getName() + ";\">" + //NOI18N
+                              Bundle.FeaturesView_noData("<b>" + buttonString + "</b>") + "</body></html>"); //NOI18N
+            
+            hintLabel.setSize(hintLabel.getPreferredSize());
+            
+            hintColor = Utils.checkedColor(new Color(255, 255, 255, 245));
+        } else {
+            hintColor = null;
+        }
+    }
+    
+    
+    public final void resetNoDataHint() {
+        hintLabel = null;
+        repaint();
     }
     
     
@@ -115,12 +154,35 @@ public class FeaturesView extends JPanel {
         fireViewOrIndexChanged();
     }
     
-    private static JPanel createContainer(ProfilerFeature feature) {
+    private static final int XMAR = 40;
+    private static final int YMAR = 40;
+    
+    private JPanel createContainer(ProfilerFeature feature) {
         JPanel container = new JPanel(new BorderLayout(0, 0));
         container.putClientProperty(ProfilerFeature.class, feature);
         
         JPanel results = feature.getResultsUI();
-        container.add(results, BorderLayout.CENTER);
+        JPanel xresults = new JPanel(new BorderLayout()) {
+            public void paint(Graphics g) {
+                super.paint(g);
+                if (hintLabel != null) {
+                    Dimension dim = hintLabel.getSize();
+                    int x = (getWidth() - dim.width) / 2;
+                    int y = (getHeight() - dim.height) / 2;
+                    
+                    g.setColor(hintColor);
+                    g.fillRect(x - XMAR, y - YMAR, dim.width + XMAR * 2, dim.height + YMAR * 2);
+                    g.setColor(Color.LIGHT_GRAY);
+                    g.drawRect(x - XMAR, y - YMAR, dim.width + XMAR * 2, dim.height + YMAR * 2);
+                    
+                    g.translate(x, y);
+                    hintLabel.paint(g);
+                    g.translate(-x, -y);
+                }
+            }
+        };
+        xresults.add(results, BorderLayout.CENTER);
+        container.add(xresults, BorderLayout.CENTER);
         
         JPanel settings = feature.getSettingsUI();
         if (settings != null) {

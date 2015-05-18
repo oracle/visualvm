@@ -69,6 +69,7 @@ import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
+import org.netbeans.lib.profiler.results.cpu.CPUResultsDiff;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -96,6 +97,7 @@ public abstract class LiveCPUView extends JPanel {
     private final ResultsMonitor rm;
     
     private CPUResultsSnapshot snapshot;
+    private CPUResultsSnapshot refSnapshot;
     private boolean sampled;
     private boolean mergedThreads;
     private Collection<Integer> selectedThreads;
@@ -104,6 +106,8 @@ public abstract class LiveCPUView extends JPanel {
     private CPUTableView hotSpotsView;
     private CPUTreeTableView forwardCallsView;
     private CPUTreeTableView reverseCallsView;
+    
+    private ThreadsSelector threadsSelector;
     
     private long lastupdate;
     private volatile boolean paused;
@@ -120,7 +124,7 @@ public abstract class LiveCPUView extends JPanel {
                 try {
                     view.refreshData(appRootNode);
                 } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    Logger.getLogger(LiveMemoryView.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(LiveMemoryView.class.getName()).log(Level.FINE, null, ex);
                 }
             }
         }
@@ -151,14 +155,20 @@ public abstract class LiveCPUView extends JPanel {
     }
     
     public ThreadsSelector createThreadSelector() {
-        return new ThreadsSelector() {
+        threadsSelector = new ThreadsSelector() {
             public CPUResultsSnapshot getSnapshot() { return snapshot; }
             public void selectionChanged(Collection<Integer> selected, boolean mergeThreads) {
                 mergedThreads = mergeThreads;
                 selectedThreads = selected;
                 setData();
             }
+            void reset() {
+                super.reset();
+                mergedThreads = false;
+                selectedThreads = null;
+            }
         };
+        return threadsSelector;
     }
     
     public void setPaused(boolean paused) {
@@ -195,7 +205,10 @@ public abstract class LiveCPUView extends JPanel {
         if (snapshot == null) {
             resetData();
         } else {
-            final FlatProfileContainer flatData = snapshot.getFlatProfile(selectedThreads, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
+            final CPUResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
+                                                 refSnapshot.createDiff(snapshot);
+            
+            final FlatProfileContainer flatData = _snapshot.getFlatProfile(selectedThreads, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
 
             final Map<Integer, ClientUtils.SourceCodeSelection> idMap = new HashMap();
             for (int i = 0; i < flatData.getNRows(); i++) // TODO: getNRows is filtered, may not work for tree data!
@@ -203,12 +216,20 @@ public abstract class LiveCPUView extends JPanel {
 
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    forwardCallsView.setData(snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled);
-                    hotSpotsView.setData(flatData, idMap, sampled);
-                    reverseCallsView.setData(snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled);
+                    boolean diff = _snapshot instanceof CPUResultsDiff;
+                    forwardCallsView.setData(_snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled, diff);
+                    hotSpotsView.setData(flatData, idMap, sampled, diff);
+                    reverseCallsView.setData(_snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled, diff);
                 }
             });
         }
+    }
+    
+    public boolean setDiffView(boolean diff) {
+        if (snapshot == null) return false;
+        refSnapshot = diff ? snapshot : null;
+        setData();
+        return true;
     }
     
     public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
@@ -222,8 +243,9 @@ public abstract class LiveCPUView extends JPanel {
         hotSpotsView.resetData();
         reverseCallsView.resetData();
         snapshot = null;
+        refSnapshot = null;
         sampled = true;
-//        selectedThreads = null; // ???
+        if (threadsSelector != null) threadsSelector.reset();
     }
     
     
@@ -249,6 +271,13 @@ public abstract class LiveCPUView extends JPanel {
     public void popupShowing() {};
     
     public void popupHidden() {};
+    
+    
+    protected void foundInForwardCalls() {}
+    
+    protected void foundInHotSpots() {}
+    
+    protected void foundInReverseCalls() {}
     
     
     private void profileMethod(ClientUtils.SourceCodeSelection value) {
@@ -418,6 +447,7 @@ public abstract class LiveCPUView extends JPanel {
                     ProfilerTable table = hotSpotsView.getResultsComponent();
                     if (SearchUtils.findString(table, searchString, true)) {
                         hotSpotsView.setVisible(true);
+                        foundInHotSpots();
                         table.requestFocusInWindow();
                     }
                 }
@@ -429,6 +459,7 @@ public abstract class LiveCPUView extends JPanel {
                     ProfilerTable table = reverseCallsView.getResultsComponent();
                     if (SearchUtils.findString(table, searchString, true)) {
                         reverseCallsView.setVisible(true);
+                        foundInReverseCalls();
                         table.requestFocusInWindow();
                     }
                 }
@@ -443,6 +474,7 @@ public abstract class LiveCPUView extends JPanel {
                     ProfilerTable table = forwardCallsView.getResultsComponent();
                     if (SearchUtils.findString(table, searchString, true)) {
                         forwardCallsView.setVisible(true);
+                        foundInForwardCalls();
                         table.requestFocusInWindow();
                     }
                 }
@@ -454,6 +486,7 @@ public abstract class LiveCPUView extends JPanel {
                     ProfilerTable table = reverseCallsView.getResultsComponent();
                     if (SearchUtils.findString(table, searchString, true)) {
                         reverseCallsView.setVisible(true);
+                        foundInReverseCalls();
                         table.requestFocusInWindow();
                     }
                 }
@@ -469,6 +502,7 @@ public abstract class LiveCPUView extends JPanel {
                     ProfilerTable table = forwardCallsView.getResultsComponent();
                     if (SearchUtils.findString(table, searchString, true)) {
                         forwardCallsView.setVisible(true);
+                        foundInForwardCalls();
                         table.requestFocusInWindow();
                     }
                 }
@@ -480,6 +514,7 @@ public abstract class LiveCPUView extends JPanel {
                     ProfilerTable table = hotSpotsView.getResultsComponent();
                     if (SearchUtils.findString(table, searchString, true)) {
                         hotSpotsView.setVisible(true);
+                        foundInHotSpots();
                         table.requestFocusInWindow();
                     }
                 }

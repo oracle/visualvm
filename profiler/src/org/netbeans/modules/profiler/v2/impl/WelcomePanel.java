@@ -44,21 +44,19 @@
 package org.netbeans.modules.profiler.v2.impl;
 
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.Set;
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToolTip;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.netbeans.lib.profiler.ui.components.NoCaret;
 import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import org.openide.util.NbBundle;
 
@@ -67,23 +65,14 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "WelcomePanel_howtoCaption=How To Configure Profiling Session",
-    "WelcomePanel_profilingSettings=Access the profiling settings:",
-    "WelcomePanel_profileButton=Profile",
-    "WelcomePanel_attachButton=Attach",
-    "WelcomePanel_clickForSetings=Click the {0} dropdown arrow in the above toolbar to access the profiling settings.",
-    "WelcomePanel_configureTarget=Configure the target:",
-    "WelcomePanel_setupProjectAttach=Setup attach to project...",
-    "WelcomePanel_setupProcessAttach=Setup attach to process...",
-    "WelcomePanel_configureProjectAttach=Select the {0} item to configure the target project for profiling.",
-    "WelcomePanel_configureProcessAttach=Select the {0} item to configure the external process for profiling.",
-    "WelcomePanel_selectFeatures=Select what features will be used to analyze the application:",
-    "#HTML-formatted, names of items from Profile dropdown menu should be in bold",
-    "WelcomePanel_multipleFeaturesHint=To profile multiple features simultaneously, select the <b>Profile multiple features</b> choice. Note that profiling <b>Methods</b> and <b>Objects</b> is mutually exclusive."
+    "WelcomePanel_howtoCaption=Configure and Start Profiling",
+    "WelcomePanel_clickForSetings=Click the {0} button in toolbar and select the desired profiling mode:",
+    "WelcomePanel_startProfiling=Click the {0} button in toolbar once the session is configured to start profiling.",
+    "WelcomePanel_modifyProfiling=Use the {0} <b>dropdown arrow</b> to change profiling settings for the session."
 })
 public abstract class WelcomePanel extends JPanel {
     
-    public WelcomePanel(boolean project, boolean attach, Set<ProfilerFeature> features) {
+    public WelcomePanel(String configureButton, String profileButton, Set<ProfilerFeature> features) {
         
         Color background = UIUtils.getProfilerResultsBackground();
         
@@ -93,9 +82,8 @@ public abstract class WelcomePanel extends JPanel {
         
         int y = 0;
         
-        HTMLTextArea header = new HTMLTextArea("<font size='+1'>" + Bundle.WelcomePanel_howtoCaption() + "</font>"); // NOI18N
+        Paragraph header = new Paragraph(null, Bundle.WelcomePanel_howtoCaption(), 3, background); // NOI18N
         header.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, header.getForeground()));
-        header.setBackground(background);
         if (UIUtils.isNimbus()) header.setOpaque(false);
         GridBagConstraints c = new GridBagConstraints();
         c.gridy = y++;
@@ -104,28 +92,14 @@ public abstract class WelcomePanel extends JPanel {
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(5, 20, 0, 20);
+        c.insets = new Insets(4, 20, 4, 20);
         pp.add(header, c);
         
-        HTMLTextArea caption1 = new HTMLTextArea("<b>" + Bundle.WelcomePanel_profilingSettings() + "</b>"); // NOI18N
-        caption1.setBackground(background);
-        if (UIUtils.isNimbus()) caption1.setOpaque(false);
-        c = new GridBagConstraints();
-        c.gridy = y++;
-        c.weightx = 1;
-        c.weighty = 1;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        c.anchor = GridBagConstraints.NORTHWEST;
-        c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(20, 20, 3, 20);
-        pp.add(caption1, c);
+        int counter = 0;
         
-        String popupButton = attach ? Bundle.WelcomePanel_attachButton() : Bundle.WelcomePanel_profileButton();
-        HTMLTextArea hint1 = new HTMLTextArea(Bundle.WelcomePanel_clickForSetings("<b><a href='#'>" + popupButton + "</a></b>")) { // NOI18N
+        Paragraph hint1 = new Paragraph(Bundle.WelcomePanel_clickForSetings("<b><a href='#'>" + configureButton + "</a></b>"), Integer.toString(++counter), 1, background) { // NOI18N
             protected void showURL(URL url) { highlightItem(null); }
         };
-        hint1.setBackground(background);
-        if (UIUtils.isNimbus()) hint1.setOpaque(false);
         c = new GridBagConstraints();
         c.gridy = y++;
         c.weightx = 1;
@@ -133,74 +107,25 @@ public abstract class WelcomePanel extends JPanel {
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(0, 40, 0, 20);
+        c.insets = new Insets(4, 28, 0, 20);
         pp.add(hint1, c);
-        
-        HTMLTextArea caption2 = null;
-        HTMLTextArea hint2 = null;
-        
-        if (attach) {
-            
-            caption2 = new HTMLTextArea("<b>" + Bundle.WelcomePanel_configureTarget() + "</b>"); // NOI18N
-            caption2.setBackground(background);
-            if (UIUtils.isNimbus()) caption2.setOpaque(false);
-            c = new GridBagConstraints();
-            c.gridy = y++;
-            c.weightx = 1;
-            c.weighty = 1;
-            c.gridwidth = GridBagConstraints.REMAINDER;
-            c.anchor = GridBagConstraints.NORTHWEST;
-            c.fill = GridBagConstraints.BOTH;
-            c.insets = new Insets(20, 20, 3, 20);
-            pp.add(caption2, c);
-            
-            final String hint2h = project ? Bundle.WelcomePanel_setupProjectAttach() :
-                                            Bundle.WelcomePanel_setupProcessAttach();
-            final String hint2s = project ? Bundle.WelcomePanel_configureProjectAttach("<b><a href='#'>" + hint2h + "</a></b>"): // NOI18N
-                                            Bundle.WelcomePanel_configureProcessAttach("<b><a href='#'>" + hint2h + "</a></b>"); // NOI18N
-            hint2 = new HTMLTextArea(hint2s) {
-                protected void showURL(URL url) { highlightItem(hint2h); }
-            };
-            hint2.setBackground(background);
-            if (UIUtils.isNimbus()) hint2.setOpaque(false);
-            c = new GridBagConstraints();
-            c.gridy = y++;
-            c.weightx = 1;
-            c.weighty = 1;
-            c.gridwidth = GridBagConstraints.REMAINDER;
-            c.anchor = GridBagConstraints.NORTHWEST;
-            c.fill = GridBagConstraints.BOTH;
-            c.insets = new Insets(0, 40, 0, 20);
-            pp.add(hint2, c);
-            
-        }
-        
-        HTMLTextArea caption3 = new HTMLTextArea("<b>" + Bundle.WelcomePanel_selectFeatures() + "</b>"); // NOI18N
-        caption3.setBackground(background);
-        if (UIUtils.isNimbus()) caption3.setOpaque(false);
-        c = new GridBagConstraints();
-        c.gridy = y++;
-        c.weightx = 1;
-        c.weighty = 1;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        c.anchor = GridBagConstraints.NORTHWEST;
-        c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(20, 20, 3, 20);
-        pp.add(caption3, c);        
         
         for (ProfilerFeature feature : features) {
         
-            Link l = new Link(feature.getName(), feature.getIcon());
+            JLabel l1 = new JLabel(feature.getName(), feature.getIcon(), JLabel.LEADING);
+            l1.setFont(new JToolTip().getFont());
+            l1.setIconTextGap(l1.getIconTextGap() + 2);
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y;
             c.gridwidth = 1;
             c.anchor = GridBagConstraints.WEST;
             c.fill = GridBagConstraints.NONE;
-            c.insets = new Insets(0, 40, 0, 10);
-            pp.add(l, c);
+            c.insets = new Insets(3, 60, 3, 10);
+            pp.add(l1, c);
 
             JLabel l2 = new JLabel(feature.getDescription());
+            l2.setFont(l1.getFont());
             l2.setEnabled(false);
             c = new GridBagConstraints();
             c.gridx = 1;
@@ -213,9 +138,7 @@ public abstract class WelcomePanel extends JPanel {
         
         }
         
-        HTMLTextArea hint3 = new HTMLTextArea(Bundle.WelcomePanel_multipleFeaturesHint());
-        hint3.setBackground(background);
-        if (UIUtils.isNimbus()) hint3.setOpaque(false);
+        Paragraph hint2 = new Paragraph(Bundle.WelcomePanel_startProfiling("<b>" + profileButton + "</b>"), Integer.toString(++counter), 1, background); // NOI18N
         c = new GridBagConstraints();
         c.gridy = y++;
         c.weightx = 1;
@@ -223,7 +146,18 @@ public abstract class WelcomePanel extends JPanel {
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.NORTHWEST;
         c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(3, 20, 5, 20);
+        c.insets = new Insets(6, 28, 0, 20);
+        pp.add(hint2, c);
+        
+        Paragraph hint3 = new Paragraph(Bundle.WelcomePanel_modifyProfiling(profileButton), Integer.toString(++counter), 1, background); // NOI18N
+        c = new GridBagConstraints();
+        c.gridy = y++;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(0, 28, 0, 20);
         pp.add(hint3, c);
         
         int w = pp.getMinimumSize().width;
@@ -231,27 +165,14 @@ public abstract class WelcomePanel extends JPanel {
         header.setSize(w, Integer.MAX_VALUE);
         header.setPreferredSize(new Dimension(w, header.getPreferredSize().height));
         
-        caption1.setSize(w, Integer.MAX_VALUE);
-        caption1.setPreferredSize(new Dimension(w, caption1.getPreferredSize().height));
-        
-        if (caption2 != null) {
-            caption2.setSize(w, Integer.MAX_VALUE);
-            caption2.setPreferredSize(new Dimension(w, caption2.getPreferredSize().height));
-        }
-        
-        caption3.setSize(w, Integer.MAX_VALUE);
-        caption3.setPreferredSize(new Dimension(w, caption3.getPreferredSize().height));
-        
         hint1.setSize(w, Integer.MAX_VALUE);
         hint1.setPreferredSize(new Dimension(w, hint1.getPreferredSize().height));
         
-        if (hint2 != null) {
-            hint2.setSize(w, Integer.MAX_VALUE);
-            hint2.setPreferredSize(new Dimension(w, hint2.getPreferredSize().height));
-        }
+        hint2.setSize(w, Integer.MAX_VALUE);
+        hint2.setPreferredSize(new Dimension(w, hint2.getPreferredSize().height));
         
         hint3.setSize(w, Integer.MAX_VALUE);
-        hint3.setPreferredSize(new Dimension(w, hint3.getPreferredSize().height));
+        hint3.setPreferredSize(new Dimension(w, hint2.getPreferredSize().height));
         
         setLayout(new GridBagLayout());
         setOpaque(true);
@@ -269,27 +190,24 @@ public abstract class WelcomePanel extends JPanel {
     public abstract void highlightItem(String text);
     
     
-    private class Link extends JButton {
+    private static class Paragraph extends HTMLTextArea {
         
-        private final String text;
-        
-        Link(String text, Icon icon) {
-            super("<html><nobr><b><a href='#'>" + text + "</a></b></nobr></html>"); // NOI18N
-            this.text = text;
+        Paragraph(String text, String caption, int captionSizeDiff, Color background) {
+            setCaret(new NoCaret());
+            setShowPopup(false);
+            setBackground(background);
+            if (UIUtils.isNimbus()) setOpaque(false);
             
-            setIcon(icon);
+            setFocusable(false);
             
-            setOpaque(false);
-            setMargin(new Insets(0, 0, 0, 0));
-            setBorder(BorderFactory.createEmptyBorder(3, 4, 3, 4));
-            setBorderPainted(false);
-            setContentAreaFilled(false);
-            
-            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            setFont(new JToolTip().getFont());
+            setText(setupText(text, caption, captionSizeDiff));
         }
         
-        protected void fireActionPerformed(ActionEvent e) {
-            highlightItem(text);
+        private String setupText(String text, String caption, int captionSizeDiff) {
+            int fsize = getFont().getSize() + captionSizeDiff;
+            return caption == null ? text : "<span style='font-size:" + fsize + "px;'>" + caption + // NOI18N
+                                            "</span>" + (text == null ? "" : ". " + text); // NOI18N
         }
         
     }

@@ -119,7 +119,7 @@ import org.openide.util.lookup.ServiceProvider;
     "AttachDialog_LocalRunningProcess=Already running local Java process", // NOI18N
     "AttachDialog_LocalStartedProcess=Manually started local Java process", // NOI18N
     "AttachDialog_RemoteStartedProcess=Manually started remote Java process", // NOI18N
-    "AttachDialog_UnknownProcess=Unknown Java process", // NOI18N
+    "AttachDialog_UnknownProcess=Java process", // NOI18N
     "AttachDialog_ColumnName=Name", // NOI18N
     "AttachDialog_ColumnPid=PID", // NOI18N
     "AttachDialog_RowPid=PID:", // NOI18N

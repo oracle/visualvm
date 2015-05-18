@@ -87,7 +87,7 @@ public class SameNameClassGroup {
         } else {
             if (isParentLoaderTo(entryLoader, classLoaderId)) {
                 return clazz;
-            } else if (isParentLoaderTo(classLoaderId, entryLoader)) { // This can happen at least with placeholders
+            } else if (clazz instanceof PlaceholderClassInfo && isParentLoaderTo(classLoaderId, entryLoader)) { // This can happen at least with placeholders
                 clazz.setLoaderId(classLoaderId);
 
                 return clazz;

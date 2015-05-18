@@ -109,7 +109,7 @@ public final class TakeSnapshotAction extends ProfilingAwareAction {
     @ActionID(id = "org.netbeans.modules.profiler.actions.TakeSnapshotAction", category = "Profile")
     @ActionRegistration(displayName = "#LBL_TakeSnapshotAction")
     @ActionReferences(value = {
-        @ActionReference(path = "Shortcuts", name = "C-F2"),
+        @ActionReference(path = "Shortcuts", name = "A-F2"),
         @ActionReference(path = "Menu/Profile", position = 900)})
     public static TakeSnapshotAction getInstance() {
         return Singleton.INSTANCE;

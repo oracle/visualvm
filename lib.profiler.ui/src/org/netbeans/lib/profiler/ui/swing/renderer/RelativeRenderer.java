@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -40,48 +40,17 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.lib.profiler.ui.swing.renderer;
 
-import javax.swing.Icon;
-
 /**
+ * Interface to be implemented by renderers supporting relative (diff) values.
  *
  * @author Jiri Sedlacek
  */
-public class JavaNameRenderer extends NormalBoldGrayRenderer {
+public interface RelativeRenderer {
     
-    private final Icon icon;
+    public void setDiffMode(boolean diffMode);
     
-    public JavaNameRenderer() {
-        this(null);
-    }
-    
-    public JavaNameRenderer(Icon icon) {
-        this.icon = icon;
-    }
-    
-    public void setValue(Object value, int row) {
-        if (value == null) {
-            setNormalValue(""); // NOI18N
-            setBoldValue(""); // NOI18N
-            setGrayValue(""); // NOI18N
-        } else {
-            String name = value.toString();
-            String gray = ""; // NOI18N
-
-            int bracketIndex = name.indexOf('('); // NOI18N
-            if (bracketIndex != -1) {
-                gray = " " + name.substring(bracketIndex); // NOI18N
-                name = name.substring(0, bracketIndex);
-            }
-
-            int dotIndex = name.lastIndexOf('.'); // NOI18N
-            setNormalValue(name.substring(0, dotIndex + 1));
-            setBoldValue(name.substring(dotIndex + 1));
-            setGrayValue(gray);
-        }
-        setIcon(icon);
-    }
+    public boolean isDiffMode();
     
 }
