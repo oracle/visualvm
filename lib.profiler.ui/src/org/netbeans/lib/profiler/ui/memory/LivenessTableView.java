@@ -185,7 +185,7 @@ abstract class LivenessTableView extends MemoryView {
         String[] _classNames = _snapshot.getClassNames();
         int[] _nTrackedLiveObjects = _snapshot.getNTrackedLiveObjects();
         long[] _trackedLiveObjectsSize = _snapshot.getTrackedLiveObjectsSize();
-        long[] _nTrackedAllocObjects = _snapshot.getTrackedLiveObjectsSize();
+        long[] _nTrackedAllocObjects = _snapshot.getNTrackedAllocObjects();
         float[] _avgObjectAge = _snapshot.getAvgObjectAge();
         int[] _maxSurvGen = _snapshot.getMaxSurvGen();
         int[] _nTotalAllocObjects = _snapshot.getnTotalAllocObjects();
