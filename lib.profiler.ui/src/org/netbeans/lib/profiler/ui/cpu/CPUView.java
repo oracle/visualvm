@@ -73,6 +73,14 @@ public abstract class CPUView extends DataView {
     protected static final String FIND_IN_FORWARDCALLS = messages.getString("CPUView_FindInForwardCalls"); // NOI18N
     protected static final String FIND_IN_HOTSPOTS = messages.getString("CPUView_FindInHotSpots"); // NOI18N
     protected static final String FIND_IN_REVERSECALLS = messages.getString("CPUView_FindInReverseCalls"); // NOI18N
+    protected static final String SELECTED_COLUMN_TOOLTIP = messages.getString("CPUView_SelectedColumnTooltip"); // NOI18N
+    protected static final String NAME_COLUMN_TOOLTIP = messages.getString("CPUView_NameColumnTooltip"); // NOI18N
+    protected static final String SELF_TIME_COLUMN_TOOLTIP = messages.getString("CPUView_SelfTimeColumnTooltip"); // NOI18N
+    protected static final String SELF_TIME_CPU_COLUMN_TOOLTIP = messages.getString("CPUView_SelfTimeCpuColumnTooltip"); // NOI18N
+    protected static final String TOTAL_TIME_COLUMN_TOOLTIP = messages.getString("CPUView_TotalTimeColumnTooltip"); // NOI18N
+    protected static final String TOTAL_TIME_CPU_COLUMN_TOOLTIP = messages.getString("CPUView_TotalTimeCpuColumnTooltip"); // NOI18N
+    protected static final String HITS_COLUMN_TOOLTIP = messages.getString("CPUView_HitsColumnTooltip"); // NOI18N
+    protected static final String INVOCATIONS_COLUMN_TOOLTIP = messages.getString("CPUView_InvocationsColumnTooltip"); // NOI18N
     // -----
     
 }

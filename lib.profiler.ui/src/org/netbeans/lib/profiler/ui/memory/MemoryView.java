@@ -74,6 +74,15 @@ public abstract class MemoryView extends DataView {
     protected static final String ACTION_GOTOSOURCE = messages.getString("MemoryView_ActionGoToSource"); // NOI18N
     protected static final String ACTION_PROFILE_METHOD = messages.getString("MemoryView_ActionProfileMethod"); // NOI18N
     protected static final String ACTION_PROFILE_CLASS = messages.getString("MemoryView_ActionProfileClass"); // NOI18N
+    protected static final String SELECTED_COLUMN_TOOLTIP = messages.getString("MemoryView_SelectedColumnTooltip"); // NOI18N
+    protected static final String NAME_COLUMN_TOOLTIP = messages.getString("MemoryView_NameColumnTooltip"); // NOI18N
+    protected static final String LIVE_SIZE_COLUMN_TOOLTIP = messages.getString("MemoryView_LiveSizeColumnTooltip"); // NOI18N
+    protected static final String LIVE_COUNT_COLUMN_TOOLTIP = messages.getString("MemoryView_LiveCountColumnTooltip"); // NOI18N
+    protected static final String ALLOC_SIZE_COLUMN_TOOLTIP = messages.getString("MemoryView_AllocSizeColumnTooltip"); // NOI18N
+    protected static final String ALLOC_COUNT_COLUMN_TOOLTIP = messages.getString("MemoryView_AllocCountColumnTooltip"); // NOI18N
+    protected static final String TOTAL_ALLOC_COUNT_COLUMN_TOOLTIP = messages.getString("MemoryView_TotalAllocCountColumnTooltip"); // NOI18N
+    protected static final String AVG_AGE_COLUMN_TOOLTIP = messages.getString("MemoryView_AvgAgeColumnTooltip"); // NOI18N
+    protected static final String GENERATIONS_COLUMN_TOOLTIP = messages.getString("MemoryView_GenerationsColumnTooltip"); // NOI18N
     // -----
     
     

@@ -172,6 +172,8 @@ abstract class CPUTableView extends CPUView {
                     // Set new Hits/Invocations column visibility
                     table.setColumnVisibility(col, sampled ? hitsVisible : invocationsVisible);
                     
+                    setToolTips();
+                    
                     repaint();
                 }
             }
@@ -228,6 +230,8 @@ abstract class CPUTableView extends CPUView {
                 CPUTableView.this.popupHidden();
             }
         };
+        
+        setToolTips();
         
         table.providePopupMenu(true);
         installDefaultAction();
@@ -302,6 +306,27 @@ abstract class CPUTableView extends CPUView {
         
         setLayout(new BorderLayout());
         add(tableContainer, BorderLayout.CENTER);
+    }
+    
+    private void setToolTips() {
+        table.setColumnToolTips(selection == null ? new String[] {
+                                        NAME_COLUMN_TOOLTIP,
+                                        SELF_TIME_COLUMN_TOOLTIP,
+                                        SELF_TIME_CPU_COLUMN_TOOLTIP,
+                                        TOTAL_TIME_COLUMN_TOOLTIP,
+                                        TOTAL_TIME_CPU_COLUMN_TOOLTIP,
+                                        sampled ? HITS_COLUMN_TOOLTIP :
+                                                  INVOCATIONS_COLUMN_TOOLTIP
+                                      } : new String[] {
+                                        SELECTED_COLUMN_TOOLTIP,
+                                        NAME_COLUMN_TOOLTIP,
+                                        SELF_TIME_COLUMN_TOOLTIP,
+                                        SELF_TIME_CPU_COLUMN_TOOLTIP,
+                                        TOTAL_TIME_COLUMN_TOOLTIP,
+                                        TOTAL_TIME_CPU_COLUMN_TOOLTIP,
+                                        sampled ? HITS_COLUMN_TOOLTIP :
+                                                  INVOCATIONS_COLUMN_TOOLTIP
+                                      });
     }
     
     protected ProfilerTable getResultsComponent() {

@@ -263,6 +263,17 @@ abstract class AllocTableView extends MemoryView {
             }
         };
         
+        table.setColumnToolTips(selection == null ? new String[] {
+                                  NAME_COLUMN_TOOLTIP,
+                                  ALLOC_SIZE_COLUMN_TOOLTIP,
+                                  ALLOC_COUNT_COLUMN_TOOLTIP
+                                } : new String[] {
+                                  SELECTED_COLUMN_TOOLTIP,
+                                  NAME_COLUMN_TOOLTIP,
+                                  ALLOC_SIZE_COLUMN_TOOLTIP,
+                                  ALLOC_COUNT_COLUMN_TOOLTIP
+                                });
+        
         table.providePopupMenu(true);
         installDefaultAction();
         

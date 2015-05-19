@@ -289,6 +289,25 @@ abstract class LivenessTreeTableView extends MemoryView {
             }
         };
         
+        treeTable.setColumnToolTips(selection == null ? new String[] {
+                                  NAME_COLUMN_TOOLTIP,
+                                  LIVE_SIZE_COLUMN_TOOLTIP,
+                                  LIVE_COUNT_COLUMN_TOOLTIP,
+                                  ALLOC_COUNT_COLUMN_TOOLTIP,
+                                  TOTAL_ALLOC_COUNT_COLUMN_TOOLTIP,
+                                  AVG_AGE_COLUMN_TOOLTIP,
+                                  GENERATIONS_COLUMN_TOOLTIP
+                                } : new String[] {
+                                  SELECTED_COLUMN_TOOLTIP,
+                                  NAME_COLUMN_TOOLTIP,
+                                  LIVE_SIZE_COLUMN_TOOLTIP,
+                                  LIVE_COUNT_COLUMN_TOOLTIP,
+                                  ALLOC_COUNT_COLUMN_TOOLTIP,
+                                  TOTAL_ALLOC_COUNT_COLUMN_TOOLTIP,
+                                  AVG_AGE_COLUMN_TOOLTIP,
+                                  GENERATIONS_COLUMN_TOOLTIP
+                                });
+        
         treeTable.providePopupMenu(true);
         treeTable.setDefaultAction(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {

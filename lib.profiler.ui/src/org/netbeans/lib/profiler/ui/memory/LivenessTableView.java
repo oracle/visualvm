@@ -333,6 +333,25 @@ abstract class LivenessTableView extends MemoryView {
             }
         };
         
+        table.setColumnToolTips(selection == null ? new String[] {
+                                  NAME_COLUMN_TOOLTIP,
+                                  LIVE_SIZE_COLUMN_TOOLTIP,
+                                  LIVE_COUNT_COLUMN_TOOLTIP,
+                                  ALLOC_COUNT_COLUMN_TOOLTIP,
+                                  TOTAL_ALLOC_COUNT_COLUMN_TOOLTIP,
+                                  AVG_AGE_COLUMN_TOOLTIP,
+                                  GENERATIONS_COLUMN_TOOLTIP
+                                } : new String[] {
+                                  SELECTED_COLUMN_TOOLTIP,
+                                  NAME_COLUMN_TOOLTIP,
+                                  LIVE_SIZE_COLUMN_TOOLTIP,
+                                  LIVE_COUNT_COLUMN_TOOLTIP,
+                                  ALLOC_COUNT_COLUMN_TOOLTIP,
+                                  TOTAL_ALLOC_COUNT_COLUMN_TOOLTIP,
+                                  AVG_AGE_COLUMN_TOOLTIP,
+                                  GENERATIONS_COLUMN_TOOLTIP
+                                });
+        
         table.providePopupMenu(true);
         installDefaultAction();
         
