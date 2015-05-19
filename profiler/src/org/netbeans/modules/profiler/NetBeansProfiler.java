@@ -171,6 +171,7 @@ import org.openide.windows.WindowManager;
     "NetBeansProfiler_ModifyingInstrumentationMsg=Modifying instrumentation...",
     "NetBeansProfiler_StartingSession=Starting profiling session...",
     "NetBeansProfiler_CancelBtn=&Cancel",
+    "NetBeansProfiler_AgentFailed=Make sure the process is not already being profiled.",
     "NetBeansProfiler_MemorySamplingJava5=<html><b>Memory sampling is not supported for Java 5.</b><br><br>Please run the profiled application using Java 6+ or use memory instrumentation.</html>"
 })
 public abstract class NetBeansProfiler extends Profiler {
@@ -812,6 +813,9 @@ public abstract class NetBeansProfiler extends Profiler {
                     if (prepareInstrumentation(profilingSettings)) {
                         success = getTargetAppRunner().initiateSession(2, false) && getTargetAppRunner().attachToTargetVM();
                     }
+                } catch (AgentInitializationException ex) {
+                    ProfilerDialogs.displayError(ex.getMessage()+"\n"+Bundle.NetBeansProfiler_AgentFailed());   // NOI18N
+                    ProfilerLogger.log(ex);                    
                 } catch (Exception ex) {
                     ProfilerDialogs.displayError(ex.getMessage());
                     ProfilerLogger.log(ex);
