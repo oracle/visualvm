@@ -141,8 +141,8 @@ abstract class LivenessTreeTableView extends MemoryView {
         long _totalLiveObjects = 0;
         long totalTrackedAlloc = 0;
         long _totalTrackedAlloc = 0;
-        long totalTotalAlloc = 0;
-        long _totalTotalAlloc = 0;
+//        long totalTotalAlloc = 0;
+//        long _totalTotalAlloc = 0;
         
         for (int i = 0; i < _nTrackedItems; i++) {
             if (diff) {
@@ -152,13 +152,13 @@ abstract class LivenessTreeTableView extends MemoryView {
                 _totalLiveObjects = Math.min(_totalLiveObjects, _nTrackedLiveObjects[i]);
                 totalTrackedAlloc = Math.max(totalTrackedAlloc, _nTrackedAllocObjects[i]);
                 _totalTrackedAlloc = Math.min(_totalTrackedAlloc, _nTrackedAllocObjects[i]);
-                totalTotalAlloc = Math.max(totalTotalAlloc, _nTotalAllocObjects[i]);
-                _totalTotalAlloc = Math.min(_totalTotalAlloc, _nTotalAllocObjects[i]);
+//                totalTotalAlloc = Math.max(totalTotalAlloc, _nTotalAllocObjects[i]);
+//                _totalTotalAlloc = Math.min(_totalTotalAlloc, _nTotalAllocObjects[i]);
             } else {
                 totalLiveBytes += _objectsSizePerClass[i];
                 totalLiveObjects += _nTrackedLiveObjects[i];
                 totalTrackedAlloc += _nTrackedAllocObjects[i];
-                totalTotalAlloc += _nTotalAllocObjects[i];
+//                totalTotalAlloc += _nTotalAllocObjects[i];
             }
             
 //            String className = StringUtils.userFormClassName(_classNames[i]);
@@ -196,8 +196,8 @@ abstract class LivenessTreeTableView extends MemoryView {
                 Math.max(Math.abs(totalLiveObjects), Math.abs(_totalLiveObjects));
         final long __totalTrackedAlloc = !diff ? totalTrackedAlloc :
                 Math.max(Math.abs(totalTrackedAlloc), Math.abs(_totalTrackedAlloc));
-        final long __totalTotalAlloc = !diff ? totalTotalAlloc :
-                Math.max(Math.abs(totalTotalAlloc), Math.abs(_totalTotalAlloc));
+//        final long __totalTotalAlloc = !diff ? totalTotalAlloc :
+//                Math.max(Math.abs(totalTotalAlloc), Math.abs(_totalTotalAlloc));
         final PresoObjLivenessCCTNode root = PresoObjLivenessCCTNode.rootNode(nodes.toArray(new PresoObjLivenessCCTNode[nodes.size()]));
         
         SwingUtilities.invokeLater(new Runnable() {
@@ -206,12 +206,12 @@ abstract class LivenessTreeTableView extends MemoryView {
                 renderers[0].setMaxValue(__totalLiveBytes);
                 renderers[1].setMaxValue(__totalLiveObjects);
                 renderers[2].setMaxValue(__totalTrackedAlloc);
-                renderers[3].setMaxValue(__totalTotalAlloc);
+//                renderers[3].setMaxValue(__totalTotalAlloc);
                 
                 renderers[0].setDiffMode(diff);
                 renderers[1].setDiffMode(diff);
                 renderers[2].setDiffMode(diff);
-                renderers[3].setDiffMode(diff);
+//                renderers[3].setDiffMode(diff);
                 
                 renderersEx[0].setDiffMode(diff);
                 renderersEx[1].setDiffMode(diff);
@@ -232,12 +232,12 @@ abstract class LivenessTreeTableView extends MemoryView {
                 renderers[0].setMaxValue(0);
                 renderers[1].setMaxValue(0);
                 renderers[2].setMaxValue(0);
-                renderers[3].setMaxValue(0);
+//                renderers[3].setMaxValue(0);
 
                 renderers[0].setDiffMode(false);
                 renderers[1].setDiffMode(false);
                 renderers[2].setDiffMode(false);
-                renderers[3].setDiffMode(false);
+//                renderers[3].setDiffMode(false);
 
                 renderersEx[0].setDiffMode(false);
                 renderersEx[1].setDiffMode(false);
@@ -294,7 +294,7 @@ abstract class LivenessTreeTableView extends MemoryView {
                                   LIVE_SIZE_COLUMN_TOOLTIP,
                                   LIVE_COUNT_COLUMN_TOOLTIP,
                                   ALLOC_COUNT_COLUMN_TOOLTIP,
-                                  TOTAL_ALLOC_COUNT_COLUMN_TOOLTIP,
+//                                  TOTAL_ALLOC_COUNT_COLUMN_TOOLTIP,
                                   AVG_AGE_COLUMN_TOOLTIP,
                                   GENERATIONS_COLUMN_TOOLTIP
                                 } : new String[] {
@@ -303,7 +303,7 @@ abstract class LivenessTreeTableView extends MemoryView {
                                   LIVE_SIZE_COLUMN_TOOLTIP,
                                   LIVE_COUNT_COLUMN_TOOLTIP,
                                   ALLOC_COUNT_COLUMN_TOOLTIP,
-                                  TOTAL_ALLOC_COUNT_COLUMN_TOOLTIP,
+//                                  TOTAL_ALLOC_COUNT_COLUMN_TOOLTIP,
                                   AVG_AGE_COLUMN_TOOLTIP,
                                   GENERATIONS_COLUMN_TOOLTIP
                                 });
@@ -329,26 +329,26 @@ abstract class LivenessTreeTableView extends MemoryView {
         
         if (selection != null) treeTable.setColumnVisibility(0, false);
         treeTable.setColumnVisibility(5 + offset, false);
-        treeTable.setColumnVisibility(6 + offset, false);
+//        treeTable.setColumnVisibility(6 + offset, false);
         
-        renderers = new HideableBarRenderer[4];
+        renderers = new HideableBarRenderer[3];
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
         renderers[1] = new HideableBarRenderer(new NumberPercentRenderer());
         renderers[2] = new HideableBarRenderer(new NumberPercentRenderer());
-        renderers[3] = new HideableBarRenderer(new NumberPercentRenderer() {
-            public void setValue(Object value, int row) {
-                if (((Number)value).longValue() == -1) {
-                    super.setValue(null, row);
-                } else {
-                    super.setValue(value, row);
-                }
-            }
-        });
+//        renderers[3] = new HideableBarRenderer(new NumberPercentRenderer() {
+//            public void setValue(Object value, int row) {
+//                if (((Number)value).longValue() == -1) {
+//                    super.setValue(null, row);
+//                } else {
+//                    super.setValue(value, row);
+//                }
+//            }
+//        });
         
         renderers[0].setMaxValue(123456789);
         renderers[1].setMaxValue(12345678);
         renderers[2].setMaxValue(12345678);
-        renderers[3].setMaxValue(12345678);
+//        renderers[3].setMaxValue(12345678);
         
         renderersEx = new NumberRenderer[2];
         renderersEx[0] = new NumberRenderer() {
@@ -382,9 +382,11 @@ abstract class LivenessTreeTableView extends MemoryView {
         treeTable.setColumnRenderer(2 + offset, renderers[0]);
         treeTable.setColumnRenderer(3 + offset, renderers[1]);
         treeTable.setColumnRenderer(4 + offset, renderers[2]);
-        treeTable.setColumnRenderer(5 + offset, renderers[3]);
-        treeTable.setColumnRenderer(6 + offset, renderersEx[0]);
-        treeTable.setColumnRenderer(7 + offset, renderersEx[1]);
+//        treeTable.setColumnRenderer(5 + offset, renderers[3]);
+//        treeTable.setColumnRenderer(6 + offset, renderersEx[0]);
+//        treeTable.setColumnRenderer(7 + offset, renderersEx[1]);
+        treeTable.setColumnRenderer(5 + offset, renderersEx[0]);
+        treeTable.setColumnRenderer(6 + offset, renderersEx[1]);
 
         if (selection != null) {
             int w = new JLabel(treeTable.getColumnName(0)).getPreferredSize().width;
@@ -393,8 +395,9 @@ abstract class LivenessTreeTableView extends MemoryView {
         treeTable.setDefaultColumnWidth(2 + offset, renderers[0].getOptimalWidth());
         treeTable.setDefaultColumnWidth(3 + offset, renderers[1].getMaxNoBarWidth());
         treeTable.setDefaultColumnWidth(4 + offset, renderers[2].getMaxNoBarWidth());
-        treeTable.setDefaultColumnWidth(5 + offset, renderers[3].getMaxNoBarWidth());
-        treeTable.setDefaultColumnWidth(6 + offset, renderers[3].getNoBarWidth() - 25);
+//        treeTable.setDefaultColumnWidth(5 + offset, renderers[3].getMaxNoBarWidth());
+//        treeTable.setDefaultColumnWidth(6 + offset, renderers[3].getNoBarWidth() - 25);
+        treeTable.setDefaultColumnWidth(5 + offset, renderers[2].getNoBarWidth() - 25);
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(treeTable, false, null);
         
@@ -426,11 +429,15 @@ abstract class LivenessTreeTableView extends MemoryView {
                 return COLUMN_LIVE_OBJECTS;
             } else if (columnIndex == 4) {
                 return COLUMN_ALLOCATED_OBJECTS;
+//            } else if (columnIndex == 5) {
+//                return COLUMN_TOTAL_ALLOCATED_OBJECTS;
+//            } else if (columnIndex == 6) {
+//                return COLUMN_AVG_AGE;
+//            } else if (columnIndex == 7) {
+//                return COLUMN_GENERATIONS;
             } else if (columnIndex == 5) {
-                return COLUMN_TOTAL_ALLOCATED_OBJECTS;
-            } else if (columnIndex == 6) {
                 return COLUMN_AVG_AGE;
-            } else if (columnIndex == 7) {
+            } else if (columnIndex == 6) {
                 return COLUMN_GENERATIONS;
             } else if (columnIndex == 0) {
                 return COLUMN_SELECTED;
@@ -449,11 +456,15 @@ abstract class LivenessTreeTableView extends MemoryView {
                 return Integer.class;
             } else if (columnIndex == 4) {
                 return Long.class;
+//            } else if (columnIndex == 5) {
+//                return Integer.class;
+//            } else if (columnIndex == 6) {
+//                return Float.class;
+//            } else if (columnIndex == 7) {
+//                return Integer.class;
             } else if (columnIndex == 5) {
-                return Integer.class;
-            } else if (columnIndex == 6) {
                 return Float.class;
-            } else if (columnIndex == 7) {
+            } else if (columnIndex == 6) {
                 return Integer.class;
             } else if (columnIndex == 0) {
                 return Boolean.class;
@@ -462,7 +473,8 @@ abstract class LivenessTreeTableView extends MemoryView {
         }
 
         public int getColumnCount() {
-            return selection == null ? 7 : 8;
+//            return selection == null ? 7 : 8;
+            return selection == null ? 6 : 7;
         }
 
         public Object getValueAt(TreeNode node, int columnIndex) {
@@ -478,11 +490,15 @@ abstract class LivenessTreeTableView extends MemoryView {
                 return livenessNode.nLiveObjects;
             } else if (columnIndex == 4) {
                 return livenessNode.nCalls;
+//            } else if (columnIndex == 5) {
+//                return livenessNode.nTotalAllocObjects;
+//            } else if (columnIndex == 6) {
+//                return livenessNode.avgObjectAge;
+//            } else if (columnIndex == 7) {
+//                return livenessNode.survGen;
             } else if (columnIndex == 5) {
-                return livenessNode.nTotalAllocObjects;
-            } else if (columnIndex == 6) {
                 return livenessNode.avgObjectAge;
-            } else if (columnIndex == 7) {
+            } else if (columnIndex == 6) {
                 return livenessNode.survGen;
             } else if (columnIndex == 0) {
                 if (selection.isEmpty()) return Boolean.FALSE;
