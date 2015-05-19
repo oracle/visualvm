@@ -116,8 +116,8 @@ abstract class LivenessTreeTableView extends MemoryView {
     
     
     public void setData(MemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
-//        final boolean includeEmpty = filter != null;
-        final boolean includeEmpty = false;
+        final boolean includeEmpty = filter != null;
+//        final boolean includeEmpty = false;
         final boolean diff = snapshot instanceof LivenessMemoryResultsDiff;
         final LivenessMemoryResultsSnapshot _snapshot = (LivenessMemoryResultsSnapshot)snapshot;
         
@@ -164,7 +164,7 @@ abstract class LivenessTreeTableView extends MemoryView {
 //            String className = StringUtils.userFormClassName(_classNames[i]);
             String className = _classNames[i];
             
-            if ((!includeEmpty && _nTotalAllocObjects[i] > 0) || (includeEmpty && filter.contains(className))) {
+            if ((!includeEmpty && _nTrackedLiveObjects[i] > 0) || (includeEmpty && filter.contains(className))) {
                 final int _i = i;
                 PresoObjLivenessCCTNode node = new PresoObjLivenessCCTNode(className, _nTrackedAllocObjects[i], _objectsSizePerClass[i], _nTrackedLiveObjects[i], _nTotalAllocObjects[i], _avgObjectAge[i], _maxSurvGen[i]) {
                     public CCTNode[] getChildren() {

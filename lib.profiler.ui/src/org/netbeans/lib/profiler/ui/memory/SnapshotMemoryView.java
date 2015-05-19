@@ -67,7 +67,6 @@ import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 
 /**
@@ -99,9 +98,7 @@ public abstract class SnapshotMemoryView extends JPanel {
         this.snapshot = snapshot;
         
         // class names in VM format
-        String[] classNames = snapshot == null ? null : snapshot.getClassNames();
-        if (classNames != null) for (int i = 0; i < classNames.length; i++)
-            classNames[i] = StringUtils.userFormClassName(classNames[i]);
+        MemoryView.userFormClassNames(snapshot);
         
         setLayout(new BorderLayout());
         
@@ -242,6 +239,9 @@ public abstract class SnapshotMemoryView extends JPanel {
     
     
     public void setRefSnapshot(MemoryResultsSnapshot snapshot) {
+        // class names in VM format
+        MemoryView.userFormClassNames(snapshot);
+        
         refSnapshot = snapshot;
         setAggregation(aggregation);
     }

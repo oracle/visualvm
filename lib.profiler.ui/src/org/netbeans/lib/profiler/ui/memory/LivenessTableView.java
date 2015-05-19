@@ -192,17 +192,13 @@ abstract class LivenessTableView extends MemoryView {
         
         int _nTrackedItems = Math.min(_snapshot.getNProfiledClasses(), _classNames.length);
         _nTrackedItems = Math.min(_nTrackedItems, _nTotalAllocObjects.length);
-        
-//        // class names in VM format
-//        for (int i = 0; i < _nTrackedItems; i++)
-//            _classNames[i] = StringUtils.userFormClassName(_classNames[i]);
             
-        if (filter == null) { // old snapshot or live results
+        if (filter == null) { // old snapshot
             filterZeroItems = !diff;
             
             setData(_nTrackedItems, _classNames, _nTrackedLiveObjects, _trackedLiveObjectsSize,
                 _nTrackedAllocObjects, _avgObjectAge, _maxSurvGen, _nTotalAllocObjects, diff);
-        } else { // new snapshot
+        } else { // new snapshot or live results
             filterZeroItems = false;
             
             List<String> fClassNames = new ArrayList();
@@ -368,7 +364,7 @@ abstract class LivenessTableView extends MemoryView {
         // Filter out classes with no instances
         table.addRowFilter(new RowFilter() {
             public boolean include(RowFilter.Entry entry) {
-                return !filterZeroItems || ((Number)entry.getValue(5 + offset)).intValue() > 0;
+                return !filterZeroItems || ((Number)entry.getValue(/*5*/4 + offset)).intValue() > 0;
             }
         });
         

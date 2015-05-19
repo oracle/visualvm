@@ -47,6 +47,7 @@ import java.util.ResourceBundle;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.utils.StringUtils;
 
 /**
  *
@@ -97,5 +98,13 @@ public abstract class MemoryView extends DataView {
     
     
     public abstract ExportUtils.ExportProvider[] getExportProviders();
+    
+    
+    static final void userFormClassNames(MemoryResultsSnapshot snapshot) {
+        // class names in VM format
+        String[] classNames = snapshot == null ? null : snapshot.getClassNames();
+        if (classNames != null) for (int i = 0; i < classNames.length; i++)
+            classNames[i] = StringUtils.userFormClassName(classNames[i]);
+    }
     
 }

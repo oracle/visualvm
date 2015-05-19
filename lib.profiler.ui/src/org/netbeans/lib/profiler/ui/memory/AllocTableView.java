@@ -158,15 +158,11 @@ abstract class AllocTableView extends MemoryView {
         int _nTrackedItems = Math.min(_snapshot.getNProfiledClasses(), _classNames.length);
         _nTrackedItems = Math.min(_nTrackedItems, _nTotalAllocObjects.length);
         
-//        // class names in VM format
-//        for (int i = 0; i < _nTrackedItems; i++)
-//            _classNames[i] = StringUtils.userFormClassName(_classNames[i]);
-        
-        if (filter == null) { // old snapshot or live results
+        if (filter == null) { // old snapshot
             filterZeroItems = !diff;
             
             setData(_nTrackedItems, _classNames, _nTotalAllocObjects, _totalAllocObjectsSize, diff);
-        } else { // new snapshot
+        } else { // new snapshot or live results
             filterZeroItems = false;
             
             List<String> fClassNames = new ArrayList();
