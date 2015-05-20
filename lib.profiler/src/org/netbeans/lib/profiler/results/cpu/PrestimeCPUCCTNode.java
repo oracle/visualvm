@@ -120,6 +120,8 @@ public abstract class PrestimeCPUCCTNode extends CCTNode implements Cloneable {
     protected PrestimeCPUCCTNode[] children;
     protected char flags; // Non-zero for several special kinds of nodes, per MASK_* bit constants above
     
+    private String nodeName;
+    
     protected int methodId;
     protected int nCalls;
     protected long sleepTime0;
@@ -300,8 +302,13 @@ public abstract class PrestimeCPUCCTNode extends CCTNode implements Cloneable {
 //    public abstract int getNCalls();
 //
 //    public abstract int getNChildren();
-
+    
     public String getNodeName() {
+        if (nodeName == null) nodeName = computeNodeName();
+        return nodeName;
+    }
+
+    protected String computeNodeName() {
         if (isFiltered()) {
             return FilterSortSupport.FILTERED_OUT_LBL;
         } else if (isSelfTimeNode()) {
