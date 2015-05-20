@@ -109,7 +109,8 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         setThreadNode();
         this.children = children;
         nChildren = children == null ? 0 : children.length;
-        for (int i = 0; i < nChildren; i++) children[i].parent = this;
+        for (int i = 0; i < nChildren; i++)
+            if (children[i] != null) children[i].parent = this;
     }
     
     PrestimeCPUCCTNodeBacked() {}
