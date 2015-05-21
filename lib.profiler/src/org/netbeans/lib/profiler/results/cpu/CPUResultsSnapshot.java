@@ -320,7 +320,8 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
     
     // Workaround to display sum of invocations of all children for thread nodes
     private PrestimeCPUCCTNode fixNCalls(PrestimeCPUCCTNode root) {
-        for (CCTNode node : root.getChildren()) {
+        CCTNode[] children = root == null ? null : root.getChildren();
+        if (children != null) for (CCTNode node : children) {
             PrestimeCPUCCTNode _root = (PrestimeCPUCCTNode)node;
             _root.nCalls = 0;
             for (CCTNode child : _root.getChildren())

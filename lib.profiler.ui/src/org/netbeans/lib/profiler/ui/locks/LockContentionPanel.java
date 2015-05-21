@@ -314,6 +314,10 @@ public class LockContentionPanel extends DataView {
         treeTable.setColumnRenderer(2, hbrWaits);
         treeTable.setDefaultColumnWidth(2, hbrWaits.getMaxNoBarWidth());
         
+        treeTable.setColumnToolTips(new String[] { LOCKS_THREADS_COLUMN_TOOLTIP,
+                                                   TIME_REL_COLUMN_TOOLTIP,
+                                                   WAITS_COLUMN_TOOLTIP });
+        
 //        NumberRenderer numberRenderer = new NumberRenderer();
 //        numberRenderer.setValue(refTime, -1);
 //        treeTable.setDefaultColumnWidth(3, numberRenderer.getPreferredSize().width);

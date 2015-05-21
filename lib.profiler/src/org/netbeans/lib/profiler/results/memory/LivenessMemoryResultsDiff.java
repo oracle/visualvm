@@ -251,7 +251,7 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
         int idx = 0;
 
         for (int i = 0; i < s1nClasses; i++) {
-            if (s1NTotalAllocObjects[i] > 0) {
+//            if (s1NTotalAllocObjects[i] > 0) {
                 Integer classIdx = (Integer) classNamesIdxMap.get(s1ClassNames[i]);
 
                 if (classIdx != null) { // duplicate classname
@@ -283,7 +283,7 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
                     nTotalAllocObjectsArr.add(Integer.valueOf(0 - s1NTotalAllocObjects[i]));
                     idx++;
                 }
-            }
+//            }
         }
 
         // create diff using values from snapshot2
@@ -306,7 +306,7 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
             long trackedLiveObjectSize = s2TrackedLiveObjectsSize[i];
             int nTotalAllocObject = s2NTotalAllocObjects[i];
 
-            if (s2NTotalAllocObjects[i] > 0) {
+//            if (s2NTotalAllocObjects[i] > 0) {
                 Integer classIdx = (Integer) classNamesIdxMap.get(className);
                 int classIndex;
 
@@ -341,7 +341,7 @@ public class LivenessMemoryResultsDiff extends LivenessMemoryResultsSnapshot {
                     trackedLiveObjectsSizeArr.add(new Long(trackedLiveObjectSize));
                     nTotalAllocObjectsArr.add(Integer.valueOf(nTotalAllocObject));
                 }
-            }
+//            }
         }
 
         // move the diff to instance variables

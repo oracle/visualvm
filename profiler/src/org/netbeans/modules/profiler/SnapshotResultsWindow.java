@@ -45,14 +45,9 @@ package org.netbeans.modules.profiler;
 
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.openide.util.NbBundle;
-import org.openide.util.actions.CallbackSystemAction;
-import org.openide.util.actions.SystemAction;
 import org.openide.windows.TopComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -426,7 +421,25 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
 //        return displayedPanel.getState();
     }
     // -------------------------------------------------------------------------
+    
+    
+    // --- Internal "API" ------------------------------------------------------
+    
+    boolean setRefSnapshot(LoadedSnapshot ls) {
+        ResultsSnapshot s = ls == null ? null : ls.getSnapshot();
+        
+        if (displayedPanel instanceof SnapshotCPUView && s instanceof CPUResultsSnapshot) {
+            ((SnapshotCPUView)displayedPanel).setRefSnapshot((CPUResultsSnapshot)s);
+            return true;
+        } else if (displayedPanel instanceof SnapshotMemoryView && s instanceof MemoryResultsSnapshot) {
+            ((SnapshotMemoryView)displayedPanel).setRefSnapshot((MemoryResultsSnapshot)s);
+            return true;
+        }
+        
+        return false;
+    }
 
+    
     // -- Private methods --------------------------------------------------------------------------------------------------
 
     private void setupCPUResultsView() {
