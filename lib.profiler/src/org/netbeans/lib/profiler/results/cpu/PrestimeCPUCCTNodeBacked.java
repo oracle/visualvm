@@ -117,6 +117,21 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     
+    PrestimeCPUCCTNode createCopy() {
+        PrestimeCPUCCTNodeBacked copy = new PrestimeCPUCCTNodeBacked();
+        setupCopy(copy);
+        return copy;
+    }
+    
+    void setupCopy(PrestimeCPUCCTNodeBacked node) {
+        super.setupCopy(node);
+        node.selfCompactDataOfs = selfCompactDataOfs;
+        node.compactDataOfs = new HashSet();
+        node.compactDataOfs.add(node.selfCompactDataOfs);
+        node.nChildren = nChildren;
+    }
+    
+    
     public CCTNode createFilteredNode() {
         PrestimeCPUCCTNodeBacked filtered = new PrestimeCPUCCTNodeBacked();
         setupFilteredNode(filtered);

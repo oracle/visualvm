@@ -46,7 +46,6 @@ package org.netbeans.lib.profiler.results.cpu;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatterFactory;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
@@ -85,6 +84,8 @@ public abstract class PrestimeCPUCCTNode extends CCTNode implements Cloneable {
     
     
     public static final PrestimeCPUCCTNode EMPTY = new PrestimeCPUCCTNode() {
+        PrestimeCPUCCTNode createCopy() { return null; }
+        
         public PrestimeCPUCCTNode getChild(int index) { return null; }
         public PrestimeCPUCCTNode[] getChildren() { return new PrestimeCPUCCTNode[0]; }
         public int getIndexOfChild(Object child) { return -1; }
@@ -147,21 +148,37 @@ public abstract class PrestimeCPUCCTNode extends CCTNode implements Cloneable {
         this.methodId = methodId;
     }
     
+    // --- Cloning support ---
+    
+    abstract PrestimeCPUCCTNode createCopy();
+    
+    void setupCopy(PrestimeCPUCCTNode node) {
+        node.container = container;
+        node.parent = parent;
+        node.children = children;
+        
+        node.flags = flags;
+
+        node.nodeName = nodeName;
+        node.methodId = methodId;
+        
+        node.nCalls = nCalls;
+        
+        node.sleepTime0 = sleepTime0;
+        node.totalTime0 = totalTime0;
+        node.totalTime1 = totalTime1;
+        node.waitTime0 = waitTime0;
+    }
+    
     // --- Filtering support ---
     
     protected void setupFilteredNode(PrestimeCPUCCTNode filtered) {
+        setupCopy(filtered);
+        
         filtered.setFilteredNode();
         
-        filtered.parent = parent;
-        filtered.container = container;
-        
+        filtered.nodeName = null;
         filtered.methodId = -1;
-
-        filtered.nCalls = nCalls;
-        filtered.sleepTime0 = sleepTime0;
-        filtered.totalTime0 = totalTime0;
-        filtered.totalTime1 = totalTime1;
-        filtered.waitTime0 = waitTime0;
 
         Collection<PrestimeCPUCCTNode> _childrenL = resolveChildren(this);
         int nChildren = _childrenL.size();
@@ -181,12 +198,14 @@ public abstract class PrestimeCPUCCTNode extends CCTNode implements Cloneable {
             List<CCTNode> ch = new ArrayList();
             
             // Include current children
-            if (children != null) ch.addAll(Arrays.asList(children));
+            if (children != null) for (PrestimeCPUCCTNode child : children)
+                    ch.add(child.createCopy());
             
             // Add or merge new children
-            for (PrestimeCPUCCTNode child : resolveChildren(_node)) {
+            PrestimeCPUCCTNode[] _children = (PrestimeCPUCCTNode[])node.getChildren();
+            if (_children != null) for (PrestimeCPUCCTNode child : _children) {
                 int idx = ch.indexOf(child);
-                if (idx == -1) ch.add(child);
+                if (idx == -1) ch.add(child.createCopy());
                 else ch.get(idx).merge(child);
             }
             
