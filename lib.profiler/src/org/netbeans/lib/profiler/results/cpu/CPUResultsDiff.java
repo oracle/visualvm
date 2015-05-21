@@ -137,14 +137,12 @@ public class CPUResultsDiff extends CPUResultsSnapshot {
     }
     
     public PrestimeCPUCCTNode getRootNode(int view, Collection<Integer> threads, boolean merge) {
-        // TODO: resolve correct threads for snapshot2
         PrestimeCPUCCTNode root1 = snapshot1.getRootNode(view, threads, merge);
         PrestimeCPUCCTNode root2 = snapshot2.getRootNode(view, threads2(threads), merge);
         return new DiffCPUCCTNode(root1, root2);
     }
     
     public PrestimeCPUCCTNode getReverseRootNode(int view, Collection<Integer> threads, boolean merge) {
-        // TODO: resolve correct threads for snapshot2
         PrestimeCPUCCTNode root1 = snapshot1.getReverseRootNode(view, threads, merge);
         PrestimeCPUCCTNode root2 = snapshot2.getReverseRootNode(view, threads2(threads), merge);
         return new DiffCPUCCTNode(root1, root2);
