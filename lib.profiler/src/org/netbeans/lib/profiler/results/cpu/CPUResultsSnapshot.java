@@ -318,7 +318,8 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         if (children != null) for (CCTNode node : children) {
             PrestimeCPUCCTNode _root = (PrestimeCPUCCTNode)node;
             _root.nCalls = 0;
-            for (CCTNode child : _root.getChildren())
+            CCTNode[] _children = _root.getChildren();
+            if (_children != null) for (CCTNode child : _children)
                 _root.addNCalls(((PrestimeCPUCCTNode)child).getNCalls());
         }
         return root;
@@ -327,12 +328,14 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
     private PrestimeCPUCCTNode[] mergedChildren(PrestimeCPUCCTNode[] nodes) {
         List<PrestimeCPUCCTNode> merged = new ArrayList();
         
-        for (PrestimeCPUCCTNode node : nodes)
-            for (CCTNode n : node.getChildren()) {
+        for (PrestimeCPUCCTNode node : nodes) {
+            CCTNode[] children = node.getChildren();
+            if (children != null) for (CCTNode n : children) {
                 int idx = merged.indexOf(n);
                 if (idx == -1) merged.add(((PrestimeCPUCCTNode)n).createCopy());
                 else merged.get(idx).merge(n);
             }
+        }
         
         return merged.toArray(new PrestimeCPUCCTNode[merged.size()]);
     }
