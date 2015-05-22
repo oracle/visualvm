@@ -236,6 +236,8 @@ final class MethodsFeature extends ProfilerFeature.Basic {
             }
             void selectionChanged() {
                 MethodsFeature.this.selectionChanged();
+                if (MethodsFeature.this.ui != null && MethodsFeature.this.ui.hasResultsUI())
+                    MethodsFeature.this.ui.getResultsUI().repaint();
             }
         };
         

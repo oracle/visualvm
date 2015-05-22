@@ -110,6 +110,10 @@ abstract class ObjectsFeatureUI extends FeatureUI {
         return memoryView;
     }
     
+    boolean hasResultsUI() {
+        return memoryView != null;
+    }
+    
     void sessionStateChanged(int sessionState) {
         refreshToolbar(sessionState);
     }

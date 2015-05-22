@@ -122,6 +122,10 @@ abstract class MethodsFeatureUI extends FeatureUI {
         return cpuView;
     }
     
+    boolean hasResultsUI() {
+        return cpuView != null;
+    }
+    
     void sessionStateChanged(int sessionState) {
         refreshToolbar(sessionState);
     }
