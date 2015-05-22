@@ -44,12 +44,14 @@
 package org.netbeans.modules.profiler.actions;
 
 import javax.swing.Action;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
@@ -106,12 +108,18 @@ public final class RunGCAction extends ProfilingAwareAction {
     }
 
     public void performAction() {
-        try {
-            Profiler.getDefault().getTargetAppRunner().runGC();
-        } catch (ClientUtils.TargetAppOrVMTerminated e) {
-            ProfilerDialogs.displayWarning(e.getMessage());
-            ProfilerLogger.log(e.getMessage());
-        }
+        ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+            public void run() {
+                try {
+                    Profiler.getDefault().getTargetAppRunner().runGC();
+                } catch (final ClientUtils.TargetAppOrVMTerminated e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() { ProfilerDialogs.displayWarning(e.getMessage()); }
+                    });
+                    ProfilerLogger.log(e.getMessage());
+                }
+            }
+        });
     }
 
     protected int[] enabledStates() {
