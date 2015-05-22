@@ -43,6 +43,8 @@
 package org.netbeans.lib.profiler.results.cpu;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import org.netbeans.lib.profiler.results.CCTNode;
 
 /**
@@ -81,6 +83,12 @@ public class CPUResultsDiff extends CPUResultsSnapshot {
         // TODO: resolve correct threadId for snapshot2 !!!
         FlatProfileContainer fpc1 = snapshot1.getFlatProfile(threadId, view);
         FlatProfileContainer fpc2 = snapshot2.getFlatProfile(threadId, view);
+        return DiffFlatProfileContainer.create(fpc1, fpc2);
+    }
+    
+    public FlatProfileContainer getFlatProfile(Collection<Integer> threads, int view) {
+        FlatProfileContainer fpc1 = snapshot1.getFlatProfile(threads, view);
+        FlatProfileContainer fpc2 = snapshot2.getFlatProfile(threads2(threads), view);
         return DiffFlatProfileContainer.create(fpc1, fpc2);
     }
     
@@ -129,17 +137,28 @@ public class CPUResultsDiff extends CPUResultsSnapshot {
     }
     
     public PrestimeCPUCCTNode getRootNode(int view, Collection<Integer> threads, boolean merge) {
-        // TODO: resolve correct threads for snapshot2
         PrestimeCPUCCTNode root1 = snapshot1.getRootNode(view, threads, merge);
-        PrestimeCPUCCTNode root2 = snapshot2.getRootNode(view, threads, merge);
+        PrestimeCPUCCTNode root2 = snapshot2.getRootNode(view, threads2(threads), merge);
         return new DiffCPUCCTNode(root1, root2);
     }
     
     public PrestimeCPUCCTNode getReverseRootNode(int view, Collection<Integer> threads, boolean merge) {
-        // TODO: resolve correct threads for snapshot2
         PrestimeCPUCCTNode root1 = snapshot1.getReverseRootNode(view, threads, merge);
-        PrestimeCPUCCTNode root2 = snapshot2.getReverseRootNode(view, threads, merge);
+        PrestimeCPUCCTNode root2 = snapshot2.getReverseRootNode(view, threads2(threads), merge);
         return new DiffCPUCCTNode(root1, root2);
+    }
+    
+    private Collection<Integer> threads2(Collection<Integer> threads1) {
+        if (threads1 == null || threads1.isEmpty()) return threads1;
+        
+        Set<String> threads1Names = new HashSet();
+        for (int thread1Id : threads1) threads1Names.add(getThreadNameForId(thread1Id));
+        Set<Integer> threads2 = new HashSet();
+        for (int thread2Id : snapshot2.getThreadIds())
+            if (threads1Names.contains(snapshot2.getThreadNameForId(thread2Id)))
+                threads2.add(thread2Id);
+        
+        return threads2;
     }
     
     public long getBound(int view) {

@@ -120,6 +120,7 @@ public abstract class SnapshotCPUView extends JPanel {
     private CPUTreeTableView reverseCallsView;
     
     private JToggleButton[] toggles;
+    private JToggleButton compareButton;
     
     
     public SnapshotCPUView(CPUResultsSnapshot snapshot, boolean sampled, Action saveAction, Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
@@ -133,6 +134,12 @@ public abstract class SnapshotCPUView extends JPanel {
     
     public void setRefSnapshot(CPUResultsSnapshot snapshot) {
         refSnapshot = snapshot;
+        
+        if (compareButton != null && snapshot != null) {
+            compareButton.setSelected(true);
+            compareButton.setToolTipText(RESET_COMPARE_SNAPSHOTS);
+        }
+        
         setAggregation(aggregation);
     }
     
@@ -260,7 +267,7 @@ public abstract class SnapshotCPUView extends JPanel {
             toolbar.addSpace(2);
         
             Icon icon = (Icon)compareAction.getValue(Action.SMALL_ICON);
-            JToggleButton compareButton = new JToggleButton(icon) {
+            compareButton = new JToggleButton(icon) {
                 protected void fireActionPerformed(ActionEvent e) {
                     boolean sel = isSelected();
                     if (sel) {

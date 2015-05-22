@@ -64,6 +64,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -107,6 +108,10 @@ import org.openide.util.Lookup;
  * @author Jiri Sedlacek
  */
 public class ProfilerTable extends JTable {
+    
+    private static ResourceBundle BUNDLE() {
+        return ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.swing.Bundle"); // NOI18N
+    }
     
     public static final String PROP_NO_HOVER = "ProfilerTableHover_NoHover"; // NOI18N
     
@@ -665,6 +670,7 @@ public class ProfilerTable extends JTable {
                     icon.paintIcon(this, g, x, y);
                 }
             };
+            if (hideable) corner.setToolTipText(BUNDLE().getString("ProfilerTable_ShowHideColumns")); // NOI18N
             scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, corner);
             
             if (scrollableColumns != null && !scrollableColumns.isEmpty())

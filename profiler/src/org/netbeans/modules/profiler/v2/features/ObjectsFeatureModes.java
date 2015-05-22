@@ -109,11 +109,18 @@ import org.openide.util.NbBundle;
 final class ObjectsFeatureModes {
     
     private static abstract class MemoryMode extends FeatureMode {
+        
+        void configureSettings(ProfilingSettings settings) {
+            settings.setRunGCOnGetResultsInMemoryProfiling(false);
+        }
+        
     }
     
     private static abstract class SampledMemoryMode extends MemoryMode {
         
         void configureSettings(ProfilingSettings settings) {
+            super.configureSettings(settings);
+            
             settings.setProfilingType(ProfilingSettings.PROFILE_MEMORY_SAMPLING);
         }
         
@@ -208,6 +215,8 @@ final class ObjectsFeatureModes {
 
         void configureSettings(ProfilingSettings settings) {
             assert SwingUtilities.isEventDispatchThread();
+            
+            super.configureSettings(settings);
             
             boolean lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.TRUE.toString()));
             settings.setProfilingType(lifecycle ? ProfilingSettings.PROFILE_MEMORY_LIVENESS :
