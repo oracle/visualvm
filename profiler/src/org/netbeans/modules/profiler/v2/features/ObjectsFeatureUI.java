@@ -130,6 +130,7 @@ abstract class ObjectsFeatureUI extends FeatureUI {
     void resetData() {
         if (lrDeltasButton != null) {
             lrDeltasButton.setSelected(false);
+            lrDeltasButton.setToolTipText(Bundle.ObjectsFeatureUI_showDeltas());
         }
         if (memoryView != null) {
             memoryView.resetData();

@@ -142,6 +142,7 @@ abstract class MethodsFeatureUI extends FeatureUI {
     void resetData() {
         if (lrDeltasButton != null) {
             lrDeltasButton.setSelected(false);
+            lrDeltasButton.setToolTipText(Bundle.MethodsFeatureUI_showDeltas());
         }
         if (cpuView != null) {
             cpuView.resetData();
