@@ -205,6 +205,8 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
             }
             void selectionChanged() {
                 ObjectsFeature.this.selectionChanged();
+                if (ObjectsFeature.this.ui != null && ObjectsFeature.this.ui.hasResultsUI())
+                    ObjectsFeature.this.ui.getResultsUI().repaint();
             }
         };
         

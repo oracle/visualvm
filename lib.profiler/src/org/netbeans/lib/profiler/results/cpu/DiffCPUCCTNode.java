@@ -62,6 +62,10 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
     }
     
     
+    DiffCPUCCTNode createCopy() {
+        return new DiffCPUCCTNode(node1, node2);
+    }
+    
     public DiffCPUCCTNode createRootCopy() {
 //        PrestimeCPUCCTNodeBacked copy1 = node1.createRootCopy();
 //        PrestimeCPUCCTNodeBacked copy2 = node2.createRootCopy();
@@ -103,7 +107,7 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
         for (PrestimeCPUCCTNode node : children1) {
             String name = node.getNodeName();
             PrestimeCPUCCTNode sameNode = nodes1.get(name);
-            if (sameNode == null) nodes1.put(name, node);
+            if (sameNode == null) nodes1.put(name, node.createCopy());
             else sameNode.merge(node); // Merge same-named items
         }
         
@@ -111,7 +115,7 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
         for (PrestimeCPUCCTNode node : children2) {
             String name = node.getNodeName();
             PrestimeCPUCCTNode sameNode = nodes2.get(name);
-            if (sameNode == null) nodes2.put(name, node);
+            if (sameNode == null) nodes2.put(name, node.createCopy());
             else sameNode.merge(node); // Merge same-named items
         }
         

@@ -388,7 +388,7 @@ public final class ResultsManager {
             s1 = findAlreadyLoadedSnapshot(snapshot1FO);
 
             if (s1 == null) {
-                s1 = loadSnapshotFromFileObject(snapshot1FO);
+                s1 = loadSnapshotImpl(snapshot1FO);
             }
             
             snapshotFO = snapshot2FO;
@@ -455,20 +455,19 @@ public final class ResultsManager {
         return diff;
     }
 
-    public void compareSnapshots(LoadedSnapshot s1, LoadedSnapshot s2) {
-//        ResultsSnapshot snap1 = s1.getSnapshot();
-//        ResultsSnapshot snap2 = s2.getSnapshot();
-        ResultsSnapshot diff = createDiffSnapshot(s1, s2);
-
-        if (diff != null) {
-            SnapshotsDiffWindow sdw = SnapshotsDiffWindow.get(diff, s1, s2);
-            sdw.open();
-            sdw.requestActive();
-        } else {
-            ProfilerDialogs.displayError(Bundle.ResultsManager_CannotCompareSnapshotsMsg(
-                                            s1.getFile().getName(), 
-                                            s2.getFile().getName()));
-        }
+    public void compareSnapshots(final LoadedSnapshot s1, final LoadedSnapshot s2) {
+        CommonUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                SnapshotResultsWindow srw = SnapshotResultsWindow.get(s1, 0, false);
+                if (!srw.setRefSnapshot(s2)) {
+                    ProfilerDialogs.displayError(Bundle.ResultsManager_CannotCompareSnapshotsMsg(
+                                                 s1.getFile().getName(), s2.getFile().getName()));
+                } else {
+                    srw.open();
+                    srw.requestActive();
+                }
+            }
+        });
     }
     
     static void checkObjectSizes(String[] names1, int[] counts1, long[] sizes1, int n1,
