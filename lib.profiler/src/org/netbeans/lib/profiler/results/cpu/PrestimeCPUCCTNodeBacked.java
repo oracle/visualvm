@@ -109,12 +109,28 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
         setThreadNode();
         this.children = children;
         nChildren = children == null ? 0 : children.length;
-        for (int i = 0; i < nChildren; i++) children[i].parent = this;
+        for (int i = 0; i < nChildren; i++)
+            if (children[i] != null) children[i].parent = this;
     }
     
     PrestimeCPUCCTNodeBacked() {}
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    PrestimeCPUCCTNode createCopy() {
+        PrestimeCPUCCTNodeBacked copy = new PrestimeCPUCCTNodeBacked();
+        setupCopy(copy);
+        return copy;
+    }
+    
+    void setupCopy(PrestimeCPUCCTNodeBacked node) {
+        super.setupCopy(node);
+        node.selfCompactDataOfs = selfCompactDataOfs;
+        node.compactDataOfs = new HashSet();
+        node.compactDataOfs.add(node.selfCompactDataOfs);
+        node.nChildren = nChildren;
+    }
+    
     
     public CCTNode createFilteredNode() {
         PrestimeCPUCCTNodeBacked filtered = new PrestimeCPUCCTNodeBacked();

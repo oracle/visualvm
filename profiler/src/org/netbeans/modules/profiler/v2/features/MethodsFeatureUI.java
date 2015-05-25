@@ -122,6 +122,10 @@ abstract class MethodsFeatureUI extends FeatureUI {
         return cpuView;
     }
     
+    boolean hasResultsUI() {
+        return cpuView != null;
+    }
+    
     void sessionStateChanged(int sessionState) {
         refreshToolbar(sessionState);
     }
@@ -142,6 +146,7 @@ abstract class MethodsFeatureUI extends FeatureUI {
     void resetData() {
         if (lrDeltasButton != null) {
             lrDeltasButton.setSelected(false);
+            lrDeltasButton.setToolTipText(Bundle.MethodsFeatureUI_showDeltas());
         }
         if (cpuView != null) {
             cpuView.resetData();

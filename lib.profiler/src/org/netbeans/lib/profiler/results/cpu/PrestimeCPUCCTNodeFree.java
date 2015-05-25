@@ -93,6 +93,12 @@ public class PrestimeCPUCCTNodeFree extends PrestimeCPUCCTNode {
 //        return children;
 //    }
     
+    PrestimeCPUCCTNode createCopy() {
+        PrestimeCPUCCTNodeFree copy = new PrestimeCPUCCTNodeFree();
+        setupCopy(copy);
+        return copy;
+    }
+    
     public CCTNode createFilteredNode() {
         PrestimeCPUCCTNodeFree filtered = new PrestimeCPUCCTNodeFree();
         setupFilteredNode(filtered);
