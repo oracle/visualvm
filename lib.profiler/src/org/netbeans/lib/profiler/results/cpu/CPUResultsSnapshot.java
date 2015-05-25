@@ -219,18 +219,14 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
     }
 
     public CPUCCTContainer getContainerForThread(int threadId, int view) {
-        if (threadCCTContainers[view] == null) {
-            generateDataForView(view);
-        }
-
+        generateDataForView(view);
+        
         return threadCCTContainers[view][getContainerIdForThreadId(threadId)];
     }
 
     public FlatProfileContainer getFlatProfile(int threadId, int view) {
-        if (threadCCTContainers[view] == null) {
-            generateDataForView(view);
-        }
-
+        generateDataForView(view);
+        
         if (threadId != -1) {
             return threadCCTContainers[view][getContainerIdForThreadId(threadId)].getFlatProfile();
         } else {
@@ -277,9 +273,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
     }
 
     public PrestimeCPUCCTNode getReverseCCT(int threadId, int methodId, int view) {
-        if (threadCCTContainers[view] == null) {
-            generateDataForView(view);
-        }
+        generateDataForView(view);
 
         if (threadId >= 0) {
             return threadCCTContainers[view][getContainerIdForThreadId(threadId)].getReverseCCT(methodId);
@@ -291,9 +285,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
     }
 
     public PrestimeCPUCCTNode getRootNode(int view) {
-        if (threadCCTContainers[view] == null) {
-            generateDataForView(view);
-        }
+        generateDataForView(view);
 
         return rootNode[view];
     }
@@ -314,16 +306,20 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         for (int i = 0; i < nodes.length; i++)
             nodes[i] = getContainerForThread(threadIds.next(), view).getRootNode();
         
+        generateDataForView(view);
+        
         return merge ? new PrestimeCPUCCTNodeBacked(threadCCTContainers[view][0], mergedChildren(nodes)) :
                        fixNCalls(new PrestimeCPUCCTNodeBacked(threadCCTContainers[view][0], nodes));
     }
     
     // Workaround to display sum of invocations of all children for thread nodes
     private PrestimeCPUCCTNode fixNCalls(PrestimeCPUCCTNode root) {
-        for (CCTNode node : root.getChildren()) {
+        CCTNode[] children = root == null ? null : root.getChildren();
+        if (children != null) for (CCTNode node : children) {
             PrestimeCPUCCTNode _root = (PrestimeCPUCCTNode)node;
             _root.nCalls = 0;
-            for (CCTNode child : _root.getChildren())
+            CCTNode[] _children = _root.getChildren();
+            if (_children != null) for (CCTNode child : _children)
                 _root.addNCalls(((PrestimeCPUCCTNode)child).getNCalls());
         }
         return root;
@@ -332,12 +328,14 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
     private PrestimeCPUCCTNode[] mergedChildren(PrestimeCPUCCTNode[] nodes) {
         List<PrestimeCPUCCTNode> merged = new ArrayList();
         
-        for (PrestimeCPUCCTNode node : nodes)
-            for (CCTNode n : node.getChildren()) {
+        for (PrestimeCPUCCTNode node : nodes) {
+            CCTNode[] children = node.getChildren();
+            if (children != null) for (CCTNode n : children) {
                 int idx = merged.indexOf(n);
-                if (idx == -1) merged.add((PrestimeCPUCCTNode)n); // TODO: add node copy !!!
+                if (idx == -1) merged.add(((PrestimeCPUCCTNode)n).createCopy());
                 else merged.get(idx).merge(n);
             }
+        }
         
         return merged.toArray(new PrestimeCPUCCTNode[merged.size()]);
     }
@@ -386,17 +384,20 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
 
                         return children;
                     }
-                    public int getNCalls() { return (int)flat.getNTotalInvocations(); }
-                    public long getTotalTime0() { return container.getWholeGraphNetTime0(); }
-                    public long getTotalTime1() { return container.getWholeGraphNetTime1(); }
                 };
+                threadNode.nCalls = (int)flat.getNTotalInvocations();
+                threadNode.totalTime0 = container.getWholeGraphNetTime0();
+                threadNode.totalTime1 = container.getWholeGraphNetTime1();
                 threadNode.nChildren = flat.getNRows();
                 nodes.add(threadNode);
             }
         }
+        
+        generateDataForView(view);
+        
         PrestimeCPUCCTNode[] _nodes = nodes.toArray(new PrestimeCPUCCTNode[nodes.size()]);
         PrestimeCPUCCTNode root = new PrestimeCPUCCTNodeBacked(threadCCTContainers[view][0], merge ? mergedChildren(_nodes) : _nodes);
-        return root;
+        return fixNCalls(root);
     }
     
     public FilterSortSupport.Configuration getFilterSortInfo(CCTNode node) {
@@ -655,6 +656,8 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
     }
 
     protected PrestimeCPUCCTNode createRootNodeForAllThreads(int view) {
+        generateDataForView(view);
+        
         CPUCCTContainer[] ccts = threadCCTContainers[view];
         int len = ccts.length;
         PrestimeCPUCCTNode[] threadNodes = new PrestimeCPUCCTNode[len];
@@ -675,6 +678,8 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
     }
     
     protected CPUCCTContainer createContainerForThreads(Collection<Integer> threads, int view) {
+        generateDataForView(view);
+        
         CPUCCTContainer[] ccts = threadCCTContainers[view];
         PrestimeCPUCCTNode[] threadNodes = new PrestimeCPUCCTNode[threads.size()];
         int threadIdx = 0;

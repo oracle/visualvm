@@ -247,6 +247,17 @@ abstract class AllocTreeTableView extends MemoryView {
             }
         };
         
+        treeTable.setColumnToolTips(selection == null ? new String[] {
+                                        NAME_COLUMN_TOOLTIP,
+                                        ALLOC_SIZE_COLUMN_TOOLTIP,
+                                        ALLOC_COUNT_COLUMN_TOOLTIP
+                                      } : new String[] {
+                                        SELECTED_COLUMN_TOOLTIP,
+                                        NAME_COLUMN_TOOLTIP,
+                                        ALLOC_SIZE_COLUMN_TOOLTIP,
+                                        ALLOC_COUNT_COLUMN_TOOLTIP
+                                      });
+        
         treeTable.providePopupMenu(true);
         treeTable.setDefaultAction(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
