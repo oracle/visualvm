@@ -46,6 +46,7 @@ package org.netbeans.test.profiler;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.util.logging.Level;
+import javax.swing.JComponent;
 import junit.framework.Test;
 import org.netbeans.jellytools.Bundle;
 import org.netbeans.jellytools.EditorOperator;
@@ -240,7 +241,20 @@ public class ProfilerValidationTest extends JellyTestCase {
         oto.waitText(VISIBLE_TOKEN);
         new EventTool().waitNoEvent(1000);
         // create snapshot
-        new JButtonOperator(tcProfiler, "Snapshot").push();
+        new JButtonOperator(tcProfiler, new ComponentChooser() {
+
+            private final String TOOLTIP = "Take snapshot of collected results";
+
+            @Override
+            public boolean checkComponent(Component comp) {
+                return TOOLTIP.equals(((JComponent) comp).getToolTipText());
+            }
+
+            @Override
+            public String getDescription() {
+                return "tooltip is " + TOOLTIP;
+            }
+        }).push();
         TopComponentOperator tcSnapshot = new TopComponentOperator(new ContainerOperator(MainWindowOperator.getDefault(), new ComponentChooser() {
 
             @Override

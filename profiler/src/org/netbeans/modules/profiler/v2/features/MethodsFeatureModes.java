@@ -67,6 +67,7 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.SmallButton;
@@ -102,7 +103,9 @@ import org.openide.util.NbBundle;
     "MethodsFeatureModes_oneMethodSelected=Selected 1 method",
     "MethodsFeatureModes_multipleMethodsSelected=Selected {0} methods",
     "MethodsFeatureModes_addMethod=Select method",
-    "MethodsFeatureModes_addClass=Select class"
+    "MethodsFeatureModes_addClass=Select class",
+    "MethodsFeatureModes_limitCallTreeToolTip=Limit depth of results call tree",
+    "MethodsFeatureModes_doNotProfileCoreJavaToolTip=Do not profile core Java classes (java.*, sun.*, com.sun.*, etc.)"
 })
 final class MethodsFeatureModes {
     
@@ -376,6 +379,7 @@ final class MethodsFeatureModes {
                 selectionContent.add(Box.createHorizontalStrut(8));
                 
                 JLabel outgoingLabel = new JLabel(Bundle.MethodsFeatureModes_outgoingCalls());
+                outgoingLabel.setToolTipText(Bundle.MethodsFeatureModes_limitCallTreeToolTip());
                 selectionContent.add(outgoingLabel);
 
                 selectionContent.add(Box.createHorizontalStrut(5));
@@ -386,9 +390,12 @@ final class MethodsFeatureModes {
                     public Dimension getMaximumSize() { return getMinimumSize(); }
                     protected void fireStateChanged() { settingsChanged(); super.fireStateChanged(); }
                 };
+                outgoingLabel.setLabelFor(outgoingSpinner);
+                outgoingSpinner.setToolTipText(Bundle.MethodsFeatureModes_limitCallTreeToolTip());
                 selectionContent.add(outgoingSpinner);
                 
                 selectionContent.add(Box.createHorizontalStrut(6));
+                if (UIUtils.isOracleLookAndFeel()) selectionContent.add(Box.createHorizontalStrut(4));
                 
                 boolean filter = Boolean.parseBoolean(readFlag(SKIP_JAVA_FLAG, Boolean.TRUE.toString()));
                 filterJava = new JCheckBox(Bundle.MethodsFeatureModes_skipJavaClasses(), filter) {
@@ -397,6 +404,7 @@ final class MethodsFeatureModes {
                         settingsChanged();
                     }
                 };
+                filterJava.setToolTipText(Bundle.MethodsFeatureModes_doNotProfileCoreJavaToolTip());
                 filterJava.setOpaque(false);
                 selectionContent.add(filterJava);
 
