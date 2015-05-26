@@ -53,7 +53,7 @@ import org.netbeans.lib.profiler.ui.Formatters;
 public class PercentRenderer extends FormattedLabelRenderer implements RelativeRenderer {
     
     private static final String NUL = Formatters.percentFormat().format(0);
-    private static final String NAN = NUL.replace("0", "-");  // NOI18N
+    private static final String NAN = NUL.replace('0', '-');  // NOI18N
     
     private long maxValue = 100;
     
