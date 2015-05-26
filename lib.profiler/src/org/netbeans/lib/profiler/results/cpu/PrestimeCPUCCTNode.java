@@ -150,7 +150,9 @@ public abstract class PrestimeCPUCCTNode extends CCTNode implements Cloneable {
     
     // --- Cloning support ---
     
-    abstract PrestimeCPUCCTNode createCopy();
+    PrestimeCPUCCTNode createCopy() {
+        throw new UnsupportedOperationException("Cannot be called directly on " + getClass().getName()); // NOI18N
+    };
     
     void setupCopy(PrestimeCPUCCTNode node) {
         node.container = container;
