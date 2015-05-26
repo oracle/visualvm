@@ -128,7 +128,7 @@ public class Instrumentor implements CommonConstants {
             return -1;
         }
 
-        if (!settings.getInstrumentationFilter().passesFilter(className.replace(".", "/"))) {
+        if (!settings.getInstrumentationFilter().passesFilter(className.replace('.', '/'))) {
             return -1;
         }
         if (clazz.getInstrClassId() == -1) {
@@ -235,7 +235,7 @@ public class Instrumentor implements CommonConstants {
             byte[] classFileBytes = clcmd.getClassFileBytes();
 
             if (classFileBytes != null) {
-                ClassRepository.addVMSuppliedClassFile(clcmd.getClassName().replace(".","/"), thisAndParentLoaderData[0], classFileBytes);
+                ClassRepository.addVMSuppliedClassFile(clcmd.getClassName().replace('.','/'), thisAndParentLoaderData[0], classFileBytes);
             }
 
             ClassLoaderTable.addChildAndParent(thisAndParentLoaderData);
