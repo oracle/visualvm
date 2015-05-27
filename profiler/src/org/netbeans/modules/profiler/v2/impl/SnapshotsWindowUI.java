@@ -133,7 +133,9 @@ import org.openide.windows.WindowManager;
     "SnapshotsWindowUI_capDeleteSnapshots=Confirm Delete",
     "SnapshotsWindowUI_msgDeleteSnapshots=Delete selected snapshots?",
     "SnapshotsWindowUI_msgDeleteFailed=Failed to delete {0}",
-    "SnapshotsWindowUI_lblNewFile=&New file name:"
+    "SnapshotsWindowUI_lblNewFile=&New file name:",
+    "SnapshotsWindowUI_ttpSnapshotType=Snapshot type",
+    "SnapshotsWindowUI_ttpSnapshotName=Snapshot name"
 })
 public final class SnapshotsWindowUI extends TopComponent {
     
@@ -350,6 +352,8 @@ public final class SnapshotsWindowUI extends TopComponent {
                 if (isOpen(s)) setFont(bold); else setFont(plain);
             }
         });
+        snapshotsTable.setColumnToolTips(new String[] { Bundle.SnapshotsWindowUI_ttpSnapshotType(),
+                                                        Bundle.SnapshotsWindowUI_ttpSnapshotName() });
         snapshotsTable.setDefaultAction(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 Snapshot s = (Snapshot)snapshotsTable.getSelectedValue(1);

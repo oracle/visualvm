@@ -44,13 +44,18 @@
 package org.netbeans.modules.profiler.v2.features;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
+import org.netbeans.modules.profiler.v2.impl.WeakProcessor;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -69,9 +74,18 @@ import org.openide.util.lookup.ServiceProvider;
 })
 final class LocksFeature extends ProfilerFeature.Basic {
     
+    private final WeakProcessor processor;
+
     private LocksFeature(ProfilerSession session) {
         super(Icons.getIcon(ProfilerIcons.WINDOW_LOCKS), Bundle.LocksFeature_name(),
               Bundle.LocksFeature_description(), 16, session);
+
+        assert !SwingUtilities.isEventDispatchThread();
+        
+        Lookup.Provider project = session.getProject();
+        String projectName = project == null ? "External Process" : // NOI18N
+                             ProjectUtilities.getDisplayName(project);
+        processor = new WeakProcessor("MethodsFeature Processor for " + projectName); // NOI18N
     }
     
     
@@ -99,14 +113,83 @@ final class LocksFeature extends ProfilerFeature.Basic {
             int getSessionState() {
                 return LocksFeature.this.getSessionState();
             }
+            Profiler getProfiler() {
+                return LocksFeature.this.getSession().getProfiler();
+            }
+            void refreshResults() {
+                LocksFeature.this.refreshResults();
+            }
         };
         return ui;
+    }
+
+    // --- Live results --------------------------------------------------------
+    
+    private Runnable refresher;
+    private volatile boolean running;
+    
+    
+    private void startResults() {
+        if (running) return;
+        running = true;
+        
+        refresher = new Runnable() {
+            public void run() {
+                if (running) {
+                    refreshView();
+                    refreshResults(1500);
+                }
+            }
+        };
+        
+        refreshResults(1000);
+    }
+
+    private void refreshView() {
+        if (ui != null /* && ResultsManager.getDefault().resultsAvailable()*/) {
+            try {
+                ProfilingSettings settings = getSession().getProfilingSettings();
+                if (ProfilingSettings.isCPUSettings(settings)
+                   || ProfilingSettings.isMemorySettings(settings)) {
+                    // CPU or memory profiling will do refresh for us,
+                    // it will call ProfilerClinet.forceObtainedResultsDump()
+                    return;
+                }
+                ui.refreshData();
+            } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                stopResults();
+            }
+        }
+    }
+    
+    private void refreshResults() {
+        if (running) processor.post(new Runnable() {
+            public void run() {
+                if (ui != null) ui.setForceRefresh();
+                refreshView();
+            }
+        });
+    }
+    
+    private void refreshResults(int delay) {
+        if (running && refresher != null) processor.post(refresher, delay);
     }
     
     private void resetResults() {
         if (ui != null) ui.resetData();
     }
+
+    private void stopResults() {
+        if (refresher != null) {
+            running = false;
+            refresher = null;
+        }
+    }
     
+    private void unpauseResults() {
+        if (ui != null) ui.resetPause();
+    }
+     
     // --- Session lifecycle ---------------------------------------------------
     
     public void notifyActivated() {
@@ -119,9 +202,14 @@ final class LocksFeature extends ProfilerFeature.Basic {
     
     
     protected void profilingStateChanged(int oldState, int newState) {
-        // TODO: reset only the Locks data!
-        if (newState == Profiler.PROFILING_STARTED)
+        if (newState == Profiler.PROFILING_INACTIVE || newState == Profiler.PROFILING_IN_TRANSITION) {
+            stopResults();
+        } else if (isActivated() && newState == Profiler.PROFILING_RUNNING) {
+            startResults();
+        } else if (newState == Profiler.PROFILING_STARTED) {
             resetResults();
+            unpauseResults();
+        }
         
         if (ui != null) ui.sessionStateChanged(getSessionState());
     }

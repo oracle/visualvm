@@ -68,6 +68,7 @@ import javax.swing.event.DocumentListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.SmallButton;
@@ -100,16 +101,26 @@ import org.openide.util.NbBundle;
     "ObjectsFeatureModes_multipleClassesSelected=Selected {0} classes",
     "ObjectsFeatureModes_addClass=Select class",
     "ObjectsFeatureModes_lblUnlimited=unlimited",
-    "ObjectsFeatureModes_lblNoAllocations=(no allocations)"
+    "ObjectsFeatureModes_lblNoAllocations=(no allocation calls)",
+    "ObjectsFeatureModes_profileAllObjectsToolTip=Unselect to profile all created objects (including already released)",
+    "ObjectsFeatureModes_collectFullStacksToolTip=Unselect to collect full depth allocations call tree",
+    "ObjectsFeatureModes_limitAllocationsDepthToolTip=Limit depth of allocations call tree (select 0 for no allocation calls)"
 })
 final class ObjectsFeatureModes {
     
     private static abstract class MemoryMode extends FeatureMode {
+        
+        void configureSettings(ProfilingSettings settings) {
+            settings.setRunGCOnGetResultsInMemoryProfiling(false);
+        }
+        
     }
     
     private static abstract class SampledMemoryMode extends MemoryMode {
         
         void configureSettings(ProfilingSettings settings) {
+            super.configureSettings(settings);
+            
             settings.setProfilingType(ProfilingSettings.PROFILE_MEMORY_SAMPLING);
         }
         
@@ -204,6 +215,8 @@ final class ObjectsFeatureModes {
 
         void configureSettings(ProfilingSettings settings) {
             assert SwingUtilities.isEventDispatchThread();
+            
+            super.configureSettings(settings);
             
             boolean lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.TRUE.toString()));
             settings.setProfilingType(lifecycle ? ProfilingSettings.PROFILE_MEMORY_LIVENESS :
@@ -362,10 +375,12 @@ final class ObjectsFeatureModes {
                 lifecycleCheckbox = new JCheckBox(Bundle.ObjectsFeatureModes_recordLifecycle(), lifecycle) {
                     protected void fireActionPerformed(ActionEvent e) { super.fireActionPerformed(e); settingsChanged(); }
                 };
+                lifecycleCheckbox.setToolTipText(Bundle.ObjectsFeatureModes_profileAllObjectsToolTip());
                 lifecycleCheckbox.setOpaque(false);
                 selectionContent.add(lifecycleCheckbox);
                 
                 selectionContent.add(Box.createHorizontalStrut(3));
+                if (UIUtils.isOracleLookAndFeel()) selectionContent.add(Box.createHorizontalStrut(4));
                 
                 final JLabel unlimited = new GrayLabel(Bundle.ObjectsFeatureModes_lblUnlimited());
                 final JLabel noAllocs = new GrayLabel(Bundle.ObjectsFeatureModes_lblNoAllocations());
@@ -381,6 +396,7 @@ final class ObjectsFeatureModes {
                         settingsChanged();
                     }
                 };
+                outgoingCheckbox.setToolTipText(Bundle.ObjectsFeatureModes_collectFullStacksToolTip());
                 outgoingCheckbox.setOpaque(false);
                 selectionContent.add(outgoingCheckbox);
                 
@@ -388,6 +404,7 @@ final class ObjectsFeatureModes {
                 selectionContent.add(unlimited);
                 
                 selectionContent.add(Box.createHorizontalStrut(1));
+                if (UIUtils.isOracleLookAndFeel()) selectionContent.add(Box.createHorizontalStrut(4));
                 
                 int limit = Integer.parseInt(readFlag(LIMIT_ALLOCATIONS_FLAG, LIMIT_ALLOCATIONS_DEFAULT.toString()));
                 outgoingSpinner = new JExtendedSpinner(new SpinnerNumberModel(Math.abs(limit), 0, 99, 1)) {
@@ -395,6 +412,7 @@ final class ObjectsFeatureModes {
                     public Dimension getMaximumSize() { return getMinimumSize(); }
                     protected void fireStateChanged() { settingsChanged(); super.fireStateChanged(); }
                 };
+                outgoingSpinner.setToolTipText(Bundle.ObjectsFeatureModes_limitAllocationsDepthToolTip());
                 JComponent editor = outgoingSpinner.getEditor();
                 JTextField field = editor instanceof JSpinner.DefaultEditor ?
                         ((JSpinner.DefaultEditor)editor).getTextField() : null;

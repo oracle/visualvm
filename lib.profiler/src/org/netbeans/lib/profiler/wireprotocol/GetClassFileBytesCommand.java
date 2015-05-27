@@ -85,7 +85,7 @@ public class GetClassFileBytesCommand extends Command {
         classLoaderIds = new int[nClasses];
 
         for (int i = 0; i < nClasses; i++) {
-            classes[i] = in.readUTF().replace("/", ".");    // NOI18N
+            classes[i] = in.readUTF().replace('/', '.');    // NOI18N
             classLoaderIds[i] = in.readInt();
         }
     }

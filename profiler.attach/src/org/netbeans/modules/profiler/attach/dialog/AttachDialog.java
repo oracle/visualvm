@@ -129,7 +129,9 @@ import org.openide.util.lookup.ServiceProvider;
     "AttachDialog_RowJvmFlags=JVM Flags:", // NOI18N
     "AttachDialog_BtnClose=Close", // NOI18N
     "AttachDialog_DetailsCaption=Details of {0}", // NOI18N
-    "AttachDialog_Steps=P&erform the following steps to start profiling:" // NOI18N
+    "AttachDialog_Steps=P&erform the following steps to start profiling:", // NOI18N
+    "AttachDialog_ProcessNameTtp=Process name", // NOI18N
+    "AttachDialog_ProcessIdTtp=Process identifier" // NOI18N
 })
 @ServiceProvider(service = AttachWizard.class)
 public class AttachDialog extends AttachWizard {
@@ -324,6 +326,8 @@ public class AttachDialog extends AttachWizard {
             processes.setFitWidthColumn(0);
             processes.setDefaultSortOrder(SortOrder.ASCENDING);
             processes.setSortColumn(0);
+            processes.setColumnToolTips(new String[] { Bundle.AttachDialog_ProcessNameTtp(),
+                                                       Bundle.AttachDialog_ProcessIdTtp() });
             LabelRenderer processRenderer = new LabelRenderer();
             processes.setColumnRenderer(0, processRenderer);
             LabelRenderer pidRenderer = new LabelRenderer();

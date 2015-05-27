@@ -88,6 +88,9 @@ abstract class CPUTreeTableView extends CPUView {
     private boolean sampled = true;
     private boolean twoTimeStamps;
     
+    private boolean hitsVisible = false;
+    private boolean invocationsVisible = true;
+    
     
     public CPUTreeTableView(Set<ClientUtils.SourceCodeSelection> selection, boolean reverse) {
         this.selection = selection;
@@ -113,9 +116,22 @@ abstract class CPUTreeTableView extends CPUView {
                                            newData.getReverseRootNode(aggregation, selectedThreads, mergeThreads));
                 }
                 if (structureChange) {
+                    // Resolve Hits/Invocations column
                     int col = treeTable.convertColumnIndexToView(selection == null ? 3 : 4);
                     String colN = treeTableModel.getColumnName(selection == null ? 3 : 4);
+                    
+                    // Persist current Hits/Invocations column visibility
+                    if (sampled) invocationsVisible = treeTable.isColumnVisible(col);
+                    else hitsVisible = treeTable.isColumnVisible(col);
+                    
+                    // Update Hits/Invocations column name
                     treeTable.getColumnModel().getColumn(col).setHeaderValue(colN);
+                    
+                    // Set new Hits/Invocations column visibility
+                    treeTable.setColumnVisibility(col, sampled ? hitsVisible : invocationsVisible);
+                    
+                    setToolTips();
+                    
                     repaint();
                 }
             }
@@ -176,6 +192,8 @@ abstract class CPUTreeTableView extends CPUView {
             }
         };
         
+        setToolTips();
+        
         treeTable.providePopupMenu(true);
         installDefaultAction();
         
@@ -196,17 +214,22 @@ abstract class CPUTreeTableView extends CPUView {
         
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer())) {
             public void setValue(Object value, int row) {
-                super.setMaxValue(getMaxValue(row, false));
+                super.setMaxValue(getMaxValue(row, 0));
                 super.setValue(value, row);
             }
         };
         renderers[1] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer())) {
             public void setValue(Object value, int row) {
-                super.setMaxValue(getMaxValue(row, true));
+                super.setMaxValue(getMaxValue(row, 1));
                 super.setValue(value, row);
             }
         };
-        renderers[2] = new HideableBarRenderer(new NumberRenderer());
+        renderers[2] = new HideableBarRenderer(new NumberRenderer()) {
+            public void setValue(Object value, int row) {
+                super.setMaxValue(getMaxValue(row, 2));
+                super.setValue(value, row);
+            }
+        };
         
         long refTime = 123456;
         renderers[0].setMaxValue(refTime);
@@ -254,6 +277,23 @@ abstract class CPUTreeTableView extends CPUView {
         add(tableContainer, BorderLayout.CENTER);
     }
     
+    private void setToolTips() {
+        treeTable.setColumnToolTips(selection == null ? new String[] {
+                                        NAME_COLUMN_TOOLTIP,
+                                        TOTAL_TIME_COLUMN_TOOLTIP,
+                                        TOTAL_TIME_CPU_COLUMN_TOOLTIP,
+                                        sampled ? HITS_COLUMN_TOOLTIP :
+                                                  INVOCATIONS_COLUMN_TOOLTIP
+                                      } : new String[] {
+                                        SELECTED_COLUMN_TOOLTIP,
+                                        NAME_COLUMN_TOOLTIP,
+                                        TOTAL_TIME_COLUMN_TOOLTIP,
+                                        TOTAL_TIME_CPU_COLUMN_TOOLTIP,
+                                        sampled ? HITS_COLUMN_TOOLTIP :
+                                                  INVOCATIONS_COLUMN_TOOLTIP
+                                      });
+    }
+    
     
     protected RowFilter getExcludesFilter() {
         return new RowFilter() { // Do not filter threads and self time nodes
@@ -269,13 +309,15 @@ abstract class CPUTreeTableView extends CPUView {
     }
     
     
-    private long getMaxValue(int row, boolean secondary) {
+    private long getMaxValue(int row, int val) {
         TreePath path = treeTable.getPathForRow(row);
         if (path == null) return Long.MIN_VALUE; // TODO: prevents NPE from export but doesn't provide the actual value!
         if (path.getPathCount() < 2) return 1;
         
         PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)path.getPathComponent(1);
-        return Math.abs(secondary ? node.getTotalTime1() : node.getTotalTime0());
+        if (val == 0) return Math.abs(node.getTotalTime0());
+        else if (val == 1) return Math.abs(node.getTotalTime1());
+        else return Math.abs(node.getNCalls());
     }
     
     protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {

@@ -77,7 +77,7 @@ public class HeapHistogramManager {
         for (int i = 0; i < ids.length; i++) {
             String className = classesIdMap.get(ids[i]);
             
-            if (classFilter.passesFilter(className.replace(".", "/"))) {
+            if (classFilter.passesFilter(className.replace('.', '/'))) {
                 ClassInfoImpl ci = new ClassInfoImpl(className, instances[i], bytes[i]);
                 histogram.addClassInfo(ci, false);
             }

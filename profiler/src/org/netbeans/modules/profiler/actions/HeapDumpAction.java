@@ -99,7 +99,7 @@ import org.openide.windows.WindowManager;
     "HeapDumpAction_DumpingFailedMsg=Taking heap dump failed. See NetBeans logfile for details.",
     "HeapDumpAction_DestinationDialogCaption=Choose Heap Dump Destination",
     "HeapDumpAction_LocationProjectString=Profiled project",
-    "HeapDumpAction_LocationGlobalString=Default storage for Global Attach",
+    "HeapDumpAction_LocationGlobalString=Default storage for external processes",
     "HeapDumpAction_DirectoryDialogCaption=Choose Directory",
     "HeapDumpAction_OkButtonText=OK",
     "HeapDumpAction_DestinationLabelText=<html><b><nobr>Choose heap dump destination:</nobr></b></html>",

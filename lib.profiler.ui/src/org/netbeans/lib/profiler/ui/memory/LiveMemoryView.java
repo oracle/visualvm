@@ -46,6 +46,8 @@ package org.netbeans.lib.profiler.ui.memory;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,6 +60,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
@@ -95,6 +98,8 @@ public abstract class LiveMemoryView extends JPanel {
     private MemoryResultsSnapshot snapshot;
     private MemoryResultsSnapshot refSnapshot;
     
+    private Collection filter;
+    
     
     @ServiceProvider(service=MemoryCCTProvider.Listener.class)
     public static final class ResultsMonitor implements MemoryCCTProvider.Listener {
@@ -107,7 +112,7 @@ public abstract class LiveMemoryView extends JPanel {
                 try {
                     view.refreshData(appRootNode);
                 } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    Logger.getLogger(LiveMemoryView.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(LiveMemoryView.class.getName()).log(Level.FINE, null, ex);
                 }
             }
         }
@@ -133,36 +138,43 @@ public abstract class LiveMemoryView extends JPanel {
         if ((lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis() || paused) && !forceRefresh) return;
         
         final MemoryResultsSnapshot _snapshot = client.getMemoryProfilingResultsSnapshot(false);
+        
+        // class names in VM format
+        MemoryView.userFormClassNames(_snapshot);
+        
+        // class names in VM format
+        InstrumentationFilter ifilter = client.getSettings().getInstrumentationFilter();
+        String[] _ifilter = ifilter == null ? null : ifilter.getFilterStrings();
+        final Collection _filter = new ArrayList();
+        if (_ifilter != null) for (String s : _ifilter)
+                _filter.add(StringUtils.userFormClassName(s));
+        
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() { refreshDataImpl(_snapshot); }
+            public void run() { refreshDataImpl(_snapshot, _filter); }
         });
         
         lastupdate = System.currentTimeMillis();
         forceRefresh = false;
     }
     
-    private void refreshDataImpl(MemoryResultsSnapshot _snapshot) {
+    private void refreshDataImpl(MemoryResultsSnapshot _snapshot, Collection _filter) {
         assert SwingUtilities.isEventDispatchThread();
         
         snapshot = _snapshot;
-        
-        // class names in VM format
-        String[] classNames = snapshot == null ? null : snapshot.getClassNames();
-        if (classNames != null) for (int i = 0; i < classNames.length; i++)
-            classNames[i] = StringUtils.userFormClassName(classNames[i]);
+        filter = _filter;
         
         updateDataView(snapshot);
         
         if (dataView != null && snapshot != null) {
-            if (refSnapshot == null) dataView.setData(snapshot, null, CPUResultsSnapshot.CLASS_LEVEL_VIEW);
-            else dataView.setData(refSnapshot.createDiff(snapshot), null, CPUResultsSnapshot.CLASS_LEVEL_VIEW);
+            if (refSnapshot == null) dataView.setData(snapshot, filter, CPUResultsSnapshot.CLASS_LEVEL_VIEW);
+            else dataView.setData(refSnapshot.createDiff(snapshot), filter, CPUResultsSnapshot.CLASS_LEVEL_VIEW);
         }
     }
     
     public boolean setDiffView(boolean diff) {
         if (snapshot == null) return false;
         refSnapshot = diff ? snapshot : null;
-        refreshDataImpl(snapshot);
+        refreshDataImpl(snapshot, filter);
         return true;
     }
 
@@ -187,6 +199,7 @@ public abstract class LiveMemoryView extends JPanel {
         if (dataView != null) dataView.resetData();
         snapshot = null;
         refSnapshot = null;
+        filter = null;
     }
 
     public void setPaused(boolean paused) {

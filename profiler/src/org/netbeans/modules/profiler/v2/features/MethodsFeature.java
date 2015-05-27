@@ -59,6 +59,7 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.swing.PopupButton;
 import org.netbeans.lib.profiler.ui.swing.SmallButton;
@@ -235,6 +236,8 @@ final class MethodsFeature extends ProfilerFeature.Basic {
             }
             void selectionChanged() {
                 MethodsFeature.this.selectionChanged();
+                if (MethodsFeature.this.ui != null && MethodsFeature.this.ui.hasResultsUI())
+                    MethodsFeature.this.ui.getResultsUI().repaint();
             }
         };
         
@@ -501,11 +504,13 @@ final class MethodsFeature extends ProfilerFeature.Basic {
     }
 
     private void refreshView() {
-        if (ui != null && ResultsManager.getDefault().resultsAvailable()) try {
-            // NOTE: might check ProfilerClient.getCurrentInstrType() here if #247827 still occurs
-            ui.refreshData();
-        } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-            stopResults();
+        if (ui != null && ResultsManager.getDefault().resultsAvailable()
+            || getSession().getProfilingSettings().getCPUProfilingType() == CommonConstants.CPU_SAMPLED) {
+            try {
+                ui.refreshData();
+            } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                stopResults();
+            }
         }
     }
     
