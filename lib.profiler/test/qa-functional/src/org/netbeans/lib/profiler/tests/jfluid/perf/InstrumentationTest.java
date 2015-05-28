@@ -262,7 +262,7 @@ public class InstrumentationTest extends CommonProfilerTestCase implements NbPer
     }
 
     protected boolean checkBytes(String className, byte[] bytes) {
-        String clnm = className.replace(".", "/");
+        String clnm = className.replace('.', '/');
         int clindex = -1;
 
         for (int i = 0; i < classNames.length; i++) {
