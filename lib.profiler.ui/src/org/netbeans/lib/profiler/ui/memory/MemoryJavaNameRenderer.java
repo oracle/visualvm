@@ -74,6 +74,8 @@ public class MemoryJavaNameRenderer extends JavaNameRenderer {
             if (node.isFiltered()) setIcon(UIManager.getLookAndFeel().getDisabledIcon(this, REVERSE_ICON));
             else if (node.getMethodClassNameAndSig()[2] == null) setIcon(CLASS_ICON); // class name
             else setIcon(REVERSE_ICON); // method name
+        } else {
+            super.setValue(value, row);
         }
         
 //        // TODO: <clinit> methods should be displayed with "()" similar to <init>
