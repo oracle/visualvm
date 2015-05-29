@@ -350,7 +350,7 @@ final class MethodsFeatureModes {
                         super.setText(Bundle.MethodsFeatureModes_editLink(text));
                     }
                     protected void fireActionPerformed(ActionEvent e) {
-                        performEditSelection(this);
+                        performEditSelection(InstrMethodsMode.this.ui);
                     }
                     public Dimension getMinimumSize() {
                         return getPreferredSize();
