@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.netbeans.lib.profiler.results.FilterSortSupport;
 
 /**
  *
@@ -77,7 +78,15 @@ class DiffObjAllocCCTNode extends PresoObjAllocCCTNode {
     }
     
     
+    public DiffObjAllocCCTNode createFilteredNode() {
+        DiffObjAllocCCTNode filtered = new DiffObjAllocCCTNode(node1, node2);
+        setupFilteredNode(filtered);
+        return filtered;
+    }
+    
+    
     public String getNodeName() {
+        if (isFiltered()) return FilterSortSupport.FILTERED_OUT_LBL;
         return node1 == null ? node2.getNodeName() : node1.getNodeName();
     }
     
