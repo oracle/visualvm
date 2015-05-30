@@ -98,13 +98,11 @@ import org.openide.util.NbBundle;
 public final class ClassMethodList {
     
     public static void showClasses(ProfilerSession session, Set<ClientUtils.SourceCodeSelection> selection, Component invoker) {
-        UI ui = UI.forClasses(session, selection, invoker);
-        ui.show(invoker, -8, invoker.getHeight() + 1);
+        UI.forClasses(session, selection).show(invoker);
     }
     
     public static void showMethods(ProfilerSession session, Set<ClientUtils.SourceCodeSelection> selection, Component invoker) {
-        UI ui = UI.forMethods(session, selection, invoker);
-        ui.show(invoker, -8, invoker.getHeight() + 1);
+        UI.forMethods(session, selection).show(invoker);
     }
     
     
@@ -114,11 +112,11 @@ public final class ClassMethodList {
         
         private boolean addingEntry = false;
         
-        static UI forClasses(ProfilerSession session, Set<ClientUtils.SourceCodeSelection> selection, Component invoker) {
+        static UI forClasses(ProfilerSession session, Set<ClientUtils.SourceCodeSelection> selection) {
             return new UI(session, selection, false);
         }
         
-        static UI forMethods(ProfilerSession session, Set<ClientUtils.SourceCodeSelection> selection, Component invoker) {
+        static UI forMethods(ProfilerSession session, Set<ClientUtils.SourceCodeSelection> selection) {
             return new UI(session, selection, true);
         }
         
@@ -193,9 +191,8 @@ public final class ClassMethodList {
                             public void run() {
                                 addingEntry = false;
                                 UI.this.setVisible(false);
-                                invoker.getParent().repaint(); // XXX
-                                if (!invoker.isShowing()) System.err.println(">>> INVALID INVOKER: " + invoker.getClass().getName() + ", " + invoker);
-                                UI.this.show(invoker, -8, invoker.getHeight() + 1);
+                                invoker.repaint();
+                                UI.this.show(invoker);
                             }
                         });
                         
@@ -209,9 +206,8 @@ public final class ClassMethodList {
                             public void run() {
                                 addingEntry = false;
                                 UI.this.setVisible(false);
-                                invoker.getParent().repaint(); // XXX
-                                if (!invoker.isShowing()) System.err.println(">>> INVALID INVOKER: " + invoker.getClass().getName() + ", " + invoker);
-                                UI.this.show(invoker, -8, invoker.getHeight() + 1);
+                                invoker.repaint();
+                                UI.this.show(invoker);
                             }
                         });
                         
@@ -239,9 +235,7 @@ public final class ClassMethodList {
                     for (ClientUtils.SourceCodeSelection s : sel) selection.remove(s);
                     
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            invoker.getParent().repaint(); // XXX
-                        }
+                        public void run() { invoker.repaint(); }
                     });
                     
                     xmodel.refresh();
@@ -278,6 +272,10 @@ public final class ClassMethodList {
         
         public void setVisible(boolean b) {
             if (!addingEntry) super.setVisible(b);
+        }
+        
+        void show(Component invoker) {
+            show(invoker, -5, invoker.getHeight() - 1);
         }
         
     }
