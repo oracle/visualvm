@@ -44,6 +44,7 @@ package org.netbeans.lib.profiler.results.cpu;
 
 import java.util.*;
 import org.netbeans.lib.profiler.results.CCTNode;
+import org.netbeans.lib.profiler.results.FilterSortSupport;
 
 /**
  *
@@ -61,6 +62,19 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
         container = node1 == null ? node2.container : node1.container;
     }
     
+    
+    DiffCPUCCTNode createCopy() {
+        DiffCPUCCTNode copy = new DiffCPUCCTNode(node1, node2);
+        setupCopy(copy);
+        return copy;
+    }
+    
+    
+    public DiffCPUCCTNode createFilteredNode() {
+        DiffCPUCCTNode filtered = new DiffCPUCCTNode(node1, node2);
+        setupFilteredNode(filtered);
+        return filtered;
+    }
     
     public DiffCPUCCTNode createRootCopy() {
 //        PrestimeCPUCCTNodeBacked copy1 = node1.createRootCopy();
@@ -103,7 +117,7 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
         for (PrestimeCPUCCTNode node : children1) {
             String name = node.getNodeName();
             PrestimeCPUCCTNode sameNode = nodes1.get(name);
-            if (sameNode == null) nodes1.put(name, node);
+            if (sameNode == null) nodes1.put(name, node.createCopy());
             else sameNode.merge(node); // Merge same-named items
         }
         
@@ -111,7 +125,7 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
         for (PrestimeCPUCCTNode node : children2) {
             String name = node.getNodeName();
             PrestimeCPUCCTNode sameNode = nodes2.get(name);
-            if (sameNode == null) nodes2.put(name, node);
+            if (sameNode == null) nodes2.put(name, node.createCopy());
             else sameNode.merge(node); // Merge same-named items
         }
         
@@ -145,7 +159,7 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
     public int getNCalls() {
         int nCalls1 = node1 == null ? 0 : node1.getNCalls();
         int nCalls2 = node2 == null ? 0 : node2.getNCalls();
-        return nCalls2 - nCalls1;
+        return nCalls2 - nCalls1 + nCalls;
     }
 
     @Override
@@ -163,7 +177,7 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
     public long getSleepTime0() {
         long sleepTime0_1 = node1 == null ? 0 : node1.getSleepTime0();
         long sleepTime0_2 = node2 == null ? 0 : node2.getSleepTime0();
-        return sleepTime0_2 - sleepTime0_1;
+        return sleepTime0_2 - sleepTime0_1 + sleepTime0;
     }
 
     @Override
@@ -175,7 +189,7 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
     public long getTotalTime0() {
         long totalTime0_1 = node1 == null ? 0 : node1.getTotalTime0();
         long totalTime0_2 = node2 == null ? 0 : node2.getTotalTime0();
-        return totalTime0_2 - totalTime0_1;
+        return totalTime0_2 - totalTime0_1 + totalTime0;
     }
 
     @Override
@@ -189,7 +203,7 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
     public long getTotalTime1() {
         long totalTime1_1 = node1 == null ? 0 : node1.getTotalTime1();
         long totalTime1_2 = node2 == null ? 0 : node2.getTotalTime1();
-        return totalTime1_2 - totalTime1_1;
+        return totalTime1_2 - totalTime1_1 + totalTime1;
     }
 
     @Override
@@ -203,7 +217,7 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
     public long getWaitTime0() {
         long waitTime0_1 = node1 == null ? 0 : node1.getWaitTime0();
         long waitTime0_2 = node2 == null ? 0 : node2.getWaitTime0();
-        return waitTime0_2 - waitTime0_1;
+        return waitTime0_2 - waitTime0_1 + waitTime0;
     }
 
     @Override
@@ -216,38 +230,44 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
     
     @Override
     public String getNodeName() {
+        if (isFiltered()) return FilterSortSupport.FILTERED_OUT_LBL;
         return node1 == null ? node2.getNodeName() : node1.getNodeName();
     }
     
-    public void setSelfTimeNode() {
-        if (node1 != null) node1.setSelfTimeNode();
-        if (node2 != null) node2.setSelfTimeNode();
-    }
+//    public void setSelfTimeNode() {
+//        if (node1 != null) node1.setSelfTimeNode();
+//        if (node2 != null) node2.setSelfTimeNode();
+//    }
     
     @Override
     public boolean isSelfTimeNode() {
         return node1 == null ? node2.isSelfTimeNode() : node1.isSelfTimeNode();
     }
     
-    public void setThreadNode() {
-        if (node1 != null) node1.setThreadNode();
-        if (node2 != null) node2.setThreadNode();
-    }
+//    public void setThreadNode() {
+//        if (node1 != null) node1.setThreadNode();
+//        if (node2 != null) node2.setThreadNode();
+//    }
 
     @Override
     public boolean isThreadNode() {
         return node1 == null ? node2.isThreadNode() : node1.isThreadNode();
     }
     
-    public void setFilteredNode() {
-//        if (node1 != null) node1.setFilteredNode();
-//        if (node2 != null) node2.setFilteredNode();
+    @Override
+    public boolean isContextCallsNode() {
+        return node1 == null ? node2.isContextCallsNode() : node1.isContextCallsNode();
     }
     
-    public void resetFilteredNode() {
+//    public void setFilteredNode() {
+//        if (node1 != null) node1.setFilteredNode();
+//        if (node2 != null) node2.setFilteredNode();
+//    }
+    
+//    public void resetFilteredNode() {
 //        if (node1 != null) node1.resetFilteredNode();
 //        if (node2 != null) node2.resetFilteredNode();
-    }
+//    }
 
 //    @Override
 //    public boolean isFilteredNode() {

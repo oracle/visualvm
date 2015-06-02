@@ -130,6 +130,8 @@ abstract class CPUTreeTableView extends CPUView {
                     // Set new Hits/Invocations column visibility
                     treeTable.setColumnVisibility(col, sampled ? hitsVisible : invocationsVisible);
                     
+                    setToolTips();
+                    
                     repaint();
                 }
             }
@@ -189,6 +191,8 @@ abstract class CPUTreeTableView extends CPUView {
                 CPUTreeTableView.this.popupHidden();
             }
         };
+        
+        setToolTips();
         
         treeTable.providePopupMenu(true);
         installDefaultAction();
@@ -271,6 +275,23 @@ abstract class CPUTreeTableView extends CPUView {
         
         setLayout(new BorderLayout());
         add(tableContainer, BorderLayout.CENTER);
+    }
+    
+    private void setToolTips() {
+        treeTable.setColumnToolTips(selection == null ? new String[] {
+                                        NAME_COLUMN_TOOLTIP,
+                                        TOTAL_TIME_COLUMN_TOOLTIP,
+                                        TOTAL_TIME_CPU_COLUMN_TOOLTIP,
+                                        sampled ? HITS_COLUMN_TOOLTIP :
+                                                  INVOCATIONS_COLUMN_TOOLTIP
+                                      } : new String[] {
+                                        SELECTED_COLUMN_TOOLTIP,
+                                        NAME_COLUMN_TOOLTIP,
+                                        TOTAL_TIME_COLUMN_TOOLTIP,
+                                        TOTAL_TIME_CPU_COLUMN_TOOLTIP,
+                                        sampled ? HITS_COLUMN_TOOLTIP :
+                                                  INVOCATIONS_COLUMN_TOOLTIP
+                                      });
     }
     
     

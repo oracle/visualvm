@@ -143,36 +143,10 @@ public class ThreadsPanel extends DataView {
     
     public void setFilter(Filter filter) {
         selectedApplied.clear();
-        RowFilter _filter = null;
-        switch (filter) {
-            case LIVE:
-                _filter = new RowFilter() {
-                    public boolean include(RowFilter.Entry entry) {
-                        ThreadData data = (ThreadData)entry.getValue(1);
-                        return ThreadData.isAliveState(data.getLastState());
-                    }
-                };
-                break;
-            case FINISHED:
-                _filter = new RowFilter() {
-                    public boolean include(RowFilter.Entry entry) {
-                        ThreadData data = (ThreadData)entry.getValue(1);
-                        return !ThreadData.isAliveState(data.getLastState());
-                    }
-                };
-                break;
-            case SELECTED:
-                selectedApplied.addAll(selected);
-                _filter = new RowFilter() {
-                    public boolean include(RowFilter.Entry entry) {
-                        return selectedApplied.contains(entry.getIdentifier());
-                    }
-                };
-                break;
-        }
-        TableRowSorter sorter = (TableRowSorter)threadsTable.getRowSorter();
-        sorter.setRowFilter(_filter);
+        if (Filter.SELECTED.equals(filter)) selectedApplied.addAll(selected);
+        
         this.filter = filter;
+        threadsTable.addRowFilter(new ThreadsFilter());
         
         filterSelected(filter);
     }
@@ -546,6 +520,29 @@ public class ThreadsPanel extends DataView {
     }
     
     public void addThreadsMonitoringActionListener(ActionListener listener) {
+    }
+    
+    
+    private final class ThreadsFilter extends RowFilter {
+        
+        public boolean include(RowFilter.Entry entry) {
+            ThreadData data = (ThreadData)entry.getValue(1);
+            switch (filter) {
+                case LIVE: return ThreadData.isAliveState(data.getLastState());
+                case FINISHED: return !ThreadData.isAliveState(data.getLastState());
+                case SELECTED: return selectedApplied.contains(entry.getIdentifier());
+                default: return true;
+            }
+        }
+        
+        public boolean equals(Object o) {
+            return o instanceof ThreadsFilter;
+        }
+        
+        public int hashCode() {
+            return Integer.MAX_VALUE - 11;
+        }
+        
     }
     
 }

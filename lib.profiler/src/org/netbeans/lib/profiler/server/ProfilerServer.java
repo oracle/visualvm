@@ -504,6 +504,9 @@ public class ProfilerServer extends Thread implements CommonConstants {
      * @see #ATTACH_DYNAMIC
      */
     public static void activate(String fullJFluidPath, int portNo, final int activateCode, int timeOut) {
+        if (connectionOpen) {
+            throw new IllegalStateException("Connection already opened on port "+portNo);   // NOI18N
+        }
         try {
             _fullJFluidPath = fullJFluidPath;
             _portNo = portNo;

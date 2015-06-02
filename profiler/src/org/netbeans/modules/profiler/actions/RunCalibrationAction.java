@@ -76,8 +76,6 @@ import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
-import org.openide.awt.ActionRegistration;
 import org.openide.awt.Mnemonics;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
@@ -102,7 +100,9 @@ import org.openide.util.RequestProcessor;
     "LBL_JavaPlatforms=Java &Platforms...",
     "MSG_CalibrationOnProfile=Profiling session is currently in progress.\nDo you want to stop the current session and perform the calibration?",
     "MSG_CalibrationOnAttach=Profiling session is currently in progress\nDo you want to detach from the target application and perform the calibration?",
-    "MSG_CalibrationFailed=Calibration failed.\nPlease check your setup and run the calibration again."
+    "MSG_CalibrationFailed=Calibration failed.\nPlease check your setup and run the calibration again.",
+    "TTP_PlatformName=Java platform name",
+    "TTP_CalibrationDate=Date of last calibration"
 })
 @ActionID(category="Profile", id="org.netbeans.modules.profiler.actions.RunCalibrationAction")
 //@ActionRegistration(displayName="#LBL_RunCalibrationAction")
@@ -150,6 +150,8 @@ public final class RunCalibrationAction extends AbstractAction {
         table.setSortColumn(0);
         table.setPreferredScrollableViewportSize(new Dimension(400, 10));
         table.setVisibleRows(6);
+        table.setColumnToolTips(new String[] { Bundle.TTP_PlatformName(),
+                                               Bundle.TTP_CalibrationDate() });
         
         ProfilerTableContainer container = new ProfilerTableContainer(table, true, null);
         container.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));

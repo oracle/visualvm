@@ -67,7 +67,6 @@ import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 
 /**
@@ -93,15 +92,15 @@ public abstract class SnapshotMemoryView extends JPanel {
     private final MemoryResultsSnapshot snapshot;
     private MemoryResultsSnapshot refSnapshot;
     
+    private JToggleButton compareButton;
+    
     
     public SnapshotMemoryView(MemoryResultsSnapshot snapshot, Collection filter, Action saveAction, final Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
         this.filter = filter;
         this.snapshot = snapshot;
         
         // class names in VM format
-        String[] classNames = snapshot == null ? null : snapshot.getClassNames();
-        if (classNames != null) for (int i = 0; i < classNames.length; i++)
-            classNames[i] = StringUtils.userFormClassName(classNames[i]);
+        MemoryView.userFormClassNames(snapshot);
         
         setLayout(new BorderLayout());
         
@@ -174,7 +173,7 @@ public abstract class SnapshotMemoryView extends JPanel {
             toolbar.addSpace(2);
         
             Icon icon = (Icon)compareAction.getValue(Action.SMALL_ICON);
-            JToggleButton compareButton = new JToggleButton(icon) {
+            compareButton = new JToggleButton(icon) {
                 protected void fireActionPerformed(ActionEvent e) {
                     boolean sel = isSelected();
                     if (sel) {
@@ -242,7 +241,15 @@ public abstract class SnapshotMemoryView extends JPanel {
     
     
     public void setRefSnapshot(MemoryResultsSnapshot snapshot) {
+        // class names in VM format
+        MemoryView.userFormClassNames(snapshot);
+        
         refSnapshot = snapshot;
+        if (compareButton != null && snapshot != null) {
+            compareButton.setSelected(true);
+            compareButton.setToolTipText(RESET_COMPARE_SNAPSHOTS);
+        }
+        
         setAggregation(aggregation);
     }
     

@@ -223,19 +223,19 @@ public class AllocMemoryResultsDiff extends AllocMemoryResultsSnapshot {
                 // class already present in snapshot1
                 classIndex = classIdx.intValue();
 
-                if ((objectsCount != 0) || (((Integer) objCountsArr.get(classIndex)).intValue() != 0)) { // Do not add classes not displayed in compared snapshots (zero instances number)
+//                if ((objectsCount != 0) || (((Integer) objCountsArr.get(classIndex)).intValue() != 0)) { // Do not add classes not displayed in compared snapshots (zero instances number)
                     objCountsArr.set(classIndex, Integer.valueOf(((Integer) objCountsArr.get(classIndex)).intValue() + objectsCount));
                     objSizesArr.set(classIndex, new Long(((Long) objSizesArr.get(classIndex)).longValue() + objectsSize));
-                } else {
-                    classNamesIdxMap.remove(className); // Remove classname that should not be displayed
-                }
+//                } else {
+//                    classNamesIdxMap.remove(className); // Remove classname that should not be displayed
+//                }
             } else {
                 // class not present in snapshot1
-                if (objectsCount != 0) { // Do not add classes not displayed in compared snapshots (zero instances number)
+//                if (objectsCount != 0) { // Do not add classes not displayed in compared snapshots (zero instances number)
                     classNamesIdxMap.put(className, Integer.valueOf(objCountsArr.size()));
                     objCountsArr.add(Integer.valueOf(objectsCount));
                     objSizesArr.add(new Long(objectsSize));
-                }
+//                }
             }
         }
 

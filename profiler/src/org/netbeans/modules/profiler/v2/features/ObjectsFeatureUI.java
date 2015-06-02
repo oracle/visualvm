@@ -110,6 +110,10 @@ abstract class ObjectsFeatureUI extends FeatureUI {
         return memoryView;
     }
     
+    boolean hasResultsUI() {
+        return memoryView != null;
+    }
+    
     void sessionStateChanged(int sessionState) {
         refreshToolbar(sessionState);
     }
@@ -130,6 +134,7 @@ abstract class ObjectsFeatureUI extends FeatureUI {
     void resetData() {
         if (lrDeltasButton != null) {
             lrDeltasButton.setSelected(false);
+            lrDeltasButton.setToolTipText(Bundle.ObjectsFeatureUI_showDeltas());
         }
         if (memoryView != null) {
             memoryView.resetData();
