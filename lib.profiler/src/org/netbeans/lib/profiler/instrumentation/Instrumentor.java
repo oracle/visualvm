@@ -43,6 +43,9 @@
 
 package org.netbeans.lib.profiler.instrumentation;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.classfile.BaseClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassLoaderTable;
@@ -50,11 +53,16 @@ import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection;
 import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.wireprotocol.*;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import org.netbeans.lib.profiler.utils.StringUtils;
+import org.netbeans.lib.profiler.wireprotocol.ClassLoadedCommand;
+import org.netbeans.lib.profiler.wireprotocol.Command;
+import org.netbeans.lib.profiler.wireprotocol.InstrumentMethodGroupCommand;
+import org.netbeans.lib.profiler.wireprotocol.InstrumentMethodGroupResponse;
+import org.netbeans.lib.profiler.wireprotocol.MethodInvokedFirstTimeCommand;
+import org.netbeans.lib.profiler.wireprotocol.MethodLoadedCommand;
+import org.netbeans.lib.profiler.wireprotocol.RootClassLoadedCommand;
 
 
 /**
@@ -104,6 +112,7 @@ public class Instrumentor implements CommonConstants {
 
     public int getClassId(String className, int classLoaderId) {
         BaseClassInfo clazz;
+        InstrumentationFilter filter = settings.getInstrumentationFilter();
 
         if (className.charAt(0) == '[') { // array , need special lookup
                                           // strip L and ; from className, see ClassFileParser.classNameAtCPIndex
@@ -112,12 +121,19 @@ public class Instrumentor implements CommonConstants {
                 int elIndex = className.indexOf('L');
                 className = new StringBuffer(className).deleteCharAt(className.length() - 1).deleteCharAt(elIndex).toString();
             }
+            String filterName = StringUtils.userFormClassName(className);
+            if (!filter.passesFilter(filterName.replace('.', '/'))) {
+                return -1;
+            }
 
             clazz = ClassRepository.lookupSpecialClass(className);
             if (clazz.getInstrClassId() == -1) {
                 clazz.setInstrClassId(oms.getNextClassId(className));
             }
         } else {
+            if (!filter.passesFilter(className.replace('.', '/'))) {
+                return -1;
+            }
             clazz = ClassRepository.lookupClassOrCreatePlaceholder(className, classLoaderId);
         }
 
@@ -128,9 +144,6 @@ public class Instrumentor implements CommonConstants {
             return -1;
         }
 
-        if (!settings.getInstrumentationFilter().passesFilter(className.replace('.', '/'))) {
-            return -1;
-        }
         if (clazz.getInstrClassId() == -1) {
             System.err.println("Warning: " + clazz.getNameAndLoader() + " does not have instrClassId");            
         }
