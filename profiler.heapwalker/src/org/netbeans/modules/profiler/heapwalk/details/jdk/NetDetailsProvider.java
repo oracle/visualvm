@@ -91,8 +91,21 @@ public final class NetDetailsProvider extends DetailsProvider.Basic {
             return DetailsUtils.getInstanceFieldString(instance, "path", heap); // NOI18N;
         } else if (INET4_ADDRESS_MASK.equals(className) ||                          // Inet4Address
                    INET6_ADDRESS_MASK.equals(className)) {                          // Inet6Address
-            String host = DetailsUtils.getInstanceFieldString(
+            String host;
+            Instance holder = (Instance)instance.getValueOfField("holder");                     // NOI18N
+            if (holder != null) {
+                // JDK-8015743, variant with holder (6u65, 7u45, 8)
+                host = DetailsUtils.getInstanceFieldString(
+                         holder, "hostName", heap);                               // NOI18N
+                if (INET4_ADDRESS_MASK.equals(className)) {
+                    instance = (Instance) holder;
+                } else {
+                    instance = (Instance) instance.getValueOfField("holder6");
+                }
+            } else {
+                host = DetailsUtils.getInstanceFieldString(
                          instance, "hostName", heap);                               // NOI18N
+            }
             String addr = null;
             if (!"0.0.0.0".equals(host)) {                                           // NOI18N
                 if (INET4_ADDRESS_MASK.equals(className)) {
