@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.server;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,9 +53,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import org.netbeans.lib.profiler.global.Platform;
 
 
 /**
@@ -104,9 +106,8 @@ public class ClassBytesLoader {
 
                 return readFile(classUrl);
             } else {
-                System.err.println("***Profiler agent critical error: Invalid URL " + classUrl); // NOI18N
 
-                return null;
+                return readUrl(classUrl);
             }
         } catch (IOException ex) {
             System.err.println("*** Profiler agent critical error: caught IOException in ClassBytesLoadergetClassFileBytes: " + ex); // NOI18N
@@ -126,14 +127,20 @@ public class ClassBytesLoader {
     /** This method just initializes an experimentally determined set of classes that may be called indirectly by
      *  getClassFileBytes() above (through ClassLoader.getSystemResourceAsStream().
      */
-    public static void preloadClasses() {
+    public static void preloadClasses(boolean remote) {
         getClassFileBytes("sun.misc.Launcher"); // NOI18N
         new java.io.FilePermission("*", "read"); // NOI18N
 
         new java.util.HashMap().keySet().iterator();
  
         // compressed remote profiling
-        new java.util.zip.Deflater();
+        if (remote) new java.util.zip.Deflater();
+        
+        try {
+            Class.forName("java.io.RandomAccessFile$1");
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private static byte[] readFile(final URL classUrl)
@@ -178,5 +185,19 @@ public class ClassBytesLoader {
 
         //System.err.println("Size "+buf.length);
         return buf;
+    }
+
+    private static byte[] readUrl(URL classUrl) throws IOException {
+        InputStream is = classUrl.openStream();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(16384);
+        byte[] buffer = new byte[4096];
+        int len;
+        
+        while ((len = is.read(buffer)) != -1) {
+            bos.write(buffer, 0, len);
+        }
+        is.close();
+        //System.err.println("Size "+bos.size());
+        return bos.toByteArray();
     }
 }
