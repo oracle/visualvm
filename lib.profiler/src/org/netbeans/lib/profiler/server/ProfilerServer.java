@@ -638,10 +638,13 @@ public class ProfilerServer extends Thread implements CommonConstants {
         status.remoteProfiling = remote;
         if (remote) {
             System.out.println(REMOTE_SESSION_MSG);
-            // This is to preload some classes that can otherwise be loaded at inappropriate time and cause class load hook firing.
-            ClassBytesLoader.preloadClasses();
+            ClassBytesLoader.preloadClasses(remote);
         } else {
             System.out.println(LOCAL_SESSION_MSG);
+            if (Platform.getJDKVersionNumber() == JDK_19) {
+                // This is to preload some classes that can otherwise be loaded at inappropriate time and cause class load hook firing.
+                ClassBytesLoader.preloadClasses(remote);
+            }
         }
     }
 
