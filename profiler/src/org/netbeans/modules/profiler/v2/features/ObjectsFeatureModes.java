@@ -343,7 +343,7 @@ final class ObjectsFeatureModes {
                         super.setText(Bundle.ObjectsFeatureModes_editLink(text));
                     }
                     protected void fireActionPerformed(ActionEvent e) {
-                        ClassMethodList.showClasses(getSession(), selection, editSelectionLink);
+                        ClassMethodList.showClasses(getSession(), selection, SelectedClassesMode.this.ui);
                     }
                     public Dimension getMinimumSize() {
                         return getPreferredSize();

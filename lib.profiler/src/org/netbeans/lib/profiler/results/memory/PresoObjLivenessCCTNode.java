@@ -409,7 +409,7 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
         for (int i=0; i<depth; i++) {
             result.append(indent); // to simulate the tree structure in CSV
         }
-        result.append((nodeName==null)?(className):(nodeName)).append(quote).append(separator);
+        result.append(getNodeName()).append(quote).append(separator);
         result.append(quote).append(totalObjSize).append(quote).append(separator);
         result.append(quote).append(nLiveObjects).append(quote).append(separator);
         result.append(quote).append(nCalls).append(quote).append(separator);

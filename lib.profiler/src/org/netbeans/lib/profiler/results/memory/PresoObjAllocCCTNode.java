@@ -91,10 +91,11 @@ public class PresoObjAllocCCTNode extends CCTNode {
     protected PresoObjAllocCCTNode parent;
     String className;
     String methodName;
-    String methodSig;
+//    String methodSig;
     String nodeName;
     protected PresoObjAllocCCTNode[] children;
     int methodId;
+    JMethodIdTable.JMethodIdTableEntry entry;
     
     protected char flags;
 
@@ -241,7 +242,7 @@ public class PresoObjAllocCCTNode extends CCTNode {
     }
 
     public String[] getMethodClassNameAndSig() {
-        return new String[] { className, methodName, methodSig };
+        return new String[] { getClassName(), getMethodName(), getMethodSig()};
     }
 
     public int getNChildren() {
@@ -256,9 +257,17 @@ public class PresoObjAllocCCTNode extends CCTNode {
         if (isFiltered()) {
             return FilterSortSupport.FILTERED_OUT_LBL;
         } else if (methodId != 0) {
+            if (nodeName == null) {
+                if (VM_ALLOC_CLASS.equals(getClassName()) && VM_ALLOC_METHOD.equals(getMethodName())) { // special handling of ProfilerRuntimeMemory.traceVMObjectAlloc
+                    nodeName = VM_ALLOC_TEXT;
+                } else {
+                    nodeName = MethodNameFormatterFactory.getDefault().getFormatter()
+                                                         .formatMethodName(getClassName(), getMethodName(), getMethodSig()).toFormatted();
+                }                
+            }
             return nodeName;
-        } else if (className != null) {
-            return className;
+        } else if (getClassName() != null) {
+            return getClassName();
         } else {
             return UKNOWN_NODENAME;
         }
@@ -389,23 +398,12 @@ public class PresoObjAllocCCTNode extends CCTNode {
 
     protected boolean setFullClassAndMethodInfo(JMethodIdTable methodIdTable) {
         if (methodId != 0) {
-            JMethodIdTable.JMethodIdTableEntry entry = methodIdTable.getEntry(methodId);
-            className = entry.className.replace('/', '.'); // NOI18N
-            methodName = entry.methodName;
-            methodSig = entry.methodSig;
-
-            if (VM_ALLOC_CLASS.equals(className) && VM_ALLOC_METHOD.equals(methodName)) { // special handling of ProfilerRuntimeMemory.traceVMObjectAlloc
-                nodeName = VM_ALLOC_TEXT;
-            } else {
-                if (entry.isNative) methodName = methodName.concat(JMethodIdTable.NATIVE_SUFFIX);
-                nodeName = MethodNameFormatterFactory.getDefault().getFormatter()
-                                                     .formatMethodName(className, methodName, methodSig).toFormatted();
-            }
+            entry = methodIdTable.getEntry(methodId);
         }
 
         // If any object allocations that happen in our own code are caught (which shouldn't happen),
         // make sure to conceal this data here.
-        boolean thisNodeOk = !"org.netbeans.lib.profiler.server.ProfilerServer".equals(className); // NOI18N
+        boolean thisNodeOk = entry!=null && !"org/netbeans/lib/profiler/server/ProfilerServer".equals(entry.className); // NOI18N
         boolean childrenOk = true;
 
         if (children != null) {
@@ -442,7 +440,7 @@ public class PresoObjAllocCCTNode extends CCTNode {
                 children = newChildren;
             }
 
-            if ((methodName == null) || (methodName.equals("main") && methodSig // NOI18N
+            if ((getMethodName() == null) || (getMethodName().equals("main") && getMethodSig() // NOI18N
                 .equals("([Ljava/lang/String;)V"))) { // NOI18N
 
                 return true;
@@ -638,7 +636,7 @@ public class PresoObjAllocCCTNode extends CCTNode {
         for (int i=0; i<depth; i++) {
             result.append(indent); // to simulate the tree structure in CSV
         }
-        result.append((nodeName==null)?(className):(nodeName)).append(quote).append(separator);
+        result.append(getNodeName()).append(quote).append(separator);
         result.append(quote).append(totalObjSize).append(quote).append(separator);
         result.append(quote).append(nCalls).append(quote).append(separator);
         result.append(quote).append((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName())).append(newLine); // NOI18N
@@ -649,5 +647,29 @@ public class PresoObjAllocCCTNode extends CCTNode {
                 children[i].exportCSVData(separator, depth+1, eDD);
             }
         }
+    }
+
+    String getClassName() {
+        if (className == null && entry != null) {
+            className = entry.className.replace('/', '.'); // NOI18N
+        }
+        return className;
+    }
+
+    String getMethodName() {
+        if (methodName == null && entry != null) {
+            methodName = entry.methodName;
+            if (entry.isNative) {
+                methodName = methodName.concat(JMethodIdTable.NATIVE_SUFFIX);
+            }   
+        }
+        return methodName;
+    }
+
+    String getMethodSig() {
+        if (entry != null) {
+            return entry.methodSig;
+        }
+        return null;
     }
 }
