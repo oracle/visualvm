@@ -112,6 +112,7 @@ public abstract class LiveCPUView extends JPanel {
     private long lastupdate;
     private volatile boolean paused;
     private volatile boolean forceRefresh;
+    private volatile boolean refreshIsRunning;
     
     @ServiceProvider(service=CPUCCTProvider.Listener.class)
     public static final class ResultsMonitor implements CPUCCTProvider.Listener {
@@ -181,6 +182,8 @@ public abstract class LiveCPUView extends JPanel {
 
     private void refreshData(RuntimeCCTNode appRootNode) throws ClientUtils.TargetAppOrVMTerminated {
         if ((lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis() || paused) && !forceRefresh) return;
+        if (refreshIsRunning) return;
+        refreshIsRunning = true;
         try {
             final CPUResultsSnapshot snapshotData =
                     client.getStatus().getInstrMethodClasses() == null ?
@@ -192,7 +195,9 @@ public abstract class LiveCPUView extends JPanel {
             lastupdate = System.currentTimeMillis();
             forceRefresh = false;
         } catch (CPUResultsSnapshot.NoDataAvailableException e) {
+            refreshIsRunning = false;
         } catch (Throwable t) {
+            refreshIsRunning = false;
             if (t instanceof ClientUtils.TargetAppOrVMTerminated) {
                 throw ((ClientUtils.TargetAppOrVMTerminated)t);
             } else {
@@ -204,6 +209,7 @@ public abstract class LiveCPUView extends JPanel {
     private void setData() {
         if (snapshot == null) {
             resetData();
+            refreshIsRunning = false;
         } else {
             final CPUResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
                                                  refSnapshot.createDiff(snapshot);
@@ -216,10 +222,14 @@ public abstract class LiveCPUView extends JPanel {
 
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    boolean diff = _snapshot instanceof CPUResultsDiff;
-                    forwardCallsView.setData(_snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled, diff);
-                    hotSpotsView.setData(flatData, idMap, sampled, diff);
-                    reverseCallsView.setData(_snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled, diff);
+                    try {
+                        boolean diff = _snapshot instanceof CPUResultsDiff;
+                        forwardCallsView.setData(_snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled, diff);
+                        hotSpotsView.setData(flatData, idMap, sampled, diff);
+                        reverseCallsView.setData(_snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled, diff);
+                    } finally {
+                        refreshIsRunning = false;
+                    }
                 }
             });
         }
