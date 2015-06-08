@@ -76,8 +76,8 @@ public class ClassBytesLoader {
         URL classUrl =  ClassLoader.getSystemResource(resourceName);
         // in case the classname is a synthetic class there is no resource defining its bytecode
         if (classUrl == null) {
-            System.err.println("***Profer debug: could not get .class file URL for a synthetic class " + className  // NOI18N
-                               + " in ClassBytesLoader.getClassFileURL"); // NOI18N
+            //System.err.println("***Profer debug: could not get .class file URL for a synthetic class " + className  // NOI18N
+            //                   + " in ClassBytesLoader.getClassFileURL"); // NOI18N
         }
         return classUrl;
     }
