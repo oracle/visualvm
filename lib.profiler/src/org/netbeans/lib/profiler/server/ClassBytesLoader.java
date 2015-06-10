@@ -135,7 +135,7 @@ public class ClassBytesLoader {
         if (remote) new java.util.zip.Deflater();
         
         try {
-            Class.forName("java.io.RandomAccessFile$1");
+            Class.forName("java.io.RandomAccessFile$1");    // NOI18N
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
@@ -145,7 +145,7 @@ public class ClassBytesLoader {
                             throws IOException, URISyntaxException {
         URI uri = new URI(classUrl.toString());
         File file = new File(uri);
-        RandomAccessFile f = new RandomAccessFile(file, "r");
+        RandomAccessFile f = new RandomAccessFile(file, "r");   // NOI18N
         byte[] buf = new byte[(int) f.length()];
 
         f.readFully(buf);
