@@ -80,7 +80,6 @@ public class HeapWalkerManager {
     private Set dumpsBeingDeleted = new HashSet();
     private List<File> heapDumps = new ArrayList();
     private List<HeapWalker> heapWalkers = new ArrayList();
-    private List<TopComponent> topComponents = new ArrayList();
 
     final private RequestProcessor heapwalkerRp = new RequestProcessor(HeapWalkerManager.class);
 
@@ -155,7 +154,6 @@ public class HeapWalkerManager {
         final File file = hw.getHeapDumpFile();
         heapDumps.remove(file);
         heapWalkers.remove(hw);
-        topComponents.remove(tc);
 
         if (dumpsBeingDeleted.remove(file)) {
             BrowserUtils.performTask(new Runnable() {
@@ -201,7 +199,6 @@ public class HeapWalkerManager {
         if (!heapWalkers.contains(hw)) {
             heapDumps.add(hw.getHeapDumpFile());
             heapWalkers.add(hw);
-            topComponents.add(hw.getTopComponent());
         }
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -237,16 +234,9 @@ public class HeapWalkerManager {
         return (hdIndex == -1) ? null : heapWalkers.get(hdIndex);
     }
 
-    private synchronized HeapWalker getHeapWalker(TopComponent tc) {
-        int tcIndex = topComponents.indexOf(tc);
-
-        return (tcIndex == -1) ? null : heapWalkers.get(tcIndex);
-    }
-
-    private synchronized TopComponent getTopComponent(HeapWalker hw) {
-        int hwIndex = heapWalkers.indexOf(hw);
-
-        return (hwIndex == -1) ? null : topComponents.get(hwIndex);
+    private TopComponent getTopComponent(HeapWalker hw) {
+        assert SwingUtilities.isEventDispatchThread();
+        return hw.getTopComponent();
     }
 
     private void deleteHeapDumpImpl(final File file, final int retries) {
