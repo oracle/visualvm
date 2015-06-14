@@ -53,8 +53,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -76,8 +74,8 @@ public class ClassBytesLoader {
         URL classUrl =  ClassLoader.getSystemResource(resourceName);
         // in case the classname is a synthetic class there is no resource defining its bytecode
         if (classUrl == null) {
-            System.err.println("***Profer debug: could not get .class file URL for a synthetic class " + className  // NOI18N
-                               + " in ClassBytesLoader.getClassFileURL"); // NOI18N
+            //System.err.println("***Profer debug: could not get .class file URL for a synthetic class " + className  // NOI18N
+            //                   + " in ClassBytesLoader.getClassFileURL"); // NOI18N
         }
         return classUrl;
     }
@@ -137,7 +135,7 @@ public class ClassBytesLoader {
         if (remote) new java.util.zip.Deflater();
         
         try {
-            Class.forName("java.io.RandomAccessFile$1");
+            Class.forName("java.io.RandomAccessFile$1");    // NOI18N
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
@@ -147,7 +145,7 @@ public class ClassBytesLoader {
                             throws IOException, URISyntaxException {
         URI uri = new URI(classUrl.toString());
         File file = new File(uri);
-        RandomAccessFile f = new RandomAccessFile(file, "r");
+        RandomAccessFile f = new RandomAccessFile(file, "r");   // NOI18N
         byte[] buf = new byte[(int) f.length()];
 
         f.readFully(buf);
