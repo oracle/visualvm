@@ -91,6 +91,7 @@ public abstract class LiveMemoryView extends JPanel {
     private long lastupdate;
     private volatile boolean paused;
     private volatile boolean forceRefresh;
+    private volatile boolean refreshIsRunning;
     
     private final Set<ClientUtils.SourceCodeSelection> selection;
     private final ResultsMonitor rm;
@@ -136,22 +137,37 @@ public abstract class LiveMemoryView extends JPanel {
     
     private void refreshData(RuntimeCCTNode appRootNode) throws ClientUtils.TargetAppOrVMTerminated {
         if ((lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis() || paused) && !forceRefresh) return;
-        
-        final MemoryResultsSnapshot _snapshot = client.getMemoryProfilingResultsSnapshot(false);
-        
-        // class names in VM format
-        MemoryView.userFormClassNames(_snapshot);
-        
-        // class names in VM format
-        InstrumentationFilter ifilter = client.getSettings().getInstrumentationFilter();
-        String[] _ifilter = ifilter == null ? null : ifilter.getFilterStrings();
-        final Collection _filter = new ArrayList();
-        if (_ifilter != null) for (String s : _ifilter)
-                _filter.add(StringUtils.userFormClassName(s));
-        
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() { refreshDataImpl(_snapshot, _filter); }
-        });
+        if (refreshIsRunning) return;
+        refreshIsRunning = true;
+        try {
+            final MemoryResultsSnapshot _snapshot = client.getMemoryProfilingResultsSnapshot(false);
+
+            // class names in VM format
+            MemoryView.userFormClassNames(_snapshot);
+
+            // class names in VM format
+            InstrumentationFilter ifilter = client.getSettings().getInstrumentationFilter();
+            String[] _ifilter = ifilter == null ? null : ifilter.getFilterStrings();
+            final Collection _filter = new ArrayList();
+            if (_ifilter != null) for (String s : _ifilter)
+                    _filter.add(StringUtils.userFormClassName(s));
+
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    try {
+                        refreshDataImpl(_snapshot, _filter);
+                    } finally {
+                        refreshIsRunning = false;
+                    }
+                }
+            });
+        } catch (RuntimeException ex) {
+            refreshIsRunning = false;
+            throw ex;
+        } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+            refreshIsRunning = false;
+            throw ex;            
+        }
         
         lastupdate = System.currentTimeMillis();
         forceRefresh = false;
