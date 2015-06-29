@@ -749,6 +749,27 @@ public final class ResultsManager {
         return false;
     }
     
+    public int getSnapshotsCountFor(Lookup.Provider project) {
+        int count = 0;
+        try {
+            FileObject snapshotsFolder = ProfilerStorage.getProjectFolder(project, false);
+            FileObject[] children;
+            
+            if (snapshotsFolder == null) {
+                return count;
+            }
+            snapshotsFolder.refresh();
+            children = snapshotsFolder.getChildren();
+            for (FileObject child : children) {
+                if (child.getExt().equalsIgnoreCase(SNAPSHOT_EXTENSION) ||
+                    checkHprofFile(FileUtil.toFile(child))) count++;
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, Bundle.ResultsManager_ObtainSavedSnapshotsFailedMsg(e.getMessage()), e);            
+        }
+        return count;
+    }
+    
     public LoadedSnapshot loadSnapshot(FileObject selectedFile) {
         try {
             return loadSnapshotImpl(selectedFile);

@@ -95,14 +95,12 @@ public final class UIUtils {
     }
     
     public static JPanel createFillerPanel() {
-        JPanel fillerPanel = new JPanel(new FlowLayout(0, 0, FlowLayout.LEADING)) {
+        JPanel fillerPanel = new JPanel(null) {
             public Dimension getPreferredSize() {
                 return DIMENSION_SMALLEST;
             }
         };
-
         fillerPanel.setOpaque(false);
-
         return fillerPanel;
     }
 
