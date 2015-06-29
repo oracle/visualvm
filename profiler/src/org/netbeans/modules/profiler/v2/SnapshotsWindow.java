@@ -43,9 +43,9 @@
 
 package org.netbeans.modules.profiler.v2;
 
-import com.sun.org.apache.xerces.internal.utils.Objects;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Objects;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ResultsManager;
