@@ -200,7 +200,7 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
         
         settings.setSamplingFrequency(pref.getInt(ProfilingSettings.PROP_SAMPLING_FREQUENCY, 10));
         settings.setCPUProfilingType(pref.getInt(ProfilingSettings.PROP_CPU_PROFILING_TYPE, CommonConstants.CPU_INSTR_FULL));
-        settings.setSamplingInterval(pref.getInt(ProfilingSettings.PROP_SAMPLING_INTERVAL, 10));
+        settings.setSamplingInterval(pref.getInt(ProfilingSettings.PROP_SAMPLING_INTERVAL, -10));
         settings.setExcludeWaitTime(pref.getBoolean(ProfilingSettings.PROP_EXCLUDE_WAIT_TIME, true));
         settings.setInstrumentSpawnedThreads(pref.getBoolean(ProfilingSettings.PROP_INSTRUMENT_SPAWNED_THREADS, false));
         settings.setNProfiledThreadsLimit(pref.getInt(ProfilingSettings.PROP_N_PROFILED_THREADS_LIMIT, 128));

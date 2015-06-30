@@ -175,7 +175,7 @@ public class ProfilingSettings {
     private int profilingType = PROFILE_MONITOR;
 
     // CPU Profiling: Sampled
-    private int samplingInterval = 10; // hybrid
+    private int samplingInterval = -10; // hybrid
     private int samplingFrequency = 10; // pure sampling
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------

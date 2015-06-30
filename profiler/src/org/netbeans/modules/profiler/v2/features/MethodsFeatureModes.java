@@ -210,6 +210,9 @@ final class MethodsFeatureModes {
             super.configureSettings(settings);            
             
             settings.setProfilingType(ProfilingSettings.PROFILE_CPU_PART);
+            settings.setCPUProfilingType(settings.getSamplingInterval() <= 0 ?
+                                         CommonConstants.CPU_INSTR_FULL :
+                                         CommonConstants.CPU_INSTR_SAMPLED);
             
             boolean filter = Boolean.parseBoolean(readFlag(SKIP_JAVA_FLAG, Boolean.TRUE.toString()));
             settings.setSelectedInstrumentationFilter(!filter ? SimpleFilter.NO_FILTER :
