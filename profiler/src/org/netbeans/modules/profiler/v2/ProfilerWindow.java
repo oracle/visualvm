@@ -88,6 +88,7 @@ import org.netbeans.modules.profiler.actions.RunGCAction;
 import org.netbeans.modules.profiler.actions.TakeThreadDumpAction;
 import org.netbeans.modules.profiler.api.ActionsSupport;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
@@ -271,7 +272,8 @@ class ProfilerWindow extends ProfilerTopComponent {
             }
         };
         
-        featuresView = new FeaturesView(welcomePanel, command);
+        boolean showHint = ProfilerIDESettings.getInstance().getShowNoDataHint();
+        featuresView = new FeaturesView(welcomePanel, showHint ? command : null);
         container.add(featuresView, BorderLayout.CENTER);
         
         features.addListener(new ProfilerFeatures.Listener() {
@@ -722,6 +724,11 @@ class ProfilerWindow extends ProfilerTopComponent {
         super.open();
     }
     
+    protected void componentOpened() {
+        super.componentOpened();
+        SnapshotsWindow.instance().sessionOpened(session);
+    }
+    
     protected void componentShowing() {
         super.componentShowing();
         SnapshotsWindow.instance().sessionActivated(session);
@@ -730,6 +737,11 @@ class ProfilerWindow extends ProfilerTopComponent {
     protected void componentHidden() {
         super.componentHidden();
         SnapshotsWindow.instance().sessionDeactivated(session);
+    }
+    
+    protected void componentClosed() {
+        super.componentOpened();
+        SnapshotsWindow.instance().sessionClosed(session);
     }
     
     public int getPersistenceType() {

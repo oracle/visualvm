@@ -112,12 +112,6 @@ final class MethodsFeatureModes {
     private static abstract class MethodsMode extends FeatureMode {
         
         void configureSettings(ProfilingSettings settings) {
-            // TODO: read from global settings (Options)
-            settings.setThreadCPUTimerOn(true);
-            settings.setInstrumentGetterSetterMethods(false);
-            settings.setInstrumentEmptyMethods(false);
-            settings.setInstrumentMethodInvoke(true);
-            settings.setExcludeWaitTime(true);
         }
         
     }
@@ -129,7 +123,6 @@ final class MethodsFeatureModes {
             
             settings.setProfilingType(ProfilingSettings.PROFILE_CPU_SAMPLING);
             settings.setCPUProfilingType(CommonConstants.CPU_SAMPLED);
-            settings.setSamplingFrequency(10);
         }
         
         void confirmSettings() {}
@@ -217,9 +210,6 @@ final class MethodsFeatureModes {
             super.configureSettings(settings);            
             
             settings.setProfilingType(ProfilingSettings.PROFILE_CPU_PART);
-            settings.setCPUProfilingType(CommonConstants.CPU_INSTR_FULL);
-            settings.setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
-            settings.setInstrumentSpawnedThreads(false);
             
             boolean filter = Boolean.parseBoolean(readFlag(SKIP_JAVA_FLAG, Boolean.TRUE.toString()));
             settings.setSelectedInstrumentationFilter(!filter ? SimpleFilter.NO_FILTER :

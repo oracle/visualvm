@@ -45,8 +45,12 @@ package org.netbeans.modules.profiler.v2;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Objects;
 import javax.swing.SwingUtilities;
+import org.netbeans.modules.profiler.LoadedSnapshot;
+import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.SnapshotsListener;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.v2.impl.SnapshotsWindowHelper;
 import org.netbeans.modules.profiler.v2.impl.SnapshotsWindowUI;
 import org.openide.filesystems.FileObject;
@@ -94,11 +98,28 @@ import org.openide.windows.WindowManager;
         });
     }
     
+    public void sessionOpened(final ProfilerSession session) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                SnapshotsWindowUI ui = getUI(false);
+                if (ui == null && ProfilerIDESettings.getInstance().getSnapshotWindowOpenPolicy() == ProfilerIDESettings.SNAPSHOT_WINDOW_OPEN_PROFILER) {
+                    ui = getUI(true);
+                    ui.setProject(session.getProject());
+                    ui.open();
+                } else if (ui != null) ui.setProject(session.getProject());
+            }
+        });
+    }
+    
     public void sessionActivated(final ProfilerSession session) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 SnapshotsWindowUI ui = getUI(false);
-                if (ui != null) ui.setProject(session.getProject());
+                if (ui == null && ProfilerIDESettings.getInstance().getSnapshotWindowOpenPolicy() == ProfilerIDESettings.SNAPSHOT_WINDOW_SHOW_PROFILER) {
+                    ui = getUI(true);
+                    ui.setProject(session.getProject());
+                    ui.open();
+                } else if (ui != null) ui.setProject(session.getProject());
             }
         });
     }
@@ -107,9 +128,49 @@ import org.openide.windows.WindowManager;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 SnapshotsWindowUI ui = getUI(false);
-                if (ui != null) ui.resetProject(session.getProject());
+                if (ui != null) {
+                    if (ProfilerIDESettings.getInstance().getSnapshotWindowClosePolicy() == ProfilerIDESettings.SNAPSHOT_WINDOW_HIDE_PROFILER)
+                        ui.close();
+                    ui.resetProject(session.getProject());
+                }
             }
         });
+    }
+    
+    public void sessionClosed(final ProfilerSession session) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                SnapshotsWindowUI ui = getUI(false);
+                if (ui != null) {
+                    if (ProfilerIDESettings.getInstance().getSnapshotWindowClosePolicy() == ProfilerIDESettings.SNAPSHOT_WINDOW_CLOSE_PROFILER)
+                        ui.close();
+                    ui.resetProject(session.getProject());
+                }
+            }
+        });
+    }
+    
+    public void snapshotSaved(final LoadedSnapshot snapshot) {
+        assert !SwingUtilities.isEventDispatchThread();
+        
+        int policy = ProfilerIDESettings.getInstance().getSnapshotWindowOpenPolicy();
+        if ((policy == ProfilerIDESettings.SNAPSHOT_WINDOW_OPEN_FIRST &&
+             ResultsManager.getDefault().getSnapshotsCountFor(snapshot.getProject()) == 1) ||
+             policy == ProfilerIDESettings.SNAPSHOT_WINDOW_OPEN_EACH) {
+            final Lookup.Provider project = snapshot.getProject();
+            ProfilerSession session = ProfilerSession.currentSession();
+            if (session != null && Objects.equals(session.getProject(), project))
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        SnapshotsWindowUI ui = getUI(false);
+                        if (ui == null) {
+                            ui = getUI(true);
+                            ui.setProject(project);
+                            ui.open();
+                        }
+                    }
+                });
+        }
     }
     
     public void refreshFolder(final FileObject folder, final boolean fullRefresh) {
