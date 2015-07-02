@@ -674,7 +674,7 @@ public class SnapshotInfoPanel extends JPanel {
         htmlText.append("<strong>"); // NOI18N
         htmlText.append(Bundle.SnapshotInfoPanel_SamplingPeriodString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
-        htmlText.append(ps.getSamplingInterval());
+        htmlText.append(ps.getSamplingFrequency());
         htmlText.append(" ms<br>"); // NOI18N
     }
     
@@ -763,7 +763,7 @@ public class SnapshotInfoPanel extends JPanel {
             htmlText.append("<strong>"); // NOI18N
             htmlText.append(Bundle.SnapshotInfoPanel_SamplingPeriodString()).append(" "); // NOI18N
             htmlText.append("</strong>"); // NOI18N
-            htmlText.append(ps.getSamplingInterval());
+            htmlText.append(ps.getSamplingFrequency());
             htmlText.append(" ms<br>"); // NOI18N
         } else {
             htmlText.append("<strong>"); // NOI18N
