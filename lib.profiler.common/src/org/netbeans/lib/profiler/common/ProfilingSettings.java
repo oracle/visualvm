@@ -158,7 +158,7 @@ public class ProfilingSettings {
     // -- Memory profiling settings
     private boolean runGCOnGetResultsInMemoryProfiling = true;
     private boolean sortResultsByThreadCPUTime = false;
-    private boolean threadCPUTimerOn = false;
+    private boolean threadCPUTimerOn = true;
     private boolean threadsMonitoringEnabled = false;
     private boolean lockContentionMonitoringEnabled = false;
     private boolean threadsSamplingEnabled = true;
@@ -175,7 +175,7 @@ public class ProfilingSettings {
     private int profilingType = PROFILE_MONITOR;
 
     // CPU Profiling: Sampled
-    private int samplingInterval = 10; // hybrid
+    private int samplingInterval = -10; // hybrid
     private int samplingFrequency = 10; // pure sampling
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
