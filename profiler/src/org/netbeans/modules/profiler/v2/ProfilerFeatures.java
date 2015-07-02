@@ -53,6 +53,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
 
@@ -144,7 +145,7 @@ final class ProfilerFeatures {
             saveActivatedFeatures();
         } else {
             if (activated.add(feature)) {
-                ProfilingSettings ps = new ProfilingSettings();
+                ProfilingSettings ps = ProfilerIDESettings.getInstance().createDefaultProfilingSettings();
                 feature.configureSettings(ps);
                 
                 Iterator<ProfilerFeature> it = activated.iterator();
@@ -273,7 +274,7 @@ final class ProfilerFeatures {
         
         if (activated.isEmpty()) return null;
         
-        ProfilingSettings settings = new ProfilingSettings();
+        ProfilingSettings settings = ProfilerIDESettings.getInstance().createDefaultProfilingSettings();
         for (ProfilerFeature f : activated) f.configureSettings(settings);
         
         settings.setUseProfilingPoints(ppoints);
