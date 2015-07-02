@@ -82,8 +82,11 @@ public final class SnapshotsWindowHelper implements SnapshotsListener {
 
     public void snapshotLoaded(LoadedSnapshot snapshot) {}
 
-    public void snapshotSaved(LoadedSnapshot snapshot) {
+    public void snapshotSaved(final LoadedSnapshot snapshot) {
         refreshSnapshots(snapshot);
+        PROCESSOR.post(new Runnable() {
+            public void run() { SnapshotsWindow.instance().snapshotSaved(snapshot); }
+        });
     }
 
     public void snapshotRemoved(LoadedSnapshot snapshot) {
