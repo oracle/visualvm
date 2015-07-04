@@ -308,6 +308,9 @@ public abstract class SnapshotMemoryView extends JPanel {
         });
         
         popup.addSeparator();
+        popup.add(invoker.createCopyMenuItem());
+        
+        popup.addSeparator();
         popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateFilter(); }
         });
