@@ -52,6 +52,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.RowFilter;
 import javax.swing.UIManager;
@@ -74,6 +75,10 @@ public abstract class DataView extends JPanel {
     // --- View UI -------------------------------------------------------------
     
     protected abstract ProfilerTable getResultsComponent();
+    
+    public final JMenuItem createCopyMenuItem() {
+        return getResultsComponent().createCopyMenuItem();
+    }
     
     public void notifyOnFocus(final Runnable handler) {
         getResultsComponent().addFocusListener(new FocusAdapter() {
