@@ -75,6 +75,10 @@ public class CheckBoxRenderer extends JCheckBox implements ProfilerRenderer {
         return this;
     }
     
+    public String toString() {
+        return Boolean.toString(isSelected());
+    }
+    
     // --- Tools ---------------------------------------------------------------
     
     private Point sharedPoint;
