@@ -186,7 +186,9 @@ public final class SearchUtils {
         
         KeyStroke escKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
         KeyStroke prevKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_MASK);
+        KeyStroke prevFKey = KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.SHIFT_MASK);
         KeyStroke nextKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+        KeyStroke nextFKey = KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0);
         
         final JButton prev = new JButton(BTN_PREVIOUS, Icons.getIcon(GeneralIcons.FIND_PREVIOUS)) {
             protected void fireActionPerformed(ActionEvent e) {
@@ -274,6 +276,9 @@ public final class SearchUtils {
             };
             textC.getActionMap().put(NEXT, nextAction);
             map.put(nextKey, NEXT);
+            
+            table.getInputMap().put(nextFKey, NEXT);
+            table.getActionMap().put(NEXT, nextAction);
 
             String PREV = "search-prev-action"; // NOI18N
             Action prevAction = new AbstractAction() {
@@ -286,6 +291,9 @@ public final class SearchUtils {
             };
             textC.getActionMap().put(PREV, prevAction);
             map.put(prevKey, PREV);
+            
+            table.getInputMap().put(prevFKey, PREV);
+            table.getActionMap().put(PREV, prevAction);
         }
         
         return panel;
