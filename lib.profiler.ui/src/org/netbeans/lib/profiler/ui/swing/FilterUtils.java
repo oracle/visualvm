@@ -96,16 +96,19 @@ public final class FilterUtils {
     public static boolean filterContains(ProfilerTable table, String text, final RowFilter excludesFilter) {
         final int mainColumn = table.getMainColumn();
         
-        final String textF = text == null ? null : text.toLowerCase();
+        final String[] texts = text == null ? new String[0] : text.toLowerCase().split(" +"); // NOI18N
         Filter filter = new Filter() {
             public boolean include(RowFilter.Entry entry) {
-                if (textF == null || textF.isEmpty()) return true;
+                if (texts.length == 0) return true;
                 if (excludesFilter != null && excludesFilter.include(entry)) return true;
-                else return (entry.getValue(mainColumn)).toString().toLowerCase().contains(textF);
+                for (String f : texts)
+                    if ((entry.getValue(mainColumn)).toString().toLowerCase().contains(f))
+                        return true;
+                return false;
             }
         };
         
-        if ((text != null && !text.isEmpty())) {
+        if (texts.length > 0) {
             table.addRowFilter(filter);
             return table.getRowCount() > 0;
         } else {

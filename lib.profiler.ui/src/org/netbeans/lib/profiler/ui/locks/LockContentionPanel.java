@@ -258,6 +258,9 @@ public class LockContentionPanel extends DataView {
 //                popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
 //                    protected void fireActionPerformed(ActionEvent e) { activateFilter(); }
 //                });
+                popup.add(createCopyMenuItem());
+                popup.addSeparator();
+                
                 popup.add(new JMenuItem(SearchUtils.ACTION_FIND) {
                     protected void fireActionPerformed(ActionEvent e) { activateSearch(); }
                 });
