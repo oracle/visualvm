@@ -58,7 +58,6 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.*;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.modules.profiler.snaptracer.TracerPackage;
@@ -400,7 +399,7 @@ final class TracerView {
                 public void run() {
                     ProgressHandle pHandle = null;
                     try {
-                        pHandle = ProgressHandleFactory.createHandle(Bundle.LBL_SelectingIntervals());
+                        pHandle = ProgressHandle.createHandle(Bundle.LBL_SelectingIntervals());
                         pHandle.setInitialDelay(0);
                         pHandle.start();
                         
