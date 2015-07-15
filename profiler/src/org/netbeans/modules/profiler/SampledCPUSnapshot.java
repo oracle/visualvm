@@ -379,7 +379,7 @@ public final class SampledCPUSnapshot {
     }
 
     private boolean isRegular(PrestimeCPUCCTNode n) {
-        return n.getThreadId() != -1 && n.getMethodId() != 0 && !n.isFiltered();
+        return !n.isThreadNode() && !n.isFiltered();
     }
 
     private void initSamples() throws IOException {
