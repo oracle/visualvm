@@ -46,7 +46,9 @@ package org.netbeans.test.profiler;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.util.logging.Level;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JSpinner;
 import junit.framework.Test;
 import org.netbeans.jellytools.Bundle;
 import org.netbeans.jellytools.EditorOperator;
@@ -71,6 +73,7 @@ import org.netbeans.jemmy.Waitable;
 import org.netbeans.jemmy.Waiter;
 import org.netbeans.jemmy.operators.ContainerOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
+import org.netbeans.jemmy.operators.JComboBoxOperator;
 import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JListOperator;
 import org.netbeans.jemmy.operators.JPopupMenuOperator;
@@ -191,16 +194,14 @@ public class ProfilerValidationTest extends JellyTestCase {
         new JButtonOperator(options, "Reset").push();
         // Snapshots category
         categoriesOper.selectItem("Snapshots");
-        JLabelOperator lblSnapshotOper = new JLabelOperator(options, "On Take Snapshot:");
-        // TODO assertEquals("Wrong value for " + lblSnapshotOper.getText(), "Open Snapshot", new JComboBoxOperator((JComboBox)lblSnapshotOper.getLabelFor()).getSelectedItem());
-        JLabelOperator lblOpenOper = new JLabelOperator(options, "Open automatically");
-        // TODO assertEquals("Wrong value for " + lblOpenOper.getText(), "Never", new JComboBoxOperator((JComboBox)lblOpenOper.getLabelFor()).getSelectedItem());
+        JLabelOperator lblSnapshotOper = new JLabelOperator(options, "When taking snapshot:");
+        assertEquals("Wrong value for " + lblSnapshotOper.getText(), "Open snapshot", new JComboBoxOperator((JComboBox) lblSnapshotOper.getLabelFor()).getSelectedItem());
+        JLabelOperator lblOpenOper = new JLabelOperator(options, "Open automatically:");
+        assertEquals("Wrong value for " + lblOpenOper.getText(), "On first saved snapshot", new JComboBoxOperator((JComboBox) lblOpenOper.getLabelFor()).getSelectedItem());
         // Engine category
         categoriesOper.selectItem("Engine");
         JLabelOperator lblSamplingOper = new JLabelOperator(options, "Sampling frequency");
-        // TODO assertEquals("Wrong value for "+ lblSamplingOper.getText(), 10, new JSpinnerOperator((JSpinner)lblSamplingOper.getLabelFor()).getValue());
-        JLabelOperator lblTrackOper = new JLabelOperator(options, "Track every");
-        // TODO assertEquals("Wrong value for "+ lblTrackOper, 10, new JSpinnerOperator((JSpinner)lblTrackOper.getLabelFor()).getValue());
+        assertEquals("Wrong value for " + lblSamplingOper.getText(), 10, new JSpinnerOperator((JSpinner) lblSamplingOper.getLabelFor()).getValue());
         options.cancel();
     }
 
