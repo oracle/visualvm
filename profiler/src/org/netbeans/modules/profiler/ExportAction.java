@@ -44,7 +44,6 @@ package org.netbeans.modules.profiler;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -55,7 +54,6 @@ import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
@@ -370,7 +368,7 @@ public final class ExportAction extends AbstractAction {
         
         if (exportedFileType==MODE_NPS) {
             new NBSwingWorker(true) {
-                final private ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.ExportAction_SavingSnapshot());
+                final private ProgressHandle ph = ProgressHandle.createHandle(Bundle.ExportAction_SavingSnapshot());
                 @Override
                 protected void doInBackground() {
                     try {
@@ -405,7 +403,7 @@ public final class ExportAction extends AbstractAction {
             
         } else {
             new NBSwingWorker(true) {
-                final private ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.ExportAction_ExportingViewMsg());
+                final private ProgressHandle ph = ProgressHandle.createHandle(Bundle.ExportAction_ExportingViewMsg());
                 @Override
                 protected void doInBackground() {
                     ph.setInitialDelay(500);

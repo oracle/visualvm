@@ -80,7 +80,6 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.ProfilerLogger;
@@ -739,7 +738,7 @@ public abstract class NetBeansProfiler extends Profiler {
     public boolean attachToApp(final ProfilingSettings profilingSettings, final AttachSettings attachSettings) {
         profilingMode = MODE_ATTACH;
 
-        ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.NetBeansProfiler_StartingSession());
+        ProgressHandle ph = ProgressHandle.createHandle(Bundle.NetBeansProfiler_StartingSession());
         ph.setInitialDelay(500);
         
         ph.start();
@@ -936,7 +935,7 @@ public abstract class NetBeansProfiler extends Profiler {
         lastSessionSettings = sessionSettings;
         lastMode = MODE_PROFILE;
 
-        ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.NetBeansProfiler_StartingSession());
+        ProgressHandle ph = ProgressHandle.createHandle(Bundle.NetBeansProfiler_StartingSession());
         try {
             ph.setInitialDelay(500);
             ph.start();

@@ -58,7 +58,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
+import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.common.Profiler;
@@ -493,7 +493,7 @@ public final class HeapDumpAction extends ProfilingAwareAction {
                         ProgressHandle pHandle = null;
 
                         try {
-                            pHandle = ProgressHandleFactory.createHandle(Bundle.HeapDumpAction_DumpingHeapText());
+                            pHandle = ProgressHandle.createHandle(Bundle.HeapDumpAction_DumpingHeapText());
                             pHandle.setInitialDelay(0);
                             pHandle.start();
                             heapdumpTaken = targetApp.getProfilerClient().takeHeapDump(dumpFileName);
