@@ -55,6 +55,7 @@ import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.RowFilter;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
@@ -69,6 +70,10 @@ public abstract class DataView extends JPanel {
     
     protected DataView() {
         super(new BorderLayout());
+        
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() { SearchUtils.enableSearchActions(getResultsComponent()); }
+        });
     }
     
     
