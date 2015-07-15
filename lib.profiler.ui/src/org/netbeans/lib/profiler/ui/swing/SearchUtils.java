@@ -68,6 +68,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.CloseButton;
+import org.netbeans.modules.profiler.api.ActionsSupport;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -95,8 +96,16 @@ public final class SearchUtils {
     // -----
     
     public static final String FIND_ACTION_KEY = "find-action-key"; // NOI18N
+    public static final String FIND_NEXT_ACTION_KEY = "find-next-action-key"; // NOI18N
+    public static final String FIND_PREV_ACTION_KEY = "find-prev-action-key"; // NOI18N
+    public static final String FIND_SEL_ACTION_KEY = "find-sel-action-key"; // NOI18N
+    
+    private static final String LAST_FIND_TEXT = "last-find-text"; // NOI18N
+    
     
     public static boolean findString(ProfilerTable table, String text, boolean next) {
+        table.putClientProperty(LAST_FIND_TEXT, text);
+        
         int rowCount = table.getRowCount();
         
         ProfilerTreeTable treeTable = null;
@@ -157,6 +166,50 @@ public final class SearchUtils {
     }
     
     
+    public static void enableSearchActions(final ProfilerTable table) {
+        ActionMap actionMap = table.getActionMap();
+        InputMap inputMap = table.getInputMap();
+        
+        Action nextAction = new AbstractAction() {
+            public void actionPerformed(final ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        Object text = table.getClientProperty(LAST_FIND_TEXT);
+                        if (text != null) findString(table, text.toString(), true);
+                    }
+                });
+            }
+        };
+        ActionsSupport.registerAction(FIND_NEXT_ACTION_KEY, nextAction, actionMap, inputMap);
+        
+        Action prevAction = new AbstractAction() {
+            public void actionPerformed(final ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        Object text = table.getClientProperty(LAST_FIND_TEXT);
+                        if (text != null) findString(table, text.toString(), false);
+                    }
+                });
+            }
+        };
+        ActionsSupport.registerAction(FIND_PREV_ACTION_KEY, prevAction, actionMap, inputMap);
+        
+        Action selAction = new AbstractAction() {
+            public void actionPerformed(final ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        int selectedRow = table.getSelectedRow();
+                        if (selectedRow == -1) return;
+                        int mainColumn = table.convertColumnIndexToView(table.getMainColumn());
+                        findString(table, table.getStringValue(selectedRow, mainColumn), true);
+                    }
+                });
+            }
+        };
+        ActionsSupport.registerAction(FIND_SEL_ACTION_KEY, selAction, actionMap, inputMap);
+    }
+    
+    
     public static JComponent createSearchPanel(final ProfilerTable table) {
         JToolBar toolbar = new JToolBar(JToolBar.HORIZONTAL);
         if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel())
@@ -186,9 +239,7 @@ public final class SearchUtils {
         
         KeyStroke escKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
         KeyStroke prevKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_MASK);
-        KeyStroke prevFKey = KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.SHIFT_MASK);
         KeyStroke nextKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
-        KeyStroke nextFKey = KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0);
         
         final JButton prev = new JButton(BTN_PREVIOUS, Icons.getIcon(GeneralIcons.FIND_PREVIOUS)) {
             protected void fireActionPerformed(ActionEvent e) {
@@ -276,9 +327,6 @@ public final class SearchUtils {
             };
             textC.getActionMap().put(NEXT, nextAction);
             map.put(nextKey, NEXT);
-            
-            table.getInputMap().put(nextFKey, NEXT);
-            table.getActionMap().put(NEXT, nextAction);
 
             String PREV = "search-prev-action"; // NOI18N
             Action prevAction = new AbstractAction() {
@@ -291,9 +339,6 @@ public final class SearchUtils {
             };
             textC.getActionMap().put(PREV, prevAction);
             map.put(prevKey, PREV);
-            
-            table.getInputMap().put(prevFKey, PREV);
-            table.getActionMap().put(PREV, prevAction);
         }
         
         return panel;
@@ -324,12 +369,25 @@ public final class SearchUtils {
     private static interface Support { @ServiceProvider(service=ActionsSupportProvider.class, position=100)
         public static final class SearchActionProvider extends ActionsSupportProvider {
             public boolean registerAction(String actionKey, Action action, ActionMap actionMap, InputMap inputMap) {
-                if (!FIND_ACTION_KEY.equals(actionKey)) return false;
+                if (FIND_ACTION_KEY.equals(actionKey)) {
+                    actionMap.put(actionKey, action);
+                    inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK), actionKey);
+                    return true;
+                } else if (FIND_NEXT_ACTION_KEY.equals(actionKey)) {
+                    actionMap.put(actionKey, action);
+                    inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0), actionKey);
+                    return true;
+                } else if (FIND_PREV_ACTION_KEY.equals(actionKey)) {
+                    actionMap.put(actionKey, action);
+                    inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.SHIFT_MASK), actionKey);
+                    return true;
+                } else if (FIND_SEL_ACTION_KEY.equals(actionKey)) {
+                    actionMap.put(actionKey, action);
+                    inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.CTRL_MASK), actionKey);
+                    return true;
+                }
 
-                actionMap.put(actionKey, action);
-                inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK), actionKey);
-
-                return true;
+                return false;
             }
         }
     }
