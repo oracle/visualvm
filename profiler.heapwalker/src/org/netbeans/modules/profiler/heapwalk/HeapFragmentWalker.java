@@ -51,7 +51,6 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -131,7 +130,7 @@ public class HeapFragmentWalker {
             changeState(RETAINED_SIZES_COMPUTING, masterAction);
             List<JavaClass> classes = heapFragment.getAllClasses();
             if (classes.size() > 0) {
-                ProgressHandle pd = interactive ? ProgressHandleFactory.createHandle(Bundle.HeapFragmentWalker_ComputingRetainedMsg()) : null;
+                ProgressHandle pd = interactive ? ProgressHandle.createHandle(Bundle.HeapFragmentWalker_ComputingRetainedMsg()) : null;
                 if (pd != null) {
                     pd.start();
                 }

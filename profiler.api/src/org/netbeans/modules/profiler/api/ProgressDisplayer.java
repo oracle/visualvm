@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler.api;
 
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Cancellable;
 
 /**
@@ -71,19 +70,19 @@ public interface ProgressDisplayer {
         ProgressHandle ph = null;
 
         public synchronized ProgressDisplayer showProgress(String message) {
-            ph = ProgressHandleFactory.createHandle(message);
+            ph = ProgressHandle.createHandle(message);
             ph.start();
             return DEFAULT;
         }
 
         public synchronized ProgressDisplayer showProgress(String message, ProgressController controller) {
-            ph = ProgressHandleFactory.createHandle(message, controller);
+            ph = ProgressHandle.createHandle(message, controller);
             ph.start();
             return DEFAULT;
         }
 
         public synchronized ProgressDisplayer showProgress(String caption, String message, ProgressController controller) {
-            ph = ProgressHandleFactory.createHandle(message, controller);
+            ph = ProgressHandle.createHandle(message, controller);
             ph.start();
             return DEFAULT;
         }

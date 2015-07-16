@@ -71,12 +71,14 @@ public final class IoDetailsProvider extends DetailsProvider.Basic {
     private static final String FD_FIS_CLASS = "java.io.FileInputStream";       // NOI18N
     private static final String FD_FOS_CLASS = "java.io.FileOutputStream";      // NOI18N
     private static final String FCI_MASK = "sun.nio.ch.FileChannelImpl";        // NOI18N
+    private static final String HEAPCHARBUFFER_MASK = "java.nio.HeapCharBuffer";// NOI18N
     
     private static final Object CACHE_LOCK = new Object();
     private static WeakHashMap<Heap,Map<Long,String>> CACHE;
     
     public IoDetailsProvider() {
-        super(FILE_MASK, ZIPFILE_MASK, RAF_MASK, FIS_MASK, FOS_MASK, FD_MASK, FCI_MASK);
+        super(FILE_MASK, ZIPFILE_MASK, RAF_MASK, FIS_MASK, FOS_MASK, FD_MASK, FCI_MASK,
+              HEAPCHARBUFFER_MASK);
     }
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -104,6 +106,11 @@ public final class IoDetailsProvider extends DetailsProvider.Basic {
             }
         } else if (FCI_MASK.equals(className)) {                                // FileChannelImpl
             return DetailsUtils.getInstanceFieldString(instance, "path", heap); // NOI18N
+        } else if (HEAPCHARBUFFER_MASK.equals(className)) {
+            int position = DetailsUtils.getIntFieldValue(instance, "position", -1); // NOI18N                                 // NOI18N
+            int limit = DetailsUtils.getIntFieldValue(instance, "limit", -1);       // NOI18N                // NOI18N
+            int offset = DetailsUtils.getIntFieldValue(instance, "offset", -1);       // NOI18N                // NOI18N
+            return DetailsUtils.getPrimitiveArrayFieldString(instance, "hb", position + offset, limit - position, null, "...");
         }
         
         return null;
