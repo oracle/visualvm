@@ -54,7 +54,6 @@ import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
@@ -272,7 +271,7 @@ final class BasicExportAction extends AbstractAction {
         if (!checkFileExists(file)) return; // user doesn't want to overwrite existing file or it can't be overwritten
 
         new NBSwingWorker(true) {
-            final private ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.BasicExportAction_ExportingViewMsg());
+            final private ProgressHandle ph = ProgressHandle.createHandle(Bundle.BasicExportAction_ExportingViewMsg());
             @Override
             protected void doInBackground() {
                 ph.setInitialDelay(500);

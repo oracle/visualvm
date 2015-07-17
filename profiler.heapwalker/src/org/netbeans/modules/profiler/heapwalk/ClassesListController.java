@@ -45,7 +45,6 @@ package org.netbeans.modules.profiler.heapwalk;
 
 import java.text.NumberFormat;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.heap.*;
 import org.netbeans.modules.profiler.heapwalk.ui.ClassesListControllerUI;
@@ -537,7 +536,7 @@ public class ClassesListController extends AbstractController {
         ProgressHandle pHandle = null;
 
         try {
-            pHandle = ProgressHandleFactory.createHandle(Bundle.ClassesListController_AnalyzingClassesMsg());
+            pHandle = ProgressHandle.createHandle(Bundle.ClassesListController_AnalyzingClassesMsg());
             pHandle.setInitialDelay(0);
             pHandle.start();
 
