@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler;
 
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.modules.profiler.ui.ImagePreviewPanel;
 import org.openide.util.NbBundle;
@@ -198,7 +197,7 @@ class SaveViewAction extends AbstractAction {
                     ProgressHandle pHandle = null;
 
                     try {
-                        pHandle = ProgressHandleFactory.createHandle(Bundle.SaveViewAction_SavingViewMsg());
+                        pHandle = ProgressHandle.createHandle(Bundle.SaveViewAction_SavingViewMsg());
                         pHandle.setInitialDelay(0);
                         pHandle.start();
                         
