@@ -69,7 +69,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.tree.TreePath;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.DialogDisplayer;
 
@@ -249,7 +248,7 @@ public class ReferencesBrowserController extends AbstractController {
                 SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             if (!done) {
-                                progress = ProgressHandleFactory.createHandle(Bundle.ReferencesBrowserController_ProgressMsg());
+                                progress = ProgressHandle.createHandle(Bundle.ReferencesBrowserController_ProgressMsg());
                                 progress.start(HeapProgress.PROGRESS_MAX);
                             }
                         }

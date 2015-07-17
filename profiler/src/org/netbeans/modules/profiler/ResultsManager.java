@@ -53,7 +53,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.ProfilerLogger;
@@ -567,7 +566,7 @@ public final class ResultsManager {
                 return;
             }
         }
-        final ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.MSG_SavingSnapshots());
+        final ProgressHandle ph = ProgressHandle.createHandle(Bundle.MSG_SavingSnapshots());
         ph.setInitialDelay(500);
         ph.start();
         ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
