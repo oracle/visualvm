@@ -47,7 +47,6 @@ import javax.swing.BoundedRangeModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.heap.*;
 import org.netbeans.modules.profiler.heapwalk.ui.HeapWalkerUI;
 import org.openide.filesystems.FileObject;
@@ -185,7 +184,7 @@ public class HeapWalker {
         ProgressHandle pHandle = null;
 
         try {
-            pHandle = ProgressHandleFactory.createHandle(Bundle.ClassesListController_LoadingDumpMsg());
+            pHandle = ProgressHandle.createHandle(Bundle.ClassesListController_LoadingDumpMsg());
             pHandle.setInitialDelay(0);
             pHandle.start(HeapProgress.PROGRESS_MAX*2);
             

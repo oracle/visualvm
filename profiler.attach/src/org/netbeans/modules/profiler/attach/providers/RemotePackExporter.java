@@ -43,7 +43,6 @@ package org.netbeans.modules.profiler.attach.providers;
 
 import java.io.IOException;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.attach.spi.AbstractRemotePackExporter;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -77,7 +76,7 @@ final public class RemotePackExporter {
             throw new IOException();
         }
         
-        ProgressHandle ph = ProgressHandleFactory.createHandle(
+        ProgressHandle ph = ProgressHandle.createHandle(
                 Bundle.RemotePackExporter_GeneratingRemotePack(impl.getRemotePackPath(exportPath, hostOS)));
         ph.setInitialDelay(500);
         ph.start();
