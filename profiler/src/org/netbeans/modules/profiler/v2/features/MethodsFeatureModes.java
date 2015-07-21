@@ -47,6 +47,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -65,11 +66,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
-import javax.swing.JTextArea;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
@@ -78,6 +76,7 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.SmallButton;
+import org.netbeans.lib.profiler.ui.swing.TextArea;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
@@ -117,7 +116,9 @@ import org.openide.util.NbBundle;
     "MethodsFeatureModes_definedClasses=Defined classes",
     "MethodsFeatureModes_classesLbl=Classes:",
     "MethodsFeatureModes_includeCalls=Include outgoing calls:",
-    "MethodsFeatureModes_excludeCalls=Exclude outgoing calls:"
+    "MethodsFeatureModes_excludeCalls=Exclude outgoing calls:",
+    "MethodsFeatureModes_classesHint=org.mypackage.**\norg.mypackage.*\norg.mypackage.MyClass",
+    "MethodsFeatureModes_filterHint=org.mypackage.*\norg.mypackage.MyClass"
 })
 final class MethodsFeatureModes {
     
@@ -574,8 +575,8 @@ final class MethodsFeatureModes {
         private static final String FILTER_MODE_FLAG = "FILTER_MODE_FLAG"; // NOI18N
         
         private JComponent ui;
-        private JTextArea classesArea;
-        private JTextArea filterArea;
+        private TextArea classesArea;
+        private TextArea filterArea;
         private JRadioButton includeChoice;
         private JRadioButton excludeChoice;
         
@@ -623,10 +624,12 @@ final class MethodsFeatureModes {
             if (ui != null) {
                 assert SwingUtilities.isEventDispatchThread();
                 
-                String classes = classesArea.getText().trim();
+                String classes = classesArea.showsHint() ? "" : // NOI18N
+                                 classesArea.getText().trim();
                 storeFlag(CLASSES_FLAG, classes.isEmpty() ? null : classes);
                 
-                String filter = filterArea.getText().trim();
+                String filter = filterArea.showsHint() ? "" : // NOI18N
+                                filterArea.getText().trim();
                 storeFlag(FILTER_FLAG, filter.isEmpty() ? null : filter);
                 
                 boolean filterMode = includeChoice.isSelected();
@@ -638,11 +641,13 @@ final class MethodsFeatureModes {
             if (ui != null) {
                 assert SwingUtilities.isEventDispatchThread();
                 
-                if (!classesArea.getText().trim().equals(readFlag(CLASSES_FLAG, ""))) // NOI18N
-                    return true;
+                String classes = classesArea.showsHint() ? "" : // NOI18N
+                                 classesArea.getText().trim();
+                if (!classes.equals(readFlag(CLASSES_FLAG, ""))) return true; // NOI18N
                 
-                if (!filterArea.getText().trim().equals(readFlag(FILTER_FLAG, ""))) // NOI18N
-                    return true;
+                String filter = filterArea.showsHint() ? "" : // NOI18N
+                                filterArea.getText().trim();
+                if (!filter.equals(readFlag(FILTER_FLAG, ""))) return true; // NOI18N
                 
                 if (Boolean.parseBoolean(readFlag(FILTER_MODE_FLAG, Boolean.TRUE.toString())) != includeChoice.isSelected())
                     return true;
@@ -677,8 +682,8 @@ final class MethodsFeatureModes {
 
         JComponent getUI() {
             if (ui == null) {
-                ui = new JPanel(new GridBagLayout());
-                ui.setOpaque(false);
+                JPanel p = new JPanel(new GridBagLayout());
+                p.setOpaque(false);
                 
                 GridBagConstraints c;
         
@@ -690,15 +695,19 @@ final class MethodsFeatureModes {
                 c.fill = GridBagConstraints.NONE;
                 c.insets = new Insets(0, 0, 0, 5);
                 c.anchor = GridBagConstraints.NORTHWEST;
-                ui.add(classesPanel, c);
+                p.add(classesPanel, c);
                 
-                classesArea = new JTextArea(readFlag(CLASSES_FLAG, "")); // NOI18N
+                classesArea = new TextArea(readFlag(CLASSES_FLAG, "")) { // NOI18N
+                    protected void changed() { settingsChanged(); }
+                };
+                classesArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N
                 classesArea.setRows(3);
-                classesArea.setColumns(35);
+                classesArea.setColumns(40);
                 JScrollPane classesScroll = new JScrollPane(classesArea);
                 classesScroll.setPreferredSize(classesScroll.getPreferredSize());
                 classesScroll.setMinimumSize(classesScroll.getPreferredSize());
                 classesArea.setColumns(0);
+                classesArea.setHint(Bundle.MethodsFeatureModes_classesHint());
                 c = new GridBagConstraints();
                 c.gridx = 1;
                 c.gridy = 0;
@@ -708,7 +717,7 @@ final class MethodsFeatureModes {
                 c.fill = GridBagConstraints.VERTICAL;
                 c.insets = new Insets(0, 0, 0, 10);
                 c.anchor = GridBagConstraints.NORTHWEST;
-                ui.add(classesScroll, c);
+                p.add(classesScroll, c);
                 
                 boolean filterMode = Boolean.TRUE.toString().equals(readFlag(FILTER_MODE_FLAG, Boolean.TRUE.toString()));
                 ButtonGroup bg = new ButtonGroup();
@@ -730,7 +739,7 @@ final class MethodsFeatureModes {
                 c.fill = GridBagConstraints.NONE;
                 c.insets = new Insets(0, 2, 0, 5);
                 c.anchor = GridBagConstraints.NORTHWEST;
-                ui.add(filterPanel, c);
+                p.add(filterPanel, c);
                 
                 excludeChoice = new JRadioButton(Bundle.MethodsFeatureModes_excludeCalls()) {
                     protected void fireActionPerformed(ActionEvent e) {
@@ -748,15 +757,19 @@ final class MethodsFeatureModes {
                 c.fill = GridBagConstraints.NONE;
                 c.insets = new Insets(0, 2, 0, 5);
                 c.anchor = GridBagConstraints.NORTHWEST;
-                ui.add(excludeChoice, c);
+                p.add(excludeChoice, c);
                 
-                filterArea = new JTextArea(readFlag(FILTER_FLAG, "")); // NOI18N
+                filterArea = new TextArea(readFlag(FILTER_FLAG, "")) { // NOI18N
+                    protected void changed() { settingsChanged(); }
+                };
+                filterArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N
                 filterArea.setRows(3);
-                filterArea.setColumns(35);
+                filterArea.setColumns(40);
                 JScrollPane filterScroll = new JScrollPane(filterArea);
                 filterScroll.setPreferredSize(filterScroll.getPreferredSize());
                 filterScroll.setMinimumSize(filterScroll.getPreferredSize());
                 filterArea.setColumns(0);
+                filterArea.setHint(Bundle.MethodsFeatureModes_filterHint());
                 c = new GridBagConstraints();
                 c.gridx = 3;
                 c.gridy = 0;
@@ -766,15 +779,9 @@ final class MethodsFeatureModes {
                 c.fill = GridBagConstraints.VERTICAL;
                 c.insets = new Insets(0, 0, 0, 5);
                 c.anchor = GridBagConstraints.NORTHWEST;
-                ui.add(filterScroll, c);
+                p.add(filterScroll, c);
                 
-                DocumentListener dl = new DocumentListener() {
-                    public void insertUpdate(DocumentEvent e) { settingsChanged(); }
-                    public void removeUpdate(DocumentEvent e) { settingsChanged(); }
-                    public void changedUpdate(DocumentEvent e) { settingsChanged(); }
-                };
-                classesArea.getDocument().addDocumentListener(dl);
-                filterArea.getDocument().addDocumentListener(dl);
+                ui = p;
                 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() { settingsChanged(); }

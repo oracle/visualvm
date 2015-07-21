@@ -47,6 +47,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -62,7 +63,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
@@ -75,6 +75,7 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.SmallButton;
+import org.netbeans.lib.profiler.ui.swing.TextArea;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
@@ -110,7 +111,8 @@ import org.openide.util.NbBundle;
     "ObjectsFeatureModes_collectFullStacksToolTip=Unselect to collect full depth allocations call tree",
     "ObjectsFeatureModes_limitAllocationsDepthToolTip=Limit depth of allocations call tree (select 0 for no allocation calls)",
     "ObjectsFeatureModes_definedClasses=Defined classes",
-    "ObjectsFeatureModes_classesLbl=Classes:"
+    "ObjectsFeatureModes_classesLbl=Classes:",
+    "ObjectsFeatureModes_classesHint=org.mypackage.MyClass\norg.mypackage.MyClass$1"
 })
 final class ObjectsFeatureModes {
     
@@ -500,7 +502,7 @@ final class ObjectsFeatureModes {
         private static final Integer LIMIT_ALLOCATIONS_DEFAULT = 10;        
         
         private JComponent ui;
-        private JTextArea classesArea;
+        private TextArea classesArea;
         private JCheckBox lifecycleCheckbox;
         private JCheckBox outgoingCheckbox;
         private JSpinner outgoingSpinner;
@@ -533,10 +535,11 @@ final class ObjectsFeatureModes {
         }
         
         void confirmSettings() {
-            if (ui != null) {
+            if (ui != null && classesArea != null) { // filter out notifications from initialization
                 assert SwingUtilities.isEventDispatchThread();
                 
-                String classes = classesArea.getText().trim();
+                String classes = classesArea.showsHint() ? "" : // NOI18N
+                                 classesArea.getText().trim();
                 storeFlag(CLASSES_FLAG, classes.isEmpty() ? null : classes);
                 
                 storeFlag(LIFECYCLE_FLAG,   lifecycleCheckbox.isSelected() ?
@@ -553,8 +556,9 @@ final class ObjectsFeatureModes {
             if (ui != null) {
                 assert SwingUtilities.isEventDispatchThread();
                 
-                if (!classesArea.getText().trim().equals(readFlag(CLASSES_FLAG, ""))) // NOI18N
-                    return true;
+                String classes = classesArea.showsHint() ? "" : // NOI18N
+                                 classesArea.getText().trim();
+                if (!classes.equals(readFlag(CLASSES_FLAG, ""))) return true; // NOI18N
                 
                 boolean lifecycle = lifecycleCheckbox.isSelected();
                 boolean _lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.TRUE.toString()));
@@ -597,8 +601,8 @@ final class ObjectsFeatureModes {
 
         JComponent getUI() {
             if (ui == null) {
-                ui = new JPanel(new GridBagLayout());
-                ui.setOpaque(false);
+                JPanel p = new JPanel(new GridBagLayout());
+                p.setOpaque(false);
                 
                 GridBagConstraints c;
         
@@ -610,15 +614,19 @@ final class ObjectsFeatureModes {
                 c.fill = GridBagConstraints.NONE;
                 c.insets = new Insets(0, 0, 0, 5);
                 c.anchor = GridBagConstraints.NORTHWEST;
-                ui.add(classesPanel, c);
+                p.add(classesPanel, c);
                 
-                classesArea = new JTextArea(readFlag(CLASSES_FLAG, "")); // NOI18N
+                classesArea = new TextArea(readFlag(CLASSES_FLAG, "")) { // NOI18N
+                    protected void changed() { settingsChanged(); }
+                };
+                classesArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N
                 classesArea.setRows(3);
-                classesArea.setColumns(30);
+                classesArea.setColumns(40);
                 JScrollPane classesScroll = new JScrollPane(classesArea);
                 classesScroll.setPreferredSize(classesScroll.getPreferredSize());
                 classesScroll.setMinimumSize(classesScroll.getPreferredSize());
                 classesArea.setColumns(0);
+                classesArea.setHint(Bundle.ObjectsFeatureModes_classesHint());
                 c = new GridBagConstraints();
                 c.gridx = 1;
                 c.gridy = 0;
@@ -627,7 +635,7 @@ final class ObjectsFeatureModes {
                 c.fill = GridBagConstraints.VERTICAL;
                 c.insets = new Insets(0, 0, 0, 5);
                 c.anchor = GridBagConstraints.NORTHWEST;
-                ui.add(classesScroll, c);
+                p.add(classesScroll, c);
                 
                 JPanel settingsPanel = new SettingsPanel();
                 
@@ -652,7 +660,7 @@ final class ObjectsFeatureModes {
                 settingsPanel.add(lifecycleCheckbox);
                 
                 settingsPanel.add(Box.createHorizontalStrut(3));
-                if (UIUtils.isOracleLookAndFeel()) ui.add(Box.createHorizontalStrut(4));
+                if (UIUtils.isOracleLookAndFeel()) p.add(Box.createHorizontalStrut(4));
                 
                 final JLabel unlimited = new GrayLabel(Bundle.ObjectsFeatureModes_lblUnlimited());
                 final JLabel noAllocs = new GrayLabel(Bundle.ObjectsFeatureModes_lblNoAllocations());
@@ -711,14 +719,9 @@ final class ObjectsFeatureModes {
                 c.fill = GridBagConstraints.NONE;
                 c.insets = new Insets(0, 0, 0, 0);
                 c.anchor = GridBagConstraints.NORTHWEST;
-                ui.add(settingsPanel, c);
+                p.add(settingsPanel, c);
                 
-                DocumentListener dl = new DocumentListener() {
-                    public void insertUpdate(DocumentEvent e) { settingsChanged(); }
-                    public void removeUpdate(DocumentEvent e) { settingsChanged(); }
-                    public void changedUpdate(DocumentEvent e) { settingsChanged(); }
-                };
-                classesArea.getDocument().addDocumentListener(dl);
+                ui = p;
                 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() { settingsChanged(); }
