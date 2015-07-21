@@ -47,19 +47,22 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
@@ -80,6 +83,7 @@ import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.impl.ClassMethodList;
 import org.netbeans.modules.profiler.v2.impl.ClassMethodSelector;
+import org.netbeans.modules.profiler.v2.ui.SettingsPanel;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -104,7 +108,9 @@ import org.openide.util.NbBundle;
     "ObjectsFeatureModes_lblNoAllocations=(no allocation calls)",
     "ObjectsFeatureModes_profileAllObjectsToolTip=Unselect to profile all created objects (including already released)",
     "ObjectsFeatureModes_collectFullStacksToolTip=Unselect to collect full depth allocations call tree",
-    "ObjectsFeatureModes_limitAllocationsDepthToolTip=Limit depth of allocations call tree (select 0 for no allocation calls)"
+    "ObjectsFeatureModes_limitAllocationsDepthToolTip=Limit depth of allocations call tree (select 0 for no allocation calls)",
+    "ObjectsFeatureModes_definedClasses=Defined classes",
+    "ObjectsFeatureModes_classesLbl=Classes:"
 })
 final class ObjectsFeatureModes {
     
@@ -327,13 +333,9 @@ final class ObjectsFeatureModes {
         
         JComponent getUI() {
             if (ui == null) {
-                ui = new JPanel(null);
-                ui.setLayout(new BoxLayout(ui, BoxLayout.LINE_AXIS));
-                ui.setOpaque(false);
+                ui = new SettingsPanel();
 
-                selectionContent = new JPanel(null);
-                selectionContent.setLayout(new BoxLayout(selectionContent, BoxLayout.LINE_AXIS));
-                selectionContent.setOpaque(false);
+                selectionContent = new SettingsPanel();
 
                 editSelectionLink = new JButton() {
                     public void setText(String text) {
@@ -435,9 +437,7 @@ final class ObjectsFeatureModes {
                 noAllocs.setVisible(outgoingSpinner.isVisible() && (Integer)outgoingSpinner.getValue() == 0);
                 selectionContent.add(noAllocs);
 
-                noSelectionContent = new JPanel();
-                noSelectionContent.setLayout(new BoxLayout(noSelectionContent, BoxLayout.LINE_AXIS));
-                noSelectionContent.setOpaque(false);
+                noSelectionContent = new SettingsPanel();
 
                 GrayLabel noSelectionHint = new GrayLabel(Bundle.ObjectsFeatureModes_noClassSelected());
                 noSelectionHint.setEnabled(false);
@@ -485,6 +485,236 @@ final class ObjectsFeatureModes {
                     ui.repaint();
                 }
             }
+        }
+        
+    }
+    
+    
+    static abstract class CustomClassesMode extends MemoryMode {
+        
+        private static final String LIFECYCLE_FLAG = "LIFECYCLE_FLAG"; // NOI18N
+        private static final String ALLOCATIONS_FLAG = "ALLOCATIONS_FLAG"; // NOI18N
+        private static final String LIMIT_ALLOCATIONS_FLAG = "LIMIT_ALLOCATIONS_FLAG"; // NOI18N
+        private static final String CLASSES_FLAG = "SELECTION_FLAG"; // NOI18N
+        
+        private static final Integer LIMIT_ALLOCATIONS_DEFAULT = 10;        
+        
+        private JComponent ui;
+        private JTextArea classesArea;
+        private JCheckBox lifecycleCheckbox;
+        private JCheckBox outgoingCheckbox;
+        private JSpinner outgoingSpinner;
+        
+
+        String getID() {
+            return "CustomMethodsMode"; // NOI18N
+        }
+
+        String getName() {
+            return Bundle.ObjectsFeatureModes_definedClasses();
+        }
+        
+        void configureSettings(ProfilingSettings settings) {
+            assert SwingUtilities.isEventDispatchThread();
+            
+            super.configureSettings(settings);
+            
+            String filterValue = getFlatValues(classesArea.getText().split("\\n")); // NOI18N
+            settings.setSelectedInstrumentationFilter(new SimpleFilter("", // NOI18N
+                    SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT, filterValue));
+            
+            boolean lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.TRUE.toString()));
+            settings.setProfilingType(lifecycle ? ProfilingSettings.PROFILE_MEMORY_LIVENESS :
+                                                  ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS);
+
+            boolean alloc = Boolean.parseBoolean(readFlag(ALLOCATIONS_FLAG, Boolean.TRUE.toString()));
+            int limit = Integer.parseInt(readFlag(LIMIT_ALLOCATIONS_FLAG, LIMIT_ALLOCATIONS_DEFAULT.toString()));
+            settings.setAllocStackTraceLimit(!alloc ? -10 : limit); // TODO: should follow limit from Options
+        }
+        
+        void confirmSettings() {
+            if (ui != null) {
+                assert SwingUtilities.isEventDispatchThread();
+                
+                String classes = classesArea.getText().trim();
+                storeFlag(CLASSES_FLAG, classes.isEmpty() ? null : classes);
+                
+                storeFlag(LIFECYCLE_FLAG,   lifecycleCheckbox.isSelected() ?
+                                            null : Boolean.FALSE.toString());
+                storeFlag(ALLOCATIONS_FLAG, outgoingCheckbox.isSelected() ?
+                                            null : Boolean.FALSE.toString());
+                String limit = ((Integer)outgoingSpinner.getValue()).toString();
+                boolean deflimit = LIMIT_ALLOCATIONS_DEFAULT.equals(limit);
+                storeFlag(LIMIT_ALLOCATIONS_FLAG, deflimit ? null : limit);
+            }
+        }
+        
+        boolean pendingChanges() {
+            if (ui != null) {
+                assert SwingUtilities.isEventDispatchThread();
+                
+                if (!classesArea.getText().trim().equals(readFlag(CLASSES_FLAG, ""))) // NOI18N
+                    return true;
+                
+                boolean lifecycle = lifecycleCheckbox.isSelected();
+                boolean _lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.TRUE.toString()));
+                if (lifecycle != _lifecycle) return true;
+                
+                boolean alloc = outgoingCheckbox.isSelected();
+                boolean _alloc = Boolean.parseBoolean(readFlag(ALLOCATIONS_FLAG, Boolean.TRUE.toString()));
+                if (alloc != _alloc) return true;
+                
+                int limit = Integer.parseInt(readFlag(LIMIT_ALLOCATIONS_FLAG, LIMIT_ALLOCATIONS_DEFAULT.toString()));
+                int _limit = (Integer)outgoingSpinner.getValue();
+                if (limit != _limit) return true;
+            }
+            return false;
+        }
+
+        boolean currentSettingsValid() {
+//            return !getSelection().isEmpty();
+            return true;
+        }
+        
+        private static String getFlatValues(String[] values) {
+            StringBuilder convertedValue = new StringBuilder();
+
+            for (int i = 0; i < values.length; i++) {
+                String filterValue = values[i].trim();
+                if ((i != (values.length - 1)) && !filterValue.endsWith(",")) // NOI18N
+                    filterValue = filterValue + ","; // NOI18N
+                convertedValue.append(filterValue);
+            }
+
+            return convertedValue.toString();
+        }
+
+        JComponent getUI() {
+            if (ui == null) {
+                ui = new JPanel(new GridBagLayout());
+                ui.setOpaque(false);
+                
+                GridBagConstraints c;
+        
+                JPanel classesPanel = new SettingsPanel();
+                classesPanel.add(new JLabel(Bundle.ObjectsFeatureModes_classesLbl()));
+                c = new GridBagConstraints();
+                c.gridx = 0;
+                c.gridy = 0;
+                c.fill = GridBagConstraints.NONE;
+                c.insets = new Insets(0, 0, 0, 5);
+                c.anchor = GridBagConstraints.NORTHWEST;
+                ui.add(classesPanel, c);
+                
+                classesArea = new JTextArea(readFlag(CLASSES_FLAG, "")); // NOI18N
+                classesArea.setRows(3);
+                classesArea.setColumns(30);
+                JScrollPane classesScroll = new JScrollPane(classesArea);
+                classesScroll.setPreferredSize(classesScroll.getPreferredSize());
+                classesScroll.setMinimumSize(classesScroll.getPreferredSize());
+                classesArea.setColumns(0);
+                c = new GridBagConstraints();
+                c.gridx = 1;
+                c.gridy = 0;
+                c.weightx = 1;
+                c.weighty = 1;
+                c.fill = GridBagConstraints.VERTICAL;
+                c.insets = new Insets(0, 0, 0, 5);
+                c.anchor = GridBagConstraints.NORTHWEST;
+                ui.add(classesScroll, c);
+                
+                JPanel settingsPanel = new SettingsPanel();
+                
+                settingsPanel.add(Box.createHorizontalStrut(5));
+
+                Component separator = Box.createHorizontalStrut(1);
+                separator.setBackground(Color.GRAY);
+                if (separator instanceof JComponent) ((JComponent)separator).setOpaque(true);
+                Dimension d = separator.getMaximumSize();
+                d.height = 20;
+                separator.setMaximumSize(d);
+                settingsPanel.add(separator);
+
+                settingsPanel.add(Box.createHorizontalStrut(8));
+
+                boolean lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.TRUE.toString()));
+                lifecycleCheckbox = new JCheckBox(Bundle.ObjectsFeatureModes_recordLifecycle(), lifecycle) {
+                    protected void fireActionPerformed(ActionEvent e) { super.fireActionPerformed(e); settingsChanged(); }
+                };
+                lifecycleCheckbox.setToolTipText(Bundle.ObjectsFeatureModes_profileAllObjectsToolTip());
+                lifecycleCheckbox.setOpaque(false);
+                settingsPanel.add(lifecycleCheckbox);
+                
+                settingsPanel.add(Box.createHorizontalStrut(3));
+                if (UIUtils.isOracleLookAndFeel()) ui.add(Box.createHorizontalStrut(4));
+                
+                final JLabel unlimited = new GrayLabel(Bundle.ObjectsFeatureModes_lblUnlimited());
+                final JLabel noAllocs = new GrayLabel(Bundle.ObjectsFeatureModes_lblNoAllocations());
+                
+                boolean alloc = Boolean.parseBoolean(readFlag(ALLOCATIONS_FLAG, Boolean.TRUE.toString()));
+                outgoingCheckbox = new JCheckBox(Bundle.ObjectsFeatureModes_limitAllocations(), alloc) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        boolean selected = isSelected();
+                        unlimited.setVisible(!selected);
+                        outgoingSpinner.setVisible(selected);
+                        noAllocs.setVisible(selected && (Integer)outgoingSpinner.getValue() == 0);
+                        settingsChanged();
+                    }
+                };
+                outgoingCheckbox.setToolTipText(Bundle.ObjectsFeatureModes_collectFullStacksToolTip());
+                outgoingCheckbox.setOpaque(false);
+                settingsPanel.add(outgoingCheckbox);
+                
+                unlimited.setVisible(!outgoingCheckbox.isSelected());
+                settingsPanel.add(unlimited);
+                
+                settingsPanel.add(Box.createHorizontalStrut(1));
+                if (UIUtils.isOracleLookAndFeel()) settingsPanel.add(Box.createHorizontalStrut(4));
+                
+                int limit = Integer.parseInt(readFlag(LIMIT_ALLOCATIONS_FLAG, LIMIT_ALLOCATIONS_DEFAULT.toString()));
+                outgoingSpinner = new JExtendedSpinner(new SpinnerNumberModel(Math.abs(limit), 0, 99, 1)) {
+                    public Dimension getPreferredSize() { return getMinimumSize(); }
+                    public Dimension getMaximumSize() { return getMinimumSize(); }
+                    protected void fireStateChanged() { settingsChanged(); super.fireStateChanged(); }
+                };
+                outgoingSpinner.setToolTipText(Bundle.ObjectsFeatureModes_limitAllocationsDepthToolTip());
+                JComponent editor = outgoingSpinner.getEditor();
+                JTextField field = editor instanceof JSpinner.DefaultEditor ?
+                        ((JSpinner.DefaultEditor)editor).getTextField() : null;
+                if (field != null) field.getDocument().addDocumentListener(new DocumentListener() {
+                    public void insertUpdate(DocumentEvent e) { change(); }
+                    public void removeUpdate(DocumentEvent e) { change(); }
+                    public void changedUpdate(DocumentEvent e) { change(); }
+                    private void change() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                noAllocs.setVisible(outgoingSpinner.isVisible() &&
+                                                    (Integer)outgoingSpinner.getValue() == 0);
+                            }
+                        });
+//                            settingsChanged();
+                    }
+                });
+                outgoingSpinner.setVisible(outgoingCheckbox.isSelected());
+                settingsPanel.add(outgoingSpinner);
+                
+                c = new GridBagConstraints();
+                c.gridx = 2;
+                c.gridy = 0;
+                c.fill = GridBagConstraints.NONE;
+                c.insets = new Insets(0, 0, 0, 0);
+                c.anchor = GridBagConstraints.NORTHWEST;
+                ui.add(settingsPanel, c);
+                
+                DocumentListener dl = new DocumentListener() {
+                    public void insertUpdate(DocumentEvent e) { settingsChanged(); }
+                    public void removeUpdate(DocumentEvent e) { settingsChanged(); }
+                    public void changedUpdate(DocumentEvent e) { settingsChanged(); }
+                };
+                classesArea.getDocument().addDocumentListener(dl);
+            }
+            return ui;
         }
         
     }

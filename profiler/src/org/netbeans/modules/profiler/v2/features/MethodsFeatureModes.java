@@ -47,22 +47,29 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTextArea;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
@@ -80,6 +87,7 @@ import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.impl.ClassMethodList;
 import org.netbeans.modules.profiler.v2.impl.ClassMethodSelector;
+import org.netbeans.modules.profiler.v2.ui.SettingsPanel;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -105,7 +113,11 @@ import org.openide.util.NbBundle;
     "MethodsFeatureModes_addMethod=Select method",
     "MethodsFeatureModes_addClass=Select class",
     "MethodsFeatureModes_limitCallTreeToolTip=Limit depth of results call tree",
-    "MethodsFeatureModes_doNotProfileCoreJavaToolTip=Do not profile core Java classes (java.*, sun.*, com.sun.*, etc.)"
+    "MethodsFeatureModes_doNotProfileCoreJavaToolTip=Do not profile core Java classes (java.*, sun.*, com.sun.*, etc.)",
+    "MethodsFeatureModes_definedClasses=Defined classes",
+    "MethodsFeatureModes_classesLbl=Classes:",
+    "MethodsFeatureModes_includeCalls=Include outgoing calls:",
+    "MethodsFeatureModes_excludeCalls=Exclude outgoing calls:"
 })
 final class MethodsFeatureModes {
     
@@ -330,13 +342,9 @@ final class MethodsFeatureModes {
                 
         JComponent getUI() {
             if (ui == null) {
-                ui = new JPanel(null);
-                ui.setLayout(new BoxLayout(ui, BoxLayout.LINE_AXIS));
-                ui.setOpaque(false);
-
-                selectionContent = new JPanel(null);
-                selectionContent.setLayout(new BoxLayout(selectionContent, BoxLayout.LINE_AXIS));
-                selectionContent.setOpaque(false);
+                ui = new SettingsPanel();
+                
+                selectionContent = new SettingsPanel();
 
                 editSelectionLink = new JButton() {
                     public void setText(String text) {
@@ -401,9 +409,7 @@ final class MethodsFeatureModes {
                 filterJava.setOpaque(false);
                 selectionContent.add(filterJava);
 
-                noSelectionContent = new JPanel();
-                noSelectionContent.setLayout(new BoxLayout(noSelectionContent, BoxLayout.LINE_AXIS));
-                noSelectionContent.setOpaque(false);
+                noSelectionContent = new SettingsPanel();
 
                 GrayLabel noSelectionHint = new GrayLabel(noSelectionString());
                 noSelectionHint.setEnabled(false);
@@ -556,6 +562,213 @@ final class MethodsFeatureModes {
         
         protected void performEditSelection(Component invoker) {
             ClassMethodList.showMethods(getSession(), getSelection(), invoker);
+        }
+        
+    }
+    
+    
+    static abstract class CustomClassesMode extends MethodsMode {
+        
+        private static final String CLASSES_FLAG = "CLASSES_FLAG"; // NOI18N
+        private static final String FILTER_FLAG = "FILTER_FLAG"; // NOI18N
+        private static final String FILTER_MODE_FLAG = "FILTER_MODE_FLAG"; // NOI18N
+        
+        private JComponent ui;
+        private JTextArea classesArea;
+        private JTextArea filterArea;
+        private JRadioButton includeChoice;
+        private JRadioButton excludeChoice;
+        
+
+        String getID() {
+            return "CustomMethodsMode"; // NOI18N
+        }
+
+        String getName() {
+            return Bundle.MethodsFeatureModes_definedClasses();
+        }
+        
+        void configureSettings(ProfilingSettings settings) {
+            assert SwingUtilities.isEventDispatchThread();
+            
+            super.configureSettings(settings);            
+            
+            settings.setProfilingType(ProfilingSettings.PROFILE_CPU_PART);
+            settings.setCPUProfilingType(settings.getSamplingInterval() <= 0 ?
+                                         CommonConstants.CPU_INSTR_FULL :
+                                         CommonConstants.CPU_INSTR_SAMPLED);
+            
+            String[] rootValues = readFlag(CLASSES_FLAG, "").split(","); // NOI18N
+            ClientUtils.SourceCodeSelection[] roots = (rootValues.length == 1 && rootValues[0].isEmpty()) ?
+                new ClientUtils.SourceCodeSelection[0] :
+                new ClientUtils.SourceCodeSelection[rootValues.length];
+            for (int i = 0; i < roots.length; i++)
+                roots[i] = new ClientUtils.SourceCodeSelection(rootValues[i], "*", null); // NOI18N
+            settings.addRootMethods(roots);
+            
+            String filter = readFlag(FILTER_FLAG, ""); // NOI18N
+            if (filter.isEmpty() || "*".equals(filter)) { // NOI18N
+                settings.setSelectedInstrumentationFilter(SimpleFilter.NO_FILTER);
+            } else {
+                int filterType = Boolean.parseBoolean(readFlag(FILTER_MODE_FLAG, Boolean.TRUE.toString())) == true ?
+                                 SimpleFilter.SIMPLE_FILTER_INCLUSIVE : SimpleFilter.SIMPLE_FILTER_EXCLUSIVE;
+                String filterValue = getFlatValues(filterArea.getText().split("\\n")); // NOI18N
+                settings.setSelectedInstrumentationFilter(new SimpleFilter("", filterType, filterValue)); // NOI18N
+            }
+            
+            settings.setStackDepthLimit(Integer.MAX_VALUE);
+        }
+
+        void confirmSettings() {
+            if (ui != null) {
+                assert SwingUtilities.isEventDispatchThread();
+                
+                String classes = classesArea.getText().trim();
+                storeFlag(CLASSES_FLAG, classes.isEmpty() ? null : classes);
+                
+                String filter = filterArea.getText().trim();
+                storeFlag(FILTER_FLAG, filter.isEmpty() ? null : filter);
+                
+                boolean filterMode = includeChoice.isSelected();
+                storeFlag(FILTER_MODE_FLAG, filterMode == true ? null : Boolean.FALSE.toString());
+            }
+        }
+
+        boolean pendingChanges() {
+            if (ui != null) {
+                assert SwingUtilities.isEventDispatchThread();
+                
+                if (!classesArea.getText().trim().equals(readFlag(CLASSES_FLAG, ""))) // NOI18N
+                    return true;
+                
+                if (!filterArea.getText().trim().equals(readFlag(FILTER_FLAG, ""))) // NOI18N
+                    return true;
+                
+                if (Boolean.parseBoolean(readFlag(FILTER_MODE_FLAG, Boolean.TRUE.toString())) != includeChoice.isSelected())
+                    return true;
+            }
+            return false;
+        }
+
+        boolean currentSettingsValid() {
+            return true;
+        }
+        
+        private static String getFlatValues(String[] values) {
+            StringBuilder convertedValue = new StringBuilder();
+
+            for (int i = 0; i < values.length; i++) {
+                String filterValue = values[i].trim();
+                if ((i != (values.length - 1)) && !filterValue.endsWith(",")) // NOI18N
+                    filterValue = filterValue + ","; // NOI18N
+                convertedValue.append(filterValue);
+            }
+
+            return convertedValue.toString();
+        }
+
+        JComponent getUI() {
+            if (ui == null) {
+                ui = new JPanel(new GridBagLayout());
+                ui.setOpaque(false);
+                
+                GridBagConstraints c;
+        
+                JPanel classesPanel = new SettingsPanel();
+                classesPanel.add(new JLabel(Bundle.MethodsFeatureModes_classesLbl()));
+                c = new GridBagConstraints();
+                c.gridx = 0;
+                c.gridy = 0;
+                c.fill = GridBagConstraints.NONE;
+                c.insets = new Insets(0, 0, 0, 5);
+                c.anchor = GridBagConstraints.NORTHWEST;
+                ui.add(classesPanel, c);
+                
+                classesArea = new JTextArea(readFlag(CLASSES_FLAG, "")); // NOI18N
+                classesArea.setRows(3);
+                classesArea.setColumns(35);
+                JScrollPane classesScroll = new JScrollPane(classesArea);
+                classesScroll.setPreferredSize(classesScroll.getPreferredSize());
+                classesScroll.setMinimumSize(classesScroll.getPreferredSize());
+                classesArea.setColumns(0);
+                c = new GridBagConstraints();
+                c.gridx = 1;
+                c.gridy = 0;
+                c.gridheight = GridBagConstraints.REMAINDER;
+                c.weightx = 1;
+                c.weighty = 1;
+                c.fill = GridBagConstraints.VERTICAL;
+                c.insets = new Insets(0, 0, 0, 10);
+                c.anchor = GridBagConstraints.NORTHWEST;
+                ui.add(classesScroll, c);
+                
+                boolean filterMode = Boolean.TRUE.toString().equals(readFlag(FILTER_MODE_FLAG, Boolean.TRUE.toString()));
+                ButtonGroup bg = new ButtonGroup();
+                JPanel filterPanel = new SettingsPanel();
+                includeChoice = new JRadioButton(Bundle.MethodsFeatureModes_includeCalls()) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        settingsChanged();
+                    }
+                };
+                includeChoice.setBorder(BorderFactory.createEmptyBorder());
+                includeChoice.setOpaque(false);
+                bg.add(includeChoice);
+                includeChoice.setSelected(filterMode);
+                filterPanel.add(includeChoice);
+                c = new GridBagConstraints();
+                c.gridx = 2;
+                c.gridy = 0;
+                c.fill = GridBagConstraints.NONE;
+                c.insets = new Insets(0, 2, 0, 5);
+                c.anchor = GridBagConstraints.NORTHWEST;
+                ui.add(filterPanel, c);
+                
+                excludeChoice = new JRadioButton(Bundle.MethodsFeatureModes_excludeCalls()) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        settingsChanged();
+                    }
+                };
+                excludeChoice.setBorder(BorderFactory.createEmptyBorder());
+                excludeChoice.setOpaque(false);
+                bg.add(excludeChoice);
+                excludeChoice.setSelected(!filterMode);
+                c = new GridBagConstraints();
+                c.gridx = 2;
+                c.gridy = 1;
+                c.fill = GridBagConstraints.NONE;
+                c.insets = new Insets(0, 2, 0, 5);
+                c.anchor = GridBagConstraints.NORTHWEST;
+                ui.add(excludeChoice, c);
+                
+                filterArea = new JTextArea(readFlag(FILTER_FLAG, "")); // NOI18N
+                filterArea.setRows(3);
+                filterArea.setColumns(35);
+                JScrollPane filterScroll = new JScrollPane(filterArea);
+                filterScroll.setPreferredSize(filterScroll.getPreferredSize());
+                filterScroll.setMinimumSize(filterScroll.getPreferredSize());
+                filterArea.setColumns(0);
+                c = new GridBagConstraints();
+                c.gridx = 3;
+                c.gridy = 0;
+                c.gridheight = GridBagConstraints.REMAINDER;
+                c.weightx = 1;
+                c.weighty = 1;
+                c.fill = GridBagConstraints.VERTICAL;
+                c.insets = new Insets(0, 0, 0, 5);
+                c.anchor = GridBagConstraints.NORTHWEST;
+                ui.add(filterScroll, c);
+                
+                DocumentListener dl = new DocumentListener() {
+                    public void insertUpdate(DocumentEvent e) { settingsChanged(); }
+                    public void removeUpdate(DocumentEvent e) { settingsChanged(); }
+                    public void changedUpdate(DocumentEvent e) { settingsChanged(); }
+                };
+                classesArea.getDocument().addDocumentListener(dl);
+                filterArea.getDocument().addDocumentListener(dl);
+            }
+            return ui;
         }
         
     }
