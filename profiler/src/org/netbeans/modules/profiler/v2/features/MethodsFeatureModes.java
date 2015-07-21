@@ -651,7 +651,15 @@ final class MethodsFeatureModes {
         }
 
         boolean currentSettingsValid() {
-            return true;
+            if (ui != null) {
+                assert SwingUtilities.isEventDispatchThread();
+                
+                if (classesArea.getText().trim().isEmpty()) return false;
+                if (filterArea.getText().trim().isEmpty()) return false;
+                
+                return true;
+            }
+            return false;
         }
         
         private static String getFlatValues(String[] values) {
@@ -767,6 +775,10 @@ final class MethodsFeatureModes {
                 };
                 classesArea.getDocument().addDocumentListener(dl);
                 filterArea.getDocument().addDocumentListener(dl);
+                
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { settingsChanged(); }
+                });
             }
             return ui;
         }

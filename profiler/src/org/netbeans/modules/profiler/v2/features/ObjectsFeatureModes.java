@@ -572,8 +572,14 @@ final class ObjectsFeatureModes {
         }
 
         boolean currentSettingsValid() {
-//            return !getSelection().isEmpty();
-            return true;
+            if (ui != null) {
+                assert SwingUtilities.isEventDispatchThread();
+                
+                if (classesArea.getText().trim().isEmpty()) return false;
+                
+                return true;
+            }
+            return false;
         }
         
         private static String getFlatValues(String[] values) {
@@ -713,6 +719,10 @@ final class ObjectsFeatureModes {
                     public void changedUpdate(DocumentEvent e) { settingsChanged(); }
                 };
                 classesArea.getDocument().addDocumentListener(dl);
+                
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { settingsChanged(); }
+                });
             }
             return ui;
         }
