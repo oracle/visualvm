@@ -659,8 +659,8 @@ final class MethodsFeatureModes {
             if (ui != null) {
                 assert SwingUtilities.isEventDispatchThread();
                 
-                if (classesArea.getText().trim().isEmpty()) return false;
-                if (filterArea.getText().trim().isEmpty()) return false;
+                if (classesArea.showsHint() || classesArea.getText().trim().isEmpty()) return false;
+                if (filterArea.showsHint() || filterArea.getText().trim().isEmpty()) return false;
                 
                 return true;
             }
