@@ -139,6 +139,7 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     private final String NO_DATA_HINT_KEY = "NO_DATA_HINT"; // NOI18N
     private final String SNAPSHOT_WINDOW_OPEN_POLICY_KEY = "SNAPSHOT_WINDOW_OPEN_POLICY"; // NOI18N
     private final String SNAPSHOT_WINDOW_CLOSE_POLICY_KEY = "SNAPSHOT_WINDOW_CLOSE_POLICY"; // NOI18N
+    private final String ENABLE_EXPERT_SETTINGS_KEY = "ENABLE_EXPERT_SETTINGS"; // NOI18N
     
     // Defaults for tracked properties
     private final String CUSTOM_HEAPDUMP_PATH_DEFAULT = ""; // NOI18N
@@ -165,6 +166,7 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     private final boolean NO_DATA_HINT_DEFAULT = true;
     private final int SNAPSHOT_WINDOW_OPEN_DEFAULT = SNAPSHOT_WINDOW_OPEN_FIRST;
     private final int SNAPSHOT_WINDOW_CLOSE_DEFAULT = SNAPSHOT_WINDOW_CLOSE_NEVER;
+    private final boolean ENABLE_EXPERT_SETTINGS_DEFAULT = false;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -352,6 +354,14 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     public int getSnapshotWindowClosePolicy() {
         return getPreferences().getInt(SNAPSHOT_WINDOW_CLOSE_POLICY_KEY, SNAPSHOT_WINDOW_CLOSE_DEFAULT);
        
+    }
+    
+    public void setEnableExpertSettings(boolean value) {
+        getPreferences().putBoolean(ENABLE_EXPERT_SETTINGS_KEY, value);
+    }
+    
+    public boolean getEnableExpertSettings() {
+        return getPreferences().getBoolean(ENABLE_EXPERT_SETTINGS_KEY, ENABLE_EXPERT_SETTINGS_DEFAULT);
     }
 
     /**
