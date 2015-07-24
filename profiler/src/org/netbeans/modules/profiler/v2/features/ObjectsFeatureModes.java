@@ -54,6 +54,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -66,6 +67,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -370,17 +372,16 @@ final class ObjectsFeatureModes {
                 separator.setMaximumSize(d);
                 selectionContent.add(separator);
 
-                selectionContent.add(Box.createHorizontalStrut(8));
-
                 boolean lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.TRUE.toString()));
                 lifecycleCheckbox = new JCheckBox(Bundle.ObjectsFeatureModes_recordLifecycle(), lifecycle) {
                     protected void fireActionPerformed(ActionEvent e) { super.fireActionPerformed(e); settingsChanged(); }
                 };
                 lifecycleCheckbox.setToolTipText(Bundle.ObjectsFeatureModes_profileAllObjectsToolTip());
                 lifecycleCheckbox.setOpaque(false);
+                selectionContent.add(createButtonStrut(lifecycleCheckbox, 8, true));
                 selectionContent.add(lifecycleCheckbox);
                 
-                selectionContent.add(Box.createHorizontalStrut(3));
+                selectionContent.add(createButtonStrut(lifecycleCheckbox, 5, false));
                 if (UIUtils.isOracleLookAndFeel()) selectionContent.add(Box.createHorizontalStrut(4));
                 
                 final JLabel unlimited = new GrayLabel(Bundle.ObjectsFeatureModes_lblUnlimited());
@@ -401,11 +402,11 @@ final class ObjectsFeatureModes {
                 outgoingCheckbox.setOpaque(false);
                 selectionContent.add(outgoingCheckbox);
                 
+                selectionContent.add(createButtonStrut(outgoingCheckbox, 5, false));
+                if (UIUtils.isOracleLookAndFeel()) selectionContent.add(Box.createHorizontalStrut(4));
+                
                 unlimited.setVisible(!outgoingCheckbox.isSelected());
                 selectionContent.add(unlimited);
-                
-                selectionContent.add(Box.createHorizontalStrut(1));
-                if (UIUtils.isOracleLookAndFeel()) selectionContent.add(Box.createHorizontalStrut(4));
                 
                 int limit = Integer.parseInt(readFlag(LIMIT_ALLOCATIONS_FLAG, LIMIT_ALLOCATIONS_DEFAULT.toString()));
                 outgoingSpinner = new JExtendedSpinner(new SpinnerNumberModel(Math.abs(limit), 0, 99, 1)) {
@@ -639,7 +640,7 @@ final class ObjectsFeatureModes {
                 
                 JPanel settingsPanel = new SettingsPanel();
                 
-                settingsPanel.add(Box.createHorizontalStrut(5));
+                settingsPanel.add(Box.createHorizontalStrut(4));
 
                 Component separator = Box.createHorizontalStrut(1);
                 separator.setBackground(Color.GRAY);
@@ -649,17 +650,16 @@ final class ObjectsFeatureModes {
                 separator.setMaximumSize(d);
                 settingsPanel.add(separator);
 
-                settingsPanel.add(Box.createHorizontalStrut(8));
-
                 boolean lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.TRUE.toString()));
                 lifecycleCheckbox = new JCheckBox(Bundle.ObjectsFeatureModes_recordLifecycle(), lifecycle) {
                     protected void fireActionPerformed(ActionEvent e) { super.fireActionPerformed(e); settingsChanged(); }
                 };
                 lifecycleCheckbox.setToolTipText(Bundle.ObjectsFeatureModes_profileAllObjectsToolTip());
                 lifecycleCheckbox.setOpaque(false);
+                settingsPanel.add(createButtonStrut(lifecycleCheckbox, 8, true));
                 settingsPanel.add(lifecycleCheckbox);
                 
-                settingsPanel.add(Box.createHorizontalStrut(3));
+                settingsPanel.add(createButtonStrut(lifecycleCheckbox, 5, false));
                 if (UIUtils.isOracleLookAndFeel()) p.add(Box.createHorizontalStrut(4));
                 
                 final JLabel unlimited = new GrayLabel(Bundle.ObjectsFeatureModes_lblUnlimited());
@@ -680,11 +680,11 @@ final class ObjectsFeatureModes {
                 outgoingCheckbox.setOpaque(false);
                 settingsPanel.add(outgoingCheckbox);
                 
+                settingsPanel.add(createButtonStrut(outgoingCheckbox, 5, false));
+                if (UIUtils.isOracleLookAndFeel()) settingsPanel.add(Box.createHorizontalStrut(4));
+                
                 unlimited.setVisible(!outgoingCheckbox.isSelected());
                 settingsPanel.add(unlimited);
-                
-                settingsPanel.add(Box.createHorizontalStrut(1));
-                if (UIUtils.isOracleLookAndFeel()) settingsPanel.add(Box.createHorizontalStrut(4));
                 
                 int limit = Integer.parseInt(readFlag(LIMIT_ALLOCATIONS_FLAG, LIMIT_ALLOCATIONS_DEFAULT.toString()));
                 outgoingSpinner = new JExtendedSpinner(new SpinnerNumberModel(Math.abs(limit), 0, 99, 1)) {
@@ -713,6 +713,11 @@ final class ObjectsFeatureModes {
                 outgoingSpinner.setVisible(outgoingCheckbox.isSelected());
                 settingsPanel.add(outgoingSpinner);
                 
+                settingsPanel.add(Box.createHorizontalStrut(5));
+                
+                noAllocs.setVisible(outgoingSpinner.isVisible() && (Integer)outgoingSpinner.getValue() == 0);
+                settingsPanel.add(noAllocs);
+                
                 c = new GridBagConstraints();
                 c.gridx = 2;
                 c.gridy = 0;
@@ -730,6 +735,14 @@ final class ObjectsFeatureModes {
             return ui;
         }
         
+    }
+    
+    
+    private static Component createButtonStrut(AbstractButton ab, int width, boolean before) {
+        Border b = ab.getBorder();
+        Insets i = b != null ? b.getBorderInsets(ab) : null;
+        int w = i == null ? width : Math.max(width - (before ? i.left : i.right), 0);
+        return Box.createHorizontalStrut(w);
     }
     
 }

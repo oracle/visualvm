@@ -62,39 +62,23 @@ import org.netbeans.lib.profiler.ui.swing.PopupButton;
  */
 public class SettingsPanel extends JPanel {
     
-    private static int DEFAULT_HEIGHT = -1;
-    
-    
     public SettingsPanel() {
         super(null);
+        
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
         setOpaque(false);
+        
+        add(Box.createVerticalStrut(defaultHeight()));
     }
     
     
-    public Dimension getPreferredSize() {
-        Dimension size = super.getPreferredSize();
-        size.height = defaultHeight();
-        return size;
-    }
-    
-    public Dimension getMinimumSize() {
-        Dimension size = super.getMinimumSize();
-        size.height = defaultHeight();
-        return size;
-    }
-    
-    public Dimension getMaximumSize() {
-        Dimension size = super.getMaximumSize();
-        size.height = defaultHeight();
-        return size;
+    public void removeAll() {
+        super.removeAll();
+        add(Box.createVerticalStrut(defaultHeight()));
     }
     
     
-    public void reshape(int x, int y, int w, int h) {
-        super.reshape(x, y, w, defaultHeight());
-    }
-    
+    private static int DEFAULT_HEIGHT = -1;
     
     private static int defaultHeight() {
         if (DEFAULT_HEIGHT == -1) {

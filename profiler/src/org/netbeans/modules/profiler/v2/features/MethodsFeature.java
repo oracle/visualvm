@@ -44,6 +44,7 @@
 package org.netbeans.modules.profiler.v2.features;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -441,6 +442,9 @@ final class MethodsFeature extends ProfilerFeature.Basic {
         
         JPanel buttonsPanel = new SettingsPanel();
         
+        final Component space = Box.createHorizontalStrut(10);
+        buttonsPanel.add(space);
+        
         // Apply button
         applyButton = new SmallButton(Bundle.ObjectsFeature_applyButton()) {
             protected void fireActionPerformed(ActionEvent e) {
@@ -449,6 +453,10 @@ final class MethodsFeature extends ProfilerFeature.Basic {
                 submitChanges();
                 unpauseResults();
             }
+            public void setVisible(boolean visible) {
+                super.setVisible(visible);
+                space.setVisible(visible);
+            }
         };
         buttonsPanel.add(applyButton);
         
@@ -456,7 +464,7 @@ final class MethodsFeature extends ProfilerFeature.Basic {
         c.gridx = 2;
         c.gridy = 0;
         c.fill = GridBagConstraints.NONE;
-        c.insets = new Insets(0, 10, 0, 0);
+        c.insets = new Insets(0, 0, 0, 0);
         c.anchor = GridBagConstraints.NORTHEAST;
         settingsUI.add(buttonsPanel, c);
         
