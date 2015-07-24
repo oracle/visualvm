@@ -68,6 +68,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
@@ -712,7 +713,7 @@ final class MethodsFeatureModes {
                 c.gridx = 1;
                 c.gridy = 0;
                 c.gridheight = GridBagConstraints.REMAINDER;
-                c.weightx = 1;
+                c.weightx = 0.5;
                 c.weighty = 1;
                 c.fill = GridBagConstraints.VERTICAL;
                 c.insets = new Insets(0, 0, 0, 10);
@@ -728,7 +729,8 @@ final class MethodsFeatureModes {
                         settingsChanged();
                     }
                 };
-                includeChoice.setBorder(BorderFactory.createEmptyBorder());
+                Border b = includeChoice.getBorder();
+                Insets i = b != null ? b.getBorderInsets(includeChoice) : null;
                 includeChoice.setOpaque(false);
                 bg.add(includeChoice);
                 includeChoice.setSelected(filterMode);
@@ -737,7 +739,8 @@ final class MethodsFeatureModes {
                 c.gridx = 2;
                 c.gridy = 0;
                 c.fill = GridBagConstraints.NONE;
-                c.insets = new Insets(0, 2, 0, 5);
+                c.insets = i == null ? new Insets(0, 0, 0, 0) :
+                           new Insets(0, 1 - i.left, 0, 1 - i.right);
                 c.anchor = GridBagConstraints.NORTHWEST;
                 p.add(filterPanel, c);
                 
@@ -747,7 +750,8 @@ final class MethodsFeatureModes {
                         settingsChanged();
                     }
                 };
-                excludeChoice.setBorder(BorderFactory.createEmptyBorder());
+                b = excludeChoice.getBorder();
+                i = b != null ? b.getBorderInsets(excludeChoice) : null;
                 excludeChoice.setOpaque(false);
                 bg.add(excludeChoice);
                 excludeChoice.setSelected(!filterMode);
@@ -755,7 +759,8 @@ final class MethodsFeatureModes {
                 c.gridx = 2;
                 c.gridy = 1;
                 c.fill = GridBagConstraints.NONE;
-                c.insets = new Insets(0, 2, 0, 5);
+                c.insets = i == null ? new Insets(0, 0, 0, 0) :
+                           new Insets(1 - i.top, 1 - i.left, 0, 1 - i.right);
                 c.anchor = GridBagConstraints.NORTHWEST;
                 p.add(excludeChoice, c);
                 
@@ -774,10 +779,10 @@ final class MethodsFeatureModes {
                 c.gridx = 3;
                 c.gridy = 0;
                 c.gridheight = GridBagConstraints.REMAINDER;
-                c.weightx = 1;
+                c.weightx = 0.5;
                 c.weighty = 1;
                 c.fill = GridBagConstraints.VERTICAL;
-                c.insets = new Insets(0, 0, 0, 5);
+                c.insets = new Insets(0, 4, 0, 1);
                 c.anchor = GridBagConstraints.NORTHWEST;
                 p.add(filterScroll, c);
                 
