@@ -713,6 +713,11 @@ final class ObjectsFeatureModes {
                 outgoingSpinner.setVisible(outgoingCheckbox.isSelected());
                 settingsPanel.add(outgoingSpinner);
                 
+                settingsPanel.add(Box.createHorizontalStrut(5));
+                
+                noAllocs.setVisible(outgoingSpinner.isVisible() && (Integer)outgoingSpinner.getValue() == 0);
+                settingsPanel.add(noAllocs);
+                
                 c = new GridBagConstraints();
                 c.gridx = 2;
                 c.gridy = 0;
