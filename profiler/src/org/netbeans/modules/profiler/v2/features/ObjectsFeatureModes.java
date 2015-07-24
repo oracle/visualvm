@@ -733,7 +733,7 @@ final class ObjectsFeatureModes {
     }
     
     
-    static Component createButtonStrut(AbstractButton ab, int width, boolean before) {
+    private static Component createButtonStrut(AbstractButton ab, int width, boolean before) {
         Border b = ab.getBorder();
         Insets i = b != null ? b.getBorderInsets(ab) : null;
         int w = i == null ? width : Math.max(width - (before ? i.left : i.right), 0);
