@@ -244,6 +244,10 @@ public class ProfilerInterface implements CommonConstants {
 
                     rootClassLoaded = true; // See the comment in classLoadHook why it's worth setting rootClassLoaded
                                             // to true after the first instrumentation, not before
+                } else {
+                    // if root class is not loaded, reset loadedClassesArray so that next time it contains current loaded classes
+                    loadedClassesArray = null;
+                    loadedClassesLoaders = null;
                 }
             }
             Monitors.exitServerState();
