@@ -52,7 +52,7 @@ import org.netbeans.lib.profiler.results.RuntimeCCTNode;
  */
 public abstract class BaseCPUCCTNode implements RuntimeCPUCCTNode {
     
-    private static RuntimeCCTNode[] EMPTY_CHILDREN = new RuntimeCCTNode[0];    
+    private static final RuntimeCCTNode[] EMPTY_CHILDREN = new RuntimeCCTNode[0];    
     
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
