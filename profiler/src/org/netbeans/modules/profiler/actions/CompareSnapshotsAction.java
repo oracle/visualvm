@@ -1048,7 +1048,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                                                      new Object[] {
                                                          getExternalSnapshotsSelector().getOKButton(),
                                                          DialogDescriptor.CANCEL_OPTION
-                                                     }, DialogDescriptor.OK_OPTION, 0, new HelpCtx("CompareSnapshots.SelectTwo.HelpCtx"), null);
+                                                     }, DialogDescriptor.OK_OPTION, 0, new HelpCtx("CompareSnapshots.SelectTwo.HelpCtx"), null); // NOI18N
         Object res = DialogDisplayer.getDefault().notify(desc);
 
         if (res.equals(getExternalSnapshotsSelector().getOKButton())) {
