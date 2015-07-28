@@ -1015,7 +1015,7 @@ public class CompareSnapshotsAction extends AbstractAction {
         DialogDescriptor desc = new DialogDescriptor(getSecondSnapshotSelector(), Bundle.CompareSnapshotsAction_SelectSnapshotDialogCaption(), true,
                                                      new Object[] {
                                                          getSecondSnapshotSelector().getOKButton(), DialogDescriptor.CANCEL_OPTION
-                                                     }, DialogDescriptor.OK_OPTION, 0, new HelpCtx("CompareSnapshots.SelectOne.HelpCtx"), null); // NOI18N
+                                                     }, DialogDescriptor.OK_OPTION, 0, SECOND_SNAPSHOT_HELP_CTX, null);
         Object res = DialogDisplayer.getDefault().notify(desc);
 
         if (res.equals(getSecondSnapshotSelector().getOKButton())) {
@@ -1048,7 +1048,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                                                      new Object[] {
                                                          getExternalSnapshotsSelector().getOKButton(),
                                                          DialogDescriptor.CANCEL_OPTION
-                                                     }, DialogDescriptor.OK_OPTION, 0, new HelpCtx("CompareSnapshots.SelectTwo.HelpCtx"), null); // NOI18N
+                                                     }, DialogDescriptor.OK_OPTION, 0, EXTERNAL_SNAPSHOT_HELP_CTX, null);
         Object res = DialogDisplayer.getDefault().notify(desc);
 
         if (res.equals(getExternalSnapshotsSelector().getOKButton())) {
