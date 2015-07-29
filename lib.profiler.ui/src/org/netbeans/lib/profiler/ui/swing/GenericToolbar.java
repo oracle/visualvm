@@ -87,8 +87,11 @@ public class GenericToolbar extends JToolBar {
     
     
     private void tweak() {
-        if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel())
-                setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+        if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel()) {
+            int axis = getOrientation() == VERTICAL ? BoxLayout.PAGE_AXIS :
+                                                      BoxLayout.LINE_AXIS;
+            setLayout(new BoxLayout(this, axis));
+        }
         
         if (UIUtils.isNimbusLookAndFeel())
             setBorder(BorderFactory.createEmptyBorder(-2, 0, -2, 0));
