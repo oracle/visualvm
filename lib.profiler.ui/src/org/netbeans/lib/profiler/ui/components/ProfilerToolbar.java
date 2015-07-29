@@ -52,22 +52,11 @@ import java.util.List;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.plaf.basic.BasicComboBoxEditor;
-import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.GenericToolbar;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
 import org.openide.util.Lookup;
 
 /**
@@ -123,51 +112,12 @@ public abstract class ProfilerToolbar {
     
     public static class Impl extends ProfilerToolbar {
         
-        protected static int PREFERRED_HEIGHT = -1;
-        
         protected final JComponent component;
         protected final JToolBar toolbar;
         
         protected Impl(boolean showSeparator) {
-            toolbar = new GenericToolbar() {
-                protected void addImpl(Component comp, Object constraints, int index) {
-                    if (comp instanceof JButton)
-                        UIUtils.fixButtonUI((JButton) comp);
-                    super.addImpl(comp, constraints, index);
-                }
-                public Dimension getPreferredSize() {
-                    Dimension dim = super.getPreferredSize();
-                    if (PREFERRED_HEIGHT == -1) {
-                        JToolBar tb = new GenericToolbar();
-                        tb.setBorder(toolbar.getBorder());
-                        tb.setBorderPainted(toolbar.isBorderPainted());
-                        tb.setRollover(toolbar.isRollover());
-                        tb.setFloatable(toolbar.isFloatable());
-                        Icon icon = Icons.getIcon(GeneralIcons.SAVE);
-                        tb.add(new JButton("Button", icon)); // NOI18N
-                        tb.add(new JToggleButton("Button", icon)); // NOI18N
-                        JComboBox c = new JComboBox();
-                        c.setEditor(new BasicComboBoxEditor());
-                        c.setRenderer(new BasicComboBoxRenderer());
-                        tb.add(c);
-                        tb.addSeparator();
-                        PREFERRED_HEIGHT = tb.getPreferredSize().height;
-                    }
-                    dim.height = getParent() instanceof JToolBar ? 1 :
-                                 Math.max(dim.height, PREFERRED_HEIGHT);
-                    return dim;
-                }
-                public void doLayout() {
-                    // #216443 - disabled/invisible/JLabel toolbar components
-                    //           break left/right arrow focus traversal
-                    for (Component component : getComponents())
-                        component.setFocusable(isFocusableComponent(component));
-                    super.doLayout();
-                }
-            };
-            if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel())
-                toolbar.setLayout(new BoxLayout(toolbar, BoxLayout.LINE_AXIS));
-            toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
+            toolbar = new GenericToolbar();
+            if (!UIUtils.isNimbusLookAndFeel()) toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
             toolbar.setBorderPainted(false);
             toolbar.setRollover(true);
             toolbar.setFloatable(false);
@@ -184,17 +134,6 @@ public abstract class ProfilerToolbar {
             } else {
                 component = toolbar;
             }
-        }
-        
-        protected boolean isFocusableComponent(Component component) {
-            if (!component.isVisible()) return false;
-//            if (!component.isEnabled()) return false;
-            if (component instanceof JLabel) return false;
-            if (component instanceof JPanel) return false;
-            if (component instanceof JSeparator) return false;
-            if (component instanceof JToolBar) return false;
-            if (component instanceof Box.Filler) return false;
-            return true;
         }
         
         @Override
