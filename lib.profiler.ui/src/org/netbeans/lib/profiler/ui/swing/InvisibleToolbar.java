@@ -26,6 +26,8 @@ public class InvisibleToolbar extends GenericToolbar {
         setRollover(true);
         setOpaque(false);
         setMargin(new Insets(0, 0, 0, 0));
+        
+        putClientProperty("Toolbar.noGTKBorder", Boolean.TRUE); // NOI18N
     }
     
 }

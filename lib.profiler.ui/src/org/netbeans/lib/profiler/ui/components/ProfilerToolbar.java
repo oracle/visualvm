@@ -151,6 +151,7 @@ public abstract class ProfilerToolbar {
             JToolBar implToolbar = ((Impl)toolbar).toolbar;
             implToolbar.setBorder(BorderFactory.createEmptyBorder());
             implToolbar.setOpaque(false);
+            implToolbar.putClientProperty("Toolbar.noGTKBorder", Boolean.TRUE); // NOI18N
             return add(implToolbar, index);
         }
         

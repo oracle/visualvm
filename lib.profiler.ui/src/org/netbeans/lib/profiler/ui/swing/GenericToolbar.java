@@ -44,6 +44,7 @@ package org.netbeans.lib.profiler.ui.swing;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Insets;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -150,6 +151,12 @@ public class GenericToolbar extends JToolBar {
         if (comp instanceof JButton) UIUtils.fixButtonUI((JButton) comp);
         
         super.addImpl(comp, constraints, index);
+    }
+    
+    
+    protected void paintComponent(Graphics g) {
+        if (UIUtils.isGTKLookAndFeel() && getClientProperty("Toolbar.noGTKBorder") == Boolean.TRUE) return; // NOI18N
+        super.paintComponent(g);
     }
     
     
