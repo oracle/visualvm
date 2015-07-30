@@ -317,6 +317,7 @@ public class AttachDialog extends AttachWizard {
             
             final JLabel processesHint = new JLabel("", JLabel.LEADING); // NOI18N
             Mnemonics.setLocalizedText(processesHint, Bundle.AttachDialog_SelectProcess());
+            processesHint.setBorder(BorderFactory.createEmptyBorder(0, 0, 3, 0));
             
             final ProcessesModel processesModel = new ProcessesModel();
             
@@ -440,7 +441,7 @@ public class AttachDialog extends AttachWizard {
             toolbar.add(Box.createHorizontalStrut(3));
             toolbar.add(autoSelect);
             
-            final JPanel dynamicContent = new JPanel(new BorderLayout(3, 3));
+            final JPanel dynamicContent = new JPanel(new BorderLayout());
             dynamicContent.add(processesHint, BorderLayout.NORTH);
             dynamicContent.add(processesContainer, BorderLayout.CENTER);
             dynamicContent.add(toolbar, BorderLayout.SOUTH);

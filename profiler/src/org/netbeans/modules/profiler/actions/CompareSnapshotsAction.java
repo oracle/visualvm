@@ -859,14 +859,14 @@ public class CompareSnapshotsAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public CompareSnapshotsAction() {
-        snapshot = null;
-        putValue(Action.NAME, Bundle.CompareSnapshotsAction_ActionName());
-        putValue(Action.SHORT_DESCRIPTION, Bundle.CompareSnapshotsAction_ActionDescr());
-        putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.SNAPSHOTS_COMPARE));
+        this(null);
     }
 
     public CompareSnapshotsAction(LoadedSnapshot snapshot) {
-        this();
+        putValue(Action.NAME, Bundle.CompareSnapshotsAction_ActionName());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.CompareSnapshotsAction_ActionDescr());
+        putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.SNAPSHOTS_COMPARE));
+        
         this.snapshot = snapshot;
     }
 
@@ -1015,7 +1015,7 @@ public class CompareSnapshotsAction extends AbstractAction {
         DialogDescriptor desc = new DialogDescriptor(getSecondSnapshotSelector(), Bundle.CompareSnapshotsAction_SelectSnapshotDialogCaption(), true,
                                                      new Object[] {
                                                          getSecondSnapshotSelector().getOKButton(), DialogDescriptor.CANCEL_OPTION
-                                                     }, DialogDescriptor.OK_OPTION, 0, null, null);
+                                                     }, DialogDescriptor.OK_OPTION, 0, SECOND_SNAPSHOT_HELP_CTX, null);
         Object res = DialogDisplayer.getDefault().notify(desc);
 
         if (res.equals(getSecondSnapshotSelector().getOKButton())) {
@@ -1048,7 +1048,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                                                      new Object[] {
                                                          getExternalSnapshotsSelector().getOKButton(),
                                                          DialogDescriptor.CANCEL_OPTION
-                                                     }, DialogDescriptor.OK_OPTION, 0, null, null);
+                                                     }, DialogDescriptor.OK_OPTION, 0, EXTERNAL_SNAPSHOT_HELP_CTX, null);
         Object res = DialogDisplayer.getDefault().notify(desc);
 
         if (res.equals(getExternalSnapshotsSelector().getOKButton())) {

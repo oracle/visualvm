@@ -55,6 +55,7 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 
@@ -68,7 +69,8 @@ public abstract class FilteringToolbar extends InvisibleToolbar {
     private final AbstractButton filterButton;
 
     public FilteringToolbar(String name) {
-        setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
+        if (!UIUtils.isNimbusLookAndFeel())
+            setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
 
         filterButton = new JToggleButton(Icons.getIcon(GeneralIcons.FILTER)) {
             protected void fireActionPerformed(ActionEvent e) {
