@@ -46,9 +46,11 @@ import java.awt.Component;
 import java.awt.Dimension;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
@@ -66,7 +68,8 @@ class EditableHistoryCombo extends JComboBox {
         
         setPrototypeDisplayValue("java.lang.String.equals(Object)"); // NOI18N
         Dimension dim = getPreferredSize();
-        dim.height = getMinimumSize().height;
+        dim.height = !UIUtils.isNimbusLookAndFeel() ? getMinimumSize().height :
+                     new JTextField("X").getPreferredSize().height; // NOI18N
         
         setMinimumSize(dim);
         setPreferredSize(dim);
