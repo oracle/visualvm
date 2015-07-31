@@ -55,6 +55,7 @@ public interface GeneralIcons extends Icons.Keys {
     public static final String CLEAR_FILTER_HIGHL = "GeneralIcons.ClearFilterHighl"; // NOI18N
     public static final String CLOSE_PANEL = "GeneralIcons.ClosePanel"; // NOI18N
     public static final String FILTER_CONTAINS = "GeneralIcons.FilterContains"; // NOI18N
+    public static final String FILTER_NOT_CONTAINS = "GeneralIcons.FilterNotContains"; // NOI18N
     public static final String FILTER_ENDS_WITH = "GeneralIcons.FilterEndsWith"; // NOI18N
     public static final String FILTER_REG_EXP = "GeneralIcons.FilterRegExp"; // NOI18N
     public static final String FILTER_STARTS_WITH = "GeneralIcons.FilterStartsWith"; // NOI18N
@@ -104,5 +105,6 @@ public interface GeneralIcons extends Icons.Keys {
     public static final String BADGE_ADD = "GeneralIcons.BadgeAdd"; // NOI18N
     public static final String BADGE_REMOVE = "GeneralIcons.BadgeRemove"; // NOI18N
     public static final String RENAME = "GeneralIcons.Rename"; // NOI18N
+    public static final String MATCH_CASE = "GeneralIcons.MatchCase"; // NOI18N
     
 }

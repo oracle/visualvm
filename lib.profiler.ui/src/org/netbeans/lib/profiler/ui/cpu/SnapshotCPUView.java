@@ -479,7 +479,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = hotSpotsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         toggles[1].setSelected(true);
                         hotSpotsView.setVisible(true);
                         table.requestFocusInWindow();
@@ -491,7 +491,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = reverseCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         toggles[2].setSelected(true);
                         reverseCallsView.setVisible(true);
                         table.requestFocusInWindow();
@@ -506,7 +506,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = forwardCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         toggles[0].setSelected(true);
                         forwardCallsView.setVisible(true);
                         table.requestFocusInWindow();
@@ -518,7 +518,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = reverseCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         toggles[2].setSelected(true);
                         reverseCallsView.setVisible(true);
                         table.requestFocusInWindow();
@@ -534,7 +534,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = forwardCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         toggles[0].setSelected(true);
                         forwardCallsView.setVisible(true);
                         table.requestFocusInWindow();
@@ -546,7 +546,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = hotSpotsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         toggles[1].setSelected(true);
                         hotSpotsView.setVisible(true);
                         table.requestFocusInWindow();

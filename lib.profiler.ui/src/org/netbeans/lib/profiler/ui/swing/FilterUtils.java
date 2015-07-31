@@ -48,17 +48,22 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.RowFilter;
@@ -67,6 +72,7 @@ import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.CloseButton;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.spi.ActionsSupportProvider;
@@ -84,31 +90,79 @@ public final class FilterUtils {
     public static final String ACTION_FILTER = messages.getString("FilterUtils_ActionFilter"); // NOI18N
     private static final String SIDEBAR_CAPTION = messages.getString("FilterUtils_SidebarCaption"); // NOI18N
     private static final String BTN_FILTER_TOOLTIP = messages.getString("FilterUtils_BtnFilterTooltip"); // NOI18N
+    private static final String BTN_MATCH_CASE_TOOLTIP = messages.getString("FilterUtils_BtnMatchCaseTooltip"); // NOI18N
     private static final String BTN_CLOSE_TOOLTIP = messages.getString("FilterUtils_BtnCloseTooltip"); // NOI18N
+    private static final String MSG_INVALID_REGEXP = messages.getString("FilterUtils_MsgInvalidRegexp"); // NOI18N
+    private static final String FILTER_CONTAINS = messages.getString("FilterUtils_FilterContains"); // NOI18N
+    private static final String FILTER_NOT_CONTAINS = messages.getString("FilterUtils_FilterNotContains"); // NOI18N
+    private static final String FILTER_REGEXP = messages.getString("FilterUtils_FilterRegexp"); // NOI18N
+    private static final String FILTER_TYPE = messages.getString("FilterUtils_FilterType"); // NOI18N
     // -----
     
     public static final String FILTER_ACTION_KEY = "filter-action-key"; // NOI18N
     
+    
     public static boolean filterContains(ProfilerTable table, String text) {
-        return filterContains(table, text, null);
+        return filterContains(table, text, false, null);
     }
     
-    public static boolean filterContains(ProfilerTable table, String text, final RowFilter excludesFilter) {
+    public static boolean filterContains(ProfilerTable table, String text, boolean matchCase, RowFilter excludes) {
+        return filterImpl(table, text, matchCase, excludes, true);
+    }
+    
+    public static boolean filterNotContains(ProfilerTable table, String text, boolean matchCase, RowFilter excludes) {
+        return filterImpl(table, text, matchCase, excludes, false);
+    }
+    
+    private static boolean filterImpl(ProfilerTable table, String text, final boolean matchCase,
+                                      final RowFilter excludesFilter, final boolean mode) {
         final int mainColumn = table.getMainColumn();
         
-        final String[] texts = text == null ? new String[0] : text.toLowerCase().split(" +"); // NOI18N
+        if (text != null && !matchCase) text = text.toLowerCase();
+        final String[] texts = text == null ? new String[0] : text.split(" +"); // NOI18N
         Filter filter = new Filter() {
             public boolean include(RowFilter.Entry entry) {
                 if (texts.length == 0) return true;
                 if (excludesFilter != null && excludesFilter.include(entry)) return true;
-                for (String f : texts)
-                    if ((entry.getValue(mainColumn)).toString().toLowerCase().contains(f))
-                        return true;
-                return false;
+                for (String f : texts) {
+                    String value = entry.getValue(mainColumn).toString();
+                    if (!matchCase) value = value.toLowerCase();
+                    if (value.contains(f)) return mode;
+                }
+                return !mode;
             }
         };
         
         if (texts.length > 0) {
+            table.addRowFilter(filter);
+            return table.getRowCount() > 0;
+        } else {
+            table.removeRowFilter(filter);
+            return false;
+        }
+    }
+    
+    public static boolean filterRegExp(ProfilerTable table, String text, final boolean matchCase, final RowFilter excludesFilter) {
+        Pattern p = null;
+        boolean f = text != null && !text.isEmpty();
+        if (f) try {
+            p = Pattern.compile(text);
+        } catch (PatternSyntaxException e) {
+            ProfilerDialogs.displayError(MSG_INVALID_REGEXP);
+            f = false;
+        }
+        final boolean _f = f;
+        final Pattern _p = p;
+        final int mainColumn = table.getMainColumn();
+        Filter filter = new Filter() {
+            public boolean include(RowFilter.Entry entry) {
+                if (!_f) return true;
+                if (excludesFilter != null && excludesFilter.include(entry)) return true;
+                return _p.matcher(entry.getValue(mainColumn).toString()).matches();
+            }
+        };
+        
+        if (f) {
             table.addRowFilter(filter);
             return table.getRowCount() > 0;
         } else {
@@ -122,14 +176,8 @@ public final class FilterUtils {
     }
     
     public static JComponent createFilterPanel(final ProfilerTable table, final RowFilter excludesFilter) {
-        JToolBar toolbar = new JToolBar(JToolBar.HORIZONTAL);
-        if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel())
-                toolbar.setLayout(new BoxLayout(toolbar, BoxLayout.LINE_AXIS));
-        toolbar.setBorder(BorderFactory.createEmptyBorder(getTopMargin(), 2, getBottomMargin(), 2));
-        toolbar.setBorderPainted(false);
-        toolbar.setRollover(true);
-        toolbar.setFloatable(false);
-        toolbar.setOpaque(false);
+        JToolBar toolbar = new InvisibleToolbar();
+        if (!UIUtils.isNimbusLookAndFeel()) toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
         
         toolbar.add(Box.createHorizontalStrut(6));
         toolbar.add(new JLabel(SIDEBAR_CAPTION));
@@ -151,33 +199,106 @@ public final class FilterUtils {
         KeyStroke escKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
         KeyStroke filterKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
         
+        final JButton[] filterButton = new JButton[1];
         final String[] activeFilter = new String[1];
+        final int[] activeFilterType = new int[1];
+        final boolean[] activeMatchCase = new boolean[1];
         
-        final JButton filter = new JButton(ACTION_FILTER, Icons.getIcon(GeneralIcons.FILTER)) {
+        JButton filter = new JButton(ACTION_FILTER, Icons.getIcon(GeneralIcons.FILTER)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
-                final JButton _filter = this;
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         String filterString = getFilterString(combo);
-                        if (filterContains(table, filterString, excludesFilter)) combo.addItem(filterString);
+                        if (doFilter(table, filterString, activeFilterType[0], activeMatchCase[0], excludesFilter))
+                            combo.addItem(filterString);
                         activeFilter[0] = filterString;
-                        updateFilterButton(_filter, activeFilter, filterString);
+                        updateFilterButton(filterButton[0], activeFilter[0], filterString);
                     }
                 });
             }
         };
         String filterAccelerator = UIUtils.keyAcceleratorString(filterKey);
         filter.setToolTipText(MessageFormat.format(BTN_FILTER_TOOLTIP, filterAccelerator));
+        filterButton[0] = filter;
         toolbar.add(filter);
         
-        updateFilterButton(filter, activeFilter, getFilterString(combo));
+        updateFilterButton(filter, activeFilter[0], getFilterString(combo));
+        
+        toolbar.add(Box.createHorizontalStrut(2));
+        
+        toolbar.addSeparator();
+        
+        toolbar.add(Box.createHorizontalStrut(1));
+        
+        final JToggleButton matchCase = new JToggleButton(Icons.getIcon(GeneralIcons.MATCH_CASE)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                if (isEnabled()) SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        activeMatchCase[0] = isSelected();
+                        String filterString = getFilterString(combo);
+                        if (doFilter(table, filterString, activeFilterType[0], activeMatchCase[0], excludesFilter))
+                            combo.addItem(filterString);
+                    }
+                });
+            }
+        };
+        matchCase.setToolTipText(BTN_MATCH_CASE_TOOLTIP);
+        
+        PopupButton filterType = new PopupButton(Icons.getIcon(GeneralIcons.FILTER_CONTAINS)) {
+            protected void populatePopup(JPopupMenu popup) {
+                popup.add(new JMenuItem(FILTER_CONTAINS, Icons.getIcon(GeneralIcons.FILTER_CONTAINS)) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        filterImpl(0, getIcon(), getText());
+                    }
+                });
+                popup.add(new JMenuItem(FILTER_NOT_CONTAINS, Icons.getIcon(GeneralIcons.FILTER_NOT_CONTAINS)) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        filterImpl(1, getIcon(), getText());
+                    }
+                });
+                popup.add(new JMenuItem(FILTER_REGEXP, Icons.getIcon(GeneralIcons.FILTER_REG_EXP)) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        filterImpl(2, getIcon(), getText());
+                    }
+                });
+            }
+            private void filterImpl(final int type, final Icon icon, final String name) {
+                if (type == 2) {
+                    matchCase.setEnabled(false);
+                    matchCase.setSelected(false);
+                } else {
+                    if (!matchCase.isEnabled()) {
+                        matchCase.setSelected(activeMatchCase[0]);
+                        matchCase.setEnabled(true);
+                    }
+                }
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        setIcon(icon);
+                        setToolTipText(MessageFormat.format(FILTER_TYPE, name));
+                        activeFilterType[0] = type;
+                        String filterString = getFilterString(combo);
+                        if (doFilter(table, filterString, activeFilterType[0], activeMatchCase[0], excludesFilter))
+                            combo.addItem(filterString);
+                    }
+                });
+            }
+        };
+        filterType.setToolTipText(MessageFormat.format(FILTER_TYPE, FILTER_CONTAINS));
+        toolbar.add(filterType);
+        
+        toolbar.add(matchCase);
         
         toolbar.add(Box.createHorizontalStrut(2));
         
         combo.setOnTextChangeHandler(new Runnable() {
             public void run() {
-                updateFilterButton(filter, activeFilter, getFilterString(combo));
+                updateFilterButton(filterButton[0], activeFilter[0], getFilterString(combo));
             }
         });
         
@@ -197,8 +318,8 @@ public final class FilterUtils {
         final Runnable hider = new Runnable() {
             public void run() {
                 activeFilter[0] = null;
-                updateFilterButton(filter, activeFilter, getFilterString(combo));
-                filterContains(table, activeFilter[0], excludesFilter);
+                updateFilterButton(filterButton[0], activeFilter[0], getFilterString(combo));
+                filterContains(table, activeFilter[0], true, excludesFilter);
                 panel.setVisible(false);
             }
         };
@@ -221,7 +342,7 @@ public final class FilterUtils {
                 public void actionPerformed(final ActionEvent e) {
                     if (combo.isPopupVisible()) combo.hidePopup();
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() { if (filter.isEnabled()) filter.doClick(); }
+                        public void run() { if (filterButton[0].isEnabled()) filterButton[0].doClick(); }
                     });
                 }
             };
@@ -237,9 +358,17 @@ public final class FilterUtils {
         return filter == null ? null : filter.trim();
     }
     
-    private static void updateFilterButton(JButton button, String[] activeFilter, String currentFilter) {
-        String active = activeFilter[0];
-        if (active == null) active = ""; // NOI18N
+    private static boolean doFilter(ProfilerTable table, String text, int filterType, boolean matchCase, RowFilter excludesFilter) {
+        switch (filterType) {
+            case 0: return filterContains(table, text, matchCase, excludesFilter);
+            case 1: return filterNotContains(table, text, matchCase, excludesFilter);
+            case 2: return filterRegExp(table, text, matchCase, excludesFilter);
+            default: return false;
+        }
+    }
+    
+    private static void updateFilterButton(JButton button, String activeFilter, String currentFilter) {
+        String active = activeFilter == null ? "" : activeFilter; // NOI18N
         String current = currentFilter == null ? "" : currentFilter; // NOI18N
         button.setEnabled(!current.equals(active));
     }
@@ -254,17 +383,6 @@ public final class FilterUtils {
             return Integer.MAX_VALUE;
         }
     
-    }
-    
-    private static int getTopMargin() {
-        if (UIUtils.isWindowsLookAndFeel() || UIUtils.isMetalLookAndFeel()) return 1;
-        if (UIUtils.isAquaLookAndFeel() || UIUtils.isNimbusLookAndFeel() || UIUtils.isOracleLookAndFeel()) return 0;
-        return 2;
-    }
-    
-    private static int getBottomMargin() {
-        if (UIUtils.isOracleLookAndFeel()) return 1;
-        return 0;
     }
     
     
