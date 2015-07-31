@@ -328,15 +328,17 @@ public final class SearchUtils {
         panel.add(closeButton, BorderLayout.EAST);
         
         String HIDE = "hide-action"; // NOI18N
-        InputMap map = panel.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        InputMap inputMap = panel.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         Action hiderAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) { hider.run(); }
         };
         panel.getActionMap().put(HIDE, hiderAction);
-        map.put(escKey, HIDE);
+        inputMap.put(escKey, HIDE);
         
         if (textC != null) {
-            map = textC.getInputMap();
+            inputMap = textC.getInputMap();
+            ActionMap actionMap = textC.getActionMap();
+            
             String NEXT = "search-next-action"; // NOI18N
             Action nextAction = new AbstractAction() {
                 public void actionPerformed(final ActionEvent e) {
@@ -346,8 +348,9 @@ public final class SearchUtils {
                     });
                 }
             };
-            textC.getActionMap().put(NEXT, nextAction);
-            map.put(nextKey, NEXT);
+            actionMap.put(NEXT, nextAction);
+            inputMap.put(nextKey, NEXT);
+            ActionsSupport.registerAction(FIND_NEXT_ACTION_KEY, nextAction, actionMap, inputMap);
 
             String PREV = "search-prev-action"; // NOI18N
             Action prevAction = new AbstractAction() {
@@ -358,8 +361,9 @@ public final class SearchUtils {
                     });
                 }
             };
-            textC.getActionMap().put(PREV, prevAction);
-            map.put(prevKey, PREV);
+            actionMap.put(PREV, prevAction);
+            inputMap.put(prevKey, PREV);
+            ActionsSupport.registerAction(FIND_PREV_ACTION_KEY, prevAction, actionMap, inputMap);
         }
         
         return panel;
@@ -375,7 +379,7 @@ public final class SearchUtils {
     private SearchUtils() {}
     
     
-    // Default keybinding Ctrl+F for Find action
+    // Default keybinding Ctrl+F and F3 variants for Find action
     private static interface Support { @ServiceProvider(service=ActionsSupportProvider.class, position=100)
         public static final class SearchActionProvider extends ActionsSupportProvider {
             public boolean registerAction(String actionKey, Action action, ActionMap actionMap, InputMap inputMap) {
