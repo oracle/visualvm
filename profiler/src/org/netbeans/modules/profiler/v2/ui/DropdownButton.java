@@ -48,6 +48,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -417,6 +418,19 @@ public class DropdownButton extends JPanel {
         
         public void repaint() {
             DropdownButton.this.repaint();
+        }
+        
+        public Insets getMargin() {
+            Insets i = super.getMargin();
+            if (UIUtils.isNimbusLookAndFeel()) {
+                if (i == null) {
+                    i = new Insets(0, 2, 0, 2);
+                } else {
+                    i.left = 2;
+                    i.right = 2;
+                }
+            }
+            return i;
         }
         
     }

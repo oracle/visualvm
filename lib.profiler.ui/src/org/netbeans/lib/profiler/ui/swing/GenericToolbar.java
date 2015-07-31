@@ -44,17 +44,31 @@ package org.netbeans.lib.profiler.ui.swing;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Insets;
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonModel;
+import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.basic.BasicComboBoxEditor;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 /**
  * Common superclass for custom toolbar implementations.
@@ -64,13 +78,25 @@ import org.netbeans.lib.profiler.ui.UIUtils;
  */
 public class GenericToolbar extends JToolBar {
     
-    public GenericToolbar() { super(); }
+    public GenericToolbar() { super(); tweak(); }
     
-    public GenericToolbar(int orientation) { super(orientation); }
+    public GenericToolbar(int orientation) { super(orientation); tweak(); }
     
-    public GenericToolbar(String name) { super(name); }
+    public GenericToolbar(String name) { super(name); tweak(); }
     
-    public GenericToolbar(String name, int orientation) { super(name, orientation); }
+    public GenericToolbar(String name, int orientation) { super(name, orientation); tweak(); }
+    
+    
+    private void tweak() {
+        if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel()) {
+            int axis = getOrientation() == VERTICAL ? BoxLayout.PAGE_AXIS :
+                                                      BoxLayout.LINE_AXIS;
+            setLayout(new BoxLayout(this, axis));
+        }
+        
+        if (UIUtils.isNimbusLookAndFeel())
+            setBorder(BorderFactory.createEmptyBorder(-2, 0, -2, 0));
+    }
     
     
     public void addSeparator() {
@@ -115,8 +141,73 @@ public class GenericToolbar extends JToolBar {
                     ab.putClientProperty("MetalListener", cl); // NOI18N
                 }
             }
+        } else if (UIUtils.isNimbusLookAndFeel()) {
+            if (comp instanceof AbstractButton && !(comp instanceof JCheckBox) && !(comp instanceof JRadioButton)) {
+                final AbstractButton ab = (AbstractButton) comp;
+                ab.setMargin(new Insets(2, 2, 2, 2));
+            }
         }
+        
+        if (comp instanceof JButton) UIUtils.fixButtonUI((JButton) comp);
+        
         super.addImpl(comp, constraints, index);
+    }
+    
+    
+    protected void paintComponent(Graphics g) {
+        if (UIUtils.isGTKLookAndFeel() && getClientProperty("Toolbar.noGTKBorder") == Boolean.TRUE) return; // NOI18N
+        super.paintComponent(g);
+    }
+    
+    
+    private static int PREFERRED_HEIGHT = -1;
+    
+    public Dimension getPreferredSize() {
+        Dimension dim = super.getPreferredSize();
+        if (PREFERRED_HEIGHT == -1) {
+            GenericToolbar tb = new GenericToolbar();
+            tb.setBorder(getBorder());
+            tb.setBorderPainted(isBorderPainted());
+            tb.setRollover(isRollover());
+            tb.setFloatable(isFloatable());
+            Icon icon = Icons.getIcon(GeneralIcons.SAVE);
+            tb.add(new JButton("Button", icon)); // NOI18N
+            tb.add(new JToggleButton("Button", icon)); // NOI18N
+            tb.add(new JTextField("Text")); // NOI18N
+            JComboBox c = new JComboBox();
+            c.setEditor(new BasicComboBoxEditor());
+            c.setRenderer(new BasicComboBoxRenderer());
+            tb.add(c);
+            tb.addSeparator();
+            PREFERRED_HEIGHT = tb.getSuperPreferredSize().height;
+        }
+        dim.height = getParent() instanceof JToolBar ? 1 :
+                     Math.max(dim.height, PREFERRED_HEIGHT);
+        return dim;
+    }
+    
+    private Dimension getSuperPreferredSize() {
+        return super.getPreferredSize();
+    }
+    
+    
+    public void doLayout() {
+        // #216443 - disabled/invisible/JLabel toolbar components
+        //           break left/right arrow focus traversal
+        for (Component component : getComponents())
+            component.setFocusable(isFocusableComponent(component));
+        super.doLayout();
+    }
+    
+    protected boolean isFocusableComponent(Component component) {
+        if (!component.isVisible()) return false;
+//            if (!component.isEnabled()) return false;
+        if (component instanceof JLabel) return false;
+        if (component instanceof JPanel) return false;
+        if (component instanceof JSeparator) return false;
+        if (component instanceof JToolBar) return false;
+        if (component instanceof Box.Filler) return false;
+        return true;
     }
     
 }
