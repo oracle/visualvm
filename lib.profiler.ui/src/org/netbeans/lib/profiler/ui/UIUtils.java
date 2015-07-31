@@ -677,7 +677,8 @@ public final class UIUtils {
             disabledLineColor = UIManager.getColor("Label.disabledForeground"); // NOI18N
             if (disabledLineColor == null)
                 disabledLineColor = UIManager.getColor("Label.disabledText"); // NOI18N
-            if (disabledLineColor == null) disabledLineColor = Color.GRAY;
+            if (disabledLineColor == null || disabledLineColor.equals(getProfilerResultsBackground()))
+                disabledLineColor = Color.GRAY;
         }
         return disabledLineColor;
     }
