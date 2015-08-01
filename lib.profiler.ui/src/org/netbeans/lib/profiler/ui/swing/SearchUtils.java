@@ -53,12 +53,12 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -92,6 +92,7 @@ public final class SearchUtils {
     private static final String BTN_PREVIOUS_TOOLTIP = messages.getString("SearchUtils_BtnPreviousTooltip"); // NOI18N
     private static final String BTN_NEXT = messages.getString("SearchUtils_BtnNext"); // NOI18N
     private static final String BTN_NEXT_TOOLTIP = messages.getString("SearchUtils_BtnNextTooltip"); // NOI18N
+    private static final String BTN_MATCH_CASE_TOOLTIP = messages.getString("SearchUtils_BtnMatchCaseTooltip"); // NOI18N
     private static final String BTN_CLOSE_TOOLTIP = messages.getString("SearchUtils_BtnCloseTooltip"); // NOI18N
     // -----
     
@@ -101,10 +102,16 @@ public final class SearchUtils {
     public static final String FIND_SEL_ACTION_KEY = "find-sel-action-key"; // NOI18N
     
     private static final String LAST_FIND_TEXT = "last-find-text"; // NOI18N
+    private static final String LAST_FIND_MATCH_CASE = "last-find-match-case"; // NOI18N
     
     
-    public static boolean findString(ProfilerTable table, String text, boolean next) {
+    public static boolean findString(ProfilerTable table, String text) {
+        return findString(table, text, true, true);
+    }
+    
+    public static boolean findString(ProfilerTable table, String text, boolean matchCase, boolean next) {
         table.putClientProperty(LAST_FIND_TEXT, text);
+        table.putClientProperty(LAST_FIND_MATCH_CASE, matchCase);
         
         int rowCount = table.getRowCount();
         
@@ -121,7 +128,7 @@ public final class SearchUtils {
             if (node == null || node.isLeaf()) return false;
         }
         
-        text = text.toLowerCase();
+        if (!matchCase) text = text.toLowerCase();
         
         int mainColumn = table.convertColumnIndexToView(table.getMainColumn());
         
@@ -135,7 +142,9 @@ public final class SearchUtils {
                 selectedPath = next ? treeTable.getNextPath(selectedPath) :
                                       treeTable.getPreviousPath(selectedPath);
                 TreeNode node = (TreeNode)selectedPath.getLastPathComponent();
-                if (treeTable.getStringValue(node, mainColumn).toLowerCase().contains(text)) {
+                String nodeValue = treeTable.getStringValue(node, mainColumn);
+                if (!matchCase) nodeValue = nodeValue.toLowerCase();
+                if (nodeValue.contains(text)) {
                     treeTable.selectPath(selectedPath, true);
                     return true;
                 }
@@ -152,7 +161,9 @@ public final class SearchUtils {
         
             int searchSteps = fromSelection ? rowCount - 1 : rowCount;
             for (int i = 0; i < searchSteps; i++) {
-                if (table.getStringValue(selectedRow, mainColumn).toLowerCase().contains(text)) {
+                String value = table.getStringValue(selectedRow, mainColumn);
+                if (!matchCase) value = value.toLowerCase();
+                if (value.contains(text)) {
                     table.selectRow(selectedRow, true);
                     return true;
                 }
@@ -175,7 +186,9 @@ public final class SearchUtils {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         Object text = table.getClientProperty(LAST_FIND_TEXT);
-                        if (text != null) findString(table, text.toString(), true);
+                        Object matchCase = table.getClientProperty(LAST_FIND_MATCH_CASE);
+                        if (text != null && matchCase != null)
+                            findString(table, text.toString(), Boolean.TRUE == matchCase, true);
                     }
                 });
             }
@@ -187,7 +200,9 @@ public final class SearchUtils {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         Object text = table.getClientProperty(LAST_FIND_TEXT);
-                        if (text != null) findString(table, text.toString(), false);
+                        Object matchCase = table.getClientProperty(LAST_FIND_MATCH_CASE);
+                        if (text != null && matchCase != null)
+                            findString(table, text.toString(), Boolean.TRUE == matchCase, false);
                     }
                 });
             }
@@ -201,7 +216,7 @@ public final class SearchUtils {
                         int selectedRow = table.getSelectedRow();
                         if (selectedRow == -1) return;
                         int mainColumn = table.convertColumnIndexToView(table.getMainColumn());
-                        findString(table, table.getStringValue(selectedRow, mainColumn), true);
+                        findString(table, table.getStringValue(selectedRow, mainColumn), true, true);
                     }
                 });
             }
@@ -211,14 +226,8 @@ public final class SearchUtils {
     
     
     public static JComponent createSearchPanel(final ProfilerTable table) {
-        JToolBar toolbar = new JToolBar(JToolBar.HORIZONTAL);
-        if (UIUtils.isGTKLookAndFeel() || UIUtils.isNimbusLookAndFeel())
-                toolbar.setLayout(new BoxLayout(toolbar, BoxLayout.LINE_AXIS));
-        toolbar.setBorder(BorderFactory.createEmptyBorder(getTopMargin(), 2, getBottomMargin(), 2));
-        toolbar.setBorderPainted(false);
-        toolbar.setRollover(true);
-        toolbar.setFloatable(false);
-        toolbar.setOpaque(false);
+        JToolBar toolbar = new InvisibleToolbar();
+        if (!UIUtils.isNimbusLookAndFeel()) toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
         
         toolbar.add(Box.createHorizontalStrut(6));
         toolbar.add(new JLabel(SIDEBAR_CAPTION));
@@ -241,6 +250,10 @@ public final class SearchUtils {
         KeyStroke prevKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_MASK);
         KeyStroke nextKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
         
+        final JToggleButton matchCase = new JToggleButton(Icons.getIcon(GeneralIcons.MATCH_CASE));
+        matchCase.setToolTipText(BTN_MATCH_CASE_TOOLTIP);
+        // NOTE: added below
+        
         final JButton prev = new JButton(BTN_PREVIOUS, Icons.getIcon(GeneralIcons.FIND_PREVIOUS)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
@@ -248,7 +261,7 @@ public final class SearchUtils {
                     public void run() {
                         String search = getSearchString(combo);
                         if (search == null || search.isEmpty()) return;
-                        if (findString(table, search, false)) combo.addItem(search);
+                        if (findString(table, search, matchCase.isSelected(), false)) combo.addItem(search);
                     }
                 });
             }
@@ -267,7 +280,7 @@ public final class SearchUtils {
                     public void run() {
                         String search = getSearchString(combo);
                         if (search == null || search.isEmpty()) return;
-                        if (findString(table, search, true)) combo.addItem(search);
+                        if (findString(table, search, matchCase.isSelected(), true)) combo.addItem(search);
                     }
                 });
             }
@@ -276,6 +289,14 @@ public final class SearchUtils {
         next.setToolTipText(MessageFormat.format(BTN_NEXT_TOOLTIP, nextAccelerator));
         next.setEnabled(false);
         toolbar.add(next);
+        
+        toolbar.add(Box.createHorizontalStrut(2));
+        
+        toolbar.addSeparator();
+        
+        toolbar.add(Box.createHorizontalStrut(1));
+        
+        toolbar.add(matchCase);
         
         toolbar.add(Box.createHorizontalStrut(2));
         
@@ -307,15 +328,17 @@ public final class SearchUtils {
         panel.add(closeButton, BorderLayout.EAST);
         
         String HIDE = "hide-action"; // NOI18N
-        InputMap map = panel.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        InputMap inputMap = panel.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         Action hiderAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) { hider.run(); }
         };
         panel.getActionMap().put(HIDE, hiderAction);
-        map.put(escKey, HIDE);
+        inputMap.put(escKey, HIDE);
         
         if (textC != null) {
-            map = textC.getInputMap();
+            inputMap = textC.getInputMap();
+            ActionMap actionMap = textC.getActionMap();
+            
             String NEXT = "search-next-action"; // NOI18N
             Action nextAction = new AbstractAction() {
                 public void actionPerformed(final ActionEvent e) {
@@ -325,8 +348,9 @@ public final class SearchUtils {
                     });
                 }
             };
-            textC.getActionMap().put(NEXT, nextAction);
-            map.put(nextKey, NEXT);
+            actionMap.put(NEXT, nextAction);
+            inputMap.put(nextKey, NEXT);
+            ActionsSupport.registerAction(FIND_NEXT_ACTION_KEY, nextAction, actionMap, inputMap);
 
             String PREV = "search-prev-action"; // NOI18N
             Action prevAction = new AbstractAction() {
@@ -337,8 +361,9 @@ public final class SearchUtils {
                     });
                 }
             };
-            textC.getActionMap().put(PREV, prevAction);
-            map.put(prevKey, PREV);
+            actionMap.put(PREV, prevAction);
+            inputMap.put(prevKey, PREV);
+            ActionsSupport.registerAction(FIND_PREV_ACTION_KEY, prevAction, actionMap, inputMap);
         }
         
         return panel;
@@ -349,23 +374,12 @@ public final class SearchUtils {
         return search == null ? null : search.trim();
     }
     
-    private static int getTopMargin() {
-        if (UIUtils.isWindowsLookAndFeel() || UIUtils.isMetalLookAndFeel()) return 1;
-        if (UIUtils.isAquaLookAndFeel() || UIUtils.isNimbusLookAndFeel() || UIUtils.isOracleLookAndFeel()) return 0;
-        return 2;
-    }
-    
-    private static int getBottomMargin() {
-        if (UIUtils.isOracleLookAndFeel()) return 1;
-        return 0;
-    }
-    
     
     // Do not create instances of this class
     private SearchUtils() {}
     
     
-    // Default keybinding Ctrl+F for Find action
+    // Default keybinding Ctrl+F and F3 variants for Find action
     private static interface Support { @ServiceProvider(service=ActionsSupportProvider.class, position=100)
         public static final class SearchActionProvider extends ActionsSupportProvider {
             public boolean registerAction(String actionKey, Action action, ActionMap actionMap, InputMap inputMap) {

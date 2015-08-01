@@ -455,7 +455,7 @@ public abstract class LiveCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = hotSpotsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         hotSpotsView.setVisible(true);
                         foundInHotSpots();
                         table.requestFocusInWindow();
@@ -467,7 +467,7 @@ public abstract class LiveCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = reverseCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         reverseCallsView.setVisible(true);
                         foundInReverseCalls();
                         table.requestFocusInWindow();
@@ -482,7 +482,7 @@ public abstract class LiveCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = forwardCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         forwardCallsView.setVisible(true);
                         foundInForwardCalls();
                         table.requestFocusInWindow();
@@ -494,7 +494,7 @@ public abstract class LiveCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = reverseCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         reverseCallsView.setVisible(true);
                         foundInReverseCalls();
                         table.requestFocusInWindow();
@@ -510,7 +510,7 @@ public abstract class LiveCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = forwardCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         forwardCallsView.setVisible(true);
                         foundInForwardCalls();
                         table.requestFocusInWindow();
@@ -522,7 +522,7 @@ public abstract class LiveCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = hotSpotsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         hotSpotsView.setVisible(true);
                         foundInHotSpots();
                         table.requestFocusInWindow();
