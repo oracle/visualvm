@@ -227,7 +227,10 @@ public final class SearchUtils {
     
     public static JComponent createSearchPanel(final ProfilerTable table) {
         JToolBar toolbar = new InvisibleToolbar();
-        if (!UIUtils.isNimbusLookAndFeel()) toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
+        if (UIUtils.isWindowsModernLookAndFeel())
+            toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 2));
+        else if (!UIUtils.isNimbusLookAndFeel())
+            toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
         
         toolbar.add(Box.createHorizontalStrut(6));
         toolbar.add(new JLabel(SIDEBAR_CAPTION));

@@ -117,7 +117,10 @@ public abstract class ProfilerToolbar {
         
         protected Impl(boolean showSeparator) {
             toolbar = new GenericToolbar();
-            if (!UIUtils.isNimbusLookAndFeel()) toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
+            if (UIUtils.isWindowsModernLookAndFeel())
+                toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 2));
+            else if (!UIUtils.isNimbusLookAndFeel())
+                toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
             toolbar.setBorderPainted(false);
             toolbar.setRollover(true);
             toolbar.setFloatable(false);
