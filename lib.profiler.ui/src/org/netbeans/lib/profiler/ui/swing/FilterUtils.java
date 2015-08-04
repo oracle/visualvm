@@ -177,7 +177,10 @@ public final class FilterUtils {
     
     public static JComponent createFilterPanel(final ProfilerTable table, final RowFilter excludesFilter) {
         JToolBar toolbar = new InvisibleToolbar();
-        if (!UIUtils.isNimbusLookAndFeel()) toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
+        if (UIUtils.isWindowsModernLookAndFeel())
+            toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 2));
+        else if (!UIUtils.isNimbusLookAndFeel())
+            toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
         
         toolbar.add(Box.createHorizontalStrut(6));
         toolbar.add(new JLabel(SIDEBAR_CAPTION));

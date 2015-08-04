@@ -391,6 +391,12 @@ public final class UIUtils {
         return ((xpThemeActiveOS) && (!xpThemeDisabled));
     }
     
+    public static boolean isWindowsModernLookAndFeel() {
+        if (!isWindowsXPLookAndFeel()) return false;
+        String osName = System.getProperty("os.name"); // NOI18N
+        return osName != null && (osName.contains("Windows 8") || osName.contains("Windows 10")); // NOI18N
+    }
+    
     public static boolean isOracleLookAndFeel() {
         // is current L&F some kind of WindowsLookAndFeel?
         return UIManager.getLookAndFeel().getID().contains("Oracle"); //NOI18N
