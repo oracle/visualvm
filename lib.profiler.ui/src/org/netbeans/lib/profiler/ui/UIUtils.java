@@ -687,23 +687,7 @@ public final class UIUtils {
                 disabledLineColor = Color.GRAY;
         }
         return disabledLineColor;
-    }
-    
-    
-    private static String acceleratorDelimiter;
-    public static String keyAcceleratorString(KeyStroke keyStroke) {
-        String keyText = KeyEvent.getKeyText(keyStroke.getKeyCode());
-        
-        int modifiers = keyStroke.getModifiers();
-        if (modifiers == 0) return keyText;
-        
-        if (acceleratorDelimiter == null) {
-            acceleratorDelimiter = UIManager.getString("MenuItem.acceleratorDelimiter"); // NOI18N
-            if (acceleratorDelimiter == null) acceleratorDelimiter = "+"; // NOI18N // Note: NetBeans default, Swing uses '-' by default
-        }
-        return KeyEvent.getKeyModifiersText(modifiers) + acceleratorDelimiter + keyText;
-    }
-    
+    }    
     
     public static BufferedImage createScreenshot(Component component) {
         assert SwingUtilities.isEventDispatchThread();

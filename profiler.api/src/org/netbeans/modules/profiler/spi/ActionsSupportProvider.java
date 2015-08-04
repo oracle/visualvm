@@ -44,6 +44,7 @@ package org.netbeans.modules.profiler.spi;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
+import javax.swing.KeyStroke;
 
 /**
  *
@@ -51,6 +52,6 @@ import javax.swing.InputMap;
  */
 public abstract class ActionsSupportProvider {
     
-    public abstract boolean registerAction(String actionKey, Action action, ActionMap actionMap, InputMap inputMap);
+    public abstract KeyStroke registerAction(String actionKey, Action action, ActionMap actionMap, InputMap inputMap);
     
 }

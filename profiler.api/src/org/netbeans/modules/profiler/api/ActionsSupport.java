@@ -41,9 +41,12 @@
  */
 package org.netbeans.modules.profiler.api;
 
+import java.awt.event.KeyEvent;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 import org.netbeans.modules.profiler.spi.ActionsSupportProvider;
 import org.openide.util.Lookup;
 
@@ -54,9 +57,31 @@ import org.openide.util.Lookup;
  */
 public final class ActionsSupport {
     
-    public static void registerAction(String actionKey, Action action, ActionMap actionMap, InputMap inputMap) {
-        for (ActionsSupportProvider provider : Lookup.getDefault().lookupAll(ActionsSupportProvider.class))
-            if (provider.registerAction(actionKey, action, actionMap, inputMap)) return;
+    public static final KeyStroke NO_KEYSTROKE = KeyStroke.getKeyStroke(KeyEvent.VK_UNDEFINED, 0);
+    
+    private static String ACC_DELIMITER;
+    public static String keyAcceleratorString(KeyStroke keyStroke) {
+        if (keyStroke == null || NO_KEYSTROKE.equals(keyStroke)) return null;
+        
+        String keyText = KeyEvent.getKeyText(keyStroke.getKeyCode());
+        
+        int modifiers = keyStroke.getModifiers();
+        if (modifiers == 0) return keyText;
+        
+        if (ACC_DELIMITER == null) {
+            ACC_DELIMITER = UIManager.getString("MenuItem.acceleratorDelimiter"); // NOI18N
+            if (ACC_DELIMITER == null) ACC_DELIMITER = "+"; // NOI18N // Note: NetBeans default, Swing uses '-' by default
+        }
+        
+        return KeyEvent.getKeyModifiersText(modifiers) + ACC_DELIMITER + keyText;
+    }
+    
+    public static KeyStroke registerAction(String actionKey, Action action, ActionMap actionMap, InputMap inputMap) {
+        for (ActionsSupportProvider provider : Lookup.getDefault().lookupAll(ActionsSupportProvider.class)) {
+            KeyStroke ks = provider.registerAction(actionKey, action, actionMap, inputMap);
+            if (ks != null) return ks;
+        }
+        return null;
     }
     
 }
