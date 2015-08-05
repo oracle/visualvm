@@ -227,7 +227,10 @@ public final class SearchUtils {
     
     public static JComponent createSearchPanel(final ProfilerTable table) {
         JToolBar toolbar = new InvisibleToolbar();
-        if (!UIUtils.isNimbusLookAndFeel()) toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
+        if (UIUtils.isWindowsModernLookAndFeel())
+            toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 2));
+        else if (!UIUtils.isNimbusLookAndFeel())
+            toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
         
         toolbar.add(Box.createHorizontalStrut(6));
         toolbar.add(new JLabel(SIDEBAR_CAPTION));
@@ -266,7 +269,7 @@ public final class SearchUtils {
                 });
             }
         };
-        String prevAccelerator = UIUtils.keyAcceleratorString(prevKey);
+        String prevAccelerator = ActionsSupport.keyAcceleratorString(prevKey);
         prev.setToolTipText(MessageFormat.format(BTN_PREVIOUS_TOOLTIP, prevAccelerator));
         prev.setEnabled(false);
         toolbar.add(prev);
@@ -285,7 +288,7 @@ public final class SearchUtils {
                 });
             }
         };
-        String nextAccelerator = UIUtils.keyAcceleratorString(nextKey);
+        String nextAccelerator = ActionsSupport.keyAcceleratorString(nextKey);
         next.setToolTipText(MessageFormat.format(BTN_NEXT_TOOLTIP, nextAccelerator));
         next.setEnabled(false);
         toolbar.add(next);
@@ -323,7 +326,7 @@ public final class SearchUtils {
         
         final Runnable hider = new Runnable() { public void run() { panel.setVisible(false); } };
         JButton closeButton = CloseButton.create(hider);
-        String escAccelerator = UIUtils.keyAcceleratorString(escKey);
+        String escAccelerator = ActionsSupport.keyAcceleratorString(escKey);
         closeButton.setToolTipText(MessageFormat.format(BTN_CLOSE_TOOLTIP, escAccelerator));
         panel.add(closeButton, BorderLayout.EAST);
         
@@ -350,7 +353,11 @@ public final class SearchUtils {
             };
             actionMap.put(NEXT, nextAction);
             inputMap.put(nextKey, NEXT);
-            ActionsSupport.registerAction(FIND_NEXT_ACTION_KEY, nextAction, actionMap, inputMap);
+            
+            KeyStroke nextKey2 = ActionsSupport.registerAction(FIND_NEXT_ACTION_KEY, nextAction, actionMap, inputMap);
+            String nextAccelerator2 = ActionsSupport.keyAcceleratorString(nextKey2);
+            if (nextAccelerator2 != null) next.setToolTipText(MessageFormat.format(BTN_NEXT_TOOLTIP,
+                                                         nextAccelerator + ", " + nextAccelerator2)); // NOI18N
 
             String PREV = "search-prev-action"; // NOI18N
             Action prevAction = new AbstractAction() {
@@ -363,7 +370,11 @@ public final class SearchUtils {
             };
             actionMap.put(PREV, prevAction);
             inputMap.put(prevKey, PREV);
-            ActionsSupport.registerAction(FIND_PREV_ACTION_KEY, prevAction, actionMap, inputMap);
+            
+            KeyStroke prevKey2 = ActionsSupport.registerAction(FIND_PREV_ACTION_KEY, prevAction, actionMap, inputMap);
+            String prevAccelerator2 = ActionsSupport.keyAcceleratorString(prevKey2);
+            if (prevAccelerator2 != null) prev.setToolTipText(MessageFormat.format(BTN_PREVIOUS_TOOLTIP,
+                                                         prevAccelerator + ", " + prevAccelerator2)); // NOI18N
         }
         
         return panel;
@@ -382,26 +393,25 @@ public final class SearchUtils {
     // Default keybinding Ctrl+F and F3 variants for Find action
     private static interface Support { @ServiceProvider(service=ActionsSupportProvider.class, position=100)
         public static final class SearchActionProvider extends ActionsSupportProvider {
-            public boolean registerAction(String actionKey, Action action, ActionMap actionMap, InputMap inputMap) {
+            public KeyStroke registerAction(String actionKey, Action action, ActionMap actionMap, InputMap inputMap) {
+                KeyStroke ks = null;
+                
                 if (FIND_ACTION_KEY.equals(actionKey)) {
-                    actionMap.put(actionKey, action);
-                    inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK), actionKey);
-                    return true;
+                    ks = KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK);
                 } else if (FIND_NEXT_ACTION_KEY.equals(actionKey)) {
-                    actionMap.put(actionKey, action);
-                    inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0), actionKey);
-                    return true;
+                    ks = KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0);
                 } else if (FIND_PREV_ACTION_KEY.equals(actionKey)) {
-                    actionMap.put(actionKey, action);
-                    inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.SHIFT_MASK), actionKey);
-                    return true;
+                    ks = KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.SHIFT_MASK);
                 } else if (FIND_SEL_ACTION_KEY.equals(actionKey)) {
+                    ks = KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.CTRL_MASK);
+                }
+                
+                if (ks != null) {
                     actionMap.put(actionKey, action);
-                    inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.CTRL_MASK), actionKey);
-                    return true;
+                    inputMap.put(ks, actionKey);
                 }
 
-                return false;
+                return ks;
             }
         }
     }
