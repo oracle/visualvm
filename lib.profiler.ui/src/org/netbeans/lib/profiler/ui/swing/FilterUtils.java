@@ -72,6 +72,7 @@ import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.CloseButton;
+import org.netbeans.modules.profiler.api.ActionsSupport;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -177,7 +178,10 @@ public final class FilterUtils {
     
     public static JComponent createFilterPanel(final ProfilerTable table, final RowFilter excludesFilter) {
         JToolBar toolbar = new InvisibleToolbar();
-        if (!UIUtils.isNimbusLookAndFeel()) toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
+        if (UIUtils.isWindowsModernLookAndFeel())
+            toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 2));
+        else if (!UIUtils.isNimbusLookAndFeel())
+            toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
         
         toolbar.add(Box.createHorizontalStrut(6));
         toolbar.add(new JLabel(SIDEBAR_CAPTION));
@@ -218,7 +222,7 @@ public final class FilterUtils {
                 });
             }
         };
-        String filterAccelerator = UIUtils.keyAcceleratorString(filterKey);
+        String filterAccelerator = ActionsSupport.keyAcceleratorString(filterKey);
         filter.setToolTipText(MessageFormat.format(BTN_FILTER_TOOLTIP, filterAccelerator));
         filterButton[0] = filter;
         toolbar.add(filter);
@@ -324,7 +328,7 @@ public final class FilterUtils {
             }
         };
         JButton closeButton = CloseButton.create(hider);
-        String escAccelerator = UIUtils.keyAcceleratorString(escKey);
+        String escAccelerator = ActionsSupport.keyAcceleratorString(escKey);
         closeButton.setToolTipText(MessageFormat.format(BTN_CLOSE_TOOLTIP, escAccelerator));
         panel.add(closeButton, BorderLayout.EAST);
         
@@ -393,13 +397,14 @@ public final class FilterUtils {
     // Default keybinding Ctrl+G for Filter action
     private static interface Support { @ServiceProvider(service=ActionsSupportProvider.class, position=100)
         public static final class FilterActionProvider extends ActionsSupportProvider {
-            public boolean registerAction(String actionKey, Action action, ActionMap actionMap, InputMap inputMap) {
-                if (!FILTER_ACTION_KEY.equals(actionKey)) return false;
-
+            public KeyStroke registerAction(String actionKey, Action action, ActionMap actionMap, InputMap inputMap) {
+                if (!FILTER_ACTION_KEY.equals(actionKey)) return null;
+                
+                KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK);
                 actionMap.put(actionKey, action);
-                inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_MASK), actionKey);
+                inputMap.put(ks, actionKey);
 
-                return true;
+                return ks;
             }
         }
     }
