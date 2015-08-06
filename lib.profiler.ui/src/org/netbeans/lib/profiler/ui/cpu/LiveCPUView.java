@@ -157,8 +157,8 @@ public abstract class LiveCPUView extends JPanel {
     
     public ThreadsSelector createThreadSelector() {
         threadsSelector = new ThreadsSelector() {
-            public CPUResultsSnapshot getSnapshot() { return snapshot; }
-            public void selectionChanged(Collection<Integer> selected, boolean mergeThreads) {
+            protected CPUResultsSnapshot getSnapshot() { return snapshot; }
+            protected void selectionChanged(Collection<Integer> selected, boolean mergeThreads) {
                 mergedThreads = mergeThreads;
                 selectedThreads = selected;
                 setData();
@@ -272,15 +272,15 @@ public abstract class LiveCPUView extends JPanel {
     }
     
     
-    public abstract boolean showSourceSupported();
+    protected abstract boolean showSourceSupported();
     
-    public abstract void showSource(ClientUtils.SourceCodeSelection value);
+    protected abstract void showSource(ClientUtils.SourceCodeSelection value);
     
-    public abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
+    protected abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
     
-    public void popupShowing() {};
+    protected void popupShowing() {};
     
-    public void popupHidden() {};
+    protected void popupHidden() {};
     
     
     protected void foundInForwardCalls() {}

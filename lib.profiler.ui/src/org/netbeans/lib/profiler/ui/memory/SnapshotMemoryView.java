@@ -254,11 +254,11 @@ public abstract class SnapshotMemoryView extends JPanel {
     }
     
     
-    public abstract boolean showSourceSupported();
+    protected abstract boolean showSourceSupported();
     
-    public abstract void showSource(ClientUtils.SourceCodeSelection value);
+    protected abstract void showSource(ClientUtils.SourceCodeSelection value);
     
-    public abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
+    protected abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
     
     
     private void profileMethod(ClientUtils.SourceCodeSelection value) {
