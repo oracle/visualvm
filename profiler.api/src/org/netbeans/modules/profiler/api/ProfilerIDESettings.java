@@ -140,6 +140,7 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     private final String SNAPSHOT_WINDOW_OPEN_POLICY_KEY = "SNAPSHOT_WINDOW_OPEN_POLICY"; // NOI18N
     private final String SNAPSHOT_WINDOW_CLOSE_POLICY_KEY = "SNAPSHOT_WINDOW_CLOSE_POLICY"; // NOI18N
     private final String ENABLE_EXPERT_SETTINGS_KEY = "ENABLE_EXPERT_SETTINGS"; // NOI18N
+    private final String LOG_PROFILER_STATUS_KEY = "LOG_PROFILER_STATUS"; // NOI18N
     
     // Defaults for tracked properties
     private final String CUSTOM_HEAPDUMP_PATH_DEFAULT = ""; // NOI18N
@@ -167,6 +168,7 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     private final int SNAPSHOT_WINDOW_OPEN_DEFAULT = SNAPSHOT_WINDOW_OPEN_FIRST;
     private final int SNAPSHOT_WINDOW_CLOSE_DEFAULT = SNAPSHOT_WINDOW_CLOSE_NEVER;
     private final boolean ENABLE_EXPERT_SETTINGS_DEFAULT = false;
+    private final boolean LOG_PROFILER_STATUS_DEFAULT = false;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -362,6 +364,14 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     
     public boolean getEnableExpertSettings() {
         return getPreferences().getBoolean(ENABLE_EXPERT_SETTINGS_KEY, ENABLE_EXPERT_SETTINGS_DEFAULT);
+    }
+    
+    public void setLogProfilerStatus(boolean value) {
+        getPreferences().putBoolean(LOG_PROFILER_STATUS_KEY, value);
+    }
+    
+    public boolean getLogProfilerStatus() {
+        return getPreferences().getBoolean(LOG_PROFILER_STATUS_KEY, LOG_PROFILER_STATUS_DEFAULT);
     }
 
     /**

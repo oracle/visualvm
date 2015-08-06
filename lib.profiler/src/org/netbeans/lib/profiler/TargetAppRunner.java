@@ -177,7 +177,7 @@ public class TargetAppRunner implements CommonConstants {
                             AsyncMessageCommand msg = (AsyncMessageCommand) cmd;
 
                             if (msg.isPositive()) {
-                                appStatusHandler.displayNotification(msg.getMessage());
+//                                appStatusHandler.displayNotification(msg.getMessage());
                             } else {
                                 appStatusHandler.displayError(msg.getMessage());
 

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -43,143 +43,155 @@
 
 package org.netbeans.modules.profiler.v2.impl;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JLabel;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.swing.GrayLabel;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
+import org.openide.awt.StatusDisplayer;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class ProfilerStatus {
+@NbBundle.Messages({
+    "ProfilerStatus_profilerStopped=Profiler stopped",
+    "ProfilerStatus_profilerStarting=Profiler starting",
+    "ProfilerStatus_profilerRunning=Profiler running",
+    "ProfilerStatus_profilerRunningMethods=Profiler running, {0} methods instrumented",
+    "ProfilerStatus_profilerRunningClasses=Profiler running, {0} classes instrumented"
+})
+public final class ProfilerStatus {
     
-    private final JLabel status;
-    private final FixedWidthLabel label;
-    private final ProfilerToolbar toolbar;
+    private static final int STATUS_TIMEOUT = Integer.getInteger("org.openide.awt.StatusDisplayer.DISPLAY_TIME", 5000); // NOI18N
+    private static final int STATUS_REFRESH = Math.min(STATUS_TIMEOUT - 250, 1500); // NOI18N
+    
+    private final ProfilerSession session;
+    
+    private volatile boolean logging;
     private final Timer refreshTimer;
     
-    public ProfilerStatus(final ProfilerSession session) {
-        toolbar = ProfilerToolbar.create(false);
-        
-        toolbar.addSpace(2);
-        toolbar.addSeparator();
-        toolbar.addSpace(5);
-        
-        status = new GrayLabel("Status:");
-        toolbar.add(status);
-        
-        toolbar.addSpace(5);
-        
-        label = new FixedWidthLabel("Inactive", "Paused", "Starting",
-                                    "Stopped", "Changing", "Running");
-        toolbar.add(label);
-        
-        toolbar.addSpace(3);
-        
-        refreshTimer = new Timer(1500, new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateStatus(session);
+    private int progressDots;
+    private boolean wasRunning;
+    
+    private Reference<StatusDisplayer.Message> lastMessage;
+    
+    
+    public static ProfilerStatus forSession(ProfilerSession session) {
+        return new ProfilerStatus(session);
+    }
+    
+    
+    public void startSessionLogging() {
+//        if (logging == false) {
+            logging = true;
+            updateStatus();
+//        }
+    }
+    
+    public void stopSessionLogging() {
+        logging = false;
+        clearStatus();
+    }
+    
+    public void log(final String text) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                StatusDisplayer.Message message = StatusDisplayer.getDefault().setStatusText(text, 1000);
+                message.clear(STATUS_TIMEOUT);
+                lastMessage = new WeakReference(message);
             }
+        });
+    }
+    
+    
+    private ProfilerStatus(ProfilerSession session) {
+        this.session = session;
+        
+        refreshTimer = new Timer(STATUS_REFRESH, new ActionListener() {
+            public void actionPerformed(ActionEvent e) { updateStatus(); }
         });
         refreshTimer.setRepeats(false);
-        // TODO: listener leaks, unregister!
+        
         session.addListener(new SimpleProfilingStateAdapter() {
-            public void update() { updateStatus(session); }
+            public void update() { updateStatus(); }
         });
     }
     
-    public ProfilerToolbar getToolbar() {
-        return toolbar;
-    }
     
-    private void updateStatus(ProfilerSession session) {
-        int state = session.getState();
+    private void updateStatus() {
+        if (!logging) return;
+        if (!ProfilerIDESettings.getInstance().getLogProfilerStatus()) {
+            clearStatus();
+            return;
+        }
         
-        switch (state) {
+        switch (session.getState()) {
             case Profiler.PROFILING_INACTIVE:
-                label.setText("Inactive");
+                if (wasRunning) {
+                    log(Bundle.ProfilerStatus_profilerStopped());
+                    wasRunning = false;
+                }
                 break;
             case Profiler.PROFILING_PAUSED:
-                label.setText("Paused");
+//                log("Profiler paused");
                 break;
             case Profiler.PROFILING_STARTED:
-                label.setText("Starting");
+                log(Bundle.ProfilerStatus_profilerStarting());
+                progressDots = 0;
+                wasRunning = true;
                 break;
             case Profiler.PROFILING_STOPPED:
-                label.setText("Stopped");
+//                log("Profiler stopped");
                 break;
             case Profiler.PROFILING_IN_TRANSITION:
-                label.setText("Changing");
+//                log("Profiler changing state");
+                progressDots = 0;
                 break;
             case Profiler.PROFILING_RUNNING:
-                updateRunningStatus(session);
+                TargetAppRunner taRunner = session.getProfiler().getTargetAppRunner();
+                ProfilingSessionStatus pss = taRunner.getProfilingSessionStatus();
+                StringBuilder sb = new StringBuilder();
+                switch (pss.currentInstrType) {
+                    case CommonConstants.INSTR_RECURSIVE_FULL:
+                    case CommonConstants.INSTR_RECURSIVE_SAMPLED:
+                        sb.append(Bundle.ProfilerStatus_profilerRunningMethods(pss.getNInstrMethods()));
+                        break;
+                    case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
+                    case CommonConstants.INSTR_OBJECT_LIVENESS:
+                        sb.append(Bundle.ProfilerStatus_profilerRunningClasses(pss.getNInstrClasses()));
+                        break;
+                    default:
+                        sb.append(Bundle.ProfilerStatus_profilerRunning());
+                }
+                
+                for (int i = 0; i < progressDots; i++) sb.append('.'); // NOI18N
+                log(sb.toString());
+                if (++progressDots > 3) progressDots = 0;
+                
+                refreshTimer.start();
+                
                 break;
         }
-        
-        status.setEnabled(state != Profiler.PROFILING_INACTIVE);
     }
     
-    private void updateRunningStatus(ProfilerSession session) {
-        ProfilingSessionStatus pss = session.getProfiler().getTargetAppRunner().getProfilingSessionStatus();
-        switch (pss.currentInstrType) {
-            case CommonConstants.INSTR_RECURSIVE_FULL:
-            case CommonConstants.INSTR_RECURSIVE_SAMPLED:
-                int m = pss.getNInstrMethods();
-                label.setDetailedText("Running, " + m + " methods instrumented");
-                refreshTimer.start();
-                break;
-            case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
-            case CommonConstants.INSTR_OBJECT_LIVENESS:
-                int c = pss.getNInstrClasses();
-                label.setDetailedText("Running, " + c + " classes instrumented");
-                refreshTimer.start();
-                break;
-            default:
-                label.setText("Running");
-        }
-    }
-    
-    
-    private static class FixedWidthLabel extends JLabel {
-        
-        private final Dimension size;
-        private boolean detailsText;
-        
-        FixedWidthLabel(String... values) {
-            size = new Dimension();
-            for (String value : values) {
-                setText(value);
-                Dimension pref = super.getPreferredSize();
-                size.width = Math.max(size.width, pref.width);
-                size.height = Math.max(size.width, pref.height);
+    private void clearStatus() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                StatusDisplayer.Message message = lastMessage == null ? null :
+                                                  lastMessage.get();
+                if (message != null) message.clear(0);
             }
-        }
-        
-        public void setText(String text) {
-            detailsText = false;
-            super.setText(text);
-        }
-        
-        public void setDetailedText(String details) {
-            detailsText = true;
-            super.setText(details);
-        }
-        
-        public Dimension getPreferredSize() {
-            return detailsText ? super.getPreferredSize() : size;
-        }
-        
+        });
     }
     
 }
