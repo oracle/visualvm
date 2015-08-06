@@ -52,6 +52,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.ItemEvent;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -96,6 +98,7 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.attach.AttachWizard;
 import org.netbeans.modules.profiler.v2.impl.FeaturesView;
+import org.netbeans.modules.profiler.v2.impl.ProfilerStatus;
 import org.netbeans.modules.profiler.v2.impl.WelcomePanel;
 import org.netbeans.modules.profiler.v2.ui.DropdownButton;
 import org.netbeans.modules.profiler.v2.ui.StayOpenPopupMenu;
@@ -188,6 +191,7 @@ class ProfilerWindow extends ProfilerTopComponent {
     
     private AttachSettings attachSettings;
     
+    private ProfilerStatus status;
 //    private String preselectItem;
     
     
@@ -299,6 +303,17 @@ class ProfilerWindow extends ProfilerTopComponent {
         updateButtons();
         
         registerActions();
+        
+        status = ProfilerStatus.forSession(session);
+        addHierarchyListener(new HierarchyListener() {
+            public void hierarchyChanged(HierarchyEvent e) {
+                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                    if (isShowing()) status.startSessionLogging();
+                    else status.stopSessionLogging();
+                }
+            }
+        });
+        if (isShowing()) status.startSessionLogging();
     }
     
     private void registerActions() {
@@ -742,6 +757,11 @@ class ProfilerWindow extends ProfilerTopComponent {
     protected void componentClosed() {
         super.componentOpened();
         SnapshotsWindow.instance().sessionClosed(session);
+    }
+    
+    protected void componentActivated() {
+        super.componentActivated();
+        if (status != null) status.startSessionLogging();
     }
     
     public int getPersistenceType() {

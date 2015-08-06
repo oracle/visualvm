@@ -83,7 +83,7 @@ public class ProfilerTopComponent extends TopComponent {
         }
     };
     
-    public void componentActivated() {
+    protected void componentActivated() {
         super.componentActivated();
         if (lastFocusOwner != null) {
             lastFocusOwner.requestFocus();
@@ -95,7 +95,7 @@ public class ProfilerTopComponent extends TopComponent {
                 addPropertyChangeListener("focusOwner", focusListener); // NOI18N
     }
 
-    public void componentDeactivated() {
+    protected void componentDeactivated() {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().
                 removePropertyChangeListener("focusOwner", focusListener); // NOI18N
         super.componentDeactivated();
