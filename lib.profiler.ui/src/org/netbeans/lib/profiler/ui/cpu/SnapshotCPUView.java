@@ -144,6 +144,9 @@ public abstract class SnapshotCPUView extends JPanel {
     }
     
     
+    protected boolean profileMethodSupported() { return true; }
+    
+    
     protected abstract boolean showSourceSupported();
     
     protected abstract void showSource(ClientUtils.SourceCodeSelection value);
@@ -458,7 +461,7 @@ public abstract class SnapshotCPUView extends JPanel {
         }
         
         popup.add(new JMenuItem(CPUView.ACTION_PROFILE_METHOD) {
-            { setEnabled(userValue != null && aggregation == CPUResultsSnapshot.METHOD_LEVEL_VIEW && CPUTableView.isSelectable(userValue)); }
+            { setEnabled(profileMethodSupported() && userValue != null && aggregation == CPUResultsSnapshot.METHOD_LEVEL_VIEW && CPUTableView.isSelectable(userValue)); }
             protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
         });
         

@@ -272,6 +272,9 @@ public abstract class LiveCPUView extends JPanel {
     }
     
     
+    protected boolean profileMethodSupported() { return true; }
+    
+    
     protected abstract boolean showSourceSupported();
     
     protected abstract void showSource(ClientUtils.SourceCodeSelection value);
@@ -436,7 +439,7 @@ public abstract class LiveCPUView extends JPanel {
         }
         
         popup.add(new JMenuItem(CPUView.ACTION_PROFILE_METHOD) {
-            { setEnabled(userValue != null && CPUTableView.isSelectable(userValue)); }
+            { setEnabled(profileMethodSupported() && userValue != null && CPUTableView.isSelectable(userValue)); }
             protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
         });
         

@@ -346,6 +346,10 @@ final class TracerView {
         void setData(CPUResultsSnapshot snapshot) {
             super.setSnapshot(snapshot, true);
         }
+        
+        protected boolean profileMethodSupported() {
+            return false;
+        }
 
         protected boolean showSourceSupported() {
             return GoToSource.isAvailable();
