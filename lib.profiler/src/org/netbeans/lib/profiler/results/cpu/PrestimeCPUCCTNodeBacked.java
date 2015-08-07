@@ -126,8 +126,9 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
     void setupCopy(PrestimeCPUCCTNodeBacked node) {
         super.setupCopy(node);
         node.selfCompactDataOfs = selfCompactDataOfs;
-        node.compactDataOfs = new HashSet();
-        node.compactDataOfs.add(node.selfCompactDataOfs);
+        node.compactDataOfs = compactDataOfs;
+//        node.compactDataOfs = new HashSet();
+//        node.compactDataOfs.add(node.selfCompactDataOfs);
         node.nChildren = nChildren;
     }
     

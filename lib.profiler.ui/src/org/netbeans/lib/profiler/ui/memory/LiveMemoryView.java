@@ -236,15 +236,15 @@ public abstract class LiveMemoryView extends JPanel {
     }
     
     
-    public abstract boolean showSourceSupported();
+    protected abstract boolean showSourceSupported();
     
-    public abstract void showSource(ClientUtils.SourceCodeSelection value);
+    protected abstract void showSource(ClientUtils.SourceCodeSelection value);
     
-    public abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
+    protected abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
     
-    public void popupShowing() {};
+    protected void popupShowing() {};
     
-    public void popupHidden() {};
+    protected void popupHidden() {};
     
     
     private void updateDataView(MemoryResultsSnapshot snapshot) {
