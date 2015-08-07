@@ -344,25 +344,53 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         int[] threadIds = getThreadIds();
         List<PrestimeCPUCCTNode> nodes = new ArrayList();
         for (int i = 0; i < threadIds.length; i++) {
-            final int _threadId = threadIds[i];
-            if (threads == null || threads.contains(_threadId)) {
-                final CPUCCTContainer container = getContainerForThread(_threadId, view);
-                final FlatProfileContainer flat = container.getFlatProfile();
+            final int threadIdF = threadIds[i];
+            if (threads == null || threads.contains(threadIdF)) {
+                final CPUCCTContainer containerF = getContainerForThread(threadIdF, view);
+                final FlatProfileContainer flatF = containerF.getFlatProfile();
                 
-                PrestimeCPUCCTNodeBacked threadNode = new PrestimeCPUCCTNodeBacked(container, null) {
-                    public CCTNode[] getChildren() {
+                class ThreadNodeBacked extends PrestimeCPUCCTNodeBacked {
+                    ThreadNodeBacked() {
+                        super(containerF, null);
+                        nCalls = (int)flatF.getNTotalInvocations();
+                        totalTime0 = containerF.getWholeGraphNetTime0();
+                        totalTime1 = containerF.getWholeGraphNetTime1();
+                        nChildren = flatF.getNRows();
+                    }
+                    PrestimeCPUCCTNode createCopy() {
+                        ThreadNodeBacked copy = new ThreadNodeBacked();
+                        setupCopy(copy);
+                        return copy;
+                    }
+                    public PrestimeCPUCCTNode[] getChildren() {
                         if (nChildren == 0) return null;
-
+                        
                         if (children == null) {
-                            children = new PrestimeCPUCCTNode[flat.getNRows()];
+                            children = new PrestimeCPUCCTNode[flatF.getNRows()];
                             for (int m = 0; m < children.length; m++) {
-                                final int _methodId = flat.getMethodIdAtRow(m);
-                                PrestimeCPUCCTNodeBacked n = new PrestimeCPUCCTNodeBacked() {
-                                    public CCTNode[] getChildren() {
+                                final int mF = m;
+                                final int methodIdF = flatF.getMethodIdAtRow(m);
+                                
+                                class ReverseNodeBacked extends PrestimeCPUCCTNodeBacked {
+                                    ReverseNodeBacked() {
+                                        nChildren = 1;
+                                        container = ThreadNodeBacked.this.container;
+                                        methodId = methodIdF;
+                                        nCalls = flatF.getNInvocationsAtRow(mF);
+                                        totalTime0 = flatF.getTotalTimeInMcs0AtRow(mF);
+                                        totalTime1 = flatF.getTotalTimeInMcs1AtRow(mF);
+                                        parent = ThreadNodeBacked.this;
+                                    }
+                                    PrestimeCPUCCTNode createCopy() {
+                                        ReverseNodeBacked copy = new ReverseNodeBacked();
+                                        setupCopy(copy);
+                                        return copy;
+                                    }
+                                    public PrestimeCPUCCTNode[] getChildren() {
                                         if (nChildren == 0) return null;
-
+                                        
                                         if (children == null) {
-                                            PrestimeCPUCCTNode r = getReverseCCT(_threadId, _methodId, view);
+                                            PrestimeCPUCCTNode r = getReverseCCT(threadIdF, methodIdF, view);
                                             children = r.children;
                                             nChildren = children == null ? 0 : children.length;
                                             if (nChildren > 0) for (PrestimeCPUCCTNode ch : children) ch.parent = this;
@@ -370,26 +398,17 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
 
                                         return children;
                                     }
-                                };
-                                n.nChildren = 1;
-                                n.container = container;
-                                n.methodId = _methodId;
-                                n.nCalls = flat.getNInvocationsAtRow(m);
-                                n.totalTime0 = flat.getTotalTimeInMcs0AtRow(m);
-                                n.totalTime1 = flat.getTotalTimeInMcs1AtRow(m);
-                                n.parent = this;
-                                children[m] = n;
+                                }
+                                
+                                children[m] = new ReverseNodeBacked();
                             }
                         }
 
                         return children;
                     }
-                };
-                threadNode.nCalls = (int)flat.getNTotalInvocations();
-                threadNode.totalTime0 = container.getWholeGraphNetTime0();
-                threadNode.totalTime1 = container.getWholeGraphNetTime1();
-                threadNode.nChildren = flat.getNRows();
-                nodes.add(threadNode);
+                }
+                
+                nodes.add(new ThreadNodeBacked());
             }
         }
         

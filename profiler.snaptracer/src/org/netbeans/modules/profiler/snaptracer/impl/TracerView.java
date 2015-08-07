@@ -346,12 +346,16 @@ final class TracerView {
         void setData(CPUResultsSnapshot snapshot) {
             super.setSnapshot(snapshot, true);
         }
+        
+        protected boolean profileMethodSupported() {
+            return false;
+        }
 
-        public boolean showSourceSupported() {
+        protected boolean showSourceSupported() {
             return GoToSource.isAvailable();
         }
         
-        public void showSource(ClientUtils.SourceCodeSelection value) {
+        protected void showSource(ClientUtils.SourceCodeSelection value) {
             String className = value.getClassName();
             String methodName = value.getMethodName();
             String methodSig = value.getMethodSignature();
@@ -362,7 +366,7 @@ final class TracerView {
             "LBL_ProfileClass=Profile Class",
             "LBL_ProfileMethod=Profile Method"                
         })
-        public void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
+        protected void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
                     String name = Wildcards.ALLWILDCARD.equals(value.getMethodName()) ?
