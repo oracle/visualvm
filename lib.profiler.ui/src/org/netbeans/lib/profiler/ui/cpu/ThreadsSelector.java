@@ -113,9 +113,9 @@ public abstract class ThreadsSelector extends PopupButton {
     }
     
     
-    public abstract CPUResultsSnapshot getSnapshot();
+    protected abstract CPUResultsSnapshot getSnapshot();
     
-    public abstract void selectionChanged(Collection<Integer> selected, boolean mergeThreads);
+    protected abstract void selectionChanged(Collection<Integer> selected, boolean mergeThreads);
     
     
     void reset() {

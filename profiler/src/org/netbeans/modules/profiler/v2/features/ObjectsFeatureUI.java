@@ -164,25 +164,25 @@ abstract class ObjectsFeatureUI extends FeatureUI {
         // --- Results ---------------------------------------------------------
         
         memoryView = new LiveMemoryView(getProfiler().getTargetAppRunner().getProfilerClient(), getSelection()) {
-            public boolean showSourceSupported() {
+            protected boolean showSourceSupported() {
                 return GoToSource.isAvailable();
             }
-            public void showSource(ClientUtils.SourceCodeSelection value) {
+            protected void showSource(ClientUtils.SourceCodeSelection value) {
                 String className = value.getClassName();
                 String methodName = value.getMethodName();
                 String methodSig = value.getMethodSignature();
                 GoToSource.openSource(getProject(), className, methodName, methodSig);
             }
-            public void selectForProfiling(ClientUtils.SourceCodeSelection value) {
+            protected void selectForProfiling(ClientUtils.SourceCodeSelection value) {
                 ObjectsFeatureUI.this.selectForProfiling(value);
             }
-            public void popupShowing() {
+            protected void popupShowing() {
                 if (lrPauseButton.isEnabled() && !lrRefreshButton.isEnabled()) {
                     popupPause = true;
                     lrPauseButton.setSelected(true);
                 }
             }
-            public void popupHidden() {
+            protected void popupHidden() {
                 if (lrPauseButton.isEnabled() && popupPause) {
                     popupPause = false;
                     lrPauseButton.setSelected(false);
