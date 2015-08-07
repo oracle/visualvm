@@ -417,7 +417,6 @@ public class ProfilerClient implements CommonConstants {
      * The getAllocatedObjectsCountResults() method below provides only one aspect of the memory profiling data.
      */
     private int[] savedAllocatedObjectsCountResults;
-    private volatile boolean connectionWithServerOpen; // Used just to prevent double entry into closeConnection()
     private volatile boolean forceObtainedResultsDumpCalled;
     private volatile boolean handlingEventBufferDump;
     private volatile boolean instrMethodsLimitReported;
