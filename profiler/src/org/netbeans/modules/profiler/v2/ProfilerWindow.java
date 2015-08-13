@@ -69,7 +69,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
@@ -135,10 +134,10 @@ import org.openide.windows.WindowManager;
     "ProfilerWindow_threadDump=Thread Dump",
     "ProfilerWindow_heapDump=Heap Dump",
     "ProfilerWindow_gc=GC",
-    "ProfilerWindow_setupAttachProject=Setup attach to project...",
-    "ProfilerWindow_setupAttachProcess=Setup attach to process...",
-    "ProfilerWindow_multipleFeatures=Enable multiple modes",
-    "ProfilerWindow_usePPoints=Use defined Profiling Points",
+    "ProfilerWindow_setupAttachProject=Setup Attach to Project...",
+    "ProfilerWindow_setupAttachProcess=Setup Attach to Process...",
+    "ProfilerWindow_multipleFeatures=Enable Multiple Modes",
+    "ProfilerWindow_usePPoints=Use Defined Profiling Points",
     "ProfilerWindow_targetSection=Target:",
     "ProfilerWindow_profileSection=Profile:",
     "ProfilerWindow_settingsSection=Settings:",
