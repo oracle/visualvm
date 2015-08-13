@@ -69,6 +69,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
@@ -141,6 +142,7 @@ import org.openide.windows.WindowManager;
     "ProfilerWindow_targetSection=Target:",
     "ProfilerWindow_profileSection=Profile:",
     "ProfilerWindow_settingsSection=Settings:",
+    "ProfilerWindow_pluginsSection=Plugins:",
     "#NOI18N",
     "ProfilerWindow_mode=editor",
     "ProfilerWindow_noFeature=<html><b>No profiling feature selected.</b><br><br>Please select at least one profiling feature for the session.</html>"
@@ -176,6 +178,7 @@ class ProfilerWindow extends ProfilerTopComponent {
     // --- Implementation ------------------------------------------------------
     
     private ProfilerFeatures features;
+    private ProfilerPlugins plugins;
     
     private ProfilerToolbar toolbar;
     private ProfilerToolbar featureToolbar;
@@ -221,6 +224,7 @@ class ProfilerWindow extends ProfilerTopComponent {
     
     private void loadSessionSettings() {
         features = session.getFeatures();
+        plugins = session.getPlugins();
         
         Properties p = new Properties();
         try {
@@ -680,6 +684,24 @@ class ProfilerWindow extends ProfilerTopComponent {
             c.insets = new Insets(0, left, 0, 5);
             c.fill = GridBagConstraints.HORIZONTAL;
             popup.add(usePPoints, c);
+        }
+        
+        if (plugins.hasPlugins()) {
+            JLabel pluginsL = new JLabel(Bundle.ProfilerWindow_pluginsSection(), JLabel.LEADING);
+            pluginsL.setFont(popup.getFont().deriveFont(Font.BOLD));
+            c = new GridBagConstraints();
+            c.gridy = y++;
+            c.insets = new Insets(8, labl, 5, 5);
+            c.fill = GridBagConstraints.HORIZONTAL;
+            popup.add(pluginsL, c);
+            
+            for (JMenuItem menu : plugins.menuItems()) {
+                c = new GridBagConstraints();
+                c.gridy = y++;
+                c.insets = new Insets(0, left, 0, 5);
+                c.fill = GridBagConstraints.HORIZONTAL;
+                popup.add(menu, c);
+            }
         }
 
         JPanel footer = new JPanel(null);
