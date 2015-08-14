@@ -104,6 +104,7 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.profiler</friend>
                 <friend>org.netbeans.modules.profiler.attach</friend>
                 <friend>org.netbeans.modules.profiler.categorization.api</friend>
+                <friend>org.netbeans.modules.profiler.commandrunner</friend>
                 <friend>org.netbeans.modules.profiler.drilldown</friend>
                 <friend>org.netbeans.modules.profiler.freeform</friend>
                 <friend>org.netbeans.modules.profiler.heapwalker</friend>
