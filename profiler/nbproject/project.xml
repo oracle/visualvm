@@ -305,10 +305,12 @@ made subject to such option by the copyright holder.
                 <friend>org.netbeans.modules.javame.profiler</friend>
                 <friend>org.netbeans.modules.javame.profiler.j2me</friend>
                 <friend>org.netbeans.modules.maven.profiler</friend>
+                <friend>org.netbeans.modules.profiler.commandrunner</friend>
                 <friend>org.netbeans.modules.profiler.freeform</friend>
                 <friend>org.netbeans.modules.profiler.heapwalker</friend>
                 <friend>org.netbeans.modules.profiler.j2ee</friend>
                 <friend>org.netbeans.modules.profiler.j2se</friend>
+                <friend>org.netbeans.modules.profiler.loadgen</friend>
                 <friend>org.netbeans.modules.profiler.nbimpl</friend>
                 <friend>org.netbeans.modules.profiler.options</friend>
                 <friend>org.netbeans.modules.profiler.ppoints</friend>
