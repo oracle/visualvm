@@ -144,11 +144,14 @@ public abstract class SnapshotCPUView extends JPanel {
     }
     
     
-    public abstract boolean showSourceSupported();
+    protected boolean profileMethodSupported() { return true; }
     
-    public abstract void showSource(ClientUtils.SourceCodeSelection value);
     
-    public abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
+    protected abstract boolean showSourceSupported();
+    
+    protected abstract void showSource(ClientUtils.SourceCodeSelection value);
+    
+    protected abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
     
     
     protected void foundInForwardCalls() {
@@ -351,8 +354,8 @@ public abstract class SnapshotCPUView extends JPanel {
         
         toolbar.addSpace(5);
         ThreadsSelector threadsPopup = new ThreadsSelector() {
-            public CPUResultsSnapshot getSnapshot() { return snapshot; }
-            public void selectionChanged(Collection<Integer> selected, boolean mergeThreads) {
+            protected CPUResultsSnapshot getSnapshot() { return snapshot; }
+            protected void selectionChanged(Collection<Integer> selected, boolean mergeThreads) {
                 mergedThreads = mergeThreads;
                 selectedThreads = selected;
                 setAggregation(aggregation);
@@ -458,7 +461,7 @@ public abstract class SnapshotCPUView extends JPanel {
         }
         
         popup.add(new JMenuItem(CPUView.ACTION_PROFILE_METHOD) {
-            { setEnabled(userValue != null && aggregation == CPUResultsSnapshot.METHOD_LEVEL_VIEW && CPUTableView.isSelectable(userValue)); }
+            { setEnabled(profileMethodSupported() && userValue != null && aggregation == CPUResultsSnapshot.METHOD_LEVEL_VIEW && CPUTableView.isSelectable(userValue)); }
             protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
         });
         
@@ -479,7 +482,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = hotSpotsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         toggles[1].setSelected(true);
                         hotSpotsView.setVisible(true);
                         table.requestFocusInWindow();
@@ -491,7 +494,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = reverseCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         toggles[2].setSelected(true);
                         reverseCallsView.setVisible(true);
                         table.requestFocusInWindow();
@@ -506,7 +509,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = forwardCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         toggles[0].setSelected(true);
                         forwardCallsView.setVisible(true);
                         table.requestFocusInWindow();
@@ -518,7 +521,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = reverseCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         toggles[2].setSelected(true);
                         reverseCallsView.setVisible(true);
                         table.requestFocusInWindow();
@@ -534,7 +537,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = forwardCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         toggles[0].setSelected(true);
                         forwardCallsView.setVisible(true);
                         table.requestFocusInWindow();
@@ -546,7 +549,7 @@ public abstract class SnapshotCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = hotSpotsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         toggles[1].setSelected(true);
                         hotSpotsView.setVisible(true);
                         table.requestFocusInWindow();
@@ -554,6 +557,9 @@ public abstract class SnapshotCPUView extends JPanel {
                 }
             });
         }
+        
+        popup.addSeparator();
+        popup.add(invoker.createCopyMenuItem());
         
         popup.addSeparator();
         popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {

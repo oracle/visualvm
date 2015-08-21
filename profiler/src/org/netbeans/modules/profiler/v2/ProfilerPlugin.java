@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -40,59 +40,51 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+package org.netbeans.modules.profiler.v2;
 
-package org.netbeans.modules.profiler.api;
-
-import org.netbeans.api.progress.ProgressHandle;
-import org.openide.util.Cancellable;
+import javax.swing.JMenu;
+import org.openide.util.Lookup;
 
 /**
+ * Common superclass for simple addons integrating into the Profile menu and
+ * getting notifications about state of the profiler session.
  *
- * @author Jaroslav Bachorik
+ * @author Jiri Sedlacek
  */
-public interface ProgressDisplayer {
-    //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
-
-    public static interface ProgressController extends Cancellable {
-    }
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public void close();
-
-    public ProgressDisplayer showProgress(String message);
-
-    public ProgressDisplayer showProgress(String message, ProgressController controller);
-
-    public ProgressDisplayer showProgress(String caption, String message, ProgressController controller);
+public abstract class ProfilerPlugin {
     
-    public static final ProgressDisplayer DEFAULT = new ProgressDisplayer() {
-        ProgressHandle ph = null;
-
-        public synchronized ProgressDisplayer showProgress(String message) {
-            ph = ProgressHandle.createHandle(message);
-            ph.start();
-            return DEFAULT;
-        }
-
-        public synchronized ProgressDisplayer showProgress(String message, ProgressController controller) {
-            ph = ProgressHandle.createHandle(message, controller);
-            ph.start();
-            return DEFAULT;
-        }
-
-        public synchronized ProgressDisplayer showProgress(String caption, String message, ProgressController controller) {
-            ph = ProgressHandle.createHandle(message, controller);
-            ph.start();
-            return DEFAULT;
-        }
-
-        public synchronized void close() {
-            if (ph != null) {
-                ph.finish();
-                ph = null;
-            }
-        }
-    };
-
+    private final String name;
+    
+    
+    public ProfilerPlugin(String name) {
+        if (name == null) throw new IllegalArgumentException("Plugin name cannot be null"); // NOI18N
+        this.name = name;
+    }
+    
+    
+    public final String getName() {
+        return name;
+    }
+    
+    
+    public abstract void createMenu(JMenu menu);
+    
+    
+    protected void sessionStarting() {}
+    
+    protected void sessionStarted()  {}
+    
+    protected void sessionStopping() {}
+    
+    protected void sessionStopped()  {}
+    
+    
+    // --- Provider ------------------------------------------------------------
+    
+    public static abstract class Provider {
+        
+        public abstract ProfilerPlugin createPlugin(Lookup.Provider project, SessionStorage storage);
+        
+    }
+    
 }

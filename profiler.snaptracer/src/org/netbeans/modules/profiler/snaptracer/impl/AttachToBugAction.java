@@ -62,7 +62,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
@@ -138,7 +137,7 @@ final class AttachToBugAction extends AbstractAction {
 
     // TODO: export also UI gestures file if available, preferably based on user option
     private static void attachtoBug(final String bugNumber, final File targetFile) {
-        final ProgressHandle progress = ProgressHandleFactory.createHandle(
+        final ProgressHandle progress = ProgressHandle.createHandle(
                 Bundle.AttachToBugAction_ProgressMsg());
         progress.setInitialDelay(500);
         RequestProcessor.getDefault().post(new Runnable() {

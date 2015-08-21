@@ -45,6 +45,7 @@ package org.netbeans.lib.profiler.ui.threads;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ResourceBundle;
 import org.netbeans.lib.profiler.results.threads.ThreadData;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.renderer.BaseRenderer;
@@ -54,6 +55,10 @@ import org.netbeans.lib.profiler.ui.swing.renderer.BaseRenderer;
  * @author Jiri Sedlacek
  */
 public class TimelineRenderer extends BaseRenderer {
+    
+    private static ResourceBundle BUNDLE() {
+        return ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.threads.Bundle"); // NOI18N
+    }
     
     private static final Color TICK_COLOR = new Color(200, 200, 200);
     
@@ -74,6 +79,11 @@ public class TimelineRenderer extends BaseRenderer {
     
     public void setValue(Object value, int row) {
         rowView = (ViewManager.RowView)value;
+    }
+    
+    public String toString() {
+        int lastIndex = rowView.getLastIndex();
+        return getStateName(lastIndex == -1 ? -1 : rowView.getState(lastIndex));
     }
     
     public void paint(Graphics g) {
@@ -115,6 +125,19 @@ public class TimelineRenderer extends BaseRenderer {
         }
         
         return x - 1;
+    }
+    
+    private static String getStateName(int state) {
+        switch (state) {
+//            case 0: return "finished";
+            case 1: return BUNDLE().getString("TimelineRenderer_ThreadStateRunning");
+            case 2: return BUNDLE().getString("TimelineRenderer_ThreadStateSleeping");
+            case 3: return BUNDLE().getString("TimelineRenderer_ThreadStateMonitor");
+            case 4: return BUNDLE().getString("TimelineRenderer_ThreadStateWait");
+            case 5: return BUNDLE().getString("TimelineRenderer_ThreadStatePark");
+//            default: return "unknown";
+            default: return BUNDLE().getString("TimelineRenderer_ThreadStateFinished");
+        }
     }
     
 }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -40,59 +40,72 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+package org.netbeans.modules.profiler.v2.ui;
 
-package org.netbeans.modules.profiler.api;
-
-import org.netbeans.api.progress.ProgressHandle;
-import org.openide.util.Cancellable;
+import java.awt.Component;
+import java.awt.Dimension;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
+import org.netbeans.lib.profiler.ui.swing.PopupButton;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Jiri Sedlacek
  */
-public interface ProgressDisplayer {
-    //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
-
-    public static interface ProgressController extends Cancellable {
-    }
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public void close();
-
-    public ProgressDisplayer showProgress(String message);
-
-    public ProgressDisplayer showProgress(String message, ProgressController controller);
-
-    public ProgressDisplayer showProgress(String caption, String message, ProgressController controller);
+public class SettingsPanel extends JPanel {
     
-    public static final ProgressDisplayer DEFAULT = new ProgressDisplayer() {
-        ProgressHandle ph = null;
-
-        public synchronized ProgressDisplayer showProgress(String message) {
-            ph = ProgressHandle.createHandle(message);
-            ph.start();
-            return DEFAULT;
+    public SettingsPanel() {
+        super(null);
+        
+        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+        setOpaque(false);
+        
+        add(Box.createVerticalStrut(defaultHeight()));
+    }
+    
+    
+    public void removeAll() {
+        super.removeAll();
+        add(Box.createVerticalStrut(defaultHeight()));
+    }
+    
+    
+    private static int DEFAULT_HEIGHT = -1;
+    
+    private static int defaultHeight() {
+        if (DEFAULT_HEIGHT == -1) {
+            JPanel ref = new JPanel(null);
+            ref.setLayout(new BoxLayout(ref, BoxLayout.LINE_AXIS));
+            ref.setOpaque(false);
+            
+            ref.add(new JLabel("XXX")); // NOI18N
+            
+            ref.add(new JButton("XXX")); // NOI18N
+            ref.add(new PopupButton("XXX")); // NOI18N
+            
+            ref.add(new JCheckBox("XXX")); // NOI18N
+            ref.add(new JRadioButton("XXX")); // NOI18N
+            
+            ref.add(new JTextField("XXX")); // NOI18N
+            
+            ref.add(new JExtendedSpinner(new SpinnerNumberModel(1, 1, 655535, 1)));
+            
+            Component separator = Box.createHorizontalStrut(1);
+            Dimension d = separator.getMaximumSize(); d.height = 20;
+            separator.setMaximumSize(d);
+            ref.add(separator);
+            
+            DEFAULT_HEIGHT = ref.getPreferredSize().height;
         }
-
-        public synchronized ProgressDisplayer showProgress(String message, ProgressController controller) {
-            ph = ProgressHandle.createHandle(message, controller);
-            ph.start();
-            return DEFAULT;
-        }
-
-        public synchronized ProgressDisplayer showProgress(String caption, String message, ProgressController controller) {
-            ph = ProgressHandle.createHandle(message, controller);
-            ph.start();
-            return DEFAULT;
-        }
-
-        public synchronized void close() {
-            if (ph != null) {
-                ph.finish();
-                ph = null;
-            }
-        }
-    };
-
+        return DEFAULT_HEIGHT;
+    }
+    
 }

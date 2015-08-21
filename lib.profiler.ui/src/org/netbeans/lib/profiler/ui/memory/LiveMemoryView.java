@@ -91,6 +91,7 @@ public abstract class LiveMemoryView extends JPanel {
     private long lastupdate;
     private volatile boolean paused;
     private volatile boolean forceRefresh;
+    private volatile boolean refreshIsRunning;
     
     private final Set<ClientUtils.SourceCodeSelection> selection;
     private final ResultsMonitor rm;
@@ -136,22 +137,37 @@ public abstract class LiveMemoryView extends JPanel {
     
     private void refreshData(RuntimeCCTNode appRootNode) throws ClientUtils.TargetAppOrVMTerminated {
         if ((lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis() || paused) && !forceRefresh) return;
-        
-        final MemoryResultsSnapshot _snapshot = client.getMemoryProfilingResultsSnapshot(false);
-        
-        // class names in VM format
-        MemoryView.userFormClassNames(_snapshot);
-        
-        // class names in VM format
-        InstrumentationFilter ifilter = client.getSettings().getInstrumentationFilter();
-        String[] _ifilter = ifilter == null ? null : ifilter.getFilterStrings();
-        final Collection _filter = new ArrayList();
-        if (_ifilter != null) for (String s : _ifilter)
-                _filter.add(StringUtils.userFormClassName(s));
-        
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() { refreshDataImpl(_snapshot, _filter); }
-        });
+        if (refreshIsRunning) return;
+        refreshIsRunning = true;
+        try {
+            final MemoryResultsSnapshot _snapshot = client.getMemoryProfilingResultsSnapshot(false);
+
+            // class names in VM format
+            MemoryView.userFormClassNames(_snapshot);
+
+            // class names in VM format
+            InstrumentationFilter ifilter = client.getSettings().getInstrumentationFilter();
+            String[] _ifilter = ifilter == null ? null : ifilter.getFilterStrings();
+            final Collection _filter = new ArrayList();
+            if (_ifilter != null) for (String s : _ifilter)
+                    _filter.add(StringUtils.userFormClassName(s));
+
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    try {
+                        refreshDataImpl(_snapshot, _filter);
+                    } finally {
+                        refreshIsRunning = false;
+                    }
+                }
+            });
+        } catch (RuntimeException ex) {
+            refreshIsRunning = false;
+            throw ex;
+        } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+            refreshIsRunning = false;
+            throw ex;            
+        }
         
         lastupdate = System.currentTimeMillis();
         forceRefresh = false;
@@ -220,15 +236,15 @@ public abstract class LiveMemoryView extends JPanel {
     }
     
     
-    public abstract boolean showSourceSupported();
+    protected abstract boolean showSourceSupported();
     
-    public abstract void showSource(ClientUtils.SourceCodeSelection value);
+    protected abstract void showSource(ClientUtils.SourceCodeSelection value);
     
-    public abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
+    protected abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
     
-    public void popupShowing() {};
+    protected void popupShowing() {};
     
-    public void popupHidden() {};
+    protected void popupHidden() {};
     
     
     private void updateDataView(MemoryResultsSnapshot snapshot) {
@@ -330,6 +346,9 @@ public abstract class LiveMemoryView extends JPanel {
             { setEnabled(userValue != null); }
             protected void fireActionPerformed(ActionEvent e) { selectForProfiling(userValue); }
         });
+        
+        popup.addSeparator();
+        popup.add(invoker.createCopyMenuItem());
         
         popup.addSeparator();
         popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {

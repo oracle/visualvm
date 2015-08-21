@@ -220,10 +220,12 @@ public abstract class ProfilerSession {
     // --- Internal API --------------------------------------------------------
     
     private ProfilerFeatures features;
+    private ProfilerPlugins plugins;
     
     final boolean doStart(ProfilingSettings pSettings, AttachSettings aSettings) {
         profilingSettings = pSettings;
         attachSettings = aSettings;
+        plugins.notifyStarting();
         return start();
     }
     
@@ -233,6 +235,7 @@ public abstract class ProfilerSession {
     }
     
     final boolean doStop() {
+        plugins.notifyStopping();
         return stop();
     }
     
@@ -280,6 +283,14 @@ public abstract class ProfilerSession {
             public void run() { getWindow().selectFeature(feature); }
         };
         UIUtils.runInEventDispatchThread(task);
+    }
+    
+    final ProfilerPlugins getPlugins() {
+        assert !SwingUtilities.isEventDispatchThread();
+        
+        synchronized(this) { if (plugins == null) plugins = new ProfilerPlugins(this); }
+        
+        return plugins;
     }
     
     final synchronized void persistStorage(boolean immediately) {

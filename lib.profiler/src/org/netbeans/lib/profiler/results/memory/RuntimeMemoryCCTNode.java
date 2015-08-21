@@ -63,6 +63,8 @@ import java.io.IOException;
 public class RuntimeMemoryCCTNode implements Cloneable, RuntimeCCTNode {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
+    private static final RuntimeCCTNode[] EMPTY_CHILDREN = new RuntimeMemoryCCTNode[0];    
+
     protected static final int TYPE_RuntimeMemoryCCTNode = 1;
     protected static final int TYPE_RuntimeObjAllocTermCCTNode = 2;
     protected static final int TYPE_RuntimeObjLivenessTermCCTNode = 3;
@@ -135,13 +137,13 @@ public class RuntimeMemoryCCTNode implements Cloneable, RuntimeCCTNode {
     @Override
     public RuntimeCCTNode[] getChildren() {
         if (children == null) {
-            return new RuntimeCCTNode[0];
+            return EMPTY_CHILDREN;
         } else if (children instanceof RuntimeCCTNode) {
             return new RuntimeCCTNode[]{(RuntimeCCTNode)children};
         } else if (children instanceof RuntimeCCTNode[]) {
             return (RuntimeCCTNode[])children;
         }
-        return new RuntimeCCTNode[0];
+        return EMPTY_CHILDREN;
     }
 
     public Object clone() {

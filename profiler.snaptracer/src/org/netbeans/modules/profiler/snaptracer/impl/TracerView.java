@@ -58,7 +58,6 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.*;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.modules.profiler.snaptracer.TracerPackage;
@@ -347,12 +346,16 @@ final class TracerView {
         void setData(CPUResultsSnapshot snapshot) {
             super.setSnapshot(snapshot, true);
         }
+        
+        protected boolean profileMethodSupported() {
+            return false;
+        }
 
-        public boolean showSourceSupported() {
+        protected boolean showSourceSupported() {
             return GoToSource.isAvailable();
         }
         
-        public void showSource(ClientUtils.SourceCodeSelection value) {
+        protected void showSource(ClientUtils.SourceCodeSelection value) {
             String className = value.getClassName();
             String methodName = value.getMethodName();
             String methodSig = value.getMethodSignature();
@@ -363,7 +366,7 @@ final class TracerView {
             "LBL_ProfileClass=Profile Class",
             "LBL_ProfileMethod=Profile Method"                
         })
-        public void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
+        protected void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
                     String name = Wildcards.ALLWILDCARD.equals(value.getMethodName()) ?
@@ -400,7 +403,7 @@ final class TracerView {
                 public void run() {
                     ProgressHandle pHandle = null;
                     try {
-                        pHandle = ProgressHandleFactory.createHandle(Bundle.LBL_SelectingIntervals());
+                        pHandle = ProgressHandle.createHandle(Bundle.LBL_SelectingIntervals());
                         pHandle.setInitialDelay(0);
                         pHandle.start();
                         

@@ -50,6 +50,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.prefs.Preferences;
+import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.lib.profiler.global.CommonConstants;
 
 
 /**
@@ -66,9 +68,17 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     public static final int CPU_STARTUP = 2;
     public static final int CPU_PROFILING_POINTS = 3;
     public static final int OOME_DETECTION_NONE = 0;
-    public static final int OOME_DETECTION_TEMPDIR = 1;
-    public static final int OOME_DETECTION_PROJECTDIR = 2;
+    public static final int OOME_DETECTION_PROJECTDIR = 1;
+    public static final int OOME_DETECTION_TEMPDIR = 2;
     public static final int OOME_DETECTION_CUSTOMDIR = 3;
+    public static final int SNAPSHOT_WINDOW_OPEN_NEVER = 0;
+    public static final int SNAPSHOT_WINDOW_OPEN_PROFILER = 1;
+    public static final int SNAPSHOT_WINDOW_SHOW_PROFILER = 2;
+    public static final int SNAPSHOT_WINDOW_OPEN_FIRST = 3;
+    public static final int SNAPSHOT_WINDOW_OPEN_EACH = 4;
+    public static final int SNAPSHOT_WINDOW_CLOSE_NEVER = 0;
+    public static final int SNAPSHOT_WINDOW_CLOSE_PROFILER = 1;
+    public static final int SNAPSHOT_WINDOW_HIDE_PROFILER = 2;
 
     /** The Window automatically opens always when profiling starts */
     public static final int OPEN_ALWAYS = 1;
@@ -126,6 +136,11 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     private final String TRACK_EVERY_KEY = "TRACK_EVERY"; // NOI18N
     private final String TV_BEHAVIOR_KEY = "TV_BEHAVIOR"; // NOI18N
     private final String LCV_BEHAVIOR_KEY = "LCV_BEHAVIOR"; // NOI18N
+    private final String NO_DATA_HINT_KEY = "NO_DATA_HINT"; // NOI18N
+    private final String SNAPSHOT_WINDOW_OPEN_POLICY_KEY = "SNAPSHOT_WINDOW_OPEN_POLICY"; // NOI18N
+    private final String SNAPSHOT_WINDOW_CLOSE_POLICY_KEY = "SNAPSHOT_WINDOW_CLOSE_POLICY"; // NOI18N
+    private final String ENABLE_EXPERT_SETTINGS_KEY = "ENABLE_EXPERT_SETTINGS"; // NOI18N
+    private final String LOG_PROFILER_STATUS_KEY = "LOG_PROFILER_STATUS"; // NOI18N
     
     // Defaults for tracked properties
     private final String CUSTOM_HEAPDUMP_PATH_DEFAULT = ""; // NOI18N
@@ -149,6 +164,11 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     private final int TRACK_EVERY_DEFAULT = 10;
     private final int TV_BEHAVIOR_DEFAULT = OPEN_ALWAYS;
     private final int LCV_BEHAVIOR_DEFAULT = OPEN_ALWAYS;
+    private final boolean NO_DATA_HINT_DEFAULT = true;
+    private final int SNAPSHOT_WINDOW_OPEN_DEFAULT = SNAPSHOT_WINDOW_OPEN_FIRST;
+    private final int SNAPSHOT_WINDOW_CLOSE_DEFAULT = SNAPSHOT_WINDOW_CLOSE_NEVER;
+    private final boolean ENABLE_EXPERT_SETTINGS_DEFAULT = false;
+    private final boolean LOG_PROFILER_STATUS_DEFAULT = false;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -157,6 +177,69 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     }
     
     private ProfilerIDESettings() {}
+    
+    
+    // ProfilingSettings -------------------------------------------------------------------------------------------------
+    
+    private ProfilingSettings pSettings;
+    
+    public ProfilingSettings getDefaultProfilingSettings() {
+        if (pSettings == null) pSettings = loadProfilingSettings();
+        return pSettings;
+    }
+    
+    public void saveDefaultProfilingSettings() {
+        if (pSettings != null) storeProfilingSettings(pSettings);
+    }
+    
+    public ProfilingSettings createDefaultProfilingSettings() {
+        ProfilingSettings defaultSettings = new ProfilingSettings();
+        getDefaultProfilingSettings().copySettingsInto(defaultSettings);
+        return defaultSettings;
+    }
+    
+    private ProfilingSettings loadProfilingSettings() {
+        Preferences pref = getPreferences();
+        ProfilingSettings settings = new ProfilingSettings();
+        
+        settings.setSamplingFrequency(pref.getInt(ProfilingSettings.PROP_SAMPLING_FREQUENCY, 10));
+        settings.setCPUProfilingType(pref.getInt(ProfilingSettings.PROP_CPU_PROFILING_TYPE, CommonConstants.CPU_INSTR_FULL));
+        settings.setSamplingInterval(pref.getInt(ProfilingSettings.PROP_SAMPLING_INTERVAL, -10));
+        settings.setExcludeWaitTime(pref.getBoolean(ProfilingSettings.PROP_EXCLUDE_WAIT_TIME, true));
+        settings.setInstrumentSpawnedThreads(pref.getBoolean(ProfilingSettings.PROP_INSTRUMENT_SPAWNED_THREADS, false));
+        settings.setNProfiledThreadsLimit(pref.getInt(ProfilingSettings.PROP_N_PROFILED_THREADS_LIMIT, 128));
+        settings.setInstrScheme(pref.getInt(ProfilingSettings.PROP_INSTR_SCHEME, CommonConstants.INSTRSCHEME_LAZY));
+        settings.setInstrumentMethodInvoke(pref.getBoolean(ProfilingSettings.PROP_INSTRUMENT_METHOD_INVOKE, true));
+        settings.setInstrumentGetterSetterMethods(pref.getBoolean(ProfilingSettings.PROP_INSTRUMENT_GETTER_SETTER_METHODS, false));
+        settings.setInstrumentEmptyMethods(pref.getBoolean(ProfilingSettings.PROP_INSTRUMENT_EMPTY_METHODS, false));
+        
+        settings.setAllocTrackEvery(pref.getInt(ProfilingSettings.PROP_OBJ_ALLOC_STACK_SAMPLING_INTERVAL, 1));
+        settings.setRunGCOnGetResultsInMemoryProfiling(pref.getBoolean(ProfilingSettings.PROP_RUN_GC_ON_GET_RESULTS_IN_MEMORY_PROFILING, false));
+        
+        settings.setThreadsSamplingEnabled(pref.getBoolean(ProfilingSettings.PROP_THREADS_SAMPLING_ENABLED, false));
+        
+        return settings;
+    }
+    
+    private void storeProfilingSettings(ProfilingSettings settings) {
+        Preferences pref = getPreferences();
+        
+        pref.putInt(ProfilingSettings.PROP_SAMPLING_FREQUENCY, settings.getSamplingFrequency());
+        pref.putInt(ProfilingSettings.PROP_CPU_PROFILING_TYPE, settings.getCPUProfilingType());
+        pref.putInt(ProfilingSettings.PROP_SAMPLING_INTERVAL, settings.getSamplingInterval());
+        pref.putBoolean(ProfilingSettings.PROP_EXCLUDE_WAIT_TIME, settings.getExcludeWaitTime());
+        pref.putBoolean(ProfilingSettings.PROP_INSTRUMENT_SPAWNED_THREADS, settings.getInstrumentSpawnedThreads());
+        pref.putInt(ProfilingSettings.PROP_N_PROFILED_THREADS_LIMIT, settings.getNProfiledThreadsLimit());
+        pref.putInt(ProfilingSettings.PROP_INSTR_SCHEME, settings.getInstrScheme());
+        pref.putBoolean(ProfilingSettings.PROP_INSTRUMENT_METHOD_INVOKE, settings.getInstrumentMethodInvoke());
+        pref.putBoolean(ProfilingSettings.PROP_INSTRUMENT_GETTER_SETTER_METHODS, settings.getInstrumentGetterSetterMethods());
+        pref.putBoolean(ProfilingSettings.PROP_INSTRUMENT_EMPTY_METHODS, settings.getInstrumentEmptyMethods());
+        
+        pref.putInt(ProfilingSettings.PROP_OBJ_ALLOC_STACK_SAMPLING_INTERVAL, settings.getAllocTrackEvery());
+        pref.putBoolean(ProfilingSettings.PROP_RUN_GC_ON_GET_RESULTS_IN_MEMORY_PROFILING, settings.getRunGCOnGetResultsInMemoryProfiling());
+        
+        pref.putBoolean(ProfilingSettings.PROP_THREADS_SAMPLING_ENABLED, settings.getThreadsSamplingEnabled());
+    }
     
     // Properties --------------------------------------------------------------------------------------------------------
     
@@ -247,6 +330,48 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
 
     public boolean getDisplayLiveResultsMemory() {
         return getPreferences().getBoolean(LIVE_MEMORY_KEY, LIVE_MEMORY_DEFAULT);
+    }
+    
+    public void setShowNoDataHint(boolean value) {
+        getPreferences().putBoolean(NO_DATA_HINT_KEY, value);
+    }
+    
+    public boolean getShowNoDataHint() {
+        return getPreferences().getBoolean(NO_DATA_HINT_KEY, NO_DATA_HINT_DEFAULT);
+    }
+    
+    public void setSnapshotWindowOpenPolicy(int policy) {
+        getPreferences().putInt(SNAPSHOT_WINDOW_OPEN_POLICY_KEY, policy);
+    }
+    
+    public int getSnapshotWindowOpenPolicy() {
+        return getPreferences().getInt(SNAPSHOT_WINDOW_OPEN_POLICY_KEY, SNAPSHOT_WINDOW_OPEN_DEFAULT);
+       
+    }
+    
+    public void setSnapshotWindowClosePolicy(int policy) {
+        getPreferences().putInt(SNAPSHOT_WINDOW_CLOSE_POLICY_KEY, policy);
+    }
+    
+    public int getSnapshotWindowClosePolicy() {
+        return getPreferences().getInt(SNAPSHOT_WINDOW_CLOSE_POLICY_KEY, SNAPSHOT_WINDOW_CLOSE_DEFAULT);
+       
+    }
+    
+    public void setEnableExpertSettings(boolean value) {
+        getPreferences().putBoolean(ENABLE_EXPERT_SETTINGS_KEY, value);
+    }
+    
+    public boolean getEnableExpertSettings() {
+        return getPreferences().getBoolean(ENABLE_EXPERT_SETTINGS_KEY, ENABLE_EXPERT_SETTINGS_DEFAULT);
+    }
+    
+    public void setLogProfilerStatus(boolean value) {
+        getPreferences().putBoolean(LOG_PROFILER_STATUS_KEY, value);
+    }
+    
+    public boolean getLogProfilerStatus() {
+        return getPreferences().getBoolean(LOG_PROFILER_STATUS_KEY, LOG_PROFILER_STATUS_DEFAULT);
     }
 
     /**

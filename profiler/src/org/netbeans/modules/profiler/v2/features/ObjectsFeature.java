@@ -43,13 +43,17 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -67,6 +71,7 @@ import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -74,6 +79,7 @@ import org.netbeans.modules.profiler.api.java.SourceClassInfo;
 import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.impl.WeakProcessor;
+import org.netbeans.modules.profiler.v2.ui.SettingsPanel;
 import org.netbeans.modules.profiler.v2.ui.TitledMenuSeparator;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -104,6 +110,7 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     private ObjectsFeatureModes.AllClassesMode allClassesMode;
     private ObjectsFeatureModes.ProjectClassesMode projectClassesMode;
     private ObjectsFeatureModes.SelectedClassesMode selectedClassesMode;
+    private ObjectsFeatureModes.CustomClassesMode definedClassesMode;
     
     
     private ObjectsFeature(ProfilerSession session) {
@@ -210,10 +217,25 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
             }
         };
         
+        if (ProfilerIDESettings.getInstance().getEnableExpertSettings()) {
+            definedClassesMode = new ObjectsFeatureModes.CustomClassesMode() {
+                String readFlag(String flag, String defaultValue) {
+                    return ObjectsFeature.this.readFlag(getID() + "_" + flag, defaultValue); // NOI18N
+                }
+                void storeFlag(String flag, String value) {
+                    ObjectsFeature.this.storeFlag(getID() + "_" + flag, value); // NOI18N
+                }
+                void settingsChanged() {
+                    ObjectsFeature.this.settingsChanged();
+                }
+            };
+        }
+        
 //        currentMode = allClassesMode;
         String _currentMode = readFlag(MODE_FLAG, allClassesMode.getID());
         if (projectClassesMode != null && _currentMode.equals(projectClassesMode.getID())) currentMode = projectClassesMode;
         else if (_currentMode.equals(selectedClassesMode.getID())) currentMode = selectedClassesMode;
+        else if (definedClassesMode != null && _currentMode.equals(definedClassesMode.getID())) currentMode = definedClassesMode;
         else currentMode = allClassesMode;
         
         appliedMode = currentMode;
@@ -285,6 +307,7 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
         if (allClassesMode != null) allClassesMode.confirmSettings();
         if (projectClassesMode != null) projectClassesMode.confirmSettings();
         if (selectedClassesMode != null) selectedClassesMode.confirmSettings();
+        if (definedClassesMode != null) definedClassesMode.confirmSettings();
     }
     
     private void settingsChanged() {
@@ -320,7 +343,7 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     
     public JPanel getSettingsUI() {
         if (settingsUI == null) {
-            settingsUI = new JPanel() {
+            settingsUI = new JPanel(new GridBagLayout()) {
                 public void setVisible(boolean visible) {
                     if (visible && getComponentCount() == 0) populateSettingsUI();
                     super.setVisible(visible);
@@ -343,10 +366,12 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     private void populateSettingsUI() {
         settingsUI.setOpaque(false);
         settingsUI.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        settingsUI.setLayout(new BoxLayout(settingsUI, BoxLayout.LINE_AXIS));
         
-        settingsUI.add(new JLabel(Bundle.ObjectsFeature_profileMode()));
-        settingsUI.add(Box.createHorizontalStrut(5));
+        GridBagConstraints c;
+        
+        JPanel profilePanel = new SettingsPanel();
+        profilePanel.add(new JLabel(Bundle.ObjectsFeature_profileMode()));
+        profilePanel.add(Box.createHorizontalStrut(5));
         
         // Mode button
         modeButton = new PopupButton(currentMode.getName()) {
@@ -363,21 +388,39 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
                 popup.add(new JRadioButtonMenuItem(selectedClassesMode.getName(), currentMode == selectedClassesMode) {
                     protected void fireActionPerformed(ActionEvent e) { setMode(selectedClassesMode); }
                 });
+                
+                if (definedClassesMode != null) popup.add(new JRadioButtonMenuItem(definedClassesMode.getName(), currentMode == definedClassesMode) {
+                    protected void fireActionPerformed(ActionEvent e) { setMode(definedClassesMode); }
+                });
             }
         };
-        settingsUI.add(modeButton);
+        profilePanel.add(modeButton);
+        
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.fill = GridBagConstraints.NONE;
+        c.insets = new Insets(0, 0, 0, 0);
+        c.anchor = GridBagConstraints.NORTHWEST;
+        settingsUI.add(profilePanel, c);
         
         // Settings container
-        settingsContainer = new JPanel(null);
-        settingsContainer.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
-        settingsContainer.setLayout(new BoxLayout(settingsContainer, BoxLayout.LINE_AXIS));
+        settingsContainer = new JPanel(new BorderLayout());
         settingsContainer.setOpaque(false);
-        settingsUI.add(settingsContainer);
+        c = new GridBagConstraints();
+        c.gridx = 1;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.fill = GridBagConstraints.VERTICAL;
+        c.insets = new Insets(0, 10, 0, 0);
+        c.anchor = GridBagConstraints.NORTHWEST;
+        settingsUI.add(settingsContainer, c);
         
-        JComponent modeUI = currentMode.getUI();
-        if (modeUI != null) settingsContainer.add(modeUI);
+        JPanel buttonsPanel = new SettingsPanel();
         
-        settingsUI.add(Box.createHorizontalGlue());
+        final Component space = Box.createHorizontalStrut(10);
+        buttonsPanel.add(space);
         
         // Apply button
         applyButton = new SmallButton(Bundle.ObjectsFeature_applyButton()) {
@@ -387,8 +430,20 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
                 submitChanges();
                 unpauseResults();
             }
+            public void setVisible(boolean visible) {
+                super.setVisible(visible);
+                space.setVisible(visible);
+            }
         };
-        settingsUI.add(applyButton);
+        buttonsPanel.add(applyButton);
+        
+        c = new GridBagConstraints();
+        c.gridx = 2;
+        c.gridy = 0;
+        c.fill = GridBagConstraints.NONE;
+        c.insets = new Insets(0, 0, 0, 0);
+        c.anchor = GridBagConstraints.NORTHEAST;
+        settingsUI.add(buttonsPanel, c);
         
         updateModeUI();
         updateApplyButton(getSession().getState());

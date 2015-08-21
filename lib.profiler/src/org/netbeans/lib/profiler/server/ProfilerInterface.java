@@ -199,6 +199,9 @@ public class ProfilerInterface implements CommonConstants {
                 } // ignore
             }
 
+            // reset loadedClassesArray so that next time it contains current loaded classes
+            loadedClassesArray = null;
+            loadedClassesLoaders = null;
             Classes.enableClassLoadHook();
 
             instrSpawnedThreads = cmd.getInstrSpawnedThreads();
@@ -532,7 +535,6 @@ public class ProfilerInterface implements CommonConstants {
         Threads.initialize();
         HeapDump.initialize(jdk15);
         ThreadDump.initialize(jdk15);
-        loadedClassesArray = null;
         ClassLoaderManager.initialize(profilerServer);
         ClassLoaderManager.addLoader(ClassLoader.getSystemClassLoader());
         reflectMethods = new WeakHashMap();

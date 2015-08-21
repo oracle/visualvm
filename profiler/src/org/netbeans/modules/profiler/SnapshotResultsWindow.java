@@ -454,17 +454,17 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             ExportUtils.Exportable exporter = ResultsManager.getDefault().createSnapshotExporter(snapshot);
             
             final SnapshotCPUView _cpuSnapshot = new SnapshotCPUView(s, sampling, aSave, aCompare, aInfo, exporter) {
-                public boolean showSourceSupported() {
+                protected boolean showSourceSupported() {
                     return GoToSource.isAvailable();
                 }
-                public void showSource(ClientUtils.SourceCodeSelection value) {
+                protected void showSource(ClientUtils.SourceCodeSelection value) {
                     Lookup.Provider project = snapshot.getProject();
                     String className = value.getClassName();
                     String methodName = value.getMethodName();
                     String methodSig = value.getMethodSignature();
                     GoToSource.openSource(project, className, methodName, methodSig);
                 }
-                public void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
+                protected void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
                     RequestProcessor.getDefault().post(new Runnable() {
                         public void run() {
                             Lookup.Provider project = snapshot.getProject();
@@ -515,17 +515,17 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             ExportUtils.Exportable exporter = ResultsManager.getDefault().createSnapshotExporter(snapshot);
             
             final SnapshotMemoryView _memorySnapshot = new SnapshotMemoryView(s, filter, aSave, aCompare, aInfo, exporter) {
-                public boolean showSourceSupported() {
+                protected boolean showSourceSupported() {
                     return GoToSource.isAvailable();
                 }
-                public void showSource(ClientUtils.SourceCodeSelection value) {
+                protected void showSource(ClientUtils.SourceCodeSelection value) {
                     Lookup.Provider project = snapshot.getProject();
                     String className = value.getClassName();
                     String methodName = value.getMethodName();
                     String methodSig = value.getMethodSignature();
                     GoToSource.openSource(project, className, methodName, methodSig);
                 }
-                public void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
+                protected void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
                     RequestProcessor.getDefault().post(new Runnable() {
                         public void run() {
                             Lookup.Provider project = snapshot.getProject();

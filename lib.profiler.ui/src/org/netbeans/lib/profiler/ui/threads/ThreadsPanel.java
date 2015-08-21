@@ -287,6 +287,9 @@ public class ThreadsPanel extends DataView {
                     popup.addSeparator();
                 }
                 
+                popup.add(createCopyMenuItem());
+                popup.addSeparator();
+                
                 popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
                     protected void fireActionPerformed(ActionEvent e) { activateFilter(); }
                 });
