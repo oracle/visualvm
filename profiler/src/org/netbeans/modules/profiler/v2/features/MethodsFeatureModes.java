@@ -119,7 +119,7 @@ import org.openide.util.NbBundle;
     "MethodsFeatureModes_includeCalls=Include outgoing calls:",
     "MethodsFeatureModes_excludeCalls=Exclude outgoing calls:",
     "MethodsFeatureModes_classesHint=org.mypackage.**\norg.mypackage.*\norg.mypackage.MyClass",
-    "MethodsFeatureModes_filterHint=org.mypackage.*\norg.mypackage.MyClass"
+    "MethodsFeatureModes_filterHint=<empty>\norg.mypackage.*\norg.mypackage.MyClass"
 })
 final class MethodsFeatureModes {
     
@@ -661,7 +661,7 @@ final class MethodsFeatureModes {
                 assert SwingUtilities.isEventDispatchThread();
                 
                 if (classesArea.showsHint() || classesArea.getText().trim().isEmpty()) return false;
-                if (filterArea.showsHint() || filterArea.getText().trim().isEmpty()) return false;
+//                if (filterArea.showsHint() || filterArea.getText().trim().isEmpty()) return false;
                 
                 return true;
             }
