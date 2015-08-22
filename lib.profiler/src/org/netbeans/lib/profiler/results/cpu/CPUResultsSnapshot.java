@@ -57,8 +57,10 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.FilterSortSupport;
+import org.netbeans.lib.profiler.utils.Wildcards;
 
 
 /**
@@ -262,6 +264,19 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         } else {
             return new String[] { instrMethodClassesViews[view][methodId], null, null };
         }
+    }
+    
+    public ClientUtils.SourceCodeSelection getSourceCodeSelection(int methodId, int view) {
+        String[] sel = getMethodClassNameAndSig(methodId, view);
+        return sel[1] != null ? new ClientUtils.SourceCodeSelection(sel[0], sel[1], sel[2]):
+                         new ClientUtils.SourceCodeSelection(sel[0], Wildcards.ALLWILDCARD, null);
+    }
+    
+    public Map<Integer, ClientUtils.SourceCodeSelection> getMethodIDMap(int view) {
+        Map<Integer, ClientUtils.SourceCodeSelection> map = new HashMap();
+        for (int i = 0; i < instrMethodClassesViews[view].length; i++)
+            map.put(i, getSourceCodeSelection(i, view));
+        return map;
     }
 
     public int getNInstrMethods() {

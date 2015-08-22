@@ -200,12 +200,13 @@ public abstract class PrestimeCPUCCTNode extends CCTNode implements Cloneable {
             List<CCTNode> ch = new ArrayList();
             
             // Include current children
-            if (children != null) for (PrestimeCPUCCTNode child : children)
+            PrestimeCPUCCTNode[] _children = (PrestimeCPUCCTNode[])getChildren();
+            if (_children != null) for (PrestimeCPUCCTNode child : _children)
                     ch.add(child.createCopy());
             
             // Add or merge new children
-            PrestimeCPUCCTNode[] _children = (PrestimeCPUCCTNode[])node.getChildren();
-            if (_children != null) for (PrestimeCPUCCTNode child : _children) {
+            PrestimeCPUCCTNode[] __children = (PrestimeCPUCCTNode[])node.getChildren();
+            if (__children != null) for (PrestimeCPUCCTNode child : __children) {
                 if (child != null && !child.isSelfTimeNode()) {
                     int idx = ch.indexOf(child);
                     if (idx == -1) ch.add(child.createCopy());

@@ -43,8 +43,11 @@
 package org.netbeans.lib.profiler.results.cpu;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.CCTNode;
 
 /**
@@ -111,6 +114,15 @@ public class CPUResultsDiff extends CPUResultsSnapshot {
     public String[] getMethodClassNameAndSig(int methodId, int view) {
         return methodId < 0 ? snapshot2.getMethodClassNameAndSig(-methodId, view) :
                               snapshot1.getMethodClassNameAndSig(methodId, view);
+    }
+    
+    public Map<Integer, ClientUtils.SourceCodeSelection> getMethodIDMap(int view) {
+        Map<Integer, ClientUtils.SourceCodeSelection> map = new HashMap();
+        for (int i = 0; i < snapshot1.instrMethodClassesViews[view].length; i++)
+            map.put(i, snapshot1.getSourceCodeSelection(i, view));
+        for (int i = 0; i < snapshot2.instrMethodClassesViews[view].length; i++)
+            map.put(-i, snapshot2.getSourceCodeSelection(i, view));
+        return map;
     }
 
     // Not used for diff

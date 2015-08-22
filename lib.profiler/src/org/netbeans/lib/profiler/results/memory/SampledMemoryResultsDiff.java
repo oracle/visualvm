@@ -142,9 +142,9 @@ public class SampledMemoryResultsDiff extends SampledMemoryResultsSnapshot {
         s2nClasses = Math.min(s2nClasses, snapshot2.getObjectsSizePerClass().length);
 
         // temporary cache for creating diff
-        HashMap classNamesIdxMap = new HashMap(s1nClasses);
-        ArrayList objCountsArr = new ArrayList(s1nClasses);
-        ArrayList objSizesArr = new ArrayList(s1nClasses);
+        HashMap<String, Integer> classNamesIdxMap = new HashMap(s1nClasses);
+        ArrayList<Integer> objCountsArr = new ArrayList(s1nClasses);
+        ArrayList<Long> objSizesArr = new ArrayList(s1nClasses);
 
         // fill the cache with negative values from snapshot1
         String[] s1ClassNames = snapshot1.getClassNames();
@@ -152,20 +152,15 @@ public class SampledMemoryResultsDiff extends SampledMemoryResultsSnapshot {
         long[] s1ObjectsSizes = snapshot1.getObjectsSizePerClass();
 
         for (int i = 0; i < s1nClasses; i++) {
-            Integer classIdx = (Integer) classNamesIdxMap.get(s1ClassNames[i]);
+            Integer classIdx = classNamesIdxMap.get(s1ClassNames[i]);
 
             if (classIdx != null) { // duplicate classname - add objCountsArr and objSizesArr to original classname
-
-                int index = classIdx.intValue();
-                Integer objCount = (Integer) objCountsArr.get(index);
-                Long objSize = (Long) objSizesArr.get(index);
-
-                objCountsArr.set(index, Integer.valueOf(objCount.intValue() - s1ObjectsCount[i]));
-                objSizesArr.set(index, new Long(objSize.longValue() - s1ObjectsSizes[i]));
+                objCountsArr.set(classIdx, objCountsArr.get(classIdx) - s1ObjectsCount[i]);
+                objSizesArr.set(classIdx, objSizesArr.get(classIdx) - s1ObjectsSizes[i]);
             } else {
-                classNamesIdxMap.put(s1ClassNames[i], Integer.valueOf(objCountsArr.size()));
-                objCountsArr.add(Integer.valueOf(0 - s1ObjectsCount[i]));
-                objSizesArr.add(new Long(0 - s1ObjectsSizes[i]));
+                classNamesIdxMap.put(s1ClassNames[i], objCountsArr.size());
+                objCountsArr.add(-s1ObjectsCount[i]);
+                objSizesArr.add(-s1ObjectsSizes[i]);
             }
         }
 
@@ -175,29 +170,23 @@ public class SampledMemoryResultsDiff extends SampledMemoryResultsSnapshot {
         long[] s2ObjectsSizes = snapshot2.getObjectsSizePerClass();
 
         for (int i = 0; i < s2nClasses; i++) {
-            String className = s2ClassNames[i];
             int objectsCount = s2ObjectsCount[i];
-            long objectsSize = s2ObjectsSizes[i];
-
-            Integer classIdx = (Integer) classNamesIdxMap.get(className);
-            int classIndex;
+            Integer classIdx = classNamesIdxMap.get(s2ClassNames[i]);
 
             if (classIdx != null) {
                 // class already present in snapshot1
-                classIndex = classIdx.intValue();
-
-                if ((objectsCount != 0) || (((Integer) objCountsArr.get(classIndex)).intValue() != 0)) { // Do not add classes not displayed in compared snapshots (zero instances number)
-                    objCountsArr.set(classIndex, Integer.valueOf(((Integer) objCountsArr.get(classIndex)).intValue() + objectsCount));
-                    objSizesArr.set(classIndex, new Long(((Long) objSizesArr.get(classIndex)).longValue() + objectsSize));
+                if (objectsCount != 0 || objCountsArr.get(classIdx) != 0) { // Do not add classes not displayed in compared snapshots (zero instances number)
+                    objCountsArr.set(classIdx, objCountsArr.get(classIdx) + objectsCount);
+                    objSizesArr.set(classIdx, objSizesArr.get(classIdx) + s2ObjectsSizes[i]);
                 } else {
-                    classNamesIdxMap.remove(className); // Remove classname that should not be displayed
+                    classNamesIdxMap.remove(s2ClassNames[i]); // Remove classname that should not be displayed
                 }
             } else {
                 // class not present in snapshot1
                 if (objectsCount != 0) { // Do not add classes not displayed in compared snapshots (zero instances number)
-                    classNamesIdxMap.put(className, Integer.valueOf(objCountsArr.size()));
-                    objCountsArr.add(Integer.valueOf(objectsCount));
-                    objSizesArr.add(new Long(objectsSize));
+                    classNamesIdxMap.put(s2ClassNames[i], objCountsArr.size());
+                    objCountsArr.add(objectsCount);
+                    objSizesArr.add(s2ObjectsSizes[i]);
                 }
             }
         }
@@ -210,17 +199,16 @@ public class SampledMemoryResultsDiff extends SampledMemoryResultsSnapshot {
         minObjectsSizePerClassDiff = Long.MAX_VALUE;
         maxObjectsSizePerClassDiff = Long.MIN_VALUE;
 
-        Iterator classNamesIter = classNamesIdxMap.entrySet().iterator();
+        Iterator<Map.Entry<String, Integer>> classNamesIter = classNamesIdxMap.entrySet().iterator();
         int index = 0;
 
         while (classNamesIter.hasNext()) {
-            Map.Entry entry = (Map.Entry) classNamesIter.next();
-            String className = (String) entry.getKey();
-            int classIndex = ((Integer) entry.getValue()).intValue();
+            Map.Entry<String, Integer> entry = classNamesIter.next();
+            int classIndex =  entry.getValue();
 
-            classNames[index] = className;
-            objectsCounts[index] = ((Integer) objCountsArr.get(classIndex)).intValue();
-            objectsSizePerClass[index] = ((Long) objSizesArr.get(classIndex)).longValue();
+            classNames[index] = entry.getKey();
+            objectsCounts[index] = objCountsArr.get(classIndex);
+            objectsSizePerClass[index] = objSizesArr.get(classIndex);
 
             minObjectsSizePerClassDiff = Math.min(minObjectsSizePerClassDiff, objectsSizePerClass[index]);
             maxObjectsSizePerClassDiff = Math.max(maxObjectsSizePerClassDiff, objectsSizePerClass[index]);
