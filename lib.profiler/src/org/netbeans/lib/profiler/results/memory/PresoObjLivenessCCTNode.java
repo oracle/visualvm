@@ -43,8 +43,6 @@
 
 package org.netbeans.lib.profiler.results.memory;
 
-import java.text.NumberFormat;
-import java.util.Locale;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.CCTNode;
@@ -68,7 +66,7 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
     public static final int SORT_BY_NAME = 6;
     public static final int SORT_BY_TOTAL_ALLOC_OBJ = 7;
     private static boolean dontShowZeroLiveObjNodes;
-    public final NumberFormat decimalFormat = NumberFormat.getInstance(Locale.ENGLISH);
+//    public final NumberFormat decimalFormat = NumberFormat.getInstance(Locale.ENGLISH);
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -413,7 +411,7 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
         result.append(quote).append(totalObjSize).append(quote).append(separator);
         result.append(quote).append(nLiveObjects).append(quote).append(separator);
         result.append(quote).append(nCalls).append(quote).append(separator);
-        result.append(quote).append(decimalFormat.format(avgObjectAge)).append(quote).append(separator);
+//        result.append(quote).append(decimalFormat.format(avgObjectAge)).append(quote).append(separator);
         result.append(quote).append(survGen).append(quote).append(separator);
         result.append(quote).append((getParent()==null)?("none"):(((PresoObjAllocCCTNode)getParent()).getNodeName())).append(newLine); // NOI18N
         eDD.dumpData(result); //dumps the current row
@@ -426,7 +424,7 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
     }
 
     public void setDecimalFormat() {
-        decimalFormat.setMinimumFractionDigits(3);
-        decimalFormat.setMaximumFractionDigits(3);
+//        decimalFormat.setMinimumFractionDigits(3);
+//        decimalFormat.setMaximumFractionDigits(3);
     }
 }

@@ -303,7 +303,7 @@ public final class ExportUtils {
                 for (ExportProvider provider : providers) {
                     FormatFilter format = provider.getFormatFilter();
                     if (filter.equals(format)) {
-                        targetFile = checkFileExtesion(targetFile, format.getExtension());
+                        targetFile = checkFileExtension(targetFile, format.getExtension());
                         if (checkFileExists(targetFile)) provider.export(targetFile);
                         else showExportDialog(fileChooser, parent, providers);
                         break;
@@ -318,7 +318,7 @@ public final class ExportUtils {
                                        MSG_OVERWRITE_FILE, TITLE_OVERWRITE_FILE);
     }
     
-    public static File checkFileExtesion(File file, String extension) {
+    public static File checkFileExtension(File file, String extension) {
         if (file.getName().endsWith(extension)) return file;
         return new File(file.getPath() + extension);
     }
