@@ -52,7 +52,9 @@ import org.openide.windows.TopComponent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
@@ -75,10 +77,9 @@ import org.openide.filesystems.FileUtil;
 public class HeapWalkerManager {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private java.util.Set dumpsBeingDeleted = new java.util.HashSet();
+    private Set dumpsBeingDeleted = new HashSet();
     private List<File> heapDumps = new ArrayList();
     private List<HeapWalker> heapWalkers = new ArrayList();
-    private List<TopComponent> topComponents = new ArrayList();
 
     final private RequestProcessor heapwalkerRp = new RequestProcessor(HeapWalkerManager.class);
 
@@ -101,15 +102,17 @@ public class HeapWalkerManager {
         return getHeapWalker(file) != null;
     }
 
-    public synchronized void closeAllHeapWalkers() {
-        HeapWalker[] heapWalkerArr = heapWalkers.toArray(new HeapWalker[heapWalkers.size()]);
-
+    public void closeAllHeapWalkers() {
+        HeapWalker[] heapWalkerArr;
+        synchronized (this) {
+            heapWalkerArr = heapWalkers.toArray(new HeapWalker[heapWalkers.size()]);
+        }
         for (HeapWalker hw : heapWalkerArr) {
             closeHeapWalker(hw);
         }
     }
 
-    public synchronized void closeHeapWalker(final HeapWalker hw) {
+    public void closeHeapWalker(final HeapWalker hw) {
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     final TopComponent tc = getTopComponent(hw);
@@ -151,7 +154,6 @@ public class HeapWalkerManager {
         final File file = hw.getHeapDumpFile();
         heapDumps.remove(file);
         heapWalkers.remove(hw);
-        topComponents.remove(tc);
 
         if (dumpsBeingDeleted.remove(file)) {
             BrowserUtils.performTask(new Runnable() {
@@ -163,35 +165,43 @@ public class HeapWalkerManager {
         }
     }
 
-    public synchronized void openHeapWalker(final File heapDump) {
-        HeapWalker hw = getHeapWalker(heapDump);
-
-        if (hw == null) {
-            try {
-                hw = new HeapWalker(heapDump);
-            } catch (IOException e) {
-                ProfilerDialogs.displayError(Bundle.HeapWalkerManager_CannotOpenHeapWalkerMsg(e.getLocalizedMessage()));
-            } catch (Exception e) {
-                Logger.getLogger(HeapWalkerManager.class.getName()).log(Level.SEVERE, null, e);
-            }
+    public void openHeapWalker(final File heapDump) {
+        String heapDumpPath;
+        
+        try {
+            heapDumpPath = heapDump.getCanonicalPath();
+        } catch (IOException ex) {
+            ProfilerDialogs.displayError(Bundle.HeapWalkerManager_CannotOpenHeapWalkerMsg(ex.getLocalizedMessage()));
+            return;
         }
+        synchronized (heapDumpPath.intern()) {
+            HeapWalker hw = getHeapWalker(heapDump);
 
-        if (hw != null) {
-            openHeapWalker(hw);
-        } else {
-            ProfilerLogger.severe("Cannot create HeapWalker [" + heapDump + "]"); // NOI18N
+            if (hw == null) {
+                try {
+                    hw = new HeapWalker(heapDump);
+                } catch (IOException e) {
+                    ProfilerDialogs.displayError(Bundle.HeapWalkerManager_CannotOpenHeapWalkerMsg(e.getLocalizedMessage()));
+                } catch (Exception e) {
+                    Logger.getLogger(HeapWalkerManager.class.getName()).log(Level.SEVERE, null, e);
+                }
+            }
+
+            if (hw != null) {
+                openHeapWalker(hw);
+            } else {
+                ProfilerLogger.severe("Cannot create HeapWalker [" + heapDump + "]"); // NOI18N
+            }
         }
     }
 
     public synchronized void openHeapWalker(final HeapWalker hw) {
+        if (!heapWalkers.contains(hw)) {
+            heapDumps.add(hw.getHeapDumpFile());
+            heapWalkers.add(hw);
+        }
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    if (!heapWalkers.contains(hw)) {
-                        heapDumps.add(hw.getHeapDumpFile());
-                        heapWalkers.add(hw);
-                        topComponents.add(hw.getTopComponent());
-                    }
-
                     final TopComponent tc = getTopComponent(hw);
 
                     if (tc == null) {
@@ -218,22 +228,15 @@ public class HeapWalkerManager {
         }
     }
 
-    private HeapWalker getHeapWalker(File heapDump) {
+    private synchronized HeapWalker getHeapWalker(File heapDump) {
         int hdIndex = heapDumps.indexOf(heapDump);
 
         return (hdIndex == -1) ? null : heapWalkers.get(hdIndex);
     }
 
-    private HeapWalker getHeapWalker(TopComponent tc) {
-        int tcIndex = topComponents.indexOf(tc);
-
-        return (tcIndex == -1) ? null : heapWalkers.get(tcIndex);
-    }
-
     private TopComponent getTopComponent(HeapWalker hw) {
-        int hwIndex = heapWalkers.indexOf(hw);
-
-        return (hwIndex == -1) ? null : topComponents.get(hwIndex);
+        assert SwingUtilities.isEventDispatchThread();
+        return hw.getTopComponent();
     }
 
     private void deleteHeapDumpImpl(final File file, final int retries) {

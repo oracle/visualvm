@@ -54,7 +54,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.heap.HeapProgress;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
@@ -136,7 +135,7 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
             ChangeListener cl = null;
             
             try {
-                pHandle = ProgressHandleFactory.createHandle(Bundle.InstanceNode_References());
+                pHandle = ProgressHandle.createHandle(Bundle.InstanceNode_References());
                 pHandle.setInitialDelay(200);
                 pHandle.start(HeapProgress.PROGRESS_MAX);
 

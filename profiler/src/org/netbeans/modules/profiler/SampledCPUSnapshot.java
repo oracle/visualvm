@@ -50,7 +50,6 @@ import java.lang.management.ThreadInfo;
 import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
@@ -379,13 +378,13 @@ public final class SampledCPUSnapshot {
     }
 
     private boolean isRegular(PrestimeCPUCCTNode n) {
-        return n.getThreadId() != -1 && n.getMethodId() != 0 && !n.isFiltered();
+        return !n.isThreadNode() && !n.isFiltered();
     }
 
     private void initSamples() throws IOException {
         SamplesInputStream stream = new SamplesInputStream(npssFile.getInputStream());
         int samplesGuess = (int)(npssFile.getSize()/130);
-        ProgressHandle ph = ProgressHandleFactory.createSystemHandle("Computing snapshot samples");
+        ProgressHandle ph = ProgressHandle.createSystemHandle("Computing snapshot samples", null);
         ph.start(samplesGuess);
         
         for(ThreadsSample s = stream.readSample(); s != null; s = stream.readSample()) {

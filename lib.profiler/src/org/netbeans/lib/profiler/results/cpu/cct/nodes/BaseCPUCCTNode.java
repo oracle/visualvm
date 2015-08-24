@@ -52,11 +52,20 @@ import org.netbeans.lib.profiler.results.RuntimeCCTNode;
  */
 public abstract class BaseCPUCCTNode implements RuntimeCPUCCTNode {
     
-    private static RuntimeCCTNode[] EMPTY_CHILDREN = new RuntimeCCTNode[0];    
+    private static final RuntimeCCTNode[] EMPTY_CHILDREN = new RuntimeCCTNode[0];    
     
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private RuntimeCPUCCTNode[] children;
+    /** Children nodes in the RuntimeCPUCCTNode tree. This field can have three different values depending on the
+     * number of children:
+     *   null if there are no children
+     *   instance of RuntimeCPUCCTNode if there is exactly one child
+     *   instance of RuntimeCPUCCTNode[] if there are multiple children
+     * This is purely a memory consumption optimization, which typically saves about 50% of memory, since a lot of
+     * RuntimeCPUCCTNode trees are a sequence of single-child nodes, and in such case we remove the need to 
+     * create a one-item array.
+     */
+    private Object children;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -69,18 +78,23 @@ public abstract class BaseCPUCCTNode implements RuntimeCPUCCTNode {
     public RuntimeCCTNode[] getChildren() {
         if (children == null) {
             return EMPTY_CHILDREN;
+        } else if (children instanceof RuntimeCPUCCTNode) {
+            return new RuntimeCPUCCTNode[]{(RuntimeCPUCCTNode)children};
         }
-        return children;
+        return (RuntimeCPUCCTNode[])children;
     }
 
     public void attachNodeAsChild(RuntimeCPUCCTNode node) {
         if (children == null) {
-            children = new RuntimeCPUCCTNode[1];
+            children = node;
+        } else if (children instanceof RuntimeCPUCCTNode) {
+            children = new RuntimeCPUCCTNode[]{(RuntimeCPUCCTNode)children,node};
         } else {
-            RuntimeCPUCCTNode[] newChildren = new RuntimeCPUCCTNode[children.length+1];
-            System.arraycopy(children, 0, newChildren, 0, children.length);
+            RuntimeCPUCCTNode[] ch = (RuntimeCPUCCTNode[]) children;
+            RuntimeCPUCCTNode[] newChildren = new RuntimeCPUCCTNode[ch.length+1];
+            System.arraycopy(ch, 0, newChildren, 0, ch.length);
+            newChildren[newChildren.length-1] = node;
             children = newChildren;
         }
-        children[children.length-1] = node;
     }
 }

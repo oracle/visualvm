@@ -65,6 +65,7 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(GeneralIcons.CLEAR_FILTER_HIGHL, "clearFilterHighl.png");
         cache.put(GeneralIcons.CLOSE_PANEL, "closePanel.png");
         cache.put(GeneralIcons.FILTER_CONTAINS, "filterContains.png");
+        cache.put(GeneralIcons.FILTER_NOT_CONTAINS, "filterNotContains.png");
         cache.put(GeneralIcons.FILTER_ENDS_WITH, "filterEndsWith.png");
         cache.put(GeneralIcons.FILTER_REG_EXP, "filterRegExp.png");
         cache.put(GeneralIcons.FILTER_STARTS_WITH, "filterStartsWith.png");
@@ -114,6 +115,7 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(GeneralIcons.BADGE_ADD, "badgeAdd.png");
         cache.put(GeneralIcons.BADGE_REMOVE, "badgeRemove.png");
         cache.put(GeneralIcons.RENAME, "rename.png");
+        cache.put(GeneralIcons.MATCH_CASE, "matchCase.png");
         
         cache.put(ProfilerIcons.NODE_FORWARD, "forwardNode.png");
         cache.put(ProfilerIcons.NODE_REVERSE, "reverseNode.png");

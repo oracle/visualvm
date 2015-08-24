@@ -53,7 +53,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.ProfilerLogger;
@@ -567,7 +566,7 @@ public final class ResultsManager {
                 return;
             }
         }
-        final ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.MSG_SavingSnapshots());
+        final ProgressHandle ph = ProgressHandle.createHandle(Bundle.MSG_SavingSnapshots());
         ph.setInitialDelay(500);
         ph.start();
         ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
@@ -747,6 +746,27 @@ public final class ResultsManager {
             LOGGER.log(Level.SEVERE, Bundle.ResultsManager_ObtainSavedSnapshotsFailedMsg(e.getMessage()), e);            
         }
         return false;
+    }
+    
+    public int getSnapshotsCountFor(Lookup.Provider project) {
+        int count = 0;
+        try {
+            FileObject snapshotsFolder = ProfilerStorage.getProjectFolder(project, false);
+            FileObject[] children;
+            
+            if (snapshotsFolder == null) {
+                return count;
+            }
+            snapshotsFolder.refresh();
+            children = snapshotsFolder.getChildren();
+            for (FileObject child : children) {
+                if (child.getExt().equalsIgnoreCase(SNAPSHOT_EXTENSION) ||
+                    checkHprofFile(FileUtil.toFile(child))) count++;
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, Bundle.ResultsManager_ObtainSavedSnapshotsFailedMsg(e.getMessage()), e);            
+        }
+        return count;
     }
     
     public LoadedSnapshot loadSnapshot(FileObject selectedFile) {

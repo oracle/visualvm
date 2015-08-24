@@ -47,7 +47,6 @@ import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.ui.NBSwingWorker;
@@ -76,7 +75,7 @@ class SaveSnapshotAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent e) {
         new NBSwingWorker() {
-            final private ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.MSG_SavingSnapshot());
+            final private ProgressHandle ph = ProgressHandle.createHandle(Bundle.MSG_SavingSnapshot());
             @Override
             protected void doInBackground() {
                 ph.setInitialDelay(500);

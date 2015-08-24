@@ -42,7 +42,6 @@
 package org.netbeans.modules.profiler;
 
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.event.SimpleProfilingStateAdapter;
 import org.netbeans.lib.profiler.global.CommonConstants;
@@ -90,7 +89,7 @@ class ServerStateMonitor {
             int serverProgress = profiler.getServerProgress();
             int serverState = profiler.getServerState();
             if (progressHandle == null) {
-                progressHandle = ProgressHandleFactory.createHandle(Bundle.ServerStateMonitor_ProfilerBusy());
+                progressHandle = ProgressHandle.createHandle(Bundle.ServerStateMonitor_ProfilerBusy());
                 if (serverProgress == CommonConstants.SERVER_PROGRESS_INDETERMINATE) {
                     progressHandle.start();
                 } else {

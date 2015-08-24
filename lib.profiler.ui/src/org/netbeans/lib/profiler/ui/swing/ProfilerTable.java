@@ -49,6 +49,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -58,6 +60,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -71,6 +74,8 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -859,6 +864,44 @@ public class ProfilerTable extends JTable {
     
     protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
         // Implementation here
+    }
+    
+    public final JMenuItem createCopyMenuItem() {
+        final int row = getSelectedRow();
+        
+        JMenu copyItem = new JMenu(BUNDLE().getString("ProfilerTable_CopyMenu")); // NOI118N
+        
+        JMenuItem copyRowItem = new JMenuItem(BUNDLE().getString("ProfilerTable_CopyRowItem")) { // NOI118N
+            protected void fireActionPerformed(ActionEvent e) {
+                StringBuilder val = new StringBuilder();
+                List<TableColumn> columns = Collections.list(_getColumnModel().getColumns());
+                for (int col = 0; col < columns.size(); col++) if (columns.get(col).getWidth() > 0)
+                    val.append("\t").append(getStringValue(row, col)); // NOI118N
+                StringSelection s = new StringSelection(val.toString().trim());
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(s, s);
+            }
+        };
+        copyItem.add(copyRowItem);
+        
+        copyItem.addSeparator();
+        
+        String genericItemName = BUNDLE().getString("ProfilerTable_CopyColumnItem"); // NOI118N
+        List<TableColumn> columns = Collections.list(_getColumnModel().getColumns());
+        for (int col = 0; col < columns.size(); col++) {
+            final int _col = col;
+            TableColumn column = columns.get(col);
+            if (column.getWidth() > 0) {
+                String columnName = column.getHeaderValue().toString();
+                copyItem.add(new JMenuItem(MessageFormat.format(genericItemName, columnName)) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        StringSelection s = new StringSelection(getStringValue(row, _col));
+                        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(s, s);
+                    }
+                });
+            }
+        }
+        
+        return copyItem;
     }
     
     protected void popupShowing() {}

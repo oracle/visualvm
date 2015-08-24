@@ -74,7 +74,6 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
     
     public void configureSettings(ProfilingSettings settings) {
         settings.setThreadsMonitoringEnabled(true);
-        settings.setThreadsSamplingEnabled(false);
     }
     
     

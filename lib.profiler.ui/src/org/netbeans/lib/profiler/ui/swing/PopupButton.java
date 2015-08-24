@@ -70,7 +70,10 @@ public class PopupButton extends SmallButton {
     
     
     {
-        iconOffset = 7;
+        if (UIUtils.isMetalLookAndFeel()) iconOffset = 6;
+        else if (UIUtils.isNimbusLookAndFeel()) iconOffset = 8;
+        else iconOffset = 7;
+        
         setHorizontalAlignment(LEADING);
     }
     

@@ -112,6 +112,7 @@ public abstract class LiveCPUView extends JPanel {
     private long lastupdate;
     private volatile boolean paused;
     private volatile boolean forceRefresh;
+    private volatile boolean refreshIsRunning;
     
     @ServiceProvider(service=CPUCCTProvider.Listener.class)
     public static final class ResultsMonitor implements CPUCCTProvider.Listener {
@@ -156,8 +157,8 @@ public abstract class LiveCPUView extends JPanel {
     
     public ThreadsSelector createThreadSelector() {
         threadsSelector = new ThreadsSelector() {
-            public CPUResultsSnapshot getSnapshot() { return snapshot; }
-            public void selectionChanged(Collection<Integer> selected, boolean mergeThreads) {
+            protected CPUResultsSnapshot getSnapshot() { return snapshot; }
+            protected void selectionChanged(Collection<Integer> selected, boolean mergeThreads) {
                 mergedThreads = mergeThreads;
                 selectedThreads = selected;
                 setData();
@@ -181,6 +182,8 @@ public abstract class LiveCPUView extends JPanel {
 
     private void refreshData(RuntimeCCTNode appRootNode) throws ClientUtils.TargetAppOrVMTerminated {
         if ((lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis() || paused) && !forceRefresh) return;
+        if (refreshIsRunning) return;
+        refreshIsRunning = true;
         try {
             final CPUResultsSnapshot snapshotData =
                     client.getStatus().getInstrMethodClasses() == null ?
@@ -192,7 +195,9 @@ public abstract class LiveCPUView extends JPanel {
             lastupdate = System.currentTimeMillis();
             forceRefresh = false;
         } catch (CPUResultsSnapshot.NoDataAvailableException e) {
+            refreshIsRunning = false;
         } catch (Throwable t) {
+            refreshIsRunning = false;
             if (t instanceof ClientUtils.TargetAppOrVMTerminated) {
                 throw ((ClientUtils.TargetAppOrVMTerminated)t);
             } else {
@@ -204,6 +209,7 @@ public abstract class LiveCPUView extends JPanel {
     private void setData() {
         if (snapshot == null) {
             resetData();
+            refreshIsRunning = false;
         } else {
             final CPUResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
                                                  refSnapshot.createDiff(snapshot);
@@ -216,10 +222,14 @@ public abstract class LiveCPUView extends JPanel {
 
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    boolean diff = _snapshot instanceof CPUResultsDiff;
-                    forwardCallsView.setData(_snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled, diff);
-                    hotSpotsView.setData(flatData, idMap, sampled, diff);
-                    reverseCallsView.setData(_snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled, diff);
+                    try {
+                        boolean diff = _snapshot instanceof CPUResultsDiff;
+                        forwardCallsView.setData(_snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled, diff);
+                        hotSpotsView.setData(flatData, idMap, sampled, diff);
+                        reverseCallsView.setData(_snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled, diff);
+                    } finally {
+                        refreshIsRunning = false;
+                    }
                 }
             });
         }
@@ -262,15 +272,18 @@ public abstract class LiveCPUView extends JPanel {
     }
     
     
-    public abstract boolean showSourceSupported();
+    protected boolean profileMethodSupported() { return true; }
     
-    public abstract void showSource(ClientUtils.SourceCodeSelection value);
     
-    public abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
+    protected abstract boolean showSourceSupported();
     
-    public void popupShowing() {};
+    protected abstract void showSource(ClientUtils.SourceCodeSelection value);
     
-    public void popupHidden() {};
+    protected abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
+    
+    protected void popupShowing() {};
+    
+    protected void popupHidden() {};
     
     
     protected void foundInForwardCalls() {}
@@ -426,7 +439,7 @@ public abstract class LiveCPUView extends JPanel {
         }
         
         popup.add(new JMenuItem(CPUView.ACTION_PROFILE_METHOD) {
-            { setEnabled(userValue != null && CPUTableView.isSelectable(userValue)); }
+            { setEnabled(profileMethodSupported() && userValue != null && CPUTableView.isSelectable(userValue)); }
             protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
         });
         
@@ -445,7 +458,7 @@ public abstract class LiveCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = hotSpotsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         hotSpotsView.setVisible(true);
                         foundInHotSpots();
                         table.requestFocusInWindow();
@@ -457,7 +470,7 @@ public abstract class LiveCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = reverseCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         reverseCallsView.setVisible(true);
                         foundInReverseCalls();
                         table.requestFocusInWindow();
@@ -472,7 +485,7 @@ public abstract class LiveCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = forwardCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         forwardCallsView.setVisible(true);
                         foundInForwardCalls();
                         table.requestFocusInWindow();
@@ -484,7 +497,7 @@ public abstract class LiveCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = reverseCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         reverseCallsView.setVisible(true);
                         foundInReverseCalls();
                         table.requestFocusInWindow();
@@ -500,7 +513,7 @@ public abstract class LiveCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = forwardCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         forwardCallsView.setVisible(true);
                         foundInForwardCalls();
                         table.requestFocusInWindow();
@@ -512,7 +525,7 @@ public abstract class LiveCPUView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
                     ProfilerTable table = hotSpotsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString, true)) {
+                    if (SearchUtils.findString(table, searchString)) {
                         hotSpotsView.setVisible(true);
                         foundInHotSpots();
                         table.requestFocusInWindow();
@@ -520,6 +533,9 @@ public abstract class LiveCPUView extends JPanel {
                 }
             });
         }
+        
+        popup.addSeparator();
+        popup.add(invoker.createCopyMenuItem());
         
         popup.addSeparator();
         popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
