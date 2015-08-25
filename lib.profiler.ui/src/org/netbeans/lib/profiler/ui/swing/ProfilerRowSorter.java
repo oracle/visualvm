@@ -76,6 +76,11 @@ class ProfilerRowSorter extends TableRowSorter {
     private int secondarySortColumn;
     
     public void setSortKeys(List newKeys) {
+        if (newKeys == null) {
+            setSortKeysImpl(newKeys);
+            return;
+        }
+        
         RowSorter.SortKey oldKey = getSortKey();
         RowSorter.SortKey newKey = (RowSorter.SortKey)newKeys.get(0);
         
