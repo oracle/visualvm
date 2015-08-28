@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.client;
 
+import java.util.regex.Pattern;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.utils.formatting.DefaultMethodNameFormatter;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
@@ -62,9 +63,15 @@ public class ClientUtils implements CommonConstants {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     public static class SourceCodeSelection implements Cloneable {
+        
+        private static final Pattern P1 = Pattern.compile("$**", Pattern.LITERAL); // NOI18N
+        private static final Pattern P2 = Pattern.compile(".**", Pattern.LITERAL); // NOI18N
+        private static final Pattern P3 = Pattern.compile(".*", Pattern.LITERAL);  // NOI18N
+        
         //~ Instance fields ------------------------------------------------------------------------------------------------------
 
         String className;
+        String normalizedClassName;
         String methodName;
         String methodSignature;
         boolean isMarkerMethod;
@@ -107,6 +114,15 @@ public class ClientUtils implements CommonConstants {
         public String getClassName() {
             return className;
         }
+        
+        String getNormalizedClassName() {
+            if (normalizedClassName == null) {
+                normalizedClassName = P1.matcher(className).replaceAll(""); // NOI18N
+                normalizedClassName = P2.matcher(normalizedClassName).replaceAll(""); // NOI18N
+                normalizedClassName = P3.matcher(normalizedClassName).replaceAll(""); // NOI18N
+            }
+            return normalizedClassName;
+        }
 
         public int getEndLine() {
             return endLine;
@@ -145,8 +161,11 @@ public class ClientUtils implements CommonConstants {
         public Object clone() throws CloneNotSupportedException {
             SourceCodeSelection clone = (SourceCodeSelection) super.clone();
             clone.className = className;
+            clone.normalizedClassName = normalizedClassName;
             clone.methodName = methodName;
             clone.methodSignature = methodSignature;
+            clone.endLine = endLine;
+            clone.startLine = startLine;
 
             return clone;
         }
@@ -195,14 +214,15 @@ public class ClientUtils implements CommonConstants {
                 return false;
             }
 
-            // length of classNames needs to be the same
-            // normalizing the class name; result of #203446
-            String cn1 = this.className.replace("$**", "").replace(".**", "").replace(".*", ""); // NOI18N
-            // normalizing the class name; result of #203446
-            String cn2 = other.className.replace("$**", "").replace(".**", "").replace(".*", ""); // NOI18N
-            if (!cn1.equals(cn2)) {
-                return false;
-            }
+//            // length of classNames needs to be the same
+//            // normalizing the class name; result of #203446
+//            String cn1 = this.className.replace("$**", "").replace(".**", "").replace(".*", ""); // NOI18N
+//            // normalizing the class name; result of #203446
+//            String cn2 = other.className.replace("$**", "").replace(".**", "").replace(".*", ""); // NOI18N
+//            if (!cn1.equals(cn2)) {
+//                return false;
+//            }
+            if (!getNormalizedClassName().equals(other.getNormalizedClassName())) return false;
 
             if (this.methodName != null) {
                 if (!this.methodName.equals(other.methodName)) {
@@ -231,6 +251,7 @@ public class ClientUtils implements CommonConstants {
             int hashcode = 0;
             hashcode += (startLine + endLine);
             hashcode += className.hashCode();
+//            hashcode += getNormalizedClassName().hashCode(); // ??? Should further improve the performance but actually degrades it
             hashcode += ((methodName != null) ? methodName.hashCode() : 0);
             hashcode += ((methodSignature != null) ? methodSignature.hashCode() : 0);
 
@@ -243,7 +264,7 @@ public class ClientUtils implements CommonConstants {
             }
 
             boolean wildcard = className.endsWith("*"); // NOI18N
-            StringBuilder flattenedBuf = new StringBuilder(className.replace("$**", "").replace(".**", "").replace(".*", "")); // NOI18N
+            StringBuilder flattenedBuf = new StringBuilder(getNormalizedClassName());
 
             if (!wildcard && methodName != null && methodName.length() > 0 && !methodName.endsWith("*")) { //NOI18N
                 flattenedBuf.append('.').append(methodName);

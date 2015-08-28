@@ -138,7 +138,7 @@ public abstract class SnapshotMemoryView extends JPanel {
             }
         } else if (snapshot instanceof LivenessMemoryResultsSnapshot) {
             if (snapshot.containsStacks()) {
-                dataView = new LivenessTreeTableView(null) {
+                dataView = new LivenessTreeTableView(null, filter == null) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
@@ -148,7 +148,7 @@ public abstract class SnapshotMemoryView extends JPanel {
                 };
 //                supportsPackageAggregation = false;
             } else {
-                dataView = new LivenessTableView(null) {
+                dataView = new LivenessTableView(null, filter == null) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
