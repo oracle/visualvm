@@ -296,7 +296,7 @@ public abstract class LiveMemoryView extends JPanel {
             if (snapshot.containsStacks()) {
                 if (dataView instanceof LivenessTreeTableView) return;
                 
-                dataView = new LivenessTreeTableView(selection) {
+                dataView = new LivenessTreeTableView(selection, false) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
@@ -310,7 +310,7 @@ public abstract class LiveMemoryView extends JPanel {
             } else {
                 if (dataView instanceof LivenessTableView) return;
                 
-                dataView = new LivenessTableView(selection) {
+                dataView = new LivenessTableView(selection, false) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
