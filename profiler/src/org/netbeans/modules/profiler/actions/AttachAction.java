@@ -75,13 +75,8 @@ public final class AttachAction extends AbstractAction {
     private AttachAction() {
         putValue(Action.NAME, Bundle.LBL_AttachMainProjectAction());
         putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_AddRootMethodAction());
-        putValue(Action.SMALL_ICON, Icons.getIcon(ProfilerIcons.ATTACH));
-        putValue("iconBase", Icons.getResource(ProfilerIcons.ATTACH));
     }
     
-    @ActionID(id = "org.netbeans.modules.profiler.actions.AttachAction", category = "Profile")
-    @ActionRegistration(iconInMenu = true, displayName = "#LBL_AttachMainProjectAction", lazy=false)
-    @ActionReference(path = "Menu/Profile", position = 200)
     public static AttachAction getInstance() {
         return Singleton.INSTANCE;
     }
