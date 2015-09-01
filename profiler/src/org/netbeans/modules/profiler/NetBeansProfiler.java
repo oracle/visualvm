@@ -116,7 +116,6 @@ import org.netbeans.lib.profiler.ui.monitor.VMTelemetryModels;
 import org.netbeans.lib.profiler.wireprotocol.Command;
 import org.netbeans.lib.profiler.wireprotocol.Response;
 import org.netbeans.lib.profiler.wireprotocol.WireIO;
-import org.netbeans.modules.profiler.api.GestureSubmitter;
 import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
@@ -765,9 +764,6 @@ public abstract class NetBeansProfiler extends Profiler {
             // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
             logActionConfig("attachToApp", profilingSettings, null, attachSettings, sSettings.getInstrumentationFilter()); // NOI18N
             
-            GestureSubmitter.logAttach(getProfiledProject(), attachSettings);
-            GestureSubmitter.logConfig(profilingSettings, sSettings.getInstrumentationFilter());
-            
             changeStateTo(PROFILING_STARTED);
             
             cleanupBeforeProfiling(sSettings);
@@ -955,9 +951,6 @@ public abstract class NetBeansProfiler extends Profiler {
             // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
             logActionConfig("connectToStartedApp", profilingSettings, sessionSettings, null, sSettings.getInstrumentationFilter()); // NOI18N
             
-            GestureSubmitter.logProfileApp(getProfiledProject(), sessionSettings);
-            GestureSubmitter.logConfig(profilingSettings, sSettings.getInstrumentationFilter());
-            
             if (prepareProfilingSession(profilingSettings, sessionSettings)) {
                 RequestProcessor.getDefault().post(new Runnable() {
                     
@@ -1111,8 +1104,6 @@ public abstract class NetBeansProfiler extends Profiler {
         sharedSettings.setInstrumentObjectInit(true);
 
         logActionConfig("modifyCurrentProfiling", profilingSettings, null, null, sharedSettings.getInstrumentationFilter()); //NOI18N
-        
-        GestureSubmitter.logConfig(profilingSettings, sharedSettings.getInstrumentationFilter());
 
         setThreadsMonitoringEnabled(profilingSettings.getThreadsMonitoringEnabled());
         setLockContentionMonitoringEnabled(profilingSettings.getLockContentionMonitoringEnabled());
@@ -1211,9 +1202,6 @@ public abstract class NetBeansProfiler extends Profiler {
         //getThreadsManager().setSupportsSleepingStateMonitoring(
         // Platform.supportsThreadSleepingStateMonitoring(sharedSettings.getTargetJDKVersionString()));
         logActionConfig("profileClass", profilingSettings, sessionSettings, null, sSettings.getInstrumentationFilter()); //NOI18N
-
-        GestureSubmitter.logProfileClass(getProfiledProject(), sessionSettings);
-        GestureSubmitter.logConfig(profilingSettings, sSettings.getInstrumentationFilter());
 
         changeStateTo(PROFILING_STARTED);
 
