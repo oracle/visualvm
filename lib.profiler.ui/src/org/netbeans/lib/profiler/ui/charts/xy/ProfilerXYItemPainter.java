@@ -137,15 +137,11 @@ public class ProfilerXYItemPainter extends SynchronousXYItemPainter {
         }
 
         if (type == TYPE_RELATIVE) {
-            // TODO: probably does not work correctly in Threads & Classes graph
             return getViewBoundsRelative(dataBounds, item, context);
-
         } else {
-
             LongRect viewBounds = context.getViewRect(dataBounds);
             LongRect.addBorder(viewBounds, lineWidth);
             return viewBounds;
-
         }
     }
     
