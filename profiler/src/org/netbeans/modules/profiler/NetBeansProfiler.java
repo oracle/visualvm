@@ -158,8 +158,8 @@ import org.openide.windows.WindowManager;
     "NetBeansProfiler_ErrorSavingAttachSettingsMessage=Error encountered while saving attach settings: {0}",
     "NetBeansProfiler_CannotFindLibsMsg=Cannot find profiler libs directory",
     "NetBeansProfiler_EngineInitFailedMsg=Failed to initialize the Profiler engine: {0}",
-    "NetBeansProfiler_InitialCalibrationMsg=Profiler will now perform an initial calibration of your machine and target JVM.\n\nThis calibration needs to be performed the first time you run the profiler to\nensure that timing results are accurate when profiling your application. To\nensure the calibration data is accurate, please make sure that other\napplications are not placing a noticeable load on your machine at this time.\n\nYou can run the calibration again by choosing\n\"Profile | Advanced Commands | Manage Calibration Data\"\n\nWarning: If your computer uses dynamic CPU frequency switching, please\ndisable it and do not use it when  profiling.",
-    "NetBeansProfiler_MustCalibrateFirstMsg=Profiling will STOP now because the calibration data is missing or is corrupt.\n\nIf this is the first time you are using the profiler or target JVM on this machine,\nyou first need to run the calibration for your target JVM.\nThe obtained calibration data will be saved and re-used\non subsequent runs, so you will not see this message again.\n\nTo perform calibration, choose\n\"Profile | Advanced Commands | Manage Calibration Data\".\n\n",
+    "NetBeansProfiler_InitialCalibrationMsg=Profiler will now perform an initial calibration of your machine and target JVM.\n\nThis calibration needs to be performed the first time you run the profiler to\nensure that timing results are accurate when profiling your application. To\nensure the calibration data is accurate, please make sure that other\napplications are not placing a noticeable load on your machine at this time.\n\nYou can run the calibration again using\n\"Tools | Options | Java | Profiler | General | Manage calibration data\"\n\nWarning: If your computer uses dynamic CPU frequency switching, please\ndisable it and do not use it when profiling.",
+    "NetBeansProfiler_MustCalibrateFirstMsg=Profiling will STOP now because the calibration data is missing or is corrupt.\n\nIf this is the first time you are using the profiler or target JVM on this machine,\nyou first need to run the calibration for your target JVM.\nThe obtained calibration data will be saved and re-used\non subsequent runs, so you will not see this message again.\n\nTo perform calibration, use\n\"Tools | Options | Java | Profiler | General | Manage calibration data\".\n\n",
     "NetBeansProfiler_MustCalibrateFirstShortMsg=<html><b>Calibration data missing.</b><br><br>Profiling cannot be started on this JDK. Please perform<br>profiler calibration first and start the profiling session again.</html>",
     "NetBeansProfiler_TerminateVMOnExitMsg=<b>The profiled application has finished execution.</b>\n Press OK to terminate the VM.",
     "NetBeansProfiler_TakeSnapshotOnExitMsg=<b>The profiled application has finished execution.</b>\nDo you want to take a snapshot of the collected results?",
@@ -989,7 +989,7 @@ public abstract class NetBeansProfiler extends Profiler {
         }
         if (sessionSettings.getRemoteHost().isEmpty() && !CalibrationDataFileIO.validateCalibrationInput(
                 sessionSettings.getJavaVersionString(),sessionSettings.getJavaExecutable())) {
-            ProfilerDialogs.displayError(Bundle.NetBeansProfiler_MustCalibrateFirstMsg(), null, Bundle.NetBeansProfiler_MustCalibrateFirstShortMsg());
+            ProfilerDialogs.displayError(Bundle.NetBeansProfiler_MustCalibrateFirstShortMsg(), null, Bundle.NetBeansProfiler_MustCalibrateFirstMsg());
             changeStateTo(PROFILING_INACTIVE);
 
             return false; // failed, cannot proceed
