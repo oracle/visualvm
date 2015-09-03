@@ -59,9 +59,8 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
-import org.netbeans.lib.profiler.charts.ChartContext;
+import org.netbeans.lib.profiler.charts.swing.LongRect;
 import org.netbeans.lib.profiler.charts.swing.Utils;
-import org.netbeans.lib.profiler.charts.xy.XYItemSelection;
 
 /**
  *
@@ -179,14 +178,13 @@ public class ProfilerXYSelectionOverlay extends ChartOverlay {
 
     private static void updateSelectedValues(Set<Point> selectedValues,
                                              List<ItemSelection> selectedItems,
-                                             ChartContext context) {
+                                             ChartComponent chart) {
         selectedValues.clear();
         for (ItemSelection sel : selectedItems) {
-            XYItemSelection xySel = (XYItemSelection)sel;
-            long xValue = xySel.getItem().getXValue(xySel.getValueIndex());
-            long yValue = xySel.getItem().getYValue(xySel.getValueIndex());
-            selectedValues.add(new Point(Utils.checkedInt(Math.ceil(context.getViewX(xValue))),
-                                         Utils.checkedInt(Math.ceil(context.getViewY(yValue)))));
+            ProfilerXYItemPainter painter = (ProfilerXYItemPainter)chart.getPaintersModel().getPainter(sel.getItem());
+            LongRect bounds = painter.getSelectionBounds(sel, chart.getChartContext());
+            selectedValues.add(new Point(Utils.checkedInt(bounds.x + (bounds.width >> 2) + 1),
+                                         Utils.checkedInt(bounds.y + (bounds.height >> 2) + 1)));
         }
     }
 
@@ -200,7 +198,7 @@ public class ProfilerXYSelectionOverlay extends ChartOverlay {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         Set<Point> oldSelectedValues = new HashSet(selectedValues);
-                        updateSelectedValues(selectedValues, chart.getSelectionModel().getHighlightedItems(), chart.getChartContext());
+                        updateSelectedValues(selectedValues, chart.getSelectionModel().getHighlightedItems(), chart);
                         vLineBoundsChanged(oldSelectedValues, selectedValues);
                     }
                 });
@@ -219,7 +217,7 @@ public class ProfilerXYSelectionOverlay extends ChartOverlay {
         public void highlightedItemsChanged(List<ItemSelection> currentItems,
               List<ItemSelection> addedItems, List<ItemSelection> removedItems) {
             Set<Point> oldSelectedValues = new HashSet(selectedValues);
-            updateSelectedValues(selectedValues, currentItems, chart.getChartContext());
+            updateSelectedValues(selectedValues, currentItems, chart);
             vLineBoundsChanged(oldSelectedValues, selectedValues);
         }
 

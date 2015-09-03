@@ -116,7 +116,7 @@ import org.openide.windows.WindowManager;
     "ResultsManager_OverwriteFileDialogCaption=Overwrite Existing File?",
     "ResultsManager_OverwriteFileDialogMsg=The target folder already contains file {0}\n Do you want to overwrite this file?",
     "ResultsManager_FileDeleteFailedMsg=Cannot delete the existing file: {0}",
-    "ResultsManager_SnapshotExportFailedMsg=Failed to export snapshot: {0}",
+    "ResultsManager_SnapshotExportFailedMsg=<html><b>Failed to export snapshot:</b><br><br>{0}</html>",
     "ResultsManager_ExportSnapshotData=Export Snapshot Data",
     "ResultsManager_SelectFileOrDirDialogCaption=Select File or Directory",
     "ResultsManager_ProfilerSnapshotFileFilter=Profiler Snapshot File (*.{0})",
@@ -975,9 +975,10 @@ public final class ResultsManager {
                 Files.copy(sourceFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING,
                                                                      StandardCopyOption.COPY_ATTRIBUTES);
                 return true;
-            } catch (IOException ex) {
-                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-                ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotExportFailedMsg(ex.getMessage()));
+            } catch (Throwable t) {
+                LOGGER.log(Level.INFO, t.getMessage(), t);
+                String msg = t.getLocalizedMessage().replace("<", "&lt;").replace(">", "&gt;"); // NOI18N
+                ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotExportFailedMsg(msg));
                 return false;
             }
         } else {
@@ -1293,8 +1294,12 @@ public final class ResultsManager {
 
                 // extension will be used from source file
             } else { // extension exists
-                targetName = fName.substring(0, idx);
-                targetExt = fName.substring(idx + 1);
+                if (heapdump || fName.endsWith("." + targetExt)) { // NOI18N
+                    targetName = fName.substring(0, idx);
+                    targetExt = fName.substring(idx + 1);
+                } else {
+                    targetName = fName;
+                }
             }
         }
 
@@ -1330,8 +1335,10 @@ public final class ResultsManager {
         if (checkFileExists(new SelectedFile(targetFolder, fileName, fileExt))) {
             try {
                 FileUtil.copyFile(selectedSnapshot, targetFolder, fileName, fileExt);
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, Bundle.ResultsManager_SnapshotExportFailedMsg(e.getMessage()), e);
+            } catch (Throwable t) {
+                LOGGER.log(Level.INFO, t.getMessage(), t);
+                String msg = t.getLocalizedMessage().replace("<", "&lt;").replace(">", "&gt;"); // NOI18N
+                ProfilerDialogs.displayError(Bundle.ResultsManager_SnapshotExportFailedMsg(msg));
             }
         }
     }
