@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.server.system;
 
 import java.lang.management.ManagementFactory;
+import javax.management.JMRuntimeException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -66,6 +67,7 @@ public class Timers {
     private static long processCPUTimeMultiplier;
     private static int processorsCount;
     private static boolean processCPUTimeAttribute;
+    private static boolean initialized;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -94,6 +96,7 @@ public class Timers {
      * in nanoseconds.
      */
     public static long getProcessCpuTime() {
+        initializeProcessCPUTime();
         if (processCPUTimeAttribute) {
              try {
                  Long cputime = (Long)conn.getAttribute(osName,PROCESS_CPU_TIME_ATTR);
@@ -117,6 +120,15 @@ public class Timers {
     public static void initialize() {
         ManagementFactory.getThreadMXBean();
         getThreadCPUTimeInNanos();
+        initializeProcessCPUTime();
+    }
+
+    private static void initializeProcessCPUTime() {
+        if (initialized) {
+            return;
+        }
+
+        initialized = true;
         try {
             MBeanAttributeInfo[] attrs;
             
@@ -135,7 +147,13 @@ public class Timers {
                     Number mul = (Number) conn.getAttribute(osName,PROCESSING_CAPACITY_ATTR);
                     processCPUTimeMultiplier = mul.longValue();
                 }
-             }
+            }
+        } catch (JMRuntimeException ex) {
+            // Glassfish: if ManagementFactory.getPlatformMBeanServer() is called too early it will throw JMRuntimeException
+            // in such case initialization will be rerun later as part of getProcessCpuTime()
+            System.err.println(ex.getLocalizedMessage());
+            initialized = false;       
+            return;   
         } catch (Exception ex) {
             ex.printStackTrace();
         }

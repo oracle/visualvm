@@ -931,7 +931,11 @@ class HprofHeap implements Heap {
 
         //int time = dumpBuffer.getInt(start+1);
         long len = dumpBuffer.getInt(start + 1 + 4) & 0xFFFFFFFFL;  // len is unsigned int
-        offset[0] = start + 1 + 4 + 4 + len;
+        if (len == 0) {
+            offset[0] = -1;
+        } else {
+            offset[0] = start + 1 + 4 + 4 + len;
+        }
 
         return tag;
     }
@@ -1042,7 +1046,7 @@ class HprofHeap implements Heap {
         HeapProgress.progressFinish();
     }
 
-    private void fillTagBounds(long tagStart) {
+    private void fillTagBounds(long tagStart) throws IOException {
         long[] offset = new long[] { tagStart };
 
         while (offset[0] < dumpBuffer.capacity()) {
@@ -1051,6 +1055,10 @@ class HprofHeap implements Heap {
             TagBounds bounds = tagBounds[tag];
             long end = offset[0];
 
+            if (end == -1) {
+                // tag with zero-length -> broken heap dump
+                throw new IOException("Heap dump is broken.\nTag 0x"+Integer.toHexString(tag)+" at offset "+start+" has zero length.");
+            }
             if (bounds == null) {
                 TagBounds newBounds;
 

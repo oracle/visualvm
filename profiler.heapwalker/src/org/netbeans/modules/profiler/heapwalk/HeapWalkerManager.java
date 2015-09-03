@@ -71,7 +71,7 @@ import org.openide.filesystems.FileUtil;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "HeapWalkerManager_CannotOpenHeapWalkerMsg=<html><b>Failed to open the heap dump.</b><br><br>{0}</html>",
+    "HeapWalkerManager_CannotOpenHeapWalkerMsg=Failed to open the heap dump.",
     "HeapWalkerManager_CannotDeleteHeapDumpMsg=<html><b>Deleting heap dump failed</b><br><br>Please try to delete the file once more. If it fails<br>again, restart the IDE and repeat the action.</html>"
 })
 public class HeapWalkerManager {
@@ -171,7 +171,7 @@ public class HeapWalkerManager {
         try {
             heapDumpPath = heapDump.getCanonicalPath();
         } catch (IOException ex) {
-            ProfilerDialogs.displayError(Bundle.HeapWalkerManager_CannotOpenHeapWalkerMsg(ex.getLocalizedMessage()));
+            ProfilerDialogs.displayError(Bundle.HeapWalkerManager_CannotOpenHeapWalkerMsg(), null, ex.getLocalizedMessage());
             return;
         }
         synchronized (heapDumpPath.intern()) {
@@ -181,7 +181,7 @@ public class HeapWalkerManager {
                 try {
                     hw = new HeapWalker(heapDump);
                 } catch (IOException e) {
-                    ProfilerDialogs.displayError(Bundle.HeapWalkerManager_CannotOpenHeapWalkerMsg(e.getLocalizedMessage()));
+                    ProfilerDialogs.displayError(Bundle.HeapWalkerManager_CannotOpenHeapWalkerMsg(), null, e.getLocalizedMessage());
                 } catch (Exception e) {
                     Logger.getLogger(HeapWalkerManager.class.getName()).log(Level.SEVERE, null, e);
                 }
