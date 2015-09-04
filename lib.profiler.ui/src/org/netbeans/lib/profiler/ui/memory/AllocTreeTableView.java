@@ -321,6 +321,7 @@ abstract class AllocTreeTableView extends MemoryView {
     
     protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
         PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)treeTable.getValueForRow(row);
+        if (node == null) return null;
         String[] name = node.getMethodClassNameAndSig();
         return new ClientUtils.SourceCodeSelection(name[0], name[1], name[2]);
     }
