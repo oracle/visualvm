@@ -94,7 +94,7 @@ abstract class SampledTableView extends MemoryView {
     protected ProfilerTable getResultsComponent() { return table; }
     
     
-    public void setData(MemoryResultsSnapshot snapshot, Collection filter, final int aggregation) {
+    public void setData(MemoryResultsSnapshot snapshot, Collection<String> filter, final int aggregation) {
         final SampledMemoryResultsSnapshot _snapshot = (SampledMemoryResultsSnapshot)snapshot;
         
         SwingUtilities.invokeLater(new Runnable() {
