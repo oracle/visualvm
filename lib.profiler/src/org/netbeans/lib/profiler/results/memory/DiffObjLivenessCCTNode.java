@@ -100,14 +100,13 @@ class DiffObjLivenessCCTNode extends PresoObjLivenessCCTNode {
     public String getNodeName() {
         if (nodeName == null) {
             if (isFiltered()) nodeName = FilterSortSupport.FILTERED_OUT_LBL;
-            else nodeName = node1 == null ? node2.getNodeName() : node1.getNodeName();
+            else nodeName = getNode().getNodeName();
         }
         return nodeName;
     }
     
     public String[] getMethodClassNameAndSig() {
-        return node1 == null ? node2.getMethodClassNameAndSig() :
-                               node1.getMethodClassNameAndSig();
+        return getNode().getMethodClassNameAndSig();
     }
     
     
@@ -124,6 +123,12 @@ class DiffObjLivenessCCTNode extends PresoObjLivenessCCTNode {
         return leaf1 && leaf2;
     }
     
+    private PresoObjLivenessCCTNode getNode() {
+        if (node1 == null) {
+            return node2;
+        }
+        return node1;
+    }
     
     private static PresoObjAllocCCTNode[] computeChildren(PresoObjAllocCCTNode[] children1, PresoObjAllocCCTNode[] children2, PresoObjLivenessCCTNode parent) {        
         Map<String, PresoObjAllocCCTNode> nodes1 = new HashMap();
