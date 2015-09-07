@@ -50,6 +50,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.util.Collection;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -206,8 +207,9 @@ final class MethodsFeature extends ProfilerFeature.Basic {
             ProfilerSession getSession() {
                 return MethodsFeature.this.getSession();
             }
-            void selectForProfiling(SourceClassInfo classInfo) {
-                MethodsFeature.this.selectClassForProfiling(classInfo);
+            void selectForProfiling(Collection<SourceClassInfo> classInfos) {
+                for (SourceClassInfo classInfo : classInfos)
+                    MethodsFeature.this.selectClassForProfiling(classInfo);
             }
             void settingsChanged() {
                 MethodsFeature.this.settingsChanged();
@@ -231,8 +233,9 @@ final class MethodsFeature extends ProfilerFeature.Basic {
             ProfilerSession getSession() {
                 return MethodsFeature.this.getSession();
             }
-            void selectForProfiling(SourceMethodInfo methodInfo) {
-                MethodsFeature.this.selectMethodForProfiling(methodInfo);
+            void selectForProfiling(Collection<SourceMethodInfo> methodInfos) {
+                for (SourceMethodInfo methodInfo : methodInfos)
+                    MethodsFeature.this.selectMethodForProfiling(methodInfo);
             }
             void settingsChanged() {
                 MethodsFeature.this.settingsChanged();
