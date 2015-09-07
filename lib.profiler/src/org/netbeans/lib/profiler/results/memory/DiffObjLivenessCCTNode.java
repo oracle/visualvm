@@ -98,13 +98,23 @@ class DiffObjLivenessCCTNode extends PresoObjLivenessCCTNode {
     
     
     public String getNodeName() {
-        if (isFiltered()) return FilterSortSupport.FILTERED_OUT_LBL;
-        return node1 == null ? node2.getNodeName() : node1.getNodeName();
+        if (nodeName == null) {
+            if (isFiltered()) nodeName = FilterSortSupport.FILTERED_OUT_LBL;
+            else nodeName = node1 == null ? node2.getNodeName() : node1.getNodeName();
+        }
+        return nodeName;
     }
     
     public String[] getMethodClassNameAndSig() {
         return node1 == null ? node2.getMethodClassNameAndSig() :
                                node1.getMethodClassNameAndSig();
+    }
+    
+    
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof DiffObjLivenessCCTNode)) return false;
+        return getNodeName().equals(((DiffObjLivenessCCTNode)o).getNodeName());
     }
     
     
