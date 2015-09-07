@@ -148,6 +148,9 @@ public class ProfilerTreeTable extends ProfilerTable {
             return path.pathByAddingChild(_model.getChild(node, 0));
 
         TreePath parentPath = path.getParentPath();
+        if (!down && parentPath == null)
+            return path.pathByAddingChild(_model.getChild(node, 0));
+        
         TreeNode parent = (TreeNode)parentPath.getLastPathComponent();
         int idx = _model.getIndexOfChild(parent, node) + 1;
 
