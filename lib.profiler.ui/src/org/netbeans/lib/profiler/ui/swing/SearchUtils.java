@@ -276,7 +276,7 @@ public final class SearchUtils {
         prev.setEnabled(false);
         toolbar.add(prev);
         
-        toolbar.add(Box.createHorizontalStrut(2));
+        if (!UIUtils.isAquaLookAndFeel()) toolbar.add(Box.createHorizontalStrut(2));
         
         final JButton next = new JButton(BTN_NEXT, Icons.getIcon(GeneralIcons.FIND_NEXT)) {
             protected void fireActionPerformed(ActionEvent e) {
