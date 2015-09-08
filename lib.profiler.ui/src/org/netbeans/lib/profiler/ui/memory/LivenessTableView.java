@@ -89,15 +89,19 @@ abstract class LivenessTableView extends MemoryView {
     private long[] nTrackedAllocObjects;
     private float[] avgObjectAge;
     private int[] maxSurvGen;
-//    private int[] nTotalAllocObjects;
+    private int[] nTotalAllocObjects;
     
     private final Set<ClientUtils.SourceCodeSelection> selection;
+    
+    private final boolean includeTotalAllocs;
     
     private boolean filterZeroItems = true;
     
     
-    public LivenessTableView(Set<ClientUtils.SourceCodeSelection> selection) {
+    LivenessTableView(Set<ClientUtils.SourceCodeSelection> selection, boolean includeTotalAllocs) {
         this.selection = selection;
+        
+        this.includeTotalAllocs = includeTotalAllocs;
         
         initUI();
     }
@@ -125,7 +129,7 @@ abstract class LivenessTableView extends MemoryView {
                     nTrackedAllocObjects = _nTrackedAllocObjects;
                     avgObjectAge = _avgObjectAge;
                     maxSurvGen = _maxSurvGen;
-//                    nTotalAllocObjects = _nTotalAllocObjects;
+                    if (includeTotalAllocs) nTotalAllocObjects = _nTotalAllocObjects;
                     
                     long liveBytes = 0;
                     long _liveBytes = 0;
@@ -133,8 +137,8 @@ abstract class LivenessTableView extends MemoryView {
                     long _liveObjects = 0;
                     long allocObjects = 0;
                     long _allocObjects = 0;
-//                    long totalAllocObjects = 0;
-//                    long _totalAllocObjects = 0;
+                    long totalAllocObjects = 0;
+                    long _totalAllocObjects = 0;
                     for (int i = 0; i < nTrackedItems; i++) {
                         if (diff) {
                             liveBytes = Math.max(liveBytes, trackedLiveObjectsSize[i]);
@@ -143,31 +147,33 @@ abstract class LivenessTableView extends MemoryView {
                             _liveObjects = Math.min(_liveObjects, nTrackedLiveObjects[i]);
                             allocObjects = Math.max(allocObjects, nTrackedAllocObjects[i]);
                             _allocObjects = Math.min(_allocObjects, nTrackedAllocObjects[i]);
-//                            totalAllocObjects = Math.max(totalAllocObjects, nTotalAllocObjects[i]);
-//                            _totalAllocObjects = Math.min(_totalAllocObjects, nTotalAllocObjects[i]);
+                            if (includeTotalAllocs) {
+                                totalAllocObjects = Math.max(totalAllocObjects, nTotalAllocObjects[i]);
+                                _totalAllocObjects = Math.min(_totalAllocObjects, nTotalAllocObjects[i]);
+                            }
                         } else {
                             liveBytes += trackedLiveObjectsSize[i];
                             liveObjects += nTrackedLiveObjects[i];
                             allocObjects += nTrackedAllocObjects[i];
-//                            totalAllocObjects += nTotalAllocObjects[i];
+                            if (includeTotalAllocs) totalAllocObjects += nTotalAllocObjects[i];
                         }
                     }
                     if (diff) {
                         renderers[0].setMaxValue(Math.max(Math.abs(liveBytes), Math.abs(_liveBytes)));
                         renderers[1].setMaxValue(Math.max(Math.abs(liveObjects), Math.abs(_liveObjects)));
                         renderers[2].setMaxValue(Math.max(Math.abs(allocObjects), Math.abs(_allocObjects)));
-//                        renderers[3].setMaxValue(Math.max(Math.abs(totalAllocObjects), Math.abs(_totalAllocObjects)));
+                        if (includeTotalAllocs) renderers[3].setMaxValue(Math.max(Math.abs(totalAllocObjects), Math.abs(_totalAllocObjects)));
                     } else {
                         renderers[0].setMaxValue(liveBytes);
                         renderers[1].setMaxValue(liveObjects);
                         renderers[2].setMaxValue(allocObjects);
-//                        renderers[3].setMaxValue(totalAllocObjects);
+                        if (includeTotalAllocs) renderers[3].setMaxValue(totalAllocObjects);
                     }
                     
                     renderers[0].setDiffMode(diff);
                     renderers[1].setDiffMode(diff);
                     renderers[2].setDiffMode(diff);
-//                    renderers[3].setDiffMode(diff);
+                    if (includeTotalAllocs) renderers[3].setDiffMode(diff);
                     
                     renderersEx[0].setDiffMode(diff);
                     renderersEx[1].setDiffMode(diff);
@@ -178,7 +184,7 @@ abstract class LivenessTableView extends MemoryView {
         });
     }
     
-    public void setData(MemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
+    public void setData(MemoryResultsSnapshot snapshot, Collection<String> filter, int aggregation) {
         LivenessMemoryResultsSnapshot _snapshot = (LivenessMemoryResultsSnapshot)snapshot;
         boolean diff = _snapshot instanceof LivenessMemoryResultsDiff;
         
@@ -209,15 +215,46 @@ abstract class LivenessTableView extends MemoryView {
             List<Integer> fMaxSurvGen = new ArrayList();
 //            List<Integer> fTotalAllocObjects = new ArrayList();
             
-            for (int i = 0; i < _nTrackedItems; i++) {
-                if (filter.contains(_classNames[i])) {
-                    fClassNames.add(_classNames[i]);
-                    fTrackedLiveObjects.add(_nTrackedLiveObjects[i]);
-                    fTrackedLiveObjectsSize.add(_trackedLiveObjectsSize[i]);
-                    fTrackedAllocObjects.add(_nTrackedAllocObjects[i]);
-                    fAvgObjectAge.add(_avgObjectAge[i]);
-                    fMaxSurvGen.add(_maxSurvGen[i]);
-//                    fTotalAllocObjects.add(_nTotalAllocObjects[i]);
+            if (isExact(filter)) {
+                for (int i = 0; i < _nTrackedItems; i++) {
+                    if (filter.contains(_classNames[i])) {
+                        fClassNames.add(_classNames[i]);
+                        fTrackedLiveObjects.add(_nTrackedLiveObjects[i]);
+                        fTrackedLiveObjectsSize.add(_trackedLiveObjectsSize[i]);
+                        fTrackedAllocObjects.add(_nTrackedAllocObjects[i]);
+                        fAvgObjectAge.add(_avgObjectAge[i]);
+                        fMaxSurvGen.add(_maxSurvGen[i]);
+    //                    fTotalAllocObjects.add(_nTotalAllocObjects[i]);
+                    }
+                }
+            } else {
+                for (String f : filter) {
+                    if (f.endsWith("*")) { // NOI18N
+                        f = f.substring(0, f.length() - 1);
+                        for (int i = 0; i < _nTrackedItems; i++) {
+                            if (_classNames[i].startsWith(f)) {
+                                fClassNames.add(_classNames[i]);
+                                fTrackedLiveObjects.add(_nTrackedLiveObjects[i]);
+                                fTrackedLiveObjectsSize.add(_trackedLiveObjectsSize[i]);
+                                fTrackedAllocObjects.add(_nTrackedAllocObjects[i]);
+                                fAvgObjectAge.add(_avgObjectAge[i]);
+                                fMaxSurvGen.add(_maxSurvGen[i]);
+            //                    fTotalAllocObjects.add(_nTotalAllocObjects[i]);
+                            }
+                        }
+                    } else {
+                        for (int i = 0; i < _nTrackedItems; i++) {
+                            if (_classNames[i].equals(f)) {
+                                fClassNames.add(_classNames[i]);
+                                fTrackedLiveObjects.add(_nTrackedLiveObjects[i]);
+                                fTrackedLiveObjectsSize.add(_trackedLiveObjectsSize[i]);
+                                fTrackedAllocObjects.add(_nTrackedAllocObjects[i]);
+                                fAvgObjectAge.add(_avgObjectAge[i]);
+                                fMaxSurvGen.add(_maxSurvGen[i]);
+            //                    fTotalAllocObjects.add(_nTotalAllocObjects[i]);
+                            }
+                        }
+                    }
                 }
             }
             
@@ -257,17 +294,17 @@ abstract class LivenessTableView extends MemoryView {
                 nTrackedAllocObjects = null;
                 avgObjectAge = null;
                 maxSurvGen = null;
-//                nTotalAllocObjects = null;
+                nTotalAllocObjects = null;
                 
                 renderers[0].setMaxValue(0);
                 renderers[1].setMaxValue(0);
                 renderers[2].setMaxValue(0);
-//                renderers[3].setMaxValue(0);
+                if (includeTotalAllocs) renderers[3].setMaxValue(0);
 
                 renderers[0].setDiffMode(false);
                 renderers[1].setDiffMode(false);
                 renderers[2].setDiffMode(false);
-//                renderers[3].setDiffMode(false);
+                if (includeTotalAllocs) renderers[3].setDiffMode(false);
 
                 renderersEx[0].setDiffMode(false);
                 renderersEx[1].setDiffMode(false);
@@ -334,18 +371,18 @@ abstract class LivenessTableView extends MemoryView {
                                   LIVE_SIZE_COLUMN_TOOLTIP,
                                   LIVE_COUNT_COLUMN_TOOLTIP,
                                   ALLOC_COUNT_COLUMN_TOOLTIP,
-//                                  TOTAL_ALLOC_COUNT_COLUMN_TOOLTIP,
                                   AVG_AGE_COLUMN_TOOLTIP,
-                                  GENERATIONS_COLUMN_TOOLTIP
+                                  GENERATIONS_COLUMN_TOOLTIP,
+                                  TOTAL_ALLOC_COUNT_COLUMN_TOOLTIP
                                 } : new String[] {
                                   SELECTED_COLUMN_TOOLTIP,
                                   NAME_COLUMN_TOOLTIP,
                                   LIVE_SIZE_COLUMN_TOOLTIP,
                                   LIVE_COUNT_COLUMN_TOOLTIP,
                                   ALLOC_COUNT_COLUMN_TOOLTIP,
-//                                  TOTAL_ALLOC_COUNT_COLUMN_TOOLTIP,
                                   AVG_AGE_COLUMN_TOOLTIP,
-                                  GENERATIONS_COLUMN_TOOLTIP
+                                  GENERATIONS_COLUMN_TOOLTIP,
+                                  TOTAL_ALLOC_COUNT_COLUMN_TOOLTIP
                                 });
         
         table.providePopupMenu(true);
@@ -359,7 +396,7 @@ abstract class LivenessTableView extends MemoryView {
         
         if (selection != null) table.setColumnVisibility(0, false);
         table.setColumnVisibility(5 + offset, false);
-//        table.setColumnVisibility(6 + offset, false);
+        if (includeTotalAllocs) table.setColumnVisibility(7 + offset, false);
         
         // Filter out classes with no instances
         table.addRowFilter(new RowFilter() {
@@ -368,16 +405,16 @@ abstract class LivenessTableView extends MemoryView {
             }
         });
         
-        renderers = new HideableBarRenderer[3];
+        renderers = new HideableBarRenderer[4];
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
         renderers[1] = new HideableBarRenderer(new NumberPercentRenderer());
         renderers[2] = new HideableBarRenderer(new NumberPercentRenderer());
-//        renderers[3] = new HideableBarRenderer(new NumberPercentRenderer());
+        renderers[3] = new HideableBarRenderer(new NumberPercentRenderer());
         
         renderers[0].setMaxValue(123456789);
         renderers[1].setMaxValue(12345678);
         renderers[2].setMaxValue(12345678);
-//        renderers[3].setMaxValue(12345678);
+        renderers[3].setMaxValue(12345678);
         
         renderersEx = new NumberRenderer[2];
         renderersEx[0] = new NumberRenderer() {
@@ -396,11 +433,9 @@ abstract class LivenessTableView extends MemoryView {
         table.setColumnRenderer(2 + offset, renderers[0]);
         table.setColumnRenderer(3 + offset, renderers[1]);
         table.setColumnRenderer(4 + offset, renderers[2]);
-//        table.setColumnRenderer(5 + offset, renderers[3]);
-//        table.setColumnRenderer(6 + offset, renderersEx[0]);
-//        table.setColumnRenderer(7 + offset, renderersEx[1]);
         table.setColumnRenderer(5 + offset, renderersEx[0]);
         table.setColumnRenderer(6 + offset, renderersEx[1]);
+        if (includeTotalAllocs) table.setColumnRenderer(7 + offset, renderers[3]);
         
         if (selection != null) {
             int w = new JLabel(table.getColumnName(0)).getPreferredSize().width;
@@ -409,11 +444,9 @@ abstract class LivenessTableView extends MemoryView {
         table.setDefaultColumnWidth(2 + offset, renderers[0].getOptimalWidth());
         table.setDefaultColumnWidth(3 + offset, renderers[1].getMaxNoBarWidth());
         table.setDefaultColumnWidth(4 + offset, renderers[2].getMaxNoBarWidth());
-//        table.setDefaultColumnWidth(5 + offset, renderers[3].getMaxNoBarWidth());
-//        table.setDefaultColumnWidth(6 + offset, renderers[3].getNoBarWidth() - 25);
-//        table.setDefaultColumnWidth(7 + offset, renderers[3].getNoBarWidth() - 25);
         table.setDefaultColumnWidth(5 + offset, renderers[2].getNoBarWidth() - 25);
         table.setDefaultColumnWidth(6 + offset, renderers[2].getNoBarWidth() - 25);
+        if (includeTotalAllocs) table.setDefaultColumnWidth(7 + offset, renderers[3].getMaxNoBarWidth());
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(table, false, null);
         
@@ -431,6 +464,10 @@ abstract class LivenessTableView extends MemoryView {
     
     private class MemoryTableModel extends AbstractTableModel {
         
+        private final int columns = 6 +
+                (selection == null ? 0 : 1) +
+                (includeTotalAllocs ? 1 : 0);
+        
         public String getColumnName(int columnIndex) {
             if (selection == null) columnIndex++;
             
@@ -442,16 +479,12 @@ abstract class LivenessTableView extends MemoryView {
                 return COLUMN_LIVE_OBJECTS;
             } else if (columnIndex == 4) {
                 return COLUMN_ALLOCATED_OBJECTS;
-//            } else if (columnIndex == 5) {
-//                return COLUMN_TOTAL_ALLOCATED_OBJECTS;
-//            } else if (columnIndex == 6) {
-//                return COLUMN_AVG_AGE;
-//            } else if (columnIndex == 7) {
-//                return COLUMN_GENERATIONS;
             } else if (columnIndex == 5) {
                 return COLUMN_AVG_AGE;
             } else if (columnIndex == 6) {
                 return COLUMN_GENERATIONS;
+            } else if (columnIndex == 7) {
+                return COLUMN_TOTAL_ALLOCATED_OBJECTS;
             } else if (columnIndex == 0) {
                 return COLUMN_SELECTED;
             }
@@ -469,15 +502,11 @@ abstract class LivenessTableView extends MemoryView {
                 return Integer.class;
             } else if (columnIndex == 4) {
                 return Long.class;
-//            } else if (columnIndex == 5) {
-//                return Integer.class;
-//            } else if (columnIndex == 6) {
-//                return Float.class;
-//            } else if (columnIndex == 7) {
-//                return Integer.class;
             } else if (columnIndex == 5) {
                 return Float.class;
             } else if (columnIndex == 6) {
+                return Integer.class;
+            } else if (columnIndex == 7) {
                 return Integer.class;
             } else if (columnIndex == 0) {
                 return Boolean.class;
@@ -490,8 +519,7 @@ abstract class LivenessTableView extends MemoryView {
         }
 
         public int getColumnCount() {
-//            return selection == null ? 7 : 8;
-            return selection == null ? 6 : 7;
+            return columns;
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
@@ -507,16 +535,12 @@ abstract class LivenessTableView extends MemoryView {
                 return nTrackedLiveObjects[rowIndex];
             } else if (columnIndex == 4) {
                 return nTrackedAllocObjects[rowIndex];
-//            } else if (columnIndex == 5) {
-//                return nTotalAllocObjects[rowIndex];
-//            } else if (columnIndex == 6) {
-//                return avgObjectAge[rowIndex];
-//            } else if (columnIndex == 7) {
-//                return maxSurvGen[rowIndex];
             } else if (columnIndex == 5) {
                 return avgObjectAge[rowIndex];
             } else if (columnIndex == 6) {
                 return maxSurvGen[rowIndex];
+            } else if (columnIndex == 7) {
+                return nTotalAllocObjects[rowIndex];
             } else if (columnIndex == 0) {
                 if (selection.isEmpty()) return Boolean.FALSE;
                 return selection.contains(classNames[rowIndex]);

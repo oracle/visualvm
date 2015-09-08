@@ -329,6 +329,7 @@ public final class CPUGraphPanel extends GraphPanel {
             }
 
             public String getRowValue(int index, long itemValue) {
+                if (itemValue < 0) return "N/A"; // NOI18N
                 String val = PERCENT_FORMATTER.format(itemValue / 1000f);
                 return trimPercents(val);
             }
@@ -351,7 +352,9 @@ public final class CPUGraphPanel extends GraphPanel {
 
             public String getExtraRowValue(int index) {
                 SynchronousXYItem item = models.cpuItemsModel().getItem(index);
-                String val = PERCENT_FORMATTER.format(item.getMaxYValue() / 1000f);
+                long maxValue = item.getMaxYValue();
+                if (maxValue < 0) return "N/A"; // NOI18N
+                String val = PERCENT_FORMATTER.format(maxValue / 1000f);
                 return trimPercents(val);
             }
 

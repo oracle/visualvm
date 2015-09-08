@@ -215,10 +215,8 @@ public abstract class LiveCPUView extends JPanel {
                                                  refSnapshot.createDiff(snapshot);
             
             final FlatProfileContainer flatData = _snapshot.getFlatProfile(selectedThreads, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
-
-            final Map<Integer, ClientUtils.SourceCodeSelection> idMap = new HashMap();
-            for (int i = 0; i < flatData.getNRows(); i++) // TODO: getNRows is filtered, may not work for tree data!
-                idMap.put(flatData.getMethodIdAtRow(i), flatData.getSourceCodeSelectionAtRow(i));
+            
+            final Map<Integer, ClientUtils.SourceCodeSelection> idMap = _snapshot.getMethodIDMap(CPUResultsSnapshot.METHOD_LEVEL_VIEW);
 
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {

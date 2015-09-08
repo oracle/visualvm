@@ -49,6 +49,8 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.swing.AbstractListModel;
@@ -182,10 +184,10 @@ public final class ClassMethodList {
                 protected void fireActionPerformed(ActionEvent e) {
                     final Component invoker = getInvoker();
                     addingEntry = true;
-                    ClientUtils.SourceCodeSelection sel = null;
+                    Collection<ClientUtils.SourceCodeSelection> sel = null;
                     
                     if (methods) {
-                        SourceMethodInfo mtd = ClassMethodSelector.selectMethod(session);
+                        Collection<SourceMethodInfo> mtd = ClassMethodSelector.selectMethods(session);
                         
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
@@ -195,12 +197,15 @@ public final class ClassMethodList {
                                 UI.this.show(invoker);
                             }
                         });
-                        
-                        if (mtd != null)
-                            sel = new ClientUtils.SourceCodeSelection(mtd.getClassName(),
-                                                                      mtd.getName(), mtd.getSignature());
+
+                        if (!mtd.isEmpty()) {
+                            sel = new HashSet();
+                            for (SourceMethodInfo smi : mtd) sel.add(
+                                    new ClientUtils.SourceCodeSelection(smi.getClassName(),
+                                                                        smi.getName(), smi.getSignature()));
+                        }
                     } else {
-                        SourceClassInfo cls = ClassMethodSelector.selectClass(session);
+                        Collection<SourceClassInfo> cls = ClassMethodSelector.selectClasses(session);
                         
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
@@ -210,14 +215,16 @@ public final class ClassMethodList {
                                 UI.this.show(invoker);
                             }
                         });
-                        
-                        if (cls != null)
-                            sel = new ClientUtils.SourceCodeSelection(cls.getQualifiedName(),
-                                                                      Wildcards.ALLWILDCARD, null);
+
+                        if (!cls.isEmpty()) {
+                            sel = new HashSet();
+                            for (SourceClassInfo sci : cls) sel.add(new ClientUtils.SourceCodeSelection(
+                                    sci.getQualifiedName(), Wildcards.ALLWILDCARD, null));
+                        }
                     }
                     
                     if (sel != null) {
-                        selection.add(sel);
+                        selection.addAll(sel);
                         xmodel.refresh();
                     }
                 }   

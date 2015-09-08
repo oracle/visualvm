@@ -586,19 +586,9 @@ public abstract class SnapshotCPUView extends JPanel {
                                        snapshot.createDiff(refSnapshot);
         
         final FlatProfileContainer flatData = _snapshot.getFlatProfile(selectedThreads, aggregation);
-
-        final Map<Integer, ClientUtils.SourceCodeSelection> idMap = new HashMap();
-        for (int i = 0; i < flatData.getNRows(); i++) // TODO: getNRows is filtered, may not work for tree data!
-            idMap.put(flatData.getMethodIdAtRow(i), flatData.getSourceCodeSelectionAtRow(i));
-//        SwingUtilities.invokeLater(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//        treeTableView.setData(snapshot, idMap, aggregation, sampled);
-//        tableView.setData(flatData, idMap, sampled);
-//            }
-//        });
         
+        final Map<Integer, ClientUtils.SourceCodeSelection> idMap = _snapshot.getMethodIDMap(aggregation);
+
         boolean diff = _snapshot instanceof CPUResultsDiff;
         forwardCallsView.setData(_snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled, diff);
         hotSpotsView.setData(flatData, idMap, sampled, diff);

@@ -44,7 +44,6 @@ package org.netbeans.modules.profiler.snaptracer.impl;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
@@ -71,7 +70,7 @@ import org.openide.windows.WindowManager;
     "ExportSnapshotAction_ActionDescr=Export IDE snapshot...",
     "ExportSnapshotAction_ProgressMsg=Exporting snapshot...",
     "ExportSnapshotAction_CannotReplaceMsg=File {0} cannot be replaced.\nCheck file permissions.",
-    "ExportSnapshotAction_ExportFailedMsg=Exporting snapshot failed.",
+    "ExportSnapshotAction_ExportFailedMsg=Exporting snapshot failed:",
     "ExportSnapshotAction_FileChooserCaption=Select File or Directory",
     "ExportSnapshotAction_ExportButtonText=Export",
     "ExportSnapshotAction_NpssFileFilter=IDE Snapshots (*{0})",
@@ -139,13 +138,17 @@ final class ExportSnapshotAction extends AbstractAction {
                         ProfilerDialogs.displayError(
                                 Bundle.ExportSnapshotAction_CannotReplaceMsg(targetFile.getName()));
                     } else {
-                        FileObject targetFO = FileUtil.toFileObject(targetFile.getParentFile());
+                        targetFile.toPath();
+                        File targetParent = FileUtil.normalizeFile(targetFile.getParentFile());
+                        FileObject targetFO = FileUtil.toFileObject(targetParent);
                         String targetName = targetFile.getName();
                         FileUtil.copyFile(sourceFO, targetFO, targetName, null);
                     }
-                } catch (IOException e) {
-                    ProfilerDialogs.displayError(Bundle.ExportSnapshotAction_ExportFailedMsg());
-                    ProfilerLogger.log("Failed to export NPSS snapshot: " + e.getMessage()); // NOI18N
+                } catch (Throwable t) {
+                    ProfilerLogger.log("Failed to export NPSS snapshot: " + t.getMessage()); // NOI18N
+                    String msg = t.getLocalizedMessage().replace("<", "&lt;").replace(">", "&gt;"); // NOI18N
+                    ProfilerDialogs.displayError("<html><b>" + Bundle.ExportSnapshotAction_ExportFailedMsg() + // NOI18N
+                                                               "</b><br><br>" + msg + "</html>"); // NOI18N
                 } finally {
                     progress.finish();
                 }

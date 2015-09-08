@@ -60,6 +60,11 @@ made subject to such option by the copyright holder.
             <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#Menu/Profile"/>
             <attr name="position" intvalue="850"/>
             
+            <file name="org-netbeans-modules-profiler-actions-AttachAction.shadow">
+               <attr name="originalFile" stringvalue="Actions/Profile/org-netbeans-modules-profiler-actions-AttachAction.instance"/>
+               <attr name="position" intvalue="200"/>
+               <attr name="ergonomics" boolvalue="true"/>
+            </file>            
             <!--folder name="Advanced">
                 <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#Menu/Profile/Advanced"/>
                 <attr name="position" intvalue="1800"/>
@@ -67,6 +72,19 @@ made subject to such option by the copyright holder.
         </folder>
     </folder>
 
+    <folder name="Actions">
+        <folder name="Profile">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.profiler.actions.Bundle"/>
+            <file name="org-netbeans-modules-profiler-actions-AttachAction.instance"> <!-- cannot yet use @ActionRegistration due to ergonomics=true on shadow -->
+                <attr name="delegate" methodvalue="org.netbeans.modules.profiler.actions.AttachAction.getInstance"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.profiler.actions.Bundle#LBL_AttachMainProjectAction"/>
+                <attr name="iconBase" stringvalue="org/netbeans/modules/profiler/impl/icons/attach.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
+        </folder>
+    </folder>
+    
     <folder name="NBProfiler">
         <folder name="Config">
             <file name="filters-default.xml" url="nbresloc:/org/netbeans/modules/profiler/filters-default.xml"/>

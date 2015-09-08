@@ -58,6 +58,8 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.JFileChooser;
@@ -90,12 +92,15 @@ public final class ExportUtils {
     private static final String PNG_FILE = messages.getString("ExportUtils_PngFile"); // NOI18N
     private static final String FILE_FILTER_DESCR = messages.getString("ExportUtils_FileFilterDescr"); // NOI18N
     private static final String MSG_CANNOT_OVERWRITE_SOURCE = messages.getString("ExportUtils_MsgCannotOverwriteSource"); // NOI18N
-//    private static final String MSG_EXPORT_SNAPSHOT_FAILED = messages.getString("ExportUtils_MsgExportSnapshotFailed"); // NOI18N
+    private static final String MSG_EXPORT_SNAPSHOT_FAILED = messages.getString("ExportUtils_MsgExportSnapshotFailed"); // NOI18N
     private static final String MSG_EXPORT_IMAGE_FAILED = messages.getString("ExportUtils_MsgExportImageFailed"); // NOI18N
 //    private static final String MSG_NODATA = messages.getString("ExportUtils_MsgNoData"); // NOI18N
     private static final String TITLE_OVERWRITE_FILE = messages.getString("ExportUtils_TitleOverwriteFile"); // NOI18N
     private static final String MSG_OVERWRITE_FILE = messages.getString("ExportUtils_MsgOverwriteFile"); // NOI18N
     // -----
+    
+    private static final Logger LOGGER = Logger.getLogger(ExportUtils.class.getName());
+    
     
     public static class FormatFilter extends FileFilter {
         
@@ -249,10 +254,12 @@ public final class ExportUtils {
             createExecutor(targetFile.getName()).submit(new Runnable() {
                 public void run() {
                     try {
+                        targetFile.toPath();
                         ImageIO.write(image, "PNG", targetFile); // NOI18N
-                    } catch (IOException ex) {
-                        System.err.println(ex);
-                        ProfilerDialogs.displayError(MSG_EXPORT_IMAGE_FAILED);
+                    } catch (Throwable t) {
+                        LOGGER.log(Level.INFO, t.getMessage(), t);
+                        String msg = t.getLocalizedMessage().replace("<", "&lt;").replace(">", "&gt;"); // NOI18N
+                        ProfilerDialogs.displayError("<html><b>" + MSG_EXPORT_IMAGE_FAILED + "</b><br><br>" + msg + "</html>"); // NOI18N
                     }
                 }
             });
@@ -303,7 +310,7 @@ public final class ExportUtils {
                 for (ExportProvider provider : providers) {
                     FormatFilter format = provider.getFormatFilter();
                     if (filter.equals(format)) {
-                        targetFile = checkFileExtesion(targetFile, format.getExtension());
+                        targetFile = checkFileExtension(targetFile, format.getExtension());
                         if (checkFileExists(targetFile)) provider.export(targetFile);
                         else showExportDialog(fileChooser, parent, providers);
                         break;
@@ -318,7 +325,7 @@ public final class ExportUtils {
                                        MSG_OVERWRITE_FILE, TITLE_OVERWRITE_FILE);
     }
     
-    public static File checkFileExtesion(File file, String extension) {
+    public static File checkFileExtension(File file, String extension) {
         if (file.getName().endsWith(extension)) return file;
         return new File(file.getPath() + extension);
     }
@@ -340,6 +347,8 @@ public final class ExportUtils {
                 else ex.writeln();
             }
             
+            if (ex.failed()) return false;
+            
             if (table instanceof ProfilerTreeTable) {
                 ProfilerTreeTable treeTable = (ProfilerTreeTable)table;
                 TreePath path = treeTable.getNextPath(treeTable.getRootPath());
@@ -347,6 +356,7 @@ public final class ExportUtils {
                 int indent = path.getPathCount() - 2;
                 TreePath firstPath = path;
                 do {
+                    if (ex.failed()) return false;
                     for (int col = 0; col < columnCount; col++) {
                         ex.write(doubleQuote);
                         if (table.getColumnClass(col) == JTree.class)
@@ -362,6 +372,7 @@ public final class ExportUtils {
                 } while (!firstPath.equals(path));
             } else {
                 for (int row = 0; row < rowCount; row++) {
+                    if (ex.failed()) return false;
                     for (int col = 0; col < columnCount; col++) {
                         ex.write(doubleQuote);
                         ex.write(table.getStringValue(row, col));
@@ -386,6 +397,8 @@ public final class ExportUtils {
         try {
             ex.writeln("<html>"); // NOI18N
             
+            if (ex.failed()) return false;
+            
             ex.writeln(" <head>"); // NOI18N
             ex.writeln("  <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />"); // NOI18N
             ex.write  ("  <title>"); // NOI18N
@@ -403,6 +416,8 @@ public final class ExportUtils {
                 ex.writeln("</th>"); // NOI18N
             }
             ex.writeln("   </tr>"); // NOI18N
+            
+            if (ex.failed()) return false;
 
             if (table instanceof ProfilerTreeTable) {
                 ProfilerTreeTable treeTable = (ProfilerTreeTable)table;
@@ -411,6 +426,7 @@ public final class ExportUtils {
                 int indent = path.getPathCount() - 2;
                 TreePath firstPath = path;
                 do {
+                    if (ex.failed()) return false;
                     ex.writeln("   <tr>"); // NOI18N
                     for (int col = 0; col < columnCount; col++) {
                         ex.write  ("    <td><pre>"); // NOI18N
@@ -427,6 +443,7 @@ public final class ExportUtils {
             } else {
                 int rowCount = table.getRowCount();
                 for (int row = 0; row < rowCount; row++) {
+                    if (ex.failed()) return false;
                     ex.writeln("   <tr>"); // NOI18N
                     for (int col = 0; col < columnCount; col++) {
                         ex.write  ("    <td><pre>"); // NOI18N
@@ -455,6 +472,8 @@ public final class ExportUtils {
         try {
             ex.writeln("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); // NOI18N
             
+            if (ex.failed()) return false;
+            
             if (table instanceof ProfilerTreeTable) {
                 ProfilerTreeTable treeTable = (ProfilerTreeTable)table;
                 TreePath path = treeTable.getNextPath(treeTable.getRootPath());
@@ -468,6 +487,7 @@ public final class ExportUtils {
                 ex.writeln(" <tree>"); // NOI18N
                 
                 do {
+                    if (ex.failed()) return false;
                     ex.write  (indent(indent));
                     ex.writeln("<node>"); // NOI18N
                     for (int col = 0; col < columnCount; col++) {
@@ -511,9 +531,12 @@ public final class ExportUtils {
                     ex.writeln("]]></th>"); // NOI18N
                 }
                 ex.writeln("  </thead>"); // NOI18N
+                
+                if (ex.failed()) return false;
 
                 ex.writeln("  <tbody>"); // NOI18N
                 for (int row = 0; row < rowCount; row++) {
+                    if (ex.failed()) return false;
                     ex.writeln("   <tr>"); // NOI18N
                     for (int col = 0; col < columnCount; col++) {
                         ex.write  ("    <td><![CDATA["); // NOI18N
@@ -589,6 +612,8 @@ public final class ExportUtils {
         private static final int WRT_BUF = 16384;
         private static final int STR_BUF = WRT_BUF * 2 - 512;
         
+        private volatile boolean failed = false;
+        
         private final File file;
         private StringBuilder buffer;
         
@@ -602,32 +627,49 @@ public final class ExportUtils {
         }
         
         
+        boolean failed() {
+            return failed;
+        }
+        
+        
         void write(char ch) {
+            if (failed) return;
+            
             buffer.append(ch);
             checkAutoFlush();
         }
         
         void writeln(char ch) {
+            if (failed) return;
+            
             buffer.append(ch).append(System.lineSeparator());
             checkAutoFlush();
         }
         
         void write(String string) {
+            if (failed) return;
+            
             buffer.append(string);
             checkAutoFlush();
         }
         
         void writeln(String string) {
+            if (failed) return;
+            
             buffer.append(string).append(System.lineSeparator());
             checkAutoFlush();
         }
         
         void writeln() {
+            if (failed) return;
+            
             buffer.append(System.lineSeparator());
             checkAutoFlush();
         }
         
         void flush() {
+            if (failed) return;
+            
             if (buffer.length() == 0) return;
             
             final StringBuilder _buffer = buffer;
@@ -639,25 +681,35 @@ public final class ExportUtils {
                     try {
                         if (writer == null) writer = createWriter(file);
                         writer.append(_buffer);
-                    } catch (IOException e) {
-                        System.err.println(e);
+                    } catch (Throwable t) {
+                        failed(t);
                     }
                 }
             });
         }
         
         void close() {
+            if (failed) return;
+            
             flush();
             
             if (executor != null) executor.submit(new Runnable() {
                 public void run() {
                     if (writer != null) try {
                         writer.close();
-                    } catch (IOException e) {
-                        System.err.println(e);
+                    } catch (Throwable t) {
+                        failed(t);
                     }
                 }
             });
+        }
+        
+        
+        private void failed(Throwable t) {
+            failed = true;
+            LOGGER.log(Level.INFO, t.getMessage(), t);
+            String msg = t.getLocalizedMessage().replace("<", "&lt;").replace(">", "&gt;"); // NOI18N
+            ProfilerDialogs.displayError("<html><b>" + MSG_EXPORT_SNAPSHOT_FAILED + "</b><br><br>" + msg + "</html>"); // NOI18N
         }
         
         
@@ -666,6 +718,7 @@ public final class ExportUtils {
         }
         
         private static Writer createWriter(File file) throws IOException {
+            file.toPath(); // will fail for invalid file
             CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder(); // NOI18N
             FileOutputStream out = new FileOutputStream(file);
             return new BufferedWriter(new OutputStreamWriter(out, encoder), WRT_BUF);
