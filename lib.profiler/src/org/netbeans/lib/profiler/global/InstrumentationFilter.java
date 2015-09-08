@@ -43,6 +43,8 @@
 
 package org.netbeans.lib.profiler.global;
 
+import java.util.Arrays;
+
 
 /**
  * Singleton instrumentation filter.
@@ -64,7 +66,9 @@ public class InstrumentationFilter implements Cloneable {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
+    private String[] instrFilterUserStrings;
     private String[] instrFilterStrings;
+    private int[] instrFilterTypes;
     private int instrFilterType;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -97,7 +101,7 @@ public class InstrumentationFilter implements Cloneable {
     public void setFilterStrings(String flatFilterString) {
         //if (flatFilterString == null) return; // don't be paranoid:o)
         flatFilterString = flatFilterString.replace(',', ' '); // NOI18N // filterStrings can be separated by comma and/or space
-        flatFilterString = flatFilterString.replace('.', '/'); // NOI18N // create slashed filterStrings
+//        flatFilterString = flatFilterString.replace('.', '/'); // NOI18N // create slashed filterStrings
 
         setSlashedFilterStrings(flatFilterString.trim().split(" +")); // NOI18N
     }
@@ -106,7 +110,11 @@ public class InstrumentationFilter implements Cloneable {
     public String[] getFilterStrings() {
         return instrFilterStrings;
     }
-
+    
+    public String[] getUserFilterStrings() {
+        return instrFilterUserStrings;
+    }
+    
     /** Sets the current filter type as defined in CommonConstants. */
     public void setFilterType(int filterType) {
         instrFilterType = filterType;
@@ -121,15 +129,22 @@ public class InstrumentationFilter implements Cloneable {
     public void setSlashedFilterStrings(String[] slashedFilterStrings) {
         //if (filterStrings == null) return; // don't be paranoid:o)  
         instrFilterStrings = slashedFilterStrings;
+        instrFilterUserStrings = (String[])Arrays.copyOf(instrFilterStrings, instrFilterStrings.length);
+        
+        if (instrFilterType == INSTR_FILTER_INCLUSIVE_EXACT) {
+            instrFilterTypes = new int[instrFilterStrings.length];
+            Arrays.fill(instrFilterTypes, INSTR_FILTER_INCLUSIVE_EXACT);
+        } else {
+            instrFilterTypes = null;
+        }
 
         // remove trailing '*'
-        String instrFilterString;
-
         for (int i = 0; i < instrFilterStrings.length; i++) {
-            instrFilterString = instrFilterStrings[i];
+            instrFilterStrings[i] = instrFilterStrings[i].replace('.', '/'); // NOI18N // create slashed filterStrings
 
-            if (instrFilterString.endsWith("*")) { // NOI18N
-                instrFilterStrings[i] = instrFilterString.substring(0, instrFilterString.length() - 1);
+            if (instrFilterStrings[i].endsWith("*")) { // NOI18N
+                instrFilterStrings[i] = instrFilterStrings[i].substring(0, instrFilterStrings[i].length() - 1);
+                if (instrFilterTypes != null) instrFilterTypes[i] = INSTR_FILTER_INCLUSIVE;
             }
         }
     }
@@ -142,11 +157,10 @@ public class InstrumentationFilter implements Cloneable {
 
     public Object clone() throws CloneNotSupportedException {
         InstrumentationFilter clone = (InstrumentationFilter) super.clone();
-        clone.instrFilterStrings = new String[instrFilterStrings.length];
-
-        for (int i = 0; i < instrFilterStrings.length; i++) {
-            clone.instrFilterStrings[i] = instrFilterStrings[i];
-        }
+        
+        clone.instrFilterStrings = (String[])Arrays.copyOf(instrFilterStrings, instrFilterStrings.length);
+        clone.instrFilterUserStrings = (String[])Arrays.copyOf(instrFilterUserStrings, instrFilterUserStrings.length);
+        clone.instrFilterTypes = instrFilterTypes == null ? null : Arrays.copyOf(instrFilterTypes, instrFilterTypes.length);
 
         return clone;
     }
@@ -241,7 +255,8 @@ public class InstrumentationFilter implements Cloneable {
         boolean filterInclusive = (instrFilterType == INSTR_FILTER_INCLUSIVE || instrFilterType == INSTR_FILTER_INCLUSIVE_EXACT);
 
         for (int i = 0; i < instrFilterStrings.length; i++) {
-            if (matches(instrFilterType, string, instrFilterStrings[i])) {
+            int filterType = instrFilterTypes == null ? instrFilterType : instrFilterTypes[i];
+            if (matches(filterType, string, instrFilterStrings[i])) {
                 return filterInclusive;
             }
         }

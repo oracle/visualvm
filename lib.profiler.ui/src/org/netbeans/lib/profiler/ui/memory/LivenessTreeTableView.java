@@ -119,8 +119,9 @@ abstract class LivenessTreeTableView extends MemoryView {
     protected ProfilerTable getResultsComponent() { return treeTable; }
     
     
-    public void setData(MemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
+    public void setData(MemoryResultsSnapshot snapshot, Collection<String> filter, int aggregation) {
         final boolean includeEmpty = filter != null;
+        final boolean exactFilter = isExact(filter);
 //        final boolean includeEmpty = false;
         final boolean diff = snapshot instanceof LivenessMemoryResultsDiff;
         final LivenessMemoryResultsSnapshot _snapshot = (LivenessMemoryResultsSnapshot)snapshot;
@@ -168,31 +169,73 @@ abstract class LivenessTreeTableView extends MemoryView {
             }
             
 //            String className = StringUtils.userFormClassName(_classNames[i]);
-            String className = _classNames[i];
+//            String className = _classNames[i];
+            final int _i = i;
             
-            if ((!includeEmpty && _nTrackedLiveObjects[i] > 0) || (includeEmpty && filter.contains(className))) {
-                final int _i = i;
-                PresoObjLivenessCCTNode node = new PresoObjLivenessCCTNode(className, _nTrackedAllocObjects[i], _objectsSizePerClass[i], _nTrackedLiveObjects[i], _nTotalAllocObjects[i], _avgObjectAge[i], _maxSurvGen[i]) {
-                    public CCTNode[] getChildren() {
-                        if (children == null) {
-                            MemoryCCTManager callGraphManager = new MemoryCCTManager(_snapshot, _i, true);
-                            PresoObjAllocCCTNode root = callGraphManager.getRootNode();
-                            setChildren(root == null ? new PresoObjAllocCCTNode[0] :
-                                        (PresoObjAllocCCTNode[])root.getChildren());
-                        }
-                        return children;
+            class Node extends PresoObjLivenessCCTNode {
+                Node(String className, long nTrackedAllocObjects, long objectsSizePerClass, int nTrackedLiveObjects, int nTotalAllocObjects, float avgObjectAge, int maxSurvGen) {
+                    super(className, nTrackedAllocObjects, objectsSizePerClass, nTrackedLiveObjects, nTotalAllocObjects, avgObjectAge, maxSurvGen);
+                }
+                public CCTNode[] getChildren() {
+                    if (children == null) {
+                        MemoryCCTManager callGraphManager = new MemoryCCTManager(_snapshot, _i, true);
+                        PresoObjAllocCCTNode root = callGraphManager.getRootNode();
+                        setChildren(root == null ? new PresoObjAllocCCTNode[0] :
+                                    (PresoObjAllocCCTNode[])root.getChildren());
                     }
-                    public boolean isLeaf() {
-                        if (children == null) return includeEmpty ? nCalls == 0 : false;
-                        else return super.isLeaf();
-                    }   
-                    public int getChildCount() {
-                        if (children == null) getChildren();
-                        return super.getChildCount();
-                    }
-                };
+                    return children;
+                }
+                public boolean isLeaf() {
+                    if (children == null) return includeEmpty ? nCalls == 0 : false;
+                    else return super.isLeaf();
+                }   
+                public int getChildCount() {
+                    if (children == null) getChildren();
+                    return super.getChildCount();
+                }
+            }
+            
+            if ((!includeEmpty && _nTrackedLiveObjects[i] > 0) || (exactFilter && includeEmpty && filter.contains(_classNames[i]))) {
+                PresoObjLivenessCCTNode node = new Node(_classNames[i], _nTrackedAllocObjects[i], _objectsSizePerClass[i], _nTrackedLiveObjects[i], _nTotalAllocObjects[i], _avgObjectAge[i], _maxSurvGen[i]);
+//                final int _i = i;
+//                    PresoObjLivenessCCTNode node = new PresoObjLivenessCCTNode(className, _nTrackedAllocObjects[i], _objectsSizePerClass[i], _nTrackedLiveObjects[i], _nTotalAllocObjects[i], _avgObjectAge[i], _maxSurvGen[i]) {
+//                    public CCTNode[] getChildren() {
+//                        if (children == null) {
+//                            MemoryCCTManager callGraphManager = new MemoryCCTManager(_snapshot, _i, true);
+//                            PresoObjAllocCCTNode root = callGraphManager.getRootNode();
+//                            setChildren(root == null ? new PresoObjAllocCCTNode[0] :
+//                                        (PresoObjAllocCCTNode[])root.getChildren());
+//                        }
+//                        return children;
+//                    }
+//                    public boolean isLeaf() {
+//                        if (children == null) return includeEmpty ? nCalls == 0 : false;
+//                        else return super.isLeaf();
+//                    }   
+//                    public int getChildCount() {
+//                        if (children == null) getChildren();
+//                        return super.getChildCount();
+//                    }
+//                };
                 nodes.add(node);
-                _nodesMap.put(node, new ClientUtils.SourceCodeSelection(className, Wildcards.ALLWILDCARD, null));
+                _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
+            } else {
+                for (String f : filter) {
+                    if (f.endsWith("*")) { // NOI18N
+                        f = f.substring(0, f.length() - 1);
+                        if (_classNames[i].startsWith(f)) {
+                            PresoObjLivenessCCTNode node = new Node(_classNames[i], _nTrackedAllocObjects[i], _objectsSizePerClass[i], _nTrackedLiveObjects[i], _nTotalAllocObjects[i], _avgObjectAge[i], _maxSurvGen[i]);
+                            nodes.add(node);
+                            _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
+                        }
+                    } else {
+                        if (_classNames[i].equals(f)) {
+                            PresoObjLivenessCCTNode node = new Node(_classNames[i], _nTrackedAllocObjects[i], _objectsSizePerClass[i], _nTrackedLiveObjects[i], _nTotalAllocObjects[i], _avgObjectAge[i], _maxSurvGen[i]);
+                            nodes.add(node);
+                            _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
+                        }
+                    }
+                }
             }
         }
         
@@ -410,6 +453,7 @@ abstract class LivenessTreeTableView extends MemoryView {
     
     protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
         PresoObjLivenessCCTNode node = (PresoObjLivenessCCTNode)treeTable.getValueForRow(row);
+        if (node == null) return null;
         String[] name = node.getMethodClassNameAndSig();
         return new ClientUtils.SourceCodeSelection(name[0], name[1], name[2]);
     }
