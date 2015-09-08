@@ -106,7 +106,7 @@ public class DropdownButton extends JPanel {
         } else if (UIUtils.isAquaLookAndFeel()) {
             POPUP_EXTENT = 19;
             POPUP_OFFSET = 7;
-            POPUP_XWIDTH = -5;
+            POPUP_XWIDTH = -8;
             POPUP_MARGIN = 6;
         } else {
             POPUP_EXTENT = 16;
@@ -431,6 +431,13 @@ public class DropdownButton extends JPanel {
                 } else {
                     i.left = 2;
                     i.right = 2;
+                }
+            } else if (UIUtils.isAquaLookAndFeel()) {
+                if (i == null) {
+                    i = new Insets(0, -6, 0, 0);
+                } else {
+                    i.left = -6;
+                    i.right = 0;
                 }
             }
             return i;

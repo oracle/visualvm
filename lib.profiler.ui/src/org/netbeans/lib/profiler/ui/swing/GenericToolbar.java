@@ -96,6 +96,8 @@ public class GenericToolbar extends JToolBar {
         
         if (UIUtils.isNimbusLookAndFeel())
             setBorder(BorderFactory.createEmptyBorder(-2, 0, -2, 0));
+        else if (UIUtils.isAquaLookAndFeel())
+            setBorder(BorderFactory.createEmptyBorder(0, 1, 0, 1));
     }
     
     
@@ -149,7 +151,9 @@ public class GenericToolbar extends JToolBar {
         } else if (UIUtils.isAquaLookAndFeel()) {
             if (comp instanceof AbstractButton && !(comp instanceof JCheckBox) && !(comp instanceof JRadioButton)) {
                 AbstractButton ab = (AbstractButton)comp;
-                ab.putClientProperty("JButton.buttonType", "textured"); // NOI18N
+                ab.putClientProperty("JButton.buttonType", "segmentedTextured"); // NOI18N
+                if (ab.getClientProperty("JButton.segmentPosition") == null) // NOI18N
+                    ab.putClientProperty("JButton.segmentPosition", "only"); // NOI18N
                 ab.setMargin(new Insets(-1, -1, -2, -1));
             }
         }

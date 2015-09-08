@@ -229,7 +229,7 @@ public final class SearchUtils {
         JToolBar toolbar = new InvisibleToolbar();
         if (UIUtils.isWindowsModernLookAndFeel())
             toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 2));
-        else if (!UIUtils.isNimbusLookAndFeel())
+        else if (!UIUtils.isNimbusLookAndFeel() && !UIUtils.isAquaLookAndFeel())
             toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
         
         toolbar.add(Box.createHorizontalStrut(6));
@@ -269,6 +269,8 @@ public final class SearchUtils {
                 });
             }
         };
+        prev.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        prev.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
         String prevAccelerator = ActionsSupport.keyAcceleratorString(prevKey);
         prev.setToolTipText(MessageFormat.format(BTN_PREVIOUS_TOOLTIP, prevAccelerator));
         prev.setEnabled(false);
@@ -288,6 +290,8 @@ public final class SearchUtils {
                 });
             }
         };
+        next.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        next.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
         String nextAccelerator = ActionsSupport.keyAcceleratorString(nextKey);
         next.setToolTipText(MessageFormat.format(BTN_NEXT_TOOLTIP, nextAccelerator));
         next.setEnabled(false);
