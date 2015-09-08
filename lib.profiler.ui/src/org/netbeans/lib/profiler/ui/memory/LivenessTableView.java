@@ -184,7 +184,7 @@ abstract class LivenessTableView extends MemoryView {
         });
     }
     
-    public void setData(MemoryResultsSnapshot snapshot, Collection filter, int aggregation) {
+    public void setData(MemoryResultsSnapshot snapshot, Collection<String> filter, int aggregation) {
         LivenessMemoryResultsSnapshot _snapshot = (LivenessMemoryResultsSnapshot)snapshot;
         boolean diff = _snapshot instanceof LivenessMemoryResultsDiff;
         
@@ -215,15 +215,46 @@ abstract class LivenessTableView extends MemoryView {
             List<Integer> fMaxSurvGen = new ArrayList();
 //            List<Integer> fTotalAllocObjects = new ArrayList();
             
-            for (int i = 0; i < _nTrackedItems; i++) {
-                if (filter.contains(_classNames[i])) {
-                    fClassNames.add(_classNames[i]);
-                    fTrackedLiveObjects.add(_nTrackedLiveObjects[i]);
-                    fTrackedLiveObjectsSize.add(_trackedLiveObjectsSize[i]);
-                    fTrackedAllocObjects.add(_nTrackedAllocObjects[i]);
-                    fAvgObjectAge.add(_avgObjectAge[i]);
-                    fMaxSurvGen.add(_maxSurvGen[i]);
-//                    fTotalAllocObjects.add(_nTotalAllocObjects[i]);
+            if (isExact(filter)) {
+                for (int i = 0; i < _nTrackedItems; i++) {
+                    if (filter.contains(_classNames[i])) {
+                        fClassNames.add(_classNames[i]);
+                        fTrackedLiveObjects.add(_nTrackedLiveObjects[i]);
+                        fTrackedLiveObjectsSize.add(_trackedLiveObjectsSize[i]);
+                        fTrackedAllocObjects.add(_nTrackedAllocObjects[i]);
+                        fAvgObjectAge.add(_avgObjectAge[i]);
+                        fMaxSurvGen.add(_maxSurvGen[i]);
+    //                    fTotalAllocObjects.add(_nTotalAllocObjects[i]);
+                    }
+                }
+            } else {
+                for (String f : filter) {
+                    if (f.endsWith("*")) { // NOI18N
+                        f = f.substring(0, f.length() - 1);
+                        for (int i = 0; i < _nTrackedItems; i++) {
+                            if (_classNames[i].startsWith(f)) {
+                                fClassNames.add(_classNames[i]);
+                                fTrackedLiveObjects.add(_nTrackedLiveObjects[i]);
+                                fTrackedLiveObjectsSize.add(_trackedLiveObjectsSize[i]);
+                                fTrackedAllocObjects.add(_nTrackedAllocObjects[i]);
+                                fAvgObjectAge.add(_avgObjectAge[i]);
+                                fMaxSurvGen.add(_maxSurvGen[i]);
+            //                    fTotalAllocObjects.add(_nTotalAllocObjects[i]);
+                            }
+                        }
+                    } else {
+                        for (int i = 0; i < _nTrackedItems; i++) {
+                            if (_classNames[i].equals(f)) {
+                                fClassNames.add(_classNames[i]);
+                                fTrackedLiveObjects.add(_nTrackedLiveObjects[i]);
+                                fTrackedLiveObjectsSize.add(_trackedLiveObjectsSize[i]);
+                                fTrackedAllocObjects.add(_nTrackedAllocObjects[i]);
+                                fAvgObjectAge.add(_avgObjectAge[i]);
+                                fMaxSurvGen.add(_maxSurvGen[i]);
+            //                    fTotalAllocObjects.add(_nTotalAllocObjects[i]);
+                            }
+                        }
+                    }
                 }
             }
             
