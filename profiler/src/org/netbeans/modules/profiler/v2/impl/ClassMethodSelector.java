@@ -88,6 +88,7 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.FilteringToolbar;
 import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
@@ -162,6 +163,7 @@ public final class ClassMethodSelector {
                                                    new Object[] { ui.getOKButton(), DialogDescriptor.CANCEL_OPTION },
                                                    ui.getOKButton(), DialogDescriptor.BOTTOM_ALIGN, helpCtx, null);
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+        if (Platform.isMac()) d.setAlwaysOnTop(true); // Workaround to open on top of the invoking popup window
         d.setVisible(true);
         
         return dd.getValue() == ui.getOKButton() ? ui.selectedClasses() : Collections.EMPTY_LIST;
@@ -177,6 +179,7 @@ public final class ClassMethodSelector {
                                                    new Object[] { ui.getOKButton(), DialogDescriptor.CANCEL_OPTION },
                                                    ui.getOKButton(), DialogDescriptor.BOTTOM_ALIGN, helpCtx, null);
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+        if (Platform.isMac()) d.setAlwaysOnTop(true); // Workaround to open on top of the invoking popup window
         d.setVisible(true);
         
         return dd.getValue() == ui.getOKButton() ? ui.selectedMethods() : Collections.EMPTY_LIST;
