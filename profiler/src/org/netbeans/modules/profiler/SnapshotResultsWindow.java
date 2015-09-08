@@ -502,8 +502,8 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             Object f = snapshot.getSettings().getSelectedInstrumentationFilter();
             SimpleFilter sf = f instanceof SimpleFilter ? (SimpleFilter)f : null;
             String value = sf == null ? null : sf.getFilterValue();
-            Collection filter = value == null || value.isEmpty() ? null :
-                       Arrays.asList(FilterUtils.getSeparateFilters(value));
+            Collection<String> filter = value == null || value.isEmpty() ? null :
+                               Arrays.asList(FilterUtils.getSeparateFilters(value));
             
             if (filter != null && filter.isEmpty()) filter = null;
             

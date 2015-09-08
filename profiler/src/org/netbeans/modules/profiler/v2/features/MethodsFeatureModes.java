@@ -53,6 +53,7 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.util.Collection;
 import java.util.HashSet;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -460,7 +461,7 @@ final class MethodsFeatureModes {
     
     static abstract class SelectedClassesMode extends InstrMethodsMode {
         
-        abstract void selectForProfiling(SourceClassInfo classInfo);
+        abstract void selectForProfiling(Collection<SourceClassInfo> classInfos);
         
         
         String getID() {
@@ -503,8 +504,7 @@ final class MethodsFeatureModes {
         
         
         protected void performAddSelection() {
-            SourceClassInfo classInfo = ClassMethodSelector.selectClass(getSession());
-            if (classInfo != null) selectForProfiling(classInfo);
+            selectForProfiling(ClassMethodSelector.selectClasses(getSession()));
         }
         
         protected void performEditSelection(Component invoker) {
@@ -515,7 +515,7 @@ final class MethodsFeatureModes {
     
     static abstract class SelectedMethodsMode extends InstrMethodsMode {
         
-        abstract void selectForProfiling(SourceMethodInfo methodInfo);
+        abstract void selectForProfiling(Collection<SourceMethodInfo> methodInfos);
         
         
         String getID() {
@@ -558,8 +558,7 @@ final class MethodsFeatureModes {
         
         
         protected void performAddSelection() {
-            SourceMethodInfo methodInfo = ClassMethodSelector.selectMethod(getSession());
-            if (methodInfo != null) selectForProfiling(methodInfo);
+            selectForProfiling(ClassMethodSelector.selectMethods(getSession()));
         }
         
         protected void performEditSelection(Component invoker) {

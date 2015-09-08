@@ -87,7 +87,7 @@ public abstract class MemoryView extends DataView {
     // -----
     
     
-    public abstract void setData(MemoryResultsSnapshot snapshot, Collection filter, int aggregation);
+    public abstract void setData(MemoryResultsSnapshot snapshot, Collection<String> filter, int aggregation);
     
     public abstract void resetData();
     
@@ -105,6 +105,11 @@ public abstract class MemoryView extends DataView {
         String[] classNames = snapshot == null ? null : snapshot.getClassNames();
         if (classNames != null) for (int i = 0; i < classNames.length; i++)
             classNames[i] = StringUtils.userFormClassName(classNames[i]);
+    }
+    
+    static final boolean isExact(Collection<String> filter) {
+        for (String f : filter) if (f.endsWith("*")) return false; // NOI18N
+        return true;
     }
     
 }
