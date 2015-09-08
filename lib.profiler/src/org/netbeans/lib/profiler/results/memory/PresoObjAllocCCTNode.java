@@ -254,23 +254,24 @@ public class PresoObjAllocCCTNode extends CCTNode {
     }
 
     public String getNodeName() {
-        if (isFiltered()) {
-            return FilterSortSupport.FILTERED_OUT_LBL;
-        } else if (methodId != 0) {
-            if (nodeName == null) {
+        if (nodeName == null) {
+            if (isFiltered()) {
+                nodeName = FilterSortSupport.FILTERED_OUT_LBL;
+            } else if (methodId != 0) {
                 if (VM_ALLOC_CLASS.equals(getClassName()) && VM_ALLOC_METHOD.equals(getMethodName())) { // special handling of ProfilerRuntimeMemory.traceVMObjectAlloc
                     nodeName = VM_ALLOC_TEXT;
                 } else {
-                    nodeName = MethodNameFormatterFactory.getDefault().getFormatter()
-                                                         .formatMethodName(getClassName(), getMethodName(), getMethodSig()).toFormatted();
-                }                
+                    nodeName = MethodNameFormatterFactory.getDefault().getFormatter().formatMethodName(
+                                        getClassName(), getMethodName(), getMethodSig()).toFormatted();
+                }
+            } else if (getClassName() != null) {
+                nodeName = getClassName();
+            } else {
+                nodeName = UKNOWN_NODENAME;
             }
-            return nodeName;
-        } else if (getClassName() != null) {
-            return getClassName();
-        } else {
-            return UKNOWN_NODENAME;
         }
+        
+        return nodeName;
     }
 
     public CCTNode getParent() {
@@ -340,6 +341,7 @@ public class PresoObjAllocCCTNode extends CCTNode {
 //    }
     
     public boolean equals(Object o) {
+        if (o == this) return true;
         if (!(o instanceof PresoObjAllocCCTNode)) return false;
         return getNodeName().equals(((PresoObjAllocCCTNode)o).getNodeName());
     }

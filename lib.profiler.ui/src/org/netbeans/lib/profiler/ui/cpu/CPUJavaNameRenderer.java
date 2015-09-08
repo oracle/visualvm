@@ -57,9 +57,12 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 public class CPUJavaNameRenderer extends JavaNameRenderer {
     
     private static final Icon THREAD_ICON = Icons.getIcon(ProfilerIcons.THREAD);
+    private static final Icon THREAD_ICON_DISABLED = UIManager.getLookAndFeel().getDisabledIcon(null, THREAD_ICON);
     private static final Icon LEAF_ICON = Icons.getIcon(ProfilerIcons.NODE_LEAF);
+    private static final Icon LEAF_ICON_DISABLED = UIManager.getLookAndFeel().getDisabledIcon(null, LEAF_ICON);
     
     private final Icon icon;
+    private final Icon iconDisabled;
     
     public CPUJavaNameRenderer() {
         this(ProfilerIcons.NODE_FORWARD);
@@ -67,6 +70,7 @@ public class CPUJavaNameRenderer extends JavaNameRenderer {
     
     public CPUJavaNameRenderer(String iconKey) {
         this.icon = Icons.getIcon(iconKey);
+        this.iconDisabled = UIManager.getLookAndFeel().getDisabledIcon(null, icon);
     }
     
     public void setValue(Object value, int row) {
@@ -89,15 +93,13 @@ public class CPUJavaNameRenderer extends JavaNameRenderer {
                 super.setValue(node.getNodeName(), row);
             }
             
-            Icon _icon = null;
-            
-            if (node.isThreadNode()) _icon = THREAD_ICON;
-            else if (node.isLeaf()) _icon = LEAF_ICON;
-            else _icon = icon;
-            
-            if (node.isFiltered()) _icon = UIManager.getLookAndFeel().getDisabledIcon(this, _icon);
-            
-            setIcon(_icon);
+            if (node.isThreadNode()) {
+                setIcon(node.isFiltered() ? THREAD_ICON_DISABLED : THREAD_ICON);
+            } else if (node.isLeaf()) {
+                setIcon(node.isFiltered() ? LEAF_ICON_DISABLED : LEAF_ICON);
+            } else {
+                setIcon(node.isFiltered() ? iconDisabled : icon);
+            }
         } else {
             super.setValue(value, row);
         }

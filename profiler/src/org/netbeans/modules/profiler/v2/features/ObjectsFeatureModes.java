@@ -53,6 +53,7 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.util.Collection;
 import java.util.HashSet;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -199,7 +200,7 @@ final class ObjectsFeatureModes {
         
         abstract ProfilerSession getSession();
         
-        abstract void selectForProfiling(SourceClassInfo classInfo);
+        abstract void selectForProfiling(Collection<SourceClassInfo> classInfos);
         
         
         // --- API implementation ----------------------------------------------
@@ -454,8 +455,7 @@ final class ObjectsFeatureModes {
                 Image addImage = ImageUtilities.mergeImages(baseIcon, addBadge, 0, 0);
                 addSelectionButton = new SmallButton(ImageUtilities.image2Icon(addImage)) {
                     protected void fireActionPerformed(ActionEvent e) {
-                        SourceClassInfo classInfo = ClassMethodSelector.selectClass(getSession());
-                        if (classInfo != null) selectForProfiling(classInfo);
+                        selectForProfiling(ClassMethodSelector.selectClasses(getSession()));
                     }
                     public Dimension getMinimumSize() {
                         return getPreferredSize();
