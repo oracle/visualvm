@@ -113,7 +113,14 @@ class DiffObjLivenessCCTNode extends PresoObjLivenessCCTNode {
     public boolean equals(Object o) {
         if (o == this) return true;
         if (!(o instanceof DiffObjLivenessCCTNode)) return false;
-        return getNodeName().equals(((DiffObjLivenessCCTNode)o).getNodeName());
+        if (isFiltered()) {
+            return ((DiffObjLivenessCCTNode)o).isFiltered();
+        }
+        return getNode().equals(((DiffObjLivenessCCTNode)o).getNode());
+    }
+
+    public int hashCode() {
+        return getNode().hashCode();
     }
     
     
@@ -131,17 +138,17 @@ class DiffObjLivenessCCTNode extends PresoObjLivenessCCTNode {
     }
     
     private static PresoObjAllocCCTNode[] computeChildren(PresoObjAllocCCTNode[] children1, PresoObjAllocCCTNode[] children2, PresoObjLivenessCCTNode parent) {        
-        Map<String, PresoObjAllocCCTNode> nodes1 = new HashMap();
+        Map<Handle, PresoObjAllocCCTNode> nodes1 = new HashMap();
         for (PresoObjAllocCCTNode node : children1) {
-            String name = node.getNodeName();
+            Handle name = new Handle(node);
             PresoObjAllocCCTNode sameNode = nodes1.get(name);
             if (sameNode == null) nodes1.put(name, node);
             else sameNode.merge(node);
         }
         
-        Map<String, PresoObjAllocCCTNode> nodes2 = new HashMap();
+        Map<Handle, PresoObjAllocCCTNode> nodes2 = new HashMap();
         for (PresoObjAllocCCTNode node : children2) {
-            String name = node.getNodeName();
+            Handle name = new Handle(node);
             PresoObjAllocCCTNode sameNode = nodes2.get(name);
             if (sameNode == null) nodes2.put(name, node);
             else sameNode.merge(node); // Merge same-named items
@@ -149,12 +156,12 @@ class DiffObjLivenessCCTNode extends PresoObjLivenessCCTNode {
         
         List<PresoObjAllocCCTNode> children = new ArrayList();
         for (PresoObjAllocCCTNode node1 : nodes1.values()) {
-            PresoObjAllocCCTNode node2 = nodes2.get(node1.getNodeName());
+            PresoObjAllocCCTNode node2 = nodes2.get(new Handle(node1));
             if (node2 != null) children.add(new DiffObjLivenessCCTNode((PresoObjLivenessCCTNode)node1, (PresoObjLivenessCCTNode)node2));
             else children.add(new DiffObjLivenessCCTNode((PresoObjLivenessCCTNode)node1, null));
         }
         for (PresoObjAllocCCTNode node2 : nodes2.values()) {
-            if (!nodes1.containsKey(node2.getNodeName())) children.add(new DiffObjLivenessCCTNode(null, (PresoObjLivenessCCTNode)node2));
+            if (!nodes1.containsKey(new Handle(node2))) children.add(new DiffObjLivenessCCTNode(null, (PresoObjLivenessCCTNode)node2));
         }
         
         return children.toArray(new PresoObjAllocCCTNode[children.size()]);
