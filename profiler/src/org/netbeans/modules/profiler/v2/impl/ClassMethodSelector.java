@@ -56,6 +56,7 @@ import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -151,7 +152,7 @@ public final class ClassMethodSelector {
     private static final WeakProcessor PROCESSOR = new WeakProcessor("Profiler ClassMethodSelector Processor"); // NOI18N
     private static final MethodNameFormatter METHOD_FORMATTER = new DefaultMethodNameFormatter(DefaultMethodNameFormatter.VERBOSITY_METHOD);
     
-    public static SourceClassInfo selectClass(ProfilerSession session) {
+    public static List<SourceClassInfo> selectClasses(ProfilerSession session) {
         // TODO: wait for finished scan
         
         UI ui = UI.forSession(session, false);
@@ -163,10 +164,10 @@ public final class ClassMethodSelector {
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
         
-        return dd.getValue() == ui.getOKButton() ? ui.selectedClass() : null;
+        return dd.getValue() == ui.getOKButton() ? ui.selectedClasses() : Collections.EMPTY_LIST;
     }
     
-    public static SourceMethodInfo selectMethod(ProfilerSession session) {
+    public static List<SourceMethodInfo> selectMethods(ProfilerSession session) {
         // TODO: wait for finished scan
         
         UI ui = UI.forSession(session, true);
@@ -178,7 +179,7 @@ public final class ClassMethodSelector {
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
         
-        return dd.getValue() == ui.getOKButton() ? ui.selectedMethod() : null;
+        return dd.getValue() == ui.getOKButton() ? ui.selectedMethods() : Collections.EMPTY_LIST;
     }
     
     
@@ -217,20 +218,20 @@ public final class ClassMethodSelector {
             return okButton;
         }
         
-        SourceClassInfo selectedClass() {
+        List<SourceClassInfo> selectedClasses() {
             if (p_selectors == selected && p_classSelector != null) {
-                return p_classSelector.getSelected();
+                return p_classSelector.getAllSelected();
             } else if (f_selectors == selected && f_classSelector != null) {
-                return f_classSelector.getSelected();
+                return f_classSelector.getAllSelected();
             }
             return null;
         }
         
-        SourceMethodInfo selectedMethod() {
+        List<SourceMethodInfo> selectedMethods() {
             if (p_selectors == selected && p_methodSelector != null) {
-                return p_methodSelector.getSelected();
+                return p_methodSelector.getAllSelected();
             } else if (f_selectors == selected && f_methodSelector != null) {
-                return f_methodSelector.getSelected();
+                return f_methodSelector.getAllSelected();
             }
             return null;
         }
@@ -256,7 +257,7 @@ public final class ClassMethodSelector {
                     p_methodSelector = null;
                 }
 
-                p_classSelector = new ClassSelector() {
+                p_classSelector = new ClassSelector(method) {
                     void classSelected() {
                         if (!method) okButton.setEnabled(getSelected() != null);
                         else p_methodSelector.init(getSelected());
@@ -310,7 +311,7 @@ public final class ClassMethodSelector {
                 f_methodSelector = null;
             }
             
-            f_classSelector = new ClassSelector() {
+            f_classSelector = new ClassSelector(method) {
                 void classSelected() {
                     if (!method) okButton.setEnabled(getSelected() != null);
                     else f_methodSelector.init(getSelected());
@@ -869,6 +870,10 @@ public final class ClassMethodSelector {
             return classesList.getSelectedValue();
         }
         
+        List<SourceClassInfo> getAllSelected() {
+            return classesList.getSelectedValuesList();
+        }
+        
         void init(final SourcePackageInfo _package) {
             isInitialized = _package != null;
             
@@ -928,7 +933,7 @@ public final class ClassMethodSelector {
         
         private boolean isInitialized;
         
-        ClassSelector() {
+        ClassSelector(boolean singleSelection) {
             classesListModel = new DefaultListModel();
             final FilteredListModel<SourceClassInfo> filteredClasses = new FilteredListModel<SourceClassInfo>(classesListModel) {
                 protected boolean matchesFilter(SourceClassInfo cls, String filter) {
@@ -953,7 +958,8 @@ public final class ClassMethodSelector {
                     }
                 }
             };
-            classesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            classesList.setSelectionMode(singleSelection ? ListSelectionModel.SINGLE_SELECTION :
+                                         ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
             filteredClasses.setSelectionModel(classesList.getSelectionModel());
             classesList.setCellRenderer(new DefaultListCellRenderer() {
                 public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -1024,6 +1030,10 @@ public final class ClassMethodSelector {
         
         SourceMethodInfo getSelected() {
             return methodsList.getSelectedValue();
+        }
+        
+        List<SourceMethodInfo> getAllSelected() {
+            return methodsList.getSelectedValuesList();
         }
         
         void init(final SourceClassInfo _class) {
@@ -1109,7 +1119,7 @@ public final class ClassMethodSelector {
                     }
                 }
             };
-            methodsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            methodsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
             filteredMethods.setSelectionModel(methodsList.getSelectionModel());
             methodsList.setCellRenderer(new DefaultListCellRenderer() {
                 public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {

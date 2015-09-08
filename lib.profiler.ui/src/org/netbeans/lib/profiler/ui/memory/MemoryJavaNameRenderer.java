@@ -58,6 +58,7 @@ public class MemoryJavaNameRenderer extends JavaNameRenderer {
     
     private static final Icon CLASS_ICON = Icons.getIcon(LanguageIcons.CLASS);
     private static final Icon REVERSE_ICON = Icons.getIcon(ProfilerIcons.NODE_REVERSE);
+    private static final Icon REVERSE_ICON_DISABLED = UIManager.getLookAndFeel().getDisabledIcon(null, REVERSE_ICON);
     
     public void setValue(Object value, int row) {
         if (value instanceof PresoObjAllocCCTNode) {
@@ -71,7 +72,7 @@ public class MemoryJavaNameRenderer extends JavaNameRenderer {
                 super.setValue(value, row);
             }
             
-            if (node.isFiltered()) setIcon(UIManager.getLookAndFeel().getDisabledIcon(this, REVERSE_ICON));
+            if (node.isFiltered()) setIcon(REVERSE_ICON_DISABLED);
             else if (node.getMethodClassNameAndSig()[2] == null) setIcon(CLASS_ICON); // class name
             else setIcon(REVERSE_ICON); // method name
         } else {

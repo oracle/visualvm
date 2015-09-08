@@ -88,14 +88,14 @@ public abstract class SnapshotMemoryView extends JPanel {
     private final MemoryView dataView;
     
     private int aggregation;
-    private final Collection filter;
+    private final Collection<String> filter;
     private final MemoryResultsSnapshot snapshot;
     private MemoryResultsSnapshot refSnapshot;
     
     private JToggleButton compareButton;
     
     
-    public SnapshotMemoryView(MemoryResultsSnapshot snapshot, Collection filter, Action saveAction, final Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
+    public SnapshotMemoryView(MemoryResultsSnapshot snapshot, Collection<String> filter, Action saveAction, final Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
         this.filter = filter;
         this.snapshot = snapshot;
         
