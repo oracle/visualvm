@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.results;
 
+import java.util.Collections;
 import java.util.Enumeration;
 import javax.swing.tree.TreeNode;
 
@@ -85,16 +86,15 @@ public abstract class CCTNode implements TreeNode {
     
     //--- TreeNode adapter ---
     public Enumeration<CCTNode> children() {
+        final CCTNode[] _children = getChildren();
+        final int _childrenCount = _children == null ? 0 : _children.length;
+        
+        if (_childrenCount == 0) return Collections.emptyEnumeration();
+        
         return new Enumeration<CCTNode>() {
             private int index = 0;
-            
-            public boolean hasMoreElements() {
-                return getChildren() != null && index < getChildren().length;
-            }
-
-            public CCTNode nextElement() {
-                return getChildren()[index++];
-            }
+            public boolean hasMoreElements() { return index < _childrenCount; }
+            public CCTNode nextElement()     { return _children[index++]; }
         };
     }
     

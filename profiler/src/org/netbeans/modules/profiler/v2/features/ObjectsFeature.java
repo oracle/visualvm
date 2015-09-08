@@ -50,6 +50,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.BorderFactory;
@@ -200,8 +201,9 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
             ProfilerSession getSession() {
                 return ObjectsFeature.this.getSession();
             }
-            void selectForProfiling(SourceClassInfo classInfo) {
-                ObjectsFeature.this.selectClassForProfiling(classInfo);
+            void selectForProfiling(Collection<SourceClassInfo> classInfos) {
+                for (SourceClassInfo classInfo : classInfos)
+                    ObjectsFeature.this.selectClassForProfiling(classInfo);
             }
             void settingsChanged() {
                 ObjectsFeature.this.settingsChanged();
