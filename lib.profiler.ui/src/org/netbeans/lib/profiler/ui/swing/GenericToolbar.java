@@ -126,7 +126,7 @@ public class GenericToolbar extends JToolBar {
     protected void addImpl(Component comp, Object constraints, int index) {
         if (UIUtils.isMetalLookAndFeel()) {
             if (comp instanceof AbstractButton && !(comp instanceof JCheckBox) && !(comp instanceof JRadioButton)) {
-                final AbstractButton ab = (AbstractButton) comp;
+                final AbstractButton ab = (AbstractButton)comp;
                 ab.setMargin(new Insets(1, 1, 1, 1));
                 if (ab.getClientProperty("MetalListener") == null) { // NOI18N
                     final ButtonModel bm = ab.getModel();
@@ -143,8 +143,14 @@ public class GenericToolbar extends JToolBar {
             }
         } else if (UIUtils.isNimbusLookAndFeel()) {
             if (comp instanceof AbstractButton && !(comp instanceof JCheckBox) && !(comp instanceof JRadioButton)) {
-                final AbstractButton ab = (AbstractButton) comp;
+                AbstractButton ab = (AbstractButton)comp;
                 ab.setMargin(new Insets(2, 2, 2, 2));
+            }
+        } else if (UIUtils.isAquaLookAndFeel()) {
+            if (comp instanceof AbstractButton && !(comp instanceof JCheckBox) && !(comp instanceof JRadioButton)) {
+                AbstractButton ab = (AbstractButton)comp;
+                ab.putClientProperty("JButton.buttonType", "textured"); // NOI18N
+                ab.setMargin(new Insets(-1, -1, -2, -1));
             }
         }
         

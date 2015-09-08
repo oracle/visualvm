@@ -104,9 +104,9 @@ public class DropdownButton extends JPanel {
             POPUP_XWIDTH = -2;
             POPUP_MARGIN = 6;
         } else if (UIUtils.isAquaLookAndFeel()) {
-            POPUP_EXTENT = 16;
-            POPUP_OFFSET = 5;
-            POPUP_XWIDTH = -2;
+            POPUP_EXTENT = 19;
+            POPUP_OFFSET = 7;
+            POPUP_XWIDTH = -5;
             POPUP_MARGIN = 6;
         } else {
             POPUP_EXTENT = 16;
@@ -365,6 +365,9 @@ public class DropdownButton extends JPanel {
             
             // See GenericToolbar.addImpl()
             putClientProperty("MetalListener", new Object()); // NOI18N
+            
+            if (UIUtils.isAquaLookAndFeel())
+                putClientProperty("JComponent.sizeVariant", "regular"); // NOI18N
             
             setModel(new DefaultButtonModel() {
                 public boolean isRollover() {
