@@ -203,7 +203,9 @@ public class InstrumentationFilter implements Cloneable {
                 return true;
             case INSTR_FILTER_INCLUSIVE_EXACT:
                 for (int i = 0; i < instrFilterStrings.length; i++) {
-                    if (instrFilterStrings[i].contains("[")) {      // NOI18N
+                    if (instrFilterStrings[i].contains("[") ||      // NOI18N
+                        (instrFilterTypes != null &&
+                        instrFilterTypes[i] == INSTR_FILTER_INCLUSIVE)) { // wildcard used
                         return true;
                     }
                 }
