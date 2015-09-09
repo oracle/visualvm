@@ -134,6 +134,8 @@ abstract class MonitorFeatureUI extends FeatureUI {
                 monitorView.setupCPUView(isSelected());
             }
         };
+        cpuView.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        cpuView.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
         cpuView.setToolTipText(Bundle.MonitorFeatureUI_cpuGraph());
         group.add(cpuView);
         monitorView.setupCPUView(true);
@@ -146,6 +148,8 @@ abstract class MonitorFeatureUI extends FeatureUI {
                 monitorView.setupMemoryView(isSelected());
             }
         };
+        memoryView.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        memoryView.putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
         memoryView.setToolTipText(Bundle.MonitorFeatureUI_memoryGraph());
         group.add(memoryView);
         monitorView.setupMemoryView(true);
@@ -158,6 +162,8 @@ abstract class MonitorFeatureUI extends FeatureUI {
                 monitorView.setupGCView(isSelected());
             }
         };
+        gcView.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        gcView.putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
         gcView.setToolTipText(Bundle.MonitorFeatureUI_gcGraph());
         group.add(gcView);
         monitorView.setupGCView(true);
@@ -170,6 +176,8 @@ abstract class MonitorFeatureUI extends FeatureUI {
                 monitorView.setupThreadsView(isSelected());
             }
         };
+        threadsView.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        threadsView.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
         threadsView.setToolTipText(Bundle.MonitorFeatureUI_threadsGraph());
         group.add(threadsView);
         monitorView.setupThreadsView(true);

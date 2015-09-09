@@ -70,6 +70,7 @@ import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.SmallButton;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
@@ -187,6 +188,8 @@ public final class ClassMethodList {
                     Collection<ClientUtils.SourceCodeSelection> sel = null;
                     
                     if (methods) {
+                        if (Platform.isMac()) addingEntry = false; // Workaround to hide the popup window on Mac
+                        
                         Collection<SourceMethodInfo> mtd = ClassMethodSelector.selectMethods(session);
                         
                         SwingUtilities.invokeLater(new Runnable() {
@@ -205,6 +208,8 @@ public final class ClassMethodList {
                                                                         smi.getName(), smi.getSignature()));
                         }
                     } else {
+                        if (Platform.isMac()) addingEntry = false; // Workaround to hide the popup window on Mac
+                        
                         Collection<SourceClassInfo> cls = ClassMethodSelector.selectClasses(session);
                         
                         SwingUtilities.invokeLater(new Runnable() {
