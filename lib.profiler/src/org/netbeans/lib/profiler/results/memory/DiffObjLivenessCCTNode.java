@@ -113,10 +113,14 @@ class DiffObjLivenessCCTNode extends PresoObjLivenessCCTNode {
     public boolean equals(Object o) {
         if (o == this) return true;
         if (!(o instanceof DiffObjLivenessCCTNode)) return false;
+        DiffObjLivenessCCTNode other = (DiffObjLivenessCCTNode)o;
         if (isFiltered()) {
-            return ((DiffObjLivenessCCTNode)o).isFiltered();
+            return other.isFiltered();
         }
-        return getNode().equals(((DiffObjLivenessCCTNode)o).getNode());
+        if (other.isFiltered()) {
+            return false;
+        }
+        return getNode().equals(other.getNode());
     }
 
     public int hashCode() {

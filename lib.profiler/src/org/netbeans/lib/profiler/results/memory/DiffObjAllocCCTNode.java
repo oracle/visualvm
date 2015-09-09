@@ -101,10 +101,14 @@ class DiffObjAllocCCTNode extends PresoObjAllocCCTNode {
     public boolean equals(Object o) {
         if (o == this) return true;
         if (!(o instanceof DiffObjAllocCCTNode)) return false;
+        DiffObjAllocCCTNode other = (DiffObjAllocCCTNode)o;
         if (isFiltered()) {
-            return ((DiffObjAllocCCTNode)o).isFiltered();
+            return other.isFiltered();
         }
-        return getNode().equals(((DiffObjAllocCCTNode)o).getNode());
+        if (other.isFiltered()) {
+            return false;
+        }
+        return getNode().equals(other.getNode());
     }
 
     public int hashCode() {
