@@ -344,6 +344,12 @@ public class PresoObjAllocCCTNode extends CCTNode {
         if (o == this) return true;
         if (!(o instanceof PresoObjAllocCCTNode)) return false;
         PresoObjAllocCCTNode other = (PresoObjAllocCCTNode)o;
+        if (isFiltered()) {
+            return other.isFiltered();
+        }
+        if (other.isFiltered()) {
+            return false;
+        }
         if (methodId == 0) {
             return getNodeName().equals(other.getNodeName());
         }
@@ -356,7 +362,7 @@ public class PresoObjAllocCCTNode extends CCTNode {
     }
     
     public int hashCode() {
-        if (methodId == 0) {
+        if (methodId == 0 || isFiltered()) {
             return getNodeName().hashCode();
         }
         return entry.className.hashCode() ^ entry.methodName.hashCode() ^ entry.methodSig.hashCode();
