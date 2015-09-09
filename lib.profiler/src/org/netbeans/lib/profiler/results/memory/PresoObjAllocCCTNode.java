@@ -347,6 +347,9 @@ public class PresoObjAllocCCTNode extends CCTNode {
         if (methodId == 0) {
             return getNodeName().equals(other.getNodeName());
         }
+        if (other.methodId == 0) {
+            return false;
+        }
         return entry.className.equals(other.entry.className) &&
                entry.methodName.equals(other.entry.methodName) &&
                entry.methodSig.equals(other.entry.methodSig);
