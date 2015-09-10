@@ -531,7 +531,7 @@ final class ObjectsFeatureModes {
             
             super.configureSettings(settings);
             
-            String filterValue = getFlatValues(classesArea.getText().split("\\n")); // NOI18N
+            String filterValue = getFlatValues(readFlag(CLASSES_FLAG, "").split("\\n")); // NOI18N
             settings.setSelectedInstrumentationFilter(new SimpleFilter("", // NOI18N
                     SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT, filterValue));
             
