@@ -168,12 +168,6 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
     }
     
     
-    public boolean equals(Object o) {
-        if (o == this) return true;
-        if (!(o instanceof PresoObjLivenessCCTNode)) return false;
-        return getNodeName().equals(((PresoObjLivenessCCTNode)o).getNodeName());
-    }
-    
     
 //    void merge(PresoObjAllocCCTNode node) {
 //        PresoObjLivenessCCTNode nodel = (PresoObjLivenessCCTNode)node;

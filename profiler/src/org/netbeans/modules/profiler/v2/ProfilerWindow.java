@@ -242,6 +242,8 @@ class ProfilerWindow extends ProfilerTopComponent {
             protected void displayPopup() { displayPopupImpl(); }
         };
         configure.setToolTipText(Bundle.ProfilerWindow_configureTooltip());
+        if (UIUtils.isAquaLookAndFeel())
+            configure.putClientProperty("JComponent.sizeVariant", "regular"); // NOI18N
         toolbar.add(configure);
         
         String command = session.isAttach() ? Bundle.ProfilerWindow_attach() :
