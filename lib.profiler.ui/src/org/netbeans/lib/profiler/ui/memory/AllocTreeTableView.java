@@ -113,7 +113,6 @@ abstract class AllocTreeTableView extends MemoryView {
     
     public void setData(MemoryResultsSnapshot snapshot, Collection<String> filter, int aggregation) {
         final boolean includeEmpty = filter != null;
-        final boolean exactFilter = isExact(filter);
         final boolean diff = snapshot instanceof AllocMemoryResultsDiff;
         final AllocMemoryResultsSnapshot _snapshot = (AllocMemoryResultsSnapshot)snapshot;
         
@@ -143,8 +142,6 @@ abstract class AllocTreeTableView extends MemoryView {
                 totalBytes += _totalAllocObjectsSize[i];
             }
             
-//            String className = StringUtils.userFormClassName(_classNames[i]);
-//            final String className = _classNames[i];
             final int _i = i;
             
             class Node extends PresoObjAllocCCTNode {
@@ -170,44 +167,44 @@ abstract class AllocTreeTableView extends MemoryView {
                 }
             }
             
-            if ((!includeEmpty && _nTotalAllocObjects[i] > 0) || (exactFilter && includeEmpty && filter.contains(_classNames[i]))) {
+            if ((!includeEmpty && _nTotalAllocObjects[i] > 0) || (isAll(filter) && includeEmpty) || (isExact(filter) && includeEmpty && filter.contains(_classNames[i]))) {
                 PresoObjAllocCCTNode node = new Node(_classNames[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i]);
-//                final int _i = i;
-//                PresoObjAllocCCTNode node = new PresoObjAllocCCTNode(className, _nTotalAllocObjects[i], _totalAllocObjectsSize[i]) {
-//                    public CCTNode[] getChildren() {
-//                        if (children == null) {
-//                            MemoryCCTManager callGraphManager = new MemoryCCTManager(_snapshot, _i, true);
-//                            PresoObjAllocCCTNode root = callGraphManager.getRootNode();
-//                            setChildren(root == null ? new PresoObjAllocCCTNode[0] :
-//                                        (PresoObjAllocCCTNode[])root.getChildren());
-//                        }
-//                        return children;
-//                    }
-//                    public boolean isLeaf() {
-//                        if (children == null) return includeEmpty ? nCalls == 0 : false;
-//                        else return super.isLeaf();
-//                    }   
-//                    public int getChildCount() {
-//                        if (children == null) getChildren();
-//                        return super.getChildCount();
-//                    }
-//                };
                 nodes.add(node);
                 _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
             } else {
                 for (String f : filter) {
-                    if (f.endsWith("*")) { // NOI18N
-                        f = f.substring(0, f.length() - 1);
+                    if (f.endsWith("**")) { // NOI18N
+                        f = f.substring(0, f.length() - 2);
                         if (_classNames[i].startsWith(f)) {
                             PresoObjAllocCCTNode node = new Node(_classNames[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i]);
                             nodes.add(node);
                             _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
+                            break;
+                        }
+                    } else if (f.endsWith("*")) { // NOI18N
+                        f = f.substring(0, f.length() - 1);
+                        
+                        if (!_classNames[i].startsWith(f)) continue;
+                            
+                        boolean subpackage = false;
+                        for (int ii = f.length(); ii < _classNames[i].length(); ii++)
+                            if (_classNames[i].charAt(ii) == '.') { // NOI18N
+                                subpackage = true;
+                                break;
+                            }
+
+                        if (!subpackage) {
+                            PresoObjAllocCCTNode node = new Node(_classNames[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i]);
+                            nodes.add(node);
+                            _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
+                            break;
                         }
                     } else {
                         if (_classNames[i].equals(f)) {
                             PresoObjAllocCCTNode node = new Node(_classNames[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i]);
                             nodes.add(node);
                             _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
+                            break;
                         }
                     }
                 }
