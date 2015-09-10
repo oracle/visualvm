@@ -343,11 +343,29 @@ public class PresoObjAllocCCTNode extends CCTNode {
     public boolean equals(Object o) {
         if (o == this) return true;
         if (!(o instanceof PresoObjAllocCCTNode)) return false;
-        return getNodeName().equals(((PresoObjAllocCCTNode)o).getNodeName());
+        PresoObjAllocCCTNode other = (PresoObjAllocCCTNode)o;
+        if (isFiltered()) {
+            return other.isFiltered();
+        }
+        if (other.isFiltered()) {
+            return false;
+        }
+        if (methodId == 0) {
+            return getNodeName().equals(other.getNodeName());
+        }
+        if (other.methodId == 0) {
+            return false;
+        }
+        return entry.className.equals(other.entry.className) &&
+               entry.methodName.equals(other.entry.methodName) &&
+               entry.methodSig.equals(other.entry.methodSig);
     }
     
     public int hashCode() {
-        return getNodeName().hashCode();
+        if (methodId == 0 || isFiltered()) {
+            return getNodeName().hashCode();
+        }
+        return entry.className.hashCode() ^ entry.methodName.hashCode() ^ entry.methodSig.hashCode();
     }
 
     protected static void assignNamesToNodesFromSnapshot(MemoryResultsSnapshot snapshot, PresoObjAllocCCTNode rootNode,
@@ -673,5 +691,27 @@ public class PresoObjAllocCCTNode extends CCTNode {
             return entry.methodSig;
         }
         return null;
+    }
+    
+    static class Handle {
+
+        final PresoObjAllocCCTNode node;
+        
+        Handle(PresoObjAllocCCTNode n) {
+            node = n;
+        }
+
+        public int hashCode() {
+            return node.hashCode();
+        }
+
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            
+            return node.equals(((Handle)obj).node);
+        }
+        
+        
+        
     }
 }
