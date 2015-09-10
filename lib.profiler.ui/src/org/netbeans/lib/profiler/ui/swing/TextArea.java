@@ -48,11 +48,14 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
@@ -241,7 +244,68 @@ public class TextArea extends JTextArea {
         miSelect.setEnabled(!showsHint() && !getText().isEmpty());
         popup.add(miSelect);
         
+        customizePopup(popup);
+        
         popup.show(this, e.getX(), e.getY());
+    }
+    
+    protected void customizePopup(JPopupMenu popup) {}
+    
+    
+    // --- Resize support ------------------------------------------------------
+    
+    protected void processKeyEvent(KeyEvent e) {
+        if (e.isControlDown() && e.getID() == KeyEvent.KEY_RELEASED) {
+            int keyCode = e.getKeyCode();
+            if (keyCode == KeyEvent.VK_EQUALS || keyCode == KeyEvent.VK_PLUS) {
+                if (changeSize(e.isShiftDown(), true)) e.consume();
+            } else if (keyCode == KeyEvent.VK_MINUS) {
+                if (changeSize(e.isShiftDown(), false)) e.consume();
+            } else if (keyCode == KeyEvent.VK_0) {
+                if (resetSize()) e.consume();
+            }
+        }
+        
+        if (!e.isConsumed()) super.processKeyEvent(e);
+    }
+    
+    protected boolean changeSize(boolean vertical, boolean direction) { return false; }
+    
+    protected boolean resetSize() { return false; }
+    
+    protected final JMenu createResizeMenu() {
+        JMenu menu = new JMenu(BUNDLE().getString("TextArea_Resize")); // NOI18N
+                        
+        JMenuItem horizPlus = new JMenuItem(BUNDLE().getString("TextArea_HorizPlus")) { // NOI18N
+            protected void fireActionPerformed(ActionEvent e) { changeSize(false, true); }
+        };
+        horizPlus.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyEvent.CTRL_MASK));
+        menu.add(horizPlus);
+        JMenuItem horizMinus = new JMenuItem(BUNDLE().getString("TextArea_HorizMinus")) { // NOI18N
+            protected void fireActionPerformed(ActionEvent e) { changeSize(false, false); }
+        };
+        horizMinus.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.CTRL_MASK));
+        menu.add(horizMinus);
+        JMenuItem vertPlus = new JMenuItem(BUNDLE().getString("TextArea_VertPlus")) { // NOI18N
+            protected void fireActionPerformed(ActionEvent e) { changeSize(true, true); }
+        };
+        vertPlus.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
+        menu.add(vertPlus);
+        JMenuItem vertMinus = new JMenuItem(BUNDLE().getString("TextArea_VertMinus")) { // NOI18N
+            protected void fireActionPerformed(ActionEvent e) { changeSize(true, false); }
+        };
+        vertMinus.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
+        menu.add(vertMinus);
+
+        menu.addSeparator();
+
+        JMenuItem reset = new JMenuItem(BUNDLE().getString("TextArea_DefaultSize")) { // NOI18N
+            protected void fireActionPerformed(ActionEvent e) { resetSize(); }
+        };
+        reset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, KeyEvent.CTRL_MASK));
+        menu.add(reset);
+        
+        return menu;
     }
     
 }

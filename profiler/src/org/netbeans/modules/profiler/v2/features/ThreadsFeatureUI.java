@@ -43,10 +43,10 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -114,9 +114,9 @@ abstract class ThreadsFeatureUI extends FeatureUI {
     private ActionPopupButton shFilter;
     
     private JLabel tlLabel;
-    private Component tlZoomInButton;
-    private Component tlZoomOutButton;
-    private Component tlFitWidthButton;
+    private JComponent tlZoomInButton;
+    private JComponent tlZoomOutButton;
+    private JComponent tlFitWidthButton;
     
     
     private void initUI() {
@@ -166,9 +166,15 @@ abstract class ThreadsFeatureUI extends FeatureUI {
         tlLabel = new GrayLabel(Bundle.ThreadsFeatureUI_timeline());
 
 
-        tlZoomInButton = threadsView.getZoomIn();
-        tlZoomOutButton = threadsView.getZoomOut();
-        tlFitWidthButton = threadsView.getFitWidth();
+        tlZoomInButton = (JComponent)threadsView.getZoomIn();
+        tlZoomInButton.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        tlZoomInButton.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
+        tlZoomOutButton = (JComponent)threadsView.getZoomOut();
+        tlZoomOutButton.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        tlZoomOutButton.putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
+        tlFitWidthButton = (JComponent)threadsView.getFitWidth();
+        tlFitWidthButton.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        tlFitWidthButton.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
 
         toolbar = ProfilerToolbar.create(true);
 
