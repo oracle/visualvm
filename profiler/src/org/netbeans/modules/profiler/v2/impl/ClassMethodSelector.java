@@ -828,6 +828,8 @@ public final class ClassMethodSelector {
                         PREF.putBoolean("Profiler.CMS.packagesSourcesB", packagesSourcesB.isSelected()); // NOI18N
                     }
                 };
+                packagesSourcesB.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+                packagesSourcesB.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
                 packagesSourcesB.setToolTipText(Bundle.ClassMethodSelector_showProjectPackages());
                 packagesSourcesB.setSelected(PREF.getBoolean("Profiler.CMS.packagesSourcesB", true)); // NOI18N
                 packagesDependenciesB = new JToggleButton(Icons.getIcon(LanguageIcons.JAR)) {
@@ -837,6 +839,8 @@ public final class ClassMethodSelector {
                         PREF.putBoolean("Profiler.CMS.packagesDependenciesB", packagesDependenciesB.isSelected()); // NOI18N
                     }
                 };
+                packagesDependenciesB.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+                packagesDependenciesB.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
                 packagesDependenciesB.setToolTipText(Bundle.ClassMethodSelector_showDependenciesPackages());
                 packagesDependenciesB.setSelected(PREF.getBoolean("Profiler.CMS.packagesDependenciesB", false)); // NOI18N
                 
@@ -986,6 +990,8 @@ public final class ClassMethodSelector {
                     PREF.putBoolean("Profiler.CMS.classesInnerB", classesInnerB.isSelected()); // NOI18N
                 }
             };
+            classesInnerB.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+            classesInnerB.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
             classesInnerB.setToolTipText(Bundle.ClassMethodSelector_showInnerClasses());
             classesInnerB.setSelected(PREF.getBoolean("Profiler.CMS.classesInnerB", true)); // NOI18N
             classesAnonymousB = new JToggleButton(Icons.getIcon(LanguageIcons.CLASS_ANONYMOUS)) {
@@ -999,6 +1005,8 @@ public final class ClassMethodSelector {
                     if (!isEnabled()) setSelected(false);
                 }
             };
+            classesAnonymousB.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+            classesAnonymousB.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
             classesAnonymousB.setToolTipText(Bundle.ClassMethodSelector_showAnonymousClasses());
             classesAnonymousB.setSelected(PREF.getBoolean("Profiler.CMS.classesAnonymousB", false)); // NOI18N
             JToolBar classesTools = new FilteringToolbar(Bundle.ClassMethodSelector_lblFilterItems()) {
@@ -1145,6 +1153,8 @@ public final class ClassMethodSelector {
                     PREF.putBoolean("Profiler.CMS.methodsInheritedB", methodsInheritedB.isSelected()); // NOI18N
                 }
             };
+            methodsInheritedB.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+            methodsInheritedB.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
             methodsInheritedB.setToolTipText(Bundle.ClassMethodSelector_showInheritedMethods());
             methodsInheritedB.setSelected(PREF.getBoolean("Profiler.CMS.methodsInheritedB", false));
             methodsNonPublicB = new JToggleButton(Icons.getIcon(LanguageIcons.METHOD_PRIVATE)) {
@@ -1154,6 +1164,8 @@ public final class ClassMethodSelector {
                     PREF.putBoolean("Profiler.CMS.methodsNonPublicB", methodsNonPublicB.isSelected()); // NOI18N
                 }
             };
+            methodsNonPublicB.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+            methodsNonPublicB.putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
             methodsNonPublicB.setToolTipText(Bundle.ClassMethodSelector_showNonPublicMethods());
             methodsNonPublicB.setSelected(PREF.getBoolean("Profiler.CMS.methodsNonPublicB", true));
             methodsStaticB = new JToggleButton(Icons.getIcon(LanguageIcons.METHOD_PUBLIC_STATIC)) {
@@ -1163,6 +1175,8 @@ public final class ClassMethodSelector {
                     PREF.putBoolean("Profiler.CMS.methodsStaticB", methodsStaticB.isSelected()); // NOI18N
                 }
             };
+            methodsStaticB.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+            methodsStaticB.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
             methodsStaticB.setToolTipText(Bundle.ClassMethodSelector_showStaticMethods());
             methodsStaticB.setSelected(PREF.getBoolean("Profiler.CMS.methodsStaticB", true));
             JToolBar methodsTools = new FilteringToolbar(Bundle.ClassMethodSelector_lblFilterItems()) {
