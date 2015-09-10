@@ -115,7 +115,7 @@ public final class UIUtils {
     }
     
     public static JSeparator createHorizontalLine(Color background) {
-        final boolean customPaint = isNimbus();
+        final boolean customPaint = isNimbus() || isAquaLookAndFeel();
         JSeparator separator = new JSeparator() {
             public Dimension getMaximumSize() {
                 return new Dimension(super.getMaximumSize().width, 1);
@@ -680,7 +680,8 @@ public final class UIUtils {
     
     public static Color getDisabledLineColor() {
         if (disabledLineColor == null) {
-            disabledLineColor = UIManager.getColor("Label.disabledForeground"); // NOI18N
+            disabledLineColor = UIManager.getColor(isAquaLookAndFeel() ? "controlShadow" : // NOI18N
+                                                   "Label.disabledForeground"); // NOI18N
             if (disabledLineColor == null)
                 disabledLineColor = UIManager.getColor("Label.disabledText"); // NOI18N
             if (disabledLineColor == null || disabledLineColor.equals(getProfilerResultsBackground()))
