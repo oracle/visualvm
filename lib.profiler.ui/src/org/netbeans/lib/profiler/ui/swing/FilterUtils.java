@@ -180,7 +180,7 @@ public final class FilterUtils {
         JToolBar toolbar = new InvisibleToolbar();
         if (UIUtils.isWindowsModernLookAndFeel())
             toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 2));
-        else if (!UIUtils.isNimbusLookAndFeel())
+        else if (!UIUtils.isNimbusLookAndFeel() && !UIUtils.isAquaLookAndFeel())
             toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
         
         toolbar.add(Box.createHorizontalStrut(6));

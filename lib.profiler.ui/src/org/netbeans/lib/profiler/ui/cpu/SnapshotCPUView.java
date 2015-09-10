@@ -222,8 +222,8 @@ public abstract class SnapshotCPUView extends JPanel {
                 if (getUI() instanceof BasicSplitPaneUI) {
                     BasicSplitPaneDivider divider = ((BasicSplitPaneUI)getUI()).getDivider();
                     if (divider != null) {
-                        Color c = UIUtils.isNimbus() ? UIUtils.getDisabledLineColor() :
-                                new JSeparator().getForeground();
+                        Color c = UIUtils.isNimbus() || UIUtils.isAquaLookAndFeel() ?
+                                  UIUtils.getDisabledLineColor() : new JSeparator().getForeground();
                         divider.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, c));
                     }
                 }
@@ -243,8 +243,8 @@ public abstract class SnapshotCPUView extends JPanel {
                 if (getUI() instanceof BasicSplitPaneUI) {
                     BasicSplitPaneDivider divider = ((BasicSplitPaneUI)getUI()).getDivider();
                     if (divider != null) {
-                        Color c = UIUtils.isNimbus() ? UIUtils.getDisabledLineColor() :
-                                new JSeparator().getForeground();
+                        Color c = UIUtils.isNimbus() || UIUtils.isAquaLookAndFeel() ?
+                                  UIUtils.getDisabledLineColor() : new JSeparator().getForeground();
                         divider.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, c));
                     }
                 }
