@@ -124,7 +124,8 @@ import org.openide.util.NbPreferences;
             + "<code>&nbsp;org.mypackage.**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes and arrays in package and subpackages<br>"
             + "<code>&nbsp;org.mypackage.*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes and arrays in package<br>"
             + "<code>&nbsp;org.mypackage.MyClass&nbsp;&nbsp;</code>single class<br><br>"
-            + "Special cases:<br><br><code>&nbsp;char[]&nbsp;&nbsp;</code>primitive array<br>"
+            + "Special cases:<br><br>"
+            + "<code>&nbsp;char[]&nbsp;&nbsp;</code>primitive array<br>"
             + "<code>&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes and arrays<br></html>"
 })
 final class ObjectsFeatureModes {
@@ -678,9 +679,7 @@ final class ObjectsFeatureModes {
                         popup.add(createResizeMenu());
                     }
                     public Point getToolTipLocation(MouseEvent event) {
-                        Insets i1 = container[0].getInsets();
-                        Insets i2 = container[0].getViewport().getInsets();
-                        return new Point(getWidth() + i1.right + i2.right + 1, -1);
+                        return new Point(-1, getHeight() + 2);
                     }
                 };
                 classesArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N

@@ -61,6 +61,7 @@ public class InstrumentationFilter implements Cloneable {
     public static final int INSTR_FILTER_NONE = 0;
     public static final int INSTR_FILTER_EXCLUSIVE = 10;
     public static final int INSTR_FILTER_INCLUSIVE = 20;
+    public static final int INSTR_FILTER_EXCLUSIVE_EXACT = 30;
     public static final int INSTR_FILTER_INCLUSIVE_EXACT = 40;
     
     private static final int FILTER_MATCHES   = 1; // string exactly matches the filter (class name)
@@ -136,7 +137,7 @@ public class InstrumentationFilter implements Cloneable {
         instrFilterStrings = slashedFilterStrings;
         instrFilterUserStrings = (String[])Arrays.copyOf(instrFilterStrings, instrFilterStrings.length);
         
-        if (instrFilterType == INSTR_FILTER_INCLUSIVE_EXACT) {
+        if (instrFilterType == INSTR_FILTER_INCLUSIVE_EXACT || instrFilterType == INSTR_FILTER_EXCLUSIVE_EXACT) {
             instrFilterTypes = new int[instrFilterStrings.length];
             Arrays.fill(instrFilterTypes, FILTER_MATCHES);
         } else {
@@ -192,6 +193,9 @@ public class InstrumentationFilter implements Cloneable {
             case INSTR_FILTER_INCLUSIVE:
                 filterStringsBuffer.append("  Filter type: Inclusive\n"); // NOI18N
                 break;
+            case INSTR_FILTER_EXCLUSIVE_EXACT:
+                filterStringsBuffer.append("  Filter type: Exclusive exact\n"); // NOI18N
+                break;
             case INSTR_FILTER_INCLUSIVE_EXACT:
                 filterStringsBuffer.append("  Filter type: Inclusive exact\n"); // NOI18N
                 break;
@@ -215,6 +219,7 @@ public class InstrumentationFilter implements Cloneable {
             case INSTR_FILTER_EXCLUSIVE:
             case INSTR_FILTER_INCLUSIVE:
                 return true;
+//            case INSTR_FILTER_EXCLUSIVE_EXACT: // NOTE: not used by memory profiling
             case INSTR_FILTER_INCLUSIVE_EXACT:
                 for (int i = 0; i < instrFilterStrings.length; i++) {
                     if (instrFilterStrings[i].contains("[") ||      // NOI18N
@@ -241,6 +246,9 @@ public class InstrumentationFilter implements Cloneable {
                 break;
             case INSTR_FILTER_INCLUSIVE:
                 System.err.println("  Filter type: Inclusive"); // NOI18N
+                break;
+            case INSTR_FILTER_EXCLUSIVE_EXACT:
+                System.err.println("  Filter type: Exclusive exact"); // NOI18N
                 break;
             case INSTR_FILTER_INCLUSIVE_EXACT:
                 System.err.println("  Filter type: Inclusive exact"); // NOI18N
@@ -285,6 +293,7 @@ public class InstrumentationFilter implements Cloneable {
             case INSTR_FILTER_INCLUSIVE:
             case FILTER_STARTS:
                 return string.startsWith(filter);
+            case INSTR_FILTER_EXCLUSIVE_EXACT:
             case INSTR_FILTER_INCLUSIVE_EXACT:
             case FILTER_MATCHES:
                 return string.equals(filter);
