@@ -175,6 +175,9 @@ public class ProfilerTable extends JTable {
         setRowHeight(UIUtils.getDefaultRowHeight() + 2);
         setBackground(UIUtils.getProfilerResultsBackground());
         
+        if (UIUtils.isNimbusLookAndFeel() && Boolean.TRUE.equals(UIManager.getBoolean("nb.dark.theme"))) // NOI18N
+            setForeground(UIManager.getColor("text")); // NOI18N
+        
         ProfilerTableActions.install(this);
         ProfilerTableHover.install(this);
         
