@@ -52,7 +52,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.HashSet;
 import javax.swing.AbstractButton;
@@ -117,7 +119,13 @@ import org.openide.util.NbPreferences;
     "ObjectsFeatureModes_limitAllocationsDepthToolTip=Limit depth of allocations call tree (select 0 for no allocation calls)",
     "ObjectsFeatureModes_definedClasses=Defined classes",
     "ObjectsFeatureModes_classesLbl=Classes:",
-    "ObjectsFeatureModes_classesHint=org.mypackage.MyClass\norg.mypackage.MyClass$1"
+    "ObjectsFeatureModes_classesHint=org.mypackage.**\norg.mypackage.*\norg.mypackage.MyClass",
+    "ObjectsFeatureModes_classesTooltip=<html>Define the classes to be profiled:<br><br>"
+            + "<code>&nbsp;org.mypackage.**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes and arrays in package and subpackages<br>"
+            + "<code>&nbsp;org.mypackage.*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes and arrays in package<br>"
+            + "<code>&nbsp;org.mypackage.MyClass&nbsp;&nbsp;</code>single class<br><br>"
+            + "Special cases:<br><br><code>&nbsp;char[]&nbsp;&nbsp;</code>primitive array<br>"
+            + "<code>&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes and arrays<br></html>"
 })
 final class ObjectsFeatureModes {
     
@@ -531,7 +539,7 @@ final class ObjectsFeatureModes {
             
             super.configureSettings(settings);
             
-            String filterValue = getFlatValues(classesArea.getText().split("\\n")); // NOI18N
+            String filterValue = getFlatValues(readFlag(CLASSES_FLAG, "").split("\\n")); // NOI18N
             settings.setSelectedInstrumentationFilter(new SimpleFilter("", // NOI18N
                     SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT, filterValue));
             
@@ -669,6 +677,11 @@ final class ObjectsFeatureModes {
                         popup.addSeparator();
                         popup.add(createResizeMenu());
                     }
+                    public Point getToolTipLocation(MouseEvent event) {
+                        Insets i1 = container[0].getInsets();
+                        Insets i2 = container[0].getViewport().getInsets();
+                        return new Point(getWidth() + i1.right + i2.right + 1, -1);
+                    }
                 };
                 classesArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N
                 classesArea.setRows(readRows());
@@ -678,6 +691,7 @@ final class ObjectsFeatureModes {
                 container[0].setMinimumSize(container[0].getPreferredSize());
                 classesArea.setColumns(0);
                 classesArea.setHint(Bundle.ObjectsFeatureModes_classesHint());
+                classesArea.setToolTipText(Bundle.ObjectsFeatureModes_classesTooltip());
                 c = new GridBagConstraints();
                 c.gridx = 1;
                 c.gridy = 0;
