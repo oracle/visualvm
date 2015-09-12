@@ -121,7 +121,6 @@ abstract class LivenessTreeTableView extends MemoryView {
     
     public void setData(MemoryResultsSnapshot snapshot, Collection<String> filter, int aggregation) {
         final boolean includeEmpty = filter != null;
-        final boolean exactFilter = isExact(filter);
 //        final boolean includeEmpty = false;
         final boolean diff = snapshot instanceof LivenessMemoryResultsDiff;
         final LivenessMemoryResultsSnapshot _snapshot = (LivenessMemoryResultsSnapshot)snapshot;
@@ -168,8 +167,6 @@ abstract class LivenessTreeTableView extends MemoryView {
                 if (includeTotalAllocs) totalTotalAlloc += _nTotalAllocObjects[i];
             }
             
-//            String className = StringUtils.userFormClassName(_classNames[i]);
-//            String className = _classNames[i];
             final int _i = i;
             
             class Node extends PresoObjLivenessCCTNode {
@@ -195,44 +192,44 @@ abstract class LivenessTreeTableView extends MemoryView {
                 }
             }
             
-            if ((!includeEmpty && _nTrackedLiveObjects[i] > 0) || (exactFilter && includeEmpty && filter.contains(_classNames[i]))) {
+            if ((!includeEmpty && _nTrackedLiveObjects[i] > 0) || (isAll(filter) && includeEmpty) || (isExact(filter) && includeEmpty && filter.contains(_classNames[i]))) {
                 PresoObjLivenessCCTNode node = new Node(_classNames[i], _nTrackedAllocObjects[i], _objectsSizePerClass[i], _nTrackedLiveObjects[i], _nTotalAllocObjects[i], _avgObjectAge[i], _maxSurvGen[i]);
-//                final int _i = i;
-//                    PresoObjLivenessCCTNode node = new PresoObjLivenessCCTNode(className, _nTrackedAllocObjects[i], _objectsSizePerClass[i], _nTrackedLiveObjects[i], _nTotalAllocObjects[i], _avgObjectAge[i], _maxSurvGen[i]) {
-//                    public CCTNode[] getChildren() {
-//                        if (children == null) {
-//                            MemoryCCTManager callGraphManager = new MemoryCCTManager(_snapshot, _i, true);
-//                            PresoObjAllocCCTNode root = callGraphManager.getRootNode();
-//                            setChildren(root == null ? new PresoObjAllocCCTNode[0] :
-//                                        (PresoObjAllocCCTNode[])root.getChildren());
-//                        }
-//                        return children;
-//                    }
-//                    public boolean isLeaf() {
-//                        if (children == null) return includeEmpty ? nCalls == 0 : false;
-//                        else return super.isLeaf();
-//                    }   
-//                    public int getChildCount() {
-//                        if (children == null) getChildren();
-//                        return super.getChildCount();
-//                    }
-//                };
                 nodes.add(node);
                 _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
             } else {
                 for (String f : filter) {
-                    if (f.endsWith("*")) { // NOI18N
-                        f = f.substring(0, f.length() - 1);
+                    if (f.endsWith("**")) { // NOI18N
+                        f = f.substring(0, f.length() - 2);
                         if (_classNames[i].startsWith(f)) {
                             PresoObjLivenessCCTNode node = new Node(_classNames[i], _nTrackedAllocObjects[i], _objectsSizePerClass[i], _nTrackedLiveObjects[i], _nTotalAllocObjects[i], _avgObjectAge[i], _maxSurvGen[i]);
                             nodes.add(node);
                             _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
+                            break;
+                        }
+                    } else if (f.endsWith("*")) { // NOI18N
+                        f = f.substring(0, f.length() - 1);
+                        
+                        if (!_classNames[i].startsWith(f)) continue;
+                            
+                        boolean subpackage = false;
+                        for (int ii = f.length(); ii < _classNames[i].length(); ii++)
+                            if (_classNames[i].charAt(ii) == '.') { // NOI18N
+                                subpackage = true;
+                                break;
+                            }
+
+                        if (!subpackage) {
+                            PresoObjLivenessCCTNode node = new Node(_classNames[i], _nTrackedAllocObjects[i], _objectsSizePerClass[i], _nTrackedLiveObjects[i], _nTotalAllocObjects[i], _avgObjectAge[i], _maxSurvGen[i]);
+                            nodes.add(node);
+                            _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
+                            break;
                         }
                     } else {
                         if (_classNames[i].equals(f)) {
                             PresoObjLivenessCCTNode node = new Node(_classNames[i], _nTrackedAllocObjects[i], _objectsSizePerClass[i], _nTrackedLiveObjects[i], _nTotalAllocObjects[i], _avgObjectAge[i], _maxSurvGen[i]);
                             nodes.add(node);
                             _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
+                            break;
                         }
                     }
                 }

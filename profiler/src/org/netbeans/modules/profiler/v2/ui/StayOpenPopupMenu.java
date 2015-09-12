@@ -61,6 +61,7 @@ import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.MenuElement;
 import javax.swing.MenuSelectionManager;
+import javax.swing.UIManager;
 import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
@@ -102,7 +103,8 @@ public class StayOpenPopupMenu extends JPopupMenu {
     
     
     public void setForceBackground(boolean force) {
-        this.forceBackground = force;
+        if (!UIUtils.isNimbus() || !Boolean.TRUE.equals(UIManager.getBoolean("nb.dark.theme"))) // NOI18N
+            this.forceBackground = force;
     }
     
     protected void paintComponent(Graphics g) {
