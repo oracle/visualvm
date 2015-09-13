@@ -52,7 +52,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.HashSet;
 import javax.swing.BorderFactory;
@@ -120,9 +122,21 @@ import org.openide.util.NbPreferences;
     "MethodsFeatureModes_definedClasses=Defined classes",
     "MethodsFeatureModes_classesLbl=Classes:",
     "MethodsFeatureModes_includeCalls=Include outgoing calls:",
+    "MethodsFeatureModes_includeTooltip=Profile only outgoing calls of the defined classes or packages",
     "MethodsFeatureModes_excludeCalls=Exclude outgoing calls:",
+    "MethodsFeatureModes_excludeTooltip=Do not profile outgoing calls of the defined classes or packages",
     "MethodsFeatureModes_classesHint=org.mypackage.**\norg.mypackage.*\norg.mypackage.MyClass",
-    "MethodsFeatureModes_filterHint=<empty>\norg.mypackage.*\norg.mypackage.MyClass"
+    "MethodsFeatureModes_filterHint=org.mypackage.**\norg.mypackage.*\norg.mypackage.MyClass",
+    "MethodsFeatureModes_classesTooltip=<html>Profile methods of these classes or packages:<br><br>"
+            + "<code>&nbsp;org.mypackage.**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package and subpackages<br>"
+            + "<code>&nbsp;org.mypackage.*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package<br>"
+            + "<code>&nbsp;org.mypackage.MyClass&nbsp;&nbsp;</code>single class<br></html>",
+    "MethodsFeatureModes_filterTooltip=<html>Include/exclude profiling outgoing calls from these classes or packages:<br><br>"
+            + "<code>&nbsp;org.mypackage.**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package and subpackages<br>"
+            + "<code>&nbsp;org.mypackage.*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package<br>"
+            + "<code>&nbsp;org.mypackage.MyClass&nbsp;&nbsp;</code>single class<br><br>"
+            + "Special case:<br><br>"
+            + "<code>&nbsp;&lt;empty&gt;</code> or <code>*&nbsp;&nbsp;</code>include all classes<br></html>"
 })
 final class MethodsFeatureModes {
     
@@ -617,11 +631,11 @@ final class MethodsFeatureModes {
             settings.addRootMethods(roots);
             
             String filter = readFlag(FILTER_FLAG, ""); // NOI18N
-            if (filter.isEmpty() || "*".equals(filter)) { // NOI18N
+            if (filter.isEmpty() || "*".equals(filter) || "**".equals(filter)) { // NOI18N
                 settings.setSelectedInstrumentationFilter(SimpleFilter.NO_FILTER);
             } else {
                 int filterType = Boolean.parseBoolean(readFlag(FILTER_MODE_FLAG, Boolean.TRUE.toString())) == true ?
-                                 SimpleFilter.SIMPLE_FILTER_INCLUSIVE : SimpleFilter.SIMPLE_FILTER_EXCLUSIVE;
+                                 SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT : SimpleFilter.SIMPLE_FILTER_EXCLUSIVE_EXACT;
                 String filterValue = getFlatValues(filterArea.getText().split("\\n")); // NOI18N
                 settings.setSelectedInstrumentationFilter(new SimpleFilter("", filterType, filterValue)); // NOI18N
             }
@@ -749,6 +763,9 @@ final class MethodsFeatureModes {
                         popup.addSeparator();
                         popup.add(createResizeMenu());
                     }
+                    public Point getToolTipLocation(MouseEvent event) {
+                        return new Point(-1, getHeight() + 2);
+                    }
                 };
                 classesArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N
                 classesArea.setRows(readRows());
@@ -758,6 +775,7 @@ final class MethodsFeatureModes {
                 container[0].setMinimumSize(container[0].getPreferredSize());
                 classesArea.setColumns(0);
                 classesArea.setHint(Bundle.MethodsFeatureModes_classesHint());
+                classesArea.setToolTipText(Bundle.MethodsFeatureModes_classesTooltip());
                 c = new GridBagConstraints();
                 c.gridx = 1;
                 c.gridy = 0;
@@ -778,6 +796,7 @@ final class MethodsFeatureModes {
                         settingsChanged();
                     }
                 };
+                includeChoice.setToolTipText(Bundle.MethodsFeatureModes_includeTooltip());
                 Border b = includeChoice.getBorder();
                 Insets i = b != null ? b.getBorderInsets(includeChoice) : null;
                 includeChoice.setOpaque(false);
@@ -799,6 +818,7 @@ final class MethodsFeatureModes {
                         settingsChanged();
                     }
                 };
+                excludeChoice.setToolTipText(Bundle.MethodsFeatureModes_excludeTooltip());
                 b = excludeChoice.getBorder();
                 i = b != null ? b.getBorderInsets(excludeChoice) : null;
                 excludeChoice.setOpaque(false);
@@ -855,6 +875,9 @@ final class MethodsFeatureModes {
                         popup.addSeparator();
                         popup.add(createResizeMenu());
                     }
+                    public Point getToolTipLocation(MouseEvent event) {
+                        return new Point(-1, getHeight() + 2);
+                    }
                 };
                 filterArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N
                 filterArea.setRows(readRows());
@@ -864,6 +887,7 @@ final class MethodsFeatureModes {
                 container[1].setMinimumSize(container[1].getPreferredSize());
                 filterArea.setColumns(0);
                 filterArea.setHint(Bundle.MethodsFeatureModes_filterHint());
+                filterArea.setToolTipText(Bundle.MethodsFeatureModes_filterTooltip());
                 c = new GridBagConstraints();
                 c.gridx = 3;
                 c.gridy = 0;
