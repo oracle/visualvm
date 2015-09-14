@@ -51,7 +51,6 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
@@ -243,8 +242,7 @@ public final class ClassMethodList {
                 protected void fireActionPerformed(ActionEvent e) {
                     final Component invoker = getInvoker();
                     
-                    List<ClientUtils.SourceCodeSelection> sel = list.getSelectedValuesList();
-                    for (ClientUtils.SourceCodeSelection s : sel) selection.remove(s);
+                    selection.removeAll(list.getSelectedValuesList());
                     
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() { invoker.repaint(); }

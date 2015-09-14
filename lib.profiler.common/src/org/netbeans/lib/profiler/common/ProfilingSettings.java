@@ -1030,6 +1030,8 @@ public class ProfilingSettings {
                 return InstrumentationFilter.INSTR_FILTER_EXCLUSIVE;
             case SimpleFilter.SIMPLE_FILTER_INCLUSIVE:
                 return InstrumentationFilter.INSTR_FILTER_INCLUSIVE;
+            case SimpleFilter.SIMPLE_FILTER_EXCLUSIVE_EXACT:
+                return InstrumentationFilter.INSTR_FILTER_EXCLUSIVE_EXACT;
             case SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT:
                 return InstrumentationFilter.INSTR_FILTER_INCLUSIVE_EXACT;
             default:
