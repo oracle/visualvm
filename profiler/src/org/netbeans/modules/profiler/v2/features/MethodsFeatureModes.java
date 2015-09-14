@@ -590,7 +590,7 @@ final class MethodsFeatureModes {
         private static final String FILTER_FLAG = "FILTER_FLAG"; // NOI18N
         private static final String FILTER_MODE_FLAG = "FILTER_MODE_FLAG"; // NOI18N
         
-        private static final int MIN_ROWS = 1;
+        private static final int MIN_ROWS = 2;
         private static final int MAX_ROWS = 15;
         private static final int DEFAULT_ROWS = 3;
         private static final int MIN_COLUMNS = 10;
@@ -720,7 +720,46 @@ final class MethodsFeatureModes {
                 c.anchor = GridBagConstraints.NORTHWEST;
                 p.add(classesPanel, c);
                 
-                final JScrollPane[] container = new JScrollPane[2];
+                class Resizer {
+                    
+                    private TextArea area1, area2;
+                    private JComponent container1, container2;
+                    
+                    void setContext(TextArea area1, TextArea area2, JComponent container1, JComponent container2) {
+                        this.area1 = area1; this.area2 = area2;
+                        this.container1 = container1; this.container2 = container2;
+                    }
+                    
+                    void resize() {
+                        area1.setColumns(readColumns1());
+                        area2.setColumns(readColumns2());
+                        
+                        int rows = readRows();
+                        area1.setRows(rows);
+                        area2.setRows(rows);
+                        
+                        area1.invalidate();
+                        area2.invalidate();
+                        
+                        container1.setPreferredSize(null);
+                        container1.setPreferredSize(container1.getPreferredSize());
+                        container1.setMinimumSize(container1.getPreferredSize());
+                        
+                        container2.setPreferredSize(null);
+                        container2.setPreferredSize(container2.getPreferredSize());
+                        container2.setMinimumSize(container2.getPreferredSize());
+                        
+                        JComponent root = SwingUtilities.getRootPane(container1);
+                        root.doLayout();
+                        root.repaint();
+                        
+                        area1.setColumns(0);
+                        area2.setColumns(0);
+                    }
+                    
+                }
+                final Resizer resizer = new Resizer();
+                
                 classesArea = new TextArea(readFlag(CLASSES_FLAG, "")) { // NOI18N
                     protected void changed() {
                         settingsChanged();
@@ -738,26 +777,15 @@ final class MethodsFeatureModes {
                             storeColumns1(cols);
                         }
                         
-                        layoutImpl();                        
+                        resizer.resize();
                         return true;
                     }
                     protected boolean resetSize() {
                         storeRows(DEFAULT_ROWS);
                         storeColumns1(DEFAULT_COLUMNS);
                 
-                        layoutImpl();
+                        resizer.resize();
                         return true;
-                    }
-                    private void layoutImpl() {
-                        setRows(readRows());
-                        setColumns(readColumns1());
-                        container[0].setPreferredSize(null);
-                        container[0].setPreferredSize(container[0].getPreferredSize());
-                        container[0].setMinimumSize(container[0].getPreferredSize());
-                        JComponent root = SwingUtilities.getRootPane(container[0]);
-                        root.doLayout();
-                        root.repaint();
-                        setColumns(0);
                     }
                     protected void customizePopup(JPopupMenu popup) {
                         popup.addSeparator();
@@ -770,9 +798,9 @@ final class MethodsFeatureModes {
                 classesArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N
                 classesArea.setRows(readRows());
                 classesArea.setColumns(readColumns1());
-                container[0] = new JScrollPane(classesArea);
-                container[0].setPreferredSize(container[0].getPreferredSize());
-                container[0].setMinimumSize(container[0].getPreferredSize());
+                JScrollPane classesScroll = new JScrollPane(classesArea);
+                classesScroll.setPreferredSize(classesScroll.getPreferredSize());
+                classesScroll.setMinimumSize(classesScroll.getPreferredSize());
                 classesArea.setColumns(0);
                 classesArea.setHint(Bundle.MethodsFeatureModes_classesHint());
                 classesArea.setToolTipText(Bundle.MethodsFeatureModes_classesTooltip());
@@ -785,7 +813,7 @@ final class MethodsFeatureModes {
                 c.fill = GridBagConstraints.VERTICAL;
                 c.insets = new Insets(0, 0, 0, 10);
                 c.anchor = GridBagConstraints.NORTHWEST;
-                p.add(container[0], c);
+                p.add(classesScroll, c);
                 
                 boolean filterMode = Boolean.TRUE.toString().equals(readFlag(FILTER_MODE_FLAG, Boolean.TRUE.toString()));
                 ButtonGroup bg = new ButtonGroup();
@@ -850,26 +878,15 @@ final class MethodsFeatureModes {
                             storeColumns2(cols);
                         }
                         
-                        layoutImpl();                        
+                        resizer.resize();               
                         return true;
                     }
                     protected boolean resetSize() {
                         storeRows(DEFAULT_ROWS);
                         storeColumns2(DEFAULT_COLUMNS);
                 
-                        layoutImpl();
+                        resizer.resize();
                         return true;
-                    }
-                    private void layoutImpl() {
-                        setRows(readRows());
-                        setColumns(readColumns2());
-                        container[1].setPreferredSize(null);
-                        container[1].setPreferredSize(container[1].getPreferredSize());
-                        container[1].setMinimumSize(container[1].getPreferredSize());
-                        JComponent root = SwingUtilities.getRootPane(container[1]);
-                        root.doLayout();
-                        root.repaint();
-                        setColumns(0);
                     }
                     protected void customizePopup(JPopupMenu popup) {
                         popup.addSeparator();
@@ -882,9 +899,9 @@ final class MethodsFeatureModes {
                 filterArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N
                 filterArea.setRows(readRows());
                 filterArea.setColumns(readColumns2());
-                container[1] = new JScrollPane(filterArea);
-                container[1].setPreferredSize(container[1].getPreferredSize());
-                container[1].setMinimumSize(container[1].getPreferredSize());
+                JScrollPane filterScroll = new JScrollPane(filterArea);
+                filterScroll.setPreferredSize(filterScroll.getPreferredSize());
+                filterScroll.setMinimumSize(filterScroll.getPreferredSize());
                 filterArea.setColumns(0);
                 filterArea.setHint(Bundle.MethodsFeatureModes_filterHint());
                 filterArea.setToolTipText(Bundle.MethodsFeatureModes_filterTooltip());
@@ -897,7 +914,9 @@ final class MethodsFeatureModes {
                 c.fill = GridBagConstraints.VERTICAL;
                 c.insets = new Insets(0, 4, 0, 1);
                 c.anchor = GridBagConstraints.NORTHWEST;
-                p.add(container[1], c);
+                p.add(filterScroll, c);
+                
+                resizer.setContext(classesArea, filterArea, classesScroll, filterScroll);
                 
                 ui = p;
                 
