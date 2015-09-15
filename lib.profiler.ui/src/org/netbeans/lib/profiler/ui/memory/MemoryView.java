@@ -107,6 +107,10 @@ public abstract class MemoryView extends DataView {
             classNames[i] = StringUtils.userFormClassName(classNames[i]);
     }
     
+    static final boolean isAll(Collection<String> filter) {
+        return filter.contains("*") || filter.contains("**"); // NOI18N
+    }
+    
     static final boolean isExact(Collection<String> filter) {
         for (String f : filter) if (f.endsWith("*")) return false; // NOI18N
         return true;
