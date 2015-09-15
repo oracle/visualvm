@@ -169,7 +169,13 @@ abstract class AllocTableView extends MemoryView {
             List<Integer> fTotalAllocObjects = new ArrayList();
             List<Long> fTotalAllocObjectsSize = new ArrayList();
             
-            if (isExact(filter)) {
+            if (isAll(filter)) {
+                for (int i = 0; i < _nTrackedItems; i++) {
+                    fClassNames.add(_classNames[i]);
+                    fTotalAllocObjects.add(_nTotalAllocObjects[i]);
+                    fTotalAllocObjectsSize.add(_totalAllocObjectsSize[i]);
+                }
+            } else if (isExact(filter)) {
                 for (int i = 0; i < _nTrackedItems; i++) {
                     if (filter.contains(_classNames[i])) {
                         fClassNames.add(_classNames[i]);
@@ -179,10 +185,28 @@ abstract class AllocTableView extends MemoryView {
                 }
             } else {
                 for (String f : filter) {
-                    if (f.endsWith("*")) { // NOI18N
-                        f = f.substring(0, f.length() - 1);
+                    if (f.endsWith("**")) { // NOI18N
+                        f = f.substring(0, f.length() - 2);
                         for (int i = 0; i < _nTrackedItems; i++) {
                             if (_classNames[i].startsWith(f)) {
+                                fClassNames.add(_classNames[i]);
+                                fTotalAllocObjects.add(_nTotalAllocObjects[i]);
+                                fTotalAllocObjectsSize.add(_totalAllocObjectsSize[i]);
+                            }
+                        }
+                    } else if (f.endsWith("*")) { // NOI18N
+                        f = f.substring(0, f.length() - 1);
+                        for (int i = 0; i < _nTrackedItems; i++) {
+                            if (!_classNames[i].startsWith(f)) continue;
+                            
+                            boolean subpackage = false;
+                            for (int ii = f.length(); ii < _classNames[i].length(); ii++)
+                                if (_classNames[i].charAt(ii) == '.') { // NOI18N
+                                    subpackage = true;
+                                    break;
+                                }
+                            
+                            if (!subpackage) {
                                 fClassNames.add(_classNames[i]);
                                 fTotalAllocObjects.add(_nTotalAllocObjects[i]);
                                 fTotalAllocObjectsSize.add(_totalAllocObjectsSize[i]);

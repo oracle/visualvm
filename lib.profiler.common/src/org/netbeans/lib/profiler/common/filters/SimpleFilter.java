@@ -58,6 +58,7 @@ public class SimpleFilter {
     public static final int SIMPLE_FILTER_NONE = 0;
     public static final int SIMPLE_FILTER_EXCLUSIVE = 1;
     public static final int SIMPLE_FILTER_INCLUSIVE = 2;
+    public static final int SIMPLE_FILTER_EXCLUSIVE_EXACT = 3;
     public static final int SIMPLE_FILTER_INCLUSIVE_EXACT = 4;
     public static final SimpleFilter NO_FILTER = new SimpleFilter("", SIMPLE_FILTER_NONE, ""); //NOI18N
     public static final String PROP_FILTER_TYPE_VALUE = "profiler.simple.filter"; //NOI18N

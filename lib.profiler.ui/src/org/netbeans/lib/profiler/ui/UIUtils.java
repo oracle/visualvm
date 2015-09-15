@@ -363,6 +363,8 @@ public final class UIUtils {
 
     /** Determines if current L&F is Windows Classic LookAndFeel */
     public static boolean isWindowsClassicLookAndFeel() {
+        if ("Windows Classic".equals(UIManager.getLookAndFeel().getName())) return true; //NOI18N
+        
         if (!isWindowsLookAndFeel()) {
             return false;
         }
