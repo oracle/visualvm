@@ -126,6 +126,8 @@ public final class AllocationsHistoryGraphPanel extends GraphPanel {
     public Action[] getActions() {
         return chartActions;
     }
+    
+    public void cleanup() {}
 
 
     // --- Private implementation ----------------------------------------------

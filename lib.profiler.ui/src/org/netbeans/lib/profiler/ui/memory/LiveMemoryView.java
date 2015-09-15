@@ -46,7 +46,6 @@ package org.netbeans.lib.profiler.ui.memory;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -73,7 +72,6 @@ import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -236,6 +234,11 @@ public abstract class LiveMemoryView extends JPanel {
     
     public void refreshSelection() {
         if (dataView != null) dataView.showSelectionColumn();
+    }
+    
+    
+    public void cleanup() {
+        if (rm.view == this) rm.view = null;
     }
     
     

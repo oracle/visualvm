@@ -155,6 +155,11 @@ abstract class MethodsFeatureUI extends FeatureUI {
     }
     
     
+    void cleanup() {
+        if (cpuView != null) cpuView.cleanup();
+    }
+    
+    
     // --- UI ------------------------------------------------------------------
     
 //    private static enum View { CALL_TREE, HOT_SPOTS, COMBINED }
