@@ -181,6 +181,7 @@ public class ToggleButtonMenuItem extends StayOpenPopupMenu.Item {
         if (UIUtils.isMetalLookAndFeel()) return "  " + text; // NOI18N
         if (UIUtils.isAquaLookAndFeel()) return "   " + text; // NOI18N
         if (UIUtils.isGTKLookAndFeel()) return " " + text; // NOI18N
+        if (UIUtils.isWindowsClassicLookAndFeel()) return "  " + text; // NOI18N
         return text;
     }
 

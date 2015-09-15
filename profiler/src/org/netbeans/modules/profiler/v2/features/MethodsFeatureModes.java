@@ -52,7 +52,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.HashSet;
 import javax.swing.BorderFactory;
@@ -120,9 +122,21 @@ import org.openide.util.NbPreferences;
     "MethodsFeatureModes_definedClasses=Defined classes",
     "MethodsFeatureModes_classesLbl=Classes:",
     "MethodsFeatureModes_includeCalls=Include outgoing calls:",
+    "MethodsFeatureModes_includeTooltip=Profile only outgoing calls of the defined classes or packages",
     "MethodsFeatureModes_excludeCalls=Exclude outgoing calls:",
+    "MethodsFeatureModes_excludeTooltip=Do not profile outgoing calls of the defined classes or packages",
     "MethodsFeatureModes_classesHint=org.mypackage.**\norg.mypackage.*\norg.mypackage.MyClass",
-    "MethodsFeatureModes_filterHint=<empty>\norg.mypackage.*\norg.mypackage.MyClass"
+    "MethodsFeatureModes_filterHint=org.mypackage.**\norg.mypackage.*\norg.mypackage.MyClass",
+    "MethodsFeatureModes_classesTooltip=<html>Profile methods of these classes or packages:<br><br>"
+            + "<code>&nbsp;org.mypackage.**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package and subpackages<br>"
+            + "<code>&nbsp;org.mypackage.*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package<br>"
+            + "<code>&nbsp;org.mypackage.MyClass&nbsp;&nbsp;</code>single class<br></html>",
+    "MethodsFeatureModes_filterTooltip=<html>Include/exclude profiling outgoing calls from these classes or packages:<br><br>"
+            + "<code>&nbsp;org.mypackage.**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package and subpackages<br>"
+            + "<code>&nbsp;org.mypackage.*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package<br>"
+            + "<code>&nbsp;org.mypackage.MyClass&nbsp;&nbsp;</code>single class<br><br>"
+            + "Special case:<br><br>"
+            + "<code>&nbsp;&lt;empty&gt;</code> or <code>*&nbsp;&nbsp;</code>include all classes<br></html>"
 })
 final class MethodsFeatureModes {
     
@@ -576,7 +590,7 @@ final class MethodsFeatureModes {
         private static final String FILTER_FLAG = "FILTER_FLAG"; // NOI18N
         private static final String FILTER_MODE_FLAG = "FILTER_MODE_FLAG"; // NOI18N
         
-        private static final int MIN_ROWS = 1;
+        private static final int MIN_ROWS = 2;
         private static final int MAX_ROWS = 15;
         private static final int DEFAULT_ROWS = 3;
         private static final int MIN_COLUMNS = 10;
@@ -617,11 +631,11 @@ final class MethodsFeatureModes {
             settings.addRootMethods(roots);
             
             String filter = readFlag(FILTER_FLAG, ""); // NOI18N
-            if (filter.isEmpty() || "*".equals(filter)) { // NOI18N
+            if (filter.isEmpty() || "*".equals(filter) || "**".equals(filter)) { // NOI18N
                 settings.setSelectedInstrumentationFilter(SimpleFilter.NO_FILTER);
             } else {
                 int filterType = Boolean.parseBoolean(readFlag(FILTER_MODE_FLAG, Boolean.TRUE.toString())) == true ?
-                                 SimpleFilter.SIMPLE_FILTER_INCLUSIVE : SimpleFilter.SIMPLE_FILTER_EXCLUSIVE;
+                                 SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT : SimpleFilter.SIMPLE_FILTER_EXCLUSIVE_EXACT;
                 String filterValue = getFlatValues(filterArea.getText().split("\\n")); // NOI18N
                 settings.setSelectedInstrumentationFilter(new SimpleFilter("", filterType, filterValue)); // NOI18N
             }
@@ -706,7 +720,46 @@ final class MethodsFeatureModes {
                 c.anchor = GridBagConstraints.NORTHWEST;
                 p.add(classesPanel, c);
                 
-                final JScrollPane[] container = new JScrollPane[2];
+                class Resizer {
+                    
+                    private TextArea area1, area2;
+                    private JComponent container1, container2;
+                    
+                    void setContext(TextArea area1, TextArea area2, JComponent container1, JComponent container2) {
+                        this.area1 = area1; this.area2 = area2;
+                        this.container1 = container1; this.container2 = container2;
+                    }
+                    
+                    void resize() {
+                        area1.setColumns(readColumns1());
+                        area2.setColumns(readColumns2());
+                        
+                        int rows = readRows();
+                        area1.setRows(rows);
+                        area2.setRows(rows);
+                        
+                        area1.invalidate();
+                        area2.invalidate();
+                        
+                        container1.setPreferredSize(null);
+                        container1.setPreferredSize(container1.getPreferredSize());
+                        container1.setMinimumSize(container1.getPreferredSize());
+                        
+                        container2.setPreferredSize(null);
+                        container2.setPreferredSize(container2.getPreferredSize());
+                        container2.setMinimumSize(container2.getPreferredSize());
+                        
+                        JComponent root = SwingUtilities.getRootPane(container1);
+                        root.doLayout();
+                        root.repaint();
+                        
+                        area1.setColumns(0);
+                        area2.setColumns(0);
+                    }
+                    
+                }
+                final Resizer resizer = new Resizer();
+                
                 classesArea = new TextArea(readFlag(CLASSES_FLAG, "")) { // NOI18N
                     protected void changed() {
                         settingsChanged();
@@ -724,40 +777,33 @@ final class MethodsFeatureModes {
                             storeColumns1(cols);
                         }
                         
-                        layoutImpl();                        
+                        resizer.resize();
                         return true;
                     }
                     protected boolean resetSize() {
                         storeRows(DEFAULT_ROWS);
                         storeColumns1(DEFAULT_COLUMNS);
                 
-                        layoutImpl();
+                        resizer.resize();
                         return true;
-                    }
-                    private void layoutImpl() {
-                        setRows(readRows());
-                        setColumns(readColumns1());
-                        container[0].setPreferredSize(null);
-                        container[0].setPreferredSize(container[0].getPreferredSize());
-                        container[0].setMinimumSize(container[0].getPreferredSize());
-                        JComponent root = SwingUtilities.getRootPane(container[0]);
-                        root.doLayout();
-                        root.repaint();
-                        setColumns(0);
                     }
                     protected void customizePopup(JPopupMenu popup) {
                         popup.addSeparator();
                         popup.add(createResizeMenu());
                     }
+                    public Point getToolTipLocation(MouseEvent event) {
+                        return new Point(-1, getHeight() + 2);
+                    }
                 };
                 classesArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N
                 classesArea.setRows(readRows());
                 classesArea.setColumns(readColumns1());
-                container[0] = new JScrollPane(classesArea);
-                container[0].setPreferredSize(container[0].getPreferredSize());
-                container[0].setMinimumSize(container[0].getPreferredSize());
+                JScrollPane classesScroll = new JScrollPane(classesArea);
+                classesScroll.setPreferredSize(classesScroll.getPreferredSize());
+                classesScroll.setMinimumSize(classesScroll.getPreferredSize());
                 classesArea.setColumns(0);
                 classesArea.setHint(Bundle.MethodsFeatureModes_classesHint());
+                classesArea.setToolTipText(Bundle.MethodsFeatureModes_classesTooltip());
                 c = new GridBagConstraints();
                 c.gridx = 1;
                 c.gridy = 0;
@@ -767,7 +813,7 @@ final class MethodsFeatureModes {
                 c.fill = GridBagConstraints.VERTICAL;
                 c.insets = new Insets(0, 0, 0, 10);
                 c.anchor = GridBagConstraints.NORTHWEST;
-                p.add(container[0], c);
+                p.add(classesScroll, c);
                 
                 boolean filterMode = Boolean.TRUE.toString().equals(readFlag(FILTER_MODE_FLAG, Boolean.TRUE.toString()));
                 ButtonGroup bg = new ButtonGroup();
@@ -778,6 +824,7 @@ final class MethodsFeatureModes {
                         settingsChanged();
                     }
                 };
+                includeChoice.setToolTipText(Bundle.MethodsFeatureModes_includeTooltip());
                 Border b = includeChoice.getBorder();
                 Insets i = b != null ? b.getBorderInsets(includeChoice) : null;
                 includeChoice.setOpaque(false);
@@ -799,6 +846,7 @@ final class MethodsFeatureModes {
                         settingsChanged();
                     }
                 };
+                excludeChoice.setToolTipText(Bundle.MethodsFeatureModes_excludeTooltip());
                 b = excludeChoice.getBorder();
                 i = b != null ? b.getBorderInsets(excludeChoice) : null;
                 excludeChoice.setOpaque(false);
@@ -830,40 +878,33 @@ final class MethodsFeatureModes {
                             storeColumns2(cols);
                         }
                         
-                        layoutImpl();                        
+                        resizer.resize();               
                         return true;
                     }
                     protected boolean resetSize() {
                         storeRows(DEFAULT_ROWS);
                         storeColumns2(DEFAULT_COLUMNS);
                 
-                        layoutImpl();
+                        resizer.resize();
                         return true;
-                    }
-                    private void layoutImpl() {
-                        setRows(readRows());
-                        setColumns(readColumns2());
-                        container[1].setPreferredSize(null);
-                        container[1].setPreferredSize(container[1].getPreferredSize());
-                        container[1].setMinimumSize(container[1].getPreferredSize());
-                        JComponent root = SwingUtilities.getRootPane(container[1]);
-                        root.doLayout();
-                        root.repaint();
-                        setColumns(0);
                     }
                     protected void customizePopup(JPopupMenu popup) {
                         popup.addSeparator();
                         popup.add(createResizeMenu());
                     }
+                    public Point getToolTipLocation(MouseEvent event) {
+                        return new Point(-1, getHeight() + 2);
+                    }
                 };
                 filterArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N
                 filterArea.setRows(readRows());
                 filterArea.setColumns(readColumns2());
-                container[1] = new JScrollPane(filterArea);
-                container[1].setPreferredSize(container[1].getPreferredSize());
-                container[1].setMinimumSize(container[1].getPreferredSize());
+                JScrollPane filterScroll = new JScrollPane(filterArea);
+                filterScroll.setPreferredSize(filterScroll.getPreferredSize());
+                filterScroll.setMinimumSize(filterScroll.getPreferredSize());
                 filterArea.setColumns(0);
                 filterArea.setHint(Bundle.MethodsFeatureModes_filterHint());
+                filterArea.setToolTipText(Bundle.MethodsFeatureModes_filterTooltip());
                 c = new GridBagConstraints();
                 c.gridx = 3;
                 c.gridy = 0;
@@ -873,7 +914,9 @@ final class MethodsFeatureModes {
                 c.fill = GridBagConstraints.VERTICAL;
                 c.insets = new Insets(0, 4, 0, 1);
                 c.anchor = GridBagConstraints.NORTHWEST;
-                p.add(container[1], c);
+                p.add(filterScroll, c);
+                
+                resizer.setContext(classesArea, filterArea, classesScroll, filterScroll);
                 
                 ui = p;
                 
