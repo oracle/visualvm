@@ -143,7 +143,9 @@ abstract class FeatureMode {
             boolean _trans = trans;
             beginTrans();
             
+            _changing();
             boolean removeAll = super.removeAll(selections);
+            if (removeAll) _changed();
             
             endTrans();
             trans = _trans;
@@ -155,7 +157,9 @@ abstract class FeatureMode {
             boolean _trans = trans;
             beginTrans();
             
+            _changing();
             boolean retainAll = super.retainAll(selections);
+            if (retainAll) _changed();
             
             endTrans();
             trans = _trans;

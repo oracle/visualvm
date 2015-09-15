@@ -619,17 +619,7 @@ public class ProfilerTreeTable extends ProfilerTable {
             List children = cache.get(parentKey);
             
             if (children == null) {
-                
-                final class Entry extends RowFilter.Entry {
-                    private Object value; private Object identifier;
-                    Entry(Object _value, Object _identifier) { value = _value; identifier = _identifier; }
-                    void setContext(Object _value, Object _identifier) { value = _value; identifier = _identifier; }
-                    public Object getValue(int index) { return value; }
-                    public Object getModel() { return null; }
-                    public int getValueCount() { return 1; }
-                    public Object getIdentifier() { return identifier; }
-                }
-                Entry entry = null;
+                FilterEntry entry = null;
                 
                 children = new ArrayList(tParent.getChildCount());
                 CCTNode filtered = null;
@@ -637,7 +627,7 @@ public class ProfilerTreeTable extends ProfilerTable {
                 if (childrenE != null) while (childrenE.hasMoreElements()) {
                     Object child = childrenE.nextElement();
                     renderer.getTreeCellRendererComponent(null, child, false, false, false, -1, false);
-                    if (entry == null) entry = new Entry(renderer.toString(), child);
+                    if (entry == null) entry = new FilterEntry(renderer.toString(), child);
                     else entry.setContext(renderer.toString(), child);
                     if (filter.include(entry)) {
                         children.add(child);
@@ -671,6 +661,16 @@ public class ProfilerTreeTable extends ProfilerTable {
 //            return path.toArray(new TreeNode[path.size()]);
 //        }
         
+    }
+    
+    private static final class FilterEntry extends RowFilter.Entry {
+        private Object value; private Object identifier;
+        FilterEntry(Object _value, Object _identifier) { value = _value; identifier = _identifier; }
+        void setContext(Object _value, Object _identifier) { value = _value; identifier = _identifier; }
+        public Object getValue(int index) { return value; }
+        public Object getModel() { return null; }
+        public int getValueCount() { return 1; }
+        public Object getIdentifier() { return identifier; }
     }
     
     
