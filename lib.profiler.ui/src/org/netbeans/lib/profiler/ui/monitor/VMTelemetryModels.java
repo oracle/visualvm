@@ -61,6 +61,7 @@ public final class VMTelemetryModels {
     // --- Instance variables --------------------------------------------------
 
     private final VMTelemetryDataManager dataManager;
+    private final DataManagerListener listener;
 
     private final Timeline timeline;
     private final SynchronousXYItemsModel cpuItemsModel;
@@ -80,10 +81,11 @@ public final class VMTelemetryModels {
         generationsItemsModel = createGenerationsItemsModel(timeline);
         threadsItemsModel = createThreadsItemsModel(timeline);
 
-        dataManager.addDataListener(new DataManagerListener() {
+        listener = new DataManagerListener() {
             public void dataChanged() { dataChangedImpl(); }
             public void dataReset() { dataResetImpl(); }
-        });
+        };
+        dataManager.addDataListener(listener);
     }
 
 
@@ -107,6 +109,11 @@ public final class VMTelemetryModels {
 
     public SynchronousXYItemsModel threadsItemsModel() {
         return threadsItemsModel;
+    }
+    
+    
+    public void cleanup() {
+        dataManager.removeDataListener(listener);
     }
 
 

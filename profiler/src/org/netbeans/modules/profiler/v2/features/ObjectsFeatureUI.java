@@ -143,6 +143,11 @@ abstract class ObjectsFeatureUI extends FeatureUI {
     }
     
     
+    void cleanup() {
+        if (memoryView != null) memoryView.cleanup();
+    }
+    
+    
     // --- UI ------------------------------------------------------------------
     
     private JLabel lrLabel;

@@ -48,7 +48,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -267,6 +266,11 @@ public abstract class LiveCPUView extends JPanel {
         forwardCallsView.refreshSelection();
         hotSpotsView.refreshSelection();
         reverseCallsView.refreshSelection();
+    }
+    
+    
+    public void cleanup() {
+        if (rm.view == this) rm.view = null;
     }
     
     

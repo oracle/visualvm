@@ -92,6 +92,11 @@ abstract class MonitorFeatureUI extends FeatureUI {
     }
     
     
+    void cleanup() {
+        if (monitorView != null) monitorView.cleanup();
+    }
+    
+    
     void sessionStateChanged(int sessionState) {
         refreshToolbar(sessionState);
     }
