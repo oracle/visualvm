@@ -44,14 +44,11 @@
 package org.netbeans.lib.profiler.server.system;
 
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import javax.management.InstanceNotFoundException;
 import javax.management.JMRuntimeException;
 import javax.management.MBeanException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
-import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
@@ -63,8 +60,8 @@ import javax.management.ReflectionException;
 public class HeapDump {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
-    private static Object hotspotDiag;
-    private static Method dumpHeapMethod;
+    private static MBeanServer mserver;
+    private static ObjectName hotspotDiag;
     private static boolean initialized;
     private static boolean runningOnJdk15;
 
@@ -95,8 +92,6 @@ public class HeapDump {
     private static native void initialize15();
 
     private static void initialize16() {
-        MBeanServer mserver;
-
         if (initialized) {
             return;
         }
@@ -115,22 +110,15 @@ public class HeapDump {
         }
 
         try {
-            ObjectInstance instance = mserver.getObjectInstance(new ObjectName("com.sun.management:type=HotSpotDiagnostic")); // NOI18N
-            hotspotDiag = mserver.instantiate(instance.getClassName());
-            dumpHeapMethod = hotspotDiag.getClass().getMethod("dumpHeap", new Class[] { String.class, Boolean.TYPE }); // NOI18N
+            hotspotDiag = new ObjectName("com.sun.management:type=HotSpotDiagnostic");   // NOI18N
+            mserver.getObjectInstance(hotspotDiag);
         } catch (MalformedObjectNameException ex) {
             ex.printStackTrace();
         } catch (InstanceNotFoundException ex) {
             System.err.println("Heap Dump is not available"); // NOI18N
-        } catch (MBeanException ex) {
-            ex.printStackTrace();
         } catch (SecurityException ex) {
             ex.printStackTrace();
-        } catch (ReflectionException ex) {
-            ex.printStackTrace();
         } catch (NullPointerException ex) {
-            ex.printStackTrace();
-        } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
         }
     }
@@ -157,18 +145,20 @@ public class HeapDump {
         String error = null;
         initialize16();
 
-        if ((dumpHeapMethod == null) || (hotspotDiag == null)) {
+        if ((mserver == null) || (hotspotDiag == null)) {
             return "Take heap dump is not available."; // NOI18N
         }
 
         try {
-            dumpHeapMethod.invoke(hotspotDiag, new Object[] { outputFile, Boolean.TRUE });
+            mserver.invoke(hotspotDiag, "dumpHeap", new Object[] {outputFile, true}, new String[] {String.class.getName(), boolean.class.getName()} );  // NOI18N
         } catch (IllegalArgumentException ex) {
             error = ex.getLocalizedMessage();
-        } catch (IllegalAccessException ex) {
+        } catch (InstanceNotFoundException ex) {
             error = ex.getLocalizedMessage();
-        } catch (InvocationTargetException ex) {
-            error = ex.getTargetException().getLocalizedMessage();
+        } catch (MBeanException ex) {
+            error = ex.getLocalizedMessage();
+        } catch (ReflectionException ex) {
+            error = ex.getLocalizedMessage();
         }
 
         return error;
