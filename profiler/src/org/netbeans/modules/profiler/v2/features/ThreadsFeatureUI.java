@@ -97,6 +97,11 @@ abstract class ThreadsFeatureUI extends FeatureUI {
     }
     
     
+    void cleanup() {
+        if (threadsView != null) threadsView.cleanup();
+    }
+    
+    
     void sessionStateChanged(int sessionState) {
         refreshToolbar(sessionState);
         

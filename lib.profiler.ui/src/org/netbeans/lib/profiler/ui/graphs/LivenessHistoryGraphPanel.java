@@ -126,6 +126,8 @@ public final class LivenessHistoryGraphPanel extends GraphPanel {
     public Action[] getActions() {
         return chartActions;
     }
+    
+    public void cleanup() {}
 
 
     // --- Private implementation ----------------------------------------------

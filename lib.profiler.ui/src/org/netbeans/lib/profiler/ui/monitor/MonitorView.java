@@ -61,6 +61,8 @@ import org.netbeans.lib.profiler.ui.graphs.ThreadsGraphPanel;
  */
 public class MonitorView extends JPanel {
     
+    private VMTelemetryModels models;
+    
     private GraphPanel cpuPanel;
     private GraphPanel memoryPanel;
     private GraphPanel gcPanel;
@@ -89,10 +91,20 @@ public class MonitorView extends JPanel {
     }
     
     
+    public void cleanup() {
+        cpuPanel.cleanup();
+        memoryPanel.cleanup();
+        gcPanel.cleanup();
+        threadsPanel.cleanup();
+        
+        models.cleanup();
+    }
+    
+    
     private void initUI(VMTelemetryDataManager dataManager) {
         setLayout(new GraphsLayout());
         
-        VMTelemetryModels models = new VMTelemetryModels(dataManager);
+        models = new VMTelemetryModels(dataManager);
         
         cpuPanel = CPUGraphPanel.createBigPanel(models);
         add(cpuPanel);

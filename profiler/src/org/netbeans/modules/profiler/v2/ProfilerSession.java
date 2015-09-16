@@ -43,6 +43,8 @@
 
 package org.netbeans.modules.profiler.v2;
 
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.Profiler;
@@ -200,6 +202,9 @@ public abstract class ProfilerSession {
     
     // --- Profiler API bridge -------------------------------------------------
     
+    private final Set<ProfilingStateListener> profilingStateListeners = new HashSet();
+    
+    
     public final int getState() {
         return profiler.getProfilingState();
     }
@@ -209,13 +214,26 @@ public abstract class ProfilerSession {
     }
     
     public final void addListener(ProfilingStateListener listener) {
-        profiler.addProfilingStateListener(listener);
+        synchronized (profiler) {
+            profiler.addProfilingStateListener(listener);
+            profilingStateListeners.add(listener);
+        }
     }
     
     public final void removeListener(ProfilingStateListener listener) {
-        profiler.removeProfilingStateListener(listener);
+        synchronized (profiler) {
+            profiler.removeProfilingStateListener(listener);
+            profilingStateListeners.remove(listener);
+        }
     }
     
+    
+    private final void cleanupAllListeners() {
+        synchronized (profiler) {
+            for (ProfilingStateListener listener : profilingStateListeners)
+                profiler.removeProfilingStateListener(listener);
+        }
+    }
     
     // --- Internal API --------------------------------------------------------
     
@@ -324,9 +342,9 @@ public abstract class ProfilerSession {
     private void cleanup() {
         synchronized(this) { if (features != null) features.sessionFinished(); }
         
-        persistStorage(false);
+        cleanupAllListeners();
         
-        // TODO: unregister listeners (this.addListener) to prevent memory leaks
+        persistStorage(false);
     }
     
     private static void notifyStopAction() {
