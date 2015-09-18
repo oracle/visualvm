@@ -44,6 +44,7 @@ package org.netbeans.lib.profiler.ui.swing;
 
 import java.awt.AWTEvent;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
@@ -423,7 +424,12 @@ class ProfilerTableHover {
     
     private static CellRendererPane PAINTER;
     private static CellRendererPane getPainter() {
-        if (PAINTER == null) PAINTER = new CellRendererPane();
+        if (PAINTER == null) PAINTER = new CellRendererPane() {
+            public void paintComponent(Graphics g, Component c, Container p, int x, int y, int w, int h, boolean shouldValidate) {
+                super.paintComponent(g, c, p, x, y, w, h, shouldValidate);
+                remove(c); // Prevent leaking ProfilerTreeTable.ProfilerTreeTableTree and transitively all the UI/models
+            }
+        };
         return PAINTER;
     }
     
