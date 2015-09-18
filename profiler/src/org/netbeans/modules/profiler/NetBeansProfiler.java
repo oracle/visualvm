@@ -1953,6 +1953,8 @@ public abstract class NetBeansProfiler extends Profiler {
             for(SessionListener sl : Lookup.getDefault().lookupAll(SessionListener.class)) {
                 sl.onShutdown();
             }
+            FlatProfileBuilder fpb = Lookup.getDefault().lookup(FlatProfileBuilder.class);
+            fpb.setContext(null, null, null);
         }
     }
 
