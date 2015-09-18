@@ -70,7 +70,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.DataManagerListener;
 import org.netbeans.lib.profiler.results.threads.ThreadData;
@@ -99,6 +98,8 @@ public class ThreadsPanel extends DataView {
     
     private final ThreadsDataManager dataManager;
     private final ViewManager viewManager;
+    
+    private DataManagerListener listener;
     
     private ProfilerTable threadsTable;
     private ProfilerTableContainer threadsTableContainer;
@@ -163,6 +164,11 @@ public class ThreadsPanel extends DataView {
     
     public void showSelectedColumn() {
         threadsTable.setColumnVisibility(0, true);
+    }
+    
+    
+    public void cleanup() {
+        dataManager.removeDataListener(listener);
     }
     
     
@@ -422,7 +428,7 @@ public class ThreadsPanel extends DataView {
         add(threadsTableContainer, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
         
-        dataManager.addDataListener(new DataManagerListener() {
+        listener = new DataManagerListener() {
             private boolean firstChange = true;
             public void dataChanged() {
                 lastTimestamp = dataManager.getEndTime();
@@ -438,7 +444,8 @@ public class ThreadsPanel extends DataView {
                 timeRelRenderer.setMaxValue(0);
                 threadsTableModel.fireTableDataChanged();
             }
-        });
+        };
+        dataManager.addDataListener(listener);
         
         registerActions();
     }

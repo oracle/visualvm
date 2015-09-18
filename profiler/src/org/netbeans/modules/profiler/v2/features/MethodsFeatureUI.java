@@ -155,6 +155,11 @@ abstract class MethodsFeatureUI extends FeatureUI {
     }
     
     
+    void cleanup() {
+        if (cpuView != null) cpuView.cleanup();
+    }
+    
+    
     // --- UI ------------------------------------------------------------------
     
 //    private static enum View { CALL_TREE, HOT_SPOTS, COMBINED }
@@ -264,6 +269,8 @@ abstract class MethodsFeatureUI extends FeatureUI {
                 refreshResults();
             }
         };
+        forwardCalls.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        forwardCalls.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
         forwardCalls.setToolTipText(Bundle.MethodsFeatureUI_viewForward());
         group.add(forwardCalls);
         toggles[0] = forwardCalls;
@@ -277,6 +284,8 @@ abstract class MethodsFeatureUI extends FeatureUI {
                 refreshResults();
             }
         };
+        hotSpots.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        hotSpots.putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
         hotSpots.setToolTipText(Bundle.MethodsFeatureUI_viewHotSpots());
         group.add(hotSpots);
         toggles[1] = hotSpots;
@@ -290,6 +299,8 @@ abstract class MethodsFeatureUI extends FeatureUI {
                 refreshResults();
             }
         };
+        reverseCalls.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        reverseCalls.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
         reverseCalls.setToolTipText(Bundle.MethodsFeatureUI_viewReverse());
         group.add(reverseCalls);
         toggles[2] = reverseCalls;

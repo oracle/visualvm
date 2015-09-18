@@ -98,13 +98,33 @@ class DiffObjLivenessCCTNode extends PresoObjLivenessCCTNode {
     
     
     public String getNodeName() {
-        if (isFiltered()) return FilterSortSupport.FILTERED_OUT_LBL;
-        return node1 == null ? node2.getNodeName() : node1.getNodeName();
+        if (nodeName == null) {
+            if (isFiltered()) nodeName = FilterSortSupport.FILTERED_OUT_LBL;
+            else nodeName = getNode().getNodeName();
+        }
+        return nodeName;
     }
     
     public String[] getMethodClassNameAndSig() {
-        return node1 == null ? node2.getMethodClassNameAndSig() :
-                               node1.getMethodClassNameAndSig();
+        return getNode().getMethodClassNameAndSig();
+    }
+    
+    
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof DiffObjLivenessCCTNode)) return false;
+        DiffObjLivenessCCTNode other = (DiffObjLivenessCCTNode)o;
+        if (isFiltered()) {
+            return other.isFiltered();
+        }
+        if (other.isFiltered()) {
+            return false;
+        }
+        return getNode().equals(other.getNode());
+    }
+
+    public int hashCode() {
+        return getNode().hashCode();
     }
     
     
@@ -114,19 +134,25 @@ class DiffObjLivenessCCTNode extends PresoObjLivenessCCTNode {
         return leaf1 && leaf2;
     }
     
+    private PresoObjLivenessCCTNode getNode() {
+        if (node1 == null) {
+            return node2;
+        }
+        return node1;
+    }
     
     private static PresoObjAllocCCTNode[] computeChildren(PresoObjAllocCCTNode[] children1, PresoObjAllocCCTNode[] children2, PresoObjLivenessCCTNode parent) {        
-        Map<String, PresoObjAllocCCTNode> nodes1 = new HashMap();
+        Map<Handle, PresoObjAllocCCTNode> nodes1 = new HashMap();
         for (PresoObjAllocCCTNode node : children1) {
-            String name = node.getNodeName();
+            Handle name = new Handle(node);
             PresoObjAllocCCTNode sameNode = nodes1.get(name);
             if (sameNode == null) nodes1.put(name, node);
             else sameNode.merge(node);
         }
         
-        Map<String, PresoObjAllocCCTNode> nodes2 = new HashMap();
+        Map<Handle, PresoObjAllocCCTNode> nodes2 = new HashMap();
         for (PresoObjAllocCCTNode node : children2) {
-            String name = node.getNodeName();
+            Handle name = new Handle(node);
             PresoObjAllocCCTNode sameNode = nodes2.get(name);
             if (sameNode == null) nodes2.put(name, node);
             else sameNode.merge(node); // Merge same-named items
@@ -134,12 +160,12 @@ class DiffObjLivenessCCTNode extends PresoObjLivenessCCTNode {
         
         List<PresoObjAllocCCTNode> children = new ArrayList();
         for (PresoObjAllocCCTNode node1 : nodes1.values()) {
-            PresoObjAllocCCTNode node2 = nodes2.get(node1.getNodeName());
+            PresoObjAllocCCTNode node2 = nodes2.get(new Handle(node1));
             if (node2 != null) children.add(new DiffObjLivenessCCTNode((PresoObjLivenessCCTNode)node1, (PresoObjLivenessCCTNode)node2));
             else children.add(new DiffObjLivenessCCTNode((PresoObjLivenessCCTNode)node1, null));
         }
         for (PresoObjAllocCCTNode node2 : nodes2.values()) {
-            if (!nodes1.containsKey(node2.getNodeName())) children.add(new DiffObjLivenessCCTNode(null, (PresoObjLivenessCCTNode)node2));
+            if (!nodes1.containsKey(new Handle(node2))) children.add(new DiffObjLivenessCCTNode(null, (PresoObjLivenessCCTNode)node2));
         }
         
         return children.toArray(new PresoObjAllocCCTNode[children.size()]);

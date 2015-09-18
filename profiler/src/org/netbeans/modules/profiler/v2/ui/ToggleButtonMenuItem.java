@@ -151,17 +151,18 @@ public class ToggleButtonMenuItem extends StayOpenPopupMenu.Item {
     }
 
     private static Icon createMenuIcon(Icon icon, Component decorator) {
-        int s = menuIconSize();
+        int h = menuIconSize();
+        int w = UIUtils.isAquaLookAndFeel() ? h + 4 : h;
 
-        BufferedImage i = new BufferedImage(s, s, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage i = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
 
         if (decorator != null) {
-            decorator.setSize(s, s);
+            decorator.setSize(w, h);
             decorator.paint(g);
         }
 
-        icon.paintIcon(null, g, (s - icon.getIconWidth()) / 2, (s - icon.getIconHeight()) / 2);
+        icon.paintIcon(null, g, (w - icon.getIconWidth()) / 2, (h - icon.getIconHeight()) / 2);
         g.dispose();
 
         return new ImageIcon(i);
@@ -178,8 +179,9 @@ public class ToggleButtonMenuItem extends StayOpenPopupMenu.Item {
 
     private static String sizeText(String text) {
         if (UIUtils.isMetalLookAndFeel()) return "  " + text; // NOI18N
-        if (UIUtils.isAquaLookAndFeel()) return "  " + text; // NOI18N
+        if (UIUtils.isAquaLookAndFeel()) return "   " + text; // NOI18N
         if (UIUtils.isGTKLookAndFeel()) return " " + text; // NOI18N
+        if (UIUtils.isWindowsClassicLookAndFeel()) return "  " + text; // NOI18N
         return text;
     }
 

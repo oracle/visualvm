@@ -96,6 +96,7 @@ public final class ThreadsGraphPanel extends GraphPanel {
     private Action[] chartActions;
 
     private final VMTelemetryModels models;
+    private final DataManagerListener listener;
 
     private final boolean smallPanel;
 
@@ -122,10 +123,11 @@ public final class ThreadsGraphPanel extends GraphPanel {
         initComponents(chartAction);
 
         // Register listener
-        models.getDataManager().addDataListener(new DataManagerListener() {
+        listener = new DataManagerListener() {
             public void dataChanged() { updateData(); }
             public void dataReset() { resetData(); }
-        });
+        };
+        models.getDataManager().addDataListener(listener);
 
         // Initialize chart & legend
         resetData();
@@ -136,6 +138,10 @@ public final class ThreadsGraphPanel extends GraphPanel {
 
     public Action[] getActions() {
         return chartActions;
+    }
+    
+    public void cleanup() {
+        models.getDataManager().removeDataListener(listener);
     }
 
 

@@ -48,7 +48,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -215,10 +214,8 @@ public abstract class LiveCPUView extends JPanel {
                                                  refSnapshot.createDiff(snapshot);
             
             final FlatProfileContainer flatData = _snapshot.getFlatProfile(selectedThreads, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
-
-            final Map<Integer, ClientUtils.SourceCodeSelection> idMap = new HashMap();
-            for (int i = 0; i < flatData.getNRows(); i++) // TODO: getNRows is filtered, may not work for tree data!
-                idMap.put(flatData.getMethodIdAtRow(i), flatData.getSourceCodeSelectionAtRow(i));
+            
+            final Map<Integer, ClientUtils.SourceCodeSelection> idMap = _snapshot.getMethodIDMap(CPUResultsSnapshot.METHOD_LEVEL_VIEW);
 
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -269,6 +266,11 @@ public abstract class LiveCPUView extends JPanel {
         forwardCallsView.refreshSelection();
         hotSpotsView.refreshSelection();
         reverseCallsView.refreshSelection();
+    }
+    
+    
+    public void cleanup() {
+        if (rm.view == this) rm.view = null;
     }
     
     
@@ -359,8 +361,8 @@ public abstract class LiveCPUView extends JPanel {
                 if (getUI() instanceof BasicSplitPaneUI) {
                     BasicSplitPaneDivider divider = ((BasicSplitPaneUI)getUI()).getDivider();
                     if (divider != null) {
-                        Color c = UIUtils.isNimbus() ? UIUtils.getDisabledLineColor() :
-                                new JSeparator().getForeground();
+                        Color c = UIUtils.isNimbus() || UIUtils.isAquaLookAndFeel() ?
+                                  UIUtils.getDisabledLineColor() : new JSeparator().getForeground();
                         divider.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, c));
                     }
                 }
@@ -380,8 +382,8 @@ public abstract class LiveCPUView extends JPanel {
                 if (getUI() instanceof BasicSplitPaneUI) {
                     BasicSplitPaneDivider divider = ((BasicSplitPaneUI)getUI()).getDivider();
                     if (divider != null) {
-                        Color c = UIUtils.isNimbus() ? UIUtils.getDisabledLineColor() :
-                                new JSeparator().getForeground();
+                        Color c = UIUtils.isNimbus() || UIUtils.isAquaLookAndFeel() ?
+                                  UIUtils.getDisabledLineColor() : new JSeparator().getForeground();
                         divider.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, c));
                     }
                 }

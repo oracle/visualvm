@@ -46,8 +46,9 @@ package org.netbeans.lib.profiler.ui.memory;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -71,7 +72,6 @@ import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
-import org.netbeans.lib.profiler.utils.StringUtils;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -99,7 +99,7 @@ public abstract class LiveMemoryView extends JPanel {
     private MemoryResultsSnapshot snapshot;
     private MemoryResultsSnapshot refSnapshot;
     
-    private Collection filter;
+    private Collection<String> filter;
     
     
     @ServiceProvider(service=MemoryCCTProvider.Listener.class)
@@ -147,10 +147,11 @@ public abstract class LiveMemoryView extends JPanel {
 
             // class names in VM format
             InstrumentationFilter ifilter = client.getSettings().getInstrumentationFilter();
-            String[] _ifilter = ifilter == null ? null : ifilter.getFilterStrings();
-            final Collection _filter = new ArrayList();
-            if (_ifilter != null) for (String s : _ifilter)
-                    _filter.add(StringUtils.userFormClassName(s));
+            String[] _ifilter = ifilter == null ? null : ifilter.getUserFilterStrings();
+            final Collection<String> _filter = _ifilter == null ? Collections.EMPTY_LIST :
+                                               Arrays.asList(_ifilter);
+//            if (_ifilter != null) for (String s : _ifilter)
+//                    _filter.add(StringUtils.userFormClassName(s));
 
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -173,7 +174,7 @@ public abstract class LiveMemoryView extends JPanel {
         forceRefresh = false;
     }
     
-    private void refreshDataImpl(MemoryResultsSnapshot _snapshot, Collection _filter) {
+    private void refreshDataImpl(MemoryResultsSnapshot _snapshot, Collection<String> _filter) {
         assert SwingUtilities.isEventDispatchThread();
         
         snapshot = _snapshot;
@@ -233,6 +234,11 @@ public abstract class LiveMemoryView extends JPanel {
     
     public void refreshSelection() {
         if (dataView != null) dataView.showSelectionColumn();
+    }
+    
+    
+    public void cleanup() {
+        if (rm.view == this) rm.view = null;
     }
     
     
@@ -296,7 +302,7 @@ public abstract class LiveMemoryView extends JPanel {
             if (snapshot.containsStacks()) {
                 if (dataView instanceof LivenessTreeTableView) return;
                 
-                dataView = new LivenessTreeTableView(selection) {
+                dataView = new LivenessTreeTableView(selection, false) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
@@ -310,7 +316,7 @@ public abstract class LiveMemoryView extends JPanel {
             } else {
                 if (dataView instanceof LivenessTableView) return;
                 
-                dataView = new LivenessTableView(selection) {
+                dataView = new LivenessTableView(selection, false) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }

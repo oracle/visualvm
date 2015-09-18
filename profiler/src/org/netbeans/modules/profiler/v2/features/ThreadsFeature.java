@@ -110,6 +110,11 @@ final class ThreadsFeature extends ProfilerFeature.Basic {
     
     public void notifyDeactivated() {
         getSession().getProfiler().getThreadsManager().resetStates();
+        
+        if (ui != null) {
+            ui.cleanup();
+            ui = null;
+        }
     }
     
     

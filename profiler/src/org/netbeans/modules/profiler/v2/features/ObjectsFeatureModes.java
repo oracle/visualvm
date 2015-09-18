@@ -52,7 +52,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.util.Collection;
 import java.util.HashSet;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -62,6 +65,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -90,6 +94,7 @@ import org.netbeans.modules.profiler.v2.ui.SettingsPanel;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 
 /**
  *
@@ -114,7 +119,14 @@ import org.openide.util.NbBundle;
     "ObjectsFeatureModes_limitAllocationsDepthToolTip=Limit depth of allocations call tree (select 0 for no allocation calls)",
     "ObjectsFeatureModes_definedClasses=Defined classes",
     "ObjectsFeatureModes_classesLbl=Classes:",
-    "ObjectsFeatureModes_classesHint=org.mypackage.MyClass\norg.mypackage.MyClass$1"
+    "ObjectsFeatureModes_classesHint=org.mypackage.**\norg.mypackage.*\norg.mypackage.MyClass",
+    "ObjectsFeatureModes_classesTooltip=<html>Define the classes to be profiled:<br><br>"
+            + "<code>&nbsp;org.mypackage.**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes and arrays in package and subpackages<br>"
+            + "<code>&nbsp;org.mypackage.*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes and arrays in package<br>"
+            + "<code>&nbsp;org.mypackage.MyClass&nbsp;&nbsp;</code>single class<br><br>"
+            + "Special cases:<br><br>"
+            + "<code>&nbsp;char[]&nbsp;&nbsp;</code>primitive array<br>"
+            + "<code>&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes and arrays<br></html>"
 })
 final class ObjectsFeatureModes {
     
@@ -199,7 +211,7 @@ final class ObjectsFeatureModes {
         
         abstract ProfilerSession getSession();
         
-        abstract void selectForProfiling(SourceClassInfo classInfo);
+        abstract void selectForProfiling(Collection<SourceClassInfo> classInfos);
         
         
         // --- API implementation ----------------------------------------------
@@ -454,8 +466,7 @@ final class ObjectsFeatureModes {
                 Image addImage = ImageUtilities.mergeImages(baseIcon, addBadge, 0, 0);
                 addSelectionButton = new SmallButton(ImageUtilities.image2Icon(addImage)) {
                     protected void fireActionPerformed(ActionEvent e) {
-                        SourceClassInfo classInfo = ClassMethodSelector.selectClass(getSession());
-                        if (classInfo != null) selectForProfiling(classInfo);
+                        selectForProfiling(ClassMethodSelector.selectClasses(getSession()));
                     }
                     public Dimension getMinimumSize() {
                         return getPreferredSize();
@@ -500,6 +511,13 @@ final class ObjectsFeatureModes {
         private static final String LIMIT_ALLOCATIONS_FLAG = "LIMIT_ALLOCATIONS_FLAG"; // NOI18N
         private static final String CLASSES_FLAG = "SELECTION_FLAG"; // NOI18N
         
+        private static final int MIN_ROWS = 1;
+        private static final int MAX_ROWS = 15;
+        private static final int DEFAULT_ROWS = 3;
+        private static final int MIN_COLUMNS = 10;
+        private static final int MAX_COLUMNS = 100;
+        private static final int DEFAULT_COLUMNS = 40;
+        
         private static final Integer LIMIT_ALLOCATIONS_DEFAULT = 10;        
         
         private JComponent ui;
@@ -522,7 +540,7 @@ final class ObjectsFeatureModes {
             
             super.configureSettings(settings);
             
-            String filterValue = getFlatValues(classesArea.getText().split("\\n")); // NOI18N
+            String filterValue = getFlatValues(readFlag(CLASSES_FLAG, "").split("\\n")); // NOI18N
             settings.setSelectedInstrumentationFilter(new SimpleFilter("", // NOI18N
                     SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT, filterValue));
             
@@ -617,17 +635,62 @@ final class ObjectsFeatureModes {
                 c.anchor = GridBagConstraints.NORTHWEST;
                 p.add(classesPanel, c);
                 
+                final JScrollPane[] container = new JScrollPane[1];
                 classesArea = new TextArea(readFlag(CLASSES_FLAG, "")) { // NOI18N
-                    protected void changed() { settingsChanged(); }
+                    protected void changed() {
+                        settingsChanged();
+                    }
+                    protected boolean changeSize(boolean vertical, boolean direction) {
+                        if (vertical) {
+                            int rows = readRows();
+                            if (direction) rows = Math.min(rows + 1, MAX_ROWS);
+                            else rows = Math.max(rows - 1, MIN_ROWS);
+                            storeRows(rows);
+                        } else {
+                            int cols = readColumns();
+                            if (direction) cols = Math.min(cols + 3, MAX_COLUMNS);
+                            else cols = Math.max(cols - 3, MIN_COLUMNS);
+                            storeColumns(cols);
+                        }
+                        
+                        layoutImpl();                        
+                        return true;
+                    }
+                    protected boolean resetSize() {
+                        storeRows(DEFAULT_ROWS);
+                        storeColumns(DEFAULT_COLUMNS);
+                
+                        layoutImpl();
+                        return true;
+                    }
+                    private void layoutImpl() {
+                        setRows(readRows());
+                        setColumns(readColumns());
+                        container[0].setPreferredSize(null);
+                        container[0].setPreferredSize(container[0].getPreferredSize());
+                        container[0].setMinimumSize(container[0].getPreferredSize());
+                        JComponent root = SwingUtilities.getRootPane(container[0]);
+                        root.doLayout();
+                        root.repaint();
+                        setColumns(0);
+                    }
+                    protected void customizePopup(JPopupMenu popup) {
+                        popup.addSeparator();
+                        popup.add(createResizeMenu());
+                    }
+                    public Point getToolTipLocation(MouseEvent event) {
+                        return new Point(-1, getHeight() + 2);
+                    }
                 };
                 classesArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N
-                classesArea.setRows(3);
-                classesArea.setColumns(40);
-                JScrollPane classesScroll = new JScrollPane(classesArea);
-                classesScroll.setPreferredSize(classesScroll.getPreferredSize());
-                classesScroll.setMinimumSize(classesScroll.getPreferredSize());
+                classesArea.setRows(readRows());
+                classesArea.setColumns(readColumns());
+                container[0] = new JScrollPane(classesArea);
+                container[0].setPreferredSize(container[0].getPreferredSize());
+                container[0].setMinimumSize(container[0].getPreferredSize());
                 classesArea.setColumns(0);
                 classesArea.setHint(Bundle.ObjectsFeatureModes_classesHint());
+                classesArea.setToolTipText(Bundle.ObjectsFeatureModes_classesTooltip());
                 c = new GridBagConstraints();
                 c.gridx = 1;
                 c.gridy = 0;
@@ -636,7 +699,7 @@ final class ObjectsFeatureModes {
                 c.fill = GridBagConstraints.VERTICAL;
                 c.insets = new Insets(0, 0, 0, 5);
                 c.anchor = GridBagConstraints.NORTHWEST;
-                p.add(classesScroll, c);
+                p.add(container[0], c);
                 
                 JPanel settingsPanel = new SettingsPanel();
                 
@@ -733,6 +796,22 @@ final class ObjectsFeatureModes {
                 });
             }
             return ui;
+        }
+        
+        private int readRows() {
+            return NbPreferences.forModule(ObjectsFeatureModes.class).getInt("ObjectsFeatureModes.rows", DEFAULT_ROWS); // NOI18N
+        }
+        
+        private void storeRows(int rows) {
+            NbPreferences.forModule(ObjectsFeatureModes.class).putInt("ObjectsFeatureModes.rows", rows); // NOI18N
+        }
+        
+        private int readColumns() {
+            return NbPreferences.forModule(ObjectsFeatureModes.class).getInt("ObjectsFeatureModes.columns", DEFAULT_COLUMNS); // NOI18N
+        }
+        
+        private void storeColumns(int columns) {
+            NbPreferences.forModule(ObjectsFeatureModes.class).putInt("ObjectsFeatureModes.columns", columns); // NOI18N
         }
         
     }

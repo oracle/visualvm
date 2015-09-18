@@ -150,6 +150,8 @@ public abstract class GraphPanel extends JPanel {
     }
 
     public abstract Action[] getActions();
+    
+    public abstract void cleanup();
 
 
     // --- General tooltip support ---------------------------------------------

@@ -43,6 +43,8 @@
 
 package org.netbeans.lib.profiler.global;
 
+import java.util.Arrays;
+
 
 /**
  * Singleton instrumentation filter.
@@ -59,12 +61,20 @@ public class InstrumentationFilter implements Cloneable {
     public static final int INSTR_FILTER_NONE = 0;
     public static final int INSTR_FILTER_EXCLUSIVE = 10;
     public static final int INSTR_FILTER_INCLUSIVE = 20;
+    public static final int INSTR_FILTER_EXCLUSIVE_EXACT = 30;
     public static final int INSTR_FILTER_INCLUSIVE_EXACT = 40;
+    
+    private static final int FILTER_MATCHES   = 1; // string exactly matches the filter (class name)
+    private static final int FILTER_STARTS    = 2; // string starts by the filter (package and subpackages)
+    private static final int FILTER_STARTS_EX = 3; // string starts by the filter and no '.' follows (package without subpackages)
+    
     private static InstrumentationFilter defaultInstance;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
+    private String[] instrFilterUserStrings;
     private String[] instrFilterStrings;
+    private int[] instrFilterTypes;
     private int instrFilterType;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -97,7 +107,7 @@ public class InstrumentationFilter implements Cloneable {
     public void setFilterStrings(String flatFilterString) {
         //if (flatFilterString == null) return; // don't be paranoid:o)
         flatFilterString = flatFilterString.replace(',', ' '); // NOI18N // filterStrings can be separated by comma and/or space
-        flatFilterString = flatFilterString.replace('.', '/'); // NOI18N // create slashed filterStrings
+//        flatFilterString = flatFilterString.replace('.', '/'); // NOI18N // create slashed filterStrings
 
         setSlashedFilterStrings(flatFilterString.trim().split(" +")); // NOI18N
     }
@@ -106,7 +116,11 @@ public class InstrumentationFilter implements Cloneable {
     public String[] getFilterStrings() {
         return instrFilterStrings;
     }
-
+    
+    public String[] getUserFilterStrings() {
+        return instrFilterUserStrings;
+    }
+    
     /** Sets the current filter type as defined in CommonConstants. */
     public void setFilterType(int filterType) {
         instrFilterType = filterType;
@@ -121,15 +135,30 @@ public class InstrumentationFilter implements Cloneable {
     public void setSlashedFilterStrings(String[] slashedFilterStrings) {
         //if (filterStrings == null) return; // don't be paranoid:o)  
         instrFilterStrings = slashedFilterStrings;
+        instrFilterUserStrings = (String[])Arrays.copyOf(instrFilterStrings, instrFilterStrings.length);
+        
+        if (instrFilterType == INSTR_FILTER_INCLUSIVE_EXACT || instrFilterType == INSTR_FILTER_EXCLUSIVE_EXACT) {
+            instrFilterTypes = new int[instrFilterStrings.length];
+            Arrays.fill(instrFilterTypes, FILTER_MATCHES);
+        } else {
+            instrFilterTypes = null;
+        }
 
         // remove trailing '*'
-        String instrFilterString;
-
         for (int i = 0; i < instrFilterStrings.length; i++) {
-            instrFilterString = instrFilterStrings[i];
+            instrFilterStrings[i] = instrFilterStrings[i].replace('.', '/'); // NOI18N // create slashed filterStrings
 
-            if (instrFilterString.endsWith("*")) { // NOI18N
-                instrFilterStrings[i] = instrFilterString.substring(0, instrFilterString.length() - 1);
+            if (instrFilterStrings[i].equals("*") || instrFilterStrings[i].equals("**")) { // NOI18N
+                if (instrFilterTypes != null) {
+                    clearFilter();
+                    break;
+                }
+            } else if (instrFilterStrings[i].endsWith("**")) { // NOI18N
+                instrFilterStrings[i] = instrFilterStrings[i].substring(0, instrFilterStrings[i].length() - 2);
+                if (instrFilterTypes != null) instrFilterTypes[i] = FILTER_STARTS;
+            } else if (instrFilterStrings[i].endsWith("*")) { // NOI18N
+                instrFilterStrings[i] = instrFilterStrings[i].substring(0, instrFilterStrings[i].length() - 1);
+                if (instrFilterTypes != null) instrFilterTypes[i] = FILTER_STARTS_EX;
             }
         }
     }
@@ -138,15 +167,15 @@ public class InstrumentationFilter implements Cloneable {
     public void clearFilter() {
         instrFilterType = INSTR_FILTER_NONE;
         instrFilterStrings = new String[0];
+        instrFilterTypes = null;
     }
 
     public Object clone() throws CloneNotSupportedException {
         InstrumentationFilter clone = (InstrumentationFilter) super.clone();
-        clone.instrFilterStrings = new String[instrFilterStrings.length];
-
-        for (int i = 0; i < instrFilterStrings.length; i++) {
-            clone.instrFilterStrings[i] = instrFilterStrings[i];
-        }
+        
+        clone.instrFilterStrings = (String[])Arrays.copyOf(instrFilterStrings, instrFilterStrings.length);
+        clone.instrFilterUserStrings = (String[])Arrays.copyOf(instrFilterUserStrings, instrFilterUserStrings.length);
+        clone.instrFilterTypes = instrFilterTypes == null ? null : Arrays.copyOf(instrFilterTypes, instrFilterTypes.length);
 
         return clone;
     }
@@ -163,6 +192,9 @@ public class InstrumentationFilter implements Cloneable {
                 break;
             case INSTR_FILTER_INCLUSIVE:
                 filterStringsBuffer.append("  Filter type: Inclusive\n"); // NOI18N
+                break;
+            case INSTR_FILTER_EXCLUSIVE_EXACT:
+                filterStringsBuffer.append("  Filter type: Exclusive exact\n"); // NOI18N
                 break;
             case INSTR_FILTER_INCLUSIVE_EXACT:
                 filterStringsBuffer.append("  Filter type: Inclusive exact\n"); // NOI18N
@@ -187,9 +219,12 @@ public class InstrumentationFilter implements Cloneable {
             case INSTR_FILTER_EXCLUSIVE:
             case INSTR_FILTER_INCLUSIVE:
                 return true;
+//            case INSTR_FILTER_EXCLUSIVE_EXACT: // NOTE: not used by memory profiling
             case INSTR_FILTER_INCLUSIVE_EXACT:
                 for (int i = 0; i < instrFilterStrings.length; i++) {
-                    if (instrFilterStrings[i].contains("[")) {      // NOI18N
+                    if (instrFilterStrings[i].contains("[") ||      // NOI18N
+                        (instrFilterTypes != null &&
+                        instrFilterTypes[i] == INSTR_FILTER_INCLUSIVE)) { // wildcard used
                         return true;
                     }
                 }
@@ -211,6 +246,9 @@ public class InstrumentationFilter implements Cloneable {
                 break;
             case INSTR_FILTER_INCLUSIVE:
                 System.err.println("  Filter type: Inclusive"); // NOI18N
+                break;
+            case INSTR_FILTER_EXCLUSIVE_EXACT:
+                System.err.println("  Filter type: Exclusive exact"); // NOI18N
                 break;
             case INSTR_FILTER_INCLUSIVE_EXACT:
                 System.err.println("  Filter type: Inclusive exact"); // NOI18N
@@ -241,7 +279,8 @@ public class InstrumentationFilter implements Cloneable {
         boolean filterInclusive = (instrFilterType == INSTR_FILTER_INCLUSIVE || instrFilterType == INSTR_FILTER_INCLUSIVE_EXACT);
 
         for (int i = 0; i < instrFilterStrings.length; i++) {
-            if (matches(instrFilterType, string, instrFilterStrings[i])) {
+            int filterType = instrFilterTypes == null ? instrFilterType : instrFilterTypes[i];
+            if (matches(filterType, string, instrFilterStrings[i])) {
                 return filterInclusive;
             }
         }
@@ -252,9 +291,17 @@ public class InstrumentationFilter implements Cloneable {
         switch (type) {
             case INSTR_FILTER_EXCLUSIVE:
             case INSTR_FILTER_INCLUSIVE:
+            case FILTER_STARTS:
                 return string.startsWith(filter);
+            case INSTR_FILTER_EXCLUSIVE_EXACT:
             case INSTR_FILTER_INCLUSIVE_EXACT:
+            case FILTER_MATCHES:
                 return string.equals(filter);
+            case FILTER_STARTS_EX:
+                if (!string.startsWith(filter)) return false;
+                for (int i = filter.length(); i < string.length(); i++)
+                    if (string.charAt(i) == '/') return false; // NOI18N
+                return true;
             default:
                 throw new IllegalArgumentException("Illegal filter type:"+type);
         }

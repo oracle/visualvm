@@ -88,14 +88,14 @@ public abstract class SnapshotMemoryView extends JPanel {
     private final MemoryView dataView;
     
     private int aggregation;
-    private final Collection filter;
+    private final Collection<String> filter;
     private final MemoryResultsSnapshot snapshot;
     private MemoryResultsSnapshot refSnapshot;
     
     private JToggleButton compareButton;
     
     
-    public SnapshotMemoryView(MemoryResultsSnapshot snapshot, Collection filter, Action saveAction, final Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
+    public SnapshotMemoryView(MemoryResultsSnapshot snapshot, Collection<String> filter, Action saveAction, final Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
         this.filter = filter;
         this.snapshot = snapshot;
         
@@ -138,7 +138,7 @@ public abstract class SnapshotMemoryView extends JPanel {
             }
         } else if (snapshot instanceof LivenessMemoryResultsSnapshot) {
             if (snapshot.containsStacks()) {
-                dataView = new LivenessTreeTableView(null) {
+                dataView = new LivenessTreeTableView(null, filter == null) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }
@@ -148,7 +148,7 @@ public abstract class SnapshotMemoryView extends JPanel {
                 };
 //                supportsPackageAggregation = false;
             } else {
-                dataView = new LivenessTableView(null) {
+                dataView = new LivenessTableView(null, filter == null) {
                     protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                         if (showSourceSupported()) showSource(userValue);
                     }

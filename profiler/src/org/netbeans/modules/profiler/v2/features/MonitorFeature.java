@@ -108,6 +108,11 @@ final class MonitorFeature extends ProfilerFeature.Basic {
     
     public void notifyDeactivated() {
         getSession().getProfiler().getVMTelemetryManager().reset();
+        
+        if (ui != null) {
+            ui.cleanup();
+            ui = null;
+        }
     }
     
     
