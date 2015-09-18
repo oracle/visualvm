@@ -58,7 +58,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jaroslav Bachorik
  */
-@ServiceProvider(service=CPUCCTProvider.Listener.class)
+//@ServiceProvider(service=CPUCCTProvider.Listener.class)
 public class StatisticalModuleContainer implements CPUCCTProvider.Listener {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
