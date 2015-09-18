@@ -246,6 +246,11 @@ public class CPUSamplingDataFrameProcessor extends AbstractLockDataFrameProcesso
         builder = new StackTraceSnapshotBuilder(ccgb[0],client.getSettings().getInstrumentationFilter(),client.getStatus());
     }
     
+    public void shutdown() {
+        super.shutdown();
+        builder = null;
+    }
+  
     private static Thread.State getThreadState(int threadState) {
         switch (threadState) {
             case CommonConstants.THREAD_STATUS_UNKNOWN:
