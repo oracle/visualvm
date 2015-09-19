@@ -54,7 +54,7 @@ import java.util.Set;
 import org.openide.util.NbBundle;
 
 
-@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.heapwalk.memorylint.Rule.class)
+//@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.heapwalk.memorylint.Rule.class)
 public class HashMapHistogram extends IteratingRule {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 

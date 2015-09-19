@@ -177,10 +177,10 @@ public abstract class LiveMemoryView extends JPanel {
     private void refreshDataImpl(MemoryResultsSnapshot _snapshot, Collection<String> _filter) {
         assert SwingUtilities.isEventDispatchThread();
         
+        updateDataView(_snapshot);
+        
         snapshot = _snapshot;
         filter = _filter;
-        
-        updateDataView(snapshot);
         
         if (dataView != null && snapshot != null) {
             if (refSnapshot == null) dataView.setData(snapshot, filter, CPUResultsSnapshot.CLASS_LEVEL_VIEW);
