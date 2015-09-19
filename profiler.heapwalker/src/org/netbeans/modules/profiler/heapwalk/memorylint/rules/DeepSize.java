@@ -56,7 +56,7 @@ import javax.swing.event.DocumentListener;
 import org.openide.util.NbBundle;
 
 
-@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.heapwalk.memorylint.Rule.class)
+//@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.heapwalk.memorylint.Rule.class)
 public class DeepSize extends IteratingRule {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
