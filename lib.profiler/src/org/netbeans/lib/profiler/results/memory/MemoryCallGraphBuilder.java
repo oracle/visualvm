@@ -549,13 +549,18 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
 
     protected void doShutdown() {
         // #204978: 'loadNamesForJMethodIds()' must be called on SHUTDOWN_INITIATED command
+        // release memory
+        resetInternalState();
     }
 
     protected void doStartup(ProfilerClient profilerClient) {
+        resetInternalState();
+        profilerClient.registerMemoryCCTProvider(this);
+    }
+
+    private void resetInternalState() {
         objMap = new ObjIdToCCTNodeMap();
         currentEpoch = 0;
-
-        profilerClient.registerMemoryCCTProvider(this);
 
         nProfiledClasses = 0;
         stacksForClasses = null;
@@ -566,8 +571,9 @@ public class MemoryCallGraphBuilder extends BaseCallGraphBuilder implements Memo
         avgObjectAge = null;
         unprofiledClass = null;
         currentEpoch = -1;
-    }
 
+    }
+    
     private String getClassName(int classId) {
         status.beginTrans(false);
 
