@@ -122,6 +122,7 @@ public class LockGraphBuilder extends BaseCallGraphBuilder implements LockProfil
     @Override
     protected void doShutdown() {
         threadInfos.reset();
+        monitorInfos = new HashMap();
     }
 
     @Override
