@@ -1384,9 +1384,10 @@ public abstract class NetBeansProfiler extends Profiler {
     public boolean prepareInstrumentation(ProfilingSettings profilingSettings) {
         teardownDispatcher();
         setupDispatcher(profilingSettings);
-
-        ClientUtils.SourceCodeSelection[] marks = MarkingEngine.getDefault().getMarkerMethods();
-        profilingSettings.setInstrumentationMarkerMethods(marks);
+        
+//        ClientUtils.SourceCodeSelection[] marks = MarkingEngine.getDefault().getMarkerMethods();
+//        profilingSettings.setInstrumentationMarkerMethods(marks);
+        profilingSettings.setInstrumentationMarkerMethods(new ClientUtils.SourceCodeSelection[0]);
 
         return prepareInstrumentationImpl(profilingSettings);
     }
@@ -1605,7 +1606,7 @@ public abstract class NetBeansProfiler extends Profiler {
 
     protected void cleanupAfterProfiling() {
         teardownDispatcher();
-        MarkingEngine.getDefault().deconfigure();
+//        MarkingEngine.getDefault().deconfigure();
         ClassRepository.cleanup();
     }
 
