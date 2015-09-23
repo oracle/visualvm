@@ -48,15 +48,11 @@ import java.awt.Component;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.lib.profiler.common.event.ProfilingStateAdapter;
-import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
-import org.netbeans.lib.profiler.results.ExportDataDumper;
 import org.netbeans.lib.profiler.ui.ResultsView;
 import org.netbeans.lib.profiler.ui.locks.LockContentionPanel;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -100,8 +96,8 @@ public final class LockContentionWindow extends ProfilerTopComponent {
         add(lockView, BorderLayout.CENTER);
 
         locksPanel = new LockContentionPanel(null);
-        locksPanel.addSaveViewAction(new SaveViewAction(new SaveView()));
-        locksPanel.addExportAction(new ExportAction(new Exporter(),null));
+//        locksPanel.addSaveViewAction(new SaveViewAction(new SaveView()));
+//        locksPanel.addExportAction(new ExportAction(new Exporter(),null));
 
         lockView.addView("Locks", null, "Locks", locksPanel, locksPanel.getToolbar());
 //        lockView.addView(Bundle.ThreadsWindow_ThreadsTableTabName(), null,
@@ -196,28 +192,28 @@ public final class LockContentionWindow extends ProfilerTopComponent {
         }
     }
     
-    private class Exporter implements ExportAction.ExportProvider {
-
-        @Override
-        public void exportData(int exportedFileType, ExportDataDumper eDD) {
-            locksPanel.exportData(exportedFileType, eDD, getViewName());
-        }
-
-        @Override
-        public String getViewName() {
-            return Bundle.LockContentionWindow_WindowName();
-        }
-
-        @Override
-        public boolean hasExportableView() {
-            return locksPanel.hasView();
-        }
-
-        @Override
-        public boolean hasLoadedSnapshot() {
-            return false;
-        }
-    }
+//    private class Exporter implements ExportAction.ExportProvider {
+//
+//        @Override
+//        public void exportData(int exportedFileType, ExportDataDumper eDD) {
+//            locksPanel.exportData(exportedFileType, eDD, getViewName());
+//        }
+//
+//        @Override
+//        public String getViewName() {
+//            return Bundle.LockContentionWindow_WindowName();
+//        }
+//
+//        @Override
+//        public boolean hasExportableView() {
+//            return locksPanel.hasView();
+//        }
+//
+//        @Override
+//        public boolean hasLoadedSnapshot() {
+//            return false;
+//        }
+//    }
 
     private class LockContentionListener implements ActionListener {
 
@@ -243,26 +239,26 @@ public final class LockContentionWindow extends ProfilerTopComponent {
         }
     }
     
-    private class SaveView implements SaveViewAction.ViewProvider {
-
-        @Override
-        public BufferedImage getViewImage(boolean onlyVisibleArea) {
-            return locksPanel.getCurrentViewScreenshot(onlyVisibleArea);
-        }
-
-        @Override
-        public String getViewName() {
-            return Bundle.LockContentionWindow_WindowName();
-        }
-
-        @Override
-        public boolean fitsVisibleArea() {
-            return locksPanel.fitsVisibleArea();
-        }
-
-        @Override
-        public boolean hasView() {
-            return locksPanel.hasView();
-        } 
-    }
+//    private class SaveView implements SaveViewAction.ViewProvider {
+//
+//        @Override
+//        public BufferedImage getViewImage(boolean onlyVisibleArea) {
+//            return locksPanel.getCurrentViewScreenshot(onlyVisibleArea);
+//        }
+//
+//        @Override
+//        public String getViewName() {
+//            return Bundle.LockContentionWindow_WindowName();
+//        }
+//
+//        @Override
+//        public boolean fitsVisibleArea() {
+//            return locksPanel.fitsVisibleArea();
+//        }
+//
+//        @Override
+//        public boolean hasView() {
+//            return locksPanel.hasView();
+//        } 
+//    }
 }
