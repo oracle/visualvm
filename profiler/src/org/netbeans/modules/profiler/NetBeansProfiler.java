@@ -90,8 +90,6 @@ import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.client.ProfilingPointsProcessor;
 import org.netbeans.lib.profiler.common.*;
-import org.netbeans.lib.profiler.common.filters.DefinedFilterSets;
-import org.netbeans.lib.profiler.common.filters.GlobalFilters;
 import org.netbeans.lib.profiler.global.CalibrationDataFileIO;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
@@ -105,7 +103,6 @@ import org.netbeans.lib.profiler.results.cpu.CPUProfilingResultListener;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileBuilder;
 import org.netbeans.lib.profiler.results.cpu.cct.CCTResultsFilter;
 import org.netbeans.lib.profiler.results.cpu.cct.TimeCollector;
-import org.netbeans.lib.profiler.results.cpu.marking.MarkingEngine;
 import org.netbeans.lib.profiler.results.locks.LockProfilingResultListener;
 import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
 import org.netbeans.lib.profiler.results.memory.MemoryProfilingResultsListener;
@@ -119,14 +116,12 @@ import org.netbeans.lib.profiler.wireprotocol.WireIO;
 import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
-import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.api.ProgressDisplayer;
 import org.netbeans.modules.profiler.spi.SessionListener;
 import org.netbeans.modules.profiler.ui.ProfilerProgressDisplayer;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.awt.Mnemonics;
 import org.openide.awt.StatusDisplayer;
-import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -383,9 +378,9 @@ public abstract class NetBeansProfiler extends Profiler {
 
     private static final Logger LOGGER = Logger.getLogger(NetBeansProfiler.class.getName());
 
-    private static final String GLOBAL_FILTERS_FILENAME = "filters"; //NOI18N
-    private static final String DEFINED_FILTERSETS_FILENAME = "filtersets"; //NOI18N
-    private static final String DEFAULT_FILE_SUFFIX = "-default"; //NOI18N
+//    private static final String GLOBAL_FILTERS_FILENAME = "filters"; //NOI18N
+//    private static final String DEFINED_FILTERSETS_FILENAME = "filtersets"; //NOI18N
+//    private static final String DEFAULT_FILE_SUFFIX = "-default"; //NOI18N
     private static boolean initialized = false;
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -399,11 +394,9 @@ public abstract class NetBeansProfiler extends Profiler {
     
     private ProfilingMonitor monitor = null;
     private TargetAppRunner targetAppRunner;
-    private DefinedFilterSets definedFilterSets;
     private FileObject profiledSingleFile;
     final private ProfilerEngineSettings sharedSettings;
     
-    private GlobalFilters globalFilters;
     private final Object setupLock = new Object();
     private ProfilingSettings lastProfilingSettings;
     private Lookup.Provider profiledProject = null;
@@ -513,22 +506,6 @@ public abstract class NetBeansProfiler extends Profiler {
 
     public SessionSettings getCurrentSessionSettings() {
         return lastSessionSettings;
-    }
-
-    public synchronized DefinedFilterSets getDefinedFilterSets() {
-        if (definedFilterSets == null) {
-            loadGlobalFilters();
-        }
-
-        return definedFilterSets;
-    }
-
-    public synchronized GlobalFilters getGlobalFilters() {
-        if (globalFilters == null) {
-            loadGlobalFilters();
-        }
-
-        return globalFilters;
     }
 
     public GlobalProfilingSettings getGlobalProfilingSettings() {
@@ -1433,42 +1410,42 @@ public abstract class NetBeansProfiler extends Profiler {
         return false;
     }
 
-    // TODO [ian] - perform saving of global settings differently
-    public void saveFilters() {
-        // 1. save global filters
-        FileLock lock = null;
-
-        try {
-            Properties globalFiltersProps = new Properties();
-            globalFilters.store(globalFiltersProps);
-            ProfilerStorage.saveGlobalProperties(globalFiltersProps, GLOBAL_FILTERS_FILENAME);
-        } catch (Exception e) {
-            ProfilerLogger.log(e);
-            ProfilerDialogs.displayError(
-                Bundle.NetBeansProfiler_ErrorSavingProfilingSettingsMessage(e.getMessage()));
-        } finally {
-            if (lock != null) {
-                lock.releaseLock();
-            }
-        }
-
-        // 2. save defined Filter Sets
-        lock = null;
-
-        try {
-            Properties definedFilterSetsProps = new Properties();
-            definedFilterSets.store(definedFilterSetsProps);
-            ProfilerStorage.saveGlobalProperties(definedFilterSetsProps, DEFINED_FILTERSETS_FILENAME);
-        } catch (Exception e) {
-            ProfilerLogger.log(e);
-            ProfilerDialogs.displayError(
-                Bundle.NetBeansProfiler_ErrorSavingFilterSetsMessage(e.getMessage()));
-        } finally {
-            if (lock != null) {
-                lock.releaseLock();
-            }
-        }
-    }
+//    // TODO [ian] - perform saving of global settings differently
+//    public void saveFilters() {
+//        // 1. save global filters
+//        FileLock lock = null;
+//
+//        try {
+//            Properties globalFiltersProps = new Properties();
+//            globalFilters.store(globalFiltersProps);
+//            ProfilerStorage.saveGlobalProperties(globalFiltersProps, GLOBAL_FILTERS_FILENAME);
+//        } catch (Exception e) {
+//            ProfilerLogger.log(e);
+//            ProfilerDialogs.displayError(
+//                Bundle.NetBeansProfiler_ErrorSavingProfilingSettingsMessage(e.getMessage()));
+//        } finally {
+//            if (lock != null) {
+//                lock.releaseLock();
+//            }
+//        }
+//
+//        // 2. save defined Filter Sets
+//        lock = null;
+//
+//        try {
+//            Properties definedFilterSetsProps = new Properties();
+//            definedFilterSets.store(definedFilterSetsProps);
+//            ProfilerStorage.saveGlobalProperties(definedFilterSetsProps, DEFINED_FILTERSETS_FILENAME);
+//        } catch (Exception e) {
+//            ProfilerLogger.log(e);
+//            ProfilerDialogs.displayError(
+//                Bundle.NetBeansProfiler_ErrorSavingFilterSetsMessage(e.getMessage()));
+//        } finally {
+//            if (lock != null) {
+//                lock.releaseLock();
+//            }
+//        }
+//    }
 
     public void shutdown() {
         getMonitor().stopUpdateThread();
@@ -1625,28 +1602,28 @@ public abstract class NetBeansProfiler extends Profiler {
         ClassRepository.initClassPaths(sharedSettings.getWorkingDir(), sharedSettings.getVMClassPaths());
     }
 
-    private void displayWarningAboutEntireAppProfiling() {
-        ProfilerDialogs.displayWarning(Bundle.NetBeansProfiler_EntireApplicationProfilingWarning());
-    }
-
-    // -- Package-Private stuff --------------------------------------------------------------------------------------------
-    private void loadGlobalFilters() {
-        try {
-            Properties globalFiltersProps = new Properties();
-            ProfilerStorage.loadGlobalProperties(globalFiltersProps, GLOBAL_FILTERS_FILENAME);
-            globalFilters = new GlobalFilters();
-            globalFilters.load(globalFiltersProps);
-            
-            Properties definedFilterSetsProps = new Properties();
-            ProfilerStorage.loadGlobalProperties(definedFilterSetsProps, DEFINED_FILTERSETS_FILENAME);
-            definedFilterSets = new DefinedFilterSets();
-            definedFilterSets.load(definedFilterSetsProps);
-        } catch (Exception e) {
-            ProfilerLogger.log(e);
-            ProfilerDialogs.displayError(
-                Bundle.NetBeansProfiler_ErrorLoadingProfilingSettingsMessage(e.getMessage()));
-        }
-    }
+//    private void displayWarningAboutEntireAppProfiling() {
+//        ProfilerDialogs.displayWarning(Bundle.NetBeansProfiler_EntireApplicationProfilingWarning());
+//    }
+//
+//    // -- Package-Private stuff --------------------------------------------------------------------------------------------
+//    private void loadGlobalFilters() {
+//        try {
+//            Properties globalFiltersProps = new Properties();
+//            ProfilerStorage.loadGlobalProperties(globalFiltersProps, GLOBAL_FILTERS_FILENAME);
+//            globalFilters = new GlobalFilters();
+//            globalFilters.load(globalFiltersProps);
+//            
+//            Properties definedFilterSetsProps = new Properties();
+//            ProfilerStorage.loadGlobalProperties(definedFilterSetsProps, DEFINED_FILTERSETS_FILENAME);
+//            definedFilterSets = new DefinedFilterSets();
+//            definedFilterSets.load(definedFilterSetsProps);
+//        } catch (Exception e) {
+//            ProfilerLogger.log(e);
+//            ProfilerDialogs.displayError(
+//                Bundle.NetBeansProfiler_ErrorLoadingProfilingSettingsMessage(e.getMessage()));
+//        }
+//    }
 
     // -- Private implementation -------------------------------------------------------------------------------------------
     private void openWindowsOnProfilingStart() {

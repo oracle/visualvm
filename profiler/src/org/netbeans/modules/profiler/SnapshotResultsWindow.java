@@ -370,12 +370,6 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     protected Component defaultFocusOwner() {
         return displayedPanel;
     }
-
-    public void displayStacksForClass(int selectedClassId, int sortingColumn, boolean sortingOrder) {
-        if (displayedPanel instanceof MemorySnapshotPanel) {
-            ((MemorySnapshotPanel) displayedPanel).displayStacksForClass(selectedClassId, sortingColumn, sortingOrder);
-        }
-    }
     
     public void refreshTabName() {
         tabName = ResultsManager.getDefault().getSnapshotDisplayName(snapshot);
@@ -408,17 +402,6 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
 
     protected String preferredID() {
         return this.getClass().getName();
-    }
-    
-    
-    // --- Support for saving/restoring selected tabs, opened columns etc. -----
-    public void setState(SnapshotPanel.State state) {
-//        displayedPanel.setState(state);
-    }
-    
-    public SnapshotPanel.State getState() {
-        return null;
-//        return displayedPanel.getState();
     }
     // -------------------------------------------------------------------------
     
