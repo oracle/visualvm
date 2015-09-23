@@ -827,7 +827,10 @@ public class TargetAppRunner implements CommonConstants {
         }
 
         try {
-            runningAppProcess = Runtime.getRuntime().exec(cmdArray, null, dir);
+            ProcessBuilder builder = new ProcessBuilder(cmdArray).directory(dir);
+            builder.redirectError(ProcessBuilder.Redirect.INHERIT);
+            builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            runningAppProcess = builder.start();
         } catch (IOException ex) {
             StringBuilder sb = new StringBuilder();
 
