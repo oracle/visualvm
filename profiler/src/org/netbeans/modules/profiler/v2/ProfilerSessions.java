@@ -191,6 +191,8 @@ final class ProfilerSessions {
                     if (session != null) session.close();
                 }
                 
+                dd.setMessage(null); // Do not leak because of WindowsPopupMenuUI.mnemonicListener
+                
             }
         });
     }
@@ -207,7 +209,11 @@ final class ProfilerSessions {
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
         
-        return dd.getValue() == DialogDescriptor.OK_OPTION ? ui.selectedFeature() : null;
+        ProfilerFeature ret = dd.getValue() == DialogDescriptor.OK_OPTION ? ui.selectedFeature() : null;
+        
+        dd.setMessage(null); // Do not leak because of WindowsPopupMenuUI.mnemonicListener
+        
+        return ret;
     }
     
     

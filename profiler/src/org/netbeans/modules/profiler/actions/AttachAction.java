@@ -45,12 +45,7 @@ package org.netbeans.modules.profiler.actions;
 
 import java.awt.event.ActionEvent;
 import javax.swing.*;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
-import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
-import org.openide.awt.ActionRegistration;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -62,8 +57,8 @@ import org.openide.util.RequestProcessor;
  * @author Ian Formanek
  */
 @NbBundle.Messages({
-    "LBL_AttachMainProjectAction=Attach to &External Process",
-    "HINT_AttachMainProjectAction=Attach to External Process"
+    "LBL_AttachAction=Attach to &External Process",
+    "HINT_AttachAction=Attach to External Process"
 })
 public final class AttachAction extends AbstractAction {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
@@ -73,8 +68,8 @@ public final class AttachAction extends AbstractAction {
     }
     
     private AttachAction() {
-        putValue(Action.NAME, Bundle.LBL_AttachMainProjectAction());
-        putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_AddRootMethodAction());
+        putValue(Action.NAME, Bundle.LBL_AttachAction());
+        putValue(Action.SHORT_DESCRIPTION, Bundle.HINT_AttachAction());
     }
     
     public static AttachAction getInstance() {

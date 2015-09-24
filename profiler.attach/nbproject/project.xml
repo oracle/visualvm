@@ -111,7 +111,6 @@
                 <friend>oracle.jdevimpl.profiler.impl</friend>
                 <friend>org.netbeans.modules.profiler</friend>
                 <friend>org.netbeans.modules.profiler.nbimpl</friend>
-                <friend>org.netbeans.modules.profiler.stp</friend>
                 <package>org.netbeans.modules.profiler.attach</package>
                 <package>org.netbeans.modules.profiler.attach.providers</package>
                 <package>org.netbeans.modules.profiler.attach.spi</package>
