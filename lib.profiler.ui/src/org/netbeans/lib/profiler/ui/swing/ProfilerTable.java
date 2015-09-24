@@ -956,14 +956,19 @@ public class ProfilerTable extends JTable {
         }
         
         // Right-press selects row for popup
-        if (popupEvent && e.getID() == MouseEvent.MOUSE_PRESSED && row != -1)
-            selectRow(row, true);
+        if (popupEvent && e.getID() == MouseEvent.MOUSE_PRESSED && row != -1) {
+            ListSelectionModel sel = getSelectionModel();
+            if (sel.getSelectionMode() == ListSelectionModel.SINGLE_SELECTION ||
+                !sel.isSelectedIndex(row)) selectRow(row, true);
+        }
         
         super.processMouseEvent(e);
         
         // Right-click selects row and opens popup
         if (popupEvent && e.getID() == MouseEvent.MOUSE_CLICKED && row != -1) {
-            selectRow(row, true);
+            ListSelectionModel sel = getSelectionModel();
+            if (sel.getSelectionMode() == ListSelectionModel.SINGLE_SELECTION ||
+                !sel.isSelectedIndex(row)) selectRow(row, true);
             final MouseEvent me = e;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() { showPopupMenu(me); };
