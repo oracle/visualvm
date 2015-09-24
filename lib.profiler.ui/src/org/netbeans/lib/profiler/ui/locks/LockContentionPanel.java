@@ -110,7 +110,7 @@ import org.openide.util.Lookup;
  *
  * @author Jiri Sedlacek
  */
-public class LockContentionPanel extends DataView {
+public abstract class LockContentionPanel extends DataView {
     
     // -----
     // I18N String constants
@@ -165,14 +165,12 @@ public class LockContentionPanel extends DataView {
     private static final int MIN_UPDATE_DIFF = 900;
     private static final int MAX_UPDATE_DIFF = 1400;
 
-    private final ProfilerClient client;
     private long lastupdate;
     private volatile boolean paused;
     private volatile boolean forceRefresh;
     
-    public LockContentionPanel(ProfilerClient clnt) { 
+    public LockContentionPanel() { 
     
-        client = clnt;
         toolbar = ProfilerToolbar.create(true);
         
         JLabel modeLabel = new JLabel(DISPLAY_MODE);
@@ -315,6 +313,10 @@ public class LockContentionPanel extends DataView {
         registerActions();
     }
     
+    
+    protected abstract ProfilerClient getProfilerClient();
+    
+    
     private void registerActions() {
         ActionMap map = getActionMap();
         
@@ -366,7 +368,7 @@ public class LockContentionPanel extends DataView {
 
     public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
         if ((lastupdate + MAX_UPDATE_DIFF < System.currentTimeMillis() && !paused) || forceRefresh) {
-            client.forceObtainedResultsDump(true);
+            getProfilerClient().forceObtainedResultsDump(true);
         }
     }
     

@@ -52,6 +52,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
@@ -105,7 +106,7 @@ abstract class MethodsFeatureUI extends FeatureUI {
     
     abstract Lookup.Provider getProject();
     
-    abstract Profiler getProfiler();
+    abstract ProfilerClient getProfilerClient();
     
     abstract void refreshResults();
     
@@ -184,7 +185,10 @@ abstract class MethodsFeatureUI extends FeatureUI {
         
         // --- Results ---------------------------------------------------------
         
-        cpuView = new LiveCPUView(getProfiler().getTargetAppRunner().getProfilerClient(), getMethodsSelection()) {
+        cpuView = new LiveCPUView(getMethodsSelection()) {
+            protected ProfilerClient getProfilerClient() {
+                return MethodsFeatureUI.this.getProfilerClient();
+            }
             protected boolean showSourceSupported() {
                 return GoToSource.isAvailable();
             }

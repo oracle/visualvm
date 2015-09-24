@@ -92,7 +92,6 @@ public abstract class LiveCPUView extends JPanel {
     private static final int MIN_UPDATE_DIFF = 900;
     private static final int MAX_UPDATE_DIFF = 1400;
     
-    private final ProfilerClient client;
     private final ResultsMonitor rm;
     
     private CPUResultsSnapshot snapshot;
@@ -137,9 +136,7 @@ public abstract class LiveCPUView extends JPanel {
         }
     }
     
-    public LiveCPUView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection) {
-        this.client = client;
-        
+    public LiveCPUView(Set<ClientUtils.SourceCodeSelection> selection) {
         initUI(selection);
         registerActions();
         
@@ -184,6 +181,7 @@ public abstract class LiveCPUView extends JPanel {
         if (refreshIsRunning) return;
         refreshIsRunning = true;
         try {
+            ProfilerClient client = getProfilerClient();
             final CPUResultsSnapshot snapshotData =
                     client.getStatus().getInstrMethodClasses() == null ?
                     null : client.getCPUProfilingResultsSnapshot(false);
@@ -241,7 +239,7 @@ public abstract class LiveCPUView extends JPanel {
     
     public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
         if ((lastupdate + MAX_UPDATE_DIFF < System.currentTimeMillis() && !paused) || forceRefresh) {
-            client.forceObtainedResultsDump(true);
+            getProfilerClient().forceObtainedResultsDump(true);
         }        
     }
     
@@ -272,6 +270,9 @@ public abstract class LiveCPUView extends JPanel {
     public void cleanup() {
         if (rm.view == this) rm.view = null;
     }
+    
+    
+    protected abstract ProfilerClient getProfilerClient();
     
     
     protected boolean profileMethodSupported() { return true; }
