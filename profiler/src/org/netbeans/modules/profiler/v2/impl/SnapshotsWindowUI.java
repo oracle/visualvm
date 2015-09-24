@@ -137,7 +137,7 @@ import org.openide.windows.WindowManager;
     "SnapshotsWindowUI_ttpSnapshotType=Snapshot type",
     "SnapshotsWindowUI_ttpSnapshotName=Snapshot name"
 })
-public final class SnapshotsWindowUI extends TopComponent {
+public final class SnapshotsWindowUI extends ProfilerTopComponent {
     
     public static final String ID = "SnapshotsWindowUI"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx("SnapshotsWindow.HelpCtx"); // NOI18N
@@ -623,6 +623,13 @@ public final class SnapshotsWindowUI extends TopComponent {
     
     public HelpCtx getHelpCtx() {
         return HELP_CTX;
+    }
+    
+    
+    // --- ProfilerTopComponent ------------------------------------------------
+    
+    protected Component defaultFocusOwner() {
+        return snapshotsTable;
     }
     
     
