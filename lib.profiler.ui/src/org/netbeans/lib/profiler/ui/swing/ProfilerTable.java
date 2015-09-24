@@ -62,6 +62,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -407,11 +408,14 @@ public class ProfilerTable extends JTable {
     }
     
     protected void saveSelection() {
-        selection = getSelectedValue(mainColumn);
+        int sel = getSelectionModel().getSelectionMode();
+        selection = sel == ListSelectionModel.SINGLE_SELECTION ?
+                getSelectedValue(mainColumn) : getSelectedValues(mainColumn).toArray();
     }
     
     protected void restoreSelection() {
-        if (selection != null) selection = selectValue(selection, mainColumn, false);
+        if (!(selection instanceof Object[])) selection = selectValue(selection, mainColumn, false);
+        else selection = selectValues((Object[])selection, mainColumn, false);
     }
     
     public void selectRow(int row, boolean scrollToVisible) {
@@ -441,6 +445,34 @@ public class ProfilerTable extends JTable {
         }
         
         return null;
+    }
+    
+    private Object[] selectValues(Object[] values, int column, boolean scrollToVisible) {
+        if (values == null || values.length == 0) return null;
+        
+        Set<Object> toSelect = new HashSet(Arrays.asList(values));
+        List<Object> selected = new ArrayList(toSelect.size());
+        
+        internal = true;
+        try {
+            int _column = convertColumnIndexToView(column);
+            for (int row = 0; row < getRowCount(); row++) {
+                Object _value = getValueAt(row, _column);
+                if (toSelect.remove(_value)) {
+                    if (selected.isEmpty()) {
+                        setRowSelectionInterval(row, row);
+                        if (scrollToVisible)
+                            scrollRectToVisible(getCellRect(row, _column, true));
+                    } else {
+                        addRowSelectionInterval(row, row);
+                    }
+                    selected.add(_value);
+                    if (toSelect.isEmpty()) break;
+                }
+            }
+        } finally { internal = false; }
+        
+        return selected.isEmpty() ? null : selected.toArray();
     }
     
     public Object getSelectedValue(int column) {
