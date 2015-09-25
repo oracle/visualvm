@@ -52,6 +52,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
@@ -93,7 +94,7 @@ abstract class ObjectsFeatureUI extends FeatureUI {
     
     abstract Lookup.Provider getProject();
     
-    abstract Profiler getProfiler();
+    abstract ProfilerClient getProfilerClient();
     
     abstract void refreshResults();
     
@@ -168,7 +169,10 @@ abstract class ObjectsFeatureUI extends FeatureUI {
         
         // --- Results ---------------------------------------------------------
         
-        memoryView = new LiveMemoryView(getProfiler().getTargetAppRunner().getProfilerClient(), getSelection()) {
+        memoryView = new LiveMemoryView(getSelection()) {
+            protected ProfilerClient getProfilerClient() {
+                return ObjectsFeatureUI.this.getProfilerClient();
+            }
             protected boolean showSourceSupported() {
                 return GoToSource.isAvailable();
             }

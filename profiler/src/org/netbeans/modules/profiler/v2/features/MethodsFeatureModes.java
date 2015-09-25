@@ -75,6 +75,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -249,14 +250,9 @@ final class MethodsFeatureModes {
             settings.setSelectedInstrumentationFilter(!filter ? SimpleFilter.NO_FILTER :
                     new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_EXCLUSIVE, CORE_JAVA_FILTER)); // NOI18N
             
-            StringBuilder b = new StringBuilder();
             HashSet<ClientUtils.SourceCodeSelection> _sel = getSelection();
             ClientUtils.SourceCodeSelection[] classes = _sel.toArray(
                     new ClientUtils.SourceCodeSelection[_sel.size()]);
-            for (int i = 0; i < classes.length; i++) {
-                b.append(classes[i].getClassName());
-                if (i < classes.length - 1) b.append(", "); // NOI18N
-            }
             settings.addRootMethods(classes);
             
             String o = readFlag(OUTGOING_CALLS_FLAG, OUTGOING_CALLS_DEFAULT.toString());
@@ -622,12 +618,13 @@ final class MethodsFeatureModes {
                                          CommonConstants.CPU_INSTR_FULL :
                                          CommonConstants.CPU_INSTR_SAMPLED);
             
-            String[] rootValues = readFlag(CLASSES_FLAG, "").split(","); // NOI18N
-            ClientUtils.SourceCodeSelection[] roots = (rootValues.length == 1 && rootValues[0].isEmpty()) ?
+            String[] rootsLines = readFlag(CLASSES_FLAG, "").split("\\n"); // NOI18N
+            String[] rootsValues = FilterUtils.getSeparateFilters(getFlatValues(rootsLines));
+            ClientUtils.SourceCodeSelection[] roots = (rootsValues.length == 1 && rootsValues[0].isEmpty()) ?
                 new ClientUtils.SourceCodeSelection[0] :
-                new ClientUtils.SourceCodeSelection[rootValues.length];
+                new ClientUtils.SourceCodeSelection[rootsValues.length];
             for (int i = 0; i < roots.length; i++)
-                roots[i] = new ClientUtils.SourceCodeSelection(rootValues[i], "*", null); // NOI18N
+                roots[i] = new ClientUtils.SourceCodeSelection(rootsValues[i], "*", null); // NOI18N
             settings.addRootMethods(roots);
             
             String filter = readFlag(FILTER_FLAG, ""); // NOI18N
@@ -636,7 +633,7 @@ final class MethodsFeatureModes {
             } else {
                 int filterType = Boolean.parseBoolean(readFlag(FILTER_MODE_FLAG, Boolean.TRUE.toString())) == true ?
                                  SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT : SimpleFilter.SIMPLE_FILTER_EXCLUSIVE_EXACT;
-                String filterValue = getFlatValues(filterArea.getText().split("\\n")); // NOI18N
+                String filterValue = getFlatValues(filter.split("\\n")); // NOI18N
                 settings.setSelectedInstrumentationFilter(new SimpleFilter("", filterType, filterValue)); // NOI18N
             }
             

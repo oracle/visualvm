@@ -47,8 +47,11 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -127,6 +130,8 @@ import org.openide.util.lookup.ServiceProvider;
     "AttachDialog_RowArguments=Arguments:", // NOI18N
     "AttachDialog_RowJvmArguments=JVM Arguments:", // NOI18N
     "AttachDialog_RowJvmFlags=JVM Flags:", // NOI18N
+    "AttachDialog_DetailsUnknown=unknown", // NOI18N
+    "AttachDialog_DetailsNone=none", // NOI18N
     "AttachDialog_BtnClose=Close", // NOI18N
     "AttachDialog_DetailsCaption=Details of {0}", // NOI18N
     "AttachDialog_Steps=P&erform the following steps to start profiling:", // NOI18N
@@ -321,7 +326,22 @@ public class AttachDialog extends AttachWizard {
             
             final ProcessesModel processesModel = new ProcessesModel();
             
-            final ProfilerTable processes = new ProfilerTable(processesModel, true, true, null);
+            final ProfilerTable processes = new ProfilerTable(processesModel, true, true, null){
+                public String getToolTipText(MouseEvent event) {
+                    int row = rowAtPoint(event.getPoint());
+                    if (row == -1) return null;
+                    
+                    row = convertRowIndexToModel(row);
+                    return "<html>" + getDetails((RunningVM)processesModel.getValueAt(row, -1)) + "</html>"; // NOI18N
+                }
+                public Point getToolTipLocation(MouseEvent event) {
+                    int row = rowAtPoint(event.getPoint());
+                    if (row == -1) return null;
+                    
+                    Rectangle rect = getCellRect(row, 0, false);
+                    return new Point(event.getX() + 15, rect.y + rect.height + 2);
+                }
+            };
             processesHint.setLabelFor(processes);
             processes.setMainColumn(0);
             processes.setFitWidthColumn(0);
@@ -685,6 +705,20 @@ public class AttachDialog extends AttachWizard {
         configureScrollBar(areaScroll.getVerticalScrollBar());
         configureScrollBar(areaScroll.getHorizontalScrollBar());
         
+        area.setText(getDetails(vm));
+        area.setCaretPosition(0);
+        
+        HelpCtx helpCtx = new HelpCtx("ProcessDetails.HelpCtx"); //NOI18N
+        JButton close = new JButton(Bundle.AttachDialog_BtnClose());
+        close.setDefaultCapable(true);
+        DialogDescriptor dd = new DialogDescriptor(areaScroll, Bundle.AttachDialog_DetailsCaption(getProcessName(vm.getMainClass())),
+                              true, new Object[] { close }, close, DialogDescriptor.DEFAULT_ALIGN, helpCtx, null);
+        Dialog d = DialogDisplayer.getDefault().createDialog(dd);
+        d.pack();
+        d.setVisible(true);
+    }
+    
+    private static String getDetails(RunningVM vm) {
         StringBuilder buffer = new StringBuilder();
         
         buffer.append("<table cellspacing=\"3\" cellpadding=\"0\" width=\"400\">"); //NOI18N
@@ -694,9 +728,9 @@ public class AttachDialog extends AttachWizard {
         
         buffer.append("<td valign='top'><nobr><b>"); //NOI18N
         buffer.append(Bundle.AttachDialog_RowPid());
-        buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
+        buffer.append("</b>&nbsp;&nbsp;&nbsp;</nobr></td>"); //NOI18N
         
-        buffer.append("<td>"); //NOI18N
+        buffer.append("<td width=\"100%\">"); //NOI18N
         buffer.append(vm.getPid());
         buffer.append("</td>"); //NOI18N
         
@@ -708,10 +742,10 @@ public class AttachDialog extends AttachWizard {
         
         buffer.append("<td valign='top'><nobr><b>"); //NOI18N
         buffer.append(Bundle.AttachDialog_RowMainClass());
-        buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
+        buffer.append("</b>&nbsp;&nbsp;&nbsp;</nobr></td>"); //NOI18N
         
-        buffer.append("<td>"); //NOI18N
-        buffer.append(escapedText(vm.getMainClass(), "unknown"));
+        buffer.append("<td width=\"100%\">"); //NOI18N
+        buffer.append(escapedText(vm.getMainClass(), Bundle.AttachDialog_DetailsUnknown()));
         buffer.append("</td>"); //NOI18N
         
         buffer.append("</tr>"); //NOI18N
@@ -722,10 +756,10 @@ public class AttachDialog extends AttachWizard {
         
         buffer.append("<td valign='top'><nobr><b>"); //NOI18N
         buffer.append(Bundle.AttachDialog_RowArguments());
-        buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
+        buffer.append("</b>&nbsp;&nbsp;&nbsp;</nobr></td>"); //NOI18N
         
-        buffer.append("<td>"); //NOI18N
-        buffer.append(escapedText(vm.getMainArgs(), "none"));
+        buffer.append("<td width=\"100%\">"); //NOI18N
+        buffer.append(escapedText(vm.getMainArgs(), Bundle.AttachDialog_DetailsNone()));
         buffer.append("</td>"); //NOI18N
         
         buffer.append("</tr>"); //NOI18N
@@ -736,10 +770,10 @@ public class AttachDialog extends AttachWizard {
         
         buffer.append("<td valign='top'><nobr><b>"); //NOI18N
         buffer.append(Bundle.AttachDialog_RowJvmArguments());
-        buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
+        buffer.append("</b>&nbsp;&nbsp;&nbsp;</nobr></td>"); //NOI18N
         
-        buffer.append("<td>"); //NOI18N
-        buffer.append(escapedText(vm.getVMArgs(), "none"));
+        buffer.append("<td width=\"100%\">"); //NOI18N
+        buffer.append(escapedText(vm.getVMArgs(), Bundle.AttachDialog_DetailsNone()));
         buffer.append("</td>"); //NOI18N
         
         buffer.append("</tr>"); //NOI18N
@@ -750,27 +784,17 @@ public class AttachDialog extends AttachWizard {
         
         buffer.append("<td valign='top'><nobr><b>"); //NOI18N
         buffer.append(Bundle.AttachDialog_RowJvmFlags());
-        buffer.append("</b>&nbsp;&nbsp;</nobr></td>"); //NOI18N
+        buffer.append("</b>&nbsp;&nbsp;&nbsp;</nobr></td>"); //NOI18N
         
-        buffer.append("<td>"); //NOI18N
-        buffer.append(escapedText(vm.getVMFlags(), "none"));
+        buffer.append("<td width=\"100%\">"); //NOI18N
+        buffer.append(escapedText(vm.getVMFlags(), Bundle.AttachDialog_DetailsNone()));
         buffer.append("</td>"); //NOI18N
         
         buffer.append("</tr>"); //NOI18N
         
         buffer.append("</table>"); //NOI18N
         
-        area.setText(buffer.toString());
-        area.setCaretPosition(0);
-        
-        HelpCtx helpCtx = new HelpCtx("ProcessDetails.HelpCtx"); //NOI18N
-        JButton close = new JButton(Bundle.AttachDialog_BtnClose());
-        close.setDefaultCapable(true);
-        DialogDescriptor dd = new DialogDescriptor(areaScroll, Bundle.AttachDialog_DetailsCaption(getProcessName(vm.getMainClass())),
-                              true, new Object[] { close }, close, DialogDescriptor.DEFAULT_ALIGN, helpCtx, null);
-        Dialog d = DialogDisplayer.getDefault().createDialog(dd);
-        d.pack();
-        d.setVisible(true);
+        return buffer.toString();
     }
     
     

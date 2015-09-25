@@ -45,6 +45,7 @@ package org.netbeans.modules.profiler.v2.features;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
@@ -113,8 +114,9 @@ final class LocksFeature extends ProfilerFeature.Basic {
             int getSessionState() {
                 return LocksFeature.this.getSessionState();
             }
-            Profiler getProfiler() {
-                return LocksFeature.this.getSession().getProfiler();
+            ProfilerClient getProfilerClient() {
+                Profiler profiler = LocksFeature.this.getSession().getProfiler();
+                return profiler.getTargetAppRunner().getProfilerClient();
             }
             void refreshResults() {
                 LocksFeature.this.refreshResults();
