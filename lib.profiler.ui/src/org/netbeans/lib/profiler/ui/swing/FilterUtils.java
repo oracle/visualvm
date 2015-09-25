@@ -120,7 +120,7 @@ public final class FilterUtils {
         final int mainColumn = table.getMainColumn();
         
         if (text != null && !matchCase) text = text.toLowerCase();
-        final String[] texts = text == null ? new String[0] : text.split(" +"); // NOI18N
+        final String[] texts = text == null || text.isEmpty() ? new String[0] : text.split(" +"); // NOI18N
         Filter filter = new Filter() {
             public boolean include(RowFilter.Entry entry) {
                 if (texts.length == 0) return true;

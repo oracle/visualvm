@@ -41,8 +41,6 @@
  */
 package org.netbeans.modules.profiler.utilities;
 
-import java.lang.reflect.InvocationTargetException;
-import javax.swing.SwingUtilities;
 import org.openide.ErrorManager;
 import org.openide.util.RequestProcessor;
 
