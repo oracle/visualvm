@@ -64,11 +64,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
@@ -121,11 +124,16 @@ import org.openide.windows.WindowManager;
     "SnapshotsWindowUI_colName=Name",
     "SnapshotsWindowUI_lblProject=Project:",
     "SnapshotsWindowUI_lblSnapshots=Snapshots:",
-    "SnapshotsWindowUI_actOpenSnapshots=Open selected snapshots",
-    "SnapshotsWindowUI_actExportSnapshot=Export selected snapshot",
-    "SnapshotsWindowUI_actCompareSnapshots=Compare selected snapshots",
-    "SnapshotsWindowUI_actRenameSnapshot=Rename selected snapshot",
-    "SnapshotsWindowUI_actDeleteSnapshots=Delete selected snapshots",
+    "SnapshotsWindowUI_actOpenSnapshots=Open",
+    "SnapshotsWindowUI_actExportSnapshot=Export...",
+    "SnapshotsWindowUI_actCompareSnapshots=Compare",
+    "SnapshotsWindowUI_actRenameSnapshot=Rename...",
+    "SnapshotsWindowUI_actDeleteSnapshots=Delete",
+    "SnapshotsWindowUI_descOpenSnapshots=Open selected snapshots",
+    "SnapshotsWindowUI_descExportSnapshot=Export selected snapshots...",
+    "SnapshotsWindowUI_descCompareSnapshots=Compare selected snapshots",
+    "SnapshotsWindowUI_descRenameSnapshot=Rename selected snapshot...",
+    "SnapshotsWindowUI_descDeleteSnapshots=Delete selected snapshots",
     "SnapshotsWindowUI_msgCannotCompareSnapshots=Selected snapshots cannot be compared.",
     "SnapshotsWindowUI_capRenameSnapshot=Rename Snapshot",
     "SnapshotsWindowUI_msgNameEmpty=Snapshot name cannot be empty.",
@@ -137,7 +145,7 @@ import org.openide.windows.WindowManager;
     "SnapshotsWindowUI_ttpSnapshotType=Snapshot type",
     "SnapshotsWindowUI_ttpSnapshotName=Snapshot name"
 })
-public final class SnapshotsWindowUI extends TopComponent {
+public final class SnapshotsWindowUI extends ProfilerTopComponent {
     
     public static final String ID = "SnapshotsWindowUI"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx("SnapshotsWindow.HelpCtx"); // NOI18N
@@ -186,11 +194,11 @@ public final class SnapshotsWindowUI extends TopComponent {
     private FileObject currentFolder;
     private final List<Snapshot> snapshots = new ArrayList();
     
-    private JButton openB;
-    private JButton exportB;
-    private JButton compareB;
-    private JButton renameB;
-    private JButton deleteB;
+    private Action openA;
+    private Action exportA;
+    private Action compareA;
+    private Action renameA;
+    private Action deleteA;
 
     private final AbstractTableModel snapshotsTableModel = new AbstractTableModel() {
         public String getColumnName(int columnIndex) {
@@ -324,7 +332,65 @@ public final class SnapshotsWindowUI extends TopComponent {
         c.insets = new Insets(15, 10, 0, 10);
         contents.add(snapshotsListL, c);
         
-        snapshotsTable = new ProfilerTable(snapshotsTableModel, true, true, null);
+        openA = new AbstractAction(Bundle.SnapshotsWindowUI_actOpenSnapshots()) {
+            {
+                putValue("BTN_TOOLTIP", Bundle.SnapshotsWindowUI_descOpenSnapshots()); // NOI18N
+            }
+            public void actionPerformed(ActionEvent e) {
+                openSnapshots(snapshotsTable.getSelectedValues(1));
+            }
+        };
+        
+        exportA = new AbstractAction(Bundle.SnapshotsWindowUI_actExportSnapshot()) {
+            {
+                putValue("BTN_TOOLTIP", Bundle.SnapshotsWindowUI_descExportSnapshot()); // NOI18N
+            }
+            public void actionPerformed(ActionEvent e) {
+                exportSnapshots(snapshotsTable.getSelectedValues(1));
+            }
+        };
+        
+        compareA = new AbstractAction(Bundle.SnapshotsWindowUI_actCompareSnapshots()) {
+            {
+                putValue("BTN_TOOLTIP", Bundle.SnapshotsWindowUI_descCompareSnapshots()); // NOI18N
+            }
+            public void actionPerformed(ActionEvent e) {
+                List<Snapshot> snapshots = snapshotsTable.getSelectedValues(1);
+                compareSnapshots(snapshots.get(0), snapshots.get(1));
+            }
+        };
+        
+        renameA = new AbstractAction(Bundle.SnapshotsWindowUI_actRenameSnapshot()) {
+            {
+                putValue("BTN_TOOLTIP", Bundle.SnapshotsWindowUI_descRenameSnapshot()); // NOI18N
+            }
+            public void actionPerformed(ActionEvent e) {
+                Snapshot s = (Snapshot)snapshotsTable.getSelectedValue(1);
+                renameSnapshot(s, snapshotsTableModel);
+            }
+        };
+        
+        deleteA = new AbstractAction(Bundle.SnapshotsWindowUI_actDeleteSnapshots()) {
+            {
+                putValue("BTN_TOOLTIP", Bundle.SnapshotsWindowUI_descDeleteSnapshots()); // NOI18N
+            }
+            public void actionPerformed(ActionEvent e) {
+                deleteSnapshots(snapshotsTable.getSelectedValues(1));
+            }
+        };
+        
+        snapshotsTable = new ProfilerTable(snapshotsTableModel, true, true, null) {
+            protected void populatePopup(final JPopupMenu popup, Object value, Object userValue) {
+                popup.add(new JMenuItem(openA) {
+                    { setFont(popup.getFont().deriveFont(Font.BOLD)); }
+                });
+                popup.add(new JMenuItem(exportA));
+                popup.add(new JMenuItem(compareA));
+                popup.add(new JMenuItem(renameA));
+                popup.add(new JMenuItem(deleteA));
+            }
+        };
+        snapshotsTable.providePopupMenu(true);
         snapshotsTable.setMainColumn(1);
         snapshotsTable.setDefaultSortOrder(SortOrder.ASCENDING);
         snapshotsTable.setSecondarySortColumn(1);
@@ -354,12 +420,7 @@ public final class SnapshotsWindowUI extends TopComponent {
         });
         snapshotsTable.setColumnToolTips(new String[] { Bundle.SnapshotsWindowUI_ttpSnapshotType(),
                                                         Bundle.SnapshotsWindowUI_ttpSnapshotName() });
-        snapshotsTable.setDefaultAction(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                Snapshot s = (Snapshot)snapshotsTable.getSelectedValue(1);
-                if (s != null) openSnapshots(Collections.singleton(s));
-            }
-        });
+        snapshotsTable.setDefaultAction(openA);
         snapshotsTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         snapshotsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
@@ -381,8 +442,11 @@ public final class SnapshotsWindowUI extends TopComponent {
         add(contents, BorderLayout.CENTER);
         
         class ThinButton extends JButton {
-            public ThinButton(Icon icon) {
-                super(icon);
+            public ThinButton(Action action, Icon icon) {
+                super(action);
+                setText(null);
+                setIcon(icon);
+                setToolTipText(action.getValue("BTN_TOOLTIP").toString()); // NOI18N
                 setOpaque(false);
             }
             public Dimension getMinimumSize() {
@@ -392,53 +456,15 @@ public final class SnapshotsWindowUI extends TopComponent {
             }
         }
         
-        openB = new ThinButton(Icons.getIcon(ProfilerIcons.SNAPSHOT_OPEN)) {
-            protected void fireActionPerformed(ActionEvent e) {
-                super.fireActionPerformed(e);
-                openSnapshots(snapshotsTable.getSelectedValues(1));
-            }
-        };
-        openB.setToolTipText(Bundle.SnapshotsWindowUI_actOpenSnapshots());
-        exportB = new ThinButton(Icons.getIcon(GeneralIcons.EXPORT)) {
-            protected void fireActionPerformed(ActionEvent e) {
-                super.fireActionPerformed(e);
-                exportSnapshots(snapshotsTable.getSelectedValues(1));
-            }
-        };
-        exportB.setToolTipText(Bundle.SnapshotsWindowUI_actExportSnapshot());
-        compareB = new ThinButton(Icons.getIcon(ProfilerIcons.SNAPSHOTS_COMPARE)) {
-            protected void fireActionPerformed(ActionEvent e) {
-                super.fireActionPerformed(e);
-                List<Snapshot> snapshots = snapshotsTable.getSelectedValues(1);
-                compareSnapshots(snapshots.get(0), snapshots.get(1));
-            }
-        };
-        compareB.setToolTipText(Bundle.SnapshotsWindowUI_actCompareSnapshots());
-        renameB = new ThinButton(Icons.getIcon(GeneralIcons.RENAME)) {
-            protected void fireActionPerformed(ActionEvent e) {
-                super.fireActionPerformed(e);
-                Snapshot s = (Snapshot)snapshotsTable.getSelectedValue(1);
-                renameSnapshot(s, snapshotsTableModel);
-            }
-        };
-        renameB.setToolTipText(Bundle.SnapshotsWindowUI_actRenameSnapshot());
-        deleteB = new ThinButton(Icons.getIcon(ProfilerIcons.RUN_GC)) {
-            protected void fireActionPerformed(ActionEvent e) {
-                super.fireActionPerformed(e);
-                deleteSnapshots(snapshotsTable.getSelectedValues(1));
-            }
-        };
-        deleteB.setToolTipText(Bundle.SnapshotsWindowUI_actDeleteSnapshots());
-        
         JPanel actions = new JPanel(new ButtonsLayout());
         actions.setOpaque(true);
         actions.setBackground(UIUtils.getProfilerResultsBackground());
         actions.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-        actions.add(openB);
-        actions.add(exportB);
-        actions.add(compareB);
-        actions.add(renameB);
-        actions.add(deleteB);
+        actions.add(new ThinButton(openA, Icons.getIcon(ProfilerIcons.SNAPSHOT_OPEN)));
+        actions.add(new ThinButton(exportA, Icons.getIcon(GeneralIcons.EXPORT)));
+        actions.add(new ThinButton(compareA, Icons.getIcon(ProfilerIcons.SNAPSHOTS_COMPARE)));
+        actions.add(new ThinButton(renameA, Icons.getIcon(GeneralIcons.RENAME)));
+        actions.add(new ThinButton(deleteA, Icons.getIcon(ProfilerIcons.RUN_GC)));
         add(actions, BorderLayout.SOUTH);
         
         updateButtons(Collections.EMPTY_LIST);
@@ -446,12 +472,12 @@ public final class SnapshotsWindowUI extends TopComponent {
     
     private void updateButtons(List<Snapshot> selectedSnapshots) {
         int selected = selectedSnapshots.size();
-        openB.setEnabled(selected > 0);
-        exportB.setEnabled(selected > 0);
-        compareB.setEnabled(selected == 2 && !selectedSnapshots.get(0).isHeapDump()
+        openA.setEnabled(selected > 0);
+        exportA.setEnabled(selected > 0);
+        compareA.setEnabled(selected == 2 && !selectedSnapshots.get(0).isHeapDump()
                                           && !selectedSnapshots.get(1).isHeapDump());
-        renameB.setEnabled(selected == 1);
-        deleteB.setEnabled(selected > 0);
+        renameA.setEnabled(selected == 1);
+        deleteA.setEnabled(selected > 0);
         
     }
     
@@ -623,6 +649,13 @@ public final class SnapshotsWindowUI extends TopComponent {
     
     public HelpCtx getHelpCtx() {
         return HELP_CTX;
+    }
+    
+    
+    // --- ProfilerTopComponent ------------------------------------------------
+    
+    protected Component defaultFocusOwner() {
+        return snapshotsTable;
     }
     
     

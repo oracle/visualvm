@@ -43,19 +43,10 @@
 
 package org.netbeans.modules.profiler.utils;
 
-import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.Platform;
-import org.openide.DialogDescriptor;
 import org.openide.util.NbBundle;
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import org.netbeans.lib.profiler.common.Profiler;
-import org.netbeans.modules.profiler.api.ProfilingSettingsManager;
-import org.openide.DialogDisplayer;
 import org.openide.util.HelpCtx;
 
 
@@ -122,78 +113,6 @@ public final class IDEUtils {
 //        }
 //    }
 
-    /**
-     * Opens a dialog that allows the user to select one of existing profiling settings
-     */
-    public static ProfilingSettings selectSettings(int type, org.netbeans.lib.profiler.common.ProfilingSettings[] availableSettings, org.netbeans.lib.profiler.common.ProfilingSettings settingsToSelect) {
-        Object[] settings = new Object[availableSettings.length + 1];
-
-        for (int i = 0; i < availableSettings.length; i++) {
-            settings[i] = availableSettings[i];
-        }
-
-        settings[availableSettings.length] = Bundle.IDEUtils_CreateNewConfigurationHint();
-
-        // constuct the UI
-        final JLabel label = new JLabel(Bundle.IDEUtils_SelectSettingsConfigurationLabelText());
-        final JButton okButton = new JButton(Bundle.IDEUtils_OkButtonText());
-        final JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(450, 250));
-        panel.setBorder(new EmptyBorder(12, 12, 12, 12));
-        panel.setLayout(new BorderLayout(0, 5));
-        panel.add(label, BorderLayout.NORTH);
-
-        final JList list = new JList(settings);
-        label.setLabelFor(list);
-        list.getAccessibleContext().setAccessibleName(Bundle.IDEUtils_ListAccessName());
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        list.addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
-                    okButton.setEnabled(list.getSelectedIndex() != -1);
-                }
-            });
-
-        if (settingsToSelect != null) {
-            list.setSelectedValue(settingsToSelect, true);
-        } else {
-            list.setSelectedIndex(0);
-        }
-
-        panel.add(new JScrollPane(list), BorderLayout.CENTER);
-
-        final DialogDescriptor dd = new DialogDescriptor(panel, Bundle.IDEUtils_SelectSettingsConfigurationDialogCaption(), true,
-                                                         new Object[] { okButton, DialogDescriptor.CANCEL_OPTION }, okButton, 0,
-                                                         HELP_CTX, null);
-        final Dialog d = DialogDisplayer.getDefault().createDialog(dd);
-        d.setVisible(true);
-
-        if (dd.getValue() == okButton) {
-            final int selectedIndex = list.getSelectedIndex();
-
-            if (selectedIndex != -1) { // TODO [ian]: do not allow this, disable OK button if there is no selection
-
-                if (selectedIndex < (settings.length - 1)) {
-                    ProfilingSettings selectedSettings = (ProfilingSettings) settings[selectedIndex];
-                    selectedSettings.setProfilingType(type);
-
-                    return selectedSettings;
-                } else { // create a new setting
-
-                    ProfilingSettings newSettings = ProfilingSettingsManager.createNewSettings(type, availableSettings);
-
-                    if (newSettings == null) {
-                        return null; // cancelled by the user
-                    }
-
-                    newSettings.setProfilingType(type);
-
-                    return newSettings;
-                }
-            }
-        }
-
-        return null;
-    }
 
     private static String getAntProfilerStartArgument(int port, int architecture, String jdkVersion) {
         String ld = Profiler.getDefault().getLibsDir();

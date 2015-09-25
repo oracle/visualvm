@@ -78,7 +78,7 @@ public class ProjectSelector extends LazyComboBox<Lookup.Provider> {
 
     public ProjectSelector(Populator populator) {
         super(populator);
-        setRenderer(projectNameRenderer());
+        setRenderer(new ProjectNameRenderer());
     }
     
     
@@ -129,54 +129,48 @@ public class ProjectSelector extends LazyComboBox<Lookup.Provider> {
     
     // --- Project renderer ----------------------------------------------------
     
-    private static ProjectNameRenderer PROJECT_RENDERER;
-    
-    private static ProjectNameRenderer projectNameRenderer() {
-        if (PROJECT_RENDERER == null) PROJECT_RENDERER = new ProjectNameRenderer();
-        return PROJECT_RENDERER;
-    }
-    
     private static final class ProjectNameRenderer extends DefaultListCellRenderer {
         
-        private static Font FONT_PLAIN;
-        private static Font FONT_BOLD;
+        private Font _plainFont;
+        private Font _boldFont;
         
-        private static final Renderer RENDERER = new Renderer();
+        private Renderer _renderer;
 
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
                                                       boolean cellHasFocus) {
             JLabel renderer = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             
-            RENDERER.setComponentOrientation(renderer.getComponentOrientation());
-            RENDERER.setOpaque(renderer.isOpaque());
-            RENDERER.setForeground(renderer.getForeground());
-            RENDERER.setBackground(renderer.getBackground());
-            RENDERER.setEnabled(renderer.isEnabled());
-            RENDERER.setBorder(renderer.getBorder());
+            if (_renderer == null) _renderer = new Renderer();
+            _renderer.setComponentOrientation(renderer.getComponentOrientation());
+            _renderer.setOpaque(renderer.isOpaque());
+            _renderer.setForeground(renderer.getForeground());
+            _renderer.setBackground(renderer.getBackground());
+            _renderer.setEnabled(renderer.isEnabled());
+            _renderer.setBorder(renderer.getBorder());
             
             if (value != EXTERNAL_PROCESS) {
                 Lookup.Provider p = (Lookup.Provider)value;
-                RENDERER.setText(ProjectUtilities.getDisplayName(p));
-                RENDERER.setIcon(ProjectUtilities.getIcon(p));
+                _renderer.setText(ProjectUtilities.getDisplayName(p));
+                _renderer.setIcon(ProjectUtilities.getIcon(p));
                 boolean main = ProjectUtilities.getMainProject() == value;
-                RENDERER.setFontEx(main ? boldFont(renderer) : plainFont(renderer));
+                _renderer.setFontEx(main ? boldFont(renderer) : plainFont(renderer));
             } else {
-                RENDERER.setText(Bundle.ProjectSelector_ExternalProcess());
-                RENDERER.setIcon(Icons.getIcon(GeneralIcons.JAVA_PROCESS));
-                RENDERER.setFontEx(plainFont(renderer));
+                _renderer.setText(Bundle.ProjectSelector_ExternalProcess());
+                _renderer.setIcon(Icons.getIcon(GeneralIcons.JAVA_PROCESS));
+                _renderer.setFontEx(plainFont(renderer));
             }
 
-            return RENDERER;
+            return _renderer;
         }
         
-        private static Font plainFont(JLabel renderer) {
-            if (FONT_PLAIN == null) FONT_PLAIN = renderer.getFont().deriveFont(Font.PLAIN);
-            return FONT_PLAIN;
+        private Font plainFont(JLabel renderer) {
+            if (_plainFont == null) _plainFont = renderer.getFont().deriveFont(Font.PLAIN);
+            return _plainFont;
         }
         
-        private static Font boldFont(JLabel renderer) {
-            if (FONT_BOLD == null) FONT_BOLD = renderer.getFont().deriveFont(Font.BOLD);
-            return FONT_BOLD;
+        private Font boldFont(JLabel renderer) {
+            if (_boldFont == null) _boldFont = renderer.getFont().deriveFont(Font.BOLD);
+            return _boldFont;
         }
         
         // Default renderer doesn't follow font settings in combo (not popup)

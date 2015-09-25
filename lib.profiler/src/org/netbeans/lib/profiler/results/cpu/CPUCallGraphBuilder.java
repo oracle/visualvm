@@ -1036,7 +1036,8 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
     private TimedCPUCCTNode markerMethodEntry(final int methodId, final ThreadInfo ti, long timeStamp0, long timeStamp1,
                                               boolean stamped) {
-        Mark mark = MarkingEngine.getDefault().markMethod(methodId, status);
+//        Mark mark = MarkingEngine.getDefault().markMethod(methodId, status);
+        Mark mark = Mark.DEFAULT;
 
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.log(Level.FINEST, "MarkerMEntry{0} for tId = {1}, time: {2}, method:  {3}, inRoot: {4}, rootEntryTimeThread: {5}", new Object[]{(!stamped) ? "(unstamped)" : "", (int) ti.threadId, timeStamp0, debugMethod(methodId), ti.rootMethodEntryTimeAbs, ti.rootMethodEntryTimeThreadCPU});
@@ -1342,7 +1343,8 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
             LOGGER.log(Level.FINEST, "RootMEntry for tId = {0}, time: {1}, method:  {2}", new Object[]{(int) ti.threadId, timeStamp0, debugMethod(methodId)});
         }
 
-        Mark mark = MarkingEngine.getDefault().markMethod(methodId, status);
+//        Mark mark = MarkingEngine.getDefault().markMethod(methodId, status);
+        Mark mark = Mark.DEFAULT;
 
         TimedCPUCCTNode curNode = ti.peek();
 
