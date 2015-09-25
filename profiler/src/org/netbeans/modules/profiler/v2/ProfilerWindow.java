@@ -598,13 +598,6 @@ class ProfilerWindow extends ProfilerTopComponent {
             }
         };
         
-//        JCheckBoxMenuItem showStatus = new StayOpenPopupMenu.CheckBoxItem("Show profiling status") {
-//            { setSelected(statusBar.getComponent().isVisible()); }
-//            protected void fireItemStateChanged(ItemEvent event) {
-//                statusBar.getComponent().setVisible(isSelected());
-//            }
-//        };
-        
         JCheckBoxMenuItem usePPoints = new StayOpenPopupMenu.CheckBoxItem(Bundle.ProfilerWindow_usePPoints()) {
             {
                 setSelected(features.getUseProfilingPoints());
@@ -743,6 +736,8 @@ class ProfilerWindow extends ProfilerTopComponent {
     
     // --- TopComponent --------------------------------------------------------
     
+    private final String ID = "ProfilerWindow"; // NOI18N
+    
     boolean closing = false;
     
     public boolean canClose() {
@@ -792,7 +787,7 @@ class ProfilerWindow extends ProfilerTopComponent {
     }
     
     protected String preferredID() {
-        return this.getClass().getName();
+        return ID;
     }
     
     public HelpCtx getHelpCtx() {

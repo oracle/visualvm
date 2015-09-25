@@ -45,9 +45,7 @@ package org.netbeans.lib.profiler.common;
 
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.filters.FilterSet;
 import org.netbeans.lib.profiler.common.filters.FilterUtils;
-import org.netbeans.lib.profiler.common.filters.GlobalFilters;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.global.InstrumentationFilter;
@@ -650,33 +648,33 @@ public class ProfilingSettings {
             return;
         }
 
-        // Filter Set
-        if (getSelectedInstrumentationFilter() instanceof FilterSet) {
-            FilterSet filterSet = (FilterSet) getSelectedInstrumentationFilter();
-            GlobalFilters globalFilters = Profiler.getDefault().getGlobalFilters();
-
-            // set filter type
-            instrumentationFilter.setFilterType((filterSet.getFilterSetType() == FilterSet.FILTER_SET_EXCLUSIVE)
-                                                ? InstrumentationFilter.INSTR_FILTER_EXCLUSIVE
-                                                : InstrumentationFilter.INSTR_FILTER_INCLUSIVE);
-
-            // set filter value
-            final StringBuffer flatFilterStringsBuffer = new StringBuffer();
-            final String[] activeGlobalFilters = filterSet.getActiveGlobalFilters();
-
-            for (int i = 0; i < activeGlobalFilters.length; i++) {
-                final String activeGlobalFilterValue = globalFilters.getFilterValue(activeGlobalFilters[i]);
-
-                if (activeGlobalFilterValue != null) {
-                    flatFilterStringsBuffer.append(activeGlobalFilterValue);
-                    flatFilterStringsBuffer.append(" "); //NOI18N
-                }
-            }
-
-            instrumentationFilter.setFilterStrings(flatFilterStringsBuffer.toString());
-
-            return;
-        }
+//        // Filter Set
+//        if (getSelectedInstrumentationFilter() instanceof FilterSet) {
+//            FilterSet filterSet = (FilterSet) getSelectedInstrumentationFilter();
+//            GlobalFilters globalFilters = Profiler.getDefault().getGlobalFilters();
+//
+//            // set filter type
+//            instrumentationFilter.setFilterType((filterSet.getFilterSetType() == FilterSet.FILTER_SET_EXCLUSIVE)
+//                                                ? InstrumentationFilter.INSTR_FILTER_EXCLUSIVE
+//                                                : InstrumentationFilter.INSTR_FILTER_INCLUSIVE);
+//
+//            // set filter value
+//            final StringBuffer flatFilterStringsBuffer = new StringBuffer();
+//            final String[] activeGlobalFilters = filterSet.getActiveGlobalFilters();
+//
+//            for (int i = 0; i < activeGlobalFilters.length; i++) {
+//                final String activeGlobalFilterValue = globalFilters.getFilterValue(activeGlobalFilters[i]);
+//
+//                if (activeGlobalFilterValue != null) {
+//                    flatFilterStringsBuffer.append(activeGlobalFilterValue);
+//                    flatFilterStringsBuffer.append(" "); //NOI18N
+//                }
+//            }
+//
+//            instrumentationFilter.setFilterStrings(flatFilterStringsBuffer.toString());
+//
+//            return;
+//        }
 
         // Unknown or no filter
         instrumentationFilter.clearFilter();

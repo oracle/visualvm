@@ -49,6 +49,7 @@ import javax.swing.Action;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
@@ -74,7 +75,7 @@ abstract class LocksFeatureUI extends FeatureUI {
     
     // --- External implementation ---------------------------------------------
         
-    abstract Profiler getProfiler();
+    abstract ProfilerClient getProfilerClient();
     
     abstract void refreshResults();
     
@@ -131,7 +132,11 @@ abstract class LocksFeatureUI extends FeatureUI {
         
         // --- Results ---------------------------------------------------------
 
-        locksView = new LockContentionPanel(getProfiler().getTargetAppRunner().getProfilerClient());
+        locksView = new LockContentionPanel() {
+            protected ProfilerClient getProfilerClient() {
+                return LocksFeatureUI.this.getProfilerClient();
+            }
+        };
         locksView.lockContentionEnabled();
         
         locksView.putClientProperty("HelpCtx.Key", "ProfileLocks.HelpCtx"); // NOI18N

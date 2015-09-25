@@ -61,6 +61,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
@@ -525,8 +526,9 @@ final class MethodsFeature extends ProfilerFeature.Basic {
             Lookup.Provider getProject() {
                 return MethodsFeature.this.getSession().getProject();
             }
-            Profiler getProfiler() {
-                return MethodsFeature.this.getSession().getProfiler();
+            ProfilerClient getProfilerClient() {
+                Profiler profiler = MethodsFeature.this.getSession().getProfiler();
+                return profiler.getTargetAppRunner().getProfilerClient();
             }
             int getSessionState() {
                 return MethodsFeature.this.getSessionState();

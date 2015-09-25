@@ -62,6 +62,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
@@ -498,8 +499,9 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
             Lookup.Provider getProject() {
                 return ObjectsFeature.this.getSession().getProject();
             }
-            Profiler getProfiler() {
-                return ObjectsFeature.this.getSession().getProfiler();
+            ProfilerClient getProfilerClient() {
+                Profiler profiler = ObjectsFeature.this.getSession().getProfiler();
+                return profiler.getTargetAppRunner().getProfilerClient();
             }
             int getSessionState() {
                 return ObjectsFeature.this.getSessionState();
