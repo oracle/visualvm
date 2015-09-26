@@ -931,7 +931,8 @@ class HprofHeap implements Heap {
 
         //int time = dumpBuffer.getInt(start+1);
         long len = dumpBuffer.getInt(start + 1 + 4) & 0xFFFFFFFFL;  // len is unsigned int
-        if (len == 0) {
+        if (len == 0 && tag != HEAP_DUMP_END) { // only HEAP_DUMP_END can have zero length
+            // broken tag length
             offset[0] = -1;
         } else {
             offset[0] = start + 1 + 4 + 4 + len;
