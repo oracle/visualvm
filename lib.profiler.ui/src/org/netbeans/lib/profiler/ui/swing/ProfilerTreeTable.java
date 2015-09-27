@@ -193,10 +193,16 @@ public class ProfilerTreeTable extends ProfilerTable {
         try {
             tree.expandPath(path);
             tree.setSelectionPath(path);
-            saveSelection();
+            // Clear and select again to make sure the underlying tree is ready
+            tree.setSelectionPath(null);
+            tree.setSelectionPath(path);
         }
         finally { internal = false; }
-        if (scrollToVisible) scrollRectToVisible(tree.getPathBounds(path));
+        
+        if (scrollToVisible) {
+            Rectangle bounds = tree.getPathBounds(path);
+            if (bounds != null) scrollRectToVisible(bounds);
+        }
     }
     
     // ---
