@@ -638,7 +638,12 @@ public class AttachDialog extends AttachWizard {
         private void updateSteps() {
             if (updatingUI) return;
             steps.setText(steps(getSettings()));
+            // Make sure the first step is visible
             steps.setCaretPosition(0);
+            // Really make sure the first step is visible
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() { steps.setCaretPosition(0); }
+            });
         }
 
         @Override
