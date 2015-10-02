@@ -177,6 +177,11 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
             if (twoTimestamps) {
                 time = timingAdjuster.adjustTime(timePM1[i], (invPM[i] + invDiff[i]), (nCalleeInvocations[i] + invDiff[i]),
                                                     true);
+                
+                if (time < 0) {
+                    time = 0;
+                }
+                    
                 timePM1[i] = (long) time;
 
                 // don't include the Thread time into wholegraphtime
