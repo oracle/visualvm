@@ -87,7 +87,7 @@ public class ImageBuilder {
         try {
             return buildImageInternal(instance, heap);
         } catch (FieldAccessor.InvalidFieldException ex) {
-            LOGGER.log(Level.FINE, "Unable to create image for instance, error: %s", ex.getMessage());
+            LOGGER.log(Level.FINE, "Unable to create image for instance, error: {0}", ex.getMessage());
             return null;
         }
     }
@@ -95,7 +95,7 @@ public class ImageBuilder {
     static Image buildImageInternal(Instance instance, Heap heap) throws FieldAccessor.InvalidFieldException {
         InstanceBuilder<? extends Image> builder = BUILDERS.getBuilder(instance, Image.class);
         if (builder == null) {
-            throw new FieldAccessor.InvalidFieldException("Unable to get Image builder for %s#%d", instance.getJavaClass().getName(), instance.getInstanceNumber()); //NOI18N
+            throw new FieldAccessor.InvalidFieldException("Unable to get Image builder for {0}#{1}", instance.getJavaClass().getName(), instance.getInstanceNumber()); //NOI18N
         }
         return builder.convert(new FieldAccessor(heap, BUILDERS), instance);
     }
@@ -142,7 +142,7 @@ public class ImageBuilder {
             } catch (FieldAccessor.InvalidFieldException ex) {
                 throw ex;
             } catch (Throwable ex) {
-                throw new FieldAccessor.InvalidFieldException("unable to recreate raster: %s", ex.getMessage()).initCause(ex); // NOI18N
+                throw new FieldAccessor.InvalidFieldException("unable to recreate raster: {0}", ex.getMessage()).initCause(ex); // NOI18N
             }
         }
     };
