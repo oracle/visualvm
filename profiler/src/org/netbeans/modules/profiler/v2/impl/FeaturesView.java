@@ -120,13 +120,22 @@ public class FeaturesView extends JPanel {
             hintLabel.setOpaque(false);
             
             Font font = new JToolTip().getFont();
-            hintLabel.setText("<html><body text=\"rgb(70, 70, 70)\" style=\"font-size: " + //NOI18N
+            
+            Color f = hintLabel.getForeground();
+            int r = f.getRed() + 70;
+            if (r > 255) r = f.getRed() - 70; else r = Math.min(r, 70);
+            int g = f.getGreen() + 70;
+            if (g > 255) g = f.getRed() - 70; else g = Math.min(g, 70);
+            int b = f.getBlue() + 70;
+            if (b > 255) b = f.getRed() - 70; else b = Math.min(b, 70);
+            hintLabel.setText("<html><body text=\"rgb(" + r + ", " + g + ", " + b + ")\" style=\"font-size: " + //NOI18N
                               (font.getSize()) + "pt; font-family: " + font.getName() + ";\">" + //NOI18N
                               Bundle.FeaturesView_noData("<b>" + buttonString + "</b>") + "</body></html>"); //NOI18N
             
             hintLabel.setSize(hintLabel.getPreferredSize());
             
-            hintColor = Utils.checkedColor(new Color(255, 255, 255, 245));
+            Color c = UIUtils.getProfilerResultsBackground();
+            hintColor = Utils.checkedColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 245));
         } else {
             hintColor = null;
         }
