@@ -220,15 +220,15 @@ public class CPUSamplingDataFrameProcessor extends AbstractLockDataFrameProcesso
                     break;
                 }
             }
-            try {
-                methodIdsTable.getNamesForMethodIds(client);
-            } catch (TargetAppOrVMTerminated ex) {
-                ProfilerLogger.log(ex.getMessage());
-                return;
-            }
-            processCollectedDumps(methodIdsTable,threadDumps);
-            threadDumps.clear();
         }
+        try {
+            methodIdsTable.getNamesForMethodIds(client);
+        } catch (TargetAppOrVMTerminated ex) {
+            ProfilerLogger.log(ex.getMessage());
+            return;
+        }
+        processCollectedDumps(methodIdsTable,threadDumps);
+        threadDumps.clear();
     }
 
     public void startup(ProfilerClient client) {
