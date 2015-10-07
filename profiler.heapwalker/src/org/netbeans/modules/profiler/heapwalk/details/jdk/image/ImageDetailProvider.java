@@ -124,7 +124,7 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
                 return builder.convert(new FieldAccessor(heap, BUILDERS), instance);
             }
         } catch (InvalidFieldException ex) {
-            LOGGER.log(Level.FINE, "Unable to get text for instance", ex.getMessage()); //NOI18N
+            LOGGER.log(Level.FINE, "Unable to get text for instance, error: %s", ex.getMessage()); //NOI18N
         }
         return null;
     }
@@ -158,7 +158,7 @@ public class ImageDetailProvider extends DetailsProvider.Basic {
             try {
                 image = ImageBuilder.buildImageInternal(instance, heap);
             } catch (InvalidFieldException ex) {
-                LOGGER.log(Level.FINE, "Unable to get text for instance", ex.getMessage());
+                LOGGER.log(Level.FINE, "Unable to get text for instance, error: %s", ex.getMessage());
                 label = new JLabel(Bundle.ImageDetailProvider_NotSupported(), JLabel.CENTER);
                 label.setEnabled(false);
             }

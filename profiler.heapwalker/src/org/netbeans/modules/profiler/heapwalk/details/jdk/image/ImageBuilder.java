@@ -87,7 +87,7 @@ public class ImageBuilder {
         try {
             return buildImageInternal(instance, heap);
         } catch (FieldAccessor.InvalidFieldException ex) {
-            LOGGER.log(Level.FINE, "Unable to create image for instance", ex.getMessage());
+            LOGGER.log(Level.FINE, "Unable to create image for instance, error: %s", ex.getMessage());
             return null;
         }
     }
