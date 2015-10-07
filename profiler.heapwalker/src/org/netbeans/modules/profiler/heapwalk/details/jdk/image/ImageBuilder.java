@@ -134,9 +134,7 @@ public class ImageBuilder {
                 int imageType = fa.getInt(instance, "imageType"); // NOI18N
                 WritableRaster raster = fa.build(instance, "raster", WritableRaster.class, false);
                 ColorModel cm = fa.build(instance, "colorModel", ColorModel.class, false);
-                BufferedImage result;
-                boolean ap = fa.getBoolean(instance, "isAlphaPremultiplied"); // NOI18N
-                result = new BufferedImage(cm, raster, ap, null);
+                BufferedImage result = new BufferedImage(cm, raster, cm.isAlphaPremultiplied(), null);
                 result.setData(raster);
                 return result;
             } catch (FieldAccessor.InvalidFieldException ex) {
