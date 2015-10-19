@@ -35,7 +35,6 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.peer.ComponentPeer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -85,8 +84,9 @@ public final class StartupDialog {
                         // For some reason the dialog created with defined JDialog.ModalityType
                         // isn't displayed on Windows when opened by the NetBeans launcher. This
                         // code seems to workaround it while not breaking anything elsewhere.
-                        ComponentPeer peer = d.getPeer();
-                        if (peer != null) peer.setVisible(true);
+                        // Disabled to fix jigsaw, the problem is not reproducible using Java7u80@Win7
+                        // ComponentPeer peer = d.getPeer();
+                        // if (peer != null) peer.setVisible(true);
 
                         d.removeHierarchyListener(this);
                         d.setAlwaysOnTop(true);
