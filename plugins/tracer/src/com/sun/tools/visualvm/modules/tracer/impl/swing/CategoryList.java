@@ -29,18 +29,17 @@ import com.sun.tools.visualvm.uisupport.VerticalLayout;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
-import javax.swing.plaf.synth.SynthContext;
-import sun.swing.plaf.synth.SynthIcon;
 
 /**
  *
@@ -151,42 +150,15 @@ public final class CategoryList extends JPanel {
 
 
     private static Icon centeredIcon(final Icon icon, final int width, final int height) {
-        Icon centeredIcon = null;
-
-        if (icon instanceof SynthIcon) {
-            try {
-                centeredIcon = new SynthIcon() {
-                    private final SynthIcon sicon = (SynthIcon)icon;
-                    public void paintIcon(SynthContext sc, Graphics grphcs, int x, int y, int w, int h) {
-                        try {
-                            int dw = SynthIcon.getIconWidth(sicon, sc);
-                            int dh = SynthIcon.getIconHeight(sicon, sc);
-                            int dx = width - dw;
-                            int dy = height - dh;
-                            SynthIcon.paintIcon(sicon, sc, grphcs, x + dx/2, y + dy/2, dw + 2, dh + 2);
-                        } catch (Throwable t) {
-                            try { sicon.paintIcon(sc, grphcs, x, y, w, h); } catch (Throwable th) {}
-                        }
-                    }
-                    public int getIconWidth(SynthContext sc)  { return width;  }
-                    public int getIconHeight(SynthContext sc) { return height; }
-                };
-            } catch (Throwable t) {}
-        }
-
-        if (centeredIcon == null) {
-            centeredIcon = new Icon() {
-                public void paintIcon(Component c, Graphics g, int x, int y) {
-                    int dx = width - icon.getIconWidth();
-                    int dy = height - icon.getIconHeight();
-                    icon.paintIcon(c, g, x + dx/2, y + dy/2);
-                }
-                public int getIconWidth()  { return width;  }
-                public int getIconHeight() { return height; }
-            };
-        }
-
-        return centeredIcon;
+        JLabel l = new JLabel(icon);
+        l.setIconTextGap(0);
+        l.setBorder(null);
+        l.setSize(width, height);
+        
+        BufferedImage img = new BufferedImage(l.getWidth(), l.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        l.paint(img.getGraphics());
+        
+        return new ImageIcon(img);
     }
 
 }
