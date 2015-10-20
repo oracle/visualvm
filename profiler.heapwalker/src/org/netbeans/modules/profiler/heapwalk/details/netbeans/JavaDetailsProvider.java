@@ -56,12 +56,13 @@ public class JavaDetailsProvider extends DetailsProvider.Basic {
 
     private static final String FO_INDEXABLE = "org.netbeans.modules.parsing.impl.indexing.FileObjectIndexable"; // NOI18N
     private static final String INDEXABLE = "org.netbeans.modules.parsing.spi.indexing.Indexable"; // NOI18N
+    private static final String CLASSPATH_ENTRY = "org.netbeans.api.java.classpath.ClassPath$Entry";    // NOI18N
     
     long lastHeapId;
     String lastSeparator;
     
     public JavaDetailsProvider() {
-        super(FO_INDEXABLE,INDEXABLE);
+        super(FO_INDEXABLE,INDEXABLE,CLASSPATH_ENTRY);
     }
 
     @Override
@@ -74,6 +75,8 @@ public class JavaDetailsProvider extends DetailsProvider.Basic {
             }
         } else if (INDEXABLE.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "delegate", heap); // NOI18N
+        } else if (CLASSPATH_ENTRY.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "url", heap);  // NOI18N
         }
         return null;
     }
