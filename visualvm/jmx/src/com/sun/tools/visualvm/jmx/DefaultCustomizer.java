@@ -43,6 +43,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -56,7 +58,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
-import sun.net.util.IPAddressUtil;
 
 /**
  * JmxConnectionCustomizer providing the default JMX Connection dialog to enter
@@ -125,26 +126,26 @@ public class DefaultCustomizer extends JmxConnectionCustomizer {
                 //     [IPv6Address]:port
                 //---------------------------------------
 
+                try {
+                    new URL("http://"+jmxurl);      // NOI18N
+                } catch (MalformedURLException ex) {
+                    return false;
+                }
                 // Is literal IPv6 address?
                 //
                 if (jmxurl.startsWith("[")) { // NOI18N
                     int index = jmxurl.indexOf("]:"); // NOI18N
                     if (index != -1) {
-                        // Extract literal IPv6 address
+                        // Extract port
                         //
-                        String address = jmxurl.substring(1, index);
-                        if (IPAddressUtil.isIPv6LiteralAddress(address)) {
-                            // Extract port
-                            //
-                            try {
-                                String portStr = jmxurl.substring(index + 2);
-                                int port = Integer.parseInt(portStr);
-                                if (port >= 0 && port <= 0xFFFF) {
-                                    valid = true;
-                                }
-                            } catch (NumberFormatException ex) {
-                                valid = false;
+                        try {
+                            String portStr = jmxurl.substring(index + 2);
+                            int port = Integer.parseInt(portStr);
+                            if (port >= 0 && port <= 0xFFFF) {
+                                valid = true;
                             }
+                        } catch (NumberFormatException ex) {
+                            valid = false;
                         }
                     }
                 } else {
