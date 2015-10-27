@@ -84,8 +84,6 @@ public abstract class LiveMemoryView extends JPanel {
     private static final int MIN_UPDATE_DIFF = 900;
     private static final int MAX_UPDATE_DIFF = 1400;
     
-    private final ProfilerClient client;
-    
     private MemoryView dataView;
     
     private long lastupdate;
@@ -126,8 +124,7 @@ public abstract class LiveMemoryView extends JPanel {
         }
     }
        
-    public LiveMemoryView(ProfilerClient client, Set<ClientUtils.SourceCodeSelection> selection) {
-        this.client = client;
+    public LiveMemoryView(Set<ClientUtils.SourceCodeSelection> selection) {
         this.selection = selection;
         
         initUI();
@@ -140,6 +137,7 @@ public abstract class LiveMemoryView extends JPanel {
         if (refreshIsRunning) return;
         refreshIsRunning = true;
         try {
+            ProfilerClient client = getProfilerClient();
             final MemoryResultsSnapshot _snapshot = client.getMemoryProfilingResultsSnapshot(false);
 
             // class names in VM format
@@ -177,10 +175,10 @@ public abstract class LiveMemoryView extends JPanel {
     private void refreshDataImpl(MemoryResultsSnapshot _snapshot, Collection<String> _filter) {
         assert SwingUtilities.isEventDispatchThread();
         
+        updateDataView(_snapshot);
+        
         snapshot = _snapshot;
         filter = _filter;
-        
-        updateDataView(snapshot);
         
         if (dataView != null && snapshot != null) {
             if (refSnapshot == null) dataView.setData(snapshot, filter, CPUResultsSnapshot.CLASS_LEVEL_VIEW);
@@ -197,6 +195,8 @@ public abstract class LiveMemoryView extends JPanel {
 
     public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
         if (paused && !forceRefresh) return;
+        
+        ProfilerClient client = getProfilerClient();
         switch (client.getCurrentInstrType()) {
             case CommonConstants.INSTR_NONE_MEMORY_SAMPLING:
                 refreshData(null);
@@ -240,6 +240,9 @@ public abstract class LiveMemoryView extends JPanel {
     public void cleanup() {
         if (rm.view == this) rm.view = null;
     }
+    
+    
+    protected abstract ProfilerClient getProfilerClient();
     
     
     protected abstract boolean showSourceSupported();

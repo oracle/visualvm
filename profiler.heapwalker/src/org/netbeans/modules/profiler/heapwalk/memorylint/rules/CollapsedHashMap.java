@@ -64,7 +64,7 @@ import org.openide.util.NbBundle;
     "FMT_CHM_Record={0}: {1} {2,number} entries are allocated to " +
     "{3,choice,1#'<b>one bucket</b>'|2#{3,number,integer} buckets}"
 })
-@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.heapwalk.memorylint.Rule.class)
+//@org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.profiler.heapwalk.memorylint.Rule.class)
 public class CollapsedHashMap extends IteratingRule {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 

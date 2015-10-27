@@ -438,10 +438,6 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
         }
     }
 
-    public void startup(ProfilerClient client) {
-        super.startup(client);
-    }
-
     private void fireMethodEntry(final int methodId, final int threadId, final int methodType, final long timeStamp0,
                                  final long timeStamp1) {
         foreachListener(new ListenerFunctor() {

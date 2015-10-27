@@ -50,8 +50,6 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
-import org.netbeans.lib.profiler.common.filters.DefinedFilterSets;
-import org.netbeans.lib.profiler.common.filters.GlobalFilters;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.instrumentation.BadLocationException;
 import org.netbeans.lib.profiler.instrumentation.InstrumentationException;
@@ -146,12 +144,6 @@ public abstract class Profiler {
     public abstract int getAgentState(String host, int port, int agentId);
 
     public abstract SessionSettings getCurrentSessionSettings();
-
-    public abstract DefinedFilterSets getDefinedFilterSets();
-
-    public abstract GlobalFilters getGlobalFilters();
-    
-    public abstract void saveFilters();
 
     public abstract GlobalProfilingSettings getGlobalProfilingSettings();
 

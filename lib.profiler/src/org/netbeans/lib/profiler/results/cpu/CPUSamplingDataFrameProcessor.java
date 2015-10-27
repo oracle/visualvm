@@ -220,15 +220,15 @@ public class CPUSamplingDataFrameProcessor extends AbstractLockDataFrameProcesso
                     break;
                 }
             }
-            try {
-                methodIdsTable.getNamesForMethodIds(client);
-            } catch (TargetAppOrVMTerminated ex) {
-                ProfilerLogger.log(ex.getMessage());
-                return;
-            }
-            processCollectedDumps(methodIdsTable,threadDumps);
-            threadDumps.clear();
         }
+        try {
+            methodIdsTable.getNamesForMethodIds(client);
+        } catch (TargetAppOrVMTerminated ex) {
+            ProfilerLogger.log(ex.getMessage());
+            return;
+        }
+        processCollectedDumps(methodIdsTable,threadDumps);
+        threadDumps.clear();
     }
 
     public void startup(ProfilerClient client) {
@@ -246,6 +246,11 @@ public class CPUSamplingDataFrameProcessor extends AbstractLockDataFrameProcesso
         builder = new StackTraceSnapshotBuilder(ccgb[0],client.getSettings().getInstrumentationFilter(),client.getStatus());
     }
     
+    public void shutdown() {
+        super.shutdown();
+        builder = null;
+    }
+  
     private static Thread.State getThreadState(int threadState) {
         switch (threadState) {
             case CommonConstants.THREAD_STATUS_UNKNOWN:

@@ -76,6 +76,7 @@ public class InstrumentationFilter implements Cloneable {
     private String[] instrFilterStrings;
     private int[] instrFilterTypes;
     private int instrFilterType;
+    private boolean hasArray;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -108,6 +109,8 @@ public class InstrumentationFilter implements Cloneable {
         //if (flatFilterString == null) return; // don't be paranoid:o)
         flatFilterString = flatFilterString.replace(',', ' '); // NOI18N // filterStrings can be separated by comma and/or space
 //        flatFilterString = flatFilterString.replace('.', '/'); // NOI18N // create slashed filterStrings
+        
+        hasArray = flatFilterString.indexOf('[') > -1; // NOI18N
 
         setSlashedFilterStrings(flatFilterString.trim().split(" +")); // NOI18N
     }
@@ -150,7 +153,9 @@ public class InstrumentationFilter implements Cloneable {
 
             if (instrFilterStrings[i].equals("*") || instrFilterStrings[i].equals("**")) { // NOI18N
                 if (instrFilterTypes != null) {
+                    boolean _hasArray = hasArray;
                     clearFilter();
+                    hasArray = _hasArray;
                     break;
                 }
             } else if (instrFilterStrings[i].endsWith("**")) { // NOI18N
@@ -168,6 +173,7 @@ public class InstrumentationFilter implements Cloneable {
         instrFilterType = INSTR_FILTER_NONE;
         instrFilterStrings = new String[0];
         instrFilterTypes = null;
+        hasArray = false;
     }
 
     public Object clone() throws CloneNotSupportedException {
@@ -176,6 +182,7 @@ public class InstrumentationFilter implements Cloneable {
         clone.instrFilterStrings = (String[])Arrays.copyOf(instrFilterStrings, instrFilterStrings.length);
         clone.instrFilterUserStrings = (String[])Arrays.copyOf(instrFilterUserStrings, instrFilterUserStrings.length);
         clone.instrFilterTypes = instrFilterTypes == null ? null : Arrays.copyOf(instrFilterTypes, instrFilterTypes.length);
+        clone.hasArray = hasArray;
 
         return clone;
     }
@@ -215,20 +222,13 @@ public class InstrumentationFilter implements Cloneable {
 
     public boolean acceptsArrays() {
         switch (instrFilterType) {
-            case INSTR_FILTER_NONE:
             case INSTR_FILTER_EXCLUSIVE:
             case INSTR_FILTER_INCLUSIVE:
                 return true;
+            case INSTR_FILTER_NONE:
 //            case INSTR_FILTER_EXCLUSIVE_EXACT: // NOTE: not used by memory profiling
             case INSTR_FILTER_INCLUSIVE_EXACT:
-                for (int i = 0; i < instrFilterStrings.length; i++) {
-                    if (instrFilterStrings[i].contains("[") ||      // NOI18N
-                        (instrFilterTypes != null &&
-                        instrFilterTypes[i] == INSTR_FILTER_INCLUSIVE)) { // wildcard used
-                        return true;
-                    }
-                }
-                return false;
+                return hasArray;
         }
         return true;
     }

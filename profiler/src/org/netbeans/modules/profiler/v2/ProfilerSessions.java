@@ -191,6 +191,8 @@ final class ProfilerSessions {
                     if (session != null) session.close();
                 }
                 
+                dd.setMessage(null); // Do not leak because of WindowsPopupMenuUI.mnemonicListener
+                
             }
         });
     }
@@ -207,7 +209,11 @@ final class ProfilerSessions {
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
         d.setVisible(true);
         
-        return dd.getValue() == DialogDescriptor.OK_OPTION ? ui.selectedFeature() : null;
+        ProfilerFeature ret = dd.getValue() == DialogDescriptor.OK_OPTION ? ui.selectedFeature() : null;
+        
+        dd.setMessage(null); // Do not leak because of WindowsPopupMenuUI.mnemonicListener
+        
+        return ret;
     }
     
     
@@ -485,13 +491,16 @@ final class ProfilerSessions {
     
     
     static boolean waitForProfiler() {
+        final Profiler profiler = Profiler.getDefault();
+        if (profiler.getProfilingState() == Profiler.PROFILING_INACTIVE) return true;
+        
         if (SwingUtilities.isEventDispatchThread()) {
-            waitingCancelled = blockingWaitDialog(null);
+            waitingCancelled = blockingWaitDialog(profiler, null);
         } else {
             final Object lock = new Object();
             synchronized(lock) { 
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() { waitingCancelled = blockingWaitDialog(lock); }
+                    public void run() { waitingCancelled = blockingWaitDialog(profiler, lock); }
                 });
                 try { lock.wait(); }
                 catch (InterruptedException ex) {}
@@ -501,9 +510,8 @@ final class ProfilerSessions {
         return !waitingCancelled;
     }
     
-    private static boolean blockingWaitDialog(Object lock) {
+    private static boolean blockingWaitDialog(Profiler profiler, Object lock) {
         try {
-            Profiler profiler = Profiler.getDefault();
             if (profiler.getProfilingState() == Profiler.PROFILING_INACTIVE) return false;
             
             JPanel panel = new JPanel(new BorderLayout(5, 5));

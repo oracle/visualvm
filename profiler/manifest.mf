@@ -4,5 +4,6 @@ OpenIDE-Module-Layer: org/netbeans/modules/profiler/mf-layer.xml
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/profiler/Bundle.properties
 OpenIDE-Module-Install: org/netbeans/modules/profiler/ProfilerModule.class
 OpenIDE-Module-Requires: org.openide.windows.WindowManager
-OpenIDE-Module-Specification-Version: 3.20
+OpenIDE-Module-Package-Dependencies: com.sun.tools.attach[VirtualMachine]
+OpenIDE-Module-Specification-Version: 3.22
 
