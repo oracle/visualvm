@@ -1175,29 +1175,29 @@ function toHtml(obj) {
     if (obj == undefined) {
         return "undefined";
     } 
-print("tohtml "+typeof(obj));
+    //print("tohtml "+typeof(obj));
     var tmp = unwrapJavaObject(obj);
     if (tmp != undefined) {
-print("1");
+        //print("1");
         if (tmp instanceof Packages.org.netbeans.lib.profiler.heap.JavaClass) {
-print("2");
+            //print("2");
             var id = tmp.javaClassId;
             var name = tmp.name;
             return "<a href='file://class/" + name + "'>class " + name + "</a>";
         }else if (tmp instanceof Packages.org.netbeans.lib.profiler.heap.Instance) {
-print("3");
+            //print("3");
             var id = tmp.instanceId;
             var number = tmp.instanceNumber;
             var name = tmp.javaClass.name;
             return "<a href='file://instance/" + name +"@" + id + "'>" +
             name + "#" + number + "</a>";
         }
-print("31 "+typeof(tmp));
+        //print("31 "+typeof(tmp));
     }
     if (obj instanceof Object) {
-print("4");
+        //print("4");
         if (Array.isArray(obj)) {
-print("5");
+            //print("5");
             // script array
             var res = "[ ";
             for (var i in obj) {
@@ -1210,14 +1210,14 @@ print("5");
             res += " ]";
             return res;
         } else {
-print("6");
+            //print("6");
             // if the object has a toHtml function property
             // just use that...
             if (typeof(obj.toHtml) == 'function') {
-print("7");
+                //print("7");
                 return obj.toHtml();
             } else {
-print("8");
+                //print("8");
                 // script object
                 var res = "{ ";
                 for (var i in obj) {
@@ -1228,12 +1228,12 @@ print("8");
             }
         }
     } else {
-print("9");
+        //print("9");
         // script wrapped Java object
         obj = wrapIterator(obj);
         // special case for enumeration
         if (obj instanceof java.util.Enumeration) {
-print("A");
+            //print("A");
             var res = "[ ";
             while (obj.hasMoreElements() && !cancelled.get()) {
                 res += toHtml(obj.nextElement()) + ", ";
@@ -1241,7 +1241,7 @@ print("A");
             res += "]";
             return res; 
         } else {
-print("B");
+            //print("B");
             return obj.toString().replace("<", "&lt;").replace(">", "&gt;");
         }
     }
