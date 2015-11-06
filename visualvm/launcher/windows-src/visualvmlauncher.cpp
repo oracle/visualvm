@@ -415,7 +415,7 @@ string VisualVMLauncher::getDefaultUserDirRoot() {
     return defUserDirRoot;
 }
 
-string NbLauncher::getDefaultCacheDirRoot() {
+string VisualVMLauncher::getDefaultCacheDirRoot() {
     TCHAR defCacheDirRootChar[MAX_PATH];
     if (FAILED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, defCacheDirRootChar))) {
         return false;
