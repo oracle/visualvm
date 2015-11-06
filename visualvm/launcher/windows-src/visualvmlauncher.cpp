@@ -538,9 +538,9 @@ void VisualVMLauncher::adjustHeapAndPermGenSize() {
     if (nbOptions.find("-J-XX:MaxPermSize") == string::npos) {
         int memory;
         if (areWeOn32bits())
-            memory = 256;
+            memory = 96;
         else
-            memory = 384;
+            memory = 96;
         char tmp[32];
         logMsg("Memory settings: -L-XX:MaxPermSize=%dm", memory);
         snprintf(tmp, 32, " -L-XX:MaxPermSize=%dm", memory);
