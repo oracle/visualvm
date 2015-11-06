@@ -172,13 +172,13 @@ fi
 if grep -v -- "-J-XX:MaxPermSize" >/dev/null <<EOF ; then
 ${visualvm_default_options}
 EOF
-	visualvm_default_options="-J-XX:MaxPermSize=384m ${visualvm_default_options}"
+	visualvm_default_options="-L-XX:MaxPermSize=96m ${visualvm_default_options}"
 fi
 
 if grep -v -- "-J-XX:PermSize" >/dev/null <<EOF ; then
-${netbeans_default_options}
+${visualvm_default_options}
 EOF
-	netbeans_default_options="-L-XX:PermSize=32m ${netbeans_default_options}"
+	visualvm_default_options="-L-XX:PermSize=32m ${visualvm_default_options}"
 fi
 
 launchNbexec() {
