@@ -99,7 +99,7 @@
           <linkerLibItems>
             <linkerOptionItem>visualvm64.res</linkerOptionItem>
           </linkerLibItems>
-          <commandLine>-mwindows</commandLine>
+          <commandLine>-mwindows -Wl,--nxcompat -Wl,--dynamicbase</commandLine>
         </linkerTool>
       </compileType>
       <item path="cmdargs.h" ex="false" tool="3" flavor2="0">

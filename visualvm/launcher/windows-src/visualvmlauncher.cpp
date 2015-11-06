@@ -77,14 +77,14 @@ int VisualVMLauncher::start(char *cmdLine) {
 
 int VisualVMLauncher::start(int argc, char *argv[]) {
     SetErrorMode(SetErrorMode(0) | SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
-
+    
     DWORD parentProcID = 0;
     if (!checkLoggingArg(argc, argv, true) || !setupProcess(argc, argv, parentProcID, CON_ATTACH_MSG) || !initBaseNames() || !readClusterFile()) {
         return -1;
     }
 
     parseConfigFile((baseDir + "\\etc\\" + getAppName() + ".conf").c_str());
-    
+
     if (!parseArgs(argc, argv)) {
         return -1;
     }
@@ -108,7 +108,7 @@ int VisualVMLauncher::start(int argc, char *argv[]) {
 
     CmdArgs newArgs(argc + 20);
     addSpecificOptions(newArgs);
-
+    
     if (!clusters.empty()) {
         newArgs.add(ARG_NAME_CLUSTERS);
         newArgs.add(clusters.c_str());
@@ -183,7 +183,7 @@ bool VisualVMLauncher::initBaseNames() {
     if (!bslash) {
         return false;
     }
-    *bslash = '\0';
+    *bslash = '\0';        
 
     baseDir = path;
     string config = baseDir + "\\etc\\" + getAppName() + ".conf";
@@ -368,7 +368,7 @@ bool VisualVMLauncher::findUserDir(const char *str) {
             logMsg("User home: %s", userHome.c_str());
         }
         userDir = userHome + (str + strlen(HOME_TOKEN));
-    } else if (strncmp(str, DEFAULT_USERDIR_ROOT_TOKEN, strlen(DEFAULT_USERDIR_ROOT_TOKEN)) == 0) {
+    } else if (strncmp(str, DEFAULT_USERDIR_ROOT_TOKEN, strlen(DEFAULT_USERDIR_ROOT_TOKEN)) == 0) {       
         userDir = getDefaultUserDirRoot() + (str + strlen(DEFAULT_USERDIR_ROOT_TOKEN));
     } else {
         getDefaultUserDirRoot();
@@ -395,7 +395,7 @@ bool VisualVMLauncher::findCacheDir(const char *str) {
             logMsg("User home: %s", userHome.c_str());
         }
         cacheDir = userHome + (str + strlen(HOME_TOKEN));
-    } else if (strncmp(str, DEFAULT_CACHEDIR_ROOT_TOKEN, strlen(DEFAULT_CACHEDIR_ROOT_TOKEN)) == 0) {
+    } else if (strncmp(str, DEFAULT_CACHEDIR_ROOT_TOKEN, strlen(DEFAULT_CACHEDIR_ROOT_TOKEN)) == 0) {        
         cacheDir = getDefaultCacheDirRoot() + (str + strlen(DEFAULT_CACHEDIR_ROOT_TOKEN));
     } else {
         getDefaultCacheDirRoot();
@@ -415,16 +415,16 @@ string VisualVMLauncher::getDefaultUserDirRoot() {
     return defUserDirRoot;
 }
 
-string VisualVMLauncher::getDefaultCacheDirRoot() {
-        TCHAR defCacheDirRootChar[MAX_PATH];
-        if (FAILED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, defCacheDirRootChar))) {
-            return false;
-        }
-        defCacheDirRoot = ((string) defCacheDirRootChar) + VISUALVM_CACHES_DIRECTORY;
-        defCacheDirRoot.erase(defCacheDirRoot.rfind('\\'));
-        logMsg("Default Cachedir Root: %s", defCacheDirRoot.c_str());
-    return defCacheDirRoot;
+string NbLauncher::getDefaultCacheDirRoot() {
+    TCHAR defCacheDirRootChar[MAX_PATH];
+    if (FAILED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, defCacheDirRootChar))) {
+        return false;
     }
+    defCacheDirRoot = ((string) defCacheDirRootChar) + VISUALVM_CACHES_DIRECTORY;
+    defCacheDirRoot.erase(defCacheDirRoot.rfind('\\'));
+    logMsg("Default Cachedir Root: %s", defCacheDirRoot.c_str());
+    return defCacheDirRoot;
+}
 
 bool VisualVMLauncher::getOption(char *&str, const char *opt) {
     if (strncmp(str, opt, strlen(opt)) == 0) {
@@ -532,6 +532,9 @@ void VisualVMLauncher::adjustHeapAndPermGenSize() {
         logMsg("Memory settings: -J-Xmx%dm", memory);
         nbOptions += tmp;
     }
+    // -XX:MaxPermSize and -XX:PermSize are passed to nbexec as
+    // launcher options, to apply them only for JDK 7. JDK 8 and
+    // newer do not support these arguments.
     if (nbOptions.find("-J-XX:MaxPermSize") == string::npos) {
         int memory;
         if (areWeOn32bits())
@@ -539,8 +542,15 @@ void VisualVMLauncher::adjustHeapAndPermGenSize() {
         else
             memory = 384;
         char tmp[32];
-        logMsg("Memory settings: -J-XX:MaxPermSize=%dm", memory);
-        snprintf(tmp, 32, " -J-XX:MaxPermSize=%dm", memory);
+        logMsg("Memory settings: -L-XX:MaxPermSize=%dm", memory);
+        snprintf(tmp, 32, " -L-XX:MaxPermSize=%dm", memory);
+        nbOptions += tmp;
+    }
+    if (nbOptions.find("-J-XX:PermSize") == string::npos) {
+        int memory = 32;
+        char tmp[32];
+        logMsg("Memory settings: -L-XX:PermSize=%dm", memory);
+        snprintf(tmp, 32, " -L-XX:PermSize=%dm", memory);
         nbOptions += tmp;
     }
 }

@@ -82,7 +82,7 @@ private:
     VisualVMLauncher(const VisualVMLauncher& orig);
     bool readClusterFile();
     bool parseArgs(int argc, char *argv[]);
-    bool parseConfigFile(const char* path);
+    bool parseConfigFile(const char* path);    
     bool getOption(char *&str, const char *opt);
     void addCluster(const char *cl);
     void addExtraClusters();
