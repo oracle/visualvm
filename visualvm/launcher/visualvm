@@ -175,6 +175,12 @@ EOF
 	visualvm_default_options="-J-XX:MaxPermSize=384m ${visualvm_default_options}"
 fi
 
+if grep -v -- "-J-XX:PermSize" >/dev/null <<EOF ; then
+${netbeans_default_options}
+EOF
+	netbeans_default_options="-L-XX:PermSize=32m ${netbeans_default_options}"
+fi
+
 launchNbexec() {
     nbexec=`grep -v "^#" "$basedir"/etc/visualvm.clusters | grep -v "^$" | grep platform | while read X; do
         if expr "$X" : "/.*" >/dev/null; then
