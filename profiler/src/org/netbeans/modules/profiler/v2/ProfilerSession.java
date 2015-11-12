@@ -168,6 +168,7 @@ public abstract class ProfilerSession {
     
     public final void setAttach(boolean attach) {
         synchronized(this) { isAttach = attach; }
+        notifyStopAction();
         notifyWindow();
     }
     
