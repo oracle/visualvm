@@ -51,6 +51,7 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.filesystems.FileObject;
@@ -361,6 +362,9 @@ public abstract class ProfilerSession {
         synchronized(this) { if (features != null) features.sessionFinished(); }
         
         cleanupAllListeners();
+        
+        // Note: should call profiler.resetAllResults() once implemented
+        ResetResultsAction.getInstance().performAction();
         
         persistStorage(false);
     }
