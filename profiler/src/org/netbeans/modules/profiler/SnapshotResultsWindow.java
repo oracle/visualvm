@@ -45,16 +45,19 @@ package org.netbeans.modules.profiler;
 
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.openide.util.NbBundle;
-import org.openide.windows.TopComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import javax.swing.*;
+import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
@@ -71,13 +74,17 @@ import org.netbeans.modules.profiler.api.ActionsSupport;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.spi.actions.AbstractSavable;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
+import org.openide.util.Utilities;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.Lookups;
@@ -91,6 +98,7 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Ian Formanek
  */
 @NbBundle.Messages({
+    "SnapshotResultsWindow_LoadingProgress=Loading profiler snapshot...",
     "SnapshotResultsWindow_SaveSnapshotDialogMsg=The results snapshot is not saved. Do you want to save it?",
     "SnapshotResultsWindow_CpuSnapshotAccessDescr=Profiler snapshot with CPU results",
     "SnapshotResultsWindow_FragmentSnapshotAccessDescr=Profiler snapshot with code fragment results",
@@ -205,6 +213,10 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     }
 
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
+    
+    private static final byte PERSISTENCE_VERSION_MAJOR = 8;
+    private static final byte PERSISTENCE_VERSION_MINOR = 1;
+    
     private static final String HELP_CTX_KEY_CPU = "CpuSnapshot.HelpCtx"; // NOI18N
     private static final String HELP_CTX_KEY_MEM = "MemorySnapshot.HelpCtx"; // NOI18N
     
@@ -227,11 +239,13 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     /**
-     * This constructor cannot be called, instances of this window cannot be persisted.
+     * Default constructor, used when restoring persisted snapshots.
      */
     public SnapshotResultsWindow() {
-        throw new InternalError("This constructor should never be called"); // NOI18N
-    } // NOI18N
+        associateLookup(new AbstractLookup(ic));
+        ic.add(getActionMap());
+        setLayout(new BorderLayout());
+    }
 
     /**
      * Creates a new SnapshotResultsWindow for provided snapshot. The content of this window will vary depending on
@@ -240,12 +254,14 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
      * @param ls The results snapshot to display
      */
     public SnapshotResultsWindow(LoadedSnapshot ls, int sortingColumn, boolean sortingOrder) {
-        associateLookup(new AbstractLookup(ic));
-        ic.add(getActionMap());
+        this();
+        initImpl(ls);
+    }
+    
+    private void initImpl(LoadedSnapshot ls) {
         this.snapshot = ls;
         updateSaveState();
 
-        setLayout(new BorderLayout());
         setFocusable(true);
         setRequestFocusEnabled(true);
         
@@ -275,7 +291,12 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                 break;
         }
         
-        if (displayedPanel != null) add(displayedPanel, BorderLayout.CENTER);
+        if (displayedPanel != null) {
+            add(displayedPanel, BorderLayout.CENTER);
+            invalidate();
+            doLayout();
+            repaint();
+        }
         
         listener = Lookup.getDefault().lookup(SnapshotListener.class);
         listener.registerSnapshotResultsWindow(this);
@@ -324,9 +345,58 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     public static synchronized boolean hasSnapshotWindow(LoadedSnapshot ls) {
         return windowsList.get(ls) != null;
     }
+    
+    public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
+        
+        out.writeByte(PERSISTENCE_VERSION_MAJOR);
+        out.writeByte(PERSISTENCE_VERSION_MINOR);
+        
+        out.writeUTF(Utilities.toURI(snapshot.getFile()).toString());
+    }
+    
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        try {
+            add(new JLabel(Bundle.SnapshotResultsWindow_LoadingProgress(), JLabel.CENTER), BorderLayout.CENTER);
+            invalidate();
+            doLayout();
+            repaint();
+            
+            super.readExternal(in);
+            
+            in.readByte(); // PERSISTENCE_VERSION_MAJOR
+            in.readByte(); // PERSISTENCE_VERSION_MINOR
+            
+            URI uri = new URI(in.readUTF());
+            final File file = Utilities.toFile(uri);
+            
+            new RequestProcessor("NPS loader for " + getName()).post(new Runnable() { // NOI18N
+                public void run() {
+                    try {
+                        FileObject fileo = FileUtil.toFileObject(file);
+                        final LoadedSnapshot ls = ResultsManager.getDefault().loadSnapshot(fileo);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                removeAll();
+                                initImpl(ls);
+                            }
+                        });
+                    } catch (Throwable t) { handleReadThrowable(t); }
+                }
+            });
+        } catch (Throwable t) { handleReadThrowable(t); }
+    }
+    
+    private void handleReadThrowable(Throwable t) {
+        ProfilerLogger.info("Restoring profiler snapshot failed: " + t.getMessage()); // NOI18N
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() { close(); }
+        });
+    }
 
     public int getPersistenceType() {
-        return TopComponent.PERSISTENCE_NEVER;
+        return ProfilerIDESettings.getInstance().getReopenSnapshots() ?
+               PERSISTENCE_ONLY_OPENED : PERSISTENCE_NEVER;
     }
     
     public HelpCtx getHelpCtx() {
@@ -334,6 +404,8 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     }
 
     public boolean canClose() {
+        if (snapshot == null) return true; // Close window when persistence fails
+        
         // #221709, add saved snapshot to Open Recent File list
         // Not supported for new snapshots to be saved on close
         File file = snapshot.getFile();
@@ -368,7 +440,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     }
     
     protected Component defaultFocusOwner() {
-        return displayedPanel;
+        return displayedPanel == null ? this : displayedPanel;
     }
     
     public void refreshTabName() {
@@ -391,6 +463,8 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     }
 
     protected void componentClosed() {
+        if (snapshot == null) return; // Window closed after persistence failure
+        
         synchronized (SnapshotResultsWindow.class) {
             windowsList.remove(snapshot);
         }

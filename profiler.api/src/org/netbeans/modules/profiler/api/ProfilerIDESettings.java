@@ -141,6 +141,8 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     private final String SNAPSHOT_WINDOW_CLOSE_POLICY_KEY = "SNAPSHOT_WINDOW_CLOSE_POLICY"; // NOI18N
     private final String ENABLE_EXPERT_SETTINGS_KEY = "ENABLE_EXPERT_SETTINGS"; // NOI18N
     private final String LOG_PROFILER_STATUS_KEY = "LOG_PROFILER_STATUS"; // NOI18N
+    private final String REOPEN_SNAPSHOTS_KEY = "REOPEN_SNAPSHOTS_KEY"; // NOI18N
+    private final String REOPEN_HDUMPS_KEY = "REOPEN_HDUMPS_KEY"; // NOI18N
     
     // Defaults for tracked properties
     private final String CUSTOM_HEAPDUMP_PATH_DEFAULT = ""; // NOI18N
@@ -169,6 +171,8 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     private final int SNAPSHOT_WINDOW_CLOSE_DEFAULT = SNAPSHOT_WINDOW_CLOSE_NEVER;
     private final boolean ENABLE_EXPERT_SETTINGS_DEFAULT = false;
     private final boolean LOG_PROFILER_STATUS_DEFAULT = false;
+    private final boolean REOPEN_SNAPSHOTS_DEFAULT = false;
+    private final boolean REOPEN_HDUMPS_DEFAULT = false;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -346,7 +350,6 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     
     public int getSnapshotWindowOpenPolicy() {
         return getPreferences().getInt(SNAPSHOT_WINDOW_OPEN_POLICY_KEY, SNAPSHOT_WINDOW_OPEN_DEFAULT);
-       
     }
     
     public void setSnapshotWindowClosePolicy(int policy) {
@@ -355,7 +358,6 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     
     public int getSnapshotWindowClosePolicy() {
         return getPreferences().getInt(SNAPSHOT_WINDOW_CLOSE_POLICY_KEY, SNAPSHOT_WINDOW_CLOSE_DEFAULT);
-       
     }
     
     public void setEnableExpertSettings(boolean value) {
@@ -372,6 +374,22 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     
     public boolean getLogProfilerStatus() {
         return getPreferences().getBoolean(LOG_PROFILER_STATUS_KEY, LOG_PROFILER_STATUS_DEFAULT);
+    }
+    
+    public void setReopenSnapshots(boolean value) {
+        getPreferences().putBoolean(REOPEN_SNAPSHOTS_KEY, value);
+    }
+    
+    public boolean getReopenSnapshots() {
+        return getPreferences().getBoolean(REOPEN_SNAPSHOTS_KEY, REOPEN_SNAPSHOTS_DEFAULT);
+    }
+    
+    public void setReopenHeapDumps(boolean value) {
+        getPreferences().putBoolean(REOPEN_HDUMPS_KEY, value);
+    }
+    
+    public boolean getReopenHeapDumps() {
+        return getPreferences().getBoolean(REOPEN_HDUMPS_KEY, REOPEN_HDUMPS_DEFAULT);
     }
 
     /**
