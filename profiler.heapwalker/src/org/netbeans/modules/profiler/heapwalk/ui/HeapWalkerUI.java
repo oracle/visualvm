@@ -128,7 +128,6 @@ public class HeapWalkerUI extends ProfilerTopComponent {
     
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         try {
-            long t1 = System.currentTimeMillis();
             add(new JLabel(Bundle.HeapWalkerUI_LoadingProgress(), JLabel.CENTER), BorderLayout.CENTER);
             invalidate();
             doLayout();
@@ -141,13 +140,10 @@ public class HeapWalkerUI extends ProfilerTopComponent {
             
             URI uri = new URI(in.readUTF());
             final File file = Utilities.toFile(uri);
-            System.err.println(">>> External read 1 in " + (System.currentTimeMillis() - t1));
             new RequestProcessor("HPROF loader for " + getName()).post(new Runnable() { // NOI18N
                 public void run() {
                     try {
-                        long t1 = System.currentTimeMillis();
                         final HeapWalker hw = new HeapWalker(file);
-                        System.err.println(">>> External read 2 in " + (System.currentTimeMillis() - t1));
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 removeAll();
