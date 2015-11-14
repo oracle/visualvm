@@ -51,7 +51,9 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
@@ -93,10 +95,9 @@ public abstract class ProfilerSession {
         Provider provider = Lookup.getDefault().lookup(Provider.class);
         ProfilerSession session = provider == null ? null : provider.createSession(context);
 
-        synchronized(CURRENT_SESSION_LOCK) {
-            CURRENT_SESSION = session;
-            notifyStopAction();
-        }
+        synchronized (CURRENT_SESSION_LOCK) { CURRENT_SESSION = session; }
+            
+        notifyStopAction();
 
         return session;
         
@@ -166,9 +167,22 @@ public abstract class ProfilerSession {
     private SessionStorage storage;
     
     
-    public final void setAttach(boolean attach) {
-        synchronized(this) { isAttach = attach; }
-        notifyWindow();
+    public final void setAttach(final boolean attach) {
+        synchronized (this) { if (attach == isAttach) return; }
+        
+        boolean sessionInProgress = inProgress();
+        if (sessionInProgress && !confirmedStop()) return;
+        
+        Runnable updater = new Runnable() {
+            public void run() {
+                synchronized (this) { isAttach = attach; }
+                notifyStopAction();
+                notifyWindow();
+            }
+        };
+        
+        if (!sessionInProgress) updater.run();
+        else ProfilerUtils.runInProfilerRequestProcessor(updater);
     }
     
     // Set when configuring profiling session, not a persistent storage!
@@ -257,7 +271,7 @@ public abstract class ProfilerSession {
         return stop();
     }
     
-    final boolean close() {
+    private final boolean confirmedStop() {
         if (inProgress()) {
             if (!ProfilerDialogs.displayConfirmation(Bundle.ProfilerWindow_terminateMsg(),
                                                 Bundle.ProfilerWindow_terminateCaption()))
@@ -265,12 +279,17 @@ public abstract class ProfilerSession {
             if (!doStop()) return false;
         }
         
-        synchronized(CURRENT_SESSION_LOCK) {
-            if (CURRENT_SESSION == this) {
-                CURRENT_SESSION = null;
-                notifyStopAction();
-            }
+        return true;
+    }
+    
+    final boolean close() {
+        if (!confirmedStop()) return false;
+        
+        synchronized (CURRENT_SESSION_LOCK) {
+            if (CURRENT_SESSION == this) CURRENT_SESSION = null;
         }
+        
+        notifyStopAction();
         
         UIUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
@@ -344,11 +363,16 @@ public abstract class ProfilerSession {
         
         cleanupAllListeners();
         
+        // Note: should call profiler.resetAllResults() once implemented
+        ResetResultsAction.getInstance().performAction();
+        
         persistStorage(false);
     }
     
     private static void notifyStopAction() {
-        final ProfilerSession CURRENT_SESSION_F = CURRENT_SESSION;
+        final ProfilerSession CURRENT_SESSION_F;
+        synchronized (CURRENT_SESSION_LOCK) { CURRENT_SESSION_F = CURRENT_SESSION; }
+        
         UIUtils.runInEventDispatchThread(new Runnable() {
             public void run() { ProfilerSessions.StopAction.getInstance().setSession(CURRENT_SESSION_F); }
         });
