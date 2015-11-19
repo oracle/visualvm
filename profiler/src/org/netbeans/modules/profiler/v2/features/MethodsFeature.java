@@ -72,6 +72,7 @@ import org.netbeans.lib.profiler.ui.swing.SmallButton;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -93,7 +94,8 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @NbBundle.Messages({
     "MethodsFeature_name=Methods",
-    "MethodsFeature_description=Profile method execution times and invocation counts, including call trees"
+    "MethodsFeature_description=Profile method execution times and invocation counts, including call trees",
+    "MethodsFeature_modeReset=<html><b>Current mode ''{0}'' is not configured properly.</b><br><br>Default ''{1}'' mode has been selected and applied instead.<br><br></html>"
 })
 final class MethodsFeature extends ProfilerFeature.Basic {
     
@@ -612,6 +614,18 @@ final class MethodsFeature extends ProfilerFeature.Basic {
         
         resetter = Lookup.getDefault().lookup(MethodsResetter.class);
         resetter.controller = this;
+        
+        if (getSession().inProgress() && !currentMode.currentSettingsValid()) {
+            final String oldMode = currentMode.getName();
+            final String newMode = allClassesMode.getName();
+            setMode(allClassesMode);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    ProfilerDialogs.displayInfo(Bundle.MethodsFeature_modeReset(
+                                                oldMode, newMode));
+                }
+            });
+        }
     }
     
     public void notifyDeactivated() {

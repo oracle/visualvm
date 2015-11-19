@@ -100,7 +100,8 @@ import org.openide.util.lookup.ServiceProvider;
     "ObjectsFeature_applyButton=Apply",
     "ObjectsFeature_arrayWarningCaption=Selected Array Warning",
     "#HTML-formatted, line breaks using <br> to make the displaying dialog not too wide",
-    "ObjectsFeature_arrayWarningMsg=<html><b>Array object selected for profiling.</b><br><br>Configuring the target application for profiling arrays can<br>take a long time when attaching to a running process or<br>changing the settings during profiling.<br><br></html>"
+    "ObjectsFeature_arrayWarningMsg=<html><b>Array object selected for profiling.</b><br><br>Configuring the target application for profiling arrays can<br>take a long time when attaching to a running process or<br>changing the settings during profiling.<br><br></html>",
+    "ObjectsFeature_modeReset=<html><b>Current mode ''{0}'' is not configured properly.</b><br><br>Default ''{1}'' mode has been selected and applied instead.<br><br></html>"
 })
 final class ObjectsFeature extends ProfilerFeature.Basic {
     
@@ -583,6 +584,18 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
         
         resetter = Lookup.getDefault().lookup(ObjectsResetter.class);
         resetter.controller = this;
+        
+        if (getSession().inProgress() && !currentMode.currentSettingsValid()) {
+            final String oldMode = currentMode.getName();
+            final String newMode = allClassesMode.getName();
+            setMode(allClassesMode);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    ProfilerDialogs.displayInfo(Bundle.MethodsFeature_modeReset(
+                                                oldMode, newMode));
+                }
+            });
+        }
     }
     
     public void notifyDeactivated() {
