@@ -148,7 +148,7 @@ sun.cpu.isalist
     Next object java.lang.Object[]#307
     Next object java.util.Vector#5
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64630d70 number 2 retained size 8
    References count 1
    Field b of Class testapp.Main
@@ -157,7 +157,7 @@ sun.cpu.isalist
     Next object java.lang.Object[]#307
     Next object java.util.Vector#5
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c9a6070 Class java.nio.ByteOrder SuperClass java.lang.Object Instance size 12 Instance count 2 All Instances Size 24
   Static Field name LITTLE_ENDIAN type object value 1684099600
    Ref object java.nio.ByteOrder#2
@@ -174,10 +174,10 @@ sun.cpu.isalist
   Instance Id 0x64615210 number 2 retained size 12
    Instance Field name name type object value 0
    References count 2
-   Field LITTLE_ENDIAN of Class java.nio.ByteOrder
    Field byteOrder of Class java.nio.Bits
+   Field LITTLE_ENDIAN of Class java.nio.ByteOrder
    Path to nearest GC root
-    Next object java.lang.Class#8
+    Next object java.lang.Class#9
  Id 0x6c99b7e8 Class java.nio.Bits SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name $assertionsDisabled type boolean value true
   Static Field name JNI_COPY_FROM_ARRAY_THRESHOLD type int value 6
@@ -5243,7 +5243,7 @@ sun.cpu.isalist
     Next object java.util.Vector#3
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628198 number 303 retained size 56
    References count 1
    Field elementData of instance 0x64628180
@@ -5251,7 +5251,7 @@ sun.cpu.isalist
     Next object java.util.Vector#4
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628280 number 304 retained size 56
    References count 1
    Field elementData of instance 0x64628268
@@ -5260,7 +5260,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646282d0 number 305 retained size 56
    References count 1
    Field elementData of instance 0x646282b8
@@ -5269,7 +5269,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628320 number 306 retained size 56
    References count 1
    Field elementData of instance 0x64628308
@@ -5278,21 +5278,21 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646286e0 number 307 retained size 56
    References count 1
    Field elementData of instance 0x646286c8
    Path to nearest GC root
     Next object java.util.Vector#5
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628830 number 308 retained size 56
    References count 1
    Field elementData of instance 0x64628818
    Path to nearest GC root
     Next object java.util.Vector#6
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628918 number 309 retained size 56
    References count 1
    Field elementData of instance 0x64628900
@@ -5300,7 +5300,7 @@ sun.cpu.isalist
     Next object java.util.ArrayList#4
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628968 number 310 retained size 56
    References count 1
    Field elementData of instance 0x64628950
@@ -5308,7 +5308,7 @@ sun.cpu.isalist
     Next object java.util.Stack#3
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646289b8 number 311 retained size 56
    References count 1
    Field elementData of instance 0x646289a0
@@ -5316,7 +5316,7 @@ sun.cpu.isalist
     Next object java.util.ArrayList#5
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629030 number 312 retained size 0
    References count 1
    Field elementData of instance 0x64629018
@@ -5343,7 +5343,7 @@ sun.cpu.isalist
     Next object java.util.ArrayList#5
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64630ab8 number 316 retained size 154
    References count 1
    Field elementData of instance 0x64630aa0
@@ -5359,7 +5359,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c948d60 Class java.lang.ThreadGroup SuperClass java.lang.Object Instance size 43 Instance count 2 All Instances Size 86
   Static Field name <classLoader> type object value 0
   Field name groups type object
@@ -5388,15 +5388,15 @@ sun.cpu.isalist
    Instance Field name name type object value 0
    Instance Field name parent type object value 0
    References count 7
-   Field group of instance 0x64610a80
+   Field group of instance 0x64610978
    Field group of instance 0x64628a88
    Field group of instance 0x64628b48
    Field group of instance 0x64628c08
    Field parent of instance 0x646105d0
-   Field group of instance 0x64610978
    Field group of instance 0x64630d78
+   Field group of instance 0x64610a80
    Path to nearest GC root
-    Next object java.lang.ref.Finalizer$FinalizerThread#1
+    Next object java.lang.ref.Reference$ReferenceHandler#1
   Instance Id 0x646105d0 number 2 retained size 123
    Instance Field name groups type object value 0
    Instance Field name ngroups type int value 0
@@ -5424,7 +5424,7 @@ sun.cpu.isalist
    Field groups of instance 0x646105a0
    Path to nearest GC root
     Next object java.lang.ThreadGroup#1
-    Next object java.lang.ref.Finalizer$FinalizerThread#1
+    Next object java.lang.ref.Reference$ReferenceHandler#1
  Id 0x6c9476c8 Class java.lang.Thread SuperClass java.lang.Object Instance size 104 Instance count 5 All Instances Size 520
   Static Field name defaultUncaughtExceptionHandler type object value 0
   Static Field name subclassAudits type object value 1684080248
@@ -5630,7 +5630,7 @@ sun.cpu.isalist
    Field threads of instance 0x646105a0
    Path to nearest GC root
     Next object java.lang.ThreadGroup#1
-    Next object java.lang.ref.Finalizer$FinalizerThread#1
+    Next object java.lang.ref.Reference$ReferenceHandler#1
   Instance Id 0x64625860 number 2 retained size 32
    References count 1
    Field threads of instance 0x646105d0
@@ -7111,7 +7111,7 @@ sun.cpu.isalist
     Next object java.io.File[]#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64625978 number 114 retained size 24
    Instance Field name hash type int value 0
    Instance Field name count type int value 26
@@ -7125,7 +7125,7 @@ sun.cpu.isalist
     Next object java.io.File[]#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64625a48 number 115 retained size 100
    Instance Field name hash type int value 0
    Instance Field name count type int value 30
@@ -7426,7 +7426,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64627a10 number 135 retained size 128
    Instance Field name hash type int value 0
    Instance Field name count type int value 44
@@ -7474,7 +7474,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64627c00 number 138 retained size 120
    Instance Field name hash type int value 0
    Instance Field name count type int value 40
@@ -7522,7 +7522,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64627dd8 number 141 retained size 130
    Instance Field name hash type int value 0
    Instance Field name count type int value 45
@@ -7570,7 +7570,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646284d8 number 144 retained size 72
    Instance Field name hash type int value 741476021
    Instance Field name count type int value 16
@@ -7618,7 +7618,7 @@ sun.cpu.isalist
     Next object java.util.ArrayList#4
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628f40 number 147 retained size 0
    Instance Field name hash type int value 676668242
    Instance Field name count type int value 16
@@ -7724,7 +7724,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629be8 number 157 retained size 142
    Instance Field name hash type int value 0
    Instance Field name count type int value 51
@@ -7742,7 +7742,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629cf0 number 158 retained size 134
    Instance Field name hash type int value 0
    Instance Field name count type int value 47
@@ -7760,7 +7760,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629df0 number 159 retained size 144
    Instance Field name hash type int value 0
    Instance Field name count type int value 52
@@ -7778,7 +7778,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629ef8 number 160 retained size 86
    Instance Field name hash type int value 0
    Instance Field name count type int value 23
@@ -7795,7 +7795,7 @@ sun.cpu.isalist
     Next object java.util.ArrayList#5
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629f50 number 161 retained size 72
    Instance Field name hash type int value 0
    Instance Field name count type int value 16
@@ -7811,7 +7811,7 @@ sun.cpu.isalist
     Next object java.util.ArrayList#5
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x6462a070 number 162 retained size 54
    Instance Field name hash type int value 0
    Instance Field name count type int value 7
@@ -7996,7 +7996,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#11
     Next object java.util.HashMap#9
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x6462aa68 number 179 retained size 94
    Instance Field name hash type int value -201520135
    Instance Field name count type int value 27
@@ -9040,7 +9040,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64630ca0 number 258 retained size 24
    Instance Field name hash type int value -1422453681
    Instance Field name count type int value 7
@@ -9054,7 +9054,7 @@ sun.cpu.isalist
     Next object java.util.Hashtable$Entry[]#6
     Next object java.util.Hashtable#5
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64630de8 number 259 retained size 0
    Instance Field name hash type int value 0
    Instance Field name count type int value 15
@@ -10179,7 +10179,7 @@ sun.cpu.isalist
     Next object java.util.ArrayList#5
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c943780 Class java.lang.ref.Reference SuperClass java.lang.Object Instance size 24 Instance count 0 All Instances Size 0
   Static Field name pending type object value 0
   Static Field name lock type object value 1684081008
@@ -11384,7 +11384,7 @@ sun.cpu.isalist
    Path to nearest GC root
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628a70 number 5 retained size 21
    Instance Field name combiner type object value 0
    Instance Field name privilegedContext type object value 0
@@ -11394,7 +11394,7 @@ sun.cpu.isalist
    Field acc of instance 0x64628620
    Path to nearest GC root
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628b30 number 6 retained size 21
    Instance Field name combiner type object value 0
    Instance Field name privilegedContext type object value 0
@@ -11470,7 +11470,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6cc36948 Class java.io.ByteArrayInputStream SuperClass java.io.InputStream Instance size 24 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
   Field name count type int
@@ -11566,7 +11566,7 @@ sun.cpu.isalist
    Path to nearest GC root
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628180 number 4 retained size 80
    Instance Field name capacityIncrement type int value 0
    Instance Field name elementCount type int value 0
@@ -11578,7 +11578,7 @@ sun.cpu.isalist
    Path to nearest GC root
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646286c8 number 5 retained size 80
    Instance Field name capacityIncrement type int value 0
    Instance Field name elementCount type int value 1
@@ -11589,7 +11589,7 @@ sun.cpu.isalist
    Field classes of instance 0x64628620
    Path to nearest GC root
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628818 number 6 retained size 80
    Instance Field name capacityIncrement type int value 0
    Instance Field name elementCount type int value 0
@@ -11600,7 +11600,7 @@ sun.cpu.isalist
    Field nativeLibraries of instance 0x64628620
    Path to nearest GC root
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629018 number 7 retained size 0
    Instance Field name capacityIncrement type int value 0
    Instance Field name elementCount type int value 0
@@ -11626,7 +11626,7 @@ sun.cpu.isalist
     Next object java.util.ArrayList#5
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c95a280 Class java.util.AbstractList SuperClass java.util.AbstractCollection Instance size 12 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
   Field name modCount type int
@@ -11741,7 +11741,7 @@ sun.cpu.isalist
    Path to nearest GC root
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628668 number 5 retained size 148
    Instance Field name values type object value 0
    Instance Field name entrySet type object value 0
@@ -11756,7 +11756,7 @@ sun.cpu.isalist
    Field package2certs of instance 0x64628620
    Path to nearest GC root
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646297d0 number 6 retained size 0
    Instance Field name values type object value 0
    Instance Field name entrySet type object value 0
@@ -13766,14 +13766,14 @@ sun.cpu.isalist
   Static Field name <classLoader> type object value 0
   Instance Id 0x64614cf8 number 1 retained size 8
    References count 6
-   Field unsafe of Class java.util.concurrent.atomic.AtomicReferenceFieldUpdater$AtomicReferenceFieldUpdaterImpl
-   Field unsafe of Class sun.misc.SharedSecrets
    Field unsafe of Class java.util.concurrent.atomic.AtomicInteger
-   Field unsafe of Class java.nio.Bits
+   Field unsafe of Class sun.misc.SharedSecrets
    Field unsafe of Class java.util.concurrent.locks.AbstractQueuedSynchronizer
+   Field unsafe of Class java.nio.Bits
+   Field unsafe of Class java.util.concurrent.atomic.AtomicReferenceFieldUpdater$AtomicReferenceFieldUpdaterImpl
    Field theUnsafe of Class sun.misc.Unsafe
    Path to nearest GC root
-    Next object java.lang.Class#74
+    Next object java.lang.Class#435
  Id 0x6c9c91d8 Class java.lang.Terminator$1 SuperClass java.lang.Object Instance size 8 Instance count 1 All Instances Size 8
   Static Field name <classLoader> type object value 0
   Instance Id 0x646252b8 number 1 retained size 8
@@ -13875,7 +13875,7 @@ sun.cpu.isalist
     Next object java.util.ArrayList#5
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x68137110 Class java.io.Console SuperClass java.lang.Object Instance size 40 Instance count 0 All Instances Size 0
   Static Field name $assertionsDisabled type boolean value true
   Static Field name cons type object value 0
@@ -13966,18 +13966,18 @@ sun.cpu.isalist
     Ref object sun.misc.Launcher$ExtClassLoader#1
    Instance Field name initialized type boolean value true
    References count 10
-   Field contextClassLoader of instance 0x64610790
+   Field scl of Class java.lang.ClassLoader
    Field classloader of instance 0x64630c58
    Field contextClassLoader of instance 0x64630d78
    Field <classLoader> of Class testapp.Main
    Field contextClassLoader of instance 0x64628b48
    Field contextClassLoader of instance 0x64628c08
    Field loader of instance 0x6462a980
-   Field scl of Class java.lang.ClassLoader
+   Field contextClassLoader of instance 0x64610790
    Field loader of instance 0x646258e0
    Field contextClassLoader of instance 0x64628a88
    Path to nearest GC root
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c9cfdd8 Class sun.misc.Launcher$ExtClassLoader SuperClass java.net.URLClassLoader Instance size 67 Instance count 1 All Instances Size 67
   Static Field name <classLoader> type object value 0
   Field name dirs type object
@@ -14012,7 +14012,7 @@ sun.cpu.isalist
    Field parent of instance 0x64628620
    Path to nearest GC root
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c9d8598 Class sun.net.www.ParseUtil SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name encodedInPath type object value 1684169584
    Ref object java.util.BitSet#1
@@ -14078,7 +14078,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c9f1dd0 Class java.net.URLClassLoader$1 SuperClass java.lang.Object Instance size 16 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
   Field name this$0 type object
@@ -15109,7 +15109,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#11
     Next object java.util.HashMap#9
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c97bc18 Class java.lang.annotation.Annotation SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x68131560 Class java.lang.annotation.Annotation[] SuperClass java.lang.Object Instance size -1 Instance count 4 All Instances Size 64
@@ -15189,7 +15189,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64630998 number 2 retained size 138
    Instance Field name allPermission type object value 0
    Instance Field name hasUnresolved type boolean value false
@@ -15226,7 +15226,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628308 number 3 retained size 76
    Instance Field name size type int value 4
    Instance Field name elementData type object value 1684177696
@@ -15238,7 +15238,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628900 number 4 retained size 76
    Instance Field name size type int value 1
    Instance Field name elementData type object value 1684179224
@@ -15249,7 +15249,7 @@ sun.cpu.isalist
    Path to nearest GC root
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646289a0 number 5 retained size 76
    Instance Field name size type int value 1
    Instance Field name elementData type object value 1684179384
@@ -15260,7 +15260,7 @@ sun.cpu.isalist
    Path to nearest GC root
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646298f0 number 6 retained size 0
    Instance Field name size type int value 0
    Instance Field name elementData type object value 1684183304
@@ -15288,7 +15288,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c97d1a0 Class java.security.AccessController SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c9ee8c0 Class java.util.HashSet SuperClass java.util.AbstractSet Instance size 12 Instance count 2 All Instances Size 24
@@ -15305,7 +15305,7 @@ sun.cpu.isalist
    Path to nearest GC root
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628718 number 2 retained size 156
    Instance Field name map type object value 1684178728
     Ref object java.util.HashMap#8
@@ -15313,7 +15313,7 @@ sun.cpu.isalist
    Field domains of instance 0x64628620
    Path to nearest GC root
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c980da8 Class java.util.Iterator SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c97b468 Class java.util.HashMap SuperClass java.util.AbstractMap Instance size 40 Instance count 23 All Instances Size 920
@@ -15388,7 +15388,7 @@ sun.cpu.isalist
     Next object java.util.HashSet#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628108 number 5 retained size 120
    Instance Field name entrySet type object value 0
    Instance Field name modCount type int value 0
@@ -15404,7 +15404,7 @@ sun.cpu.isalist
    Path to nearest GC root
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646281d0 number 6 retained size 120
    Instance Field name entrySet type object value 0
    Instance Field name modCount type int value 0
@@ -15420,7 +15420,7 @@ sun.cpu.isalist
    Path to nearest GC root
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628358 number 7 retained size 216
    Instance Field name entrySet type object value 0
    Instance Field name modCount type int value 4
@@ -15441,7 +15441,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628728 number 8 retained size 144
    Instance Field name entrySet type object value 0
    Instance Field name modCount type int value 1
@@ -15457,7 +15457,7 @@ sun.cpu.isalist
    Path to nearest GC root
     Next object java.util.HashSet#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646287a0 number 9 retained size 216
    Instance Field name entrySet type object value 0
    Instance Field name modCount type int value 1
@@ -15472,7 +15472,7 @@ sun.cpu.isalist
    Field packages of instance 0x64628620
    Path to nearest GC root
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628868 number 10 retained size 144
    Instance Field name entrySet type object value 0
    Instance Field name modCount type int value 1
@@ -15487,7 +15487,7 @@ sun.cpu.isalist
    Field pdcache of instance 0x64628620
    Path to nearest GC root
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646289f0 number 11 retained size 144
    Instance Field name entrySet type object value 0
    Instance Field name modCount type int value 1
@@ -15504,7 +15504,7 @@ sun.cpu.isalist
    Path to nearest GC root
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646291b8 number 12 retained size 0
    Instance Field name entrySet type object value 0
    Instance Field name modCount type int value 6
@@ -15650,7 +15650,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646309b0 number 22 retained size 120
    Instance Field name entrySet type object value 0
    Instance Field name modCount type int value 0
@@ -15690,7 +15690,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c956d88 Class java.util.Collection SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c9a2e08 Class java.util.Set SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
@@ -15716,12 +15716,12 @@ sun.cpu.isalist
   Static Field name <classLoader> type object value 0
   Instance Id 0x64610958 number 1 retained size 8
    References count 4
-   Field reflFactory of Class java.io.ObjectStreamClass
    Field reflectionFactory of Class java.lang.Class
+   Field reflFactory of Class java.io.ObjectStreamClass
    Field reflectionFactory of Class java.lang.reflect.AccessibleObject
    Field soleInstance of Class sun.reflect.ReflectionFactory
    Path to nearest GC root
-    Next object java.lang.Class#404
+    Next object java.lang.Class#86
  Id 0x6c97dc68 Class sun.reflect.ReflectionFactory$GetReflectionFactoryAction SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6cae7190 Class java.io.DataInput SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
@@ -16898,7 +16898,7 @@ sun.cpu.isalist
     Next object java.io.File[]#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64625968 number 2 retained size 40
    Instance Field name prefixLength type int value 1
    Instance Field name path type object value 1684167032
@@ -16909,7 +16909,7 @@ sun.cpu.isalist
     Next object java.io.File[]#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64625bc0 number 3 retained size 136
    Instance Field name prefixLength type int value 1
    Instance Field name path type object value 1684167632
@@ -16962,7 +16962,7 @@ sun.cpu.isalist
    Path to nearest GC root
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c9f1930 Class java.lang.SystemClassLoaderAction SuperClass java.lang.Object Instance size 12 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
   Field name parent type object
@@ -17013,7 +17013,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64627bc8 number 2 retained size 184
    Instance Field name hashCode type int value -1082233293
    Instance Field name handler type object value 1684175344
@@ -17040,7 +17040,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64627da0 number 3 retained size 176
    Instance Field name hashCode type int value 528592138
    Instance Field name handler type object value 1684175344
@@ -17067,7 +17067,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64627f90 number 4 retained size 186
    Instance Field name hashCode type int value -1084663432
    Instance Field name handler type object value 1684175344
@@ -17094,7 +17094,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646285e8 number 5 retained size 128
    Instance Field name hashCode type int value 744619056
    Instance Field name handler type object value 1684175344
@@ -17121,7 +17121,7 @@ sun.cpu.isalist
     Next object java.util.ArrayList#4
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629a28 number 6 retained size 210
    Instance Field name hashCode type int value -1
    Instance Field name handler type object value 1684178104
@@ -17147,7 +17147,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629bb0 number 7 retained size 198
    Instance Field name hashCode type int value -1
    Instance Field name handler type object value 1684178104
@@ -17173,7 +17173,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629cb8 number 8 retained size 190
    Instance Field name hashCode type int value -1
    Instance Field name handler type object value 1684178104
@@ -17199,7 +17199,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629db8 number 9 retained size 200
    Instance Field name hashCode type int value -1
    Instance Field name handler type object value 1684178104
@@ -17225,7 +17225,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629ec0 number 10 retained size 142
    Instance Field name hashCode type int value -1
    Instance Field name handler type object value 1684179560
@@ -17250,7 +17250,7 @@ sun.cpu.isalist
     Next object java.util.ArrayList#5
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6813a280 Class java.net.URL[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6ca07220 Class java.security.cert.Certificate SuperClass java.lang.Object Instance size 12 Instance count 0 All Instances Size 0
@@ -17265,7 +17265,7 @@ sun.cpu.isalist
    Field value of instance 0x64630cc8
    Path to nearest GC root
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c9f6c28 Class java.security.CodeSource SuperClass java.lang.Object Instance size 28 Instance count 1 All Instances Size 28
   Static Field name serialVersionUID type long value 4977541819976013951
   Static Field name <classLoader> type object value 0
@@ -17289,7 +17289,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c996370 Class java.nio.ByteBuffer SuperClass java.nio.Buffer Instance size 43 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
   Field name nativeByteOrder type boolean
@@ -17331,7 +17331,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628950 number 3 retained size 80
    Instance Field name capacityIncrement type int value 0
    Instance Field name elementCount type int value 0
@@ -17343,7 +17343,7 @@ sun.cpu.isalist
    Path to nearest GC root
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c9e48f0 Class java.util.concurrent.locks.Lock SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x68139850 Class java.util.concurrent.locks.Lock[] SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
@@ -17398,7 +17398,7 @@ sun.cpu.isalist
    Path to nearest GC root
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646288e0 number 2 retained size 590
    Instance Field name jarHandler type object value 1684179560
     Ref object sun.net.www.protocol.jar.Handler#2
@@ -17414,7 +17414,7 @@ sun.cpu.isalist
    Field ucp of instance 0x64628620
    Path to nearest GC root
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c9e8538 Class java.util.concurrent.locks.AbstractQueuedSynchronizer SuperClass java.util.concurrent.locks.AbstractOwnableSynchronizer Instance size 24 Instance count 0 All Instances Size 0
   Static Field name waitStatusOffset type long value 24
   Static Field name tailOffset type long value 16
@@ -17912,7 +17912,7 @@ sun.cpu.isalist
     Next object java.util.ArrayList#5
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6cc32e18 Class java.util.jar.JavaUtilJarAccessImpl SuperClass java.lang.Object Instance size 8 Instance count 1 All Instances Size 8
   Static Field name <classLoader> type object value 0
   Instance Id 0x64628cd0 number 1 retained size 8
@@ -18214,7 +18214,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c9c8ac8 Class java.lang.Terminator SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name handler type object value 1684165304
    Ref object java.lang.Terminator$1#1
@@ -18320,7 +18320,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629b88 number 2 retained size 234
    Instance Field name lmap type object value 1684177752
     Ref object java.util.HashMap#7
@@ -18343,7 +18343,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629c90 number 3 retained size 226
    Instance Field name lmap type object value 1684177752
     Ref object java.util.HashMap#7
@@ -18366,7 +18366,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629d90 number 4 retained size 236
    Instance Field name lmap type object value 1684177752
     Ref object java.util.HashMap#7
@@ -18389,7 +18389,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629e98 number 5 retained size 178
    Instance Field name lmap type object value 1684179440
     Ref object java.util.HashMap#11
@@ -18411,7 +18411,7 @@ sun.cpu.isalist
     Next object java.util.ArrayList#5
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c9f29f0 Class sun.misc.URLClassPath$Loader SuperClass java.lang.Object Instance size 12 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
   Field name base type object
@@ -18433,7 +18433,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628a68 number 2 retained size 8
    References count 3
    Field jarHandler of instance 0x646288e0
@@ -18442,7 +18442,7 @@ sun.cpu.isalist
    Path to nearest GC root
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c9f7650 Class java.security.PermissionCollection SuperClass java.lang.Object Instance size 9 Instance count 0 All Instances Size 0
   Static Field name serialVersionUID type long value -6727011328946861783
   Static Field name <classLoader> type object value 0
@@ -18471,7 +18471,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6ca001f8 Class java.security.Policy SuperClass java.lang.Object Instance size 12 Instance count 0 All Instances Size 0
   Static Field name debug type object value 0
   Static Field name policy type object value 0
@@ -21303,7 +21303,7 @@ sun.cpu.isalist
     Next object java.util.Hashtable$Entry[]#6
     Next object java.util.Hashtable#5
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x68131de8 Class java.util.Hashtable$Entry[] SuperClass java.lang.Object Instance size -1 Instance count 12 All Instances Size 1864
   Static Field name <classLoader> type object value 0
   Instance Id 0x64615860 number 1 retained size 8158
@@ -21337,14 +21337,14 @@ sun.cpu.isalist
     Next object java.util.Hashtable#4
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628690 number 6 retained size 108
    References count 1
    Field table of instance 0x64628668
    Path to nearest GC root
     Next object java.util.Hashtable#5
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646297f8 number 7 retained size 0
    References count 1
    Field table of instance 0x646297d0
@@ -21410,7 +21410,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6ca02b08 Class sun.security.provider.PolicyFile SuperClass java.security.Policy Instance size 25 Instance count 0 All Instances Size 0
   Static Field name PARAMS2 type object value 1684212296
    Ref object java.lang.Class[]#7
@@ -21799,7 +21799,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c977fe0 Class java.util.AbstractMap SuperClass java.lang.Object Instance size 16 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
   Field name values type object
@@ -22008,7 +22008,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629c78 number 12 retained size 24
    Instance Field name hash type int value -1241767900
    Instance Field name next type object value 0
@@ -22024,7 +22024,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629d78 number 13 retained size 24
    Instance Field name hash type int value 507990287
    Instance Field name next type object value 0
@@ -22040,7 +22040,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629e80 number 14 retained size 48
    Instance Field name hash type int value -1244059609
    Instance Field name next type object value 1684183920
@@ -22057,7 +22057,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x6462a500 number 15 retained size 0
    Instance Field name hash type int value 174971558
    Instance Field name next type object value 0
@@ -22139,7 +22139,7 @@ sun.cpu.isalist
     Next object java.util.HashMap#11
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x6462a9b0 number 22 retained size 96
    Instance Field name hash type int value -1596453874
    Instance Field name next type object value 0
@@ -22153,7 +22153,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#11
     Next object java.util.HashMap#9
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x6462aa80 number 23 retained size 118
    Instance Field name hash type int value -47514415
    Instance Field name next type object value 0
@@ -23829,7 +23829,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64630c28 number 154 retained size 204
    Instance Field name hash type int value 1583289
    Instance Field name next type object value 0
@@ -23847,7 +23847,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64630c40 number 155 retained size 42
    Instance Field name hash type int value -2006458019
    Instance Field name next type object value 0
@@ -23869,7 +23869,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64630c88 number 156 retained size 24
    Instance Field name hash type int value 788385046
    Instance Field name next type object value 0
@@ -23883,7 +23883,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64630ce0 number 157 retained size 24
    Instance Field name hash type int value 10901398
    Instance Field name next type object value 0
@@ -23898,7 +23898,7 @@ sun.cpu.isalist
     Next object java.util.HashMap#8
     Next object java.util.HashSet#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x681318b8 Class java.util.HashMap$Entry[] SuperClass java.lang.Object Instance size -1 Instance count 26 All Instances Size 3488
   Static Field name <classLoader> type object value 0
   Instance Id 0x64610740 number 1 retained size 80
@@ -23945,7 +23945,7 @@ sun.cpu.isalist
     Next object java.util.HashSet#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628130 number 7 retained size 80
    References count 1
    Field table of instance 0x64628108
@@ -23953,7 +23953,7 @@ sun.cpu.isalist
     Next object java.util.HashMap#5
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646281f8 number 8 retained size 80
    References count 1
    Field table of instance 0x646281d0
@@ -23961,7 +23961,7 @@ sun.cpu.isalist
     Next object java.util.HashMap#6
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628380 number 9 retained size 176
    References count 1
    Field table of instance 0x64628358
@@ -23970,7 +23970,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628750 number 10 retained size 104
    References count 1
    Field table of instance 0x64628728
@@ -23978,21 +23978,21 @@ sun.cpu.isalist
     Next object java.util.HashMap#8
     Next object java.util.HashSet#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646287c8 number 11 retained size 176
    References count 1
    Field table of instance 0x646287a0
    Path to nearest GC root
     Next object java.util.HashMap#9
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628890 number 12 retained size 104
    References count 1
    Field table of instance 0x64628868
    Path to nearest GC root
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628a18 number 13 retained size 104
    References count 1
    Field table of instance 0x646289f0
@@ -24000,7 +24000,7 @@ sun.cpu.isalist
     Next object java.util.HashMap#11
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646291e0 number 14 retained size 0
    References count 1
    Field table of instance 0x646291b8
@@ -24069,7 +24069,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646309d8 number 25 retained size 80
    References count 1
    Field table of instance 0x646309b0
@@ -24093,7 +24093,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
  Id 0x6c97d938 Class java.security.PrivilegedAction SuperClass java.lang.Object Instance size 8 Instance count 0 All Instances Size 0
   Static Field name <classLoader> type object value 0
  Id 0x6c9edca8 Class sun.reflect.DelegatingConstructorAccessorImpl SuperClass sun.reflect.ConstructorAccessorImpl Instance size 12 Instance count 4 All Instances Size 48
@@ -25936,7 +25936,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646274e8 number 133 retained size 20
    References count 1
    Field sharpsMap of Class java.lang.CharacterDataLatin1
@@ -25976,7 +25976,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64627c18 number 137 retained size 96
    References count 1
    Field value of instance 0x64627c00
@@ -26011,7 +26011,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64627df0 number 140 retained size 106
    References count 1
    Field value of instance 0x64627dd8
@@ -26046,7 +26046,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x646284f0 number 143 retained size 48
    References count 1
    Field value of instance 0x646284d8
@@ -26080,7 +26080,7 @@ sun.cpu.isalist
     Next object java.util.ArrayList#4
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64628b00 number 146 retained size 50
    References count 1
    Field name of instance 0x64628a88
@@ -26156,7 +26156,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#11
     Next object java.util.HashMap#9
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629af0 number 160 retained size 130
    References count 1
    Field value of instance 0x64629ad8
@@ -26169,7 +26169,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629c00 number 161 retained size 118
    References count 1
    Field value of instance 0x64629be8
@@ -26182,7 +26182,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629d08 number 162 retained size 110
    References count 1
    Field value of instance 0x64629cf0
@@ -26195,7 +26195,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629e08 number 163 retained size 120
    References count 1
    Field value of instance 0x64629df0
@@ -26208,7 +26208,7 @@ sun.cpu.isalist
     Next object sun.misc.URLClassPath#1
     Next object sun.misc.Launcher$ExtClassLoader#1
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629f10 number 164 retained size 62
    References count 1
    Field value of instance 0x64629ef8
@@ -26220,7 +26220,7 @@ sun.cpu.isalist
     Next object java.util.ArrayList#5
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64629f68 number 165 retained size 48
    References count 1
    Field value of instance 0x64629f50
@@ -26232,7 +26232,7 @@ sun.cpu.isalist
     Next object java.util.ArrayList#5
     Next object sun.misc.URLClassPath#2
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x6462a088 number 166 retained size 30
    References count 1
    Field value of instance 0x6462a070
@@ -27097,7 +27097,7 @@ sun.cpu.isalist
     Next object java.util.HashMap$Entry[]#12
     Next object java.util.HashMap#10
     Next object sun.misc.Launcher$AppClassLoader#1
-    Next object java.lang.Thread#1
+    Next object java.lang.Class#101
   Instance Id 0x64630e00 number 268 retained size 0
    References count 1
    Field value of instance 0x64630de8
