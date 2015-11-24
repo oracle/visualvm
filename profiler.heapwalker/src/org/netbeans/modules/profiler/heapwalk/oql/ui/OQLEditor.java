@@ -63,6 +63,7 @@ import org.openide.util.Lookup;
 /**
  *
  * @author Jaroslav Bachorik
+ * @author Jiri Sedlacek
  */
 public class OQLEditor extends JPanel {
 
@@ -84,7 +85,6 @@ public class OQLEditor extends JPanel {
 
     public OQLEditor(OQLEngine engine) {
         this.engine = engine;
-        init();
     }
 
     private void init() {
@@ -129,32 +129,28 @@ public class OQLEditor extends JPanel {
     }
 
     public void setScript(String script) {
-        queryEditor.setText(script);
+        editor().setText(script);
     }
 
     public String getScript() {
-        return queryEditor.getText();
+        return editor().getText();
     }
 
     @Override
     public void setBackground(Color bg) {
         super.setBackground(bg);
-        if (queryEditor != null) {
-            queryEditor.setBackground(bg);
-        }
+        if (queryEditor != null) queryEditor.setBackground(bg);
     }
 
     @Override
     public void setOpaque(boolean isOpaque) {
         super.setOpaque(isOpaque);
-        if (queryEditor != null) {
-            queryEditor.setOpaque(isOpaque);
-        }
+        if (queryEditor != null) queryEditor.setOpaque(isOpaque);
     }
 
     @Override
     public void requestFocus() {
-        queryEditor.requestFocus();
+        editor().requestFocus();
     }
 
     final private void validateScript() {
@@ -174,28 +170,29 @@ public class OQLEditor extends JPanel {
     }
 
     public void setEditable(boolean b) {
-        if (queryEditor.isEditable() == b) return;
+        JEditorPane editor = editor();
+        if (editor.isEditable() == b) return;
         
-        queryEditor.setEditable(b);
+        editor.setEditable(b);
 
         if (b) {
-            if (lastBgColor != null) {
-                queryEditor.setBackground(lastBgColor);
-            }
-            if (lastCaret != null) {
-                queryEditor.setCaret(lastCaret);
-            }
+            if (lastBgColor != null) editor.setBackground(lastBgColor);
+            if (lastCaret != null) editor.setCaret(lastCaret);
         } else {
-            lastBgColor = queryEditor.getBackground();
-            lastCaret = queryEditor.getCaret();
-            queryEditor.setBackground(disabledBgColor);
-            queryEditor.setCaret(nullCaret);
+            lastBgColor = editor.getBackground();
+            lastCaret = editor.getCaret();
+            editor.setBackground(disabledBgColor);
+            editor.setCaret(nullCaret);
         }
     }
 
     public boolean isEditable() {
-        return queryEditor.isEditable();
+        return editor().isEditable();
     }
+    
+    private JEditorPane editor() {
+        if (queryEditor == null) init();
+        return queryEditor;
+    }
+    
 }
-
-

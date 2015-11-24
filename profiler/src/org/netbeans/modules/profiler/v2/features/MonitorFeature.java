@@ -95,6 +95,14 @@ final class MonitorFeature extends ProfilerFeature.Basic {
             Profiler getProfiler() {
                 return MonitorFeature.this.getSession().getProfiler();
             }
+
+            String readFlag(String flag, String defaultValue) {
+                return MonitorFeature.this.readFlag("UI_" + flag, defaultValue); // NOI18N
+            }
+
+            void storeFlag(String flag, String value) {
+                MonitorFeature.this.storeFlag("UI_" + flag, value); // NOI18N
+            }
         };
         return ui;
     }

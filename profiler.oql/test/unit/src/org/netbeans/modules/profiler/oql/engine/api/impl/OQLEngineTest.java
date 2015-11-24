@@ -672,7 +672,7 @@ public class OQLEngineTest {
         final String[] rslt = new String[1];
 
         instance.executeQuery(
-            "select map(filter(heap.findClass('java.lang.System').props.table, 'it != null && it.key != null && it.value != null'),  " +
+            "select map(filter(heap.findClass('java.lang.System').statics.props.table, 'it != null && it.key != null && it.value != null'),  " +
                 "function (it) { " +
                     "return 'MapEntry{' + it.key.toString() + ' = ' + it.value.toString() + '}' ;" +
                 "}" +
@@ -695,7 +695,7 @@ public class OQLEngineTest {
         final String[] rslt = new String[1];
 
         instance.executeQuery(
-            "select map(filter(heap.findClass('java.lang.System').props.table, 'it != null && it.key != null && it.value != null'), " +
+            "select map(filter(heap.findClass('java.lang.System').statics.props.table, 'it != null && it.key != null && it.value != null'), " +
             "'{ key: it.key.toString(), value: it.value.toString() }')", new ObjectVisitor() {
 
             public boolean visit(Object o) {

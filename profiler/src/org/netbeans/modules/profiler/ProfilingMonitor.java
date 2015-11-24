@@ -45,8 +45,6 @@ package org.netbeans.modules.profiler;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import org.netbeans.lib.profiler.ProfilerClient;
-import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.MonitoredData;
 import org.netbeans.lib.profiler.common.Profiler;
@@ -55,7 +53,6 @@ import org.netbeans.lib.profiler.results.monitor.VMTelemetryDataManager;
 import org.netbeans.lib.profiler.results.threads.ThreadsDataManager;
 import javax.swing.*;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.util.NbBundle;
 
 
@@ -83,7 +80,7 @@ public final class ProfilingMonitor {
         private TargetAppRunner runner;
         private ThreadsDataManager threadsDataManager;
         private VMTelemetryDataManager vmTelemetryManager;
-        private boolean doUpdateLiveResults;
+//        private boolean doUpdateLiveResults;
         private boolean keepRunning = true;
         private volatile boolean oomeNotified;
 
@@ -128,32 +125,32 @@ public final class ProfilingMonitor {
                                             // ---------------------------------------------------------
                                             // Temporary workaround to refresh profiling points when LiveResultsWindow is not refreshing
                                             // TODO: move this code to a separate class performing the update if necessary
-                                            final Profiler profiler = Profiler.getDefault();
-                                            final ProfilerClient client = profiler.getTargetAppRunner().getProfilerClient();
-                                            final int instrType = client.getCurrentInstrType();
-                                            if ((NetBeansProfiler.getDefaultNB().processesProfilingPoints())
-                                                && (!doUpdateLiveResults /*|| !LiveResultsWindow.hasDefault()*/)) {
-                                                ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
-                                                        public void run() {
-                                                            try {
-                                                                if (instrType != ProfilerEngineSettings.INSTR_CODE_REGION) {
-                                                                    client.forceObtainedResultsDump(true);
-                                                                }
-                                                            } catch (Exception e /*ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated*/) {
-                                                            }
-                                                        }
-                                                    });
-
-                                            }
-
-                                            // ---------------------------------------------------------
-
-                                            // Let results updating happen every other cycle (i.e. every ~2.5 sec) to allow the user to understand something before it disappears :-)
-//                                            if (doUpdateLiveResults && LiveResultsWindow.hasDefault()) {
-//                                                LiveResultsWindow.getDefault().refreshLiveResults();
+//                                            final Profiler profiler = Profiler.getDefault();
+//                                            final ProfilerClient client = profiler.getTargetAppRunner().getProfilerClient();
+//                                            final int instrType = client.getCurrentInstrType();
+//                                            if ((NetBeansProfiler.getDefaultNB().processesProfilingPoints())
+//                                                && (!doUpdateLiveResults /*|| !LiveResultsWindow.hasDefault()*/)) {
+//                                                ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+//                                                        public void run() {
+//                                                            try {
+//                                                                if (instrType != ProfilerEngineSettings.INSTR_CODE_REGION) {
+//                                                                    client.forceObtainedResultsDump(true);
+//                                                                }
+//                                                            } catch (Exception e /*ClientUtils.TargetAppOrVMTerminated targetAppOrVMTerminated*/) {
+//                                                            }
+//                                                        }
+//                                                    });
+//
 //                                            }
-
-                                            doUpdateLiveResults = !doUpdateLiveResults;
+//
+//                                            // ---------------------------------------------------------
+//
+//                                            // Let results updating happen every other cycle (i.e. every ~2.5 sec) to allow the user to understand something before it disappears :-)
+////                                            if (doUpdateLiveResults && LiveResultsWindow.hasDefault()) {
+////                                                LiveResultsWindow.getDefault().refreshLiveResults();
+////                                            }
+//
+//                                            doUpdateLiveResults = !doUpdateLiveResults;
                                         } catch (Exception e) {
                                             Profiler.getDefault().notifyException(Profiler.EXCEPTION, e);
                                         } catch (OutOfMemoryError e) {
