@@ -468,12 +468,16 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
             if (subclasses != null) {
                 preloadBytecodeForAllSubclasses(subclasses);
                 for (int i = 0; i < subclasses.size(); i++) {
+                    DynamicClassInfo subClass = (DynamicClassInfo) subclasses.get(i);
                     //System.out.println("Gonna scan subclass " + subclassNames.get(i) + " of class " + className + " for method " + methodName);
                     // DynamicClassInfo subClass = javaClassForName((String) subclassNames.get(i));
                     // if ((idx != -1 && subClass.overridesVirtualMethod(clazz, idx) != -1) || idx == -1) - see the comment in findAndMarkOverridingMethods()
                     // on why this seems to be of no use.
-                    locateAndMarkMethodReachable((DynamicClassInfo) subclasses.get(i), methodName, methodSignature, virtualCall,
-                                                 false, false);
+                    if (!subClass.isInterface()) {
+                        boolean searchSuper = clazz.isInterface() && !subclasses.contains(subClass.getSuperClass());
+                        locateAndMarkMethodReachable(subClass, methodName, methodSignature, virtualCall,
+                                                      searchSuper, false);
+                    }
                 }
             }
         }
@@ -496,25 +500,6 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
                 }
             }
         }
-
-        DynamicClassInfo[] interfaces = clazz.getSuperInterfaces();
-
-        if (interfaces == null) {
-            return false;
-        }
-
-        for (int i = 0; i < interfaces.length; i++) {
-            DynamicClassInfo intfClazz = interfaces[i];
-
-            if (intfClazz == null) {
-                continue;
-            }
-
-            if (locateAndMarkMethodReachable(intfClazz, methodName, methodSignature, virtualCall, true, false)) {
-                return true;
-            }
-        }
-
         return false;
     }
 
