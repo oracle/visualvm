@@ -761,7 +761,8 @@ public class ProfilerTable extends JTable {
     
     public void doLayout() {
         ProfilerColumnModel cModel = _getColumnModel();
-        TableColumn res = getTableHeader().getResizingColumn();
+        JTableHeader header = getTableHeader();
+        TableColumn res = header == null ? null : header.getResizingColumn();
         if (res != null) {
             // Resizing column
             int delta = getWidth() - cModel.getTotalColumnWidth();
