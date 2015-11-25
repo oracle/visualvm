@@ -315,7 +315,7 @@ public class ProfilerTableContainer extends JPanel {
                     if (height > viewHeight) {
                         g.setColor(table.getGridColor());
                         JTableHeader header = table.getTableHeader();
-                        for (int i = 0; i < table.getColumnCount(); i++) {
+                        if (header != null) for (int i = 0; i < table.getColumnCount(); i++) {
                             Rectangle rect = header.getHeaderRect(i);
                             if (rect.width > 0) g.drawLine(rect.x + rect.width - 1, viewHeight,
                                                            rect.x + rect.width - 1, height - 1);
