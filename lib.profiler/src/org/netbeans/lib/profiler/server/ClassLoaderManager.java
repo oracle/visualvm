@@ -416,7 +416,7 @@ class ClassLoaderManager implements CommonConstants {
             ClassLoader loader = (ClassLoader) targetLdrWeakRef.get();
 
             while (loader != null) {
-                Class res = (Class) findLoadedClassMethod.invoke(loader, args);
+                Class res = getLoadedClassInThisLoaderOnly(className);
 
                 // Class res = targetLoader.findLoadedClass(className);
                 if (res != null) {
@@ -443,20 +443,28 @@ class ClassLoaderManager implements CommonConstants {
     }
 
     private Class getLoadedClassInThisLoaderOnly(String className) {
+        Class clazz = null;
+        ClassLoader loader = (ClassLoader) targetLdrWeakRef.get();
+        
+        if (loader == null) {
+            return null;
+        }
         try {
             Object[] args = new Object[] { className };
-            ClassLoader loader = (ClassLoader) targetLdrWeakRef.get();
-
-            if (loader != null) {
-                return (Class) findLoadedClassMethod.invoke(loader, args);
-
-                // Class res = targetLoader.findLoadedClass(className);
-            }
+            clazz = (Class) findLoadedClassMethod.invoke(loader, args);
         } catch (Exception ex) {
             System.err.println("Profiler Agent Error: internal error in ClassLoaderManager 2"); // NOI18N
             ex.printStackTrace(System.err);
         }
+        if (clazz == null && indexIntoManVec > 0) {
+            try {
+                clazz = loader.loadClass(className);
+            } catch (ClassNotFoundException ex) {
+                System.err.println(ENGINE_WARNING+" CNFE in getLoadedClassInThisLoaderOnly "+ex.getLocalizedMessage()+" for "+className+" classloaderId "+indexIntoManVec+" classLoader: "+loader);
+            }
+            //System.out.println("Loaded class "+className+" initial loader "+indexIntoManVec);
+        }
 
-        return null;
+        return clazz;
     }
 }
