@@ -96,8 +96,12 @@ public class HTMLLabel extends JEditorPane implements HyperlinkListener {
         if (UIUtils.isNimbusLookAndFeel() && !o)
             setBackground(new Color(0, 0, 0, 0));
     }
+    
+    private String txt;
 
     public void setText(String value) {
+        txt = value;
+        
         Font font = getFont();
         Color textColor = getForeground();
         
@@ -105,8 +109,13 @@ public class HTMLLabel extends JEditorPane implements HyperlinkListener {
         value = value.replace("<code>", "<code style=\"font-size: " + font.getSize() + "pt;\">"); //NOI18N
         
         String colorText = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; //NOI18N
-        super.setText("<html><body text=\"" + colorText + "\" style=\"font-size: " + font.getSize() + "pt; font-family: " + font.getName() + ";\">" + value
-                      + "</body></html>"); //NOI18N
+        super.setText("<html><body align=\"right\" text=\"" + colorText + "\" style=\"font-size: " + font.getSize() //NOI18N
+                      + "pt; font-family: " + font.getName() + ";\"><nobr>" + value + "</nobr></body></html>"); //NOI18N
+    }
+    
+    public void setForeground(Color fg) {
+        super.setForeground(fg);
+        if (txt != null) setText(txt);
     }
 
     public void hyperlinkUpdate(HyperlinkEvent e) {
