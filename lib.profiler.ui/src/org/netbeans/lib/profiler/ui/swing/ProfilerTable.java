@@ -232,17 +232,20 @@ public class ProfilerTable extends JTable {
     public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
         Component c = super.prepareRenderer(renderer, row, column);
         
+        boolean cEnabled = c.isEnabled();
+        if (!cEnabled) c.setForeground(UIManager.getColor("TextField.inactiveForeground")); // NOI18N
+        
         boolean isSelected = isCellSelected(row, column);
         
         if (isSelected && isEnabled()) {
             boolean focusOwner = !shadeUnfocusedSelection || super.isFocusOwner();
-            c.setForeground(focusOwner ? getSelectionForeground() : UIUtils.getUnfocusedSelectionForeground());
+            if (cEnabled) c.setForeground(focusOwner ? getSelectionForeground() : UIUtils.getUnfocusedSelectionForeground());
             c.setBackground(focusOwner ? getSelectionBackground() : UIUtils.getUnfocusedSelectionBackground());
         } else if (!isEnabled()) {
-            c.setForeground(UIManager.getColor("TextField.inactiveForeground")); // NOI18N
+            if (cEnabled) c.setForeground(UIManager.getColor("TextField.inactiveForeground")); // NOI18N
             c.setBackground(UIManager.getColor("TextField.inactiveBackground")); // NOI18N
         } else {
-            c.setForeground(getForeground());
+            if (cEnabled) c.setForeground(getForeground());
             c.setBackground((row & 0x1) == 0 ? getBackground() :
                             UIUtils.getDarker(getBackground()));
         }
@@ -761,7 +764,8 @@ public class ProfilerTable extends JTable {
     
     public void doLayout() {
         ProfilerColumnModel cModel = _getColumnModel();
-        TableColumn res = getTableHeader().getResizingColumn();
+        JTableHeader header = getTableHeader();
+        TableColumn res = header == null ? null : header.getResizingColumn();
         if (res != null) {
             // Resizing column
             int delta = getWidth() - cModel.getTotalColumnWidth();
