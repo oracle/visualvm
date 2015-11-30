@@ -65,7 +65,7 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
 
     /**
      * Returns an unique String identifying the CredentialsProvider. Must be
-     * overriden to return a different identificator when subclassing the
+     * overridden to return a different identificator when subclassing the
      * CredentialsProvider.
      *
      * @return unique String identifying the CredentialsProvider
@@ -178,7 +178,7 @@ public abstract class CredentialsProvider extends EnvironmentProvider {
     private static Map<String, ?> createMap(String username, String password) {
         Map map = new HashMap();
 
-        if (username != null || password != null)
+        if (username != null && !username.isEmpty())
             map.put(JMXConnector.CREDENTIALS,
                     new String[] { username, decodePassword(password) });
 
