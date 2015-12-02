@@ -101,6 +101,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.table.TableStringConverter;
 import org.netbeans.lib.profiler.ui.UIConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.renderer.Movable;
@@ -816,6 +817,11 @@ public class ProfilerTable extends JTable {
     
     protected TableRowSorter createRowSorter() {
         ProfilerRowSorter s = new ProfilerRowSorter(getModel());
+        s.setStringConverter(new TableStringConverter() {
+            public String toString(TableModel model, int row, int column) {
+                return getStringValue(convertRowIndexToView(row), convertColumnIndexToView(column));
+            }
+        });
         s.setDefaultSortOrder(SortOrder.DESCENDING);
         s.setSortColumn(0);
         return s;
