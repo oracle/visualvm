@@ -305,6 +305,8 @@ public class Platform implements CommonConstants {
             jdkVersion = JDK_18;
         } else if (javaVersion.startsWith("1.9")) { // NOI18N
             jdkVersion = JDK_19;
+        } else if (javaVersion.startsWith("9")) { // NOI18N
+            jdkVersion = JDK_19;
         } else if (javaVersion.equals("CVM")) { // NOI18N
             jdkVersion = JDK_CVM;
         } else {
