@@ -93,7 +93,8 @@ final class VisualVMStartup extends ModuleInstall {
     private static boolean isJava7or8or9() {
         String javaVersion = System.getProperty("java.specification.version"); // NOI18N
         if (javaVersion == null) return false;
-        return javaVersion.startsWith("1.7") || javaVersion.startsWith("1.8") || javaVersion.startsWith("1.9"); // NOI18N
+        return javaVersion.startsWith("1.7") || javaVersion.startsWith("1.8")  // NOI18N
+            || javaVersion.startsWith("1.9") || javaVersion.startsWith("9"); // NOI18N
     }
     
     private static boolean isJDK() {

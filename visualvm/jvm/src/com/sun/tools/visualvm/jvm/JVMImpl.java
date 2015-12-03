@@ -215,7 +215,7 @@ public class JVMImpl extends Jvm implements JvmstatListener {
     
     public boolean is19() {
         String ver = getJavaVersion();
-        if (ver != null && ver.startsWith("1.9.")) {    // NOI18N
+        if (ver != null && (ver.startsWith("1.9.") || (ver.startsWith("9")))) {    // NOI18N
             return true;
         }
         return false;

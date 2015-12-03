@@ -75,6 +75,7 @@ public final class ProfilerSupport {
     private static final String JAVA_RT_17_PREFIX = "1.7.0";  // NOI18N
     private static final String JAVA_RT_18_PREFIX = "1.8.0";  // NOI18N
     private static final String JAVA_RT_19_PREFIX = "1.9.0";  // NOI18N
+    private static final String JAVA_RT_9_PREFIX = "9";  // NOI18N
     
     private static ProfilerSupport instance;
     
@@ -356,6 +357,8 @@ public final class ProfilerSupport {
                 return false;
             } else if (javaRTVersion.startsWith(JAVA_RT_19_PREFIX)) {
                 return false;
+            } else if (javaRTVersion.startsWith(JAVA_RT_9_PREFIX)) {
+                return false;
             }
         // OpenJDK -------------------------------------------------------------
         } else if(vmName.startsWith(OPENJDK_VM_NAME_PREFIX)) {
@@ -377,8 +380,9 @@ public final class ProfilerSupport {
             // OpenJDK 8 should be OK
             else if (javaRTVersion.startsWith(JAVA_RT_18_PREFIX)) {
                 return false;
-            }
-            else if (javaRTVersion.startsWith(JAVA_RT_19_PREFIX)) {
+            } else if (javaRTVersion.startsWith(JAVA_RT_19_PREFIX)) {
+                return false;
+            } else if (javaRTVersion.startsWith(JAVA_RT_9_PREFIX)) {
                 return false;
             }
         }
