@@ -313,6 +313,9 @@ public class MiscUtils implements CommonConstants {
         } else if (outString.startsWith("1.9")) { // NOI18N
 
             return JDK_19_STRING;
+        } else if (outString.startsWith("9")) { // NOI18N
+
+            return JDK_19_STRING;
         } else {
             throw new IOException(VM_INCOMPATIBLE_MSG + printOutString);
         }
@@ -633,6 +636,8 @@ public class MiscUtils implements CommonConstants {
 
     private static boolean isSupported15or16or17or18or19orCvm(String jdkVersionString) {
         if (jdkVersionString.startsWith("1.9")) { // NOI18N
+            return true;
+        } else if (jdkVersionString.startsWith("9")) { // NOI18N
             return true;
         } else if (jdkVersionString.startsWith("1.8")) { // NOI18N
             return true;
