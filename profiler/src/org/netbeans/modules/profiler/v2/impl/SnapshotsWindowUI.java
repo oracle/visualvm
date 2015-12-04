@@ -628,7 +628,10 @@ public final class SnapshotsWindowUI extends ProfilerTopComponent {
         refreshSnapshots();
         
         openProjectsListener = new ChangeListener() {
-            public void stateChanged(ChangeEvent e) { selector.resetModel(); }
+            public void stateChanged(ChangeEvent e) {
+                selector.resetModel();
+                selector.repaint();
+            }
         };
         ProjectUtilities.addOpenProjectsListener(openProjectsListener);
     }
