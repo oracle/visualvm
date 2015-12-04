@@ -109,21 +109,29 @@ public class LazyComboBox<E> extends JComboBox<E> {
     }
     
     public final Dimension getPreferredSize() {
-        if (getPrototypeDisplayValue() != null || _getModel().isPopulated()) return super.getPreferredSize();
-        else return new JComboBox(new Object[] { _getModel().getSelectedItem() }).getPreferredSize();
+        Dimension d;
+        if (getPrototypeDisplayValue() != null || _getModel().isPopulated()) d = super.getPreferredSize();
+        else d = new JComboBox(new Object[] { _getModel().getSelectedItem() }).getPreferredSize();
+        if (getPreferredWidth() >= 0) d.width = Math.max(d.width, getPreferredWidth());
+        return d;
     }
     
     public final Dimension getMinimumSize() {
         Dimension d = getPreferredSize();
-        d.width = 0;
+        if (getPreferredWidth() < 0) d.width = 0;
+        else d.width = Math.max(0, getPreferredWidth());
         return d;
     }
     
     public final Dimension getMaximumSize() {
         Dimension d = getPreferredSize();
-        d.width = Integer.MAX_VALUE;
+        if (getPreferredWidth() < 0) d.width = Integer.MAX_VALUE;
+        else d.width = Math.max(d.width, getPreferredWidth());
         return d;
     }
+    
+    // Override this method to define preferred width of the component
+    protected int getPreferredWidth() { return -1; }
 
 
     public static abstract class Populator<E> {
