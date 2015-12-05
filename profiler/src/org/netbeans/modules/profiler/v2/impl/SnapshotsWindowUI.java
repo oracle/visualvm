@@ -54,6 +54,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
 import java.text.Collator;
@@ -627,8 +628,24 @@ public final class SnapshotsWindowUI extends ProfilerTopComponent {
         
         refreshSnapshots();
         
+        final boolean[] firstMainProject = new boolean[1];
+        
         openProjectsListener = new ChangeListener() {
-            public void stateChanged(ChangeEvent e) { selector.resetModel(); }
+            public void stateChanged(ChangeEvent e) {
+                if (!firstMainProject[0] && selector.getProject() == null && e.getSource() instanceof PropertyChangeEvent) {
+                    PropertyChangeEvent event = (PropertyChangeEvent)e.getSource();
+                    if ("MainProject".equals(event.getPropertyName())) { // NOI18N // OpenProjects.PROPERTY_MAIN_PROJECT
+                        if (event.getOldValue() == null && event.getNewValue() instanceof Lookup.Provider) {
+                            firstMainProject[0] = true;
+                            selector.setProject((Lookup.Provider)event.getNewValue());
+                            return;
+                        }
+                    }
+                }
+                
+                selector.resetModel();
+                selector.repaint();
+            }
         };
         ProjectUtilities.addOpenProjectsListener(openProjectsListener);
     }
