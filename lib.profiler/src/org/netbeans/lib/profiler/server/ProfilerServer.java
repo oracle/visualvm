@@ -119,7 +119,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
         private String branding;
 
         /**
-         * current sufix which will be returned in next calling nextElement
+         * current suffix which will be returned in next calling nextElement
          */
         private String current;
 
@@ -129,7 +129,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
         private boolean defaultInProgress = false;
 
         /**
-         * this flag means, if empty sufix was exported yet
+         * this flag means, if empty suffix was exported yet
          */
         private boolean empty = false;
 
@@ -162,15 +162,15 @@ public class ProfilerServer extends Thread implements CommonConstants {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         /**
-         * Tests if there is any sufix.
+         * Tests if there is any suffix.
          */
         public boolean hasNext() {
             return (current != null);
         }
 
         /**
-         * @return next sufix.
-         * @throws NoSuchElementException if there is no more locale sufix.
+         * @return next suffix.
+         * @throws NoSuchElementException if there is no more locale suffix.
          */
         public Object next() throws NoSuchElementException {
             if (current == null) {

@@ -315,10 +315,18 @@ public class ProfilerTableContainer extends JPanel {
                     if (height > viewHeight) {
                         g.setColor(table.getGridColor());
                         JTableHeader header = table.getTableHeader();
-                        if (header != null) for (int i = 0; i < table.getColumnCount(); i++) {
-                            Rectangle rect = header.getHeaderRect(i);
-                            if (rect.width > 0) g.drawLine(rect.x + rect.width - 1, viewHeight,
-                                                           rect.x + rect.width - 1, height - 1);
+                        if (header != null) {
+                            for (int i = 0; i < table.getColumnCount(); i++) {
+                                Rectangle rect = header.getHeaderRect(i);
+                                if (rect.width > 0) g.drawLine(rect.x + rect.width - 1, viewHeight,
+                                                               rect.x + rect.width - 1, height - 1);
+                            }
+                        } else if (table.getRowCount() > 0) {
+                            for (int i = 0; i < table.getColumnCount(); i++) {
+                                Rectangle rect = table.getCellRect(0, i, true);
+                                if (rect.width > 0) g.drawLine(rect.x + rect.width - 1, viewHeight,
+                                                               rect.x + rect.width - 1, height - 1);
+                            }
                         }
                     }
                 }

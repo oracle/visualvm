@@ -100,6 +100,8 @@ public class StackTraceSnapshotBuilder {
         new MethodInfo("sun.nio.ch.KQueueArrayWrapper","kevent0[native](int, long, int, long) : int"), // NOI18N
         new MethodInfo("sun.nio.ch.WindowsSelectorImpl$SubSelector","poll0[native]"), // NOI18N
         new MethodInfo("sun.nio.ch.WindowsSelectorImpl$SubSelector","poll0[native](long, int, int[], int[], int[], long) : int"), // NOI18N
+        new MethodInfo("java.net.PlainSocketImpl", "socketConnect[native]"), // NOI18N
+        new MethodInfo("java.net.PlainSocketImpl", "socketConnect[native](java.net.InetAddress, int, int) : void"), // NOI18N
     });
 
     private InstrumentationFilter filter;
