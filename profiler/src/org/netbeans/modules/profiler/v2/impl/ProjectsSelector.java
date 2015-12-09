@@ -76,7 +76,9 @@ import org.openide.util.NbBundle;
     "ProjectsSelector_selectProjects=Select projects:",
     "ProjectsSelector_filterProjects=Filter projects",
     "ProjectsSelector_columnSelected=Selected",
-    "ProjectsSelector_columnProject=Project"
+    "ProjectsSelector_columnProject=Project",
+    "ProjectsSelector_columnSelectedToolTip=Selected for profiling",
+    "ProjectsSelector_columnProjectToolTip=Project name"
 })
 public abstract class ProjectsSelector {
     
@@ -116,6 +118,9 @@ public abstract class ProjectsSelector {
 
             final SelectedProjectsModel projectsModel = new SelectedProjectsModel();
             final ProfilerTable threadsTable = new ProfilerTable(projectsModel, true, false, null);
+            threadsTable.setColumnToolTips(new String[] {
+                Bundle.ProjectsSelector_columnSelectedToolTip(),
+                Bundle.ProjectsSelector_columnProjectToolTip() });
             threadsTable.setMainColumn(1);
             threadsTable.setFitWidthColumn(1);
             threadsTable.setDefaultSortOrder(1, SortOrder.ASCENDING);
