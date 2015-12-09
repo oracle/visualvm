@@ -117,31 +117,31 @@ public abstract class ProjectsSelector {
             content.add(hint, BorderLayout.NORTH);
 
             final SelectedProjectsModel projectsModel = new SelectedProjectsModel();
-            final ProfilerTable threadsTable = new ProfilerTable(projectsModel, true, false, null);
-            threadsTable.setColumnToolTips(new String[] {
+            final ProfilerTable projectsTable = new ProfilerTable(projectsModel, true, false, null);
+            projectsTable.setColumnToolTips(new String[] {
                 Bundle.ProjectsSelector_columnSelectedToolTip(),
                 Bundle.ProjectsSelector_columnProjectToolTip() });
-            threadsTable.setMainColumn(1);
-            threadsTable.setFitWidthColumn(1);
-            threadsTable.setDefaultSortOrder(1, SortOrder.ASCENDING);
-            threadsTable.setSortColumn(1);
-            threadsTable.setColumnRenderer(0, new CheckBoxRenderer());
+            projectsTable.setMainColumn(1);
+            projectsTable.setFitWidthColumn(1);
+            projectsTable.setDefaultSortOrder(1, SortOrder.ASCENDING);
+            projectsTable.setSortColumn(1);
+            projectsTable.setColumnRenderer(0, new CheckBoxRenderer());
             LabelRenderer projectRenderer = new ProjectRenderer();
-            threadsTable.setColumnRenderer(1, projectRenderer);
-            int w = new JLabel(threadsTable.getColumnName(0)).getPreferredSize().width;
-            threadsTable.setDefaultColumnWidth(0, w + 15);
-            int h = threadsTable.getRowHeight() * 8;
-            h += threadsTable.getTableHeader().getPreferredSize().height;
+            projectsTable.setColumnRenderer(1, projectRenderer);
+            int w = new JLabel(projectsTable.getColumnName(0)).getPreferredSize().width;
+            projectsTable.setDefaultColumnWidth(0, w + 15);
+            int h = projectsTable.getRowHeight() * 8;
+            h += projectsTable.getTableHeader().getPreferredSize().height;
             projectRenderer.setText("A longest expected project name A longest expected project name"); // NOI18N
             Dimension prefSize = new Dimension(w + projectRenderer.getPreferredSize().width, h);
-            threadsTable.setPreferredScrollableViewportSize(prefSize);
-            ProfilerTableContainer tableContainer = new ProfilerTableContainer(threadsTable, true, null);
+            projectsTable.setPreferredScrollableViewportSize(prefSize);
+            ProfilerTableContainer tableContainer = new ProfilerTableContainer(projectsTable, true, null);
             content.add(tableContainer, BorderLayout.CENTER);
 
             JToolBar controls = new FilteringToolbar(Bundle.ProjectsSelector_filterProjects()) {
                 protected void filterChanged(final String filter) {
-                    if (filter == null) threadsTable.setRowFilter(null);
-                    else threadsTable.setRowFilter(new RowFilter() {
+                    if (filter == null) projectsTable.setRowFilter(null);
+                    else projectsTable.setRowFilter(new RowFilter() {
                         public boolean include(RowFilter.Entry entry) {
                             return entry.getStringValue(1).contains(filter);
                         }
