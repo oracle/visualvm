@@ -97,11 +97,11 @@ import org.openide.windows.WindowManager;
  */
 @NbBundle.Messages({
     "ProfilerSessions_actionNotSupported=Action not supported by the current profiling session.",
-    "ProfilerSessions_loadingFeatures=Loading project features...",
+    "ProfilerSessions_loadingFeatures=Loading profiler modes...",
     "ProfilerSessions_selectProject=&Select the project to profile:",
-    "ProfilerSessions_selectFeature=Select Feature",
-    "ProfilerSessions_selectHandlingFeature=Select the feature to handle the action:",
-    "ProfilerSessions_selectProjectAndFeature=Select Project and Feature",
+    "ProfilerSessions_selectFeature=Select Profiler Mode",
+    "ProfilerSessions_selectHandlingFeature=S&elect profiler mode to handle the action:",
+    "ProfilerSessions_selectProjectAndFeature=Select Project and Profiler Mode",
     "ProfilerSessions_finishingSession=Finishing previous session...",
     "ProfilerSessions_finishSessionCaption=Profile",
     "ProfilerSessions_cancel=Cancel",
@@ -248,13 +248,14 @@ final class ProfilerSessions {
             int y = 0;
             GridBagConstraints c;
             
-            JLabel l = new JLabel(Bundle.ProfilerSessions_selectHandlingFeature());
+            selectModeLabel = new JLabel();
+            Mnemonics.setLocalizedText(selectModeLabel, Bundle.ProfilerSessions_selectHandlingFeature());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(10, 10, 10, 10);
-            add(l, c);
+            add(selectModeLabel, c);
             
             ButtonGroup rbg = new ButtonGroup();
             for (final ProfilerFeature f : features) {
@@ -272,6 +273,7 @@ final class ProfilerSessions {
                 c.anchor = GridBagConstraints.WEST;
                 c.insets = new Insets(0, 20, 0, 10);
                 add(rb, c);
+                if (selectModeLabel.getLabelFor() == null) selectModeLabel.setLabelFor(rb);
             }
             
             c = new GridBagConstraints();
@@ -288,6 +290,8 @@ final class ProfilerSessions {
         private JPanel contents;
         private JRadioButton profileProject;
         private JRadioButton attachProject;
+        private JLabel selectModeLabel;
+        
         private void repaintContents() {
             contents.invalidate();
             contents.revalidate();
@@ -368,15 +372,15 @@ final class ProfilerSessions {
             c.insets = new Insets(0, 0, 10, 0);
             add(UIUtils.createFillerPanel(), c);
             
-            JLabel ll = new JLabel();
-            Mnemonics.setLocalizedText(ll, Bundle.ProfilerSessions_selectHandlingFeature());
+            selectModeLabel = new JLabel();
+            Mnemonics.setLocalizedText(selectModeLabel, Bundle.ProfilerSessions_selectHandlingFeature());
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = y++;
             c.gridwidth = GridBagConstraints.REMAINDER;
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(10, 10, 10, 10);
-            add(ll, c);
+            add(selectModeLabel, c);
             
             c = new GridBagConstraints();
             c.gridx = 0;
@@ -447,6 +451,7 @@ final class ProfilerSessions {
                         public void run() {
                             
                             contents.removeAll();
+                            selectModeLabel.setLabelFor(null);
                             
                             int y = 0;
                             GridBagConstraints c;
@@ -468,6 +473,7 @@ final class ProfilerSessions {
                                     c.anchor = GridBagConstraints.WEST;
                                     c.insets = new Insets(0, 20, 0, 10);
                                     contents.add(rb, c);
+                                    if (selectModeLabel.getLabelFor() == null) selectModeLabel.setLabelFor(rb);
                                 }
                             }
                             
