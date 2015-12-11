@@ -57,7 +57,7 @@ import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
  */
 public final class DetailsUtils {
     
-    private static final int MAX_ARRAY_LENGTH = 128;
+    public static final int MAX_ARRAY_LENGTH = 160;
     
     
     // --- Check types ---------------------------------------------------------

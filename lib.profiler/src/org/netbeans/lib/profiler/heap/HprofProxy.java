@@ -96,6 +96,7 @@ class HprofProxy {
         }
         String className = stringInstance.getJavaClass().getName();
         if (String.class.getName().equals(className)) {
+            Byte coder = (Byte) stringInstance.getValueOfField("coder"); // NOI18N
             PrimitiveArrayDump chars = (PrimitiveArrayDump) stringInstance.getValueOfField("value"); // NOI18N
             if (chars != null) {
                 Integer offset = (Integer) stringInstance.getValueOfField("offset"); // NOI18N
@@ -106,7 +107,7 @@ class HprofProxy {
                 if (len == null) {
                     len = new Integer(chars.getLength());
                 }
-                char[] charArr = chars.getChars(offset.intValue(), len.intValue());
+                char[] charArr = getChars(chars, coder, offset.intValue(), len.intValue());
 
                 return new String(charArr).intern();
             }
@@ -114,5 +115,47 @@ class HprofProxy {
         }
         // what? Non-string in system properties?
         return "*"+className+"#"+stringInstance.getInstanceNumber()+"*";  // NOI18N
+    }
+
+    private static char[] getChars(PrimitiveArrayDump chars, Byte coder, int offset, int len) {
+        if (coder == null) {
+            return chars.getChars(offset, len);
+        }
+        int cdr = coder.intValue();
+        switch (cdr) {
+            case 0: {
+                char[] charArr = new char[len];
+                byte[] bytes = chars.getBytes(offset, len);
+                for (int i=0; i<bytes.length; i++) {
+                    charArr[i] = (char)(bytes[i] & 0xff);
+                }
+                return charArr;
+            }
+            case 1: {
+                final int HI_BYTE_SHIFT;
+                final int LO_BYTE_SHIFT;
+                int shifts[] = getStringUTF16ShiftBytes(chars.dumpClass.getHprof());
+                char[] charArr = new char[len/2];
+                byte[] bytes = chars.getBytes(offset, len);
+
+                HI_BYTE_SHIFT = shifts[0];
+                LO_BYTE_SHIFT = shifts[1];
+                for (int i=0; i<bytes.length; i+=2) {
+                    charArr[i/2] = (char) (((bytes[i] & 0xff) << HI_BYTE_SHIFT) |
+                      ((bytes[i+1] & 0xff) << LO_BYTE_SHIFT));
+                }
+                return charArr;
+            }
+            default:
+                return "*unknown coder*".toCharArray();
+        }
+    }
+    
+    private static int[] getStringUTF16ShiftBytes(Heap heap) {
+        JavaClass utf16Class = heap.getJavaClassByName("java.lang.StringUTF16");                  // NOI18N
+        Integer HI_BYTE_SHIFT = (Integer) utf16Class.getValueOfStaticField("HI_BYTE_SHIFT");      // NOI18N
+        Integer LO_BYTE_SHIFT = (Integer) utf16Class.getValueOfStaticField("LO_BYTE_SHIFT");      // NOI18N
+        
+        return new int[] {HI_BYTE_SHIFT.intValue(),LO_BYTE_SHIFT.intValue()};
     }
 }
