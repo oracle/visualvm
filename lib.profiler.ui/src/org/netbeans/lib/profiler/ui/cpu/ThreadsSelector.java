@@ -96,6 +96,8 @@ public abstract class ThreadsSelector extends PopupButton {
     private static final String MERGE_THREADS_TOOLTIP_DISABLED = messages.getString("ThreadsSelector_MergeThreadsToolTipDisabled"); // NOI18N
     private static final String COLUMN_SELECTED = messages.getString("ThreadsSelector_ColumnSelected"); // NOI18N
     private static final String COLUMN_THREAD = messages.getString("ThreadsSelector_ColumnThread"); // NOI18N
+    private static final String COLUMN_SELECTED_TOOLTIP = messages.getString("ThreadsSelector_ColumnSelectedToolTip"); // NOI18N
+    private static final String COLUMN_THREAD_TOOLTIP = messages.getString("ThreadsSelector_ColumnThreadToolTip"); // NOI18N
     // -----
     
     
@@ -154,6 +156,7 @@ public abstract class ThreadsSelector extends PopupButton {
             
             final SelectedThreadsModel threadsModel = new SelectedThreadsModel();
             final ProfilerTable threadsTable = new ProfilerTable(threadsModel, true, false, null);
+            threadsTable.setColumnToolTips(new String[] { COLUMN_SELECTED_TOOLTIP, COLUMN_THREAD_TOOLTIP });
             threadsTable.setMainColumn(1);
             threadsTable.setFitWidthColumn(1);
             threadsTable.setDefaultSortOrder(1, SortOrder.ASCENDING);
