@@ -55,8 +55,14 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -72,6 +78,8 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -82,6 +90,7 @@ import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.SmallButton;
 import org.netbeans.lib.profiler.ui.swing.TextArea;
+import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
@@ -90,7 +99,10 @@ import org.netbeans.modules.profiler.api.project.ProjectContentsSupport;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.impl.ClassMethodList;
 import org.netbeans.modules.profiler.v2.impl.ClassMethodSelector;
+import org.netbeans.modules.profiler.v2.impl.ProjectsSelector;
 import org.netbeans.modules.profiler.v2.ui.SettingsPanel;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -105,6 +117,8 @@ import org.openide.util.NbPreferences;
     "ObjectsFeatureModes_projectClasses=Project classes",
     "ObjectsFeatureModes_selectedClasses=Selected classes",
     "ObjectsFeatureModes_editLink=<html><a href='#'>{0}, edit</a></html>",
+    "ObjectsFeatureModes_selectedProject=Selected {0}",
+    "ObjectsFeatureModes_selectedProjects=Selected {0} projects",
     "ObjectsFeatureModes_recordLifecycle=Track only live objects",
     "ObjectsFeatureModes_recordAllocations=Record allocations",
     "ObjectsFeatureModes_limitAllocations=Limit allocations depth:",
@@ -176,12 +190,32 @@ final class ObjectsFeatureModes {
     
     static abstract class ProjectClassesMode extends SampledMemoryMode {
         
+        private final Collection<Lookup.Provider> selectedProjects;
+        
         // --- External implementation -----------------------------------------
         
         abstract Lookup.Provider getProject();
         
         
         // --- API implementation ----------------------------------------------
+        
+        private static final String PROJECTS_FLAG = "PROJECTS_FLAG"; // NOI18N
+        
+        ProjectClassesMode() {
+            selectedProjects = new HashSet();
+            
+            Collection<File> files = createFilesFromStorage();
+            if (files.isEmpty()) {
+                selectedProjects.add(getProject());
+            } else {
+                for (File file : files) if (file.exists()) {
+                    FileObject fo = FileUtil.toFileObject(FileUtil.normalizeFile(file));
+                    Lookup.Provider project = fo == null ? null : ProjectUtilities.getProject(fo);
+                    if (fo != null) selectedProjects.add(project);
+                }
+                verifySelectedProjects(false);
+            }
+        }
         
         String getID() {
             return "ProjectClassesMode"; // NOI18N
@@ -190,15 +224,175 @@ final class ObjectsFeatureModes {
         String getName() {
             return Bundle.ObjectsFeatureModes_projectClasses();
         }
-
+        
         void configureSettings(ProfilingSettings settings) {
             super.configureSettings(settings);
-                
-            ProjectContentsSupport pcs = ProjectContentsSupport.get(getProject());
-            String filter = pcs.getInstrumentationFilter(false);
-            SimpleFilter f = new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE, filter); // NOI18N
+            
+            StringBuilder filter = new StringBuilder();
+            
+            for (Lookup.Provider project : selectedProjects) {
+                ProjectContentsSupport pcs = ProjectContentsSupport.get(project);
+                filter.append(pcs.getInstrumentationFilter(false));
+                filter.append(" "); // NOI18N
+            }
+            
+            SimpleFilter f = new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE, // NOI18N
+                                                  filter.toString().trim());
             settings.setSelectedInstrumentationFilter(f);
         }
+        
+        void confirmSettings() {
+            if (ui != null) {
+                assert SwingUtilities.isEventDispatchThread();
+                                
+                saveSelection();
+            }
+        }
+        
+        boolean pendingChanges() {
+            if (ui != null) {
+                assert SwingUtilities.isEventDispatchThread();
+                
+                if (!filesEquals(createFilesFromSelection(), createFilesFromStorage())) return true;
+            }
+            return false;
+        }
+        
+        boolean currentSettingsValid() {
+            return !selectedProjects.isEmpty();
+        }
+        
+        
+        private void saveSelection() {
+            Collection<File> files = createFilesFromSelection();
+            if (files.isEmpty()) {
+                storeFlag(PROJECTS_FLAG, null);
+            } else {
+                StringBuilder sb = new StringBuilder();
+                for (File file : files) {
+                    try {
+                        sb.append(file.getCanonicalPath());
+                    } catch (IOException ex) {
+                        sb.append(file.getAbsolutePath());
+                    }
+                    sb.append(File.pathSeparatorChar);
+                }
+                storeFlag(PROJECTS_FLAG, sb.toString());
+            }
+        }
+        
+        private Collection<File> createFilesFromStorage() {
+            Set<File> files = new HashSet();
+            
+            String s = readFlag(PROJECTS_FLAG, null);
+            if (s != null) {
+                String[] sa = s.split(File.pathSeparator);
+                for (String _s : sa) files.add(new File(_s));
+            }
+            
+            return files;
+        }
+        
+        private Collection<File> createFilesFromSelection() {
+            Set<File> files = new HashSet();
+            
+            if (selectedProjects.size() > 1 || !selectedProjects.contains(getProject()))
+                for (Lookup.Provider project : selectedProjects)
+                    files.add(FileUtil.toFile(ProjectUtilities.getProjectDirectory(project)));
+            
+            return files;
+        }
+        
+        private boolean filesEquals(Collection<File> files1, Collection<File> files2) {
+            if (files1.size() != files2.size()) return false;
+            for (File file1 : files1) if (!files2.contains(file1)) return false;
+            return true;
+        }
+        
+        // NOTE: must be executed in EDT except of calling from constructor (populating selectedProjects)
+        private void verifySelectedProjects(boolean refreshLink) {
+            if (selectedProjects.size() == 1 && selectedProjects.contains(getProject())) return;
+            
+            List<Lookup.Provider> projects = Arrays.asList(ProjectUtilities.getOpenedProjects());
+            Iterator<Lookup.Provider> iterator = selectedProjects.iterator();
+            while (iterator.hasNext()) if (!projects.contains(iterator.next())) iterator.remove();
+            
+            if (selectedProjects.isEmpty()) selectedProjects.add(getProject());
+            
+            if (refreshLink) refreshProjectsLink();
+        }
+        
+        
+        JComponent getUI() {
+            if (ui == null) {
+                final ChangeListener projectsListener = new ChangeListener() {
+                    public void stateChanged(ChangeEvent e) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() { verifySelectedProjects(true); }
+                        });
+                    }
+                };
+                ui = new SettingsPanel() {
+                    public void addNotify() {
+                        super.addNotify();
+                        ProjectUtilities.addOpenProjectsListener(projectsListener);
+                    }
+                    public void removeNotify() {
+                        ProjectUtilities.removeOpenProjectsListener(projectsListener);
+                        super.removeNotify();
+                    }
+                };
+                
+                editProjectLink = new JButton() {
+                    public void setText(String text) {
+                        super.setText(Bundle.MethodsFeatureModes_editLink(text));
+                    }
+                    protected void fireActionPerformed(ActionEvent e) {
+                        performEditProject();
+                    }
+                    public Dimension getMinimumSize() {
+                        return getPreferredSize();
+                    }
+                    public Dimension getMaximumSize() {
+                        return getPreferredSize();
+                    }
+                };
+                editProjectLink.setContentAreaFilled(false);
+                editProjectLink.setBorderPainted(true);
+                editProjectLink.setMargin(new Insets(0, 0, 0, 0));
+                editProjectLink.setBorder(BorderFactory.createEmptyBorder());
+                editProjectLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                refreshProjectsLink();
+                ui.add(editProjectLink);
+            }
+            return ui;
+        }
+        
+        
+        private void performEditProject() {
+            new ProjectsSelector(selectedProjects) {
+                protected void selectionChanged(Collection<Lookup.Provider> selected) {
+                    selectedProjects.clear();
+                    selectedProjects.addAll(selected);
+                    refreshProjectsLink();
+                    settingsChanged();
+                }
+            }.show(ui);
+        }
+        
+        private void refreshProjectsLink() {
+            if (editProjectLink == null) return;
+            if (selectedProjects.size() == 1)
+                editProjectLink.setText(Bundle.MethodsFeatureModes_selectedProject(
+                                        ProjectUtilities.getDisplayName(selectedProjects.
+                                        iterator().next())));
+            else editProjectLink.setText(Bundle.MethodsFeatureModes_selectedProjects(
+                                        selectedProjects.size()));
+        }
+        
+        
+        private JComponent ui;
+        private JButton editProjectLink;
         
     }
     
