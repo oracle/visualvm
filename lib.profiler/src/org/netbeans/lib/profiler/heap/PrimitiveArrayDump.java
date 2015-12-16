@@ -92,6 +92,20 @@ class PrimitiveArrayDump extends ArrayDump implements PrimitiveArrayInstance {
         return chars;
     }
 
+    byte[] getBytes(int start, int length) {
+        assert getType() == HprofHeap.BYTE;
+
+        byte[] bytes = new byte[length];
+        long offset = getArrayStartOffset() + ((long)start);
+        HprofByteBuffer dumpBuffer = dumpClass.getHprofBuffer();
+
+        for (int i = 0; i < length; i++) {
+            bytes[i] = dumpBuffer.get(offset+i);
+        }
+
+        return bytes;
+    }
+
     private long getArrayStartOffset() {
         int idSize = dumpClass.getHprofBuffer().getIDSize();
 

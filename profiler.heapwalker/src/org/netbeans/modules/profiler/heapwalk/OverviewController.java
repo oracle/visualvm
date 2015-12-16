@@ -72,6 +72,7 @@ import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.NbBundle;
@@ -214,7 +215,7 @@ public class OverviewController extends AbstractController {
         String oomeString = "";
         if (oome != null) {
             Instance thread = oome.getInstance();
-            String threadName = htmlize(getThreadName(thread));
+            String threadName = htmlize(getThreadName(heap, thread));
             String threadUrl = "<a href='"+ THREAD_URL_PREFIX + thread.getJavaClass().getName() + "/" + thread.getInstanceId() + "'>" + threadName + "</a>"; // NOI18N
             oomeString = "<br><br>" + LINE_PREFIX // NOI18N
                 + Bundle.OverviewController_OOMELabelString() + "<br>" + LINE_PREFIX // NOI18N
@@ -448,7 +449,7 @@ public class OverviewController extends AbstractController {
                     ThreadObjectGCRoot threadRoot = (ThreadObjectGCRoot)root;
                     Instance threadInstance = threadRoot.getInstance();
                     if (threadInstance != null) {
-                        String threadName = getThreadName(threadInstance);
+                        String threadName = getThreadName(h, threadInstance);
                         Boolean daemon = (Boolean)threadInstance.getValueOfField("daemon"); // NOI18N
                         Integer priority = (Integer)threadInstance.getValueOfField("priority"); // NOI18N
                         Long threadId = (Long)threadInstance.getValueOfField("tid");    // NOI18N
@@ -525,47 +526,13 @@ public class OverviewController extends AbstractController {
         return stackTrace;
     }
 
-    private String getThreadName(final Instance threadInstance) {
+    private String getThreadName(final Heap heap, final Instance threadInstance) {
         Object threadName = threadInstance.getValueOfField("name");  // NOI18N
-        PrimitiveArrayInstance chars;
-        int offset = 0;
-        int len;
         
         if (threadName == null) {
             return "*null*"; // NOI18N
         }
-        if (threadName instanceof PrimitiveArrayInstance) {
-            chars = (PrimitiveArrayInstance)threadName;
-            len = chars.getLength();
-        } else {
-            Instance stringInstance = (Instance)threadName;
-            assert stringInstance.getJavaClass().getName().equals(String.class.getName());
-
-            chars = (PrimitiveArrayInstance) stringInstance.getValueOfField("value"); // NOI18N
-            if (chars != null) {
-                Integer oi = (Integer) stringInstance.getValueOfField("offset");  // NOI18N
-                Integer ci = (Integer) stringInstance.getValueOfField("count");   // NOI18N
-                if (oi != null) {
-                    offset = oi.intValue();
-                }
-                if (ci != null) {
-                    len = ci.intValue();
-                } else {
-                    len = chars.getLength();
-                }
-            } else {
-                return "*null*"; // NOI18N
-            }
-        }
-        List<String> charsList = chars.getValues();
-        List<String> stringList = charsList.subList(offset, offset+len);
-        char charArr[] = new char[stringList.size()];
-        int j = 0;
-
-        for(String ch:stringList) {
-            charArr[j++] = ch.charAt(0);
-        }
-        return new String(charArr);
+        return DetailsSupport.getDetailsString((Instance) threadName, heap);
     }
 
 

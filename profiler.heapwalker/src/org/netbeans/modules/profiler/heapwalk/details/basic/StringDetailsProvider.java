@@ -42,8 +42,10 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details.basic;
 
+import java.util.List;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.lookup.ServiceProvider;
@@ -51,6 +53,7 @@ import org.openide.util.lookup.ServiceProvider;
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
 @ServiceProvider(service=DetailsProvider.class)
 public final class StringDetailsProvider extends DetailsProvider.Basic {
@@ -64,16 +67,26 @@ public final class StringDetailsProvider extends DetailsProvider.Basic {
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
         if (STRING_MASK.equals(className)) {                                        // String
-            int offset = DetailsUtils.getIntFieldValue(instance, "offset", 0);      // NOI18N
-            int count = DetailsUtils.getIntFieldValue(instance, "count", -1);       // NOI18N
-            return DetailsUtils.getPrimitiveArrayFieldString(instance, "value",     // NOI18N
-                                                             offset, count, null,
-                                                             "...");                // NOI18N
+            byte coder = DetailsUtils.getByteFieldValue(instance, "coder", (byte) -1);     // NOI18N
+            if (coder == -1) {
+                int offset = DetailsUtils.getIntFieldValue(instance, "offset", 0);      // NOI18N
+                int count = DetailsUtils.getIntFieldValue(instance, "count", -1);       // NOI18N
+                return DetailsUtils.getPrimitiveArrayFieldString(instance, "value",     // NOI18N
+                        offset, count, null,
+                        "...");                // NOI18N
+            } else {
+                return getJDK9String(heap, instance, "value", coder, null, "...");          // NOI18N                
+            }
         } else if (BUILDERS_MASK.equals(className)) {                               // AbstractStringBuilder+
-            int count = DetailsUtils.getIntFieldValue(instance, "count", -1);       // NOI18N
-            return DetailsUtils.getPrimitiveArrayFieldString(instance, "value",     // NOI18N
-                                                             0, count, null,
-                                                             "...");                // NOI18N
+            byte coder = DetailsUtils.getByteFieldValue(instance, "coder", (byte) -1);  // NOI18N
+            if (coder == -1) {
+                int count = DetailsUtils.getIntFieldValue(instance, "count", -1);       // NOI18N
+                return DetailsUtils.getPrimitiveArrayFieldString(instance, "value",     // NOI18N
+                        0, count, null,
+                        "...");                // NOI18N
+            } else {
+                return getJDK9String(heap, instance, "value", coder, null, "...");          // NOI18N                
+            }
         }
         return null;
     }
@@ -82,4 +95,33 @@ public final class StringDetailsProvider extends DetailsProvider.Basic {
         return new ArrayValueView(className, instance, heap);
     }
     
+    private String getJDK9String(Heap heap, Instance instance, String field, byte coder, String separator, String trailer) {
+        Object byteArray = instance.getValueOfField(field);
+        if (byteArray instanceof PrimitiveArrayInstance) {
+            List<String> values = ((PrimitiveArrayInstance) byteArray).getValues();
+            if (values != null) {
+                StringDecoder decoder = new StringDecoder(heap, coder, values);
+                int valuesCount = decoder.getStringLength();
+                int separatorLength = separator == null ? 0 : separator.length();
+                int trailerLength = trailer == null ? 0 : trailer.length();
+                int estimatedSize = Math.min(valuesCount * (1 + separatorLength), DetailsUtils.MAX_ARRAY_LENGTH + trailerLength);
+                StringBuilder value = new StringBuilder(estimatedSize);
+                int lastValue = valuesCount - 1;
+                for (int i = 0; i <= lastValue; i++) {
+                    value.append(decoder.getValueAt(i));
+                    if (value.length() >= DetailsUtils.MAX_ARRAY_LENGTH) {
+                        if (trailerLength > 0) {
+                            value.append(trailer);
+                        }
+                        break;
+                    }
+                    if (separator != null && i < lastValue) {
+                        value.append(separator);
+                    }
+                }
+                return value.toString();
+            }
+        }
+        return null;
+    }
 }

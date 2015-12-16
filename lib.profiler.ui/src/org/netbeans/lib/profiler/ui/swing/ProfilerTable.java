@@ -74,6 +74,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -218,16 +219,8 @@ public class ProfilerTable extends JTable {
         tColumn.setCellRenderer(createTableCellRenderer(renderer));
     }
     
-    public static TableCellRenderer createTableCellRenderer(final ProfilerRenderer renderer) {
-        return new TableCellRenderer() {
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                renderer.setValue(value, table.convertRowIndexToModel(row));
-                return renderer.getComponent();
-            }
-            public String toString() {
-                return renderer.toString();
-            }
-        };
+    public static TableCellRenderer createTableCellRenderer(ProfilerRenderer renderer) {
+        return new ProfilerRendererWrapper(renderer);
     }
     
     public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
@@ -269,6 +262,29 @@ public class ProfilerTable extends JTable {
         c.setBackground(getSelectionBackground());
         
         return c;
+    }
+    
+    private static class ProfilerRendererWrapper implements TableCellRenderer, ProfilerRenderer {
+        
+        private final ProfilerRenderer renderer;
+        
+        ProfilerRendererWrapper(ProfilerRenderer renderer) { this.renderer = renderer; }
+        
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            setValue(value, table.convertRowIndexToModel(row));
+            return getComponent();
+        }
+        
+        public void setValue(Object value, int row) { renderer.setValue(value, row); }
+    
+        public int getHorizontalAlignment() { return renderer.getHorizontalAlignment(); }
+
+        public JComponent getComponent() { return renderer.getComponent(); }
+        
+        public void move(int x, int y) { renderer.move(x, y); }
+        
+        public String toString() { return renderer.toString(); }
+        
     }
     
     private ScrollableRenderer _renderer;
@@ -367,11 +383,26 @@ public class ProfilerTable extends JTable {
     
     // row, column - view index
     public String getStringValue(int row, int column) {
+        Object value = getValueAt(row, column);
         TableCellRenderer renderer = getCellRenderer(row, column);
         if (renderer instanceof ProfilerRenderer) {
-            ((ProfilerRenderer)renderer).setValue(getValueAt(row, column), row);
+            ((ProfilerRenderer)renderer).setValue(value, convertRowIndexToModel(row));
         } else {
-            prepareRenderer(renderer, row, column);
+            renderer.getTableCellRendererComponent(this, value, false, false, row, column);
+        }
+        return renderer.toString();
+    }
+    
+    // row, column - model index
+    public String getModelStringValue(int row, int column) {
+        int c = convertColumnIndexToView(column);
+        Object value = getModel().getValueAt(row, column);
+        TableCellRenderer renderer = getCellRenderer(row, c);
+        if (renderer instanceof ProfilerRenderer) {
+            ((ProfilerRenderer)renderer).setValue(value, row);
+        } else {
+            renderer.getTableCellRendererComponent(this, value, false, false,
+                                                   convertRowIndexToView(row), c);
         }
         return renderer.toString();
     }
@@ -819,7 +850,7 @@ public class ProfilerTable extends JTable {
         ProfilerRowSorter s = new ProfilerRowSorter(getModel());
         s.setStringConverter(new TableStringConverter() {
             public String toString(TableModel model, int row, int column) {
-                return getStringValue(convertRowIndexToView(row), convertColumnIndexToView(column));
+                return getModelStringValue(row, column);
             }
         });
         s.setDefaultSortOrder(SortOrder.DESCENDING);
