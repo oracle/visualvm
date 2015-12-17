@@ -50,6 +50,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -310,7 +312,17 @@ public class OQLControllerUI extends JPanel implements HelpCtx.Provider {
             this.queryController = queryController;
 
             initComponents(engine);
-            updateUIState();
+            
+            addHierarchyListener(new HierarchyListener() {
+                public void hierarchyChanged(HierarchyEvent e) {
+                    if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                        if (isShowing()) {
+                            updateUIState();
+                            QueryUI.this.removeHierarchyListener(this);
+                        }
+                    }
+                }
+            });
         }
 
 

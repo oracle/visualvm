@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -112,6 +113,7 @@ class HprofHeap implements Heap {
     private NearestGCRoot nearestGCRoot;
     private ComputedSummary computedSummary;
     private Map gcRoots;
+    private List gcRootsList;
     private DominatorTree domTree;
     final private Object gcRootLock = new Object();
     private TagBounds allInstanceDumpBounds;
@@ -191,9 +193,23 @@ class HprofHeap implements Heap {
                 gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_THREAD_BLOCK]));
                 gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_MONITOR_USED]));
                 gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_THREAD_OBJECT]));
+
+                gcRootsList = new ArrayList(gcRoots.values());
+                Collections.sort(gcRootsList, new Comparator() {
+                    public int compare(Object o1, Object o2) {
+                        HprofGCRoot r1 = (HprofGCRoot) o1;
+                        HprofGCRoot r2 = (HprofGCRoot) o2;
+                        int kind = r1.getKind().compareTo(r2.getKind());
+
+                        if (kind != 0) {
+                            return kind;
+                        }
+                        return Long.compare(r1.getInstanceId(), r2.getInstanceId());
+                    }
+                });
             }
 
-            return gcRoots.values();
+            return gcRootsList;
         }
     }
 

@@ -44,6 +44,7 @@
 package org.netbeans.modules.profiler.v2.features;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
@@ -70,6 +71,11 @@ import org.openide.util.NbBundle;
 })
 abstract class MonitorFeatureUI extends FeatureUI {
     
+    private static final String CPU_GRAPH_FLAG = "CPU_GRAPH_FLAG"; // NOI18N
+    private static final String MEM_GRAPH_FLAG = "MEM_GRAPH_FLAG"; // NOI18N
+    private static final String GC_GRAPH_FLAG = "GC_GRAPH_FLAG"; // NOI18N
+    private static final String THCL_GRAPH_FLAG = "THCL_GRAPH_FLAG"; // NOI18N
+    
     private ProfilerToolbar toolbar;
     private MonitorView monitorView;
     
@@ -77,6 +83,10 @@ abstract class MonitorFeatureUI extends FeatureUI {
     // --- External implementation ---------------------------------------------
     
     abstract Profiler getProfiler();
+    
+    abstract String readFlag(String flag, String defaultValue);
+
+    abstract void storeFlag(String flag, String value);
     
     
     // --- API implementation --------------------------------------------------
@@ -138,13 +148,18 @@ abstract class MonitorFeatureUI extends FeatureUI {
                 super.fireActionPerformed(e);
                 monitorView.setupCPUView(isSelected());
             }
+            protected void fireItemStateChanged(ItemEvent event) {
+                super.fireItemStateChanged(event);
+                storeFlag(CPU_GRAPH_FLAG, isSelected() ? null : Boolean.FALSE.toString());
+            }
         };
         cpuView.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
         cpuView.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
         cpuView.setToolTipText(Bundle.MonitorFeatureUI_cpuGraph());
         group.add(cpuView);
-        monitorView.setupCPUView(true);
-        cpuView.setSelected(true);
+        boolean cpuGraphVisible = Boolean.parseBoolean(readFlag(CPU_GRAPH_FLAG, Boolean.TRUE.toString()));
+        monitorView.setupCPUView(cpuGraphVisible);
+        cpuView.setSelected(cpuGraphVisible);
         toolbar.add(cpuView);
         
         JToggleButton memoryView = new JToggleButton(Icons.getIcon(ProfilerIcons.MEMORY)) {
@@ -152,13 +167,18 @@ abstract class MonitorFeatureUI extends FeatureUI {
                 super.fireActionPerformed(e);
                 monitorView.setupMemoryView(isSelected());
             }
+            protected void fireItemStateChanged(ItemEvent event) {
+                super.fireItemStateChanged(event);
+                storeFlag(MEM_GRAPH_FLAG, isSelected() ? null : Boolean.FALSE.toString());
+            }
         };
         memoryView.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
         memoryView.putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
         memoryView.setToolTipText(Bundle.MonitorFeatureUI_memoryGraph());
         group.add(memoryView);
-        monitorView.setupMemoryView(true);
-        memoryView.setSelected(true);
+        boolean memGraphVisible = Boolean.parseBoolean(readFlag(MEM_GRAPH_FLAG, Boolean.TRUE.toString()));
+        monitorView.setupMemoryView(memGraphVisible);
+        memoryView.setSelected(memGraphVisible);
         toolbar.add(memoryView);
         
         JToggleButton gcView = new JToggleButton(Icons.getIcon(ProfilerIcons.RUN_GC)) {
@@ -166,13 +186,18 @@ abstract class MonitorFeatureUI extends FeatureUI {
                 super.fireActionPerformed(e);
                 monitorView.setupGCView(isSelected());
             }
+            protected void fireItemStateChanged(ItemEvent event) {
+                super.fireItemStateChanged(event);
+                storeFlag(GC_GRAPH_FLAG, isSelected() ? null : Boolean.FALSE.toString());
+            }
         };
         gcView.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
         gcView.putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
         gcView.setToolTipText(Bundle.MonitorFeatureUI_gcGraph());
         group.add(gcView);
-        monitorView.setupGCView(true);
-        gcView.setSelected(true);
+        boolean gcGraphVisible = Boolean.parseBoolean(readFlag(GC_GRAPH_FLAG, Boolean.TRUE.toString()));
+        monitorView.setupGCView(gcGraphVisible);
+        gcView.setSelected(gcGraphVisible);
         toolbar.add(gcView);
         
         JToggleButton threadsView = new JToggleButton(Icons.getIcon(ProfilerIcons.WINDOW_THREADS)) {
@@ -180,13 +205,18 @@ abstract class MonitorFeatureUI extends FeatureUI {
                 super.fireActionPerformed(e);
                 monitorView.setupThreadsView(isSelected());
             }
+            protected void fireItemStateChanged(ItemEvent event) {
+                super.fireItemStateChanged(event);
+                storeFlag(THCL_GRAPH_FLAG, isSelected() ? null : Boolean.FALSE.toString());
+            }
         };
         threadsView.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
         threadsView.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
         threadsView.setToolTipText(Bundle.MonitorFeatureUI_threadsGraph());
         group.add(threadsView);
-        monitorView.setupThreadsView(true);
-        threadsView.setSelected(true);
+        boolean thclGraphVisible = Boolean.parseBoolean(readFlag(THCL_GRAPH_FLAG, Boolean.TRUE.toString()));
+        monitorView.setupThreadsView(thclGraphVisible);
+        threadsView.setSelected(thclGraphVisible);
         toolbar.add(threadsView);
         
         

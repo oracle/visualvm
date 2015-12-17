@@ -189,8 +189,8 @@ public class BaseRenderer extends JComponent implements ProfilerRenderer {
     
     // --- Appearance ----------------------------------------------------------
     
-    private boolean visible;
-    private boolean enabled;
+    private boolean visible = true;
+    private boolean enabled = true;
     private Color foreground;
     private Color background;
     

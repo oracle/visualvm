@@ -73,7 +73,6 @@ public class LabelRenderer extends JLabel implements ProfilerRenderer {
     }
 
     public LabelRenderer(boolean plain) {
-        setEnabled(true);
         setHorizontalAlignment(LEADING);
         setVerticalAlignment(TOP);
         setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
@@ -310,7 +309,7 @@ public class LabelRenderer extends JLabel implements ProfilerRenderer {
     private Icon icon;
     private Color foreground;
     private Color background;
-    private boolean enabled;
+    private boolean enabled = true;
 
     public void setText(String text) {
         this.text = text;

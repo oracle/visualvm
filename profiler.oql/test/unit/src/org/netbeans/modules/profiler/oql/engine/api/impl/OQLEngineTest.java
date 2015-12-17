@@ -529,7 +529,7 @@ public class OQLEngineTest {
     public void testMap() throws Exception {
         System.out.println("map");
 
-        final String[] output = new String[] {"", "$assertionsDisabled=true\nserialVersionUID=301077366599181567\ntmpdir=null\ncounter=-1\ntmpFileLock=<a href='file://instance/java.lang.Object@1684106928'>java.lang.Object#6</a>\npathSeparator=<a href='file://instance/java.lang.String@1684106888'>java.lang.String#101</a>\npathSeparatorChar=:\nseparator=<a href='file://instance/java.lang.String@1684106848'>java.lang.String#100</a>\nseparatorChar=/\nfs=<a href='file://instance/java.io.UnixFileSystem@1684106408'>java.io.UnixFileSystem#1</a>\n<classLoader>=null\n"};
+        final String[] output = new String[] {"", "$assertionsDisabled=true\nserialVersionUID=301077366599181570\ntmpdir=null\ncounter=-1\ntmpFileLock=<a href='file://instance/java.lang.Object@1684106928'>java.lang.Object#6</a>\npathSeparator=<a href='file://instance/java.lang.String@1684106888'>java.lang.String#101</a>\npathSeparatorChar=:\nseparator=<a href='file://instance/java.lang.String@1684106848'>java.lang.String#100</a>\nseparatorChar=/\nfs=<a href='file://instance/java.io.UnixFileSystem@1684106408'>java.io.UnixFileSystem#1</a>\n<classLoader>=null\n"};
 
         instance.executeQuery("select map(heap.findClass(\"java.io.File\").statics, \"index + '=' + toHtml(it)\")", new ObjectVisitor() {
 
@@ -672,7 +672,7 @@ public class OQLEngineTest {
         final String[] rslt = new String[1];
 
         instance.executeQuery(
-            "select map(filter(heap.findClass('java.lang.System').props.table, 'it != null && it.key != null && it.value != null'),  " +
+            "select map(filter(heap.findClass('java.lang.System').statics.props.table, 'it != null && it.key != null && it.value != null'),  " +
                 "function (it) { " +
                     "return 'MapEntry{' + it.key.toString() + ' = ' + it.value.toString() + '}' ;" +
                 "}" +
@@ -695,7 +695,7 @@ public class OQLEngineTest {
         final String[] rslt = new String[1];
 
         instance.executeQuery(
-            "select map(filter(heap.findClass('java.lang.System').props.table, 'it != null && it.key != null && it.value != null'), " +
+            "select map(filter(heap.findClass('java.lang.System').statics.props.table, 'it != null && it.key != null && it.value != null'), " +
             "'{ key: it.key.toString(), value: it.value.toString() }')", new ObjectVisitor() {
 
             public boolean visit(Object o) {

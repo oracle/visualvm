@@ -100,7 +100,9 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
     private JButton all;
     
     private String caption;
+    private Heap heap;
     private List<String> values;
+    private byte coder = -1;
     private String separator;
     private int offset;
     private int count;
@@ -115,21 +117,25 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
         this.className = className;
     }
 
-    protected void computeView(Instance instance, Heap heap) {
+    protected void computeView(Instance instance, Heap h) {
         
         if (StringDetailsProvider.STRING_MASK.equals(className)) {                  // String
             separator = "";                                                         // NOI18N
             offset = DetailsUtils.getIntFieldValue(instance, "offset", 0);          // NOI18N
             count = DetailsUtils.getIntFieldValue(instance, "count", -1);           // NOI18N
+            coder = DetailsUtils.getByteFieldValue(instance, "coder", (byte) -1);   // NOI18N
             values = DetailsUtils.getPrimitiveArrayFieldValues(instance, "value");  // NOI18N
             caption = Bundle.ArrayValueView_Value();
+            heap = h;
             type = STRING;
         } else if (StringDetailsProvider.BUILDERS_MASK.equals(className)) {         // AbstractStringBuilder+
             separator = "";                                                         // NOI18N
             offset = 0;
             count = DetailsUtils.getIntFieldValue(instance, "count", -1);           // NOI18N
+            coder = DetailsUtils.getByteFieldValue(instance, "coder", (byte) -1);   // NOI18N
             values = DetailsUtils.getPrimitiveArrayFieldValues(instance, "value");  // NOI18N
             caption = Bundle.ArrayValueView_Value();
+            heap = h;
             type = STRING_BUILDER;
         } else if (instance instanceof PrimitiveArrayInstance) {                    // Primitive array
             chararray = "char[]".equals(instance.getJavaClass().getName());         // NOI18N
@@ -237,15 +243,14 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
     
     private String getString(boolean preview) {
         if (values == null) return "";                                              // NOI18N
-        
-        int valuesCount = count < 0 ? values.size() - offset :
-                          Math.min(count, values.size() - offset);            
+        StringDecoder decoder = new StringDecoder(heap, coder, values);
+        int valuesCount = count < 0 ? decoder.getStringLength() - offset : count;            
         int separatorLength = separator == null ? 0 : separator.length();
         int estimatedSize = (int)Math.min((long)valuesCount * (2 + separatorLength), MAX_PREVIEW_LENGTH + TRUNCATED.length());
         StringBuilder value = new StringBuilder(estimatedSize);
         int lastValue = offset + valuesCount - 1;
         for (int i = offset; i <= lastValue; i++) {
-            value.append(values.get(i));
+            value.append(decoder.getValueAt(i));
             if (preview && value.length() >= MAX_PREVIEW_LENGTH) {
                 value.append(TRUNCATED);
                 truncated = true;
@@ -310,11 +315,11 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
     public void exportData(int exportedFileType, ExportDataDumper eDD) {
         String comma = ","; // NOI18N
         if (values != null) {
-            int valuesCount = count < 0 ? values.size() - offset :
-                              Math.min(count, values.size() - offset);
+            StringDecoder decoder = new StringDecoder(heap, coder, values);
+            int valuesCount = count < 0 ? decoder.getStringLength() - offset : count;            
             int lastValue = offset + valuesCount - 1;
             for (int i = offset; i <= lastValue; i++) {
-                String value = values.get(i);
+                String value = decoder.getValueAt(i);
                 
                 switch (exportedFileType) {
                     case BasicExportAction.MODE_CSV:
