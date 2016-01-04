@@ -513,7 +513,7 @@ final class MethodsFeatureModes {
             if (ui != null) {
                 assert SwingUtilities.isEventDispatchThread();
                 
-                storeFlag(OUTGOING_CALLS_ENABLED_FLAG, outgoingChoice.isSelected() ? null : Boolean.FALSE.toString());
+                storeFlag(OUTGOING_CALLS_ENABLED_FLAG, lastOutgoingSelected ? null : Boolean.FALSE.toString());
                 
                 String outgoingCalls = outgoingSpinner.getValue().toString();
                 storeFlag(OUTGOING_CALLS_FLAG, OUTGOING_CALLS_DEFAULT.toString().equals(outgoingCalls) ? null : outgoingCalls);
@@ -531,7 +531,7 @@ final class MethodsFeatureModes {
             if (ui != null) {
                 assert SwingUtilities.isEventDispatchThread();
                 
-                if (Boolean.parseBoolean(readFlag(OUTGOING_CALLS_ENABLED_FLAG, Boolean.TRUE.toString())) != outgoingChoice.isSelected())
+                if (Boolean.parseBoolean(readFlag(OUTGOING_CALLS_ENABLED_FLAG, Boolean.TRUE.toString())) != lastOutgoingSelected)
                     return true;
                 
                 if (!outgoingSpinner.getValue().toString().equals(readFlag(OUTGOING_CALLS_FLAG, OUTGOING_CALLS_DEFAULT.toString())))
