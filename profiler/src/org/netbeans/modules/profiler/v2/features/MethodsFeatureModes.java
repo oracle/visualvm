@@ -429,7 +429,6 @@ final class MethodsFeatureModes {
         private static final String OUTGOING_CALLS_ENABLED_FLAG = "OUTGOING_CALLS_ENABLED_FLAG"; // NOI18N
         private static final String OUTGOING_CALLS_FLAG = "OUTGOING_CALLS_FLAG"; // NOI18N
         private static final String SKIP_JAVA_FLAG = "SKIP_JAVA_FLAG"; // NOI18N // Note: used in 8.1
-        private static final String FILTER_CALLS_ENABLED_FLAG = "FILTER_CALLS_ENABLED_FLAG"; // NOI18N
         private static final String FILTER_CALLS_FLAG = "FILTER_CALLS_FLAG"; // NOI18N
         private static final String FILTER_CALLS_VALUE_FLAG = "FILTER_CALLS_VALUE_FLAG"; // NOI18N
         private static final String SELECTION_FLAG = "SELECTION_FLAG"; // NOI18N
@@ -457,7 +456,7 @@ final class MethodsFeatureModes {
                     // default value, no need to set anything
                 } else {
                     // no filtering, set the appropriate flag
-                    storeFlag(FILTER_CALLS_ENABLED_FLAG, Boolean.FALSE.toString());
+                    storeFlag(FILTER_CALLS_FLAG, FilterSelector.FilterName.NO_FILTER.name());
                 }
             }
             
@@ -481,26 +480,23 @@ final class MethodsFeatureModes {
                                          CommonConstants.CPU_INSTR_FULL :
                                          CommonConstants.CPU_INSTR_SAMPLED);
             
-            boolean filterEnabled = Boolean.parseBoolean(readFlag(FILTER_CALLS_ENABLED_FLAG, Boolean.TRUE.toString()));
-            if (!filterEnabled) {
+            String filterType = readFlag(FILTER_CALLS_FLAG, FilterSelector.FilterName.EXCLUDE_JAVA_FILTER.name());
+            if (FilterSelector.FilterName.NO_FILTER.name().equals(filterType)) {
                 settings.setSelectedInstrumentationFilter(SimpleFilter.NO_FILTER);
+            } else if (FilterSelector.FilterName.EXCLUDE_JAVA_FILTER.name().equals(filterType)) {
+                settings.setSelectedInstrumentationFilter(new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_EXCLUSIVE, CORE_JAVA_FILTER)); // NOI18N
             } else {
-                String filterType = readFlag(FILTER_CALLS_FLAG, FilterSelector.FilterName.EXCLUDE_JAVA_FILTER.name());
-                if (FilterSelector.FilterName.EXCLUDE_JAVA_FILTER.name().equals(filterType)) {
-                    settings.setSelectedInstrumentationFilter(new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_EXCLUSIVE, CORE_JAVA_FILTER)); // NOI18N
-                } else {
-                     String filterStrings = readFlag(FILTER_CALLS_VALUE_FLAG, CORE_JAVA_FILTER);
-                     if (filterStrings.isEmpty() || "*".equals(filterStrings) || "**".equals(filterStrings)) { // NOI18N
-                         settings.setSelectedInstrumentationFilter(SimpleFilter.NO_FILTER);
-                     } else {
-                         filterStrings = getFlatValues(filterStrings.split("\\n")); // NOI18N
-                         if (FilterSelector.FilterName.EXCLUDE_CUSTOM_FILTER.name().equals(filterType)) {
-                             settings.setSelectedInstrumentationFilter(new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_EXCLUSIVE_EXACT, filterStrings)); // NOI18N
-                         } else if (FilterSelector.FilterName.INCLUDE_CUSTOM_FILTER.name().equals(filterType)) {
-                             settings.setSelectedInstrumentationFilter(new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT, filterStrings)); // NOI18N
-                         }
+                 String filterStrings = readFlag(FILTER_CALLS_VALUE_FLAG, CORE_JAVA_FILTER);
+                 if (filterStrings.isEmpty() || "*".equals(filterStrings) || "**".equals(filterStrings)) { // NOI18N
+                     settings.setSelectedInstrumentationFilter(SimpleFilter.NO_FILTER);
+                 } else {
+                     filterStrings = getFlatValues(filterStrings.split("\\n")); // NOI18N
+                     if (FilterSelector.FilterName.EXCLUDE_CUSTOM_FILTER.name().equals(filterType)) {
+                         settings.setSelectedInstrumentationFilter(new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_EXCLUSIVE_EXACT, filterStrings)); // NOI18N
+                     } else if (FilterSelector.FilterName.INCLUDE_CUSTOM_FILTER.name().equals(filterType)) {
+                         settings.setSelectedInstrumentationFilter(new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT, filterStrings)); // NOI18N
                      }
-                }
+                 }
             }
             
             HashSet<ClientUtils.SourceCodeSelection> _sel = getSelection();
@@ -522,8 +518,6 @@ final class MethodsFeatureModes {
                 String outgoingCalls = outgoingSpinner.getValue().toString();
                 storeFlag(OUTGOING_CALLS_FLAG, OUTGOING_CALLS_DEFAULT.toString().equals(outgoingCalls) ? null : outgoingCalls);
                 
-                storeFlag(FILTER_CALLS_ENABLED_FLAG, filterChoice.isSelected() ? null : Boolean.FALSE.toString());
-                
                 String filter = FilterSelector.FilterName.EXCLUDE_JAVA_FILTER.equals(filterName) ? null : filterName.name();
                 storeFlag(FILTER_CALLS_FLAG, filter);
                 
@@ -543,9 +537,6 @@ final class MethodsFeatureModes {
                 if (!outgoingSpinner.getValue().toString().equals(readFlag(OUTGOING_CALLS_FLAG, OUTGOING_CALLS_DEFAULT.toString())))
                     return true;
                 
-                if (Boolean.parseBoolean(readFlag(FILTER_CALLS_ENABLED_FLAG, Boolean.TRUE.toString())) != filterChoice.isSelected())
-                    return true;
-                
                 String filter = readFlag(FILTER_CALLS_FLAG, FilterSelector.FilterName.EXCLUDE_JAVA_FILTER.name());
                 if (!filterName.equals(FilterSelector.FilterName.valueOf(filter))) return true;
                 
@@ -560,11 +551,9 @@ final class MethodsFeatureModes {
             if (ui != null) {
                 assert SwingUtilities.isEventDispatchThread();
                 
-                if (filterChoice.isSelected()) {
-                    if (FilterSelector.FilterName.EXCLUDE_CUSTOM_FILTER.equals(filterName) ||
-                        FilterSelector.FilterName.INCLUDE_CUSTOM_FILTER.equals(filterName))
-                        return !filterValue.isEmpty();
-                }
+                if (FilterSelector.FilterName.EXCLUDE_CUSTOM_FILTER.equals(filterName) ||
+                    FilterSelector.FilterName.INCLUDE_CUSTOM_FILTER.equals(filterName))
+                    return !filterValue.isEmpty();
                 
                 if (getSelection().isEmpty()) return false;
                 
@@ -618,8 +607,6 @@ final class MethodsFeatureModes {
         private JCheckBox outgoingChoice;
         private JLabel outgoingHint;
         private JSpinner outgoingSpinner;
-        private JLabel filterHint;
-        private JCheckBox filterChoice;
         private JButton addSelectionButton;
         private JButton editSelectionLink;
         private JButton filterLink;
@@ -719,24 +706,11 @@ final class MethodsFeatureModes {
                 selectionContent.add(Box.createHorizontalStrut(10));
                 if (UIUtils.isOracleLookAndFeel()) selectionContent.add(Box.createHorizontalStrut(4));
 
-                boolean filterEnabled = Boolean.parseBoolean(readFlag(FILTER_CALLS_ENABLED_FLAG, Boolean.TRUE.toString()));
-                filterChoice = new JCheckBox(Bundle.MethodsFeatureModes_filterOutgoingCalls(), filterEnabled) {
-                    protected void fireActionPerformed(ActionEvent e) {
-                        super.fireActionPerformed(e);
-                        updateControls();
-                        settingsChanged();
-                    }
-                };
-                filterChoice.setToolTipText(Bundle.MethodsFeatureModes_filterOutgoingTooltip());
-                filterChoice.setOpaque(false);
-                selectionContent.add(filterChoice);
+                JLabel filterLabel = new JLabel(Bundle.MethodsFeatureModes_filterOutgoingCalls());
+                filterLabel.setToolTipText(Bundle.MethodsFeatureModes_filterOutgoingTooltip());
+                selectionContent.add(filterLabel);
                 
-                selectionContent.add(createStrut(filterChoice, 5, false));
-                
-                filterHint = new GrayLabel(Bundle.MethodsFeatureModes_noFilter());
-                filterHint.setEnabled(false);
-                filterHint.setVisible(!filterChoice.isSelected());
-                selectionContent.add(filterHint);
+                selectionContent.add(createStrut(filterLabel, 5, false));
 
                 filterLink = new JButton() {
                     public void setText(String text) {
@@ -757,7 +731,6 @@ final class MethodsFeatureModes {
                 filterLink.setMargin(new Insets(0, 0, 0, 0));
                 filterLink.setBorder(BorderFactory.createEmptyBorder());
                 filterLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                filterLink.setVisible(filterChoice.isSelected());
                 selectionContent.add(filterLink);
                 updateControls();
 
@@ -807,8 +780,8 @@ final class MethodsFeatureModes {
         }
         
         private void updateControls() {
-            boolean outgoingRequired = !filterChoice.isSelected() ||
-                    FilterSelector.FilterName.EXCLUDE_JAVA_FILTER.equals(filterName);
+            boolean outgoingRequired = FilterSelector.FilterName.NO_FILTER.equals(filterName) ||
+                                       FilterSelector.FilterName.EXCLUDE_JAVA_FILTER.equals(filterName);
             outgoingLabel.setVisible(outgoingRequired);
             outgoingChoice.setVisible(!outgoingRequired);
             
@@ -818,10 +791,6 @@ final class MethodsFeatureModes {
             boolean outgoingDefined = outgoingChoice.isSelected();
             outgoingSpinner.setVisible(outgoingDefined);
             outgoingHint.setVisible(!outgoingDefined);
-            
-            boolean filteringDefined = filterChoice.isSelected();
-            filterLink.setVisible(filteringDefined);
-            filterHint.setVisible(!filteringDefined);
             
             filterLink.setText(filterName.toString());
         }

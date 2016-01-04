@@ -67,6 +67,7 @@ import org.openide.util.NbBundle;
  */
 @NbBundle.Messages({
     "FilterSelector_outgoingCalls=Outgoing calls filter:",
+    "FilterSelector_noFilter=No filter",
     "FilterSelector_excludeCoreJava=Exclude core Java classes",
     "FilterSelector_excludeCustom=Exclude defined classes",
     "FilterSelector_includeCustom=Include defined classes",
@@ -81,12 +82,14 @@ import org.openide.util.NbBundle;
 public abstract class FilterSelector {
     
     public static enum FilterName {
+        NO_FILTER,
         EXCLUDE_JAVA_FILTER,
         EXCLUDE_CUSTOM_FILTER,
         INCLUDE_CUSTOM_FILTER;
         
         public String toString() {
             switch(this) {
+                case NO_FILTER:             return Bundle.FilterSelector_noFilter();
                 case EXCLUDE_JAVA_FILTER:   return Bundle.FilterSelector_excludeCoreJava();
                 case EXCLUDE_CUSTOM_FILTER: return Bundle.FilterSelector_excludeCustom();
                 case INCLUDE_CUSTOM_FILTER: return Bundle.FilterSelector_includeCustom();
@@ -107,6 +110,7 @@ public abstract class FilterSelector {
     
     private class UI {
         
+        private JRadioButton noFilterChoice;
         private JRadioButton javaClassesChoice;
         private JRadioButton excludeCustomChoice;
         private JRadioButton includeCustomChoice;
@@ -139,6 +143,18 @@ public abstract class FilterSelector {
             };
             GridBagConstraints c;
             int y = 0;
+            
+            noFilterChoice = new JRadioButton(Bundle.FilterSelector_noFilter(),
+                                FilterName.NO_FILTER.equals(filterName));
+            bg.add(noFilterChoice);
+            c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = y++;
+            c.gridwidth = 1;
+            c.anchor = GridBagConstraints.WEST;
+            c.fill = GridBagConstraints.NONE;
+            c.insets = new Insets(3, 0, 0, 0);
+            filters.add(noFilterChoice, c);
             
             javaClassesChoice = new JRadioButton(Bundle.FilterSelector_excludeCoreJava(),
                                 FilterName.EXCLUDE_JAVA_FILTER.equals(filterName));
@@ -237,7 +253,9 @@ public abstract class FilterSelector {
             
             String filterValue = customClasses.showsHint() ? "" : customClasses.getText().trim(); // NOI18N
             
-            if (javaClassesChoice.isSelected()) {
+            if (noFilterChoice.isSelected()) {
+                FilterSelector.this.filterChanged(FilterName.NO_FILTER, filterValue);
+            } else if (javaClassesChoice.isSelected()) {
                 FilterSelector.this.filterChanged(FilterName.EXCLUDE_JAVA_FILTER, filterValue);
             } else if (excludeCustomChoice.isSelected()) {
                 FilterSelector.this.filterChanged(FilterName.EXCLUDE_CUSTOM_FILTER, filterValue);
