@@ -278,7 +278,7 @@ public class ProfilerPopupFactory {
 
         public void componentMoved(ComponentEvent e)   { /*closePopup();*/ }
 
-        public void componentShown(ComponentEvent e)   { closePopup(); }
+        public void componentShown(ComponentEvent e)   { if (SwingUtilities.getWindowAncestor(this) != e.getComponent()) closePopup(); }
 
         public void componentHidden(ComponentEvent e)  { closePopup(); }
 
