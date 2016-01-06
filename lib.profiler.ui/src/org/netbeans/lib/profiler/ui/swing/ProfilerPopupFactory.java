@@ -67,6 +67,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
 import javax.swing.DefaultButtonModel;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -84,7 +85,11 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 public class ProfilerPopupFactory {
     
     public static Popup getPopup(Component invoker, Component content, int x, int y) {
-        PopupPane pane = new PopupPane(content);
+        return getPopup(invoker, content, x, y, null);
+    }
+    
+    public static Popup getPopup(Component invoker, Component content, int x, int y, Listener listener) {
+        PopupPane pane = new PopupPane(content, listener);
         
         Point loc = new Point(x, y);
         SwingUtilities.convertPointToScreen(loc, invoker);
@@ -95,15 +100,29 @@ public class ProfilerPopupFactory {
         return popup;
     }
     
+    
+    public static abstract class Listener {
+        
+        protected void popupShown() {}
+        
+        protected void popupHidden() {}
+        
+    }
+    
      
     private static class PopupPane extends JPanel implements AWTEventListener,
                                            ComponentListener, WindowListener {
         
         private Popup popup;
+        private final Listener listener;
         private Reference<Component> focus;
         
+        private boolean skippingEvents;
         
-        PopupPane(Component content) {
+        
+        PopupPane(Component content, Listener listener) {
+            this.listener = listener;
+            
             setFocusCycleRoot(true);
             setFocusTraversalPolicyProvider(true);
             setFocusTraversalPolicy(new PopupFocusTraversalPolicy());
@@ -133,13 +152,14 @@ public class ProfilerPopupFactory {
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-//                    System.err.println(">>> POLICY: " + ((JComponent)getComponent(0)).getFocusTraversalPolicy());
-                    getFocusTraversalPolicy().getDefaultComponent(PopupPane.this)
-                                             .requestFocusInWindow();
+                    Component defaultFocus = getFocusTraversalPolicy().getDefaultComponent(PopupPane.this);
+                    if (defaultFocus != null) defaultFocus.requestFocusInWindow();
                 }
             });
             
             installListeners();
+            
+            if (listener != null) listener.popupShown();
         }
 
         public void removeNotify() {
@@ -153,6 +173,8 @@ public class ProfilerPopupFactory {
             }
             
             super.removeNotify();
+            
+            if (listener != null) listener.popupHidden();
         }
         
         private void installListeners() {
@@ -189,6 +211,8 @@ public class ProfilerPopupFactory {
         private boolean internal = false;
         
         public void eventDispatched(AWTEvent e) {
+            if (skippingEvents) return;
+            
             if (e instanceof MouseEvent) {
                 MouseEvent me = (MouseEvent)e;
                 if (internal || me.isConsumed()) return;
@@ -238,12 +262,23 @@ public class ProfilerPopupFactory {
             return false;
         }
         
+        private boolean skipClose(Component comp) {
+            if (comp instanceof JComponent) {
+                return Boolean.FALSE.equals(((JComponent)comp).getClientProperty("HidePopupKey")); // NOI18N
+            } else if (comp instanceof Container) {
+                for (Component c : ((Container)comp).getComponents())
+                    if (skipClose(c)) return true;
+            }
+            
+            return false;
+        }
+        
 
         public void componentResized(ComponentEvent e) { /*closePopup();*/ }
 
         public void componentMoved(ComponentEvent e)   { /*closePopup();*/ }
 
-        public void componentShown(ComponentEvent e)   { closePopup(); }
+        public void componentShown(ComponentEvent e)   { if (SwingUtilities.getWindowAncestor(this) != e.getComponent()) closePopup(); }
 
         public void componentHidden(ComponentEvent e)  { closePopup(); }
 
@@ -253,13 +288,14 @@ public class ProfilerPopupFactory {
 
         public void windowIconified(WindowEvent e)     { closePopup(); }
         
-        public void windowDeactivated(WindowEvent e)   { closePopup(); }
+        public void windowDeactivated(WindowEvent e)   { if (!skipClose(e.getOppositeWindow())) closePopup();
+                                                         else skippingEvents = true; }
         
         public void windowOpened(WindowEvent e)        {}
 
         public void windowDeiconified(WindowEvent e)   {}
 
-        public void windowActivated(WindowEvent e)     {}
+        public void windowActivated(WindowEvent e)     { skippingEvents = false; }
         
     }
     
