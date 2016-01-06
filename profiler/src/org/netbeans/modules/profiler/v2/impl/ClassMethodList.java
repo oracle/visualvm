@@ -47,6 +47,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,6 +64,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.Popup;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -109,7 +112,9 @@ public final class ClassMethodList {
     
     private static class UI {
         
+        private Popup popup;
         private JPanel panel;
+        private Component invoker;
         
         static UI forClasses(ProfilerSession session, Set<ClientUtils.SourceCodeSelection> selection) {
             return new UI(session, selection, false);
@@ -121,7 +126,17 @@ public final class ClassMethodList {
         
         
         void show(Component invoker) {
-            ProfilerPopupFactory.getPopup(invoker, panel, -5, invoker.getHeight() - 1).show();
+            this.invoker = invoker;
+            showPopup();
+        }
+        
+        private void showPopup() {
+            popup = ProfilerPopupFactory.getPopup(invoker, panel, -5, invoker.getHeight() - 1);
+            popup.show();
+        }
+        
+        private void hidePopup() {
+            if (popup != null) popup.hide();
         }
         
         
@@ -183,8 +198,17 @@ public final class ClassMethodList {
                 protected void fireActionPerformed(ActionEvent e) {
                     Collection<ClientUtils.SourceCodeSelection> sel = null;
                     
+                    Window w1 = SwingUtilities.getWindowAncestor(invoker);
+                    Window w2 = SwingUtilities.getWindowAncestor(panel);
+                    boolean hidePopup = w1 != w2;
+                    
                     if (methods) {
+                        if (hidePopup) hidePopup();
+
                         Collection<SourceMethodInfo> mtd = ClassMethodSelector.selectMethods(session);
+
+                        if (hidePopup) showPopup();
+
                         if (!mtd.isEmpty()) {
                             sel = new HashSet();
                             for (SourceMethodInfo smi : mtd) sel.add(
@@ -192,7 +216,12 @@ public final class ClassMethodList {
                                                                         smi.getName(), smi.getSignature()));
                         }
                     } else {
+                        if (hidePopup) hidePopup();
+
                         Collection<SourceClassInfo> cls = ClassMethodSelector.selectClasses(session);
+
+                        if (hidePopup) showPopup();
+
                         if (!cls.isEmpty()) {
                             sel = new HashSet();
                             for (SourceClassInfo sci : cls) sel.add(new ClientUtils.SourceCodeSelection(
