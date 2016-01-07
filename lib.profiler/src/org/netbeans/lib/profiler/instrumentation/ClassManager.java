@@ -229,7 +229,7 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
     }
 
     protected static void registerPlaceholder(PlaceholderClassInfo pci) {
-        ClassRepository.addPlaceholder(pci);
+        ClassRepository.addClassInfo(pci);
     }
 
     protected static void resetLoadedClassData() {

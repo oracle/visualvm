@@ -46,6 +46,8 @@ package org.netbeans.lib.profiler.wireprotocol;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 
 /**
@@ -124,7 +126,9 @@ public class RootClassLoadedCommand extends Command {
         return "RootClassLoadedCommand, classes: " + classCount + ", " + super.toString();  // NOI18N
     }
 
-    void readObject(ObjectInputStream in) throws IOException {
+    void readObject(ObjectInputStream gin) throws IOException {
+        GZIPInputStream eix = new GZIPInputStream(gin, 32768);
+        ObjectInputStream in = new ObjectInputStream(eix);
         byte[] EMPTY = new byte[0];
         classCount = in.readInt();
         allLoadedClassNames = new String[classCount];
@@ -183,7 +187,9 @@ public class RootClassLoadedCommand extends Command {
         }
     }
 
-    void writeObject(ObjectOutputStream out) throws IOException {
+    void writeObject(ObjectOutputStream gout) throws IOException {
+        GZIPOutputStream eox = new GZIPOutputStream(gout, 32768);
+        ObjectOutputStream out = new ObjectOutputStream(eox);
         out.writeInt(classCount);
 
         for (int i = 0; i < classCount; i++) {
@@ -239,6 +245,8 @@ public class RootClassLoadedCommand extends Command {
         for (int i = 0; i < parentLoaderIds.length; i++) {
             out.writeInt(parentLoaderIds[i]);
         }
+        out.flush();
+        eox.finish();
 
         // Free memory
         allLoadedClassNames = null;
