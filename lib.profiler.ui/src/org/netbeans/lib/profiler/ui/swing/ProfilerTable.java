@@ -70,6 +70,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
+import javax.accessibility.AccessibleContext;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -284,6 +285,8 @@ public class ProfilerTable extends JTable {
         public void move(int x, int y) { renderer.move(x, y); }
         
         public String toString() { return renderer.toString(); }
+
+        public AccessibleContext getAccessibleContext() { return renderer.getAccessibleContext(); }
         
     }
     

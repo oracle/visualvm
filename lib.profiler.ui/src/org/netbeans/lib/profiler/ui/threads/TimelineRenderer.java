@@ -78,11 +78,11 @@ public class TimelineRenderer extends BaseRenderer {
     }
     
     public void setValue(Object value, int row) {
-        rowView = (ViewManager.RowView)value;
+        rowView = (ViewManager.RowView)value; // NOTE: rowView can be set to null here!
     }
     
     public String toString() {
-        int lastIndex = rowView.getLastIndex();
+        int lastIndex = rowView == null ? -1 : rowView.getLastIndex();
         return getStateName(lastIndex == -1 ? -1 : rowView.getState(lastIndex));
     }
     
@@ -108,7 +108,7 @@ public class TimelineRenderer extends BaseRenderer {
             else oldX = x;
         }
         
-        int i = rowView.getLastIndex();
+        int i = rowView == null ? -1 : rowView.getLastIndex();
         if (i != -1) {
             int xx = Math.min(rowView.getMaxPosition(), w);
             while (i >= 0 && xx >= 0) xx = paintState(g, i--, xx, h);
@@ -116,6 +116,8 @@ public class TimelineRenderer extends BaseRenderer {
     }
     
     private int paintState(Graphics g, int i, int xx, int h) {
+        if (rowView == null) return 0;
+        
         int x = Math.max(0, rowView.getPosition(rowView.getTime(i)));
         
         Color c = ThreadData.getThreadStateColor(rowView.getState(i));
