@@ -54,12 +54,12 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.ui.swing.FilteringToolbar;
+import org.netbeans.lib.profiler.ui.swing.ProfilerPopupFactory;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
@@ -98,14 +98,16 @@ public abstract class ProjectsSelector {
     protected abstract void selectionChanged(Collection<Lookup.Provider> selected);
     
     
-    private class UI extends JPopupMenu {
+    private class UI {
+        
+        private JPanel panel;
         
         UI(Collection<Lookup.Provider> selected) {
             populatePopup();
         }
         
         void show(Component invoker) {
-            show(invoker, -5, invoker.getHeight() - 1);
+            ProfilerPopupFactory.getPopup(invoker, panel, -5, invoker.getHeight() - 1).show();
         }
         
         private void populatePopup() {
@@ -151,7 +153,7 @@ public abstract class ProjectsSelector {
 
             content.add(controls, BorderLayout.SOUTH);
 
-            add(content);
+            panel = content;
         }
         
         private class SelectedProjectsModel extends AbstractTableModel {
