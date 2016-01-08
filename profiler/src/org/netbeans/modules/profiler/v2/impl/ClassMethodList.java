@@ -47,6 +47,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,17 +61,16 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.Popup;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.swing.ProfilerPopupFactory;
 import org.netbeans.lib.profiler.ui.swing.SmallButton;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
@@ -110,9 +110,11 @@ public final class ClassMethodList {
     
     private ClassMethodList() {}
     
-    private static class UI extends JPopupMenu {
+    private static class UI {
         
-        private boolean addingEntry = false;
+        private Popup popup;
+        private JPanel panel;
+        private Component invoker;
         
         static UI forClasses(ProfilerSession session, Set<ClientUtils.SourceCodeSelection> selection) {
             return new UI(session, selection, false);
@@ -120,6 +122,21 @@ public final class ClassMethodList {
         
         static UI forMethods(ProfilerSession session, Set<ClientUtils.SourceCodeSelection> selection) {
             return new UI(session, selection, true);
+        }
+        
+        
+        void show(Component invoker) {
+            this.invoker = invoker;
+            showPopup();
+        }
+        
+        private void showPopup() {
+            popup = ProfilerPopupFactory.getPopup(invoker, panel, -5, invoker.getHeight() - 1);
+            popup.show();
+        }
+        
+        private void hidePopup() {
+            if (popup != null) popup.hide();
         }
         
         
@@ -161,12 +178,9 @@ public final class ClassMethodList {
                 public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                     renderer.setValue(formatter.formatMethodName((ClientUtils.SourceCodeSelection)value).toFormatted(), index);
                     JComponent c = renderer.getComponent();
-                    if (isSelected && isEnabled()) {
+                    if (isSelected) {
                         c.setForeground(list.getSelectionForeground());
                         c.setBackground(list.getSelectionBackground());
-                    } else if (!isEnabled()) {
-                        c.setForeground(UIManager.getColor("TextField.inactiveForeground")); // NOI18N
-                        c.setBackground(UIManager.getColor("TextField.inactiveBackground")); // NOI18N
                     } else {
                         c.setForeground(list.getForeground());
                         c.setBackground((index & 0x1) == 0 ? list.getBackground() :
@@ -182,23 +196,18 @@ public final class ClassMethodList {
             Image addImage = ImageUtilities.mergeImages(baseIcon, addBadge, 0, 0);
             final JButton addB = new SmallButton(ImageUtilities.image2Icon(addImage)) {
                 protected void fireActionPerformed(ActionEvent e) {
-                    final Component invoker = getInvoker();
-                    addingEntry = true;
                     Collection<ClientUtils.SourceCodeSelection> sel = null;
                     
+                    Window w1 = SwingUtilities.getWindowAncestor(invoker);
+                    Window w2 = SwingUtilities.getWindowAncestor(panel);
+                    boolean hidePopup = w1 != w2;
+                    
                     if (methods) {
-                        if (Platform.isMac()) addingEntry = false; // Workaround to hide the popup window on Mac
-                        
+                        if (hidePopup) hidePopup();
+
                         Collection<SourceMethodInfo> mtd = ClassMethodSelector.selectMethods(session);
-                        
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                addingEntry = false;
-                                UI.this.setVisible(false);
-                                invoker.repaint();
-                                UI.this.show(invoker);
-                            }
-                        });
+
+                        if (hidePopup) showPopup();
 
                         if (!mtd.isEmpty()) {
                             sel = new HashSet();
@@ -207,18 +216,11 @@ public final class ClassMethodList {
                                                                         smi.getName(), smi.getSignature()));
                         }
                     } else {
-                        if (Platform.isMac()) addingEntry = false; // Workaround to hide the popup window on Mac
-                        
+                        if (hidePopup) hidePopup();
+
                         Collection<SourceClassInfo> cls = ClassMethodSelector.selectClasses(session);
-                        
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                addingEntry = false;
-                                UI.this.setVisible(false);
-                                invoker.repaint();
-                                UI.this.show(invoker);
-                            }
-                        });
+
+                        if (hidePopup) showPopup();
 
                         if (!cls.isEmpty()) {
                             sel = new HashSet();
@@ -240,14 +242,7 @@ public final class ClassMethodList {
             Image removeImage = ImageUtilities.mergeImages(baseIcon, removeBadge, 0, 0);
             final JButton removeB = new SmallButton(ImageUtilities.image2Icon(removeImage)) {
                 protected void fireActionPerformed(ActionEvent e) {
-                    final Component invoker = getInvoker();
-                    
                     selection.removeAll(list.getSelectedValuesList());
-                    
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() { invoker.repaint(); }
-                    });
-                    
                     xmodel.refresh();
                     list.clearSelection();
                     setEnabled(false);
@@ -276,16 +271,7 @@ public final class ClassMethodList {
             buttons.add(removeB);
             content.add(buttons, BorderLayout.EAST);
             
-            add(content);
-            
-        }
-        
-        public void setVisible(boolean b) {
-            if (!addingEntry) super.setVisible(b);
-        }
-        
-        void show(Component invoker) {
-            show(invoker, -5, invoker.getHeight() - 1);
+            panel = content;            
         }
         
     }

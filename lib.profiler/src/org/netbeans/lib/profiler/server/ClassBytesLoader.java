@@ -135,9 +135,10 @@ public class ClassBytesLoader {
         if (remote) new java.util.zip.Deflater();
         
         try {
+            // for JDK 9
             Class.forName("java.io.RandomAccessFile$1");    // NOI18N
         } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
+            // just ignore - RandomAccessFile$1 is not available on JDK 7 and earlier
         }
     }
 
