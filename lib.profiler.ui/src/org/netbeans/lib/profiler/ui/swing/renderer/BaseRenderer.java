@@ -49,6 +49,8 @@ import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleRole;
 import javax.swing.JComponent;
 
 /**
@@ -264,5 +266,25 @@ public class BaseRenderer extends JComponent implements ProfilerRenderer {
     public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {}
 
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {}
+    
+    // --- Accessibility -------------------------------------------------------
+    
+    private AccessibleContext accessibleContext;
+    
+    protected AccessibleContext createAccesibleContext() {
+        return new JComponent.AccessibleJComponent() {
+            public AccessibleRole getAccessibleRole() {
+                return AccessibleRole.FILLER;
+            }
+            public String getAccessibleName() {
+                return ""; // NOI18N
+            }
+        };
+    }
+    
+    public AccessibleContext getAccessibleContext() {
+        if (accessibleContext == null) accessibleContext = createAccesibleContext();
+        return accessibleContext;
+    }
     
 }

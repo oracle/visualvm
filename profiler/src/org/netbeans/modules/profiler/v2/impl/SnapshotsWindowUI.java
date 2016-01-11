@@ -403,7 +403,8 @@ public final class SnapshotsWindowUI extends ProfilerTopComponent {
                 setHorizontalAlignment(CENTER);
             }
             public void setValue(Object value, int row) {
-                setIcon(Icons.getIcon(Snapshot.getIconName((Integer)value)));
+                if (value == null) setIcon(null);
+                else setIcon(Icons.getIcon(Snapshot.getIconName((Integer)value)));
             }
         });
         snapshotsTable.setColumnRenderer(1, new LabelRenderer() {
@@ -414,9 +415,13 @@ public final class SnapshotsWindowUI extends ProfilerTopComponent {
                 bold = plain.deriveFont(Font.BOLD);
             }
             public void setValue(Object value, int row) {
-                Snapshot s = (Snapshot)value;
-                setText(s.getDisplayName());
-                if (isOpen(s)) setFont(bold); else setFont(plain);
+                if (value == null) {
+                    setText(""); // NOI18N
+                } else {
+                    Snapshot s = (Snapshot)value;
+                    setText(s.getDisplayName());
+                    if (isOpen(s)) setFont(bold); else setFont(plain);
+                }
             }
         });
         snapshotsTable.setColumnToolTips(new String[] { Bundle.SnapshotsWindowUI_ttpSnapshotType(),

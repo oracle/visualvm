@@ -227,11 +227,16 @@ public abstract class ProjectsSelector {
         }
 
         public void setValue(Object value, int row) {
-            Lookup.Provider project = (Lookup.Provider)value;
-            setText(ProjectUtilities.getDisplayName(project));
-            Icon icon = ProjectUtilities.getIcon(project);
-            setIcon(isEnabled() ? icon : disabledIcon(icon));
-            setFont(Objects.equals(main, value) ? font.deriveFont(Font.BOLD) : font);
+            if (value == null) {
+                setText(""); // NOI18N
+                setIcon(null);
+            } else {
+                Lookup.Provider project = (Lookup.Provider)value;
+                setText(ProjectUtilities.getDisplayName(project));
+                Icon icon = ProjectUtilities.getIcon(project);
+                setIcon(isEnabled() ? icon : disabledIcon(icon));
+                setFont(Objects.equals(main, value) ? font.deriveFont(Font.BOLD) : font);
+            }
         }
         
         private static Icon disabledIcon(Icon icon) {
