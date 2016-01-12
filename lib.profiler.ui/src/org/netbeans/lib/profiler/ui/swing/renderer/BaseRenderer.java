@@ -274,10 +274,10 @@ public class BaseRenderer extends JComponent implements ProfilerRenderer {
     protected AccessibleContext createAccesibleContext() {
         return new JComponent.AccessibleJComponent() {
             public AccessibleRole getAccessibleRole() {
-                return AccessibleRole.FILLER;
+                return AccessibleRole.LABEL;
             }
             public String getAccessibleName() {
-                return ""; // NOI18N
+                return BaseRenderer.this.toString();
             }
         };
     }

@@ -72,6 +72,8 @@ import org.openide.util.NbBundle;
 })
 public abstract class WelcomePanel extends JPanel {
     
+    public static final String CAPTION = Bundle.WelcomePanel_howtoCaption();
+    
     public WelcomePanel(String configureButton, String profileButton, Set<ProfilerFeature> features) {
         
         Color background = UIUtils.getProfilerResultsBackground();
@@ -82,7 +84,7 @@ public abstract class WelcomePanel extends JPanel {
         
         int y = 0;
         
-        Paragraph header = new Paragraph(null, Bundle.WelcomePanel_howtoCaption(), 3, background); // NOI18N
+        Paragraph header = new Paragraph(null, CAPTION, 3, background);
         header.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, header.getForeground()));
         if (UIUtils.isNimbus()) header.setOpaque(false);
         GridBagConstraints c = new GridBagConstraints();
