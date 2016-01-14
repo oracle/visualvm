@@ -108,25 +108,37 @@ public class TimelineRenderer extends BaseRenderer {
             else oldX = x;
         }
         
-        int i = rowView == null ? -1 : rowView.getLastIndex();
-        if (i != -1) {
-            int xx = Math.min(rowView.getMaxPosition(), w);
-            while (i >= 0 && xx >= 0) xx = paintState(g, i--, xx, h);
+        if (rowView == null) return;
+        
+        int i = rowView.getLastIndex();
+        if (i == -1) return;
+        
+        int xx = Math.min(i == rowView.getMaxIndex() ? rowView.getMaxPosition():
+                          rowView.getPosition(rowView.getTime(i + 1)), w) + location.x;
+        
+        boolean firstShortEvent = true;
+        
+        while (i >= 0 && xx >= 0) {
+            x = Math.max(0, rowView.getPosition(rowView.getTime(i))) + location.x;
+            int ww = xx - x;
+            if (ww > 0 || firstShortEvent) {
+                if (ww == 0) {
+                    ww = 1;
+                    firstShortEvent = false;
+                } else {
+                    firstShortEvent = true;
+                }
+                
+                Color c = ThreadData.getThreadStateColor(rowView.getState(i));
+                if (c != null) {
+                    g.setColor(c);
+                    g.fillRect(x, BAR_MARGIN + location.y, ww, h - BAR_MARGIN_X2);
+                }
+                
+                xx = x;
+            }
+            i--;
         }
-    }
-    
-    private int paintState(Graphics g, int i, int xx, int h) {
-        if (rowView == null) return 0;
-        
-        int x = Math.max(0, rowView.getPosition(rowView.getTime(i)));
-        
-        Color c = ThreadData.getThreadStateColor(rowView.getState(i));
-        if (c != null) {
-            g.setColor(c);
-            g.fillRect(x + location.x, BAR_MARGIN + location.y, xx - x + 1, h - BAR_MARGIN_X2);
-        }
-        
-        return x - 1;
     }
     
     private static String getStateName(int state) {
