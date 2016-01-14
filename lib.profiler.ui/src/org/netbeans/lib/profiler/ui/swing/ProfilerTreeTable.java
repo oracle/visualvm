@@ -60,6 +60,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.accessibility.Accessible;
+import javax.accessibility.AccessibleContext;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -249,18 +251,7 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
     
     public static TreeCellRenderer createTreeCellRenderer(final ProfilerRenderer renderer) {
-        return new TreeCellRenderer() {
-            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-                renderer.setValue(value, row);
-                JComponent comp = renderer.getComponent();
-                comp.setOpaque(false);
-                if (tree != null) comp.setForeground(tree.getForeground());
-                return comp;
-            }
-            public String toString() {
-                return renderer.toString();
-            }
-        };
+        return new ProfilerRendererWrapper(renderer);
     }
     
     Component getRenderer(TableCellRenderer renderer, int row, int column, boolean sized) {
@@ -272,6 +263,35 @@ public class ProfilerTreeTable extends ProfilerTable {
         }
         
         return comp;
+    }
+    
+    
+    private static class ProfilerRendererWrapper implements TreeCellRenderer, ProfilerRenderer {
+        
+        private final ProfilerRenderer renderer;
+        
+        ProfilerRendererWrapper(ProfilerRenderer renderer) { this.renderer = renderer; }
+        
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            setValue(value, row); // NOTE: should use table.convertRowIndexToModel(row)
+            JComponent comp = getComponent();
+            comp.setOpaque(false);
+            if (tree != null) comp.setForeground(tree.getForeground());
+            return comp;
+        }
+        
+        public void setValue(Object value, int row) { renderer.setValue(value, row); }
+    
+        public int getHorizontalAlignment() { return renderer.getHorizontalAlignment(); }
+
+        public JComponent getComponent() { return renderer.getComponent(); }
+        
+        public void move(int x, int y) { renderer.move(x, y); }
+        
+        public String toString() { return renderer.toString(); }
+
+        public AccessibleContext getAccessibleContext() { return renderer.getAccessibleContext(); }
+        
     }
     
     
@@ -882,7 +902,7 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
     
     
-    private static class ProfilerTreeTableTree extends JTree implements TableCellRenderer {
+    private static class ProfilerTreeTableTree extends JTree implements TableCellRenderer, Accessible {
         
         private int currentX;
         private int currentWidth;
@@ -903,7 +923,7 @@ public class ProfilerTreeTable extends ProfilerTable {
             setBorder(BorderFactory.createEmptyBorder());
             getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
             
-            setCellRenderer(createTreeCellRenderer(new LabelRenderer()));
+            setCellRenderer(new ProfilerRendererWrapper(new LabelRenderer()));
             
             setLargeModel(true);
         }
@@ -1034,6 +1054,13 @@ public class ProfilerTreeTable extends ProfilerTable {
         
         public String toString() {
             return getCellRenderer().toString();
+        }
+        
+        public AccessibleContext getAccessibleContext() {
+            TreeCellRenderer renderer = getCellRenderer();
+            return renderer instanceof Accessible ?
+                   ((Accessible)renderer).getAccessibleContext() :
+                   new JComponent.AccessibleJComponent() {};
         }
         
     }

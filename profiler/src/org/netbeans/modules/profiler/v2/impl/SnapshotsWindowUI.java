@@ -144,7 +144,8 @@ import org.openide.windows.WindowManager;
     "SnapshotsWindowUI_msgDeleteFailed=Failed to delete {0}",
     "SnapshotsWindowUI_lblNewFile=&New file name:",
     "SnapshotsWindowUI_ttpSnapshotType=Snapshot type",
-    "SnapshotsWindowUI_ttpSnapshotName=Snapshot name"
+    "SnapshotsWindowUI_ttpSnapshotName=Snapshot name",
+    "SnapshotsWindowUI_accessDescr=List of saved profiler snapshots"
 })
 public final class SnapshotsWindowUI extends ProfilerTopComponent {
     
@@ -157,6 +158,8 @@ public final class SnapshotsWindowUI extends ProfilerTopComponent {
     public SnapshotsWindowUI() {
         setName(Bundle.SnapshotsWindowUI_name());
         setIcon(Icons.getImage(ProfilerIcons.SNAPSHOT_TAKE));
+        
+        getAccessibleContext().setAccessibleDescription(Bundle.SnapshotsWindowUI_accessDescr());
         
         putClientProperty(ID, ID);
         
