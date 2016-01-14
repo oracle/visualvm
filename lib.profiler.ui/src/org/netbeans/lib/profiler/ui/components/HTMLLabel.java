@@ -46,12 +46,10 @@ package org.netbeans.lib.profiler.ui.components;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
-import java.awt.Insets;
 import java.net.URL;
-import javax.swing.BorderFactory;
 import javax.swing.JEditorPane;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.border.Border;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
@@ -66,7 +64,9 @@ import org.netbeans.lib.profiler.ui.UIUtils;
  * @author Ian Formanek
  */
 public class HTMLLabel extends JEditorPane implements HyperlinkListener {
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
+    
+    private int halign = SwingConstants.LEADING;
+    
 
     public HTMLLabel() {
         this(null);
@@ -94,9 +94,7 @@ public class HTMLLabel extends JEditorPane implements HyperlinkListener {
         setFont(UIManager.getFont("Label.font")); //NOI18N
         addHyperlinkListener(this);
         
-        updateBorder();
-        
-        if (txt != null) setText(txt);
+        if (text != null) setText(text);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -105,6 +103,7 @@ public class HTMLLabel extends JEditorPane implements HyperlinkListener {
         super.setOpaque(o);
         if (UIUtils.isNimbusLookAndFeel() && !o)
             setBackground(new Color(0, 0, 0, 0));
+        if (txt != null) setText(txt);
     }
     
     private String txt;
@@ -120,9 +119,25 @@ public class HTMLLabel extends JEditorPane implements HyperlinkListener {
         value = value.replace("<code>", "<code style=\"font-size: " + font.getSize() + "pt;\">"); //NOI18N
         
         String fgText = "rgb(" + fgColor.getRed() + "," + fgColor.getGreen() + "," + fgColor.getBlue() + ")"; //NOI18N
-        String bgText = "rgb(" + bgColor.getRed() + "," + bgColor.getGreen() + "," + bgColor.getBlue() + ")"; //NOI18N
-        super.setText("<html><body align=\"right\" text=\"" + fgText + "\" bgcolor=\"" + bgText + "\" style=\"font-size: " + font.getSize() //NOI18N
-                      + "pt; font-family: " + font.getName() + ";\"><nobr>" + value + "</nobr></body></html>"); //NOI18N
+        String bgText = isOpaque() ? "rgb(" + bgColor.getRed() + "," + bgColor.getGreen() + "," + bgColor.getBlue() + ")" : null; //NOI18N
+        
+        String alignText = null;
+        switch (halign) {
+            case SwingConstants.CENTER:
+                alignText = "center"; //NOI18N
+                break;
+            case SwingConstants.RIGHT:
+            case SwingConstants.TRAILING:
+                alignText = "right"; //NOI18N
+                break;
+        }
+        
+        String bodyFlags = "text=\"" + fgText + "\""; //NOI18N
+        if (bgText != null) bodyFlags += " bgcolor=\"" + bgText + "\""; //NOI18N
+        if (alignText != null) bodyFlags += " align=\"" + alignText + "\""; //NOI18N
+        
+        super.setText("<html><body " + bodyFlags + " style=\"font-size: " + font.getSize() //NOI18N
+                      + "pt; font-family: " + font.getName() + ";\">" + value + "</body></html>"); //NOI18N
     }
     
     public void setForeground(Color fg) {
@@ -132,7 +147,19 @@ public class HTMLLabel extends JEditorPane implements HyperlinkListener {
     
     public void setBackground(Color bg) {
         super.setBackground(bg);
-        updateBorder();
+//        setBorder(getBorder());
+        if (txt != null) setText(txt);
+    }
+    
+//    public void setBorder(Border b) {
+//        Insets i = b == null ? new Insets(0, 0, 0, 0) : b.getBorderInsets(this);
+//        if (!isOpaque()) super.setBorder(BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right));
+//        else super.setBorder(BorderFactory.createMatteBorder(i.top, i.left, i.bottom, i.right, getBackground()));
+//    }
+    
+    public void setHorizontalAlignment(int alignment) {
+        if (alignment == halign) return;
+        halign = alignment;
         if (txt != null) setText(txt);
     }
 
@@ -148,12 +175,6 @@ public class HTMLLabel extends JEditorPane implements HyperlinkListener {
         } else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
             setCursor(Cursor.getDefaultCursor());
         }
-    }
-    
-    private void updateBorder() {
-        Border b = getBorder();
-        Insets i = b == null ? new Insets(0, 0, 0, 0) : b.getBorderInsets(this);
-        setBorder(BorderFactory.createMatteBorder(i.top, i.left, i.bottom, i.right, getBackground()));
     }
 
     protected void showURL(URL url) {

@@ -46,6 +46,7 @@ package org.netbeans.modules.profiler.ui;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.openide.awt.HtmlBrowser;
 import java.net.URL;
+import javax.swing.BorderFactory;
 
 
 public final class NBHTMLLabel extends HTMLLabel {
@@ -53,6 +54,7 @@ public final class NBHTMLLabel extends HTMLLabel {
 
     public NBHTMLLabel(final String text) {
         super(text);
+        setBorder(BorderFactory.createEmptyBorder(5, 3, 3, 5));
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
