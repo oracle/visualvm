@@ -426,6 +426,7 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
             }
         }
         
+        private boolean lastMaxIn = true;
         private void preferredWidthChanged(int oldWidth, int newWidth) {
             int maxIndex = getMaxIndex();
             if (maxIndex == -1) return;
@@ -433,8 +434,14 @@ public class ViewManager extends ProfilerTableContainer.ColumnChangeAdapter {
             int currPos = getMaxPosition() - offset;
             if (currPos >= 0 && currPos < width) { // TODO: verify
                 i = maxIndex;
+                lastMaxIn = true;
             } else {
-                // offsetChanged when tracking end or no change
+                if (lastMaxIn && currPos >= width) {
+                    // preferred width increases with new data
+                    i = maxIndex;
+                    findLastIndexLeft();
+                }
+                lastMaxIn = false;
             }
         }
         

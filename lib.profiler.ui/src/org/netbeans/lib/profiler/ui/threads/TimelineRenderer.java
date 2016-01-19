@@ -113,22 +113,13 @@ public class TimelineRenderer extends BaseRenderer {
         int i = rowView.getLastIndex();
         if (i == -1) return;
         
-        int xx = Math.min(i == rowView.getMaxIndex() ? rowView.getMaxPosition():
-                          rowView.getPosition(rowView.getTime(i + 1)), w) + location.x;
-        
-        boolean firstShortEvent = true;
+        int xx = (i == rowView.getMaxIndex() ? rowView.getMaxPosition() :
+                  rowView.getPosition(rowView.getTime(i + 1))) + location.x;
         
         while (i >= 0 && xx >= 0) {
             x = Math.max(0, rowView.getPosition(rowView.getTime(i))) + location.x;
             int ww = xx - x;
-            if (ww > 0 || firstShortEvent) {
-                if (ww == 0) {
-                    ww = 1;
-                    firstShortEvent = false;
-                } else {
-                    firstShortEvent = true;
-                }
-                
+            if (ww > 0) {
                 Color c = ThreadData.getThreadStateColor(rowView.getState(i));
                 if (c != null) {
                     g.setColor(c);
