@@ -812,8 +812,7 @@ public class TargetAppRunner implements CommonConstants {
             commands.add(mainArgs[i]);
         }
 
-        String[] cmdArray = new String[commands.size()];
-        commands.toArray(cmdArray);
+        String[] cmdArray = (String[])commands.toArray(new String[0]);
 
         MiscUtils.printInfoMessage("Starting target application..."); // NOI18N
         MiscUtils.printVerboseInfoMessage(cmdArray);

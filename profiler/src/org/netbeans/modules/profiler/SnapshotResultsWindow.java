@@ -308,8 +308,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
         Collection windows = windowsList.values();
 
         if (!windows.isEmpty()) {
-            SnapshotResultsWindow[] toClose = new SnapshotResultsWindow[windows.size()];
-            windows.toArray(toClose);
+            SnapshotResultsWindow[] toClose = (SnapshotResultsWindow[])windows.toArray(new SnapshotResultsWindow[0]);
 
             for (int i = 0; i < toClose.length; i++) {
                 SnapshotResultsWindow snapshotResultsWindow = toClose[i];

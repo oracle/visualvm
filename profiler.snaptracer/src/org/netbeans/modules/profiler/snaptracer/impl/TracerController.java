@@ -204,7 +204,7 @@ final class TracerController  {
         while (itemsI.hasNext()) {
             Map.Entry<TracerPackage, List<TracerProbe>> item = itemsI.next();
             List<TracerProbe> probes = item.getValue();
-            TracerProbe[] probesArr = probes.toArray(new TracerProbe[probes.size()]);
+            TracerProbe[] probesArr = probes.toArray(new TracerProbe[0]);
 
             PackageStateHandler ph = item.getKey().getStateHandler();
             if (ph != null) try {
@@ -256,7 +256,7 @@ final class TracerController  {
                 TracerPackage pkg = item.getKey();
                 notifiedName = pkg.getName();
                 List<TracerProbe> probes = item.getValue();
-                TracerProbe[] probesArr = probes.toArray(new TracerProbe[probes.size()]);
+                TracerProbe[] probesArr = probes.toArray(new TracerProbe[0]);
 
                 PackageStateHandler ph = pkg.getStateHandler();
                 if (ph != null) ph.sessionStarting(probesArr, null);
@@ -298,7 +298,7 @@ final class TracerController  {
         while (itemsI.hasNext()) {
             Map.Entry<TracerPackage, List<TracerProbe>> item = itemsI.next();
             List<TracerProbe> probes = item.getValue();
-            TracerProbe[] probesArr = probes.toArray(new TracerProbe[probes.size()]);
+            TracerProbe[] probesArr = probes.toArray(new TracerProbe[0]);
 
             PackageStateHandler ph = item.getKey().getStateHandler();
             if (ph != null) try {
@@ -325,7 +325,7 @@ final class TracerController  {
         while (itemsI.hasNext()) {
             Map.Entry<TracerPackage, List<TracerProbe>> item = itemsI.next();
             List<TracerProbe> probes = item.getValue();
-            TracerProbe[] probesArr = probes.toArray(new TracerProbe[probes.size()]);
+            TracerProbe[] probesArr = probes.toArray(new TracerProbe[0]);
 
             PackageStateHandler ph = item.getKey().getStateHandler();
             if (ph != null) try {
@@ -352,7 +352,7 @@ final class TracerController  {
         while (itemsI.hasNext()) {
             Map.Entry<TracerPackage, List<TracerProbe>> item = itemsI.next();
             List<TracerProbe> probes = item.getValue();
-            TracerProbe[] probesArr = probes.toArray(new TracerProbe[probes.size()]);
+            TracerProbe[] probesArr = probes.toArray(new TracerProbe[0]);
 
             PackageStateHandler ph = item.getKey().getStateHandler();
             if (ph != null) try {
@@ -379,7 +379,7 @@ final class TracerController  {
         while (itemsI.hasNext()) {
             Map.Entry<TracerPackage, List<TracerProbe>> item = itemsI.next();
             List<TracerProbe> probes = item.getValue();
-            TracerProbe[] probesArr = probes.toArray(new TracerProbe[probes.size()]);
+            TracerProbe[] probesArr = probes.toArray(new TracerProbe[0]);
 
             PackageStateHandler ph = item.getKey().getStateHandler();
             if (ph != null) try {

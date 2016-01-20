@@ -97,7 +97,7 @@ public class InstrumentationTest extends CommonProfilerTestCase implements NbPer
     }
 
     public NbPerformanceTest.PerformanceData[] getPerformanceData() {
-        return data.toArray(new NbPerformanceTest.PerformanceData[data.size()]);
+        return data.toArray(new NbPerformanceTest.PerformanceData[0]);
     }
 
     public void reportPerformance(String name, long value, String unit) {
@@ -220,8 +220,8 @@ public class InstrumentationTest extends CommonProfilerTestCase implements NbPer
             }
         }
 
-        classNames = names.toArray(new String[names.size()]);
-        classesBytes = bytes.toArray(new byte[bytes.size()][]);
+        classNames = names.toArray(new String[0]);
+        classesBytes = bytes.toArray(new byte[0][]);
     }
 
     protected void setRootMethods(String jarFile) throws Exception {
@@ -241,7 +241,7 @@ public class InstrumentationTest extends CommonProfilerTestCase implements NbPer
         }
 
         ClientUtils.SourceCodeSelection[] ret = new ClientUtils.SourceCodeSelection[list.size()];
-        String[] cls = list.toArray(new String[list.size()]);
+        String[] cls = list.toArray(new String[0]);
 
         for (int i = 0; i < list.size(); i++) {
             ret[i] = new ClientUtils.SourceCodeSelection(cls[i] + ".", "", ""); //NOI18N

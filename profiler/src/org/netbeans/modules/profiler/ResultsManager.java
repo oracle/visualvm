@@ -668,10 +668,7 @@ public final class ResultsManager {
                     }
                 });
 
-            FileObject[] ret = new FileObject[files.size()];
-            files.toArray(ret);
-
-            return ret;
+            return (FileObject[])files.toArray(new FileObject[0]);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, Bundle.ResultsManager_ObtainSavedSnapshotsFailedMsg(e.getMessage()), e);
 
@@ -717,10 +714,7 @@ public final class ResultsManager {
                     }
                 });
 
-            FileObject[] ret = new FileObject[files.size()];
-            files.toArray(ret);
-
-            return ret;
+            return (FileObject[])files.toArray(new FileObject[0]);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, Bundle.ResultsManager_ObtainSavedSnapshotsFailedMsg(e.getMessage()), e);
 

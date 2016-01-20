@@ -94,7 +94,7 @@ public class ThreadDump {
                 compositeData.add(toCompositeData(ti));
             }
         }
-        return compositeData.toArray(new CompositeData[compositeData.size()]);
+        return compositeData.toArray(new CompositeData[0]);
     }
 
     public static boolean isJDK15() {

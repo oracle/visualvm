@@ -128,7 +128,7 @@ public class ClassFileCache {
                     if (!preloadNames.contains(name)) {
                         preloadBytecode(name, location);
                     }
-                    String names[] = (String[]) preloadNames.toArray(new String[preloadNames.size()]);
+                    String names[] = (String[]) preloadNames.toArray(new String[0]);
                     int loadersId[] = new int[preloadLoaderIds.size()];
                     for (int i=0; i<loadersId.length; i++) {
                         loadersId[i] = ((Integer)preloadLoaderIds.get(i)).intValue();

@@ -227,7 +227,7 @@ public class PrestimeCPUCCTNodeBacked extends PrestimeCPUCCTNode {
 //            compactDataOfs = filtered.compactDataOfs;
 //        } else {
             nChildren = childrenL.size();
-            children = childrenL.toArray(new PrestimeCPUCCTNode[nChildren]);
+            children = childrenL.toArray(new PrestimeCPUCCTNode[0]);
 //        }
         
 //        // Now that children are created, sort them in the order previously used
