@@ -276,7 +276,10 @@ public class ProfilerTreeTable extends ProfilerTable {
             setValue(value, row); // NOTE: should use table.convertRowIndexToModel(row)
             JComponent comp = getComponent();
             comp.setOpaque(false);
-            if (tree != null) comp.setForeground(tree.getForeground());
+            if (tree != null) {
+                comp.setForeground(tree.getForeground());
+                comp.setBackground(tree.getBackground());
+            }
             return comp;
         }
         
@@ -909,6 +912,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         
         private int currentRowOffset;
         private boolean currentFirst;
+        private boolean currentFocused;
         private boolean currentSelected;
         
         private boolean customRendering;
@@ -956,18 +960,25 @@ public class ProfilerTreeTable extends ProfilerTable {
 
         // Overridden for performance reasons.
         public void revalidate() {}
+        
+        public boolean hasFocus() {
+            return currentFocused;
+        }
 
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row,
                                                        int column) {
+            ProfilerTable ptable = (ProfilerTable)table;
+            
             currentRowOffset = row * rowHeight;
             currentFirst = column == 0 || isFirstColumn(table.getColumnModel(), column);
+            currentFocused = !ptable.shadesUnfocusedSelection() || hasFocus || table.hasFocus();
             currentSelected = isSelected;
             
             Rectangle cellBounds = getRowBounds(row);
             currentX = cellBounds.x;
             currentWidth = cellBounds.width;
             
-            customRendering = ((ProfilerTable)table).isCustomRendering();
+            customRendering = ptable.isCustomRendering();
             if (synthLikeUI != null) synthLikeUI.setSelected(isSelected);
             
             return this;
