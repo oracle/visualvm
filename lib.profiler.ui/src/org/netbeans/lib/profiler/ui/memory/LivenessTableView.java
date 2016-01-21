@@ -291,7 +291,7 @@ abstract class LivenessTableView extends MemoryView {
             }
             
             int trackedItems = fClassNames.size();
-            String[] aClassNames = fClassNames.toArray(new String[trackedItems]);
+            String[] aClassNames = fClassNames.toArray(new String[0]);
             
             int[] aTrackedLiveObjects = new int[trackedItems];
             for (int i = 0; i < trackedItems; i++) aTrackedLiveObjects[i] = fTrackedLiveObjects.get(i);

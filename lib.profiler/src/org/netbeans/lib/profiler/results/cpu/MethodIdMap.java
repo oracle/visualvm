@@ -106,7 +106,7 @@ public class MethodIdMap {
     }
 
     public String[] getInstrClassesOrPackages() {
-        String[] ret = (String[]) classOrPackageNames.toArray(new String[classOrPackageNames.size()]);
+        String[] ret = (String[]) classOrPackageNames.toArray(new String[0]);
         classOrPackageNames = null;
 
         return ret;

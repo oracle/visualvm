@@ -271,7 +271,7 @@ public abstract class MonitorTestCase extends CommonProfilerTestCase {
                 }
             }
 
-            String[] keys = (String[]) threads.keySet().toArray(new String[threads.size()]);
+            String[] keys = (String[]) threads.keySet().toArray(new String[0]);
             Arrays.sort(keys);
             Collections.sort(names);
 

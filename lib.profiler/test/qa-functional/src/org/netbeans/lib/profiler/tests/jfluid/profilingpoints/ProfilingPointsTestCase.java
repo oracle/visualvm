@@ -116,7 +116,7 @@ public abstract class ProfilingPointsTestCase extends CommonProfilerTestCase {
     //                list.add(pp);
     //            }
     //        }
-    //        settings.setProfilingPoints(list.toArray(new ProfilingPoint[list.size()]));
+    //        settings.setProfilingPoints(list.toArray(new ProfilingPoint[0]));
     //        
     //        TargetAppRunner runner = new TargetAppRunner(settings, new TestProfilerAppHandler(this));
     //        runner.getProfilingSessionStatus().startProfilingPointsActive = true;

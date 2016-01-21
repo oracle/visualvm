@@ -212,8 +212,7 @@ public class ClassPath {
             }
         }
 
-        paths = new PathEntry[vec.size()];
-        vec.toArray(paths);
+        paths = (PathEntry[])vec.toArray(new PathEntry[0]);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

@@ -244,7 +244,7 @@ abstract class LivenessTreeTableView extends MemoryView {
                 Math.max(Math.abs(totalTrackedAlloc), Math.abs(_totalTrackedAlloc));
         final long __totalTotalAlloc = !diff ? totalTotalAlloc :
                 Math.max(Math.abs(totalTotalAlloc), Math.abs(_totalTotalAlloc));
-        final PresoObjLivenessCCTNode root = PresoObjLivenessCCTNode.rootNode(nodes.toArray(new PresoObjLivenessCCTNode[nodes.size()]));
+        final PresoObjLivenessCCTNode root = PresoObjLivenessCCTNode.rootNode(nodes.toArray(new PresoObjLivenessCCTNode[0]));
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {

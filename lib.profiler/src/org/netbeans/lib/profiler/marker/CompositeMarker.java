@@ -84,7 +84,7 @@ public class CompositeMarker implements Marker {
             markerMethods.addAll(Arrays.asList(mMethods));
         }
 
-        return (MarkMapping[]) markerMethods.toArray(new MarkMapping[markerMethods.size()]);
+        return (MarkMapping[]) markerMethods.toArray(new MarkMapping[0]);
     }
 
     public Mark[] getMarks() {
@@ -95,7 +95,7 @@ public class CompositeMarker implements Marker {
             Mark[] marks = delegate.getMarks();
             allMarks.addAll(Arrays.asList(marks));
         }
-        return (Mark[]) allMarks.toArray(new Mark[allMarks.size()]);
+        return (Mark[]) allMarks.toArray(new Mark[0]);
     }
 
     public void addMarker(Marker marker) {
