@@ -154,7 +154,7 @@ public class JpsProxy {
             return null;
         }
 
-        return (RunningVM[]) vret.toArray(new RunningVM[vret.size()]);
+        return (RunningVM[]) vret.toArray(new RunningVM[0]);
     }
 
     private static boolean isAttachable(MonitoredVm vm) {

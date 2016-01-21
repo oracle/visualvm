@@ -85,7 +85,7 @@ public class MethodMarker implements Marker {
             mappings.add(new MarkMapping(markerMethod, (Mark) markMap.get(markerMethod)));
         }
 
-        return (MarkMapping[]) mappings.toArray(new MarkMapping[mappings.size()]);
+        return (MarkMapping[]) mappings.toArray(new MarkMapping[0]);
     }
     
     public Mark[] getMarks() {

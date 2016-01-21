@@ -407,12 +407,9 @@ public final class TimelineSupport {
                         rowMaxValues[rowIndex] =
                                 new String[] { visibleRowItemMaxValues.get(0) };
                     } else {
-                        rowColors[rowIndex] = visibleRowItemColors.toArray(
-                                new Color[visibleRowItemColors.size()]);
-                        rowMinValues[rowIndex] = visibleRowItemMinValues.toArray(
-                                new String[visibleRowItemMinValues.size()]);
-                        rowMaxValues[rowIndex] = visibleRowItemMaxValues.toArray(
-                                new String[visibleRowItemMaxValues.size()]);
+                        rowColors[rowIndex] = visibleRowItemColors.toArray(new Color[0]);
+                        rowMinValues[rowIndex] = visibleRowItemMinValues.toArray(new String[0]);
+                        rowMaxValues[rowIndex] = visibleRowItemMaxValues.toArray(new String[0]);
                     }
                 }
             }
@@ -607,7 +604,7 @@ public final class TimelineSupport {
         
         final int columnCount = selectedItemsCount + 2;
         final SynchronousXYItem[] selectedItemsArr =
-                selectedItems.toArray(new SynchronousXYItem[selectedItemsCount]);
+                selectedItems.toArray(new SynchronousXYItem[0]);
         final String[] columnNames = new String[columnCount];
         columnNames[0] = "Mark";
         columnNames[1] = "Time [ms]";

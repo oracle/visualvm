@@ -151,7 +151,7 @@ public class PresoObjAllocCCTNode extends CCTNode {
         filtered.totalObjSize = totalObjSize;
 
         Collection<PresoObjAllocCCTNode> _childrenL = resolveChildren(this);
-        filtered.children = _childrenL.toArray(new PresoObjAllocCCTNode[_childrenL.size()]);
+        filtered.children = _childrenL.toArray(new PresoObjAllocCCTNode[0]);
     }
     
     public void merge(CCTNode node) {
@@ -173,7 +173,7 @@ public class PresoObjAllocCCTNode extends CCTNode {
                 else ch.get(idx).merge(child);
             }
             
-            children = ch.toArray(new PresoObjAllocCCTNode[ch.size()]);
+            children = ch.toArray(new PresoObjAllocCCTNode[0]);
         }
     }
 

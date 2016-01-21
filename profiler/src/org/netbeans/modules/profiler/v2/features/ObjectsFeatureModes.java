@@ -444,8 +444,7 @@ final class ObjectsFeatureModes {
 
             StringBuilder b = new StringBuilder();
             HashSet<ClientUtils.SourceCodeSelection> _sel = getSelection();
-            ClientUtils.SourceCodeSelection[] classes = _sel.toArray(
-                    new ClientUtils.SourceCodeSelection[_sel.size()]);
+            ClientUtils.SourceCodeSelection[] classes = _sel.toArray(new ClientUtils.SourceCodeSelection[0]);
             for (int i = 0; i < classes.length; i++) {
                 b.append(classes[i].getClassName());
                 if (i < classes.length - 1) b.append(", "); // NOI18N

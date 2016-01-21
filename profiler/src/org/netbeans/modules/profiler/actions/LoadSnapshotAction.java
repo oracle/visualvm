@@ -156,7 +156,7 @@ public final class LoadSnapshotAction extends AbstractAction {
                 processor().post(new Runnable() {
                     public void run() {
                         final LoadedSnapshot[] imported = ResultsManager.getDefault().loadSnapshots(
-                                snapshotsFOArr.toArray(new FileObject[snapshotsFOArr.size()]));
+                                snapshotsFOArr.toArray(new FileObject[0]));
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 ResultsManager.getDefault().openSnapshots(imported);
