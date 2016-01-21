@@ -297,7 +297,7 @@ public class StringUtils {
             }
         }
 
-        return (String[]) listRes.toArray(new String[listRes.size()]);
+        return (String[]) listRes.toArray(new String[0]);
     }
 
     public static String userFormClassName(String className) {

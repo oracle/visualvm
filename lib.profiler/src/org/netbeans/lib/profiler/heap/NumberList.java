@@ -315,8 +315,7 @@ class NumberList {
         if (dirtyBlocks.isEmpty()) {
             return;
         }
-        Long[] dirty=new Long[dirtyBlocks.size()];
-        dirtyBlocks.toArray(dirty);
+        Long[] dirty=(Long[])dirtyBlocks.toArray(new Long[0]);
         Arrays.sort(dirty);
         byte blocks[] = new byte[1024*blockSize];
         int dataOffset = 0;

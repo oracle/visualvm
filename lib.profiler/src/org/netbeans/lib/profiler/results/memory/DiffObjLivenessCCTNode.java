@@ -168,7 +168,7 @@ class DiffObjLivenessCCTNode extends PresoObjLivenessCCTNode {
             if (!nodes1.containsKey(new Handle(node2))) children.add(new DiffObjLivenessCCTNode(null, (PresoObjLivenessCCTNode)node2));
         }
         
-        return children.toArray(new PresoObjAllocCCTNode[children.size()]);
+        return children.toArray(new PresoObjAllocCCTNode[0]);
     }
     
 }

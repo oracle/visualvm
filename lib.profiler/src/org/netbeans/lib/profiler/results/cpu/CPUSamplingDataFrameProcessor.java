@@ -323,7 +323,7 @@ public class CPUSamplingDataFrameProcessor extends AbstractLockDataFrameProcesso
         
         ThreadDump(long ts, Map<Integer,ThreadInfo> threadsMap) {
             timestamp = ts;
-            threadDumps = threadsMap.values().toArray(new ThreadInfo[threadsMap.size()]);
+            threadDumps = threadsMap.values().toArray(new ThreadInfo[0]);
         }
     }    
 }

@@ -225,7 +225,7 @@ abstract class AllocTableView extends MemoryView {
             }
             
             int trackedItems = fClassNames.size();
-            String[] aClassNames = fClassNames.toArray(new String[trackedItems]);
+            String[] aClassNames = fClassNames.toArray(new String[0]);
             
             int[] aTotalAllocObjects = new int[trackedItems];
             for (int i = 0; i < trackedItems; i++) aTotalAllocObjects[i] = fTotalAllocObjects.get(i);

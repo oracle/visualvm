@@ -176,7 +176,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 }
             }
 
-            return (CPUCCTContainer[]) ccts.toArray(new CPUCCTContainer[ccts.size()]);
+            return (CPUCCTContainer[]) ccts.toArray(new CPUCCTContainer[0]);
         } finally {
             threadInfos.endTrans();
         }
