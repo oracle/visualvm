@@ -500,8 +500,7 @@ final class MethodsFeatureModes {
             }
             
             HashSet<ClientUtils.SourceCodeSelection> _sel = getSelection();
-            ClientUtils.SourceCodeSelection[] classes = _sel.toArray(
-                    new ClientUtils.SourceCodeSelection[_sel.size()]);
+            ClientUtils.SourceCodeSelection[] classes = _sel.toArray(new ClientUtils.SourceCodeSelection[0]);
             settings.addRootMethods(classes);
             
             if (Boolean.parseBoolean(readFlag(OUTGOING_CALLS_ENABLED_FLAG, Boolean.TRUE.toString())))

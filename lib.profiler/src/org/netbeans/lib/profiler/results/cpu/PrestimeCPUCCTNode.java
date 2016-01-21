@@ -183,8 +183,7 @@ public abstract class PrestimeCPUCCTNode extends CCTNode implements Cloneable {
         filtered.methodId = -1;
 
         Collection<PrestimeCPUCCTNode> _childrenL = resolveChildren(this);
-        int nChildren = _childrenL.size();
-        filtered.children = _childrenL.toArray(new PrestimeCPUCCTNode[nChildren]);
+        filtered.children = _childrenL.toArray(new PrestimeCPUCCTNode[0]);
     }
     
     public void merge(CCTNode node) {
@@ -214,7 +213,7 @@ public abstract class PrestimeCPUCCTNode extends CCTNode implements Cloneable {
                 }
             }
             
-            children = ch.toArray(new PrestimeCPUCCTNode[ch.size()]);
+            children = ch.toArray(new PrestimeCPUCCTNode[0]);
         }
     }
 

@@ -191,7 +191,7 @@ public abstract class MeasureDiffsTestCase extends CommonProfilerTestCase {
         commands.add(settings.getMainClassName());
         commands.add(outFile.getAbsolutePath());
 
-        String[] cmds = (String[]) commands.toArray(new String[commands.size()]);
+        String[] cmds = (String[]) commands.toArray(new String[0]);
 
         try {
             Runtime.getRuntime().exec(cmds, null, new File(settings.getWorkingDir())).waitFor();

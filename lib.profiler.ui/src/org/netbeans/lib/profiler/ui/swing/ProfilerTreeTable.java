@@ -687,7 +687,7 @@ public class ProfilerTreeTable extends ProfilerTable {
 //                path.add(node);
 //                node = node.getParent();
 //            }
-//            return path.toArray(new TreeNode[path.size()]);
+//            return path.toArray(new TreeNode[0]);
 //        }
         
     }

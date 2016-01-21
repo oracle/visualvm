@@ -172,7 +172,7 @@ public abstract class JbbTestType extends CommonProfilerTestCase {
 
         try {
             Process p = Runtime.getRuntime()
-                               .exec((String[]) (command.toArray(new String[command.size()])), null,
+                               .exec((String[]) (command.toArray(new String[0])), null,
                                      new File(settings.getWorkingDir()));
             new DumpStream(p, p.getErrorStream(), getLogStream(), "[App error] ").start();
             new DumpStream(p, p.getInputStream(), getLogStream(), "[App output] ").start();

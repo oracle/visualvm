@@ -184,7 +184,7 @@ public class Instrumentor implements CommonConstants {
             return null;
         }
 
-        return (String[]) rootClassNames.toArray(new String[rootClassNames.size()]);
+        return (String[]) rootClassNames.toArray(new String[0]);
     }
 
     public void setSavedSourceCodeSelection(SourceCodeSelection[] s) {
