@@ -213,14 +213,26 @@ public class VMTelemetryDataManager extends DataManager {
 
         if (gcStarts.length > 0 || gcFinishs.length > 0) {
 
-            // Ensure the first event is gc start (filter-out leading gc end)
-            if (firstStart && gcStarts.length > 0) {
-                if (gcFinishs.length > 0 && gcStarts[0] > gcFinishs[0]) {
-                    long[] gcFinishs2 = new long[gcFinishs.length - 1];
-                    if (gcFinishs2.length > 0) System.arraycopy(gcFinishs, 1,
-                                                                gcFinishs2, 0,
-                                                                gcFinishs2.length);
-                    gcFinishs = gcFinishs2;
+//            // Ensure the first event is gc start (filter-out leading gc end)
+//            if (firstStart && gcStarts.length > 0) {
+//                if (gcFinishs.length > 0 && gcStarts[0] > gcFinishs[0]) {
+//                    long[] gcFinishs2 = new long[gcFinishs.length - 1];
+//                    if (gcFinishs2.length > 0) System.arraycopy(gcFinishs, 1,
+//                                                                gcFinishs2, 0,
+//                                                                gcFinishs2.length);
+//                    gcFinishs = gcFinishs2;
+//                }
+//                firstStart = false;
+//            }
+
+            // Ensure the first event is gc start (fake leading gc start)
+            int starts = gcStarts.length;
+            if (firstStart && (starts > 0 || gcFinishs.length > 0)) {
+                if (starts == 0 || gcStarts[0] > gcFinishs[0]) {
+                    long[] gcStarts2 = new long[starts + 1];
+                    if (starts > 0) System.arraycopy(gcStarts, 0, gcStarts2, 1, starts);
+                    gcStarts2[0] = timeStamps[0];
+                    gcStarts = gcStarts2;
                 }
                 firstStart = false;
             }
@@ -266,7 +278,7 @@ public class VMTelemetryDataManager extends DataManager {
             if (lastUnpairedStart != -1) {
                 long[] unpairedStarts = this.gcStarts[lastUnpairedStart];
                 long[] unpairedFinishs = this.gcFinishs[lastUnpairedStart];
-                unpairedFinishs[unpairedFinishs.length - 1] = gcFinishs[0];
+                unpairedFinishs[unpairedFinishs.length - 1] = this.gcFinishs[itemCount][0];
                 this.gcStarts[itemCount][0] = unpairedStarts[unpairedStarts.length - 1];
             }
 
