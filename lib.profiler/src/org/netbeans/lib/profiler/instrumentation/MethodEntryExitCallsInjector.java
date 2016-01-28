@@ -120,7 +120,7 @@ class MethodEntryExitCallsInjector extends Injector implements CommonConstants {
 
     private static void initializeInjectedCode() {
         // Injection for methodEntry(char methodId) (rootMethodEntry(char methodId)) and methodExit(char methodId)
-        // the length of the injected code if extended to 8, to avoid worrying about switch statement 4-byte alignment
+        // the length of the injected code is extended to 8, to avoid worrying about switch statement 4-byte alignment
         injCodeLen1 = 8;
         injCode1 = new byte[injCodeLen1];
         injCode1[0] = (byte) opc_sipush;
