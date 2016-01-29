@@ -44,9 +44,10 @@
 package org.netbeans.lib.profiler.instrumentation;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
@@ -97,7 +98,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    protected Hashtable instrClasses = new Hashtable();
+    protected Map instrClasses = new HashMap();
     protected InstrumentationFilter instrFilter;
     protected byte[] codeBytes;
     protected boolean dontInstrumentEmptyMethods;
@@ -456,8 +457,8 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
             // Check if java.lang.reflect.Method is already among classes to instrument
             int idx = 0;
 
-            for (Enumeration e = instrClasses.elements(); e.hasMoreElements(); idx++) {
-                DynamicClassInfo clazz = (DynamicClassInfo) e.nextElement();
+            for (Iterator e = instrClasses.values().iterator(); e.hasNext(); idx++) {
+                DynamicClassInfo clazz = (DynamicClassInfo) e.next();
 
                 if (clazz.getName() == JAVA_LANG_REFLECT_METHOD_SLASHED_CLASS_NAME) {
                     reflectMethodClassIdx = idx;
@@ -484,8 +485,8 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
         int classIdx = 0;
         int methodIdx = 0;
 
-        for (Enumeration e = instrClasses.elements(); e.hasMoreElements();) {
-            DynamicClassInfo clazz = (DynamicClassInfo) e.nextElement();
+        for (Iterator e = instrClasses.values().iterator(); e.hasNext();) {
+            DynamicClassInfo clazz = (DynamicClassInfo) e.next();
             int nMethods = clazz.getMethodNames().length;
             instrMethodClasses[classIdx] = clazz.getName().replace('/', '.').intern(); // NOI18N
             instrClassLoaderIds[classIdx] = clazz.getLoaderId();
