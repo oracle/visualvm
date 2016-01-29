@@ -271,7 +271,7 @@ public interface JavaClassConstants {
     static final int opc_invokespecial = 183;
     static final int opc_invokestatic = 184;
     static final int opc_invokeinterface = 185;
-    static final int opc_xxxunusedxxx = 186;
+    static final int opc_invokedynamic = 186;
     static final int opc_new = 187;
     static final int opc_newarray = 188;
     static final int opc_anewarray = 189;
