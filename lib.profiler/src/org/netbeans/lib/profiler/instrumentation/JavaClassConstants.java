@@ -53,13 +53,11 @@ public interface JavaClassConstants {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     /* Class file constants */
-    public static final int JAVA_MAGIC = -889275714;
-    public static final int JAVA_MAJOR_VERSION = 51;
+    public static final int JAVA_MAGIC = 0xCAFEBABE;
+    public static final int JAVA_MAJOR_VERSION = 52;
     public static final int JAVA_MINOR_VERSION = 0;
     public static final int JAVA_MIN_MAJOR_VERSION = 45;
     public static final int JAVA_MIN_MINOR_VERSION = 3;
-    public static final int DEFAULT_MAJOR_VERSION = 46;
-    public static final int DEFAULT_MINOR_VERSION = 0;
 
     /* Constant pool entries tag constants */
     public static final int CONSTANT_Utf8 = 1;
