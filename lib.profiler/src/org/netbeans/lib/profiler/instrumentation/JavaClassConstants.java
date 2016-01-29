@@ -289,210 +289,210 @@ public interface JavaClassConstants {
     static final int opc_jsr_w = 201;
     static final int opc_breakpoint = 202;
     public static final int[] opc_length = {
-                                               1, // opc_nop
-    1, // opc_aconst_null              = 1;
-    1, // opc_iconst_m1                = 2;
-    1, // opc_iconst_0                 = 3;
-    1, // opc_iconst_1                 = 4;
-    1, // opc_iconst_2                 = 5;
-    1, // opc_iconst_3                 = 6;
-    1, // opc_iconst_4                 = 7;
-    1, // opc_iconst_5                 = 8;
-    1, // opc_lconst_0                 = 9;
-    1, // opc_lconst_1                 = 10;
-    1, // opc_fconst_0                 = 11;
-    1, // opc_fconst_1                 = 12;
-    1, // opc_fconst_2                 = 13;
-    1, // opc_dconst_0                 = 14;
-    1, // opc_dconst_1                 = 15;
-    2, // opc_bipush
-    3, // opc_sipush
-    2, // opc_ldc
-    3, // opc_ldc_w
-    3, // opc_ldc2_w
-    2, // opc_iload
-    2, // opc_lload
-    2, // opc_fload
-    2, // opc_dload
-    2, // opc_aload
-    1, // opc_iload_0                  = 26;
-    1, // opc_iload_1                  = 27;
-    1, // opc_iload_2                  = 28;
-    1, // opc_iload_3                  = 29;
-    1, // opc_lload_0                  = 30;
-    1, // opc_lload_1                  = 31;
-    1, // opc_lload_2                  = 32;
-    1, // opc_lload_3                  = 33;
-    1, // opc_fload_0                  = 34;
-    1, // opc_fload_1                  = 35;
-    1, // opc_fload_2                  = 36;
-    1, // opc_fload_3                  = 37;
-    1, // opc_dload_0                  = 38;
-    1, // opc_dload_1                  = 39;
-    1, // opc_dload_2                  = 40;
-    1, // opc_dload_3                  = 41;
-    1, // opc_aload_0                  = 42;
-    1, // opc_aload_1                  = 43;
-    1, // opc_aload_2                  = 44;
-    1, // opc_aload_3                  = 45;
-    1, // opc_iaload                   = 46;
-    1, // opc_laload                   = 47;
-    1, // opc_faload                   = 48;
-    1, // opc_daload                   = 49;
-    1, // opc_aaload                   = 50;
-    1, // opc_baload                   = 51;
-    1, // opc_caload                   = 52;
-    1, // opc_saload                   = 53;
-    2, // opc_istore
-    2, // opc_lstore
-    2, // opc_fstore
-    2, // opc_dstore
-    2, // opc_astore
-    1, // opc_istore_0                 = 59;
-    1, // opc_istore_1                 = 60;
-    1, // opc_istore_2                 = 61;
-    1, // opc_istore_3                 = 62;
-    1, // opc_lstore_0                 = 63;
-    1, // opc_lstore_1                 = 64;
-    1, // opc_lstore_2                 = 65;
-    1, // opc_lstore_3                 = 66;
-    1, // opc_fstore_0                 = 67;
-    1, // opc_fstore_1                 = 68;
-    1, // opc_fstore_2                 = 69;
-    1, // opc_fstore_3                 = 70;
-    1, // opc_dstore_0                 = 71;
-    1, // opc_dstore_1                 = 72;
-    1, // opc_dstore_2                 = 73;
-    1, // opc_dstore_3                 = 74;
-    1, // opc_astore_0                 = 75;
-    1, // opc_astore_1                 = 76;
-    1, // opc_astore_2                 = 77;
-    1, // opc_astore_3                 = 78;
-    1, // opc_iastore                  = 79;
-    1, // opc_lastore                  = 80;
-    1, // opc_fastore                  = 81;
-    1, // opc_dastore                  = 82;
-    1, // opc_aastore                  = 83;
-    1, // opc_bastore                  = 84;
-    1, // opc_castore                  = 85;
-    1, // opc_sastore                  = 86;
-    1, // opc_pop                      = 87;
-    1, // opc_pop2                     = 88;
-    1, // opc_dup                      = 89;
-    1, // opc_dup_x1                   = 90;
-    1, // opc_dup_x2                   = 91;
-    1, // opc_dup2                     = 92;
-    1, // opc_dup2_x1                  = 93;
-    1, // opc_dup2_x2                  = 94;
-    1, // opc_swap                     = 95;
-    1, // opc_iadd                     = 96;
-    1, // opc_ladd                     = 97;
-    1, // opc_fadd                     = 98;
-    1, // opc_dadd                     = 99;
-    1, // opc_isub                     = 100;
-    1, // opc_lsub                     = 101;
-    1, // opc_fsub                     = 102;
-    1, // opc_dsub                     = 103;
-    1, // opc_imul                     = 104;
-    1, // opc_lmul                     = 105;
-    1, // opc_fmul                     = 106;
-    1, // opc_dmul                     = 107;
-    1, // opc_idiv                     = 108;
-    1, // opc_ldiv                     = 109;
-    1, // opc_fdiv                     = 110;
-    1, // opc_ddiv                     = 111;
-    1, // opc_irem                     = 112;
-    1, // opc_lrem                     = 113;
-    1, // opc_frem                     = 114;
-    1, // opc_drem                     = 115;
-    1, // opc_ineg                     = 116;
-    1, // opc_lneg                     = 117;
-    1, // opc_fneg                     = 118;
-    1, // opc_dneg                     = 119;
-    1, // opc_ishl                     = 120;
-    1, // opc_lshl                     = 121;
-    1, // opc_ishr                     = 122;
-    1, // opc_lshr                     = 123;
-    1, // opc_iushr                    = 124;
-    1, // opc_lushr                    = 125;
-    1, // opc_iand                     = 126;
-    1, // opc_land                     = 127;
-    1, // opc_ior                      = 128;
-    1, // opc_lor                      = 129;
-    1, // opc_ixor                     = 130;
-    1, // opc_lxor                     = 131;
-    3, // opc_iinc
-    1, // opc_i2l                      = 133;
-    1, // opc_i2f                      = 134;
-    1, // opc_i2d                      = 135;
-    1, // opc_l2i                      = 136;
-    1, // opc_l2f                      = 137;
-    1, // opc_l2d                      = 138;
-    1, // opc_f2i                      = 139;
-    1, // opc_f2l                      = 140;
-    1, // opc_f2d                      = 141;
-    1, // opc_d2i                      = 142;
-    1, // opc_d2l                      = 143;
-    1, // opc_d2f                      = 144;
-    1, // opc_i2b                      = 145;
-    1, // opc_i2c                      = 146;
-    1, // opc_i2s                      = 147;
-    1, // opc_lcmp                     = 148;
-    1, // opc_fcmpl                    = 149;
-    1, // opc_fcmpg                    = 150;
-    1, // opc_dcmpl                    = 151;
-    1, // opc_dcmpg                    = 152;
-    3, // opc_ifeq
-    3, // opc_ifne
-    3, // opc_iflt
-    3, // opc_ifge
-    3, // opc_ifgt
-    3, // opc_ifle
-    3, // opc_if_icmpeq
-    3, // opc_if_icmpne
-    3, // opc_if_icmplt
-    3, // opc_if_icmpge
-    3, // opc_if_icmpgt
-    3, // opc_if_icmple
-    3, // opc_if_acmpeq
-    3, // opc_if_acmpne
-    3, // opc_goto
-    3, // opc_jsr
-    2, // opc_ret
-    0, // opc_tableswitch - variable length, handled specially
-    0, // opc_lookupswitch - variable length, handled specially
-    1, // opc_ireturn                  = 172;
-    1, // opc_lreturn                  = 173;
-    1, // opc_freturn                  = 174;
-    1, // opc_dreturn                  = 175;
-    1, // opc_areturn                  = 176;
-    1, // opc_return                   = 177;
-    3, // opc_getstatic
-    3, // opc_putstatic
-    3, // opc_getfield
-    3, // opc_putfield
-    3, // opc_invokevirtual
-    3, // opc_invokespecial
-    3, // opc_invokestatic
-    5, // opc_invokeinterface
-    5, // opc_invokedynamic
-    3, // opc_new
-    2, // opc_newarray
-    3, // opc_anewarray
-    1, // opc_arraylength              = 190;
-    1, // opc_athrow                   = 191;
-    3, // opc_checkcast
-    3, // opc_instanceof
-    1, // opc_monitorenter             = 194;
-    1, // opc_monitorexit              = 195;
-    0, // opc_wide - special handling
-    4, // opc_multianewarray
-    3, // opc_ifnull
-    3, // opc_ifnonnull
-    5, // opc_goto_w
-    5, // opc_jsr_w
-    0, // opc_breakpoint
-                                           };
+                                    1, // opc_nop
+                                    1, // opc_aconst_null              = 1;
+                                    1, // opc_iconst_m1                = 2;
+                                    1, // opc_iconst_0                 = 3;
+                                    1, // opc_iconst_1                 = 4;
+                                    1, // opc_iconst_2                 = 5;
+                                    1, // opc_iconst_3                 = 6;
+                                    1, // opc_iconst_4                 = 7;
+                                    1, // opc_iconst_5                 = 8;
+                                    1, // opc_lconst_0                 = 9;
+                                    1, // opc_lconst_1                 = 10;
+                                    1, // opc_fconst_0                 = 11;
+                                    1, // opc_fconst_1                 = 12;
+                                    1, // opc_fconst_2                 = 13;
+                                    1, // opc_dconst_0                 = 14;
+                                    1, // opc_dconst_1                 = 15;
+                                    2, // opc_bipush
+                                    3, // opc_sipush
+                                    2, // opc_ldc
+                                    3, // opc_ldc_w
+                                    3, // opc_ldc2_w
+                                    2, // opc_iload
+                                    2, // opc_lload
+                                    2, // opc_fload
+                                    2, // opc_dload
+                                    2, // opc_aload
+                                    1, // opc_iload_0                  = 26;
+                                    1, // opc_iload_1                  = 27;
+                                    1, // opc_iload_2                  = 28;
+                                    1, // opc_iload_3                  = 29;
+                                    1, // opc_lload_0                  = 30;
+                                    1, // opc_lload_1                  = 31;
+                                    1, // opc_lload_2                  = 32;
+                                    1, // opc_lload_3                  = 33;
+                                    1, // opc_fload_0                  = 34;
+                                    1, // opc_fload_1                  = 35;
+                                    1, // opc_fload_2                  = 36;
+                                    1, // opc_fload_3                  = 37;
+                                    1, // opc_dload_0                  = 38;
+                                    1, // opc_dload_1                  = 39;
+                                    1, // opc_dload_2                  = 40;
+                                    1, // opc_dload_3                  = 41;
+                                    1, // opc_aload_0                  = 42;
+                                    1, // opc_aload_1                  = 43;
+                                    1, // opc_aload_2                  = 44;
+                                    1, // opc_aload_3                  = 45;
+                                    1, // opc_iaload                   = 46;
+                                    1, // opc_laload                   = 47;
+                                    1, // opc_faload                   = 48;
+                                    1, // opc_daload                   = 49;
+                                    1, // opc_aaload                   = 50;
+                                    1, // opc_baload                   = 51;
+                                    1, // opc_caload                   = 52;
+                                    1, // opc_saload                   = 53;
+                                    2, // opc_istore
+                                    2, // opc_lstore
+                                    2, // opc_fstore
+                                    2, // opc_dstore
+                                    2, // opc_astore
+                                    1, // opc_istore_0                 = 59;
+                                    1, // opc_istore_1                 = 60;
+                                    1, // opc_istore_2                 = 61;
+                                    1, // opc_istore_3                 = 62;
+                                    1, // opc_lstore_0                 = 63;
+                                    1, // opc_lstore_1                 = 64;
+                                    1, // opc_lstore_2                 = 65;
+                                    1, // opc_lstore_3                 = 66;
+                                    1, // opc_fstore_0                 = 67;
+                                    1, // opc_fstore_1                 = 68;
+                                    1, // opc_fstore_2                 = 69;
+                                    1, // opc_fstore_3                 = 70;
+                                    1, // opc_dstore_0                 = 71;
+                                    1, // opc_dstore_1                 = 72;
+                                    1, // opc_dstore_2                 = 73;
+                                    1, // opc_dstore_3                 = 74;
+                                    1, // opc_astore_0                 = 75;
+                                    1, // opc_astore_1                 = 76;
+                                    1, // opc_astore_2                 = 77;
+                                    1, // opc_astore_3                 = 78;
+                                    1, // opc_iastore                  = 79;
+                                    1, // opc_lastore                  = 80;
+                                    1, // opc_fastore                  = 81;
+                                    1, // opc_dastore                  = 82;
+                                    1, // opc_aastore                  = 83;
+                                    1, // opc_bastore                  = 84;
+                                    1, // opc_castore                  = 85;
+                                    1, // opc_sastore                  = 86;
+                                    1, // opc_pop                      = 87;
+                                    1, // opc_pop2                     = 88;
+                                    1, // opc_dup                      = 89;
+                                    1, // opc_dup_x1                   = 90;
+                                    1, // opc_dup_x2                   = 91;
+                                    1, // opc_dup2                     = 92;
+                                    1, // opc_dup2_x1                  = 93;
+                                    1, // opc_dup2_x2                  = 94;
+                                    1, // opc_swap                     = 95;
+                                    1, // opc_iadd                     = 96;
+                                    1, // opc_ladd                     = 97;
+                                    1, // opc_fadd                     = 98;
+                                    1, // opc_dadd                     = 99;
+                                    1, // opc_isub                     = 100;
+                                    1, // opc_lsub                     = 101;
+                                    1, // opc_fsub                     = 102;
+                                    1, // opc_dsub                     = 103;
+                                    1, // opc_imul                     = 104;
+                                    1, // opc_lmul                     = 105;
+                                    1, // opc_fmul                     = 106;
+                                    1, // opc_dmul                     = 107;
+                                    1, // opc_idiv                     = 108;
+                                    1, // opc_ldiv                     = 109;
+                                    1, // opc_fdiv                     = 110;
+                                    1, // opc_ddiv                     = 111;
+                                    1, // opc_irem                     = 112;
+                                    1, // opc_lrem                     = 113;
+                                    1, // opc_frem                     = 114;
+                                    1, // opc_drem                     = 115;
+                                    1, // opc_ineg                     = 116;
+                                    1, // opc_lneg                     = 117;
+                                    1, // opc_fneg                     = 118;
+                                    1, // opc_dneg                     = 119;
+                                    1, // opc_ishl                     = 120;
+                                    1, // opc_lshl                     = 121;
+                                    1, // opc_ishr                     = 122;
+                                    1, // opc_lshr                     = 123;
+                                    1, // opc_iushr                    = 124;
+                                    1, // opc_lushr                    = 125;
+                                    1, // opc_iand                     = 126;
+                                    1, // opc_land                     = 127;
+                                    1, // opc_ior                      = 128;
+                                    1, // opc_lor                      = 129;
+                                    1, // opc_ixor                     = 130;
+                                    1, // opc_lxor                     = 131;
+                                    3, // opc_iinc
+                                    1, // opc_i2l                      = 133;
+                                    1, // opc_i2f                      = 134;
+                                    1, // opc_i2d                      = 135;
+                                    1, // opc_l2i                      = 136;
+                                    1, // opc_l2f                      = 137;
+                                    1, // opc_l2d                      = 138;
+                                    1, // opc_f2i                      = 139;
+                                    1, // opc_f2l                      = 140;
+                                    1, // opc_f2d                      = 141;
+                                    1, // opc_d2i                      = 142;
+                                    1, // opc_d2l                      = 143;
+                                    1, // opc_d2f                      = 144;
+                                    1, // opc_i2b                      = 145;
+                                    1, // opc_i2c                      = 146;
+                                    1, // opc_i2s                      = 147;
+                                    1, // opc_lcmp                     = 148;
+                                    1, // opc_fcmpl                    = 149;
+                                    1, // opc_fcmpg                    = 150;
+                                    1, // opc_dcmpl                    = 151;
+                                    1, // opc_dcmpg                    = 152;
+                                    3, // opc_ifeq
+                                    3, // opc_ifne
+                                    3, // opc_iflt
+                                    3, // opc_ifge
+                                    3, // opc_ifgt
+                                    3, // opc_ifle
+                                    3, // opc_if_icmpeq
+                                    3, // opc_if_icmpne
+                                    3, // opc_if_icmplt
+                                    3, // opc_if_icmpge
+                                    3, // opc_if_icmpgt
+                                    3, // opc_if_icmple
+                                    3, // opc_if_acmpeq
+                                    3, // opc_if_acmpne
+                                    3, // opc_goto
+                                    3, // opc_jsr
+                                    2, // opc_ret
+                                    0, // opc_tableswitch - variable length, handled specially
+                                    0, // opc_lookupswitch - variable length, handled specially
+                                    1, // opc_ireturn                  = 172;
+                                    1, // opc_lreturn                  = 173;
+                                    1, // opc_freturn                  = 174;
+                                    1, // opc_dreturn                  = 175;
+                                    1, // opc_areturn                  = 176;
+                                    1, // opc_return                   = 177;
+                                    3, // opc_getstatic
+                                    3, // opc_putstatic
+                                    3, // opc_getfield
+                                    3, // opc_putfield
+                                    3, // opc_invokevirtual
+                                    3, // opc_invokespecial
+                                    3, // opc_invokestatic
+                                    5, // opc_invokeinterface
+                                    5, // opc_invokedynamic
+                                    3, // opc_new
+                                    2, // opc_newarray
+                                    3, // opc_anewarray
+                                    1, // opc_arraylength              = 190;
+                                    1, // opc_athrow                   = 191;
+                                    3, // opc_checkcast
+                                    3, // opc_instanceof
+                                    1, // opc_monitorenter             = 194;
+                                    1, // opc_monitorexit              = 195;
+                                    0, // opc_wide - special handling
+                                    4, // opc_multianewarray
+                                    3, // opc_ifnull
+                                    3, // opc_ifnonnull
+                                    5, // opc_goto_w
+                                    5, // opc_jsr_w
+                                    0, // opc_breakpoint
+                                };
 
     /* Primitive type array codes (used by opc_newarray opcode) */
     public static final int T_BOOLEAN = 4; // Z
@@ -504,13 +504,17 @@ public interface JavaClassConstants {
     public static final int T_INT = 10; // I
     public static final int T_LONG = 11; // J
     public static final String[] PRIMITIVE_ARRAY_TYPE_NAMES = {
-                                                                  null, null, null, null, "[Z", // NOI18N
-    "[C", // NOI18N
-    "[F", // NOI18N
-    "[D", // NOI18N
-    "[B", // NOI18N
-    "[S", // NOI18N
-    "[I", // NOI18N
-    "[J" // NOI18N
-                                                              };
+                                    null,
+                                    null,
+                                    null,
+                                    null, 
+                                    "[Z", // NOI18N
+                                    "[C", // NOI18N
+                                    "[F", // NOI18N
+                                    "[D", // NOI18N
+                                    "[B", // NOI18N
+                                    "[S", // NOI18N
+                                    "[I", // NOI18N
+                                    "[J" // NOI18N
+                                };
 }
