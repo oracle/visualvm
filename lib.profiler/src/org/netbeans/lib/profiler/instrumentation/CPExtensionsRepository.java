@@ -99,7 +99,7 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
     private static final String HANDLE_SERVLET_DO_METHOD_NAME = "handleServletDoMethod"; // NOI18N
     private static final String VOID_VOID_SIGNATURE = "()V"; // NOI18N
     private static final String CHAR_VOID_SIGNATURE = "(C)V"; // NOI18N
-    private static final String VOID_OBJECT_SIGNATURE = "(Ljava/lang/Object;)V"; // NOI18N
+    private static final String OBJECT_VOID_SIGNATURE = "(Ljava/lang/Object;)V"; // NOI18N
     private static final String OBJECT_CHAR_VOID_SIGNATURE = "(Ljava/lang/Object;C)V"; // NOI18N
     private static final String REFLECT_METHOD_VOID_SIGNATURE = "(Ljava/lang/reflect/Method;)V"; // NOI18N
     private static final String JAVA_LANG_THROWABLE_NAME = "java/lang/Throwable"; // NOI18N
@@ -175,7 +175,7 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
         // Now initialize the constant pool contents added to class javax.servlet.http.HttpServlet , 
         // to support doGet(), doPost(), doPut(), doDelete() servlet tracking    
         entries = new CPEntry[6];
-        addMethod(PROFRUNTIME_CPU_CLASS_NAME, HANDLE_SERVLET_DO_METHOD_NAME, VOID_OBJECT_SIGNATURE, entries, 0);
+        addMethod(PROFRUNTIME_CPU_CLASS_NAME, HANDLE_SERVLET_DO_METHOD_NAME, OBJECT_VOID_SIGNATURE, entries, 0);
         standardCPFragments[INJ_SERVLET_DO_METHOD] = new PackedCPFragment(entries);
         miContents_HandleServletDoMethodIdx = 0;
 
