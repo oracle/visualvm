@@ -99,7 +99,7 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
     private static final String HANDLE_SERVLET_DO_METHOD_NAME = "handleServletDoMethod"; // NOI18N
     private static final String VOID_VOID_SIGNATURE = "()V"; // NOI18N
     private static final String CHAR_VOID_SIGNATURE = "(C)V"; // NOI18N
-    private static final String VOID_OBJECT_SIGNATURE = "(Ljava/lang/Object;)V"; // NOI18N
+    private static final String OBJECT_VOID_SIGNATURE = "(Ljava/lang/Object;)V"; // NOI18N
     private static final String OBJECT_CHAR_VOID_SIGNATURE = "(Ljava/lang/Object;C)V"; // NOI18N
     private static final String REFLECT_METHOD_VOID_SIGNATURE = "(Ljava/lang/reflect/Method;)V"; // NOI18N
     private static final String JAVA_LANG_THROWABLE_NAME = "java/lang/Throwable"; // NOI18N
@@ -124,111 +124,41 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
 
         // Initialize the "normal" recursive instrumentation added constant pool contents
         CPEntry[] entries = new CPEntry[12];
-        int i = -1;
-        entries[++i] = new CPEntry(CHAR_VOID_SIGNATURE);
-
-        int charVoidSignatureIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_Class);
-
-        int profilerRuntimeClassRefIdx = i;
-        entries[++i] = new CPEntry(PROFRUNTIME_CPUFULL_CLASS_NAME);
-
-        int profilerRuntimeClassNameIdx = i;
-        entries[profilerRuntimeClassRefIdx].setIndex1(i);
-        entries[++i] = new CPEntry(CONSTANT_Methodref);
-        entries[i].setIndex1(profilerRuntimeClassRefIdx);
-
+        int i = 0;
         int methodEntryMethodRefIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_NameAndType);
-        entries[methodEntryMethodRefIdx].setIndex2(i);
-
-        int methodEntryNameAndTypeIdx = i;
-        entries[++i] = new CPEntry(METHOD_ENTRY_METHOD_NAME);
-        entries[methodEntryNameAndTypeIdx].setIndex1(i);
-        entries[methodEntryNameAndTypeIdx].setIndex2(charVoidSignatureIdx);
-
-        entries[++i] = new CPEntry(CONSTANT_Methodref);
-        entries[i].setIndex1(profilerRuntimeClassRefIdx);
-
+        i = addMethod(PROFRUNTIME_CPUFULL_CLASS_NAME, METHOD_ENTRY_METHOD_NAME, CHAR_VOID_SIGNATURE, entries, i);
         int methodExitMethodRefIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_NameAndType);
-        entries[methodExitMethodRefIdx].setIndex2(i);
-
-        int methodExitNameAndTypeIdx = i;
-        entries[++i] = new CPEntry(METHOD_EXIT_METHOD_NAME);
-        entries[methodExitNameAndTypeIdx].setIndex1(i);
-        entries[methodExitNameAndTypeIdx].setIndex2(charVoidSignatureIdx);
-
-        entries[++i] = new CPEntry(CONSTANT_Methodref);
-        entries[i].setIndex1(profilerRuntimeClassRefIdx);
-
+        i = addMethod(PROFRUNTIME_CPUFULL_CLASS_NAME, METHOD_EXIT_METHOD_NAME, CHAR_VOID_SIGNATURE, entries, i);
         int profilePointHitMethodRefIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_NameAndType);
-        entries[profilePointHitMethodRefIdx].setIndex2(i);
-
-        int profilePointHitNameAndTypeIdx = i;
-        entries[++i] = new CPEntry(PROFILE_POINT_HIT);
-        entries[profilePointHitNameAndTypeIdx].setIndex1(i);
-        entries[profilePointHitNameAndTypeIdx].setIndex2(charVoidSignatureIdx);
-        normalContents_ProfilePointHitMethodIdx = profilePointHitMethodRefIdx;
-
+        addMethod(PROFRUNTIME_CPUFULL_CLASS_NAME, PROFILE_POINT_HIT, CHAR_VOID_SIGNATURE, entries, i);
+        int profilerRuntimeClassRefIdx = getClassCPEntryIndex(PROFRUNTIME_CPUFULL_CLASS_NAME, entries);
+        int charVoidSignatureIdx = getUtf8CPEntryIndex(CHAR_VOID_SIGNATURE, entries);
         standardCPFragments[INJ_RECURSIVE_NORMAL_METHOD] = new PackedCPFragment(entries);
+        normalContents_ProfilePointHitMethodIdx = profilePointHitMethodRefIdx;
         normalContents_MethodEntryMethodIdx = methodEntryMethodRefIdx;
         normalContents_MethodExitMethodIdx = methodExitMethodRefIdx;
 
         // Create cpool contents for "sampled instrumentation" code injection, by replacing just
         // the instrumentation class name
-        entries[profilerRuntimeClassNameIdx] = new CPEntry(PROFRUNTIME_CPUSAMPLED_CLASS_NAME);
+        entries[getUtf8CPEntryIndex(PROFRUNTIME_CPUFULL_CLASS_NAME, entries)] = new CPEntry(PROFRUNTIME_CPUSAMPLED_CLASS_NAME);
         standardCPFragments[INJ_RECURSIVE_SAMPLED_NORMAL_METHOD] = new PackedCPFragment(entries);
 
         // Additional constant pool contents for rootEntry(char methodId) injection
         entries = new CPEntry[3];
-        i = -1;
-        entries[++i] = new CPEntry(CONSTANT_Methodref);
-        entries[i].setIndex1(profilerRuntimeClassRefIdx + 0x10000);
-
-        int rootEntryMethodRefIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_NameAndType);
-        entries[rootEntryMethodRefIdx].setIndex2(i);
-
-        int rootEntryNameAndTypeIdx = i;
-        entries[++i] = new CPEntry(ROOT_ENTRY_METHOD_NAME);
-        entries[rootEntryNameAndTypeIdx].setIndex1(i);
-        entries[rootEntryNameAndTypeIdx].setIndex2(charVoidSignatureIdx + 0x10000);
-
+        addMethod(profilerRuntimeClassRefIdx + 0x10000, ROOT_ENTRY_METHOD_NAME, charVoidSignatureIdx + 0x10000, entries, 0);
         standardCPFragments[INJ_RECURSIVE_ROOT_METHOD] = new PackedCPFragment(entries);
-        rootContents_RootEntryMethodIdx = rootEntryMethodRefIdx;
+        rootContents_RootEntryMethodIdx = 0;
 
         // rootEntry() injection for sampled instrumentation is the same as for full instrumentation
         standardCPFragments[INJ_RECURSIVE_SAMPLED_ROOT_METHOD] = new PackedCPFragment(entries);
 
         // Additional constant pool contents for markerMethodEntry(char methodId) and markerMethodExit(char methodId) injection
         entries = new CPEntry[6];
-        i = -1;
-        entries[++i] = new CPEntry(CONSTANT_Methodref);
-        entries[i].setIndex1(profilerRuntimeClassRefIdx + 0x10000);
-
+        i = 0;
         int markerEntryMethodRefIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_NameAndType);
-        entries[markerEntryMethodRefIdx].setIndex2(i);
-
-        int markerEntryNameAndTypeIdx = i;
-        entries[++i] = new CPEntry(MARKER_ENTRY_METHOD_NAME);
-        entries[markerEntryNameAndTypeIdx].setIndex1(i);
-        entries[markerEntryNameAndTypeIdx].setIndex2(charVoidSignatureIdx + 0x10000);
-
-        entries[++i] = new CPEntry(CONSTANT_Methodref);
-        entries[i].setIndex1(profilerRuntimeClassRefIdx + 0x10000);
-
+        i = addMethod(profilerRuntimeClassRefIdx + 0x10000, MARKER_ENTRY_METHOD_NAME, charVoidSignatureIdx + 0x10000, entries, i);
         int markerExitMethodRefIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_NameAndType);
-        entries[markerExitMethodRefIdx].setIndex2(i);
-
-        int markerExitNameAndTypeIdx = i;
-        entries[++i] = new CPEntry(MARKER_EXIT_METHOD_NAME);
-        entries[markerExitNameAndTypeIdx].setIndex1(i);
-        entries[markerExitNameAndTypeIdx].setIndex2(charVoidSignatureIdx + 0x10000);
-
+        addMethod(profilerRuntimeClassRefIdx + 0x10000, MARKER_EXIT_METHOD_NAME, charVoidSignatureIdx + 0x10000, entries, i);
         standardCPFragments[INJ_RECURSIVE_MARKER_METHOD] = new PackedCPFragment(entries);
         rootContents_MarkerEntryMethodIdx = markerEntryMethodRefIdx;
         rootContents_MarkerExitMethodIdx = markerExitMethodRefIdx;
@@ -238,178 +168,136 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
 
         // Now initialize the constant pool contents added to class java.lang.reflect.Method, to support invoke() instrumentation    
         entries = new CPEntry[6];
-        i = -1;
-        entries[++i] = new CPEntry(REFLECT_METHOD_VOID_SIGNATURE);
-
-        int methodSignatureIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_Class);
-        profilerRuntimeClassRefIdx = i;
-        entries[++i] = new CPEntry(PROFRUNTIME_CPU_CLASS_NAME);
-        entries[profilerRuntimeClassRefIdx].setIndex1(i);
-        entries[++i] = new CPEntry(CONSTANT_Methodref);
-        entries[i].setIndex1(profilerRuntimeClassRefIdx);
-
-        int methodRefIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_NameAndType);
-        entries[methodRefIdx].setIndex2(i);
-
-        int nameAndTypeIdx = i;
-        entries[++i] = new CPEntry(HANDLE_REFLECT_INVOKE_METHOD_NAME);
-        entries[nameAndTypeIdx].setIndex1(i);
-        entries[nameAndTypeIdx].setIndex2(methodSignatureIdx);
-
+        addMethod(PROFRUNTIME_CPU_CLASS_NAME, HANDLE_REFLECT_INVOKE_METHOD_NAME, REFLECT_METHOD_VOID_SIGNATURE, entries, 0);
         standardCPFragments[INJ_REFLECT_METHOD_INVOKE] = new PackedCPFragment(entries);
-        miContents_HandleReflectInvokeMethodIdx = methodRefIdx;
+        miContents_HandleReflectInvokeMethodIdx = 0;
 
         // Now initialize the constant pool contents added to class javax.servlet.http.HttpServlet , 
         // to support doGet(), doPost(), doPut(), doDelete() servlet tracking    
         entries = new CPEntry[6];
-        i = -1;
-        entries[++i] = new CPEntry(VOID_OBJECT_SIGNATURE);
-
-        int servetSignatureIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_Class);
-        profilerRuntimeClassRefIdx = i;
-        entries[++i] = new CPEntry(PROFRUNTIME_CPU_CLASS_NAME);
-        entries[profilerRuntimeClassRefIdx].setIndex1(i);
-        entries[++i] = new CPEntry(CONSTANT_Methodref);
-        entries[i].setIndex1(profilerRuntimeClassRefIdx);
-
-        int servletRefIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_NameAndType);
-        entries[servletRefIdx].setIndex2(i);
-
-        int servletNameAndTypeIdx = i;
-        entries[++i] = new CPEntry(HANDLE_SERVLET_DO_METHOD_NAME);
-        entries[servletNameAndTypeIdx].setIndex1(i);
-        entries[servletNameAndTypeIdx].setIndex2(servetSignatureIdx);
-
+        addMethod(PROFRUNTIME_CPU_CLASS_NAME, HANDLE_SERVLET_DO_METHOD_NAME, OBJECT_VOID_SIGNATURE, entries, 0);
         standardCPFragments[INJ_SERVLET_DO_METHOD] = new PackedCPFragment(entries);
-        miContents_HandleServletDoMethodIdx = servletRefIdx;
+        miContents_HandleServletDoMethodIdx = 0;
 
         // Initialize the constant pool contents used for code region profiling.
         entries = new CPEntry[9];
-        i = -1;
-        entries[++i] = new CPEntry(VOID_VOID_SIGNATURE);
-
-        int voidVoidSignatureIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_Class);
-        profilerRuntimeClassRefIdx = i;
-        entries[++i] = new CPEntry(PROFRUNTIME_CPUCODEREGION_CLASS_NAME);
-        entries[profilerRuntimeClassRefIdx].setIndex1(i);
-        entries[++i] = new CPEntry(CONSTANT_Methodref);
-        entries[i].setIndex1(profilerRuntimeClassRefIdx);
-
+        i = 0;
         int codeRegionEntryMethodRefIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_NameAndType);
-        entries[codeRegionEntryMethodRefIdx].setIndex2(i);
-
-        int codeRegionEntryNameAndTypeIdx = i;
-        entries[++i] = new CPEntry(CODE_REGION_ENTRY_METHOD_NAME);
-        entries[codeRegionEntryNameAndTypeIdx].setIndex1(i);
-        entries[codeRegionEntryNameAndTypeIdx].setIndex2(voidVoidSignatureIdx);
-
-        entries[++i] = new CPEntry(CONSTANT_Methodref);
-        entries[i].setIndex1(profilerRuntimeClassRefIdx);
-
+        i = addMethod(PROFRUNTIME_CPUCODEREGION_CLASS_NAME, CODE_REGION_ENTRY_METHOD_NAME, VOID_VOID_SIGNATURE, entries, i);
         int codeRegionExitMethodRefIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_NameAndType);
-        entries[codeRegionExitMethodRefIdx].setIndex2(i);
-
-        int codeRegionExitNameAndTypeIdx = i;
-        entries[++i] = new CPEntry(CODE_REGION_EXIT_METHOD_NAME);
-        entries[codeRegionExitNameAndTypeIdx].setIndex1(i);
-        entries[codeRegionExitNameAndTypeIdx].setIndex2(voidVoidSignatureIdx);
-
+        addMethod(PROFRUNTIME_CPUCODEREGION_CLASS_NAME, CODE_REGION_EXIT_METHOD_NAME, VOID_VOID_SIGNATURE, entries, i);
         standardCPFragments[INJ_CODE_REGION] = new PackedCPFragment(entries);
         codeRegionContents_CodeRegionEntryMethodIdx = codeRegionEntryMethodRefIdx;
         codeRegionContents_CodeRegionExitMethodIdx = codeRegionExitMethodRefIdx;
 
         // Initialize the constant pool contents used for object allocation profiling
         entries = new CPEntry[10];
-        i = -1;
-        entries[++i] = new CPEntry(OBJECT_CHAR_VOID_SIGNATURE);
-
-        int objCharVoidSignatureIdx = i;
-        entries[++i] = new CPEntry(CHAR_VOID_SIGNATURE);
-
-        int charVoidSignatureIdx2 = i;
-        entries[++i] = new CPEntry(CONSTANT_Class);
-        profilerRuntimeClassRefIdx = i;
-        entries[++i] = new CPEntry(PROFRUNTIME_OBJALLOC_CLASS_NAME);
-        entries[profilerRuntimeClassRefIdx].setIndex1(i);
-        entries[++i] = new CPEntry(CONSTANT_Methodref);
-        entries[i].setIndex1(profilerRuntimeClassRefIdx);
-
+        i = 0;
         int objAllocTraceMethodRefIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_NameAndType);
-        entries[objAllocTraceMethodRefIdx].setIndex2(i);
-
-        int objAllocTraceNameAndTypeIdx = i;
-        entries[++i] = new CPEntry(TRACE_OBJ_ALLOC_METHOD_NAME);
-        entries[objAllocTraceNameAndTypeIdx].setIndex1(i);
-        entries[objAllocTraceNameAndTypeIdx].setIndex2(objCharVoidSignatureIdx);
-
-        entries[++i] = new CPEntry(CONSTANT_Methodref);
-        entries[i].setIndex1(profilerRuntimeClassRefIdx);
-
+        i = addMethod(PROFRUNTIME_OBJALLOC_CLASS_NAME, TRACE_OBJ_ALLOC_METHOD_NAME, OBJECT_CHAR_VOID_SIGNATURE, entries, i);
         int memPprofilePointHitMethodRefIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_NameAndType);
-        entries[memPprofilePointHitMethodRefIdx].setIndex2(i);
-
-        int memProfilePointHitNameAndTypeIdx = i;
-        entries[++i] = new CPEntry(PROFILE_POINT_HIT);
-        entries[memProfilePointHitNameAndTypeIdx].setIndex1(i);
-        entries[memProfilePointHitNameAndTypeIdx].setIndex2(charVoidSignatureIdx2);
-        memoryProfContents_ProfilePointHitMethodIdx = memPprofilePointHitMethodRefIdx;
-
+        addMethod(PROFRUNTIME_OBJALLOC_CLASS_NAME, PROFILE_POINT_HIT, CHAR_VOID_SIGNATURE, entries, i);
         standardCPFragments[INJ_OBJECT_ALLOCATIONS] = new PackedCPFragment(entries);
         memoryProfContents_TraceObjAllocMethodIdx = objAllocTraceMethodRefIdx;
+        memoryProfContents_ProfilePointHitMethodIdx = memPprofilePointHitMethodRefIdx;
 
-        // Initialize the constant pool contents used for object liveness profiling
-        entries = new CPEntry[10];
-        i = -1;
-        entries[++i] = new CPEntry(OBJECT_CHAR_VOID_SIGNATURE);
-        objCharVoidSignatureIdx = i;
-        entries[++i] = new CPEntry(CHAR_VOID_SIGNATURE);
-        entries[++i] = new CPEntry(CONSTANT_Class);
-        profilerRuntimeClassRefIdx = i;
-        entries[++i] = new CPEntry(PROFRUNTIME_OBJLIVENESS_CLASS_NAME);
-        entries[profilerRuntimeClassRefIdx].setIndex1(i);
-        entries[++i] = new CPEntry(CONSTANT_Methodref);
-        entries[i].setIndex1(profilerRuntimeClassRefIdx);
-        objAllocTraceMethodRefIdx = i;
-        entries[++i] = new CPEntry(CONSTANT_NameAndType);
-        entries[objAllocTraceMethodRefIdx].setIndex2(i);
-        objAllocTraceNameAndTypeIdx = i;
-        entries[++i] = new CPEntry(TRACE_OBJ_ALLOC_METHOD_NAME);
-        entries[objAllocTraceNameAndTypeIdx].setIndex1(i);
-        entries[objAllocTraceNameAndTypeIdx].setIndex2(objCharVoidSignatureIdx);
-
-        entries[++i] = new CPEntry(CONSTANT_Methodref);
-        entries[i].setIndex1(profilerRuntimeClassRefIdx);
-        entries[++i] = new CPEntry(CONSTANT_NameAndType);
-        entries[memPprofilePointHitMethodRefIdx].setIndex2(i);
-        entries[++i] = new CPEntry(PROFILE_POINT_HIT);
-        entries[memProfilePointHitNameAndTypeIdx].setIndex1(i);
-        entries[memProfilePointHitNameAndTypeIdx].setIndex2(charVoidSignatureIdx2);
-
+        // Create cpool contents for "object liveness profiling" code injection, by replacing just
+        // the instrumentation class name
+        entries[getUtf8CPEntryIndex(PROFRUNTIME_OBJALLOC_CLASS_NAME, entries)] = new CPEntry(PROFRUNTIME_OBJLIVENESS_CLASS_NAME);
         standardCPFragments[INJ_OBJECT_LIVENESS] = new PackedCPFragment(entries);
 
         /*memoryProfContents_TraceObjAllocMethodIdx = objAllocTraceMethodRefIdx;  // Same as above */
         
         entries = new CPEntry[1];
-        i = -1;
-        entries[++i] = new CPEntry(STACK_MAP_TABLE_ATTRIBUTE);
+        entries[0] = new CPEntry(STACK_MAP_TABLE_ATTRIBUTE);
         standardCPFragments[INJ_STACKMAP] = new PackedCPFragment(entries);
         
         entries = new CPEntry[2];
-        i = -1;
-        entries[++i] = new CPEntry(CONSTANT_Class);
-        profilerRuntimeClassRefIdx = i;
-        entries[++i] = new CPEntry(JAVA_LANG_THROWABLE_NAME);
-        entries[profilerRuntimeClassRefIdx].setIndex1(i);
+        addClass(JAVA_LANG_THROWABLE_NAME, entries, 0);
         standardCPFragments[INJ_THROWABLE] = new PackedCPFragment(entries);
 
+    }
+    
+    static int addMethod(int classRefIdx, String methodName, int signatureIdx, CPEntry[] entries, int index) {
+        int methodRef = index;
+        entries[index++] = new CPEntry(CONSTANT_Methodref);
+        int nameAndTypeIdx = index;
+        index = addNameAndType(methodName, signatureIdx, entries, index);
+        entries[methodRef].setIndex1(classRefIdx);
+        entries[methodRef].setIndex2(nameAndTypeIdx);
+        return index;
+    }
+
+    static int addMethod(String className, String methodName, String signature, CPEntry[] entries, int index) {
+        int methodRef = index;
+        entries[index++] = new CPEntry(CONSTANT_Methodref);
+        int classIndex = getClassCPEntryIndex(className, entries);
+        if (classIndex == -1) {
+            classIndex = index;
+            index = addClass(className, entries, index);
+        }
+        int nameAndTypeIdx = index;
+        index = addNameAndType(methodName, signature, entries, index);
+        entries[methodRef].setIndex1(classIndex);
+        entries[methodRef].setIndex2(nameAndTypeIdx);
+        return index;
+    }
+    
+    static int addClass(String className, CPEntry[] entries, int index) {
+        entries[index] = new CPEntry(CONSTANT_Class);
+        entries[index].setIndex1(index+1);
+        entries[index+1] = new CPEntry(className);
+        return index+2;
+    }
+    
+    static int addNameAndType(String methodName, String signature, CPEntry[] entries, int index) {
+        int nameAndTypeIdx = index;
+        entries[index++] = new CPEntry(CONSTANT_NameAndType);
+        int nameIdx = getUtf8CPEntryIndex(methodName, entries);
+        if (nameIdx == -1) {
+            nameIdx = index;
+            entries[index++] = new CPEntry(methodName);
+        }
+        int sigIdx = getUtf8CPEntryIndex(signature, entries);
+        if (sigIdx == -1) {
+            sigIdx = index;
+            entries[index++] = new CPEntry(signature);
+        }
+        entries[nameAndTypeIdx].setIndex1(nameIdx);
+        entries[nameAndTypeIdx].setIndex2(sigIdx);
+        return index;
+    }
+
+    static int addNameAndType(String methodName, int signatureIdx, CPEntry[] entries, int index) {
+        entries[index] = new CPEntry(CONSTANT_NameAndType);
+        entries[index].setIndex1(index+1);
+        entries[index].setIndex2(signatureIdx);
+        entries[index+1] = new CPEntry(methodName);
+        return index+2;
+    }
+    
+    static boolean isUtf8CPEntry(CPEntry entry, String string) {
+        return  entry != null && entry.tag == CONSTANT_Utf8 && entry.utf8.equals(string);
+    }
+    
+    static int getUtf8CPEntryIndex(String string, CPEntry[] entries) {
+        for (int i = 0; i < entries.length; i++) {
+            if (isUtf8CPEntry(entries[i],string)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    static int getClassCPEntryIndex(String string, CPEntry[] entries) {
+        for (int i = 0; i < entries.length; i++) {
+            CPEntry e = entries[i];
+            if (e != null && e.tag == CONSTANT_Class) {
+                if (isUtf8CPEntry(entries[e.index1],string)) {
+                    return i;                
+                }
+            }
+        }
+        return -1;
     }
 }
