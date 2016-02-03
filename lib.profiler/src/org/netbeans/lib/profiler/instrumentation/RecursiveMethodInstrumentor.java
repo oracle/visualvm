@@ -44,9 +44,12 @@
 package org.netbeans.lib.profiler.instrumentation;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
+import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.classfile.PlaceholderClassInfo;
 import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
@@ -95,7 +98,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    protected Hashtable instrClasses = new Hashtable();
+    protected Map instrClasses = new HashMap();
     protected InstrumentationFilter instrFilter;
     protected byte[] codeBytes;
     protected boolean dontInstrumentEmptyMethods;
@@ -178,9 +181,7 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
     }
 
     protected void addToSubclassList(DynamicClassInfo clazz, DynamicClassInfo addedClassInfo) {
-        String superClassName = clazz.getSuperclassName();
-        int loaderId = clazz.getLoaderId();
-        DynamicClassInfo superClass = javaClassForName(superClassName, loaderId);
+        DynamicClassInfo superClass = getSuperClass(clazz);
         clazz.setSuperClass(superClass);
 
         if ((superClass != null) && !clazz.isInterface()) {
@@ -190,16 +191,16 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
                 findAndMarkOverridingMethodsReachable(superClass, addedClassInfo);
             }
 
-            if (superClassName != OBJECT_SLASHED_CLASS_NAME) {
+            if (superClass.getName() != OBJECT_SLASHED_CLASS_NAME) {
                 addToSubclassList(superClass, addedClassInfo);
             }
         }
 
-        String[] interfaces = clazz.getInterfaceNames();
+        DynamicClassInfo[] interfaces = getInterfaces(clazz);
 
         if (interfaces != null) {
             for (int i = 0; i < interfaces.length; i++) {
-                DynamicClassInfo superInterface = javaClassForName(interfaces[i], loaderId);
+                DynamicClassInfo superInterface = interfaces[i];
                 clazz.setSuperInterface(superInterface, i);
 
                 if (superInterface != null) {
@@ -456,8 +457,8 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
             // Check if java.lang.reflect.Method is already among classes to instrument
             int idx = 0;
 
-            for (Enumeration e = instrClasses.elements(); e.hasMoreElements(); idx++) {
-                DynamicClassInfo clazz = (DynamicClassInfo) e.nextElement();
+            for (Iterator e = instrClasses.values().iterator(); e.hasNext(); idx++) {
+                DynamicClassInfo clazz = (DynamicClassInfo) e.next();
 
                 if (clazz.getName() == JAVA_LANG_REFLECT_METHOD_SLASHED_CLASS_NAME) {
                     reflectMethodClassIdx = idx;
@@ -484,8 +485,8 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
         int classIdx = 0;
         int methodIdx = 0;
 
-        for (Enumeration e = instrClasses.elements(); e.hasMoreElements();) {
-            DynamicClassInfo clazz = (DynamicClassInfo) e.nextElement();
+        for (Iterator e = instrClasses.values().iterator(); e.hasNext();) {
+            DynamicClassInfo clazz = (DynamicClassInfo) e.next();
             int nMethods = clazz.getMethodNames().length;
             instrMethodClasses[classIdx] = clazz.getName().replace('/', '.').intern(); // NOI18N
             instrClassLoaderIds[classIdx] = clazz.getLoaderId();
@@ -634,5 +635,40 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
             instrClasses.put(classNameAndLoader, clazz);
             nInstrClasses++;
         }
+    }
+    
+    private DynamicClassInfo getSuperClass(DynamicClassInfo clazz) {
+        String superClassName = clazz.getSuperclassName();
+        
+        if (clazz.isLoaded()) {
+            List classes = ClassRepository.getAllClassVersions(superClassName);
+            if (classes != null && classes.size()==1) {
+                return (DynamicClassInfo) classes.get(0);
+            }
+        }
+        return javaClassForName(superClassName, clazz.getLoaderId());
+    }
+    
+    private DynamicClassInfo[] getInterfaces(DynamicClassInfo clazz) {
+        String[] interfaceNames = clazz.getInterfaceNames();
+        
+        if (interfaceNames != null) {
+            DynamicClassInfo[] interfaces = new DynamicClassInfo[interfaceNames.length];
+            int loaderId = clazz.getLoaderId();
+            boolean isLoaded = clazz.isLoaded();
+            
+            for (int i = 0; i < interfaceNames.length; i++) {
+                if (isLoaded) {
+                    List classes = ClassRepository.getAllClassVersions(interfaceNames[i]);
+                    if (classes != null && classes.size()==1) {
+                        interfaces[i] = (DynamicClassInfo) classes.get(0);
+                        continue;
+                    }
+                }
+                interfaces[i] = javaClassForName(interfaceNames[i], loaderId);
+            }
+            return interfaces;
+        }
+        return null;
     }
 }

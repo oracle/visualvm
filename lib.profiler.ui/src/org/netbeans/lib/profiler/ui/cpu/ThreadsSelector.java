@@ -56,18 +56,16 @@ import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.ToolTipManager;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.FilteringToolbar;
 import org.netbeans.lib.profiler.ui.swing.PopupButton;
+import org.netbeans.lib.profiler.ui.swing.ProfilerPopupFactory;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
@@ -137,10 +135,10 @@ public abstract class ThreadsSelector extends PopupButton {
     }
     
     
-    protected void populatePopup(final JPopupMenu popup) {
+    protected void displayPopup() {
         CPUResultsSnapshot snapshot = getSnapshot();
         int[] threadIDs = snapshot == null ? null : snapshot.getThreadIds();
-        String[] threadNames = snapshot == null ? null : snapshot.getThreadNames();
+//        String[] threadNames = snapshot == null ? null : snapshot.getThreadNames();
         
         JPanel content = new JPanel(new BorderLayout());
         content.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
@@ -240,15 +238,9 @@ public abstract class ThreadsSelector extends PopupButton {
             
             content.add(controls, BorderLayout.SOUTH);
         }
-        
-        popup.add(content);
-        
-        popup.addPopupMenuListener(new PopupMenuListener() {
-            public void popupMenuCanceled(PopupMenuEvent e) {}
-            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {}
 
-            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                popup.removePopupMenuListener(this);
+        ProfilerPopupFactory.Listener listener = new ProfilerPopupFactory.Listener() {
+            protected void popupHidden() {
                 if (!displayAllThreads && selection.isEmpty()) {
                     displayAllThreads = true;
                     mergeSelectedThreads = false;
@@ -256,8 +248,8 @@ public abstract class ThreadsSelector extends PopupButton {
                 }
                 allThreadsResetter = null;
             }
-            
-        });
+        };
+        ProfilerPopupFactory.getPopup(this, content, -5, getHeight() - 1, listener).show();
     }
     
     

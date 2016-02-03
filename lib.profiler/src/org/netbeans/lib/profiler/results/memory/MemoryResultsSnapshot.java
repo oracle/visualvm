@@ -205,7 +205,7 @@ public abstract class MemoryResultsSnapshot extends ResultsSnapshot {
                     filter(filter, filterType, n);
                     node.children = n.children;
                 } else {
-                    node.children = ch.toArray(new PresoObjAllocCCTNode[ch.size()]);
+                    node.children = ch.toArray(new PresoObjAllocCCTNode[0]);
                 }
             }
             

@@ -656,7 +656,7 @@ public class LoadedSnapshot {
 
         ThreadsSample(long t, Collection<ThreadInfo> tis) {
             time = t;
-            tinfos = tis.toArray(new ThreadInfo[tis.size()]);
+            tinfos = tis.toArray(new ThreadInfo[0]);
         }
 
         long getTime() {

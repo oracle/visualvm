@@ -341,7 +341,7 @@ public abstract class ClassRepository implements CommonConstants {
         return new CodeRegionBCI(clazz.getName(), methodName, methodSignature, 0, clazz.getMethodBytecode(idx).length - 1);
     }
 
-    public static void addPlaceholder(PlaceholderClassInfo pci) {
+    public static void addClassInfo(BaseClassInfo pci) {
         BaseClassInfo singleExistingClazzOrPCI;
         SameNameClassGroup classGroup;
         String className = pci.getName();
@@ -379,7 +379,7 @@ public abstract class ClassRepository implements CommonConstants {
             try {
                 String location = getClassFileLoc(classLoaderId);
                 DynamicClassInfo lazyClass = new LazyDynamicClassInfo(className, classLoaderId, location, superClassName, interfaceNames);
-                classes.put(className, lazyClass);
+                addClassInfo(lazyClass);
             } catch (IOException ex) { // this should not happen
                 Logger.getLogger(ClassRepository.class.getName()).log(Level.SEVERE, null, ex);
             }

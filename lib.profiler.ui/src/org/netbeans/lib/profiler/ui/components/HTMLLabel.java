@@ -43,15 +43,20 @@
 
 package org.netbeans.lib.profiler.ui.components;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
 import java.net.URL;
-import javax.swing.*;
+import javax.swing.JEditorPane;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.NavigationFilter;
 import javax.swing.text.Position;
+import javax.swing.text.html.HTMLEditorKit;
 import org.netbeans.lib.profiler.ui.UIUtils;
 
 
@@ -59,18 +64,24 @@ import org.netbeans.lib.profiler.ui.UIUtils;
  * @author Ian Formanek
  */
 public class HTMLLabel extends JEditorPane implements HyperlinkListener {
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
+    
+    private int halign = SwingConstants.LEADING;
+    
 
     public HTMLLabel() {
-        setEditorKit(new javax.swing.text.html.HTMLEditorKit());
+        this(null);
+    }
+
+    public HTMLLabel(String text) {
+        setEditorKit(new HTMLEditorKit());
         setEditable(false);
         setOpaque(false);
         setNavigationFilter(new NavigationFilter() {
-                public void moveDot(FilterBypass fb, int dot, Position.Bias bias) {
+                public void moveDot(NavigationFilter.FilterBypass fb, int dot, Position.Bias bias) {
                     super.moveDot(fb, 0, bias);
                 }
 
-                public void setDot(FilterBypass fb, int dot, Position.Bias bias) {
+                public void setDot(NavigationFilter.FilterBypass fb, int dot, Position.Bias bias) {
                     super.setDot(fb, 0, bias);
                 }
 
@@ -82,11 +93,8 @@ public class HTMLLabel extends JEditorPane implements HyperlinkListener {
             });
         setFont(UIManager.getFont("Label.font")); //NOI18N
         addHyperlinkListener(this);
-    }
-
-    public HTMLLabel(String text) {
-        this();
-        setText(text);
+        
+        if (text != null) setText(text);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -95,6 +103,7 @@ public class HTMLLabel extends JEditorPane implements HyperlinkListener {
         super.setOpaque(o);
         if (UIUtils.isNimbusLookAndFeel() && !o)
             setBackground(new Color(0, 0, 0, 0));
+        if (txt != null) setText(txt);
     }
     
     private String txt;
@@ -103,18 +112,54 @@ public class HTMLLabel extends JEditorPane implements HyperlinkListener {
         txt = value;
         
         Font font = getFont();
-        Color textColor = getForeground();
+        Color fgColor = getForeground();
+        Color bgColor = getBackground();
         
         value = value.replaceAll("\\n\\r|\\r\\n|\\n|\\r", "<br>"); //NOI18N
         value = value.replace("<code>", "<code style=\"font-size: " + font.getSize() + "pt;\">"); //NOI18N
         
-        String colorText = "rgb(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")"; //NOI18N
-        super.setText("<html><body align=\"right\" text=\"" + colorText + "\" style=\"font-size: " + font.getSize() //NOI18N
-                      + "pt; font-family: " + font.getName() + ";\"><nobr>" + value + "</nobr></body></html>"); //NOI18N
+        String fgText = "rgb(" + fgColor.getRed() + "," + fgColor.getGreen() + "," + fgColor.getBlue() + ")"; //NOI18N
+        String bgText = isOpaque() ? "rgb(" + bgColor.getRed() + "," + bgColor.getGreen() + "," + bgColor.getBlue() + ")" : null; //NOI18N
+        
+        String alignText = null;
+        switch (halign) {
+            case SwingConstants.CENTER:
+                alignText = "center"; //NOI18N
+                break;
+            case SwingConstants.RIGHT:
+            case SwingConstants.TRAILING:
+                alignText = "right"; //NOI18N
+                break;
+        }
+        
+        String bodyFlags = "text=\"" + fgText + "\""; //NOI18N
+        if (bgText != null) bodyFlags += " bgcolor=\"" + bgText + "\""; //NOI18N
+        if (alignText != null) bodyFlags += " align=\"" + alignText + "\""; //NOI18N
+        
+        super.setText("<html><body " + bodyFlags + " style=\"font-size: " + font.getSize() //NOI18N
+                      + "pt; font-family: " + font.getName() + ";\">" + value + "</body></html>"); //NOI18N
     }
     
     public void setForeground(Color fg) {
         super.setForeground(fg);
+        if (txt != null) setText(txt);
+    }
+    
+    public void setBackground(Color bg) {
+        super.setBackground(bg);
+//        setBorder(getBorder());
+        if (txt != null) setText(txt);
+    }
+    
+//    public void setBorder(Border b) {
+//        Insets i = b == null ? new Insets(0, 0, 0, 0) : b.getBorderInsets(this);
+//        if (!isOpaque()) super.setBorder(BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right));
+//        else super.setBorder(BorderFactory.createMatteBorder(i.top, i.left, i.bottom, i.right, getBackground()));
+//    }
+    
+    public void setHorizontalAlignment(int alignment) {
+        if (alignment == halign) return;
+        halign = alignment;
         if (txt != null) setText(txt);
     }
 

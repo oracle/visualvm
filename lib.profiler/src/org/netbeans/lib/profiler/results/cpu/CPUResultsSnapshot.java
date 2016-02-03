@@ -352,7 +352,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
             }
         }
         
-        return merged.toArray(new PrestimeCPUCCTNode[merged.size()]);
+        return merged.toArray(new PrestimeCPUCCTNode[0]);
     }
     
     public PrestimeCPUCCTNode getReverseRootNode(final int view, Collection<Integer> threads, boolean merge) {
@@ -429,7 +429,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
         
         generateDataForView(view);
         
-        PrestimeCPUCCTNode[] _nodes = nodes.toArray(new PrestimeCPUCCTNode[nodes.size()]);
+        PrestimeCPUCCTNode[] _nodes = nodes.toArray(new PrestimeCPUCCTNode[0]);
         PrestimeCPUCCTNode root = new PrestimeCPUCCTNodeBacked(threadCCTContainers[view][0], merge ? mergedChildren(_nodes) : _nodes);
         return fixNCalls(root);
     }
@@ -511,7 +511,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
 //                    filter(config, n);
 //                    node.children = n.children;
 //                } else {
-//                    node.children = ch.toArray(new PrestimeCPUCCTNodeFree[ch.size()]);
+//                    node.children = ch.toArray(new PrestimeCPUCCTNodeFree[0]);
 //                }
 //            }
 //            

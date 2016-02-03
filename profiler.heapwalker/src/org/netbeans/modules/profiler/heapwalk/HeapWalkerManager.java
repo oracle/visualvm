@@ -105,7 +105,7 @@ public class HeapWalkerManager {
     public void closeAllHeapWalkers() {
         HeapWalker[] heapWalkerArr;
         synchronized (this) {
-            heapWalkerArr = heapWalkers.toArray(new HeapWalker[heapWalkers.size()]);
+            heapWalkerArr = heapWalkers.toArray(new HeapWalker[0]);
         }
         for (HeapWalker hw : heapWalkerArr) {
             closeHeapWalker(hw);

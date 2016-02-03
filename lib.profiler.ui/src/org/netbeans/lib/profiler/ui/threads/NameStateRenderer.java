@@ -61,9 +61,14 @@ public class NameStateRenderer extends LabelRenderer {
     }
     
     public void setValue(Object value, int row) {
-        ThreadData data = (ThreadData)value;
-        setText(data.getName());
-        setIcon(getIcon(data.getLastState()));
+        if (value == null) {
+            setText(""); // NOI18N
+            setIcon(null);
+        } else {
+            ThreadData data = (ThreadData)value;
+            setText(data.getName());
+            setIcon(getIcon(data.getLastState()));
+        }
     }
     
     private static final int THREAD_ICON_SIZE = 9;    

@@ -102,7 +102,6 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
     private static final String VOID_OBJECT_SIGNATURE = "(Ljava/lang/Object;)V"; // NOI18N
     private static final String OBJECT_CHAR_VOID_SIGNATURE = "(Ljava/lang/Object;C)V"; // NOI18N
     private static final String REFLECT_METHOD_VOID_SIGNATURE = "(Ljava/lang/reflect/Method;)V"; // NOI18N
-    private static final String OBJECT_CHAR_BOOLEAN_VOID_SIGNATURE = "(Ljava/lang/Object;CZ)V"; // NOI18N
     private static final String JAVA_LANG_THROWABLE_NAME = "java/lang/Throwable"; // NOI18N
     private static final String STACK_MAP_TABLE_ATTRIBUTE = "StackMapTable"; // NOI18N
 

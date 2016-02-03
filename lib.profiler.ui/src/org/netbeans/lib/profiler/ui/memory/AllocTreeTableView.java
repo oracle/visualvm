@@ -215,7 +215,7 @@ abstract class AllocTreeTableView extends MemoryView {
                 Math.max(Math.abs(totalBytes), Math.abs(_totalBytes));
         final long __totalObjects = !diff ? totalObjects :
                 Math.max(Math.abs(totalObjects), Math.abs(_totalObjects));
-        final PresoObjAllocCCTNode root = PresoObjAllocCCTNode.rootNode(nodes.toArray(new PresoObjAllocCCTNode[nodes.size()]));
+        final PresoObjAllocCCTNode root = PresoObjAllocCCTNode.rootNode(nodes.toArray(new PresoObjAllocCCTNode[0]));
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {

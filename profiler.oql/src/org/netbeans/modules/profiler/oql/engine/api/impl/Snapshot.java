@@ -320,7 +320,7 @@ public class Snapshot {
 
     public GCRoot[] getRootsArray() {
         List rootList = getRootsList();
-        return (GCRoot[]) rootList.toArray(new GCRoot[rootList.size()]);
+        return (GCRoot[]) rootList.toArray(new GCRoot[0]);
     }
    
     public ReferenceChain[] rootsetReferencesTo(Instance target, boolean includeWeak) {
@@ -374,7 +374,7 @@ public class Snapshot {
             toInspect = s.iterator;
         } while (!engine.isCancelled());
 
-        return result.toArray(new ReferenceChain[result.size()]);
+        return result.toArray(new ReferenceChain[0]);
     }
 
     private boolean isAssignable(JavaClass from, JavaClass to) {
