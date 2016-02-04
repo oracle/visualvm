@@ -514,6 +514,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
         int[] loadedClassLoaderIds = rootLoaded.getAllLoadedClassLoaderIds();
         DynamicClassInfo[] loadedClassInfos = new DynamicClassInfo[loadedClasses.length];
 
+        // preload all classes
         for (int i = 0; i < loadedClasses.length; i++) {
             DynamicClassInfo clazz = javaClassForName(loadedClasses[i], loadedClassLoaderIds[i]);
 
@@ -522,8 +523,14 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
             }
 
             clazz.setLoaded(true);
-            addToSubclassList(clazz, clazz);
             loadedClassInfos[i] = clazz;
+        }
+        for (int i = 0; i < loadedClasses.length; i++) {
+            DynamicClassInfo clazz = javaClassForName(loadedClasses[i], loadedClassLoaderIds[i]);
+
+            if (clazz != null) {
+                addToSubclassList(clazz, clazz);
+            }
         }
 
         return loadedClassInfos;

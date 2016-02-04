@@ -80,7 +80,7 @@ public final class ProjectContentsSupport {
                 ClientUtils.SourceCodeSelection[] roots = provider.getProfilingRoots(profiledClassFile, profileSubprojects);
                 if (roots != null && roots.length > 0) allRoots.addAll(Arrays.asList(roots));
             }
-            return allRoots.toArray(new ClientUtils.SourceCodeSelection[allRoots.size()]);
+            return allRoots.toArray(new ClientUtils.SourceCodeSelection[0]);
         }
     }
     

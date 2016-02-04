@@ -184,6 +184,7 @@ final class MethodsFeature extends ProfilerFeature.Basic {
                 MethodsFeature.this.settingsChanged();
             }
         };
+        allClassesMode.initialize();
         
         if (getSession().getProject() != null) projectClassesMode = new MethodsFeatureModes.ProjectClassesMode() {
             String readFlag(String flag, String defaultValue) {
@@ -199,6 +200,7 @@ final class MethodsFeature extends ProfilerFeature.Basic {
                 return MethodsFeature.this.getSession().getProject();
             }
         };
+        if (projectClassesMode != null) projectClassesMode.initialize();
         
         selectedClassesMode = new MethodsFeatureModes.SelectedClassesMode() {
             String readFlag(String flag, String defaultValue) {
@@ -225,6 +227,7 @@ final class MethodsFeature extends ProfilerFeature.Basic {
                 MethodsFeature.this.selectionChanged();
             }
         };
+        selectedClassesMode.initialize();
         
         selectedMethodsMode = new MethodsFeatureModes.SelectedMethodsMode() {
             String readFlag(String flag, String defaultValue) {
@@ -253,6 +256,7 @@ final class MethodsFeature extends ProfilerFeature.Basic {
                     MethodsFeature.this.ui.getResultsUI().repaint();
             }
         };
+        selectedMethodsMode.initialize();
         
         if (ProfilerIDESettings.getInstance().getEnableExpertSettings()) {
             definedClassesMode = new MethodsFeatureModes.CustomClassesMode() {
@@ -267,6 +271,7 @@ final class MethodsFeature extends ProfilerFeature.Basic {
                 }
             };
         }
+        if (definedClassesMode != null) definedClassesMode.initialize();
         
 //        currentMode = allClassesMode;
         String _currentMode = readFlag(MODE_FLAG, allClassesMode.getID());

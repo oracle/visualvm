@@ -244,7 +244,7 @@ abstract class LivenessTreeTableView extends MemoryView {
                 Math.max(Math.abs(totalTrackedAlloc), Math.abs(_totalTrackedAlloc));
         final long __totalTotalAlloc = !diff ? totalTotalAlloc :
                 Math.max(Math.abs(totalTotalAlloc), Math.abs(_totalTotalAlloc));
-        final PresoObjLivenessCCTNode root = PresoObjLivenessCCTNode.rootNode(nodes.toArray(new PresoObjLivenessCCTNode[nodes.size()]));
+        final PresoObjLivenessCCTNode root = PresoObjLivenessCCTNode.rootNode(nodes.toArray(new PresoObjLivenessCCTNode[0]));
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -383,7 +383,7 @@ abstract class LivenessTreeTableView extends MemoryView {
         renderers[2] = new HideableBarRenderer(new NumberPercentRenderer());
         renderers[3] = new HideableBarRenderer(new NumberPercentRenderer() {
             public void setValue(Object value, int row) {
-                if (((Number)value).longValue() == -1) {
+                if (value == null || ((Number)value).longValue() == -1) {
                     super.setValue(null, row);
                 } else {
                     super.setValue(value, row);

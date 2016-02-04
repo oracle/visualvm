@@ -117,7 +117,7 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
             return EMPTY_PROFILEPOINT_ARRAY;
         }
 
-        return (RuntimeProfilingPoint[]) newPoints.toArray(new RuntimeProfilingPoint[newPoints.size()]);
+        return (RuntimeProfilingPoint[]) newPoints.toArray(new RuntimeProfilingPoint[0]);
     }
 
     /**
@@ -148,7 +148,7 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
             Collections.sort(newPoints, ByBciComparator);
         }
 
-        return (RuntimeProfilingPoint[]) newPoints.toArray(new RuntimeProfilingPoint[newPoints.size()]);
+        return (RuntimeProfilingPoint[]) newPoints.toArray(new RuntimeProfilingPoint[0]);
     }
 
     /**
@@ -186,7 +186,7 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
             Collections.sort(newPoints, ByBciComparator);
         }
 
-        return (RuntimeProfilingPoint[]) newPoints.toArray(new RuntimeProfilingPoint[newPoints.size()]);
+        return (RuntimeProfilingPoint[]) newPoints.toArray(new RuntimeProfilingPoint[0]);
     }
 
     /**
@@ -229,7 +229,7 @@ public class ClassManager implements JavaClassConstants, CommonConstants {
     }
 
     protected static void registerPlaceholder(PlaceholderClassInfo pci) {
-        ClassRepository.addPlaceholder(pci);
+        ClassRepository.addClassInfo(pci);
     }
 
     protected static void resetLoadedClassData() {

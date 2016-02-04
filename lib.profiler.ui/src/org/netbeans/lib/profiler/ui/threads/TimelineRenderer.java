@@ -78,11 +78,11 @@ public class TimelineRenderer extends BaseRenderer {
     }
     
     public void setValue(Object value, int row) {
-        rowView = (ViewManager.RowView)value;
+        rowView = (ViewManager.RowView)value; // NOTE: rowView can be set to null here!
     }
     
     public String toString() {
-        int lastIndex = rowView.getLastIndex();
+        int lastIndex = rowView == null ? -1 : rowView.getLastIndex();
         return getStateName(lastIndex == -1 ? -1 : rowView.getState(lastIndex));
     }
     
@@ -108,23 +108,28 @@ public class TimelineRenderer extends BaseRenderer {
             else oldX = x;
         }
         
+        if (rowView == null) return;
+        
         int i = rowView.getLastIndex();
-        if (i != -1) {
-            int xx = Math.min(rowView.getMaxPosition(), w);
-            while (i >= 0 && xx >= 0) xx = paintState(g, i--, xx, h);
-        }
-    }
-    
-    private int paintState(Graphics g, int i, int xx, int h) {
-        int x = Math.max(0, rowView.getPosition(rowView.getTime(i)));
+        if (i == -1) return;
         
-        Color c = ThreadData.getThreadStateColor(rowView.getState(i));
-        if (c != null) {
-            g.setColor(c);
-            g.fillRect(x + location.x, BAR_MARGIN + location.y, xx - x + 1, h - BAR_MARGIN_X2);
-        }
+        int xx = (i == rowView.getMaxIndex() ? rowView.getMaxPosition() :
+                  rowView.getPosition(rowView.getTime(i + 1))) + location.x;
         
-        return x - 1;
+        while (i >= 0 && xx >= 0) {
+            x = Math.max(0, rowView.getPosition(rowView.getTime(i))) + location.x;
+            int ww = xx - x;
+            if (ww > 0) {
+                Color c = ThreadData.getThreadStateColor(rowView.getState(i));
+                if (c != null) {
+                    g.setColor(c);
+                    g.fillRect(x, BAR_MARGIN + location.y, ww, h - BAR_MARGIN_X2);
+                }
+                
+                xx = x;
+            }
+            i--;
+        }
     }
     
     private static String getStateName(int state) {

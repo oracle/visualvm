@@ -60,6 +60,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleRole;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -144,7 +146,8 @@ import org.openide.windows.WindowManager;
     "ProfilerWindow_pluginsSection=Plugins:",
     "#NOI18N",
     "ProfilerWindow_mode=editor",
-    "ProfilerWindow_noFeature=<html><b>No profiling feature selected.</b><br><br>Please select at least one profiling feature for the session.</html>"
+    "ProfilerWindow_noFeature=<html><b>No profiling feature selected.</b><br><br>Please select at least one profiling feature for the session.</html>",
+    "ProfilerWindow_accessName=Profiler Window for {0}"
 })
 class ProfilerWindow extends ProfilerTopComponent {    
     
@@ -802,6 +805,33 @@ class ProfilerWindow extends ProfilerTopComponent {
         if (helpCtx == null) helpCtx = "ProfileWindow.HelpCtx"; // NOI18N
         
         return new HelpCtx(helpCtx);
+    }
+    
+    
+    // --- Accessibility -------------------------------------------------------
+    
+    private AccessibleContext accessibleContext;
+    
+    public AccessibleContext getAccessibleContext() {
+        if (accessibleContext == null) {
+            accessibleContext = new JComponent.AccessibleJComponent() {
+                public AccessibleRole getAccessibleRole() {
+                    return AccessibleRole.PANEL;
+                }
+
+                public String getAccessibleName() {
+                    return Bundle.ProfilerWindow_accessName(getDisplayName());
+                }
+
+                public String getAccessibleDescription() {
+                    ProfilerFeature selected = featuresView == null ? null :
+                                    featuresView.getSelectedFeature();
+                    return selected == null ? WelcomePanel.CAPTION :
+                           (selected.getName() + " " + selected.getDescription()); // NOI18N
+                }
+            };
+        }
+        return accessibleContext;
     }
     
     
