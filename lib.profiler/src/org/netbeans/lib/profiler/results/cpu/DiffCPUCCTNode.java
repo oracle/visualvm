@@ -141,7 +141,7 @@ class DiffCPUCCTNode extends PrestimeCPUCCTNodeBacked {
         
         for (PrestimeCPUCCTNode child : children) child.parent = parent;
         
-        return children.toArray(new PrestimeCPUCCTNode[children.size()]);
+        return children.toArray(new PrestimeCPUCCTNode[0]);
     }
     
     protected void resetChildren() {

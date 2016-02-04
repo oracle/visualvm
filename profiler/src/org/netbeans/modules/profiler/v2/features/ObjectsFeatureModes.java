@@ -444,8 +444,7 @@ final class ObjectsFeatureModes {
 
             StringBuilder b = new StringBuilder();
             HashSet<ClientUtils.SourceCodeSelection> _sel = getSelection();
-            ClientUtils.SourceCodeSelection[] classes = _sel.toArray(
-                    new ClientUtils.SourceCodeSelection[_sel.size()]);
+            ClientUtils.SourceCodeSelection[] classes = _sel.toArray(new ClientUtils.SourceCodeSelection[0]);
             for (int i = 0; i < classes.length; i++) {
                 b.append(classes[i].getClassName());
                 if (i < classes.length - 1) b.append(", "); // NOI18N
@@ -585,10 +584,10 @@ final class ObjectsFeatureModes {
                 };
                 lifecycleCheckbox.setToolTipText(Bundle.ObjectsFeatureModes_profileAllObjectsToolTip());
                 lifecycleCheckbox.setOpaque(false);
-                selectionContent.add(createButtonStrut(lifecycleCheckbox, 8, true));
+                selectionContent.add(createStrut(lifecycleCheckbox, 8, true));
                 selectionContent.add(lifecycleCheckbox);
                 
-                selectionContent.add(createButtonStrut(lifecycleCheckbox, 5, false));
+                selectionContent.add(createStrut(lifecycleCheckbox, 5, false));
                 if (UIUtils.isOracleLookAndFeel()) selectionContent.add(Box.createHorizontalStrut(4));
                 
                 final JLabel unlimited = new GrayLabel(Bundle.ObjectsFeatureModes_lblUnlimited());
@@ -609,7 +608,7 @@ final class ObjectsFeatureModes {
                 outgoingCheckbox.setOpaque(false);
                 selectionContent.add(outgoingCheckbox);
                 
-                selectionContent.add(createButtonStrut(outgoingCheckbox, 5, false));
+                selectionContent.add(createStrut(outgoingCheckbox, 5, false));
                 if (UIUtils.isOracleLookAndFeel()) selectionContent.add(Box.createHorizontalStrut(4));
                 
                 unlimited.setVisible(!outgoingCheckbox.isSelected());
@@ -914,10 +913,10 @@ final class ObjectsFeatureModes {
                 };
                 lifecycleCheckbox.setToolTipText(Bundle.ObjectsFeatureModes_profileAllObjectsToolTip());
                 lifecycleCheckbox.setOpaque(false);
-                settingsPanel.add(createButtonStrut(lifecycleCheckbox, 8, true));
+                settingsPanel.add(createStrut(lifecycleCheckbox, 8, true));
                 settingsPanel.add(lifecycleCheckbox);
                 
-                settingsPanel.add(createButtonStrut(lifecycleCheckbox, 5, false));
+                settingsPanel.add(createStrut(lifecycleCheckbox, 5, false));
                 if (UIUtils.isOracleLookAndFeel()) p.add(Box.createHorizontalStrut(4));
                 
                 final JLabel unlimited = new GrayLabel(Bundle.ObjectsFeatureModes_lblUnlimited());
@@ -938,7 +937,7 @@ final class ObjectsFeatureModes {
                 outgoingCheckbox.setOpaque(false);
                 settingsPanel.add(outgoingCheckbox);
                 
-                settingsPanel.add(createButtonStrut(outgoingCheckbox, 5, false));
+                settingsPanel.add(createStrut(outgoingCheckbox, 5, false));
                 if (UIUtils.isOracleLookAndFeel()) settingsPanel.add(Box.createHorizontalStrut(4));
                 
                 unlimited.setVisible(!outgoingCheckbox.isSelected());
@@ -1012,9 +1011,9 @@ final class ObjectsFeatureModes {
     }
     
     
-    private static Component createButtonStrut(AbstractButton ab, int width, boolean before) {
-        Border b = ab.getBorder();
-        Insets i = b != null ? b.getBorderInsets(ab) : null;
+    private static Component createStrut(JComponent c, int width, boolean before) {
+        Border b = c.getBorder();
+        Insets i = b != null ? b.getBorderInsets(c) : null;
         int w = i == null ? width : Math.max(width - (before ? i.left : i.right), 0);
         return Box.createHorizontalStrut(w);
     }

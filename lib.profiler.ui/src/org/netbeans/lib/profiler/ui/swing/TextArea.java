@@ -165,7 +165,7 @@ public class TextArea extends JTextArea {
     
     protected void processMouseEvent(MouseEvent e) {
         super.processMouseEvent(e);
-        if (e.isPopupTrigger()) showPopup(e);
+        if (e.isPopupTrigger() && isEnabled()) showPopup(e);
     }
     
     

@@ -346,8 +346,7 @@ public class ProfilingSettings {
     }
 
     public ClientUtils.SourceCodeSelection[] getInstrumentationMarkerMethods() {
-        return (ClientUtils.SourceCodeSelection[]) instrumentationMarkerMethods.toArray(new ClientUtils.SourceCodeSelection[instrumentationMarkerMethods
-                                                                                                                            .size()]);
+        return (ClientUtils.SourceCodeSelection[]) instrumentationMarkerMethods.toArray(new ClientUtils.SourceCodeSelection[0]);
     }
 
     public ClientUtils.SourceCodeSelection[] getInstrumentationMethods() {
@@ -357,7 +356,7 @@ public class ProfilingSettings {
         methods.addAll(instrumentationRootMethods);
         methods.addAll(instrumentationMarkerMethods);
 
-        return (ClientUtils.SourceCodeSelection[]) methods.toArray(new ClientUtils.SourceCodeSelection[methods.size()]);
+        return (ClientUtils.SourceCodeSelection[]) methods.toArray(new ClientUtils.SourceCodeSelection[0]);
     }
 
     public void setInstrumentationRootMethods(final ClientUtils.SourceCodeSelection[] roots) {
@@ -373,8 +372,7 @@ public class ProfilingSettings {
     }
 
     public ClientUtils.SourceCodeSelection[] getInstrumentationRootMethods() {
-        return (ClientUtils.SourceCodeSelection[]) instrumentationRootMethods.toArray(new ClientUtils.SourceCodeSelection[instrumentationRootMethods
-                                                                                                                          .size()]);
+        return (ClientUtils.SourceCodeSelection[]) instrumentationRootMethods.toArray(new ClientUtils.SourceCodeSelection[0]);
     }
     
     public void setSamplingFrequency(int samplingFrequency) {
@@ -611,7 +609,7 @@ public class ProfilingSettings {
         //    for(Iterator iter=rootMethods.iterator();iter.hasNext();) {
         //      ((ClientUtils.SourceCodeSelection)iter.next()).setMarkerMethod(true);
         //    }
-        //    settings.setInstrumentationRootMethods((ClientUtils.SourceCodeSelection[])rootMethods.toArray(new ClientUtils.SourceCodeSelection[rootMethods.size()]));
+        //    settings.setInstrumentationRootMethods((ClientUtils.SourceCodeSelection[])rootMethods.toArray(new ClientUtils.SourceCodeSelection[0]));
         settings.setInstrumentationRootMethods(getInstrumentationMethods());
 
         // Now applySettings the filters to the Engine's instrumentation filter

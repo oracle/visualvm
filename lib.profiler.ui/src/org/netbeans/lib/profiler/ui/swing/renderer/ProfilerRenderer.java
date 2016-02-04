@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.ui.swing.renderer;
 
+import javax.accessibility.Accessible;
 import javax.swing.JComponent;
 
 /**
@@ -50,7 +51,7 @@ import javax.swing.JComponent;
  *
  * @author Jiri Sedlacek
  */
-public interface ProfilerRenderer extends Movable {
+public interface ProfilerRenderer extends Movable, Accessible {
     
     public void setValue(Object value, int row);
     

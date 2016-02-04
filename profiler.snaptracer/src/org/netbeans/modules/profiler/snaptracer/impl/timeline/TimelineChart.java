@@ -601,7 +601,7 @@ final class TimelineChart extends SynchronousXYChart {
         }
 
         SynchronousXYItem[] getItems() {
-            return items.toArray(new SynchronousXYItem[items.size()]);
+            return items.toArray(new SynchronousXYItem[0]);
         }
 
         @SuppressWarnings("element-type-mismatch")

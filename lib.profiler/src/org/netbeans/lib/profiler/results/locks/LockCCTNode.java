@@ -93,7 +93,7 @@ public abstract class LockCCTNode extends CCTNode {
         if (children == null) {
             computeChildrenImpl();
         }
-        return children.toArray(new LockCCTNode[children.size()]);
+        return children.toArray(new LockCCTNode[0]);
     }
 
     @Override

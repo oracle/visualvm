@@ -59,28 +59,35 @@ public class LockContentionRenderer extends NormalBoldGrayRenderer {
     private static final Icon LOCK_ICON = Icons.getIcon(ProfilerIcons.WINDOW_LOCKS);
     
     public void setValue(Object value, int row) {
-        LockCCTNode node = (LockCCTNode)value;
-        
-        boolean lockNode = node.isThreadLockNode();
-        boolean monitorNode = node.isMonitorNode();
-        
-        String nodeName = node.getNodeName();
-        int bracketIndex = nodeName.indexOf('('); // NOI18N
-        int dotIndex = nodeName.lastIndexOf('.'); // NOI18N
-        
-        String normalValue = getNormalValue(node, nodeName, bracketIndex, dotIndex, lockNode);
-        String boldValue = getBoldValue(node, nodeName, bracketIndex, dotIndex, lockNode);
-        String grayValue = getGrayValue(node, nodeName, bracketIndex, dotIndex, lockNode);
-        
-        setNormalValue(normalValue);
-        setBoldValue(boldValue);
-        setGrayValue(grayValue);
-        
-        Icon icon = null;
-        if (lockNode) icon = THREAD_ICON;
-        else if (monitorNode) icon = LOCK_ICON;
-        
-        setIcon(icon);
+        if (value == null) {
+            setNormalValue(""); // NOI18N
+            setBoldValue(""); // NOI18N
+            setGrayValue(""); // NOI18N
+            setIcon(null);
+        } else {
+            LockCCTNode node = (LockCCTNode)value;
+
+            boolean lockNode = node.isThreadLockNode();
+            boolean monitorNode = node.isMonitorNode();
+
+            String nodeName = node.getNodeName();
+            int bracketIndex = nodeName.indexOf('('); // NOI18N
+            int dotIndex = nodeName.lastIndexOf('.'); // NOI18N
+
+            String normalValue = getNormalValue(node, nodeName, bracketIndex, dotIndex, lockNode);
+            String boldValue = getBoldValue(node, nodeName, bracketIndex, dotIndex, lockNode);
+            String grayValue = getGrayValue(node, nodeName, bracketIndex, dotIndex, lockNode);
+
+            setNormalValue(normalValue);
+            setBoldValue(boldValue);
+            setGrayValue(grayValue);
+
+            Icon icon = null;
+            if (lockNode) icon = THREAD_ICON;
+            else if (monitorNode) icon = LOCK_ICON;
+
+            setIcon(icon);
+        }
     }
     
     private String getNormalValue(LockCCTNode node, String nodeName, int bracketIndex,
