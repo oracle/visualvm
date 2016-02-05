@@ -105,6 +105,7 @@ import org.netbeans.lib.profiler.common.CommonUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.lib.profiler.ui.components.table.DiffBarCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
+import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -964,7 +965,7 @@ public class ClassesListControllerUI extends JTitledPanel {
         
         if(showSourceItem != null) {
             String className = BrowserUtils.getArrayBaseType((String)displayCache[row][0]);
-            showSourceItem.setEnabled(!BrowserUtils.isPrimitiveType(className));
+            showSourceItem.setEnabled(!VMUtils.isPrimitiveType(className));
         }
         tablePopup.show(classesListTable, x, y);
     }

@@ -106,9 +106,6 @@ public class BrowserUtils {
 
     private static final int MAX_FULLNAME_LENGTH = 100;
 
-    private static final Set<String> PRIMITIVE_TYPES = new HashSet<String>(
-            Arrays.asList("char", "byte", "short", "int", "long", "float", "double", "boolean"));
-
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     /** Get item class of an array. (e.g. <code>byte[]</code> for <code>byte[][]</code>)
@@ -416,10 +413,4 @@ public class BrowserUtils {
         return name;
     }
     
-    /** Check if the className is primitive type.
-     */
-    public static boolean isPrimitiveType(String className) {
-        return PRIMITIVE_TYPES.contains(className);
-    }
-
 }
