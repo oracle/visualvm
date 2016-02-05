@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.utils;
 
+import static org.netbeans.lib.profiler.utils.VMUtils.*;
 
 /**
  * A class that can be used to obtain Java class or method name formatted in various ways.
@@ -52,25 +53,6 @@ package org.netbeans.lib.profiler.utils;
  */
 public class MethodNameFormatter {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    private static final String BOOLEAN_TEXT = "boolean"; // NOI18N
-    private static final String CHAR_TEXT = "char"; // NOI18N
-    private static final String BYTE_TEXT = "byte"; // NOI18N
-    private static final String SHORT_TEXT = "short"; // NOI18N
-    private static final String INT_TEXT = "int"; // NOI18N
-    private static final String LONG_TEXT = "long"; // NOI18N
-    private static final String FLOAT_TEXT = "float"; // NOI18N
-    private static final String DOUBLE_TEXT = "double"; // NOI18N
-    private static final String VOID_TEXT = "void"; // NOI18N
-    private static final char BOOLEAN_CODE = 'Z'; // NOI18N
-    private static final char CHAR_CODE = 'C'; // NOI18N
-    private static final char BYTE_CODE = 'B'; // NOI18N
-    private static final char SHORT_CODE = 'S'; // NOI18N
-    private static final char INT_CODE = 'I'; // NOI18N
-    private static final char LONG_CODE = 'J'; // NOI18N
-    private static final char FLOAT_CODE = 'F'; // NOI18N
-    private static final char DOUBLE_CODE = 'D'; // NOI18N
-    private static final char VOID_CODE = 'V'; // NOI18N
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -137,24 +119,24 @@ public class MethodNameFormatter {
 
                     nextChar = returnType.charAt(curPos++);
 
-                    if (nextChar == BOOLEAN_CODE) {
-                        returnType = BOOLEAN_TEXT + arrayIndicator.toString();
-                    } else if (nextChar == CHAR_CODE) {
-                        returnType = CHAR_TEXT + arrayIndicator.toString();
-                    } else if (nextChar == BYTE_CODE) {
-                        returnType = BYTE_TEXT + arrayIndicator.toString();
-                    } else if (nextChar == SHORT_CODE) {
-                        returnType = SHORT_TEXT + arrayIndicator.toString();
-                    } else if (nextChar == INT_CODE) {
-                        returnType = INT_TEXT + arrayIndicator.toString();
-                    } else if (nextChar == LONG_CODE) {
-                        returnType = LONG_TEXT + arrayIndicator.toString();
-                    } else if (nextChar == FLOAT_CODE) {
-                        returnType = FLOAT_TEXT + arrayIndicator.toString();
-                    } else if (nextChar == DOUBLE_CODE) {
-                        returnType = DOUBLE_TEXT + arrayIndicator.toString();
-                    } else if (nextChar == VOID_CODE) {
-                        returnType = VOID_TEXT + arrayIndicator.toString();
+                    if (nextChar == BOOLEAN) {
+                        returnType = BOOLEAN_STRING + arrayIndicator.toString();
+                    } else if (nextChar == CHAR) {
+                        returnType = CHAR_STRING + arrayIndicator.toString();
+                    } else if (nextChar == BYTE) {
+                        returnType = BYTE_STRING + arrayIndicator.toString();
+                    } else if (nextChar == SHORT) {
+                        returnType = SHORT_STRING + arrayIndicator.toString();
+                    } else if (nextChar == INT) {
+                        returnType = INT_STRING + arrayIndicator.toString();
+                    } else if (nextChar == LONG) {
+                        returnType = LONG_STRING + arrayIndicator.toString();
+                    } else if (nextChar == FLOAT) {
+                        returnType = FLOAT_STRING + arrayIndicator.toString();
+                    } else if (nextChar == DOUBLE) {
+                        returnType = DOUBLE_STRING + arrayIndicator.toString();
+                    } else if (nextChar == VOID) {
+                        returnType = VOID_STRING + arrayIndicator.toString();
                     } else { // return type is a class
                              // Check if the class belongs to the java.lang.* package, and replace it with simple name if so.
                              // However, avoid doing so if it's from say java.lang.ref.* package - otherwise we'll get confusing
@@ -191,22 +173,22 @@ public class MethodNameFormatter {
 
                         nextChar = paramsString.charAt(curPos++);
 
-                        if (nextChar == BOOLEAN_CODE) {
-                            paramsBuf.append(BOOLEAN_TEXT);
-                        } else if (nextChar == CHAR_CODE) {
-                            paramsBuf.append(CHAR_TEXT);
-                        } else if (nextChar == BYTE_CODE) {
-                            paramsBuf.append(BYTE_TEXT);
-                        } else if (nextChar == SHORT_CODE) {
-                            paramsBuf.append(SHORT_TEXT);
-                        } else if (nextChar == INT_CODE) {
-                            paramsBuf.append(INT_TEXT);
-                        } else if (nextChar == LONG_CODE) {
-                            paramsBuf.append(LONG_TEXT);
-                        } else if (nextChar == FLOAT_CODE) {
-                            paramsBuf.append(FLOAT_TEXT);
-                        } else if (nextChar == DOUBLE_CODE) {
-                            paramsBuf.append(DOUBLE_TEXT);
+                        if (nextChar == BOOLEAN) {
+                            paramsBuf.append(BOOLEAN_STRING);
+                        } else if (nextChar == CHAR) {
+                            paramsBuf.append(CHAR);
+                        } else if (nextChar == BYTE) {
+                            paramsBuf.append(BYTE_STRING);
+                        } else if (nextChar == SHORT) {
+                            paramsBuf.append(SHORT_STRING);
+                        } else if (nextChar == INT) {
+                            paramsBuf.append(INT_STRING);
+                        } else if (nextChar == LONG) {
+                            paramsBuf.append(LONG_STRING);
+                        } else if (nextChar == FLOAT) {
+                            paramsBuf.append(FLOAT_STRING);
+                        } else if (nextChar == DOUBLE) {
+                            paramsBuf.append(DOUBLE_STRING);
                         } else { // it's a class
 
                             int startPos = curPos;
