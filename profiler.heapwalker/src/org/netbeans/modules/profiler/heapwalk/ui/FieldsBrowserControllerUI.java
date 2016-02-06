@@ -95,6 +95,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.utils.VMUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -870,7 +871,7 @@ public class FieldsBrowserControllerUI extends JTitledPanel {
                     className = instanceNode.getInstance().getJavaClass().getName();
                 }
             }
-            showSourceItem.setEnabled(className != null && !BrowserUtils.isPrimitiveType(BrowserUtils.getArrayBaseType(className)));
+            showSourceItem.setEnabled(className != null && !VMUtils.isPrimitiveType(BrowserUtils.getArrayBaseType(className)));
         }
 
         if ((x == -1) || (y == -1)) {
