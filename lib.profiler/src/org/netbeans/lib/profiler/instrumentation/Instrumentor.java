@@ -193,8 +193,6 @@ public class Instrumentor implements CommonConstants {
 
     public void setStatusInfoFromSourceCodeSelection(SourceCodeSelection[] s)
                                               throws ClassNotFoundException, BadLocationException, IOException, ClassFormatError {
-        ClassRepository.CodeRegionBCI location = null;
-
         if (s.length > 0) {
             SourceCodeSelection sel = s[0];
 

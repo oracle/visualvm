@@ -44,7 +44,6 @@
 package org.netbeans.lib.profiler.marker;
 
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.results.cpu.marking.MarkMapping;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import java.util.ArrayList;
