@@ -276,6 +276,17 @@ public class ProfilerInterface implements CommonConstants {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final int REDEFINE_CHUNK_SIZE = 500;
+    
+    static final char BOOLEAN = 'Z'; // NOI18N
+    static final char CHAR = 'C'; // NOI18N
+    static final char BYTE = 'B'; // NOI18N
+    static final char SHORT = 'S'; // NOI18N
+    static final char INT = 'I'; // NOI18N
+    static final char LONG = 'J'; // NOI18N
+    static final char FLOAT = 'F'; // NOI18N
+    static final char DOUBLE = 'D'; // NOI18N
+    static final char VOID = 'V'; // NOI18N
+    static final char REFERENCE = 'L'; // NOI18N
 
     // -----
     // I18N String constants
@@ -900,23 +911,23 @@ public class ProfilerInterface implements CommonConstants {
         }
 
         if (type == Integer.TYPE) {
-            sb.append('I'); // NOI18N
+            sb.append(INT);
         } else if (type == Boolean.TYPE) {
-            sb.append('Z'); // NOI18N
+            sb.append(BOOLEAN);
         } else if (type == Byte.TYPE) {
-            sb.append('B'); // NOI18N
+            sb.append(BYTE);
         } else if (type == Character.TYPE) {
-            sb.append('C'); // NOI18N
+            sb.append(CHAR);
         } else if (type == Long.TYPE) {
-            sb.append('J'); // NOI18N
+            sb.append(LONG);
         } else if (type == Float.TYPE) {
-            sb.append('F'); // NOI18N
+            sb.append(FLOAT);
         } else if (type == Double.TYPE) {
-            sb.append('D'); // NOI18N
+            sb.append(DOUBLE);
         } else if (type == Void.TYPE) {
-            sb.append('V'); // NOI18N
+            sb.append(VOID);
         } else {
-            sb.append('L'); // NOI18N
+            sb.append(REFERENCE);
             sb.append(type.getName().replace('.', '/')); // NOI18N
             sb.append(';'); // NOI18N
         }

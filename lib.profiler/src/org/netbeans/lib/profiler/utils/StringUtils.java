@@ -52,6 +52,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.ResourceBundle;
 
+import static org.netbeans.lib.profiler.utils.VMUtils.*;
 
 /**
  * Utility methods for String-related operations.
@@ -315,29 +316,29 @@ public class StringUtils {
             if (lastBrackPos == (className.length() - 2)) { // It's an array of ultimately primitive type, e.g. [[C
 
                 switch (className.charAt(lastBrackPos + 1)) {
-                    case 'C':
-                        elemType = "char"; // NOI18N
+                    case CHAR:
+                        elemType = CHAR_STRING;
                         break;
-                    case 'B':
-                        elemType = "byte"; // NOI18N
+                    case BYTE:
+                        elemType = BYTE_STRING;
                         break;
-                    case 'I':
-                        elemType = "int"; // NOI18N
+                    case INT:
+                        elemType = INT_STRING;
                         break;
-                    case 'Z':
-                        elemType = "boolean"; // NOI18N
+                    case BOOLEAN:
+                        elemType = BOOLEAN_STRING;
                         break;
-                    case 'F':
-                        elemType = "float"; // NOI18N
+                    case FLOAT:
+                        elemType = FLOAT_STRING;
                         break;
-                    case 'D':
-                        elemType = "double"; // NOI18N
+                    case DOUBLE:
+                        elemType = DOUBLE_STRING;
                         break;
-                    case 'S':
-                        elemType = "short"; // NOI18N
+                    case SHORT:
+                        elemType = SHORT_STRING;
                         break;
-                    case 'J':
-                        elemType = "long"; // NOI18N
+                    case LONG:
+                        elemType = LONG_STRING;
                         break;
                 }
             } else {

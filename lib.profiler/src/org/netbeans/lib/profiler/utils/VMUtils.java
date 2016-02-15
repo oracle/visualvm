@@ -52,6 +52,17 @@ package org.netbeans.lib.profiler.utils;
 public class VMUtils {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
+    public static final char BOOLEAN = 'Z'; // NOI18N
+    public static final char CHAR = 'C'; // NOI18N
+    public static final char BYTE = 'B'; // NOI18N
+    public static final char SHORT = 'S'; // NOI18N
+    public static final char INT = 'I'; // NOI18N
+    public static final char LONG = 'J'; // NOI18N
+    public static final char FLOAT = 'F'; // NOI18N
+    public static final char DOUBLE = 'D'; // NOI18N
+    public static final char VOID = 'V'; // NOI18N
+    public static final char REFERENCE = 'L'; // NOI18N
+
     public static final String BOOLEAN_CODE = "Z"; // NOI18N
     public static final String CHAR_CODE = "C"; // NOI18N
     public static final String BYTE_CODE = "B"; // NOI18N

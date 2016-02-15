@@ -70,15 +70,6 @@ class HeapHistogramManager {
     private static final String FLOAT_TEXT = "float"; // NOI18N
     private static final String DOUBLE_TEXT = "double"; // NOI18N
     private static final String VOID_TEXT = "void"; // NOI18N
-    private static final char BOOLEAN_CODE = 'Z'; // NOI18N
-    private static final char CHAR_CODE = 'C'; // NOI18N
-    private static final char BYTE_CODE = 'B'; // NOI18N
-    private static final char SHORT_CODE = 'S'; // NOI18N
-    private static final char INT_CODE = 'I'; // NOI18N
-    private static final char LONG_CODE = 'J'; // NOI18N
-    private static final char FLOAT_CODE = 'F'; // NOI18N
-    private static final char DOUBLE_CODE = 'D'; // NOI18N
-    private static final char OBJECT_CODE = 'L'; // NOI18N
     private static final Map permGenNames = new HashMap();
 
     static {
@@ -306,31 +297,31 @@ class HeapHistogramManager {
 
             if (index != -1) {
                 switch (jvmName.charAt(index + 1)) {
-                    case BOOLEAN_CODE:
+                    case ProfilerInterface.BOOLEAN:
                         name = BOOLEAN_TEXT;
                         break;
-                    case CHAR_CODE:
+                    case ProfilerInterface.CHAR:
                         name = CHAR_TEXT;
                         break;
-                    case BYTE_CODE:
+                    case ProfilerInterface.BYTE:
                         name = BYTE_TEXT;
                         break;
-                    case SHORT_CODE:
+                    case ProfilerInterface.SHORT:
                         name = SHORT_TEXT;
                         break;
-                    case INT_CODE:
+                    case ProfilerInterface.INT:
                         name = INT_TEXT;
                         break;
-                    case LONG_CODE:
+                    case ProfilerInterface.LONG:
                         name = LONG_TEXT;
                         break;
-                    case FLOAT_CODE:
+                    case ProfilerInterface.FLOAT:
                         name = FLOAT_TEXT;
                         break;
-                    case DOUBLE_CODE:
+                    case ProfilerInterface.DOUBLE:
                         name = DOUBLE_TEXT;
                         break;
-                    case OBJECT_CODE:
+                    case ProfilerInterface.REFERENCE:
                         name = jvmName.substring(index + 2, jvmName.length() - 1);
                         break;
                     default:
