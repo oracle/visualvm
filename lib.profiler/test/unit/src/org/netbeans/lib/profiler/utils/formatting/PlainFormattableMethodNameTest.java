@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.utils;
+package org.netbeans.lib.profiler.utils.formatting;
 
 import junit.framework.TestCase;
 
@@ -51,7 +51,7 @@ import junit.framework.TestCase;
  *
  * @author Ian Formanek
  */
-public final class MethodNameFormatterTest extends TestCase {
+public final class PlainFormattableMethodNameTest extends TestCase {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final String[] patternSources = {
@@ -91,10 +91,10 @@ public final class MethodNameFormatterTest extends TestCase {
     "int[][][][][][][][]", // paramsString
     "float[][][][][][][][][]", // returnType
     "foo.bar.Constr", // formattedClass
-    "foo.bar.Constr.<init>()", // formattedClassAndMethod
-    "<init>()", // formattedMethod
-    "foo.bar.Constr.<init>()", // fullFormattedClassAndMethod
-    "<init>()", // fullFormattedMethod
+    "foo.bar.Constr", // formattedClassAndMethod
+    "", // formattedMethod
+    "foo.bar.Constr", // fullFormattedClassAndMethod
+    "", // fullFormattedMethod
     "", // paramsString
     "", // returnType
     "foo.bar.Constr", // formattedClass
@@ -126,12 +126,12 @@ public final class MethodNameFormatterTest extends TestCase {
      * Test to ensure that the formatting of test methods is as expected.
      */
     public void testFormatting() {
-        MethodNameFormatter mnf;
+        PlainFormattableMethodName mnf;
 
         int count = 0;
 
         for (int i = 0; (i + 2) < patternSources.length; i += 3) {
-            mnf = new MethodNameFormatter(patternSources[i], patternSources[i + 1], patternSources[i + 2]);
+            mnf = new PlainFormattableMethodName(patternSources[i], patternSources[i + 1], patternSources[i + 2], 0);
 
             assertEquals("Wrong results for getFormattedClass " + mnf, patternResults[count++], mnf.getFormattedClass());
             assertEquals("Wrong results for getFormattedClassAndMethod " + mnf, patternResults[count++],
@@ -141,7 +141,7 @@ public final class MethodNameFormatterTest extends TestCase {
                          mnf.getFullFormattedClassAndMethod());
             assertEquals("Wrong results for getFullFormattedMethod " + mnf, patternResults[count++], mnf.getFullFormattedMethod());
             assertEquals("Wrong results for getParamsString " + mnf, patternResults[count++], mnf.getParamsString());
-            assertEquals("Wrong results for getReturnType " + mnf, patternResults[count++], mnf.getReturnType());
+            assertEquals("Wrong results for getReturnType " + mnf, patternResults[count++], mnf.getReturnTypeX());
         }
     }
 

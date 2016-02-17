@@ -41,10 +41,8 @@
  */
 package org.netbeans.modules.profiler.oql.engine.api.impl;
 
-import org.netbeans.modules.profiler.oql.engine.api.ReferenceChain;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,6 +56,9 @@ import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.lib.profiler.heap.Value;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
+import org.netbeans.modules.profiler.oql.engine.api.ReferenceChain;
+
+import static org.netbeans.lib.profiler.utils.VMUtils.*;
 
 /**
  *
@@ -119,25 +120,25 @@ public class Snapshot {
             className = className.substring(arrDim);
         }
         if (className.length() == 1) {
-            if (className.equals("I")) { // NOI18N
-                className = "int"; // NOI18N
-            } else if (className.equals("J")) { // NOI18N
-                className = "long"; // NOI18N
-            } else if (className.equals("D")) { // NOI18N
-                className = "double"; // NOI18N
-            } else if (className.equals("F")) { // NOI18N
-                className = "float"; // NOI18N
-            } else if (className.equals("B")) { // NOI18N
-                className = "byte"; // NOI18N
-            } else if (className.equals("S")) { // NOI18N
-                className = "short"; // NOI18N
-            } else if (className.equals("C")) { // NOI18N
-                className = "char"; // NOI18N
-            } else if (className.equals("Z")) { // NOI18N
-                className = "boolean"; // NOI18N
+            if (className.equals(INT_CODE)) {
+                className = INT_STRING;
+            } else if (className.equals(LONG_CODE)) {
+                className = LONG_STRING;
+            } else if (className.equals(DOUBLE_CODE)) {
+                className = DOUBLE_STRING;
+            } else if (className.equals(FLOAT_CODE)) {
+                className = FLOAT_STRING;
+            } else if (className.equals(BYTE_CODE)) {
+                className = BYTE_STRING;
+            } else if (className.equals(SHORT_CODE)) {
+                className = SHORT_STRING;
+            } else if (className.equals(CHAR_CODE)) {
+                className = CHAR_STRING;
+            } else if (className.equals(BOOLEAN_CODE)) {
+                className = BOOLEAN_STRING;
             }
         }
-        if (arrDim > 0 && className.startsWith("L")) { // NOI18N
+        if (arrDim > 0 && className.charAt(0) == REFERENCE) {   // class name
             className = className.substring(1);
         }
         StringBuilder sb = new StringBuilder(className);

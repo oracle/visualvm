@@ -44,7 +44,6 @@
 package org.netbeans.lib.profiler.utils.formatting;
 
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.utils.*;
 
 
 /**
