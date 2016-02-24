@@ -44,7 +44,6 @@
 package org.netbeans.lib.profiler.results.cpu;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
