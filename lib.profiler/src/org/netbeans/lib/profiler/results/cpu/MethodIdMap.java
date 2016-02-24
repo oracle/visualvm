@@ -79,7 +79,7 @@ public class MethodIdMap {
      *                                   equal to the number of instrumented methods, but some entries may be the same of
      *                                   course.
      * @param nInstrMethods              number of entries in this array that are actually used
-     * @param newView                    the new view for which we are creeating ids - class-level or package-level
+     * @param newView                    the new view for which we are creating ids - class-level or package-level
      */
     public MethodIdMap(String[] methodLevelInstrClassNames, int nInstrMethods, int newView) {
         this.newView = newView;
