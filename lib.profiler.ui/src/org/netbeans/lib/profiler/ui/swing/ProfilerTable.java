@@ -272,7 +272,7 @@ public class ProfilerTable extends JTable {
         ProfilerRendererWrapper(ProfilerRenderer renderer) { this.renderer = renderer; }
         
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            setValue(value, table.convertRowIndexToModel(row));
+            setValue(value, row != -1 ? table.convertRowIndexToModel(row) : -1);
             return getComponent();
         }
         
