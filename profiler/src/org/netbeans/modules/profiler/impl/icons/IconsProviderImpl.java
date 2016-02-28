@@ -166,6 +166,7 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(ProfilerIcons.WINDOW_TELEMETRY_OVERVIEW, "telemetryOverviewWindow.png");
         cache.put(ProfilerIcons.WINDOW_THREADS, "threadsWindow.png");
         cache.put(ProfilerIcons.WINDOW_LOCKS, "locksWindow.png");
+        cache.put(ProfilerIcons.WINDOW_SQL, "sqlWindow.png");
         cache.put(ProfilerIcons.VIEW_LIVE_RESULTS_CPU_32, "liveResultsCPUView32.png");
         cache.put(ProfilerIcons.VIEW_LIVE_RESULTS_FRAGMENT_32, "liveResultsFragmentView32.png");
         cache.put(ProfilerIcons.VIEW_LIVE_RESULTS_MEMORY_32, "liveResultsMemView32.png");

@@ -201,11 +201,11 @@ public class PresoObjAllocCCTNode extends CCTNode {
         JMethodIdTable.getDefault().getNamesForMethodIds(profilerClient);
     }
 
-    public static PresoObjAllocCCTNode createPresentationCCTFromSnapshot(MemoryResultsSnapshot snapshot,
+    public static PresoObjAllocCCTNode createPresentationCCTFromSnapshot(JMethodIdTable methodIdTable,
                                                                          RuntimeMemoryCCTNode rootRuntimeNode,
                                                                          String classTypeName) {
         PresoObjAllocCCTNode rootNode = generateMirrorNode(rootRuntimeNode);
-        assignNamesToNodesFromSnapshot(snapshot, rootNode, classTypeName);
+        assignNamesToNodesFromSnapshot(methodIdTable, rootNode, classTypeName);
 
         return rootNode;
     }
@@ -368,10 +368,10 @@ public class PresoObjAllocCCTNode extends CCTNode {
         return entry.className.hashCode() ^ entry.methodName.hashCode() ^ entry.methodSig.hashCode();
     }
 
-    protected static void assignNamesToNodesFromSnapshot(MemoryResultsSnapshot snapshot, PresoObjAllocCCTNode rootNode,
+    protected static void assignNamesToNodesFromSnapshot(JMethodIdTable methodIdTable, PresoObjAllocCCTNode rootNode,
                                                          String classTypeName) {
         rootNode.className = StringUtils.userFormClassName(classTypeName);
-        rootNode.setFullClassAndMethodInfo(snapshot.getJMethodIdTable());
+        rootNode.setFullClassAndMethodInfo(methodIdTable);
     }
 
     protected static void assignNamesToNodesFromVM(ProfilerClient profilerClient, PresoObjAllocCCTNode rootNode,
