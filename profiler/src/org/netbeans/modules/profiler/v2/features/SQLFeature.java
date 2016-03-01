@@ -49,6 +49,7 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.ResultsListener;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
@@ -59,6 +60,8 @@ import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.modules.profiler.v2.impl.WeakProcessor;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
+import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -111,6 +114,16 @@ final class SQLFeature extends ProfilerFeature.Basic {
     
     private SQLFeatureUI getUI() {
         if (ui == null) ui = new SQLFeatureUI() {
+            void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        String name = Wildcards.ALLWILDCARD.equals(value.getMethodName()) ?
+                                      "Profile Class" :
+                                      "Profile Method";
+                        ProfilerSession.findAndConfigure(Lookups.fixed(value), getProject(), name);
+                    }
+                });
+            }
             Lookup.Provider getProject() {
                 return SQLFeature.this.getSession().getProject();
             }

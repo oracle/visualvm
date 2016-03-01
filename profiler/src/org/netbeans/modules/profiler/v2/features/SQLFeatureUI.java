@@ -83,11 +83,13 @@ abstract class SQLFeatureUI extends FeatureUI {
     
     // --- External implementation ---------------------------------------------
         
+    abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
+    
+    abstract Lookup.Provider getProject();
+    
     abstract ProfilerClient getProfilerClient();
     
     abstract void refreshResults();
-    
-    abstract Lookup.Provider getProject();
     
    
     // --- API implementation --------------------------------------------------
@@ -169,7 +171,7 @@ abstract class SQLFeatureUI extends FeatureUI {
                 GoToSource.openSource(project, className, methodName, methodSig);
             }
             protected void selectForProfiling(ClientUtils.SourceCodeSelection value) {
-//                throw new UnsupportedOperationException("Not supported yet.");
+                SQLFeatureUI.this.selectForProfiling(value);
             }
             protected void popupShowing() {
                 if (lrPauseButton.isEnabled() && !lrRefreshButton.isEnabled()) {

@@ -245,11 +245,11 @@ public abstract class LiveJDBCView extends JPanel {
     protected void popupHidden() {};
     
     
-    protected void foundInForwardCalls() {}
-    
-    protected void foundInHotSpots() {}
-    
-    protected void foundInReverseCalls() {}
+//    protected void foundInForwardCalls() {}
+//    
+//    protected void foundInHotSpots() {}
+//    
+//    protected void foundInReverseCalls() {}
     
     
     private void profileMethod(ClientUtils.SourceCodeSelection value) {
