@@ -46,6 +46,7 @@ package org.netbeans.lib.profiler.ui.jdbc;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.util.Collection;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,15 +58,14 @@ import javax.swing.JPopupMenu;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
+import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
+import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
 import org.netbeans.lib.profiler.ui.memory.LiveMemoryView;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.openide.util.Lookup;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -76,10 +76,10 @@ public abstract class LiveJDBCView extends JPanel {
     private static final int MIN_UPDATE_DIFF = 900;
     private static final int MAX_UPDATE_DIFF = 1400;
     
-    private final ResultsMonitor rm;
+    private ResultsMonitor rm;
     
-    private CPUResultsSnapshot snapshot;
-    private CPUResultsSnapshot refSnapshot;
+    private JdbcResultsSnapshot snapshot;
+    private JdbcResultsSnapshot refSnapshot;
     
     private DataView lastFocused;
     private JDBCTreeTableView jdbcCallsView;
@@ -89,16 +89,13 @@ public abstract class LiveJDBCView extends JPanel {
     private volatile boolean forceRefresh;
     private volatile boolean refreshIsRunning;
     
-    @ServiceProvider(service=CPUCCTProvider.Listener.class)
-    public static final class ResultsMonitor implements CPUCCTProvider.Listener {
-
-        private LiveJDBCView view;
+    private final class ResultsMonitor implements JdbcCCTProvider.Listener {
         
         @Override
         public void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
-            if (view != null && !empty) {
+            if (!empty) {
                 try {
-                    view.refreshData(appRootNode);
+                    LiveJDBCView.this.refreshData(appRootNode);
                 } catch (ClientUtils.TargetAppOrVMTerminated ex) {
                     Logger.getLogger(LiveMemoryView.class.getName()).log(Level.FINE, null, ex);
                 }
@@ -107,19 +104,14 @@ public abstract class LiveJDBCView extends JPanel {
 
         @Override
         public void cctReset() {
-            if (view != null) {
-                view.resetData();
-            }
+            LiveJDBCView.this.resetData();
         }
     }
     
     
     public LiveJDBCView(Set<ClientUtils.SourceCodeSelection> selection) {
         initUI(selection);
-        registerActions();
-        
-        rm = Lookup.getDefault().lookup(ResultsMonitor.class);
-        rm.view = this;
+        registerActions();        
     }
     
     
@@ -141,15 +133,13 @@ public abstract class LiveJDBCView extends JPanel {
         refreshIsRunning = true;
         try {
             ProfilerClient client = getProfilerClient();
-            final CPUResultsSnapshot snapshotData =
+            final JdbcResultsSnapshot snapshotData =
                     client.getStatus().getInstrMethodClasses() == null ?
-                    null : client.getCPUProfilingResultsSnapshot(false);
+                    null : client.getJdbcProfilingResultsSnapshot(false);
             snapshot = snapshotData;
             setData();
             lastupdate = System.currentTimeMillis();
             forceRefresh = false;
-        } catch (CPUResultsSnapshot.NoDataAvailableException e) {
-            refreshIsRunning = false;
         } catch (Throwable t) {
             refreshIsRunning = false;
             if (t instanceof ClientUtils.TargetAppOrVMTerminated) {
@@ -165,8 +155,8 @@ public abstract class LiveJDBCView extends JPanel {
             resetData();
             refreshIsRunning = false;
         } else {
-            final CPUResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
-                                                 refSnapshot.createDiff(snapshot);
+//            final CPUResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
+//                                                 refSnapshot.createDiff(snapshot);
             
 //            final FlatProfileContainer flatData = _snapshot.getFlatProfile(selectedThreads, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
 //            
@@ -215,16 +205,29 @@ public abstract class LiveJDBCView extends JPanel {
     
     
     public void cleanup() {
-        if (rm.view == this) rm.view = null;
     }
     
     
     public void profilingSessionStarted() {
-        // TODO: register CPUCCTProvider.Listener
+        if (rm == null) {
+            rm = new ResultsMonitor();
+            Collection<? extends JdbcCCTProvider> jdbcCCTProviders = Lookup.getDefault().lookupAll(JdbcCCTProvider.class);
+            assert !jdbcCCTProviders.isEmpty();
+            for (JdbcCCTProvider provider : jdbcCCTProviders) {
+                provider.addListener(rm);
+            }
+        }    
     }
     
     public void profilingSessionFinished() {
-        // TODO: unregister CPUCCTProvider.Listener
+        if (rm != null) {
+            Collection<? extends JdbcCCTProvider> jdbcCCTProviders = Lookup.getDefault().lookupAll(JdbcCCTProvider.class);
+            assert !jdbcCCTProviders.isEmpty();
+            for (JdbcCCTProvider provider : jdbcCCTProviders) {
+                provider.removeListener(rm);
+            }
+            rm = null;
+        }
     }
     
     

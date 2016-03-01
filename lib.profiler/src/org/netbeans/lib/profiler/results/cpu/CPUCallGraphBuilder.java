@@ -194,7 +194,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     }
 
     public void methodEntry(final int methodId, final int threadId, final int methodType, final long timeStamp0,
-                            final long timeStamp1) {
+                            final long timeStamp1, final List parameters, int[] methodIds) {
         if (!isReady() || (threadInfos.threadInfos == null)) {
             return;
         }
@@ -217,7 +217,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 break;
             }
             case METHODTYPE_MARKER: {
-                markerMethodEntry(methodId, ti, timeStamp0, timeStamp1);
+                markerMethodEntry(methodId, ti, timeStamp0, timeStamp1, parameters, methodIds);
 
                 break;
             }
@@ -226,7 +226,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         batchNotEmpty = true;
     }
 
-    public void methodEntryUnstamped(final int methodId, final int threadId, final int methodType) {
+    public void methodEntryUnstamped(final int methodId, final int threadId, final int methodType, final List parameters, final int[] methodIds) {
         if (!isReady() || (threadInfos.threadInfos == null)) {
             return;
         }
@@ -244,7 +244,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 break;
             }
             case METHODTYPE_MARKER: {
-                markerMethodEntry(methodId, ti);
+                markerMethodEntry(methodId, ti, parameters, methodIds);
 
                 break;
             }
@@ -961,12 +961,12 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
 
             @Override
             public int getMinMethodId() {
-                return profilerClient.getStatus().getStartingMethodId();
+                return 1;
             }
 
             @Override
             public int getMaxMethodId() {
-                return profilerClient.getStatus().getNInstrMethods() + profilerClient.getStatus().getStartingMethodId() - 1;
+                return profilerClient.getStatus().getNInstrMethods();
             }
 
             @Override
@@ -1034,7 +1034,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     }
 
     private TimedCPUCCTNode markerMethodEntry(final int methodId, final ThreadInfo ti, long timeStamp0, long timeStamp1,
-                                              boolean stamped) {
+                                              boolean stamped, List parameters, int[] methodIds) {
 //        Mark mark = MarkingEngine.getDefault().markMethod(methodId, status);
         Mark mark = Mark.DEFAULT;
 
@@ -1158,12 +1158,12 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         return curNode;
     }
 
-    private TimedCPUCCTNode markerMethodEntry(final int methodId, final ThreadInfo ti, long timeStamp0, long timeStamp1) {
-        return markerMethodEntry(methodId, ti, timeStamp0, timeStamp1, true);
+    private TimedCPUCCTNode markerMethodEntry(final int methodId, final ThreadInfo ti, long timeStamp0, long timeStamp1, List parameters, int[] methodIds) {
+        return markerMethodEntry(methodId, ti, timeStamp0, timeStamp1, true, parameters, methodIds);
     }
 
-    private TimedCPUCCTNode markerMethodEntry(final int methodId, final ThreadInfo ti) {
-        return markerMethodEntry(methodId, ti, 0, 0, false);
+    private TimedCPUCCTNode markerMethodEntry(final int methodId, final ThreadInfo ti, List parameters, int[] methodIds) {
+        return markerMethodEntry(methodId, ti, 0, 0, false, parameters, methodIds);
     }
 
     private TimedCPUCCTNode plainMethodEntry(final int methodId, final ThreadInfo ti, long timeStamp0, long timeStamp1,

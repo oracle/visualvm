@@ -66,6 +66,7 @@ import javax.management.openmbean.CompositeData;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
+import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
@@ -97,6 +98,7 @@ public class LoadedSnapshot {
     public static final int SNAPSHOT_TYPE_MEMORY_ALLOCATIONS = 4;
     public static final int SNAPSHOT_TYPE_MEMORY_LIVENESS = 8;
     public static final int SNAPSHOT_TYPE_MEMORY_SAMPLED = 16;
+    public static final int SNAPSHOT_TYPE_CPU_JDBC = 32;
     public static final int SNAPSHOT_TYPE_MEMORY = SNAPSHOT_TYPE_MEMORY_ALLOCATIONS | SNAPSHOT_TYPE_MEMORY_LIVENESS | SNAPSHOT_TYPE_MEMORY_SAMPLED;
     public static final String PROFILER_FILE_MAGIC_STRING = "nBpRoFiLeR"; // NOI18N
     private static final byte SNAPSHOT_FILE_VERSION_MAJOR = 1;
@@ -207,6 +209,8 @@ public class LoadedSnapshot {
             return SNAPSHOT_TYPE_MEMORY_ALLOCATIONS;
         } else if (snapshot instanceof SampledMemoryResultsSnapshot) {
             return SNAPSHOT_TYPE_MEMORY_SAMPLED;
+        } else if (snapshot instanceof JdbcResultsSnapshot) {
+            return SNAPSHOT_TYPE_CPU_JDBC;
         } else {
             throw new IllegalStateException(Bundle.LoadedSnapshot_IllegalSnapshotDataMsg());
         }
@@ -436,6 +440,10 @@ public class LoadedSnapshot {
                     break;
                 case SNAPSHOT_TYPE_MEMORY_SAMPLED:
                     snapshot = new SampledMemoryResultsSnapshot();
+                    
+                    break;
+                case SNAPSHOT_TYPE_CPU_JDBC:
+                    snapshot = new JdbcResultsSnapshot();
                     
                     break;
                 default:

@@ -88,12 +88,12 @@ public class PresoObjAllocCCTNode extends CCTNode {
 
     public long nCalls;
     public long totalObjSize;
-    protected PresoObjAllocCCTNode parent;
+    public PresoObjAllocCCTNode parent;
     String className;
     String methodName;
 //    String methodSig;
     String nodeName;
-    protected PresoObjAllocCCTNode[] children;
+    public PresoObjAllocCCTNode[] children;
     int methodId;
     JMethodIdTable.JMethodIdTableEntry entry;
     

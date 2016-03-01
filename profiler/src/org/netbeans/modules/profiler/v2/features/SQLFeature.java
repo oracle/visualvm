@@ -43,11 +43,18 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.ResultsListener;
@@ -74,6 +81,14 @@ import org.openide.util.lookup.ServiceProvider;
 })
 final class SQLFeature extends ProfilerFeature.Basic {
     
+    private static final Class[] jdbcMarkerClasses = {
+        Driver.class,
+        Connection.class,
+        Statement.class,
+        PreparedStatement.class,
+        CallableStatement.class
+    };
+
     private final WeakProcessor processor;
     
     
@@ -91,13 +106,21 @@ final class SQLFeature extends ProfilerFeature.Basic {
     // --- Settings ------------------------------------------------------------
     
     public boolean supportsSettings(ProfilingSettings psettings) {
-        return !ProfilingSettings.isCPUSettings(psettings) &&
-               !ProfilingSettings.isMemorySettings(psettings);
+        return !ProfilingSettings.isMemorySettings(psettings);
     }
     
     public void configureSettings(ProfilingSettings settings) {
-        // TODO: configure ProfilingSettings for JDBC profiling
-    }
+        settings.setProfilingType(ProfilingSettings.PROFILE_CPU_PART);
+        settings.setCPUProfilingType(CommonConstants.CPU_INSTR_FULL);
+
+        ClientUtils.SourceCodeSelection[] roots = new ClientUtils.SourceCodeSelection[jdbcMarkerClasses.length];
+        for (int i = 0; i < jdbcMarkerClasses.length; i++) {
+            roots[i] = new ClientUtils.SourceCodeSelection(jdbcMarkerClasses[i].getName(), "*", null); // NOI18N
+            roots[i].setMarkerMethod(true);
+        }
+        settings.addRootMethods(roots);
+        settings.setSelectedInstrumentationFilter(SimpleFilter.NO_FILTER);
+}
     
     
     // --- Toolbar & Results UI ------------------------------------------------
@@ -256,8 +279,8 @@ final class SQLFeature extends ProfilerFeature.Basic {
     @ServiceProvider(service=ProfilerFeature.Provider.class)
     public static final class Provider extends ProfilerFeature.Provider {
         public ProfilerFeature getFeature(ProfilerSession session) {
-            return Boolean.getBoolean("org.netbeans.modules.profiler.features.enableSQL") ? new SQLFeature(session) : null; // NOI18N
-//            return new SQLFeature(session);
+            //return Boolean.getBoolean("org.netbeans.modules.profiler.features.enableSQL") ? new SQLFeature(session) : null; // NOI18N
+            return new SQLFeature(session);
         }
     }
     
