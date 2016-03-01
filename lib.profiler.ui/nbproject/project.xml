@@ -123,6 +123,7 @@ made subject to such option by the copyright holder.
                 <package>org.netbeans.lib.profiler.ui.cpu</package>
                 <package>org.netbeans.lib.profiler.ui.cpu.statistics</package>
                 <package>org.netbeans.lib.profiler.ui.graphs</package>
+                <package>org.netbeans.lib.profiler.ui.jdbc</package>
                 <package>org.netbeans.lib.profiler.ui.locks</package>
                 <package>org.netbeans.lib.profiler.ui.memory</package>
                 <package>org.netbeans.lib.profiler.ui.monitor</package>

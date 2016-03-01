@@ -44,11 +44,15 @@
 package org.netbeans.modules.profiler.v2.features;
 
 import javax.swing.JPanel;
+import org.netbeans.lib.profiler.ProfilerClient;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -70,52 +74,63 @@ final class SQLFeature extends ProfilerFeature.Basic {
     
     // --- Settings ------------------------------------------------------------
     
+    public boolean supportsSettings(ProfilingSettings psettings) {
+        return !ProfilingSettings.isCPUSettings(psettings) &&
+               !ProfilingSettings.isMemorySettings(psettings);
+    }
+    
     public void configureSettings(ProfilingSettings settings) {
+        // TODO: configure ProfilingSettings for JDBC profiling
     }
     
     
     // --- Toolbar & Results UI ------------------------------------------------
     
-    private JPanel ui;
+    private SQLFeatureUI ui;
     
     public JPanel getResultsUI() {
-        if (ui == null) ui = new JPanel();
+        return getUI().getResultsUI();
+    }
+    
+    public ProfilerToolbar getToolbar() {
+        return getUI().getToolbar();
+    }
+    
+    private SQLFeatureUI getUI() {
+        if (ui == null) ui = new SQLFeatureUI() {
+            int getSessionState() {
+                return SQLFeature.this.getSessionState();
+            }
+            ProfilerClient getProfilerClient() {
+                Profiler profiler = SQLFeature.this.getSession().getProfiler();
+                return profiler.getTargetAppRunner().getProfilerClient();
+            }
+            void refreshResults() {
+            }
+            Lookup.Provider getProject() {
+                return SQLFeature.this.getSession().getProject();
+            }
+        };
         return ui;
     }
-//    
-//    public ProfilerToolbar getToolbar() {
-//        return getUI().getToolbar();
-//    }
-//    
-//    private SQLFeatureUI getUI() {
-//        if (ui == null) ui = new SQLFeatureUI() {
-//            int getSessionState() {
-//                return SQLFeature.this.getSessionState();
-//            }
-//            Profiler getProfiler() {
-//                return SQLFeature.this.getSession().getProfiler();
-//            }
-//        };
-//        return ui;
-//    }
     
     
     // --- Session lifecycle ---------------------------------------------------
     
-//    public void notifyActivated() {
-//    }
-//    
-//    public void notifyDeactivated() {
-//        if (ui != null) {
-//            ui.cleanup();
-//            ui = null;
-//        }
-//    }
-//    
-//    
-//    protected void profilingStateChanged(int oldState, int newState) {
-//        if (ui != null) ui.sessionStateChanged(getSessionState());
-//    }
+    public void notifyActivated() {
+    }
+    
+    public void notifyDeactivated() {
+        if (ui != null) {
+            ui.cleanup();
+            ui = null;
+        }
+    }
+    
+    
+    protected void profilingStateChanged(int oldState, int newState) {
+        if (ui != null) ui.sessionStateChanged(getSessionState());
+    }
     
     
     // --- Provider ------------------------------------------------------------
