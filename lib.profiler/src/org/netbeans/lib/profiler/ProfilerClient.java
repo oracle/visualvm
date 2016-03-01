@@ -251,8 +251,6 @@ public class ProfilerClient implements CommonConstants {
                     (new Thread() {
                             public void run() {
                                 try {
-                                    int instrType = getCurrentInstrType();
-
                                     if (currentInstrTypeIsRecursiveCPUProfiling() || currentInstrTypeIsMemoryProfiling()) {
                                         forceObtainedResultsDump(false, 15);
                                     }
@@ -500,8 +498,8 @@ public class ProfilerClient implements CommonConstants {
             }
         }
         synchronized (this) {
-            int len = 0;
-            boolean twoTimeStamps = false;
+            int len;
+            boolean twoTimeStamps;
             String[] instrClassNames, instrMethodNames, instrMethodSigs;
             try {
                 status.beginTrans(false);
@@ -795,7 +793,7 @@ public class ProfilerClient implements CommonConstants {
                 return;
             }
 
-            Response resp = null;
+            Response resp;
             checkForTargetAppRunning();
 
             long curTime = System.currentTimeMillis();
@@ -1590,7 +1588,7 @@ public class ProfilerClient implements CommonConstants {
     //-------------------------------- Private implementation ------------------------------------------
     private void clearPreviousInstrumentationInServer()
                                                throws InstrumentationException, ClientUtils.TargetAppOrVMTerminated {
-        Response resp = null;
+        Response resp;
         checkForTargetAppRunning();
 
         // First send the command that will make the application stop emitting events
@@ -1898,7 +1896,7 @@ public class ProfilerClient implements CommonConstants {
         synchronized (instrumentationLock) {
             AppStatusHandler.AsyncDialog waitDialog = null;
             try {
-                InstrumentMethodGroupResponse imgr = null;
+                InstrumentMethodGroupResponse imgr;
 
                 if (!serverClassesInitialized) { // Check if it is a fake command from server, used to just pre-initialize
                                                  // some internal server classes
