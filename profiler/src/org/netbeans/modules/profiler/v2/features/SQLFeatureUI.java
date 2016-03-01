@@ -169,7 +169,7 @@ abstract class SQLFeatureUI extends FeatureUI {
                 GoToSource.openSource(project, className, methodName, methodSig);
             }
             protected void selectForProfiling(ClientUtils.SourceCodeSelection value) {
-//                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//                throw new UnsupportedOperationException("Not supported yet.");
             }
             protected void popupShowing() {
                 if (lrPauseButton.isEnabled() && !lrRefreshButton.isEnabled()) {
@@ -188,8 +188,6 @@ abstract class SQLFeatureUI extends FeatureUI {
         jdbcView.putClientProperty("HelpCtx.Key", "ProfileSQL.HelpCtx"); // NOI18N
         
         
-        // --- Toolbar ---------------------------------------------------------
-
         // --- Toolbar ---------------------------------------------------------
         
         lrLabel = new GrayLabel(Bundle.MethodsFeatureUI_liveResults());
@@ -271,10 +269,15 @@ abstract class SQLFeatureUI extends FeatureUI {
     }
     
     private void refreshToolbar(final int state) {
-//        if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
-//            public void run() {
-//            }
-//        });
+        if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+//                boolean running = isRunning(state);
+                boolean running = state == Profiler.PROFILING_RUNNING;
+                lrPauseButton.setEnabled(running);
+                lrRefreshButton.setEnabled(!popupPause && running && lrPauseButton.isSelected());
+                lrDeltasButton.setEnabled(running);
+            }
+        });
     }
     
 }
