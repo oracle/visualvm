@@ -55,11 +55,13 @@ import javax.swing.ActionMap;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
 import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.memory.LiveMemoryView;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
@@ -155,23 +157,21 @@ public abstract class LiveJDBCView extends JPanel {
             resetData();
             refreshIsRunning = false;
         } else {
-//            final CPUResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
+//            final JdbcResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
 //                                                 refSnapshot.createDiff(snapshot);
-            
-//            final FlatProfileContainer flatData = _snapshot.getFlatProfile(selectedThreads, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
-//            
-//            final Map<Integer, ClientUtils.SourceCodeSelection> idMap = _snapshot.getMethodIDMap(CPUResultsSnapshot.METHOD_LEVEL_VIEW);
+            final JdbcResultsSnapshot _snapshot = snapshot;
 //
-//            SwingUtilities.invokeLater(new Runnable() {
-//                public void run() {
-//                    try {
-//                        boolean diff = _snapshot instanceof CPUResultsDiff;
-//                        jdbcCallsView.setData(_snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled, diff);
-//                    } finally {
-//                        refreshIsRunning = false;
-//                    }
-//                }
-//            });
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    try {
+//                        boolean diff = _snapshot instanceof JdbcResultsDiff;
+                        boolean diff = false;
+                        jdbcCallsView.setData(_snapshot, null, -1, null, false, false, diff);
+                    } finally {
+                        refreshIsRunning = false;
+                    }
+                }
+            });
         }
     }
     
@@ -339,7 +339,7 @@ public abstract class LiveJDBCView extends JPanel {
         return lastFocused;
     }
     
-    private void populatePopup(final DataView invoker, JPopupMenu popup, Object value, final ClientUtils.SourceCodeSelection userValue) {
+    private void populatePopup(final DataView invoker, JPopupMenu popup, final Object value, final ClientUtils.SourceCodeSelection userValue) {
         if (showSourceSupported()) {
             popup.add(new JMenuItem(JDBCView.ACTION_GOTOSOURCE) {
                 { setEnabled(userValue != null); setFont(getFont().deriveFont(Font.BOLD)); }
@@ -349,7 +349,7 @@ public abstract class LiveJDBCView extends JPanel {
         }
         
         popup.add(new JMenuItem(JDBCView.ACTION_PROFILE_METHOD) {
-//            { setEnabled(profileMethodSupported() && userValue != null && CPUTableView.isSelectable(userValue)); }
+            { setEnabled(userValue != null && JDBCTreeTableView.isSelectable((PresoObjAllocCCTNode)value)); }
             protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
         });
         

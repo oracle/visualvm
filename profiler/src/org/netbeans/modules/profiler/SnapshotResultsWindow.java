@@ -63,8 +63,10 @@ import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
+import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.cpu.SnapshotCPUView;
+import org.netbeans.lib.profiler.ui.jdbc.SnapshotJDBCView;
 import org.netbeans.lib.profiler.ui.memory.SnapshotMemoryView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
@@ -221,8 +223,9 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     private static final String HELP_CTX_KEY_MEM = "MemorySnapshot.HelpCtx"; // NOI18N
     
     private static final Image WINDOW_ICON_CPU = Icons.getImage(ProfilerIcons.CPU);
-    private static final Image WINDOWS_ICON_FRAGMENT = Icons.getImage(ProfilerIcons.FRAGMENT);
-    private static final Image WINDOWS_ICON_MEMORY = Icons.getImage(ProfilerIcons.MEMORY);
+    private static final Image WINDOW_ICON_FRAGMENT = Icons.getImage(ProfilerIcons.FRAGMENT);
+    private static final Image WINDOW_ICON_MEMORY = Icons.getImage(ProfilerIcons.MEMORY);
+    private static final Image WINDOW_ICON_JDBC = Icons.getImage(ProfilerIcons.WINDOW_SQL);
     private static final HashMap /*<ResultsSnapshot, SnapshotResultsWindow>*/ windowsList = new HashMap();
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -269,7 +272,6 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
 
         switch (snapshot.getType()) {
             case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
-            case LoadedSnapshot.SNAPSHOT_TYPE_CPU_JDBC:
                 setIcon(WINDOW_ICON_CPU);
                 helpCtx = new HelpCtx(HELP_CTX_KEY_CPU);
                 getAccessibleContext().setAccessibleDescription(Bundle.SnapshotResultsWindow_CpuSnapshotAccessDescr());
@@ -284,10 +286,18 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
             case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
             case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_SAMPLED:
-                setIcon(WINDOWS_ICON_MEMORY);
+                setIcon(WINDOW_ICON_MEMORY);
                 helpCtx = new HelpCtx(HELP_CTX_KEY_MEM);
                 getAccessibleContext().setAccessibleDescription(Bundle.SnapshotResultsWindow_MemorySnapshotAccessDescr());
                 setupMemoryResultsView();
+
+                break;
+                
+            case LoadedSnapshot.SNAPSHOT_TYPE_CPU_JDBC:
+                setIcon(WINDOW_ICON_JDBC);
+                helpCtx = new HelpCtx(HELP_CTX_KEY_CPU);
+                getAccessibleContext().setAccessibleDescription(Bundle.SnapshotResultsWindow_CpuSnapshotAccessDescr());
+                setupJDBCResultsView();
 
                 break;
         }
@@ -600,6 +610,51 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             
             registerActions(_memorySnapshot);
             displayedPanel = _memorySnapshot;
+        }
+    }
+    
+    private void setupJDBCResultsView() {
+        ResultsSnapshot _snapshot = snapshot.getSnapshot();
+        if (_snapshot instanceof JdbcResultsSnapshot) {
+            JdbcResultsSnapshot s = (JdbcResultsSnapshot)_snapshot;
+            
+            SaveSnapshotAction aSave = new SaveSnapshotAction(snapshot);
+            CompareSnapshotsAction aCompare = new CompareSnapshotsAction(snapshot);
+            SnapshotInfoAction aInfo = new SnapshotInfoAction(snapshot);
+            ExportUtils.Exportable exporter = ResultsManager.getDefault().createSnapshotExporter(snapshot);
+            
+            final SnapshotJDBCView _jdbcSnapshot = new SnapshotJDBCView(s, aSave, aCompare, aInfo, exporter) {
+                protected boolean showSourceSupported() {
+                    return GoToSource.isAvailable();
+                }
+                protected void showSource(ClientUtils.SourceCodeSelection value) {
+                    Lookup.Provider project = snapshot.getProject();
+                    String className = value.getClassName();
+                    String methodName = value.getMethodName();
+                    String methodSig = value.getMethodSignature();
+                    GoToSource.openSource(project, className, methodName, methodSig);
+                }
+                protected void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            Lookup.Provider project = snapshot.getProject();
+                            String name = Wildcards.ALLWILDCARD.equals(value.getMethodName()) ?
+                                          Bundle.SnapshotResultsWindow_ProfileClass() :
+                                          Bundle.SnapshotResultsWindow_ProfileMethod();
+                            ProfilerSession.findAndConfigure(Lookups.fixed(value), project, name);
+                        }
+                    });
+                }
+            };
+            
+            aCompare.setPerformer(new CompareSnapshotsAction.Performer() {
+                public void compare(LoadedSnapshot snapshot) {
+                    _jdbcSnapshot.setRefSnapshot((JdbcResultsSnapshot)snapshot.getSnapshot());
+                }
+            });
+            
+            registerActions(_jdbcSnapshot);
+            displayedPanel = _jdbcSnapshot;
         }
     }
 

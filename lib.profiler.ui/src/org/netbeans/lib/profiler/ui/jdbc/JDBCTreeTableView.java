@@ -44,7 +44,9 @@
 package org.netbeans.lib.profiler.ui.jdbc;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.JPopupMenu;
@@ -53,10 +55,11 @@ import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
+import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
+import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
@@ -74,10 +77,8 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  */
 abstract class JDBCTreeTableView extends JDBCView {
     
-    private CPUTreeTableModel treeTableModel;
+    private JDBCTreeTableModel treeTableModel;
     private ProfilerTreeTable treeTable;
-    
-    private Map<Integer, ClientUtils.SourceCodeSelection> idMap;
     
     
     public JDBCTreeTableView(Set<ClientUtils.SourceCodeSelection> selection, boolean reverse) {
@@ -85,16 +86,73 @@ abstract class JDBCTreeTableView extends JDBCView {
     }
     
     
-    void setData(final CPUResultsSnapshot newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final int aggregation, final Collection<Integer> selectedThreads, final boolean mergeThreads, final boolean _sampled, final boolean _diff) {
+    void setData(final JdbcResultsSnapshot newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final int aggregation, final Collection<Integer> selectedThreads, final boolean mergeThreads, final boolean _sampled, final boolean _diff) {
+//        final boolean diff = snapshot instanceof AllocMemoryResultsDiff;
+        final boolean diff = false;
+        
+        String[] _names = newData.getSelectNames();
+        long[] _nTotalAllocObjects = newData.getInvocationsPerSelectId();
+        long[] _totalAllocObjectsSize = newData.getTimePerSelectId();
+        
+        List<PresoObjAllocCCTNode> nodes = new ArrayList();
+        
+        long totalObjects = 0;
+        long _totalObjects = 0;
+        long totalBytes = 0;
+        long _totalBytes = 0;
+        
+        for (int i = 1; i < _names.length; i++) {
+            if (diff) {
+//                totalObjects = Math.max(totalObjects, _nTotalAllocObjects[i]);
+//                _totalObjects = Math.min(_totalObjects, _nTotalAllocObjects[i]);
+//                totalBytes = Math.max(totalBytes, _totalAllocObjectsSize[i]);
+//                _totalBytes = Math.min(_totalBytes, _totalAllocObjectsSize[i]);
+            } else {
+                totalObjects += _nTotalAllocObjects[i];
+                totalBytes += _totalAllocObjectsSize[i];
+            }
+            
+            final int _i = i;
+            
+            class Node extends PresoObjAllocCCTNode {
+                Node(String className, long nTotalAllocObjects, long totalAllocObjectsSize) {
+                    super(className, nTotalAllocObjects, totalAllocObjectsSize);
+                }
+                public CCTNode[] getChildren() {
+                    if (children == null) {
+                        PresoObjAllocCCTNode root = newData.createPresentationCCT(_i, false);
+                        setChildren(root == null ? new PresoObjAllocCCTNode[0] :
+                                    (PresoObjAllocCCTNode[])root.getChildren());
+                    }
+                    return children;
+                }
+                public boolean isLeaf() {
+                    if (children == null) return /*includeEmpty ? nCalls == 0 :*/ false;
+                    else return super.isLeaf();
+                }   
+                public int getChildCount() {
+                    if (children == null) getChildren();
+                    return super.getChildCount();
+                }
+            }
+            
+            PresoObjAllocCCTNode node = new Node(_names[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i]);
+            nodes.add(node);
+        }
+        
+        final long __totalBytes = !diff ? totalBytes :
+                Math.max(Math.abs(totalBytes), Math.abs(_totalBytes));
+        final long __totalObjects = !diff ? totalObjects :
+                Math.max(Math.abs(totalObjects), Math.abs(_totalObjects));
+        final PresoObjAllocCCTNode root = PresoObjAllocCCTNode.rootNode(nodes.toArray(new PresoObjAllocCCTNode[0]));
+        
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                idMap = newIdMap;
-                renderers[0].setDiffMode(_diff);
-                renderers[1].setDiffMode(_diff);
-                if (treeTableModel != null) {
-                    treeTableModel.setRoot(newData == null ? PrestimeCPUCCTNode.EMPTY :
-                                           newData.getRootNode(aggregation, selectedThreads, mergeThreads));
-                }
+                renderers[0].setMaxValue(__totalBytes);
+                renderers[1].setMaxValue(__totalObjects);
+                renderers[0].setDiffMode(diff);
+                renderers[1].setDiffMode(diff);
+                treeTableModel.setRoot(root);
             }
         });
     }
@@ -134,7 +192,7 @@ abstract class JDBCTreeTableView extends JDBCView {
     private HideableBarRenderer[] renderers;
     
     private void initUI() {
-        treeTableModel = new CPUTreeTableModel(PrestimeCPUCCTNode.EMPTY);
+        treeTableModel = new JDBCTreeTableModel(PrestimeCPUCCTNode.EMPTY);
         
         treeTable = new ProfilerTreeTable(treeTableModel, true, true, new int[] { 0 }) {
             public ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
@@ -167,25 +225,14 @@ abstract class JDBCTreeTableView extends JDBCView {
         treeTable.setDefaultSortOrder(1, SortOrder.DESCENDING);
         
         renderers = new HideableBarRenderer[2];
-        
-        renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer())) {
-            public void setValue(Object value, int row) {
-                super.setMaxValue(getMaxValue(row, 0));
-                super.setValue(value, row);
-            }
-        };
-        renderers[1] = new HideableBarRenderer(new NumberRenderer()) {
-            public void setValue(Object value, int row) {
-                super.setMaxValue(getMaxValue(row, 1));
-                super.setValue(value, row);
-            }
-        };
+        renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer()));
+        renderers[1] = new HideableBarRenderer(new NumberRenderer());
         
         long refTime = 123456;
         renderers[0].setMaxValue(refTime);
         renderers[1].setMaxValue(refTime);
         
-        treeTable.setTreeCellRenderer(new JDBCJavaNameRenderer(ProfilerIcons.NODE_FORWARD));
+        treeTable.setTreeCellRenderer(new JDBCJavaNameRenderer());
         treeTable.setColumnRenderer(1, renderers[0]);
         treeTable.setColumnRenderer(2, renderers[1]);
         
@@ -203,41 +250,40 @@ abstract class JDBCTreeTableView extends JDBCView {
                                         NAME_COLUMN_TOOLTIP,
                                         TOTAL_TIME_COLUMN_TOOLTIP,
                                         INVOCATIONS_COLUMN_TOOLTIP
-                                      });
+                                    });
     }
     
     
-    protected RowFilter getExcludesFilter() {
-        return new RowFilter() { // Do not filter threads and self time nodes
-            public boolean include(RowFilter.Entry entry) {
-                PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)entry.getIdentifier();
-                return node.isThreadNode() || node.isSelfTimeNode();
-            }
-        };
-    }
+//    protected RowFilter getExcludesFilter() {
+//        return new RowFilter() { // Do not filter threads and self time nodes
+//            public boolean include(RowFilter.Entry entry) {
+//                PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)entry.getIdentifier();
+//                return node.isThreadNode() || node.isSelfTimeNode();
+//            }
+//        };
+//    }
     
     protected ProfilerTable getResultsComponent() {
         return treeTable;
     }
     
     
-    private long getMaxValue(int row, int val) {
-        TreePath path = treeTable.getPathForRow(row);
-        if (path == null) return Long.MIN_VALUE; // TODO: prevents NPE from export but doesn't provide the actual value!
-        if (path.getPathCount() < 2) return 1;
-        
-        PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)path.getPathComponent(1);
-        if (val == 0) return Math.abs(node.getTotalTime0());
-        else if (val == 1) return Math.abs(node.getTotalTime1());
-        else return Math.abs(node.getNCalls());
-    }
+//    private long getMaxValue(int row, int val) {
+//        TreePath path = treeTable.getPathForRow(row);
+//        if (path == null) return Long.MIN_VALUE; // TODO: prevents NPE from export but doesn't provide the actual value!
+//        if (path.getPathCount() < 2) return 1;
+//        
+//        PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)path.getPathComponent(1);
+//        if (val == 0) return Math.abs(node.getTotalTime0());
+//        else if (val == 1) return Math.abs(node.getTotalTime1());
+//        else return Math.abs(node.getNCalls());
+//    }
     
     protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
-        PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)treeTable.getValueForRow(row);
-        if (node == null) return null;
-        else if (node.isThreadNode() || node.isFiltered() || node.isSelfTimeNode()) return null;
-//        else return selectionForId(node.getMethodId());
-        else return idMap.get(node.getMethodId());
+        PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)treeTable.getValueForRow(row);
+        if (node == null || isSQL(node)) return null;
+        String[] name = node.getMethodClassNameAndSig();
+        return new ClientUtils.SourceCodeSelection(name[0], name[1], name[2]);
     }
     
 //    private ClientUtils.SourceCodeSelection selectionForId(int methodId) {
@@ -253,16 +299,22 @@ abstract class JDBCTreeTableView extends JDBCView {
 //        }
 //    }
     
-//    private static boolean isSelectable(PrestimeCPUCCTNode node) {
-//        if (node.isThreadNode() || node.isFiltered() || node.isSelfTimeNode()) return false;
-//        if (node.getMethodClassNameAndSig()[1].endsWith("[native]")) return false; // NOI18N
-//        return true;
-//    }
+    static boolean isSQL(PresoObjAllocCCTNode node) {
+        CCTNode p = node.getParent();
+        if (p != null && p.getParent() == null) return true;
+        return false;
+    }
+    
+    static boolean isSelectable(PresoObjAllocCCTNode node) {
+        if (isSQL(node)) return false;
+        if (node.getMethodClassNameAndSig()[1].endsWith("[native]")) return false; // NOI18N
+        return true;
+    }
     
     
-    private class CPUTreeTableModel extends ProfilerTreeTableModel.Abstract {
+    private class JDBCTreeTableModel extends ProfilerTreeTableModel.Abstract {
         
-        CPUTreeTableModel(TreeNode root) {
+        JDBCTreeTableModel(TreeNode root) {
             super(root);
         }
         
@@ -280,12 +332,13 @@ abstract class JDBCTreeTableView extends JDBCView {
         public Class<?> getColumnClass(int columnIndex) {
             if (columnIndex == 0) {
                 return JTree.class;
-            } else if (columnIndex == 1) {
-                return Long.class;
-            } else if (columnIndex == 2) {
-                return Integer.class;
+//            } else if (columnIndex == 1) {
+//                return Long.class;
+//            } else if (columnIndex == 2) {
+//                return Integer.class;
             }
-            return null;
+            return Long.class;
+//            return null;
         }
 
         public int getColumnCount() {
@@ -293,13 +346,13 @@ abstract class JDBCTreeTableView extends JDBCView {
         }
 
         public Object getValueAt(TreeNode node, int columnIndex) {
-            PrestimeCPUCCTNode cpuNode = (PrestimeCPUCCTNode)node;
+            PresoObjAllocCCTNode jdbcNode = (PresoObjAllocCCTNode)node;
             if (columnIndex == 0) {
-                return cpuNode.getNodeName();
+                return jdbcNode.getNodeName();
             } else if (columnIndex == 1) {
-                return cpuNode.getTotalTime0();
+                return jdbcNode.totalObjSize;
             } else if (columnIndex == 2) {
-                return cpuNode.getNCalls();
+                return jdbcNode.nCalls;
             }
             return null;
         }
