@@ -158,7 +158,18 @@ abstract class JDBCTreeTableView extends JDBCView {
     }
     
     public void resetData() {
-        setData(null, null, -1, null, false, false, false);
+        final PresoObjAllocCCTNode root = PresoObjAllocCCTNode.rootNode(new PresoObjAllocCCTNode[0]);
+        
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                renderers[0].setMaxValue(0);
+                renderers[1].setMaxValue(0);
+                renderers[0].setDiffMode(false);
+                renderers[1].setDiffMode(false);
+                
+                treeTableModel.setRoot(root);
+            }
+        });
     }
     
     
