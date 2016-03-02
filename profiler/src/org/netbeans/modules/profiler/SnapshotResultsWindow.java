@@ -269,6 +269,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
 
         switch (snapshot.getType()) {
             case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
+            case LoadedSnapshot.SNAPSHOT_TYPE_CPU_JDBC:
                 setIcon(WINDOW_ICON_CPU);
                 helpCtx = new HelpCtx(HELP_CTX_KEY_CPU);
                 getAccessibleContext().setAccessibleDescription(Bundle.SnapshotResultsWindow_CpuSnapshotAccessDescr());
