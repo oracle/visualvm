@@ -91,7 +91,8 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     private Map connections;
     private Map selectsToId;
     private Map idsToSelect;
-    private RuntimeMemoryCCTNode[] stacksForSelects; // [0-selectIds.size()] selectId -> root of its allocation traces tree
+    private int maxSelectId;
+    private RuntimeMemoryCCTNode[] stacksForSelects; // [1- maxSelectId] selectId -> root of its allocation traces tree
     private int sqlCallLevel;
     final private ThreadInfos threadInfos = new ThreadInfos();
 
@@ -108,7 +109,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         try {
             ProfilerClient client = getClient();
             if (client != null) {
-                appNode = new SimpleCPUCCTNode(selectsToId.size());
+                appNode = new SimpleCPUCCTNode(maxSelectId);
             } else {
                 appNode = new SimpleCPUCCTNode(true);
             }
@@ -188,6 +189,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         connections = new HashMap();
         selectsToId = new HashMap();
         idsToSelect = new HashMap();
+        maxSelectId = 0;
         sqlCallLevel = 0;
         profilerClient.registerJdbcCCTProvider(this);
     }
@@ -430,7 +432,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     private int getSelectId(String select) {
         Integer selectId = (Integer) selectsToId.get(select);
         if (selectId == null) {
-            selectId = Integer.valueOf(selectsToId.size());
+            selectId = Integer.valueOf(++maxSelectId);
             selectsToId.put(select, selectId);
             idsToSelect.put(selectId, select);
             updateNumberOfSelects();
@@ -681,9 +683,9 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     }
 
     private void updateNumberOfSelects() {
-        int nProfiledSelects = selectsToId.size();
+        int nProfiledSelects = maxSelectId;
 
-        if ((stacksForSelects == null) || (stacksForSelects.length < nProfiledSelects)) {
+        if ((stacksForSelects == null) || (stacksForSelects.length <= nProfiledSelects)) {
             int newSize = (nProfiledSelects * 3) / 2;
             RuntimeMemoryCCTNode[] newStacks = new RuntimeMemoryCCTNode[newSize];
 
@@ -751,7 +753,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
 
         @Override
         protected int getMaxMethodId() {
-            return selectsToId.size();
+            return maxSelectId;
         }
 
         @Override

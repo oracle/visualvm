@@ -96,13 +96,13 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
     /** [0-nProfiledSelects] select names */
     String[] selectNames;
 
-    /** [0-nProfiledSelects] total number of invocations for select */
+    /** [1-nProfiledSelects] total number of invocations for select */
     long[] invocationsPerSelectId;
 
-    /** [0-nProfiledSelects] total time for select */
+    /** [1-nProfiledSelects] total time for select */
     long[] timePerSelectId;
 
-    /** [0-nProfiledSelects] select Id -> root of its allocation traces tree */
+    /** [1-nProfiledSelects] select Id -> root of its allocation traces tree */
     private RuntimeMemoryCCTNode[] stacksForSelects;
 
     /** total number of profiled selects */
@@ -249,7 +249,7 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
         invocationsPerSelectId = new long[nProfiledSelects];
         timePerSelectId = new long[nProfiledSelects];
 
-        for (int i = 0; i < nProfiledSelects; i++) {
+        for (int i = 1; i < nProfiledSelects; i++) {
             selectNames[i] = in.readUTF();
             invocationsPerSelectId[i] = in.readLong();
             timePerSelectId[i] = in.readLong();
@@ -287,7 +287,7 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
 
         out.writeInt(nProfiledSelects);
 
-        for (int i = 0; i < nProfiledSelects; i++) {
+        for (int i = 1; i < nProfiledSelects; i++) {
             out.writeUTF(selectNames[i]);
             out.writeLong(invocationsPerSelectId[i]);
             out.writeLong(timePerSelectId[i]);
