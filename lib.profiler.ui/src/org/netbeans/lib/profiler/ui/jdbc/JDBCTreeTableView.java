@@ -51,7 +51,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
-import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeNode;
@@ -69,7 +68,6 @@ import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.McsTimeRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 /**
  *
