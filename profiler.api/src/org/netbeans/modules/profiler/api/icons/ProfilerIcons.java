@@ -100,6 +100,7 @@ public interface ProfilerIcons extends Icons.Keys {
     public static final String WINDOW_TELEMETRY = "ProfilerIcons.WindowTelemetry"; // NOI18N
     public static final String WINDOW_THREADS = "ProfilerIcons.WindowThreads"; // NOI18N
     public static final String WINDOW_LOCKS = "ProfilerIcons.WindowLocks"; // NOI18N
+    public static final String WINDOW_SQL = "ProfilerIcons.WindowSql"; // NOI18N
     
     public static final String VIEW_LIVE_RESULTS_CPU_32 = "ProfilerIcons.ViewLiveResultsCpu32"; // NOI18N
     public static final String VIEW_LIVE_RESULTS_FRAGMENT_32 = "ProfilerIcons.ViewLiveResultsFragment32"; // NOI18N
