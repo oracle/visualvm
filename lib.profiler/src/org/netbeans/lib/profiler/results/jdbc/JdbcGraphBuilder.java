@@ -53,7 +53,6 @@ import org.netbeans.lib.profiler.classfile.ClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.BaseCallGraphBuilder;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
@@ -174,6 +173,10 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     @Override
     protected void doReset() {
         threadInfos.reset();
+        selectsToId.clear();
+        idsToSelect.clear();
+        maxSelectId = 0;
+        sqlCallLevel = 0;
     }
 
     @Override
@@ -181,6 +184,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         statements = null;
         connections = null;
         selectsToId = null;
+        idsToSelect = null;
     }
 
     @Override
