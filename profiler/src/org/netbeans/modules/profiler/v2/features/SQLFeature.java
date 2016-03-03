@@ -110,7 +110,7 @@ final class SQLFeature extends ProfilerFeature.Basic {
     }
     
     public void configureSettings(ProfilingSettings settings) {
-        settings.setProfilingType(ProfilingSettings.PROFILE_CPU_PART);
+        settings.setProfilingType(ProfilingSettings.PROFILE_CPU_JDBC);
         settings.setCPUProfilingType(CommonConstants.CPU_INSTR_FULL);
 
         ClientUtils.SourceCodeSelection[] roots = new ClientUtils.SourceCodeSelection[jdbcMarkerClasses.length];
