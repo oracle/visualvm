@@ -46,6 +46,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.logging.Level;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -351,9 +352,10 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
             stacksForSelects = new RuntimeMemoryCCTNode[stacks.length];
             PresoObjAllocCCTNode.getNamesForMethodIdsFromVM(client, stacks);
 
-            for (int i = 0; i < stacksForSelects.length; i++) {
+            for (int i = 0; i < nProfiledSelects; i++) {
                 if (stacks[i] != null) {
                     stacksForSelects[i] = (RuntimeMemoryCCTNode) stacks[i].clone();
+                    updateTime(stacksForSelects[i], timePerSelectId[i]/invocationsPerSelectId[i]);
                 }
             }
             table = new JMethodIdTable(JMethodIdTable.getDefault());
@@ -389,5 +391,29 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
         LOGGER.finest("timePerSelectId.length: " + debugLength(timePerSelectId));
         LOGGER.finest("selectNames.length: " + debugLength(selectNames)); // NOI18N
         LOGGER.finest("table: " + ((table == null) ? "null" : table.debug())); // NOI18N
+    }
+
+    private void updateTime(RuntimeMemoryCCTNode stacksForSelect, long l) {
+        Stack nodes = new Stack();
+        
+        nodes.add(stacksForSelect);
+        while (!nodes.empty()) {
+            RuntimeMemoryCCTNode n = (RuntimeMemoryCCTNode) nodes.pop();
+            if (n instanceof RuntimeObjAllocTermCCTNode) {
+                RuntimeObjAllocTermCCTNode node = (RuntimeObjAllocTermCCTNode)n;
+                node.totalObjSize = l*node.nCalls;
+            }
+            if (n.children != null) {
+                if (n.children instanceof RuntimeMemoryCCTNode) {
+                    nodes.push(n.children);
+                } else {
+                    RuntimeMemoryCCTNode[] ar = (RuntimeMemoryCCTNode[]) n.children;
+
+                    for (int j = 0; j < ar.length; j++) {
+                        nodes.push(ar[j]);
+                    }
+                }
+            }
+        }
     }
 }

@@ -249,7 +249,10 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
                     if (select != null) {
                         int selectId = getSelectId(select);
                         markerMethodEntry(selectId, ti, timeStamp0, timeStamp1, true);
-                        processStackTrace(selectId, methoIds);
+                        RuntimeObjAllocTermCCTNode term = (RuntimeObjAllocTermCCTNode) processStackTrace(selectId, methoIds);
+                        if (term != null) {
+                            term.updateForNewObject(0);
+                        }
                         batchNotEmpty = true;
                     }
                 }
