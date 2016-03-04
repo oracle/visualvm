@@ -45,7 +45,6 @@ package org.netbeans.lib.profiler.ui.jdbc;
 
 import javax.swing.Icon;
 import javax.swing.UIManager;
-import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -57,7 +56,7 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  */
 public class JDBCJavaNameRenderer extends JavaNameRenderer {
     
-    private static final Icon SQL_ICON = Icons.getIcon(ProfilerIcons.WINDOW_SQL);
+    private static final Icon SQL_ICON = Icons.getIcon(ProfilerIcons.SQL_QUERY);
     private static final Icon SQL_ICON_DISABLED = UIManager.getLookAndFeel().getDisabledIcon(null, SQL_ICON);
     private static final Icon LEAF_ICON = Icons.getIcon(ProfilerIcons.NODE_LEAF);
     private static final Icon LEAF_ICON_DISABLED = UIManager.getLookAndFeel().getDisabledIcon(null, LEAF_ICON);

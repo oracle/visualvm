@@ -123,6 +123,7 @@ public final class IconsProviderImpl extends IconsProvider.Basic {
         cache.put(ProfilerIcons.SNAPSHOT_MEMORY_32, "memorySnapshot32.png");
         cache.put(ProfilerIcons.THREAD, "thread.png");
         cache.put(ProfilerIcons.ALL_THREADS, "allThreads.png");
+        cache.put(ProfilerIcons.SQL_QUERY, "sqlQuery.png");
         cache.put(ProfilerIcons.ATTACH, "attach.png");
         cache.put(ProfilerIcons.ATTACH_24, "attach24.png");
         cache.put(ProfilerIcons.SNAPSHOTS_COMPARE, "compareSnapshots.png");

@@ -53,6 +53,7 @@ public interface ProfilerIcons extends Icons.Keys {
     public static final String SNAPSHOT_MEMORY_32 = "ProfilerIcons.SnapshotMemory32"; // NOI18N
     public static final String THREAD = "ProfilerIcons.Thread"; // NOI18N
     public static final String ALL_THREADS = "ProfilerIcons.AllThreads"; // NOI18N
+    public static final String SQL_QUERY = "ProfilerIcons.SqlQuery"; // NOI18N
     
     public static final String ATTACH = "ProfilerIcons.Attach"; // NOI18N
     public static final String ATTACH_24 = "ProfilerIcons.Attach24"; // NOI18N
