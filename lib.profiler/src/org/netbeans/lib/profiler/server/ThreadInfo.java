@@ -43,6 +43,8 @@
 
 package org.netbeans.lib.profiler.server;
 
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An instance of this class is allocated for each profiled thread, to hold thread-local information, such as whether
@@ -95,6 +97,7 @@ public class ThreadInfo {
     long lastWaitStartTime; // Used in Code Region profiling for tracking wait times
     long threadEntryTime; // Used to support thread suspension and code fragment profiling
     private boolean initialized; // To signal that this thread is not initialized or was reset, so this threadInfo is unusable
+    List parameters;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -252,6 +255,21 @@ public class ThreadInfo {
         evBuf = new byte[evBufSize];
     }
 
+    void addParameter(Object par) {
+        if (parameters == null) {
+            parameters = new ArrayList();
+        }
+        parameters.add(par);
+    }
+    
+    List getParameters() {
+        return parameters;
+    }
+    
+    void clearParameters() {
+        parameters.clear();
+    }
+    
     static int getNProfiledAppThreads() {
         return nProfiledAppThreads;
     }
@@ -356,6 +374,7 @@ public class ThreadInfo {
                         ti.evBuf = null; // release results buffer
                     }
                     ti.thread = null; // release dead thread
+                    ti.parameters = null;
                     hasDeadThreads = true;
                 }
             }

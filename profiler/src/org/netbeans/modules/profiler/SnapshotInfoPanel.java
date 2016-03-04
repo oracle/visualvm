@@ -487,6 +487,10 @@ public class SnapshotInfoPanel extends JPanel {
                 }
 
                 break;
+            case ProfilingSettings.PROFILE_CPU_JDBC:
+                htmlText.append("JDBC");
+                
+                break;
             case ProfilingSettings.PROFILE_MEMORY_SAMPLING:
                 filter = ps.getSelectedInstrumentationFilter();
                 sFilter = filter instanceof SimpleFilter ? (SimpleFilter)filter : null;
