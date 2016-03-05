@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -41,49 +41,60 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.profiler.results.cpu;
+package org.netbeans.lib.profiler.ui.jdbc;
 
-import java.util.List;
-import org.netbeans.lib.profiler.results.locks.LockProfilingResultListener;
-
+import javax.swing.Icon;
+import javax.swing.UIManager;
+import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
+import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Jiri Sedlacek
  */
-public interface CPUProfilingResultListener extends LockProfilingResultListener {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    static final int METHODTYPE_NORMAL = 1;
-    static final int METHODTYPE_ROOT = 2;
-    static final int METHODTYPE_MARKER = 3;
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    void methodEntry(final int methodId, final int threadId, final int methodType, final long timeStamp0, final long timeStamp1,
-            final List parameters, final int[] methodIds);
-
-    void methodEntryUnstamped(final int methodId, final int threadId, final int methodType, final List parameters, final int[] methodIds);
-
-    void methodExit(final int methodId, final int threadId, final int methodType, final long timeStamp0, final long timeStamp1);
-
-    void methodExitUnstamped(final int methodId, final int threadId, final int methodType);
-
-    void servletRequest(final int threadId, final int requestType, final String servletPath, final int sessionId);
-
-    void sleepEntry(final int threadId, final long timeStamp0, final long timeStamp1);
-
-    void sleepExit(final int threadId, final long timeStamp0, final long timeStamp1);
-
-    void threadsResume(final long timeStamp0, final long timeStamp1);
-
-    void threadsSuspend(final long timeStamp0, final long timeStamp1);
-
-    void waitEntry(final int threadId, final long timeStamp0, final long timeStamp1);
-
-    void waitExit(final int threadId, final long timeStamp0, final long timeStamp1);
-
-    void parkEntry(final int threadId, final long timeStamp0, final long timeStamp1);
-
-    void parkExit(final int threadId, final long timeStamp0, final long timeStamp1);
+public class JDBCJavaNameRenderer extends JavaNameRenderer {
+    
+    private static final Icon SQL_ICON = Icons.getIcon(ProfilerIcons.SQL_QUERY);
+    private static final Icon SQL_ICON_DISABLED = UIManager.getLookAndFeel().getDisabledIcon(null, SQL_ICON);
+    private static final Icon LEAF_ICON = Icons.getIcon(ProfilerIcons.NODE_LEAF);
+    private static final Icon LEAF_ICON_DISABLED = UIManager.getLookAndFeel().getDisabledIcon(null, LEAF_ICON);
+    
+    private final Icon icon;
+    private final Icon iconDisabled;
+    
+    public JDBCJavaNameRenderer() {
+        this(ProfilerIcons.NODE_REVERSE);
+    }
+    
+    public JDBCJavaNameRenderer(String iconKey) {
+        this.icon = Icons.getIcon(iconKey);
+        this.iconDisabled = UIManager.getLookAndFeel().getDisabledIcon(null, icon);
+    }
+    
+    public void setValue(Object value, int row) {
+        if (value instanceof PresoObjAllocCCTNode) {
+            PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)value;
+            
+            if (node.isFiltered()) {
+                setNormalValue(""); // NOI18N
+                setBoldValue(""); // NOI18N
+                setGrayValue(node.getNodeName());
+            } else {
+                super.setValue(node.getNodeName(), row);
+            }
+            
+            if (JDBCTreeTableView.isSQL(node)) {
+                setIcon(node.isFiltered() ? SQL_ICON_DISABLED : SQL_ICON);
+            } else if (node.isLeaf()) {
+                setIcon(node.isFiltered() ? LEAF_ICON_DISABLED : LEAF_ICON);
+            } else {
+                setIcon(node.isFiltered() ? iconDisabled : icon);
+            }
+        } else {
+            super.setValue(value, row);
+        }
+    }
+    
 }
