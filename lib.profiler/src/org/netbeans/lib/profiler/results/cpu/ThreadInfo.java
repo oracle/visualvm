@@ -43,7 +43,7 @@ package org.netbeans.lib.profiler.results.cpu;
 
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
 
-class ThreadInfo {
+public class ThreadInfo {
 
     //~ Static fields/initializers -------------------------------------------------------------------------------------------
     // The following variable is used to record the "compensation" value, a difference between the timestamp at the
@@ -57,29 +57,29 @@ class ThreadInfo {
 
     //~ Instance fields ------------------------------------------------------------------------------------------------------
     final private Object stackLock = new Object();
-    TimedCPUCCTNode[] stack;
+    public TimedCPUCCTNode[] stack;
     // Simulated stack for this thread - stack starting at root method
     // (or a pseudo node if multiple root methods are called within the thread)
     int inRoot;
     // flag indicating this thread is in a root method initiated code
     int stackTopIdx;
     // Index of the stack top element
-    final int threadId;
-    int totalNNodes;
+    public final int threadId;
+    public int totalNNodes;
     // total number of call tree nodes for this thread
     long rootGrossTimeAbs;
     long rootGrossTimeThreadCPU;
     // Accumulated absolute and thread CPU gross time for the root method
     // - blackout data subtracted, calibration data not
-    long rootMethodEntryTimeAbs;
-    long rootMethodEntryTimeThreadCPU;
+    public long rootMethodEntryTimeAbs;
+    public long rootMethodEntryTimeThreadCPU;
     // Absoute and thread CPU entry timestamps for the root method.
     // The xxx0 part is used when only absolute or thread CPU time data is collected.
     // Both xxx0 and xx1 parts are used when both timestamps are collected.
-    long topMethodEntryTime0;
-    long topMethodEntryTime1;
+    public long topMethodEntryTime0;
+    public long topMethodEntryTime1;
     // Entry (or "re-entry" upon return from the callee) time for the topmost method
-    long totalNInv;
+    public long totalNInv;
 
     ThreadInfo(int threadId) {
         super();
@@ -89,17 +89,17 @@ class ThreadInfo {
         this.threadId = threadId;
     }
 
-    boolean isInRoot() {
+    public boolean isInRoot() {
         return inRoot > 0;
     }
 
-    TimedCPUCCTNode peek() {
+    public TimedCPUCCTNode peek() {
         synchronized (stackLock) {
             return (stackTopIdx > -1) ? stack[stackTopIdx] : null;
         }
     }
 
-    TimedCPUCCTNode pop() {
+    public TimedCPUCCTNode pop() {
         TimedCPUCCTNode node = null;
         synchronized (stackLock) {
             if (stackTopIdx >= 0) {
@@ -111,7 +111,7 @@ class ThreadInfo {
         }
     }
 
-    void push(TimedCPUCCTNode node) {
+    public void push(TimedCPUCCTNode node) {
         synchronized (stackLock) {
             stackTopIdx++;
             if (stackTopIdx >= stack.length) {
