@@ -366,10 +366,10 @@ public abstract class SnapshotJDBCView extends JPanel {
 //        ActionPopupButton aggregation = new ActionPopupButton(aMethods, aClasses, aPackages);
 //        toolbar.add(aggregation);
 //        
-//        if (infoAction != null) {
-//            toolbar.addFiller();
-//            toolbar.add(infoAction);
-//        }
+        if (infoAction != null) {
+            toolbar.addFiller();
+            toolbar.add(infoAction);
+        }
 //        
         add(toolbar.getComponent(), BorderLayout.NORTH);
         

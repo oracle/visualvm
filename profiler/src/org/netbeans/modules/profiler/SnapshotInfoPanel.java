@@ -488,7 +488,10 @@ public class SnapshotInfoPanel extends JPanel {
 
                 break;
             case ProfilingSettings.PROFILE_CPU_JDBC:
-                htmlText.append("JDBC");
+                htmlText.append("<strong>"); // NOI18N
+                htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
+                htmlText.append("</strong>"); // NOI18N
+                htmlText.append("SQL Queries");
                 
                 break;
             case ProfilingSettings.PROFILE_MEMORY_SAMPLING:
