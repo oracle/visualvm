@@ -47,6 +47,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
+import javax.swing.table.DefaultTableCellRenderer;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -66,7 +67,7 @@ public class JDBCJavaNameRenderer extends JavaNameRenderer {
     private final Icon icon;
     private final Icon iconDisabled;
     
-    private final JLabel sqlRenderer = new JLabel();
+    private final JLabel sqlRenderer = new DefaultTableCellRenderer();
     
     private String currentValue;
     
