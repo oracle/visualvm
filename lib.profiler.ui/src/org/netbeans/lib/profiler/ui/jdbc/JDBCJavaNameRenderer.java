@@ -57,7 +57,7 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  *
  * @author Jiri Sedlacek
  */
-public class JDBCJavaNameRenderer extends JavaNameRenderer {
+final class JDBCJavaNameRenderer extends JavaNameRenderer {
     
     private static final Icon SQL_ICON = Icons.getIcon(ProfilerIcons.SQL_QUERY);
     private static final Icon SQL_ICON_DISABLED = UIManager.getLookAndFeel().getDisabledIcon(null, SQL_ICON);
@@ -67,7 +67,7 @@ public class JDBCJavaNameRenderer extends JavaNameRenderer {
     private final Icon icon;
     private final Icon iconDisabled;
     
-    private final JLabel sqlRenderer = new DefaultTableCellRenderer();
+    private JLabel sqlRenderer;
     
     private String currentValue;
     
@@ -91,8 +91,13 @@ public class JDBCJavaNameRenderer extends JavaNameRenderer {
             
             isSQL = JDBCTreeTableView.isSQL(node);
             if (isSQL) {
-                sqlRenderer.setText(formatSQLCommand(currentValue));
-                sqlRenderer.setIcon(filtered ? SQL_ICON_DISABLED : SQL_ICON);
+                String htmlName = node.htmlName;
+                if (htmlName == null) {
+                    htmlName = SQLFormatter.format(currentValue);
+                    node.htmlName = htmlName;
+                }
+                sqlRenderer().setText(htmlName);
+                sqlRenderer().setIcon(filtered ? SQL_ICON_DISABLED : SQL_ICON);
             } else {
                 if (filtered) {
                     setNormalValue(""); // NOI18N
@@ -114,7 +119,7 @@ public class JDBCJavaNameRenderer extends JavaNameRenderer {
     }
     
     public JComponent getComponent() {
-        return isSQL ? sqlRenderer : super.getComponent();
+        return isSQL ? sqlRenderer() : super.getComponent();
     }
     
     public String toString() {
@@ -122,28 +127,9 @@ public class JDBCJavaNameRenderer extends JavaNameRenderer {
     }
     
     
-    private static String formatSQLCommand(String command) {
-        StringBuilder s = new StringBuilder();
-        s.append("<html>"); // NOI18N
-        
-        command = command.replace("CREATE TABLE ", "<b>CREATE TABLE </b>"); // NOI18N
-        command = command.replace("ALTER TABLE ", "<b>ALTER TABLE </b>"); // NOI18N
-        command = command.replace("TRUNCATE TABLE ", "<b>TRUNCATE TABLE </b>"); // NOI18N
-        command = command.replace("INSERT INTO ", "<b>INSERT INTO </b>"); // NOI18N
-//        command = command.replace("DELETE FROM ", "<b>DELETE FROM </b>"); // NOI18N
-        command = command.replace("SELECT ", "<b>SELECT </b>"); // NOI18N
-        command = command.replace("DELETE ", "<b>DELETE </b>"); // NOI18N 
-        command = command.replace("FROM ", "<b>FROM </b>"); // NOI18N
-        command = command.replace("WHERE ", "<b>WHERE </b>"); // NOI18N
-        command = command.replace("UPDATE ", "<b>UPDATE </b>"); // NOI18N
-        command = command.replace("VALUES ", "<b>VALUES </b>"); // NOI18N
-        command = command.replace("DISTINCT ", "<b>DISTINCT </b>"); // NOI18N
-        command = command.replace("ORDER BY ", "<b>ORDER BY </b>"); // NOI18N
-        command = command.replace("GROUP BY ", "<b>GROUP BY </b>"); // NOI18N
-        s.append(command);
-        
-        s.append("</html>"); // NOI18N
-        return s.toString();
+    private JLabel sqlRenderer() {
+        if (sqlRenderer == null) sqlRenderer = new DefaultTableCellRenderer();
+        return sqlRenderer;
     }
     
 }
