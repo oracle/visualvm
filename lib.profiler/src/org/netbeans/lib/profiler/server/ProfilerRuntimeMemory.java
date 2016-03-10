@@ -66,9 +66,9 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
     protected static short[] allocatedInstThreshold;
     protected static char[] objectSize;
     protected static short samplingInterval;
-    protected static int samplingDepth;
+    protected static int stackSamplingDepth;
     static final Object classIdMapLock = new Object();
-    private static int stackDepth;
+    private static int currentStackDepth;
     private static int[] stackFrameIds;
     private static Map classIdMap;
     private static volatile boolean resultsAvailable;
@@ -111,7 +111,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
     }
 
     /** Negative parameter means the depth is not limited. val == 0 means we should not take stack samples */
-    public static void setSamplingDepth(int val) {
+    public static void setStackSamplingDepth(int val) {
         if (val < 0) {
             val = MAX_STACK_FRAMES;
         } else if (val > 0) {
@@ -121,10 +121,10 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
                 val = MAX_STACK_FRAMES;
             }
         } else {
-            stackDepth = 0;
+            currentStackDepth = 0;
         }
 
-        samplingDepth = val;
+        stackSamplingDepth = val;
     }
 
     public static void setSamplingInterval(short val) {
@@ -227,8 +227,8 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
 
         synchronized (eventBuffer) { // Note that we have to use synchronization here due to the static stackFrameIds[] array
 
-            if (samplingDepth != 0) {
-                stackDepth = Stacks.getCurrentStackFrameIds(Thread.currentThread(), samplingDepth, stackFrameIds);
+            if (stackSamplingDepth != 0) {
+                currentStackDepth = Stacks.getCurrentStackFrameIds(Thread.currentThread(), stackSamplingDepth, stackFrameIds);
             }
 
             writeObjAllocStackTraceEvent(classId, objSize);
@@ -243,8 +243,8 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
 
         synchronized (eventBuffer) { // Note that we have to use synchronization here due to the static stackFrameIds[] array
 
-            if (samplingDepth != 0) {
-                stackDepth = Stacks.getCurrentStackFrameIds(Thread.currentThread(), samplingDepth, stackFrameIds);
+            if (stackSamplingDepth != 0) {
+                currentStackDepth = Stacks.getCurrentStackFrameIds(Thread.currentThread(), stackSamplingDepth, stackFrameIds);
             }
 
             writeObjLivenessStackTraceEvent(classId, epoch, objCount, objSize);
@@ -349,8 +349,8 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
             return; // Instrumentation removal happened when we were in instrumentation 
         }
 
-        if (stackDepth != 0) {
-            stackDepth -= NO_OF_PROFILER_FRAMES; // Top frames are our own methods
+        if (currentStackDepth != 0) {
+            currentStackDepth -= NO_OF_PROFILER_FRAMES; // Top frames are our own methods
         }
 
         if (!resultsAvailable) {
@@ -360,7 +360,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
 
         int curPos = globalEvBufPos;
 
-        if ((curPos + 16 + (stackDepth * 4)) > globalEvBufPosThreshold) { // Dump the buffer
+        if ((curPos + 16 + (currentStackDepth * 4)) > globalEvBufPosThreshold) { // Dump the buffer
             externalActionsHandler.handleEventBufferDump(eventBuffer, 0, curPos);
             curPos = 0;
         }
@@ -411,8 +411,8 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
             return; // Instrumentation removal happened when we were in instrumentation 
         }
 
-        if (stackDepth != 0) {
-            stackDepth -= NO_OF_PROFILER_FRAMES; // Top 4 frames are our own methods
+        if (currentStackDepth != 0) {
+            currentStackDepth -= NO_OF_PROFILER_FRAMES; // Top 4 frames are our own methods
         }
 
         if (!resultsAvailable) {
@@ -422,7 +422,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
 
         int curPos = globalEvBufPos;
 
-        if ((curPos + 24 + (stackDepth * 4)) > globalEvBufPosThreshold) { // Dump the buffer
+        if ((curPos + 24 + (currentStackDepth * 4)) > globalEvBufPosThreshold) { // Dump the buffer
             externalActionsHandler.handleEventBufferDump(eventBuffer, 0, curPos);
             curPos = 0;
         }
@@ -448,9 +448,9 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
     }
 
     private static int writeStack(int curPos) {
-        eventBuffer[curPos++] = (byte) ((stackDepth >> 16) & 0xFF);
-        eventBuffer[curPos++] = (byte) ((stackDepth >> 8) & 0xFF);
-        eventBuffer[curPos++] = (byte) ((stackDepth) & 0xFF);
+        eventBuffer[curPos++] = (byte) ((currentStackDepth >> 16) & 0xFF);
+        eventBuffer[curPos++] = (byte) ((currentStackDepth >> 8) & 0xFF);
+        eventBuffer[curPos++] = (byte) ((currentStackDepth) & 0xFF);
 
         /// A variant when we send non-reversed call graph
         //int base = depth + NO_OF_PROFILER_FRAMES - 1;
@@ -460,7 +460,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
         //}
         int frameIdx = NO_OF_PROFILER_FRAMES;
 
-        for (int i = 0; i < stackDepth; i++) {
+        for (int i = 0; i < currentStackDepth; i++) {
             eventBuffer[curPos++] = (byte) ((stackFrameIds[frameIdx] >> 24) & 0xFF);
             eventBuffer[curPos++] = (byte) ((stackFrameIds[frameIdx] >> 16) & 0xFF);
             eventBuffer[curPos++] = (byte) ((stackFrameIds[frameIdx] >> 8) & 0xFF);

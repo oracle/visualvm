@@ -64,7 +64,6 @@ import org.netbeans.lib.profiler.results.cpu.cct.nodes.ServletRequestCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.SimpleCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.ThreadCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
-import org.netbeans.lib.profiler.results.cpu.marking.MarkingEngine;
 
 
 /**
