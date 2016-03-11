@@ -71,6 +71,8 @@ import org.netbeans.lib.profiler.results.coderegion.CodeRegionResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
+import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
+import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.*;
 import org.netbeans.lib.profiler.results.threads.ThreadDump;
 import org.netbeans.lib.profiler.utils.MiscUtils;
@@ -251,8 +253,6 @@ public class ProfilerClient implements CommonConstants {
                     (new Thread() {
                             public void run() {
                                 try {
-                                    int instrType = getCurrentInstrType();
-
                                     if (currentInstrTypeIsRecursiveCPUProfiling() || currentInstrTypeIsMemoryProfiling()) {
                                         forceObtainedResultsDump(false, 15);
                                     }
@@ -384,6 +384,7 @@ public class ProfilerClient implements CommonConstants {
     private InitiateProfilingCommand commandOnStartup = null;
     private Instrumentor instrumentor;
     private MemoryCCTProvider memCctProvider;
+    private JdbcCCTProvider jdbcCctProvider;
     private final Object execInSeparateThreadLock = new Object();
     final private Object forceObtainedResultsDumpLock = new Object(); // To make dump processing and other commands mutually
                                                                 // exclusive
@@ -500,8 +501,8 @@ public class ProfilerClient implements CommonConstants {
             }
         }
         synchronized (this) {
-            int len = 0;
-            boolean twoTimeStamps = false;
+            int len;
+            boolean twoTimeStamps;
             String[] instrClassNames, instrMethodNames, instrMethodSigs;
             try {
                 status.beginTrans(false);
@@ -660,6 +661,40 @@ public class ProfilerClient implements CommonConstants {
         }
     }
 
+   /**
+     * Returns the snapshot of current JDBC(Selects) profiling results
+     *
+     * @return JDBC Results snapshot
+     * @throws ClientUtils.TargetAppOrVMTerminated
+     *          In case the profiled application has already terminated
+     */
+    public JdbcResultsSnapshot getJdbcProfilingResultsSnapshot()
+        throws ClientUtils.TargetAppOrVMTerminated {
+        return getJdbcProfilingResultsSnapshot(true);
+    }
+
+    /**
+     * Returns the snapshot of current Memory profiling results
+     *
+     * @param dump true to fetch latest events from server, false otherwise (use only available data)
+     * @return Memory Results snapshot
+     * @throws ClientUtils.TargetAppOrVMTerminated
+     *          In case the profiled application has already terminated
+     */
+    public JdbcResultsSnapshot getJdbcProfilingResultsSnapshot(boolean dump)
+        throws ClientUtils.TargetAppOrVMTerminated {
+        checkForTargetVMAlive();
+        if (dump) {
+            if (!forceObtainedResultsDump(false, 5)) {
+                return null;
+            }
+        }
+
+        synchronized (this) {
+            return new JdbcResultsSnapshot(resultsStart, System.currentTimeMillis(), jdbcCctProvider, this);
+        }
+    }
+    
     public Marker getMethodMarker() {
         return settings.getMethodMarker();
     }
@@ -795,7 +830,7 @@ public class ProfilerClient implements CommonConstants {
                 return;
             }
 
-            Response resp = null;
+            Response resp;
             checkForTargetAppRunning();
 
             long curTime = System.currentTimeMillis();
@@ -1150,6 +1185,10 @@ public class ProfilerClient implements CommonConstants {
 
     public void registerMemoryCCTProvider(MemoryCCTProvider provider) {
         memCctProvider = provider;
+    }
+
+    public void registerJdbcCCTProvider(JdbcCCTProvider provider) {
+        jdbcCctProvider = provider;
     }
 
     public void removeAllInstrumentation(boolean cleanupClient)
@@ -1590,7 +1629,7 @@ public class ProfilerClient implements CommonConstants {
     //-------------------------------- Private implementation ------------------------------------------
     private void clearPreviousInstrumentationInServer()
                                                throws InstrumentationException, ClientUtils.TargetAppOrVMTerminated {
-        Response resp = null;
+        Response resp;
         checkForTargetAppRunning();
 
         // First send the command that will make the application stop emitting events
@@ -1898,7 +1937,7 @@ public class ProfilerClient implements CommonConstants {
         synchronized (instrumentationLock) {
             AppStatusHandler.AsyncDialog waitDialog = null;
             try {
-                InstrumentMethodGroupResponse imgr = null;
+                InstrumentMethodGroupResponse imgr;
 
                 if (!serverClassesInitialized) { // Check if it is a fake command from server, used to just pre-initialize
                                                  // some internal server classes

@@ -254,6 +254,7 @@ public abstract class Profiler {
                 break;
             case ProfilingSettings.PROFILE_CPU_ENTIRE:
             case ProfilingSettings.PROFILE_CPU_PART:
+            case ProfilingSettings.PROFILE_CPU_JDBC:
                 instrumentSelectedRoots(profilingSettings.getInstrumentationMethods());
 
                 break;
