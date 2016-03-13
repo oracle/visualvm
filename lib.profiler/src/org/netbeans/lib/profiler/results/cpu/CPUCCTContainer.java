@@ -104,7 +104,7 @@ public class CPUCCTContainer {
 
     protected CPUResultsSnapshot cpuResSnapshot;
     protected FlatProfileContainer cachedFlatProfile;
-    protected PrestimeCPUCCTNode rootNode;
+    public PrestimeCPUCCTNode rootNode;
     protected String threadName;
     protected byte[] compactData;
     protected int[] invPerMethodId;

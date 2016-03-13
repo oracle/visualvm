@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 1997-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -40,50 +40,39 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
-package org.netbeans.lib.profiler.results.cpu;
-
-import java.util.List;
-import org.netbeans.lib.profiler.results.locks.LockProfilingResultListener;
-
+package org.netbeans.lib.profiler.ui.jdbc;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Jiri Sedlacek
  */
-public interface CPUProfilingResultListener extends LockProfilingResultListener {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
-    static final int METHODTYPE_NORMAL = 1;
-    static final int METHODTYPE_ROOT = 2;
-    static final int METHODTYPE_MARKER = 3;
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    void methodEntry(final int methodId, final int threadId, final int methodType, final long timeStamp0, final long timeStamp1,
-            final List parameters, final int[] methodIds);
-
-    void methodEntryUnstamped(final int methodId, final int threadId, final int methodType, final List parameters, final int[] methodIds);
-
-    void methodExit(final int methodId, final int threadId, final int methodType, final long timeStamp0, final long timeStamp1);
-
-    void methodExitUnstamped(final int methodId, final int threadId, final int methodType);
-
-    void servletRequest(final int threadId, final int requestType, final String servletPath, final int sessionId);
-
-    void sleepEntry(final int threadId, final long timeStamp0, final long timeStamp1);
-
-    void sleepExit(final int threadId, final long timeStamp0, final long timeStamp1);
-
-    void threadsResume(final long timeStamp0, final long timeStamp1);
-
-    void threadsSuspend(final long timeStamp0, final long timeStamp1);
-
-    void waitEntry(final int threadId, final long timeStamp0, final long timeStamp1);
-
-    void waitExit(final int threadId, final long timeStamp0, final long timeStamp1);
-
-    void parkEntry(final int threadId, final long timeStamp0, final long timeStamp1);
-
-    void parkExit(final int threadId, final long timeStamp0, final long timeStamp1);
+final class SQLFormatter {
+    
+    static String format(String command) {
+        StringBuilder s = new StringBuilder();
+        s.append("<html>"); // NOI18N
+        
+        command = command.replace("CREATE TABLE ", "<b>CREATE TABLE </b>"); // NOI18N
+        command = command.replace("ALTER TABLE ", "<b>ALTER TABLE </b>"); // NOI18N
+        command = command.replace("TRUNCATE TABLE ", "<b>TRUNCATE TABLE </b>"); // NOI18N
+        command = command.replace("INSERT INTO ", "<b>INSERT INTO </b>"); // NOI18N
+//        command = command.replace("DELETE FROM ", "<b>DELETE FROM </b>"); // NOI18N
+        command = command.replace("SELECT ", "<b>SELECT </b>"); // NOI18N
+        command = command.replace("DELETE ", "<b>DELETE </b>"); // NOI18N 
+        command = command.replace("FROM ", "<b>FROM </b>"); // NOI18N
+        command = command.replace("WHERE ", "<b>WHERE </b>"); // NOI18N
+        command = command.replace("UPDATE ", "<b>UPDATE </b>"); // NOI18N
+        command = command.replace("VALUES ", "<b>VALUES </b>"); // NOI18N
+        command = command.replace("DISTINCT ", "<b>DISTINCT </b>"); // NOI18N
+        command = command.replace("ORDER BY ", "<b>ORDER BY </b>"); // NOI18N
+        command = command.replace("GROUP BY ", "<b>GROUP BY </b>"); // NOI18N
+        
+        command = command.replace("(", "<font color='gray'>(");
+        command = command.replace(")", ")</font>");
+        s.append(command);
+        
+        s.append("</html>"); // NOI18N
+        return s.toString();
+    }
+    
 }
