@@ -77,6 +77,9 @@ public class ProfilingSettingsPresets {
             } else if (type == ProfilingSettings.PROFILE_CPU_PART) {
                 setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
                 setInstrumentSpawnedThreads(false);
+            } else if (type == ProfilingSettings.PROFILE_CPU_JDBC) {
+                setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
+                setInstrumentSpawnedThreads(false);
             } else if (type == ProfilingSettings.PROFILE_CPU_SAMPLING) {
                 setSamplingFrequency(10);
                 setThreadCPUTimerOn(true);
