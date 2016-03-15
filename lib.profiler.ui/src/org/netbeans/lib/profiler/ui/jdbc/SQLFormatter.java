@@ -42,37 +42,103 @@
  */
 package org.netbeans.lib.profiler.ui.jdbc;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  *
  * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
 final class SQLFormatter {
-    
+    private static String keywords[] = {
+        "AS",
+        "ALL",
+        "AND",
+        "ASC",
+        "AVG",
+        "BY",
+        "COUNT",
+        "CROSS",
+        "DESC",
+        "DISTINCT",
+        "FROM",
+        "FULL",
+        "GROUP",
+        "HAVING",
+        "INNER",
+        "LEFT",
+        "JOIN",
+        "MAX",
+        "MIN",
+        "NATURAL",
+        "NOT",
+        "ON",
+        "OR",
+        "ORDER",
+        "OUTER",
+        "RIGHT",
+        "SELECT",
+        "SUM",
+        "WHERE",
+        "CREATE TABLE",
+        "ALTER TABLE",
+        "TRUNCATE TABLE",
+        "DROP TABLE",
+        "INSERT INTO",
+        "DELETE",
+        "UPDATE",
+        "VALUES",
+        "SET",
+        "'[^']*'"
+    };
+
+    private static Pattern keywordsPattern = Pattern.compile(getKeywordPattern(), Pattern.CASE_INSENSITIVE);
+
+    private static String getKeywordPattern() {
+        StringBuilder pattern = new StringBuilder();
+
+        for (String keyword : keywords) {
+            pattern.append("(");    // NOI18N
+            if (Character.isLetter(keyword.charAt(0))) {
+                pattern.append("\\b");  // NOi18N
+                pattern.append(keyword);
+                pattern.append("\\b");  // NOI18N
+            } else {
+                pattern.append(keyword);
+            }
+            pattern.append(")|");   // NOI18N
+        }
+        return pattern.substring(0, pattern.length()-1);
+    }
+
     static String format(String command) {
+        String formattedCommand;
         StringBuilder s = new StringBuilder();
+        int offset = 0;
+        Matcher m = keywordsPattern.matcher(command);
+        
         s.append("<html>"); // NOI18N
-        
-        command = command.replace("CREATE TABLE ", "<b>CREATE TABLE </b>"); // NOI18N
-        command = command.replace("ALTER TABLE ", "<b>ALTER TABLE </b>"); // NOI18N
-        command = command.replace("TRUNCATE TABLE ", "<b>TRUNCATE TABLE </b>"); // NOI18N
-        command = command.replace("INSERT INTO ", "<b>INSERT INTO </b>"); // NOI18N
-//        command = command.replace("DELETE FROM ", "<b>DELETE FROM </b>"); // NOI18N
-        command = command.replace("SELECT ", "<b>SELECT </b>"); // NOI18N
-        command = command.replace("DELETE ", "<b>DELETE </b>"); // NOI18N 
-        command = command.replace("FROM ", "<b>FROM </b>"); // NOI18N
-        command = command.replace("WHERE ", "<b>WHERE </b>"); // NOI18N
-        command = command.replace("UPDATE ", "<b>UPDATE </b>"); // NOI18N
-        command = command.replace("VALUES ", "<b>VALUES </b>"); // NOI18N
-        command = command.replace("DISTINCT ", "<b>DISTINCT </b>"); // NOI18N
-        command = command.replace("ORDER BY ", "<b>ORDER BY </b>"); // NOI18N
-        command = command.replace("GROUP BY ", "<b>GROUP BY </b>"); // NOI18N
-        
-        command = command.replace("(", "<font color='gray'>(");
-        command = command.replace(")", ")</font>");
-        s.append(command);
-        
+        while(m.find()) {
+            String kw = m.group();
+            s.append(command.substring(offset, m.start()));
+            if (kw.startsWith("'")) {       // NOI18N
+                // string literal
+                s.append(kw);
+            } else {
+                s.append("<b>");    // NOI18N
+                s.append(kw);
+                s.append("</b>");   // NOI18N
+            }
+            offset = m.end();
+        }
+        s.append(command.substring(offset,command.length()));
         s.append("</html>"); // NOI18N
-        return s.toString();
+
+        formattedCommand = s.toString();
+        formattedCommand = formattedCommand.replace("(", "<font color='gray'>(");   // NOI18N
+        formattedCommand = formattedCommand.replace(")", ")</font>");   // NOI18N
+        return formattedCommand;
     }
     
 }
