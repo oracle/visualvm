@@ -42,6 +42,7 @@
 package org.netbeans.lib.profiler.results.jdbc;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -172,11 +173,19 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
 
     @Override
     protected void doReset() {
-        threadInfos.reset();
-        selectsToId.clear();
-        idsToSelect.clear();
-        maxSelectId = 0;
-        sqlCallLevel = 0;
+        beginTrans(true);
+        try {
+            threadInfos.reset();
+            selectsToId.clear();
+            idsToSelect.clear();
+            maxSelectId = 0;
+            sqlCallLevel = 0;
+            if (stacksForSelects != null) {
+                Arrays.fill(stacksForSelects, null);
+            }
+        } finally {
+            endTrans();
+        }
     }
 
     @Override
