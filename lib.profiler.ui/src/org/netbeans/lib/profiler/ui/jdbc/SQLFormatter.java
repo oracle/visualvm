@@ -116,8 +116,10 @@ final class SQLFormatter {
         String formattedCommand;
         StringBuilder s = new StringBuilder();
         int offset = 0;
-        Matcher m = keywordsPattern.matcher(command);
+        Matcher m;
         
+        command = htmlize(command);
+        m = keywordsPattern.matcher(command);
         s.append("<html>"); // NOI18N
         while(m.find()) {
             String kw = m.group();
@@ -139,6 +141,10 @@ final class SQLFormatter {
         formattedCommand = formattedCommand.replace("(", "<font color='gray'>(");   // NOI18N
         formattedCommand = formattedCommand.replace(")", ")</font>");   // NOI18N
         return formattedCommand;
+    }
+
+    private static String htmlize(String value) {
+        return value.replace(">", "&gt;").replace("<", "&lt;");     // NOI18N
     }
     
 }
