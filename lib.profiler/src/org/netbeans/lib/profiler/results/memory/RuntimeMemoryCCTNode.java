@@ -79,10 +79,10 @@ public class RuntimeMemoryCCTNode implements Cloneable, RuntimeCCTNode {
      * This is purely a memory consumption optimization, which typically saves about 80% of memory, since most allocation
      * stack traces are a sequence of single-child nodes, and in such case we remove the need to create a one-item array
      */
-    Object children;
+    public Object children;
 
     /** unique Id of method - jMethodId from JVM (see MemoryCallGraphBuilder.getNamesForJMethodIds) */
-    int methodId;
+    public int methodId;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -90,7 +90,7 @@ public class RuntimeMemoryCCTNode implements Cloneable, RuntimeCCTNode {
     protected RuntimeMemoryCCTNode() {
     }
 
-    RuntimeMemoryCCTNode(int methodId) {
+    public RuntimeMemoryCCTNode(int methodId) {
         this.methodId = methodId;
     }
 
