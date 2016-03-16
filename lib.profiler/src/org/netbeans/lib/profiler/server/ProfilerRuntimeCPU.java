@@ -59,6 +59,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final boolean DEBUG = false;
+    private static final int MAX_STRING_LENGTH = 2048;
     private static int nProfiledThreadsLimit;
     protected static int nProfiledThreadsAllowed;
     protected static int stackDepthLimit = Integer.MAX_VALUE;
@@ -696,7 +697,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         } else if (type == Double.TYPE) {
             return 8;
         } else {
-            return 2 + (converToString(p).length()*2) & 0x03FF;
+            return 2 + truncatedByteLength(converToString(p));
         }
     }
     
@@ -753,7 +754,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
             evBuf[curPos++] = (byte) ((vp) & 0xFF);
         } else {    
             String sp = converToString(p);
-            int lengthBytes = (sp.length()*2) & 0x03FF;
+            int lengthBytes = truncatedByteLength(sp);
             evBuf[curPos++] = ProfilerInterface.REFERENCE;
             evBuf[curPos++] = (byte) ((lengthBytes >> 8) & 0xFF);
             evBuf[curPos++] = (byte) ((lengthBytes) & 0xFF);
@@ -779,5 +780,14 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
             return String.valueOf(((java.sql.Timestamp)o).getTime());            
         }
         return clazz + "@" + Integer.toHexString(System.identityHashCode(o));
+    }
+    
+    private static int truncatedByteLength(String s) {
+        int length = s.length()*2;
+        
+        if (length < MAX_STRING_LENGTH) {
+            return length;
+        }
+        return MAX_STRING_LENGTH;
     }
 }
