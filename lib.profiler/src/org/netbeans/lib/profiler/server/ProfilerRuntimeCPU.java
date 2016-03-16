@@ -775,6 +775,9 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         if (clazz.equals("java.sql.Date")) {
             return String.valueOf(((java.sql.Date)o).getTime());
         }
+        if (clazz.equals("java.sql.Timestamp")) {
+            return String.valueOf(((java.sql.Timestamp)o).getTime());            
+        }
         return clazz + "@" + Integer.toHexString(System.identityHashCode(o));
     }
 }

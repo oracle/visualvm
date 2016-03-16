@@ -120,6 +120,9 @@ class SQLStatement {
             case "setDate":
                 setDate((Integer)parameters.get(1), (String)parameters.get(2));
                 break;
+            case "setTimestamp":
+                setTimestamp((Integer)parameters.get(1), (String)parameters.get(2));
+                break;
             case "setNull":
                 setNull((Integer)parameters.get(1), (Integer)parameters.get(2));
                 break;
@@ -229,8 +232,13 @@ class SQLStatement {
         parameters.ensureCapacity(parameterIndex+1);
     }
 
-    void setTimestamp(int parameterIndex, Timestamp x) {
-        parameters.ensureCapacity(parameterIndex+1);
+    void setTimestamp(int parameterIndex, String x) {
+        ensureCapacity(parameterIndex);
+        long time = Long.valueOf(x);
+        if (JDBC_LOGGER.isLoggable(Level.FINER)) {
+            JDBC_LOGGER.log(Level.FINER, "setTime index:{0} value:{1}", new Object[]{parameterIndex,new Timestamp(time)});
+        }
+        parameters.set(parameterIndex, new Timestamp(time));
     }
 
     void setAsciiStream(int parameterIndex, InputStream x, int length) {
