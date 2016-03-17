@@ -157,6 +157,7 @@ public interface CommonConstants {
     public static final byte THREAD_DUMP_END = 32;
     public static final byte THREAD_INFO_IDENTICAL = 33;
     public static final byte THREAD_INFO = 34;
+    public static final byte MARKER_ENTRY_PARAMETERS = 35;
 
     // The following are used when storing unstamped method entry/exit events in the "compact" format, when both
     // event code and method id are packed in a single char. See more comments in ProfilerRuntimeCPUSampledInstr.java
