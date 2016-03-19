@@ -112,6 +112,8 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
                 }
             }
 
+            ProfilerServer.notifyClientOnResultsAvailability();
+            writeParametersEvent(ti);
             writeTimeStampedEvent(MARKER_ENTRY, ti, methodId);
         }
         ti.stackDepth++; //= 1;  // This is the logical stack depth
