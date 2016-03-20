@@ -43,9 +43,11 @@
 
 package org.netbeans.lib.profiler.server;
 
-import org.netbeans.lib.profiler.global.Platform;
-import org.netbeans.lib.profiler.server.system.Timers;
 import java.lang.reflect.Method;
+import java.util.List;
+import org.netbeans.lib.profiler.global.Platform;
+import org.netbeans.lib.profiler.server.system.Stacks;
+import org.netbeans.lib.profiler.server.system.Timers;
 
 /**
  * This class contains the functionality that is common for all CPU profiling methods available in JFluid.
@@ -57,6 +59,7 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private static final boolean DEBUG = false;
+    private static final int MAX_STRING_LENGTH = 2048;
     private static int nProfiledThreadsLimit;
     protected static int nProfiledThreadsAllowed;
     protected static int stackDepthLimit = Integer.MAX_VALUE;
@@ -223,6 +226,12 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         ProfilerRuntime.clearDataStructures();
         nProfiledThreadsAllowed = nProfiledThreadsLimit;
     }
+    
+    protected static void createNewDataStructures() {
+        ProfilerRuntime.createNewDataStructures();
+        // top level Marker method has stacktrace 
+        Stacks.createNativeStackFrameBuffer(ProfilerRuntimeMemory.MAX_STACK_FRAMES);
+    }
 
     protected static long currentTimeInCounts() {
         return Timers.getCurrentTimeInCounts();
@@ -384,9 +393,21 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
 
     // ---------------------------------- Writing profiler events --------------------------------------
     static void writeTimeStampedEvent(byte eventType, ThreadInfo ti, char methodId) {
+        int[] stackFrameIds = null;
+        int currentStackDepth = 0;
+        if (eventType == MARKER_ENTRY) {
+            // top-level marker method has stack trace
+            if (ti.stackDepth == 0) {
+                stackFrameIds = new int[ProfilerRuntimeMemory.MAX_STACK_FRAMES];
+                currentStackDepth = Stacks.getCurrentStackFrameIds(ti.getThread(), stackFrameIds.length, stackFrameIds);
+                currentStackDepth -= ProfilerRuntimeMemory.NO_OF_PROFILER_FRAMES;
+            } else {
+                stackFrameIds = new int[0];
+            }
+        }
         int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
 
-        if (curPos > ThreadInfo.evBufPosThreshold) {
+        if (curPos + currentStackDepth*4 > ThreadInfo.evBufPosThreshold) {
             copyLocalBuffer(ti);
             curPos = ti.evBufPos;
         }
@@ -431,12 +452,58 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
                                    + (int) methodId + ", timestamp: " + threadTimeStamp); // NOI18N
             }
         }
+        if (stackFrameIds != null) {
+            evBuf[curPos++] = (byte) ((currentStackDepth >> 16) & 0xFF);
+            evBuf[curPos++] = (byte) ((currentStackDepth >> 8) & 0xFF);
+            evBuf[curPos++] = (byte) ((currentStackDepth) & 0xFF);
+            int frameIdx = ProfilerRuntimeMemory.NO_OF_PROFILER_FRAMES;
+
+            for (int i = 0; i < currentStackDepth; i++) {
+                evBuf[curPos++] = (byte) ((stackFrameIds[frameIdx] >> 24) & 0xFF);
+                evBuf[curPos++] = (byte) ((stackFrameIds[frameIdx] >> 16) & 0xFF);
+                evBuf[curPos++] = (byte) ((stackFrameIds[frameIdx] >> 8) & 0xFF);
+                evBuf[curPos++] = (byte) ((stackFrameIds[frameIdx]) & 0xFF);
+                frameIdx++;
+            }
+        }
 
         ti.evBufPos = curPos;
     }
     
     static long writeWaitTimeEvent(byte eventType, ThreadInfo ti) {
         return writeWaitTimeEvent(eventType, ti, null);
+    }
+    
+    static void writeParametersEvent(ThreadInfo ti) {
+        List pars = ti.getParameters();
+        int parsLength = 0;
+        if (pars != null) {
+            for (int i = 0; i < pars.size(); i++) {
+                parsLength += 1 + getParSize(pars.get(i));
+            }
+        }
+        int fullInfoLen = 1 + 1 + parsLength;
+        int curPos = ti.evBufPos; // It's important to use a local copy for evBufPos, so that evBufPos is at event boundary at any moment
+
+        if ((curPos + fullInfoLen) > ThreadInfo.evBufPosThreshold) {
+            copyLocalBuffer(ti);
+            curPos = ti.evBufPos;
+        }
+
+        byte[] evBuf = ti.evBuf;
+
+        evBuf[curPos++] = MARKER_ENTRY_PARAMETERS;
+        if (pars != null) {
+            evBuf[curPos++] = (byte) pars.size();
+
+            for (int i = 0; i < pars.size(); i++) {
+                curPos = writeParameter(evBuf, curPos, pars.get(i));
+            }
+            ti.clearParameters();
+        } else {
+            evBuf[curPos++] = 0;            
+        }
+        ti.evBufPos = curPos;
     }
     
     private static void servletDoMethodHook(ThreadInfo ti, Object request) {
@@ -468,5 +535,259 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         }
 
         writeServletDoMethod(ti, method, servletPath, requestedSessionId);
+    }
+    
+    public static void addParameter(boolean b) {
+        if (recursiveInstrumentationDisabled) {
+            return;
+        }
+
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+        ti.inProfilingRuntimeMethod++;
+        ti.addParameter(Boolean.valueOf(b));
+        ti.inProfilingRuntimeMethod--; 
+    }
+
+    public static void addParameter(char b) {
+        if (recursiveInstrumentationDisabled) {
+            return;
+        }
+
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+
+        ti.inProfilingRuntimeMethod++;
+        ti.addParameter(new Character(b));
+        ti.inProfilingRuntimeMethod--; 
+    }
+
+    public static void addParameter(byte b) {
+        if (recursiveInstrumentationDisabled) {
+            return;
+        }
+
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+
+        ti.inProfilingRuntimeMethod++;
+        ti.addParameter(new Byte(b));
+        ti.inProfilingRuntimeMethod--; 
+    }
+
+    public static void addParameter(short b) {
+        if (recursiveInstrumentationDisabled) {
+            return;
+        }
+
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+
+        ti.inProfilingRuntimeMethod++;
+        ti.addParameter(new Short(b));
+        ti.inProfilingRuntimeMethod--; 
+    }
+
+    public static void addParameter(int b) {
+        if (recursiveInstrumentationDisabled) {
+            return;
+        }
+
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+
+        ti.inProfilingRuntimeMethod++;
+        ti.addParameter(new Integer(b));
+        ti.inProfilingRuntimeMethod--; 
+    }
+
+    public static void addParameter(long b) {
+        if (recursiveInstrumentationDisabled) {
+            return;
+        }
+
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+
+        ti.inProfilingRuntimeMethod++;
+        ti.addParameter(new Long(b));
+        ti.inProfilingRuntimeMethod--; 
+    }
+
+    public static void addParameter(float b) {
+        if (recursiveInstrumentationDisabled) {
+            return;
+        }
+
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+
+        ti.inProfilingRuntimeMethod++;
+        ti.addParameter(new Float(b));
+        ti.inProfilingRuntimeMethod--; 
+    }
+
+    public static void addParameter(double b) {
+        if (recursiveInstrumentationDisabled) {
+            return;
+        }
+
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+
+        ti.inProfilingRuntimeMethod++;
+        ti.addParameter(new Double(b));
+        ti.inProfilingRuntimeMethod--; 
+    }
+
+    public static void addParameter(Object b) {
+        if (recursiveInstrumentationDisabled) {
+            return;
+        }
+
+        ThreadInfo ti = ThreadInfo.getThreadInfo();
+
+        if (ti.inProfilingRuntimeMethod > 0) {
+            return;
+        }
+
+        ti.inProfilingRuntimeMethod++;
+        ti.addParameter(b != null ? b : "");
+        ti.inProfilingRuntimeMethod--; 
+    }
+    
+    private static int getParSize(Object p) {
+        Class type = p.getClass();
+        if (type == Integer.TYPE) {
+            return 4;
+        } else if (type == Boolean.TYPE) {
+            return 1;
+        } else if (type == Byte.TYPE) {
+            return 1;
+        } else if (type == Character.TYPE) {
+            return 2;
+        } else if (type == Long.TYPE) {
+            return 8;
+        } else if (type == Float.TYPE) {
+            return 4;
+        } else if (type == Double.TYPE) {
+            return 8;
+        } else {
+            return 2 + truncatedByteLength(converToString(p));
+        }
+    }
+    
+    private static int writeParameter(byte[] evBuf, int curPos, Object p) {
+        Class type = p.getClass();
+        if (type == Integer.class) {
+            int vp = ((Integer)p).intValue();
+            evBuf[curPos++] = ProfilerInterface.INT;
+            evBuf[curPos++] = (byte) ((vp >> 24) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp >> 16) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp >> 8) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp) & 0xFF);
+        } else if (type == Boolean.class) {
+            boolean vp = ((Boolean)p).booleanValue();
+            evBuf[curPos++] = ProfilerInterface.BOOLEAN;
+            evBuf[curPos++] = (byte) (vp ? 1 : 0);
+        } else if (type == Byte.class) {
+            byte vp = ((Byte)p).byteValue();
+            evBuf[curPos++] = ProfilerInterface.BYTE;
+            evBuf[curPos++] = vp;
+        } else if (type == Character.class) {
+            char vp = ((Character)p).charValue();
+            evBuf[curPos++] = ProfilerInterface.CHAR;
+            evBuf[curPos++] = (byte) ((vp >> 8) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp) & 0xFF);
+        } else if (type == Long.class) {
+            long vp = ((Long)p).longValue();
+            evBuf[curPos++] = ProfilerInterface.LONG;
+            evBuf[curPos++] = (byte) ((vp >> 56) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp >> 48) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp >> 40) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp >> 32) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp >> 24) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp >> 16) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp >> 8) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp) & 0xFF); 
+        } else if (type == Float.class) {
+            int vp = Float.floatToIntBits(((Float)p).floatValue());
+            evBuf[curPos++] = ProfilerInterface.FLOAT;
+            evBuf[curPos++] = (byte) ((vp >> 24) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp >> 16) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp >> 8) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp) & 0xFF);
+        } else if (type == Double.class) {
+            long vp = Double.doubleToLongBits(((Double)p).doubleValue());
+            evBuf[curPos++] = ProfilerInterface.DOUBLE;
+            evBuf[curPos++] = (byte) ((vp >> 56) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp >> 48) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp >> 40) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp >> 32) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp >> 24) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp >> 16) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp >> 8) & 0xFF);
+            evBuf[curPos++] = (byte) ((vp) & 0xFF);
+        } else {    
+            String sp = converToString(p);
+            int lengthBytes = truncatedByteLength(sp);
+            evBuf[curPos++] = ProfilerInterface.REFERENCE;
+            evBuf[curPos++] = (byte) ((lengthBytes >> 8) & 0xFF);
+            evBuf[curPos++] = (byte) ((lengthBytes) & 0xFF);
+            for (int i = 0; i < lengthBytes/2; i++) {
+                char ch = sp.charAt(i);
+                evBuf[curPos++] = (byte) ((ch >> 8) & 0xFF);
+                evBuf[curPos++] = (byte) ((ch) & 0xFF);
+            }
+        }
+        return curPos;
+    }
+    
+    static String converToString(Object o) {
+        String clazz = o.getClass().getName();
+        
+        if (clazz.startsWith("java.lang.")) {
+            return o.toString();
+        }
+        if (clazz.equals("java.sql.Date")) {
+            return String.valueOf(((java.sql.Date)o).getTime());
+        }
+        if (clazz.equals("java.sql.Timestamp")) {
+            return String.valueOf(((java.sql.Timestamp)o).getTime());            
+        }
+        return clazz + "@" + Integer.toHexString(System.identityHashCode(o));
+    }
+    
+    private static int truncatedByteLength(String s) {
+        int length = s.length()*2;
+        
+        if (length < MAX_STRING_LENGTH) {
+            return length;
+        }
+        return MAX_STRING_LENGTH;
     }
 }
