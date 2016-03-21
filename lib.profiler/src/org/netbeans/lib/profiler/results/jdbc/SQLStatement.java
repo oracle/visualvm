@@ -430,7 +430,11 @@ class SQLStatement {
                 qindex = sqlTemplate.length();
                 par = "";
             } else {
-                par = formatParamter(parameters.get(parindex++));
+                if (parindex >= parameters.size()) {
+                    par = "!!!!!UNSET";     // NOI18N
+                } else {
+                    par = formatParamter(parameters.get(parindex++));
+                }
             }
             fullSql.append(sqlTemplate.substring(lindex, qindex));
             fullSql.append(par);
@@ -445,4 +449,10 @@ class SQLStatement {
         }
         return par.toString();
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + ":" + sqlTemplate;    /// NOI18N
+    }
+
 }
