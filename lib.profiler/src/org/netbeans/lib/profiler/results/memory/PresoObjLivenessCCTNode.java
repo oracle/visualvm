@@ -143,7 +143,7 @@ public class PresoObjLivenessCCTNode extends PresoObjAllocCCTNode {
         PresoObjLivenessCCTNode rootNode = generateMirrorNode(rootRuntimeNode, survGens);
 
         if (rootNode != null) { // null means there are no live objects for any allocation path
-            assignNamesToNodesFromSnapshot(snapshot, rootNode, classTypeName);
+            assignNamesToNodesFromSnapshot(snapshot.getJMethodIdTable(), rootNode, classTypeName);
         }
 
         return rootNode;

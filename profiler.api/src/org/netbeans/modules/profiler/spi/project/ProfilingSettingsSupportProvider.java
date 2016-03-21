@@ -107,6 +107,8 @@ public abstract class ProfilingSettingsSupportProvider {
                     o += project == null ? 0.85f : 0.5f; // entire app
                 } else if (profilingType == ProfilingSettings.PROFILE_CPU_PART) {
                     o += 0.2f; // part of app
+                } else if (profilingType == ProfilingSettings.PROFILE_CPU_JDBC) {
+                    o += 0.1f; // just JDBC methods are instrumented
                 }
 
                 if (FilterUtils.NONE_FILTER.equals(settings.getSelectedInstrumentationFilter()) &&
