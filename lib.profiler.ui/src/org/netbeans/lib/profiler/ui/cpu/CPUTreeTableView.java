@@ -134,6 +134,13 @@ abstract class CPUTreeTableView extends CPUView {
                     
                     repaint();
                 }
+                
+                if (newData != null) {
+                    int column = selection == null ? 2 : 3;
+                    boolean cpuColumnVisible = treeTable.isColumnVisible(column);
+                    if (twoTimeStamps && !cpuColumnVisible) treeTable.setColumnVisibility(column, true);
+                    else if (!twoTimeStamps && cpuColumnVisible) treeTable.setColumnVisibility(column, false);
+                }
             }
         });
     }
