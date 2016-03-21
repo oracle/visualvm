@@ -682,19 +682,19 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
     
     private static int getParSize(Object p) {
         Class type = p.getClass();
-        if (type == Integer.TYPE) {
+        if (type == Integer.class) {
             return 4;
-        } else if (type == Boolean.TYPE) {
+        } else if (type == Boolean.class) {
             return 1;
-        } else if (type == Byte.TYPE) {
+        } else if (type == Byte.class) {
             return 1;
-        } else if (type == Character.TYPE) {
+        } else if (type == Character.class) {
             return 2;
-        } else if (type == Long.TYPE) {
+        } else if (type == Long.class) {
             return 8;
-        } else if (type == Float.TYPE) {
+        } else if (type == Float.class) {
             return 4;
-        } else if (type == Double.TYPE) {
+        } else if (type == Double.class) {
             return 8;
         } else {
             return 2 + truncatedByteLength(converToString(p));
