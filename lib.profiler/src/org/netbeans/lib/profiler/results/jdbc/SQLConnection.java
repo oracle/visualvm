@@ -65,15 +65,15 @@ class SQLConnection {
     }
 
     void createStatement(Map statements) {
-        statements.put(SQLStatement.NEW_STATEMENT, new SQLStatement());
+        statements.put(SQLStatement.NEW_STATEMENT, new SQLStatement(JdbcCCTProvider.SQL_STATEMENT));
     }
 
     void prepareStatement(Map statements, String sql) {
-        statements.put(SQLStatement.NEW_PREPARED_STATEMENT, new SQLStatement(sql));
+        statements.put(SQLStatement.NEW_PREPARED_STATEMENT, new SQLStatement(JdbcCCTProvider.SQL_PREPARED_STATEMENT, sql));
     }
 
     void prepareCall(Map statements, String sql) {
-        statements.put(SQLStatement.NEW_CALLABLE_STATEMENT, new SQLStatement(sql));
+        statements.put(SQLStatement.NEW_CALLABLE_STATEMENT, new SQLStatement(JdbcCCTProvider.SQL_CALLABLE_STATEMENT, sql));
     }
 
 }

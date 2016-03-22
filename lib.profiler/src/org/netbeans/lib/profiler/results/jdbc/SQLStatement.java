@@ -75,12 +75,15 @@ class SQLStatement {
     private List batch = new ArrayList();
     private ArrayList parameters = new ArrayList();
     private String sqlTemplate;
+    private final int type;
 
-    SQLStatement() {
+    SQLStatement(int t) {
+        type = t;
     }
 
-    SQLStatement(String sql) {
+    SQLStatement(int t, String sql) {
         sqlTemplate = sql;
+        type = t;
     }
 
     String invoke(String methodName, String methodSignature, List parameters) {
@@ -453,6 +456,10 @@ class SQLStatement {
     @Override
     public String toString() {
         return super.toString() + ":" + sqlTemplate;    /// NOI18N
+    }
+
+    int getType() {
+        return type;
     }
 
 }

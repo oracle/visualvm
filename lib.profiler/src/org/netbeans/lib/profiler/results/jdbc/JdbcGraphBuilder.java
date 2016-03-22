@@ -250,7 +250,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
                     if (statement == null) {
                         statement = getNewStatement(thisClass);
                         if (statement == null) {
-                            statement = new SQLStatement();
+                            statement = new SQLStatement(SQL_STATEMENT_UNKNOWN);
                         }
                         statements.put(thisHash, statement);
                     }
@@ -759,6 +759,15 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
                 }
             }
         }
+    }
+
+    @Override
+    public int getStatementType(int selectId) {
+        SQLStatement sql = (SQLStatement) selectsToId.get(Integer.valueOf(selectId));
+        if (sql != null) {
+            return sql.getType();
+        }
+        return JdbcCCTProvider.SQL_STATEMENT_UNKNOWN;
     }
 
     private class JdbcCCTFlattener extends CCTFlattener {

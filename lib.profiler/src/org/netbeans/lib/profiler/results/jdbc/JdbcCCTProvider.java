@@ -50,11 +50,17 @@ import org.netbeans.lib.profiler.results.memory.RuntimeMemoryCCTNode;
  * @author Tomas Hurka
  */
 public interface JdbcCCTProvider extends CCTProvider, FlatProfileProvider {
+    public static final int SQL_STATEMENT_UNKNOWN = -1;
+    public static final int SQL_STATEMENT = 0;
+    public static final int SQL_PREPARED_STATEMENT = 1;
+    public static final int SQL_CALLABLE_STATEMENT = 2;
+    
     public static interface Listener extends CCTProvider.Listener {
     }
     
     RuntimeMemoryCCTNode[] getStacksForSelects();
+    int getStatementType(int selectId);
     void updateInternals();
     void beginTrans(boolean mutable);
-    void endTrans();    
+    void endTrans();
 }
