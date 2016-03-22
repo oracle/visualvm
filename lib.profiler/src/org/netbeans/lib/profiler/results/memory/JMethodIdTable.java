@@ -90,14 +90,14 @@ public class JMethodIdTable {
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    JMethodIdTable() {
+    public JMethodIdTable() {
         size = 97;
         threshold = (size * 3) / 4;
         nElements = 0;
         entries = new JMethodIdTableEntry[size];
     }
 
-    JMethodIdTable(JMethodIdTable otherTable) {
+    public JMethodIdTable(JMethodIdTable otherTable) {
         staticTable = true;
         threshold = otherTable.nElements + 1;
         size = (threshold * 4) / 3 ;
