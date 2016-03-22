@@ -176,6 +176,19 @@ abstract class CPUTableView extends CPUView {
                     
                     repaint();
                 }
+                
+                if (newData != null && !twoTimeStamps) {
+                    int selfColumn = selection == null ? 2 : 3;
+                    int totalColumn = selection == null ? 4 : 5;
+                    if (table.isColumnVisible(selfColumn)) {
+                        table.setColumnVisibility(selfColumn, false);
+                        table.setColumnVisibility(selfColumn - 1, true);
+                    }
+                    if (table.isColumnVisible(totalColumn)) {
+                        table.setColumnVisibility(totalColumn, false);
+                        table.setColumnVisibility(totalColumn - 1, true);
+                    }
+                }
             }
         });
     }

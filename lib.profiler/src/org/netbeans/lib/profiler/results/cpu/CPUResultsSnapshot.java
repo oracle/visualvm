@@ -369,7 +369,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
                         super(containerF, null);
                         nCalls = (int)flatF.getNTotalInvocations();
                         totalTime0 = containerF.getWholeGraphNetTime0();
-                        totalTime1 = containerF.getWholeGraphNetTime1();
+                        totalTime1 = containerF.isCollectingTwoTimeStamps() ? containerF.getWholeGraphNetTime1() : 0;
                         nChildren = flatF.getNRows();
                     }
                     PrestimeCPUCCTNode createCopy() {
@@ -393,7 +393,7 @@ public class CPUResultsSnapshot extends ResultsSnapshot {
                                         methodId = methodIdF;
                                         nCalls = flatF.getNInvocationsAtRow(mF);
                                         totalTime0 = flatF.getTotalTimeInMcs0AtRow(mF);
-                                        totalTime1 = flatF.getTotalTimeInMcs1AtRow(mF);
+                                        totalTime1 = flatF.isCollectingTwoTimeStamps() ? flatF.getTotalTimeInMcs1AtRow(mF) : 0;
                                         parent = ThreadNodeBacked.this;
                                     }
                                     PrestimeCPUCCTNode createCopy() {
