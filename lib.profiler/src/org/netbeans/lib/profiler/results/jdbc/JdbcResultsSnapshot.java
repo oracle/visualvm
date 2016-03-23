@@ -160,6 +160,10 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
         return timePerSelectId;
     }
 
+    public int[] getTypeForSelectId() {
+        return typeForSelectId;
+    }
+
     public boolean containsStacks() {
         return stacksForSelects != null;
     }
