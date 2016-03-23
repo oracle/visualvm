@@ -97,8 +97,6 @@ public class PresoObjAllocCCTNode extends CCTNode {
     int methodId;
     JMethodIdTable.JMethodIdTableEntry entry;
     
-    public String htmlName; // TODO: temporary, to be moved to JdbcCCTNode
-    
     protected char flags;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------

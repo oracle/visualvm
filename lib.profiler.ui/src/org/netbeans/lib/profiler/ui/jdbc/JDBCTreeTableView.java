@@ -57,6 +57,7 @@ import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
+import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
 import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
@@ -65,6 +66,7 @@ import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.McsTimeRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
@@ -112,29 +114,30 @@ abstract class JDBCTreeTableView extends JDBCView {
             
             final int _i = i;
             
-            class Node extends PresoObjAllocCCTNode {
-                Node(String className, long nTotalAllocObjects, long totalAllocObjectsSize) {
-                    super(className, nTotalAllocObjects, totalAllocObjectsSize);
-                }
-                public CCTNode[] getChildren() {
-                    if (children == null) {
-                        PresoObjAllocCCTNode root = newData.createPresentationCCT(_i, false);
-                        setChildren(root == null ? new PresoObjAllocCCTNode[0] :
-                                    (PresoObjAllocCCTNode[])root.getChildren());
-                    }
-                    return children;
-                }
-                public boolean isLeaf() {
-                    if (children == null) return /*includeEmpty ? nCalls == 0 :*/ false;
-                    else return super.isLeaf();
-                }   
-                public int getChildCount() {
-                    if (children == null) getChildren();
-                    return super.getChildCount();
-                }
-            }
-            
-            PresoObjAllocCCTNode node = new Node(_names[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i]);
+//            class Node extends PresoObjAllocCCTNode {
+//                Node(String className, long nTotalAllocObjects, long totalAllocObjectsSize) {
+//                    super(className, nTotalAllocObjects, totalAllocObjectsSize);
+//                }
+//                public CCTNode[] getChildren() {
+//                    if (children == null) {
+//                        PresoObjAllocCCTNode root = newData.createPresentationCCT(_i, false);
+//                        setChildren(root == null ? new PresoObjAllocCCTNode[0] :
+//                                    (PresoObjAllocCCTNode[])root.getChildren());
+//                    }
+//                    return children;
+//                }
+//                public boolean isLeaf() {
+//                    if (children == null) return /*includeEmpty ? nCalls == 0 :*/ false;
+//                    else return super.isLeaf();
+//                }   
+//                public int getChildCount() {
+//                    if (children == null) getChildren();
+//                    return super.getChildCount();
+//                }
+//            }
+            SQLQueryNode node = new SQLQueryNode(_names[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i], newData.getTypeForSelectId()[i]) {
+                PresoObjAllocCCTNode computeChildren() { return newData.createPresentationCCT(_i, false); }
+            };
             nodes.add(node);
         }
         
@@ -248,6 +251,15 @@ abstract class JDBCTreeTableView extends JDBCView {
         treeTable.setDefaultColumnWidth(1, renderers[0].getOptimalWidth());
         treeTable.setDefaultColumnWidth(2, renderers[1].getMaxNoBarWidth());
         
+        // Debug columns
+        LabelRenderer lr = new LabelRenderer();
+        lr.setHorizontalAlignment(LabelRenderer.TRAILING);
+        treeTable.setColumnRenderer(3, lr);
+        lr.setValue("XCommand TypeX", -1);
+        treeTable.setDefaultSortOrder(3, SortOrder.ASCENDING);
+        treeTable.setDefaultColumnWidth(3, lr.getPreferredSize().width);
+        treeTable.setColumnVisibility(3, false);
+        
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(treeTable, false, null);
         
         setLayout(new BorderLayout());
@@ -258,7 +270,8 @@ abstract class JDBCTreeTableView extends JDBCView {
         treeTable.setColumnToolTips(new String[] {
                                         NAME_COLUMN_TOOLTIP,
                                         TOTAL_TIME_COLUMN_TOOLTIP,
-                                        INVOCATIONS_COLUMN_TOOLTIP
+                                        INVOCATIONS_COLUMN_TOOLTIP,
+                                        "SQL Command Type"
                                     });
     }
     
@@ -309,9 +322,10 @@ abstract class JDBCTreeTableView extends JDBCView {
 //    }
     
     static boolean isSQL(PresoObjAllocCCTNode node) {
-        CCTNode p = node.getParent();
-        if (p != null && p.getParent() == null) return true;
-        return false;
+//        CCTNode p = node.getParent();
+//        if (p != null && p.getParent() == null) return true;
+//        return false;
+        return node instanceof SQLQueryNode;
     }
     
     static boolean isSelectable(PresoObjAllocCCTNode node) {
@@ -334,7 +348,9 @@ abstract class JDBCTreeTableView extends JDBCView {
                 return COLUMN_TOTALTIME;
             } else if (columnIndex == 2) {
                 return COLUMN_INVOCATIONS;
-            } 
+            }  else if (columnIndex == 3) {
+                return "Command Type";
+            }
             return null;
         }
 
@@ -345,13 +361,15 @@ abstract class JDBCTreeTableView extends JDBCView {
 //                return Long.class;
 //            } else if (columnIndex == 2) {
 //                return Integer.class;
+            } else if (columnIndex == 3) {
+                return String.class;
             }
             return Long.class;
 //            return null;
         }
 
         public int getColumnCount() {
-            return 3;
+            return 4;
         }
 
         public Object getValueAt(TreeNode node, int columnIndex) {
@@ -362,6 +380,16 @@ abstract class JDBCTreeTableView extends JDBCView {
                 return jdbcNode.totalObjSize;
             } else if (columnIndex == 2) {
                 return jdbcNode.nCalls;
+            } else if (columnIndex == 3) {
+                if (jdbcNode instanceof SQLQueryNode) {
+                    switch (((SQLQueryNode)jdbcNode).getCommandType()) {
+                        case JdbcCCTProvider.SQL_PREPARED_STATEMENT: return "prepared";
+                        case JdbcCCTProvider.SQL_CALLABLE_STATEMENT: return "callable";
+                        default: return "reqular";
+                    }
+                } else {
+                    return "-";
+                }
             }
             return null;
         }
@@ -372,6 +400,33 @@ abstract class JDBCTreeTableView extends JDBCView {
             return false;
         }
         
+    }
+    
+    abstract class SQLQueryNode extends PresoObjAllocCCTNode {
+        String htmlName;
+        private final int commandType;
+        SQLQueryNode(String className, long nTotalAllocObjects, long totalAllocObjectsSize, int commandType) {
+            super(className, nTotalAllocObjects, totalAllocObjectsSize);
+            this.commandType = commandType;
+        }
+        public CCTNode[] getChildren() {
+            if (children == null) {
+                PresoObjAllocCCTNode root = computeChildren();
+                setChildren(root == null ? new PresoObjAllocCCTNode[0] :
+                            (PresoObjAllocCCTNode[])root.getChildren());
+            }
+            return children;
+        }
+        public boolean isLeaf() {
+            if (children == null) return /*includeEmpty ? nCalls == 0 :*/ false;
+            else return super.isLeaf();
+        }   
+        public int getChildCount() {
+            if (children == null) getChildren();
+            return super.getChildCount();
+        }
+        abstract PresoObjAllocCCTNode computeChildren();
+        int getCommandType() { return commandType; }
     }
     
 }

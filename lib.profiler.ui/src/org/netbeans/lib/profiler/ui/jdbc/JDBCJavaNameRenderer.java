@@ -91,10 +91,11 @@ final class JDBCJavaNameRenderer extends JavaNameRenderer {
             
             isSQL = JDBCTreeTableView.isSQL(node);
             if (isSQL) {
-                String htmlName = node.htmlName;
+                JDBCTreeTableView.SQLQueryNode sqlNode = (JDBCTreeTableView.SQLQueryNode)node;
+                String htmlName = sqlNode.htmlName;
                 if (htmlName == null) {
                     htmlName = SQLFormatter.format(currentValue);
-                    node.htmlName = htmlName;
+                    sqlNode.htmlName = htmlName;
                 }
                 sqlRenderer().setText(htmlName);
                 sqlRenderer().setIcon(filtered ? SQL_ICON_DISABLED : SQL_ICON);
