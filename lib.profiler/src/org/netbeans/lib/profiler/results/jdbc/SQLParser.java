@@ -52,14 +52,14 @@ import static org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider.*;
 class SQLParser {
     
     Object[] commands = {
-        "ALTER", SQL_COMMAND_ALTER,
-        "CREATE", SQL_COMMAND_CREATE,
-        "DELETE", SQL_COMMAND_DELETE,
-        "DESCRIBE", SQL_COMMAND_DESCRIBE,
-        "INSERT", SQL_COMMAND_INSERT,
-        "SELECT", SQL_COMMAND_SELECT,
-        "SET", SQL_COMMAND_SET,
-        "UPDATE", SQL_COMMAND_UPDATE
+        "ALTER", SQL_COMMAND_ALTER,     // NOI18N
+        "CREATE", SQL_COMMAND_CREATE,   // NOI18N
+        "DELETE", SQL_COMMAND_DELETE,   // NOI18N
+        "DESCRIBE", SQL_COMMAND_DESCRIBE,   // NOI18N
+        "INSERT", SQL_COMMAND_INSERT,   // NOI18N
+        "SELECT", SQL_COMMAND_SELECT,   // NOI18N
+        "SET", SQL_COMMAND_SET,         // NOI18N
+        "UPDATE", SQL_COMMAND_UPDATE    // NOI18N
     };
 
     private final Pattern commandsPattern;
@@ -68,9 +68,9 @@ class SQLParser {
         StringBuffer pattern = new StringBuffer();
         
         for (int i =0; i < commands.length; i+=2) {
-            pattern.append("(^\\b");
+            pattern.append("(^\\b");    // NOI18N
             pattern.append(commands[i]);
-            pattern.append("\\b)|");
+            pattern.append("\\b)|");    // NOI18N
         }
         commandsPattern = Pattern.compile(pattern.substring(0, pattern.length()-1).toString(), Pattern.CASE_INSENSITIVE);
     }
