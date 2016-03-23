@@ -46,6 +46,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.lib.profiler.ProfilerClient;
@@ -89,8 +90,8 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
 
     private Map statements;
     private Map connections;
-    private Map selectsToId;
-    private Map idsToSelect;
+    private Map<Select,Integer> selectsToId;
+    private Map<Integer, Select> idsToSelect;
     private int maxSelectId;
     private RuntimeMemoryCCTNode[] stacksForSelects; // [1- maxSelectId] selectId -> root of its allocation traces tree
     private int sqlCallLevel;
@@ -256,7 +257,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
                     }
                     select = statement.invoke(status.getInstrMethodNames()[methodId], status.getInstrMethodSignatures()[methodId], parameters);
                     if (select != null) {
-                        int selectId = getSelectId(select);
+                        int selectId = getSelectId(statement.getType(), select);
                         markerMethodEntry(selectId, ti, timeStamp0, timeStamp1, true);
                         RuntimeObjAllocTermCCTNode term = (RuntimeObjAllocTermCCTNode) processStackTrace(selectId, methoIds);
                         if (term != null) {
@@ -445,12 +446,14 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         return (SQLStatement) statements.remove(SQLStatement.NEW_STATEMENT);
     }
 
-    private int getSelectId(String select) {
-        Integer selectId = (Integer) selectsToId.get(select);
+    private int getSelectId(int type, String select) {
+        Select sel = new Select(type, select);
+        
+        Integer selectId = selectsToId.get(sel);
         if (selectId == null) {
             selectId = Integer.valueOf(++maxSelectId);
-            selectsToId.put(select, selectId);
-            idsToSelect.put(selectId, select);
+            selectsToId.put(sel, selectId);
+            idsToSelect.put(selectId, sel);
             updateNumberOfSelects();
         }
         return selectId.intValue();
@@ -713,7 +716,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     }
 
     private String debugSelect(int selectId) {
-        return (String) idsToSelect.get(Integer.valueOf(selectId));
+        return idsToSelect.get(Integer.valueOf(selectId)).getSelect();
     }
 
     private void debugStackTrace(int[] methoIds) {
@@ -763,9 +766,9 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
 
     @Override
     public int getCommandType(int selectId) {
-        SQLStatement sql = (SQLStatement) selectsToId.get(Integer.valueOf(selectId));
-        if (sql != null) {
-            return sql.getType();
+        Select sel = idsToSelect.get(Integer.valueOf(selectId));
+        if (sel != null) {
+            return sel.getType();
         }
         return JdbcCCTProvider.SQL_STATEMENT_UNKNOWN;
     }
@@ -783,7 +786,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
 
         @Override
         protected String getInstrMethodClass(int selectId) {
-            return (String) idsToSelect.get(Integer.valueOf(selectId));
+            return idsToSelect.get(Integer.valueOf(selectId)).getSelect();
         }
 
         @Override
@@ -806,7 +809,52 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         @Override
         public String getMethodNameAtRow(int row) {
             int selectId = getMethodIdAtRow(row);
-            return (String) idsToSelect.get(Integer.valueOf(selectId));
+            return idsToSelect.get(Integer.valueOf(selectId)).getSelect();
+        }
+        
+    }
+    
+    private static class Select {
+        private final int type;
+        private final String select;
+        
+        Select(int t, String s) {
+            type = t;
+            select = s;
+        }
+
+        private int getType() {
+            return type;
+        }
+
+        private String getSelect() {
+            return select;
+        }
+
+        @Override
+        public int hashCode() {
+            return type ^ select.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final Select other = (Select) obj;
+            if (this.type != other.type) {
+                return false;
+            }
+            if (!Objects.equals(this.select, other.select)) {
+                return false;
+            }
+            return true;
         }
         
     }
