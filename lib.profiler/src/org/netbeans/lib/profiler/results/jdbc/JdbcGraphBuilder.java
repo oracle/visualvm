@@ -96,6 +96,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     private RuntimeMemoryCCTNode[] stacksForSelects; // [1- maxSelectId] selectId -> root of its allocation traces tree
     private int sqlCallLevel;
     final private ThreadInfos threadInfos = new ThreadInfos();
+    private final SQLParser sqlParser = new SQLParser();
 
     @Override
     protected RuntimeCCTNode getAppRootNode() {
@@ -447,7 +448,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     }
 
     private int getSelectId(int type, String select) {
-        Select sel = new Select(type, select);
+        Select sel = new Select(type, extractSQLCommandType(select), select);
         
         Integer selectId = selectsToId.get(sel);
         if (selectId == null) {
@@ -735,6 +736,10 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         }
     }
 
+    int extractSQLCommandType(String sql) {
+        return sqlParser.extractSQLCommandType(sql);
+    }
+    
     @Override
     public void beginTrans(boolean mutable) {
         threadInfos.beginTrans(mutable);
@@ -771,6 +776,15 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
             return sel.getType();
         }
         return JdbcCCTProvider.SQL_STATEMENT_UNKNOWN;
+    }
+
+    @Override
+    public int getSQLCommand(int selectId) {
+        Select sel = idsToSelect.get(Integer.valueOf(selectId));
+        if (sel != null) {
+            return sel.getCommandType();
+        }
+        return JdbcCCTProvider.SQL_COMMAND_OTHER;
     }
 
     private class JdbcCCTFlattener extends CCTFlattener {
@@ -816,15 +830,21 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     
     private static class Select {
         private final int type;
+        private final int commandType;
         private final String select;
         
-        Select(int t, String s) {
+        Select(int t, int ct, String s) {
             type = t;
+            commandType = ct;
             select = s;
         }
 
         private int getType() {
             return type;
+        }
+
+        private int getCommandType() {
+            return commandType;
         }
 
         private String getSelect() {

@@ -41,37 +41,52 @@
  */
 package org.netbeans.lib.profiler.results.jdbc;
 
-import org.netbeans.lib.profiler.results.CCTProvider;
-import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
-import org.netbeans.lib.profiler.results.memory.RuntimeMemoryCCTNode;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import static org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider.*;
 
 /**
  *
  * @author Tomas Hurka
  */
-public interface JdbcCCTProvider extends CCTProvider, FlatProfileProvider {
-    public static final int SQL_STATEMENT_UNKNOWN = -1;
-    public static final int SQL_STATEMENT = 0;
-    public static final int SQL_PREPARED_STATEMENT = 1;
-    public static final int SQL_CALLABLE_STATEMENT = 2;
+class SQLParser {
+    
+    Object[] commands = {
+        "ALTER", SQL_COMMAND_ALTER,
+        "CREATE", SQL_COMMAND_CREATE,
+        "DELETE", SQL_COMMAND_DELETE,
+        "DESCRIBE", SQL_COMMAND_DESCRIBE,
+        "INSERT", SQL_COMMAND_INSERT,
+        "SELECT", SQL_COMMAND_SELECT,
+        "SET", SQL_COMMAND_SET,
+        "UPDATE", SQL_COMMAND_UPDATE
+    };
 
-    public static final int SQL_COMMAND_OTHER = -1;
-    public static final int SQL_COMMAND_ALTER = 0;
-    public static final int SQL_COMMAND_CREATE = 1;
-    public static final int SQL_COMMAND_DELETE = 2;
-    public static final int SQL_COMMAND_DESCRIBE = 3;
-    public static final int SQL_COMMAND_INSERT = 4;
-    public static final int SQL_COMMAND_SELECT = 5;
-    public static final int SQL_COMMAND_SET = 6;
-    public static final int SQL_COMMAND_UPDATE = 7;
+    private final Pattern commandsPattern;
+
+    SQLParser() {
+        StringBuffer pattern = new StringBuffer();
         
-    public static interface Listener extends CCTProvider.Listener {
+        for (int i =0; i < commands.length; i+=2) {
+            pattern.append("(^\\b");
+            pattern.append(commands[i]);
+            pattern.append("\\b)|");
+        }
+        commandsPattern = Pattern.compile(pattern.substring(0, pattern.length()-1).toString(), Pattern.CASE_INSENSITIVE);
     }
     
-    RuntimeMemoryCCTNode[] getStacksForSelects();
-    int getCommandType(int selectId);
-    int getSQLCommand(int selectId);
-    void updateInternals();
-    void beginTrans(boolean mutable);
-    void endTrans();
+    int extractSQLCommandType(String sql) {
+        Matcher m = commandsPattern.matcher(sql);
+        
+        if (m.find()) {
+            for (int i=0; i < commands.length; i+=2) {
+                if (m.start(i/2+1) != -1) {
+                    return ((Integer)commands[i+1]).intValue();
+                }
+            }
+            throw new IllegalArgumentException(m.toString());
+        }
+        return SQL_COMMAND_OTHER;
+    }
+    
 }

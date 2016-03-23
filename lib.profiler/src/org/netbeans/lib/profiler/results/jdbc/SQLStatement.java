@@ -76,7 +76,7 @@ class SQLStatement {
     private ArrayList parameters = new ArrayList();
     private String sqlTemplate;
     private final int type;
-
+    
     SQLStatement(int t) {
         type = t;
     }
