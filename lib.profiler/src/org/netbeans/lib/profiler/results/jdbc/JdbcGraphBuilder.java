@@ -762,7 +762,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     }
 
     @Override
-    public int getStatementType(int selectId) {
+    public int getCommandType(int selectId) {
         SQLStatement sql = (SQLStatement) selectsToId.get(Integer.valueOf(selectId));
         if (sql != null) {
             return sql.getType();

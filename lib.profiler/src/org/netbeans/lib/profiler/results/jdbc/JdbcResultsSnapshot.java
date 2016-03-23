@@ -352,7 +352,7 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
             selectNames[selectId] = fpc.getMethodNameAtRow(i);
             invocationsPerSelectId[selectId] = fpc.getNInvocationsAtRow(i);
             timePerSelectId[selectId] = fpc.getTotalTimeInMcs0AtRow(i);
-            typeForSelectId[selectId] = provider.getStatementType(selectId);
+            typeForSelectId[selectId] = provider.getCommandType(selectId);
         }
 
         RuntimeMemoryCCTNode[] stacks = provider.getStacksForSelects();
