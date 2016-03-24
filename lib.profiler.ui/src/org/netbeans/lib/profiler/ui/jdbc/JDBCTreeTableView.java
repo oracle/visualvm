@@ -45,6 +45,7 @@ package org.netbeans.lib.profiler.ui.jdbc;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -135,7 +136,7 @@ abstract class JDBCTreeTableView extends JDBCView {
 //                    return super.getChildCount();
 //                }
 //            }
-            SQLQueryNode node = new SQLQueryNode(_names[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i], newData.getTypeForSelectId()[i]) {
+            SQLQueryNode node = new SQLQueryNode(_names[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i], newData.getTypeForSelectId()[i], newData.getCommandTypeForSelectId()[i], newData.getTablesForSelectId()[i]) {
                 PresoObjAllocCCTNode computeChildren() { return newData.createPresentationCCT(_i, false); }
             };
             nodes.add(node);
@@ -254,11 +255,22 @@ abstract class JDBCTreeTableView extends JDBCView {
         // Debug columns
         LabelRenderer lr = new LabelRenderer();
         lr.setHorizontalAlignment(LabelRenderer.TRAILING);
+        lr.setValue("XStatement TypeX", -1);
+        
         treeTable.setColumnRenderer(3, lr);
-        lr.setValue("XCommand TypeX", -1);
         treeTable.setDefaultSortOrder(3, SortOrder.ASCENDING);
         treeTable.setDefaultColumnWidth(3, lr.getPreferredSize().width);
         treeTable.setColumnVisibility(3, false);
+        
+        treeTable.setColumnRenderer(4, lr);
+        treeTable.setDefaultSortOrder(4, SortOrder.ASCENDING);
+        treeTable.setDefaultColumnWidth(4, lr.getPreferredSize().width);
+        treeTable.setColumnVisibility(4, false);
+        
+        treeTable.setColumnRenderer(5, lr);
+        treeTable.setDefaultSortOrder(5, SortOrder.ASCENDING);
+        treeTable.setDefaultColumnWidth(5, lr.getPreferredSize().width);
+        treeTable.setColumnVisibility(5, false);
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(treeTable, false, null);
         
@@ -271,7 +283,9 @@ abstract class JDBCTreeTableView extends JDBCView {
                                         NAME_COLUMN_TOOLTIP,
                                         TOTAL_TIME_COLUMN_TOOLTIP,
                                         INVOCATIONS_COLUMN_TOOLTIP,
-                                        "SQL Command Type"
+                                        "SQL Statement Type",
+                                        "SQL Command Type",
+                                        "Database Tables"
                                     });
     }
     
@@ -349,7 +363,11 @@ abstract class JDBCTreeTableView extends JDBCView {
             } else if (columnIndex == 2) {
                 return COLUMN_INVOCATIONS;
             }  else if (columnIndex == 3) {
+                return "Statement Type";
+            } else if (columnIndex == 4) {
                 return "Command Type";
+            } else if (columnIndex == 5) {
+                return "Tables";
             }
             return null;
         }
@@ -363,13 +381,17 @@ abstract class JDBCTreeTableView extends JDBCView {
 //                return Integer.class;
             } else if (columnIndex == 3) {
                 return String.class;
+            } else if (columnIndex == 4) {
+                return String.class;
+            } else if (columnIndex == 5) {
+                return String.class;
             }
             return Long.class;
 //            return null;
         }
 
         public int getColumnCount() {
-            return 4;
+            return 6;
         }
 
         public Object getValueAt(TreeNode node, int columnIndex) {
@@ -382,11 +404,33 @@ abstract class JDBCTreeTableView extends JDBCView {
                 return jdbcNode.nCalls;
             } else if (columnIndex == 3) {
                 if (jdbcNode instanceof SQLQueryNode) {
-                    switch (((SQLQueryNode)jdbcNode).getCommandType()) {
+                    switch (((SQLQueryNode)jdbcNode).getStatementType()) {
                         case JdbcCCTProvider.SQL_PREPARED_STATEMENT: return "prepared";
                         case JdbcCCTProvider.SQL_CALLABLE_STATEMENT: return "callable";
                         default: return "reqular";
                     }
+                } else {
+                    return "-";
+                }
+            } else if (columnIndex == 4) {
+                if (jdbcNode instanceof SQLQueryNode) {
+                    switch (((SQLQueryNode)jdbcNode).getCommandType()) {
+                        case JdbcCCTProvider.SQL_COMMAND_ALTER: return "ALTER";
+                        case JdbcCCTProvider.SQL_COMMAND_CREATE: return "CREATE";
+                        case JdbcCCTProvider.SQL_COMMAND_DELETE: return "DELETE";
+                        case JdbcCCTProvider.SQL_COMMAND_DESCRIBE: return "DESCRIBE";
+                        case JdbcCCTProvider.SQL_COMMAND_INSERT: return "INSERT";
+                        case JdbcCCTProvider.SQL_COMMAND_SELECT: return "SELECT";
+                        case JdbcCCTProvider.SQL_COMMAND_SET: return "SET";
+                        case JdbcCCTProvider.SQL_COMMAND_UPDATE: return "UPDATE";
+                        default: return "other statement";
+                    }
+                } else {
+                    return "-";
+                }
+            } else if (columnIndex == 5) {
+                if (jdbcNode instanceof SQLQueryNode) {
+                    return Arrays.toString(((SQLQueryNode)jdbcNode).getTables());
                 } else {
                     return "-";
                 }
@@ -404,10 +448,14 @@ abstract class JDBCTreeTableView extends JDBCView {
     
     abstract class SQLQueryNode extends PresoObjAllocCCTNode {
         String htmlName;
+        private final int statementType;
         private final int commandType;
-        SQLQueryNode(String className, long nTotalAllocObjects, long totalAllocObjectsSize, int commandType) {
+        private final String[] tables;
+        SQLQueryNode(String className, long nTotalAllocObjects, long totalAllocObjectsSize, int statementType, int commandType, String[] tables) {
             super(className, nTotalAllocObjects, totalAllocObjectsSize);
+            this.statementType = statementType;
             this.commandType = commandType;
+            this.tables = tables;
         }
         public CCTNode[] getChildren() {
             if (children == null) {
@@ -426,7 +474,9 @@ abstract class JDBCTreeTableView extends JDBCView {
             return super.getChildCount();
         }
         abstract PresoObjAllocCCTNode computeChildren();
+        int getStatementType() { return statementType; }
         int getCommandType() { return commandType; }
+        String[] getTables() { return tables; }
     }
     
 }
