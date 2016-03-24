@@ -61,8 +61,12 @@ class SQLParser {
         "SET", SQL_COMMAND_SET,         // NOI18N
         "UPDATE", SQL_COMMAND_UPDATE    // NOI18N
     };
-
+    private static final String fromRegexp = "(^\\bSELECT\\b)|(\\bFROM\\b)|(\\bWHERE\\b)|('[^']*')";
+    private static final String wordRegexp = "\\b[\\w]+\\b";
+    
     private final Pattern commandsPattern;
+    private final Pattern fromPattern;
+    private final Pattern wordPattern;
 
     SQLParser() {
         StringBuffer pattern = new StringBuffer();
@@ -73,6 +77,8 @@ class SQLParser {
             pattern.append("\\b)|");    // NOI18N
         }
         commandsPattern = Pattern.compile(pattern.substring(0, pattern.length()-1).toString(), Pattern.CASE_INSENSITIVE);
+        fromPattern = Pattern.compile(fromRegexp, Pattern.CASE_INSENSITIVE);
+        wordPattern = Pattern.compile(wordRegexp, Pattern.CASE_INSENSITIVE);
     }
     
     int extractSQLCommandType(String sql) {
@@ -87,6 +93,47 @@ class SQLParser {
             throw new IllegalArgumentException(m.toString());
         }
         return SQL_COMMAND_OTHER;
+    }
+    
+    String[] extractTables(String sql) {
+        String fromClause = extractFromClause(sql);
+        
+        if (fromClause != null) {
+            String[] tablesRefs = fromClause.trim().split(",");
+            String[] tables = new String[tablesRefs.length];
+            
+            for (int i = 0; i < tablesRefs.length; i++) {
+                Matcher m = wordPattern.matcher(tablesRefs[i]);
+                if (m.find()) {
+                    tables[i] = m.group();
+                }
+            }
+            return tables;
+        }
+        return new String[0];
+    }
+    
+    
+    String extractFromClause(String sql) {
+        Matcher m = fromPattern.matcher(sql);
+        if (m.find()) {
+            if (m.start(1) != -1) { // SELECT 
+                int fromStart = -1;
+                int fromEnd = -1;
+                while (m.find()) {
+                    if (m.end(2) != -1) { // FROM
+                        fromStart = m.end(2);
+                    } else if (m.start(3) != -1) {    // WHERE
+                        fromEnd = m.start(3);
+                        break;
+                    }
+                }
+                if (fromStart < fromEnd) {
+                    return sql.substring(fromStart+1, fromEnd);
+                }
+            }
+        }
+        return null;
     }
     
 }

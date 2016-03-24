@@ -454,6 +454,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         if (selectId == null) {
             selectId = Integer.valueOf(++maxSelectId);
             sel.setCommandType(extractSQLCommandType(select));
+            sel.setTables(extractTables(select));
             selectsToId.put(sel, selectId);
             idsToSelect.put(selectId, sel);
             updateNumberOfSelects();
@@ -741,6 +742,10 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         return sqlParser.extractSQLCommandType(sql);
     }
     
+    String[] extractTables(String sql) {
+        return sqlParser.extractTables(sql);
+    }
+    
     @Override
     public void beginTrans(boolean mutable) {
         threadInfos.beginTrans(mutable);
@@ -788,6 +793,15 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         return JdbcCCTProvider.SQL_COMMAND_OTHER;
     }
 
+    @Override
+    public String[] getTables(int selectId) {
+        Select sel = idsToSelect.get(Integer.valueOf(selectId));
+        if (sel != null) {
+            return sel.getTables();
+        }
+        return new String[0];
+    }
+
     private class JdbcCCTFlattener extends CCTFlattener {
 
         public JdbcCCTFlattener(ProfilerClient client) {
@@ -833,6 +847,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         private final int type;
         private  int commandType;
         private final String select;
+        private String[] tables;
         
         Select(int t, String s) {
             type = t;
@@ -847,8 +862,16 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
             commandType = ct;
         }
 
+        private void setTables(String[] t) {
+            tables = t;
+        }
+
         private int getCommandType() {
             return commandType;
+        }
+
+        public String[] getTables() {
+            return tables;
         }
 
         private String getSelect() {

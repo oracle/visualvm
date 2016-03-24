@@ -109,6 +109,9 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
     /** [1-nProfiledSelects] command type see JdbcCCTProvider.SQL_COMMAND* constants */
     int[] commandTypeForSelectId;
 
+    /** [1-nProfiledSelects] array of  SQL tables affected by selectId */
+    String[][] tablesForSelectId;
+
     /** [1-nProfiledSelects] select Id -> root of its allocation traces tree */
     private RuntimeMemoryCCTNode[] stacksForSelects;
 
@@ -169,6 +172,10 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
 
     public int[] getCommandTypeForSelectId() {
         return commandTypeForSelectId;
+    }
+
+    public String[][] getTablesForSelectId() {
+        return tablesForSelectId;
     }
 
     public boolean containsStacks() {
@@ -265,6 +272,7 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
         timePerSelectId = new long[nProfiledSelects];
         typeForSelectId = new int[nProfiledSelects];
         commandTypeForSelectId = new int[nProfiledSelects];
+        tablesForSelectId = new String[nProfiledSelects][];
 
         for (int i = 1; i < nProfiledSelects; i++) {
             selectNames[i] = in.readUTF();
@@ -272,6 +280,10 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
             timePerSelectId[i] = in.readLong();
             typeForSelectId[i] = in.readInt();
             commandTypeForSelectId[i] = in.readInt();
+            tablesForSelectId[i] = new String[in.readInt()];
+            for (int j = 0; j < tablesForSelectId[i].length; j++) {
+                tablesForSelectId[i][j] = in.readUTF();
+            }
         }
 
         if (in.readBoolean()) {
@@ -312,6 +324,10 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
             out.writeLong(timePerSelectId[i]);
             out.writeInt(typeForSelectId[i]);
             out.writeInt(commandTypeForSelectId[i]);
+            out.writeInt(tablesForSelectId[i].length);
+            for (int j = 0; j < tablesForSelectId[i].length; j++) {
+                out.writeUTF(tablesForSelectId[i][j]);
+            }
         }
 
         out.writeBoolean(stacksForSelects != null);
@@ -361,6 +377,7 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
         timePerSelectId = new long[nProfiledSelects];
         typeForSelectId = new int[nProfiledSelects];
         commandTypeForSelectId = new int[nProfiledSelects];
+        tablesForSelectId = new String[nProfiledSelects][];
         selectNames = new String[nProfiledSelects];
         for (int i=0; i<fpc.getNRows() ; i++) {
             int selectId = fpc.getMethodIdAtRow(i);
@@ -369,6 +386,7 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
             timePerSelectId[selectId] = fpc.getTotalTimeInMcs0AtRow(i);
             typeForSelectId[selectId] = provider.getCommandType(selectId);
             commandTypeForSelectId[selectId] = provider.getSQLCommand(selectId);
+            tablesForSelectId[selectId] = provider.getTables(selectId);
         }
 
         RuntimeMemoryCCTNode[] stacks = provider.getStacksForSelects();
@@ -415,6 +433,7 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
         LOGGER.finest("timePerSelectId.length: " + debugLength(timePerSelectId));
         LOGGER.finest("typeForSelectId.length: " + debugLength(typeForSelectId));
         LOGGER.finest("commandTypeForSelectId.length: " + debugLength(commandTypeForSelectId));
+        LOGGER.finest("tablesForSelectId.length: " + debugLength(tablesForSelectId));
         LOGGER.finest("selectNames.length: " + debugLength(selectNames)); // NOI18N
         LOGGER.finest("table: " + ((table == null) ? "null" : table.debug())); // NOI18N
     }
