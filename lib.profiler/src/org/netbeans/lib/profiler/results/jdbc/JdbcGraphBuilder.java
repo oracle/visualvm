@@ -448,11 +448,12 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     }
 
     private int getSelectId(int type, String select) {
-        Select sel = new Select(type, extractSQLCommandType(select), select);
+        Select sel = new Select(type, select);
         
         Integer selectId = selectsToId.get(sel);
         if (selectId == null) {
             selectId = Integer.valueOf(++maxSelectId);
+            sel.setCommandType(extractSQLCommandType(select));
             selectsToId.put(sel, selectId);
             idsToSelect.put(selectId, sel);
             updateNumberOfSelects();
@@ -830,17 +831,20 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     
     private static class Select {
         private final int type;
-        private final int commandType;
+        private  int commandType;
         private final String select;
         
-        Select(int t, int ct, String s) {
+        Select(int t, String s) {
             type = t;
-            commandType = ct;
             select = s;
         }
 
         private int getType() {
             return type;
+        }
+
+        private void setCommandType(int ct) {
+            commandType = ct;
         }
 
         private int getCommandType() {
