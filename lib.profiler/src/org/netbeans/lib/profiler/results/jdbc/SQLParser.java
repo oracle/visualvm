@@ -61,7 +61,10 @@ class SQLParser {
         "SET", SQL_COMMAND_SET,         // NOI18N
         "UPDATE", SQL_COMMAND_UPDATE    // NOI18N
     };
-    private static final String fromRegexp = "(^\\bSELECT\\b)|(\\bFROM\\b)|(\\bWHERE\\b)|('[^']*')";
+    private static final String fromRegexp = "(^\\bSELECT\\b)|(\\bFROM\\b)|(\\bWHERE\\b)|" +
+            "(^\\bUPDATE\\b)|" +
+            "(^\\bINSERT INTO\\b)|" +
+            "('[^']*')";
     private static final String wordRegexp = "\\b[\\w]+\\b";
     
     private final Pattern commandsPattern;
@@ -130,6 +133,16 @@ class SQLParser {
                 }
                 if (fromStart < fromEnd) {
                     return sql.substring(fromStart+1, fromEnd);
+                }
+            } else if (m.start(4) != -1) {        // UPDATE
+                Matcher mw = wordPattern.matcher(sql.substring(m.end(4)+1));
+                if (mw.find()) {
+                    return mw.group();
+                }
+            } else if (m.start(5) != -1) {        // INSERT INTO
+                Matcher mw = wordPattern.matcher(sql.substring(m.end(5)+1));
+                if (mw.find()) {
+                    return mw.group();
                 }
             }
         }
