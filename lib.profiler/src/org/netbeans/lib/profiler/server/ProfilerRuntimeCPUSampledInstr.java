@@ -140,6 +140,8 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
                 }
             }
 
+            ProfilerServer.notifyClientOnResultsAvailability();
+            writeParametersEvent(ti);
             if (ti.stackDepth > 0) {
                 if (!ti.sampleDue) {
                     writeUnstampedEvent(MARKER_ENTRY_UNSTAMPED, ti, methodId);
