@@ -325,7 +325,7 @@ abstract class JDBCTreeTableView extends JDBCView {
     
     protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
         PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)treeTable.getValueForRow(row);
-        if (node == null || isSQL(node)) return null;
+        if (node == null || isSQL(node) || node.isFiltered()) return null;
         String[] name = node.getMethodClassNameAndSig();
         return new ClientUtils.SourceCodeSelection(name[0], name[1], name[2]);
     }
@@ -352,7 +352,8 @@ abstract class JDBCTreeTableView extends JDBCView {
     
     static boolean isSelectable(PresoObjAllocCCTNode node) {
         if (isSQL(node)) return false;
-        if (node.getMethodClassNameAndSig()[1].endsWith("[native]")) return false; // NOI18N
+        String methodName = node.getMethodClassNameAndSig()[1];
+        if (methodName == null || methodName.endsWith("[native]")) return false; // NOI18N
         return true;
     }
     
