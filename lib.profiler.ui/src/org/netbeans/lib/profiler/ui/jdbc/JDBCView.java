@@ -43,6 +43,7 @@
 package org.netbeans.lib.profiler.ui.jdbc;
 
 import java.util.ResourceBundle;
+import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
 import org.netbeans.lib.profiler.ui.results.DataView;
 
 /**
@@ -91,5 +92,19 @@ public abstract class JDBCView extends DataView {
     static final String HITS_COLUMN_TOOLTIP = messages.getString("CPUView_HitsColumnTooltip"); // NOI18N
 //    static final String INVOCATIONS_COLUMN_TOOLTIP = messages.getString("CPUView_InvocationsColumnTooltip"); // NOI18N
     // -----
+    
+    static String commandString(int command) {
+        switch (command) {
+            case JdbcCCTProvider.SQL_COMMAND_ALTER: return "ALTER"; // NOI18N
+            case JdbcCCTProvider.SQL_COMMAND_CREATE: return "CREATE"; // NOI18N
+            case JdbcCCTProvider.SQL_COMMAND_DELETE: return "DELETE"; // NOI18N
+            case JdbcCCTProvider.SQL_COMMAND_DESCRIBE: return "DESCRIBE"; // NOI18N
+            case JdbcCCTProvider.SQL_COMMAND_INSERT: return "INSERT"; // NOI18N
+            case JdbcCCTProvider.SQL_COMMAND_SELECT: return "SELECT"; // NOI18N
+            case JdbcCCTProvider.SQL_COMMAND_SET: return "SET"; // NOI18N
+            case JdbcCCTProvider.SQL_COMMAND_UPDATE: return "UPDATE"; // NOI18N
+            default: return "other command";
+        }
+    }
     
 }
