@@ -53,6 +53,7 @@ public interface ProfilerIcons extends Icons.Keys {
     public static final String SNAPSHOT_MEMORY_32 = "ProfilerIcons.SnapshotMemory32"; // NOI18N
     public static final String THREAD = "ProfilerIcons.Thread"; // NOI18N
     public static final String ALL_THREADS = "ProfilerIcons.AllThreads"; // NOI18N
+    public static final String SQL_QUERY = "ProfilerIcons.SqlQuery"; // NOI18N
     
     public static final String ATTACH = "ProfilerIcons.Attach"; // NOI18N
     public static final String ATTACH_24 = "ProfilerIcons.Attach24"; // NOI18N
@@ -100,6 +101,7 @@ public interface ProfilerIcons extends Icons.Keys {
     public static final String WINDOW_TELEMETRY = "ProfilerIcons.WindowTelemetry"; // NOI18N
     public static final String WINDOW_THREADS = "ProfilerIcons.WindowThreads"; // NOI18N
     public static final String WINDOW_LOCKS = "ProfilerIcons.WindowLocks"; // NOI18N
+    public static final String WINDOW_SQL = "ProfilerIcons.WindowSql"; // NOI18N
     
     public static final String VIEW_LIVE_RESULTS_CPU_32 = "ProfilerIcons.ViewLiveResultsCpu32"; // NOI18N
     public static final String VIEW_LIVE_RESULTS_FRAGMENT_32 = "ProfilerIcons.ViewLiveResultsFragment32"; // NOI18N
