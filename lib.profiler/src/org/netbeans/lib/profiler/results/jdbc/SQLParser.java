@@ -61,11 +61,15 @@ class SQLParser {
         "SET", SQL_COMMAND_SET,         // NOI18N
         "UPDATE", SQL_COMMAND_UPDATE    // NOI18N
     };
-    private static final String fromRegexp = "(^\\bSELECT\\b)|(\\bFROM\\b)|(\\bWHERE\\b)|" +
+    private static final String fromRegexp = "(^\\bSELECT\\b)|" +
+            "(\\bFROM\\b)|" +
+            "(\\bWHERE\\b)|" +
+            "(\\bGROUP\\sBY\\b)|" +
+            "(\\bORDER\\sBY\\b)|" +
             "(^\\bUPDATE\\b)|" +
             "(^\\bINSERT INTO\\b)|" +
             "('[^']*')";
-    private static final String wordRegexp = "\\b[\\w]+\\b";
+    private static final String wordRegexp = "\\b\\w+\\.?\\w*\\b";
     
     private final Pattern commandsPattern;
     private final Pattern fromPattern;
@@ -129,18 +133,26 @@ class SQLParser {
                     } else if (m.start(3) != -1) {    // WHERE
                         fromEnd = m.start(3);
                         break;
+                    } else if (m.start(4) != -1) {    // GROUP BY
+                        fromEnd = m.start(4);
+                        break;
+                    } else if (m.start(5) != -1) {    // ORDER BY
+                        fromEnd = m.start(5);
+                        break;
                     }
                 }
                 if (fromStart < fromEnd) {
                     return sql.substring(fromStart+1, fromEnd);
+                } else if (fromStart != -1 && fromEnd == -1) { // just FROM without WHERE
+                    return sql.substring(fromStart+1);
                 }
-            } else if (m.start(4) != -1) {        // UPDATE
-                Matcher mw = wordPattern.matcher(sql.substring(m.end(4)+1));
+            } else if (m.start(6) != -1) {        // UPDATE
+                Matcher mw = wordPattern.matcher(sql.substring(m.end(6)+1));
                 if (mw.find()) {
                     return mw.group();
                 }
-            } else if (m.start(5) != -1) {        // INSERT INTO
-                Matcher mw = wordPattern.matcher(sql.substring(m.end(5)+1));
+            } else if (m.start(7) != -1) {        // INSERT INTO
+                Matcher mw = wordPattern.matcher(sql.substring(m.end(7)+1));
                 if (mw.find()) {
                     return mw.group();
                 }
