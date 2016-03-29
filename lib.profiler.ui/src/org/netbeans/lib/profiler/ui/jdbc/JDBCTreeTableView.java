@@ -406,7 +406,7 @@ abstract class JDBCTreeTableView extends JDBCView {
         public Object getValueAt(TreeNode node, int columnIndex) {
             PresoObjAllocCCTNode jdbcNode = (PresoObjAllocCCTNode)node;
             if (columnIndex == 0) {
-                return jdbcNode.getNodeName();
+                return jdbcNode;
             } else if (columnIndex == 1) {
                 return jdbcNode.totalObjSize;
             } else if (columnIndex == 2) {
