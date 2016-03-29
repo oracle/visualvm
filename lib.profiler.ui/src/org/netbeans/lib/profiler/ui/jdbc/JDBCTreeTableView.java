@@ -54,6 +54,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
+import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeNode;
@@ -298,30 +299,19 @@ abstract class JDBCTreeTableView extends JDBCView {
     }
     
     
-//    protected RowFilter getExcludesFilter() {
-//        return new RowFilter() { // Do not filter threads and self time nodes
-//            public boolean include(RowFilter.Entry entry) {
-//                PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)entry.getIdentifier();
-//                return node.isThreadNode() || node.isSelfTimeNode();
-//            }
-//        };
-//    }
+    protected RowFilter getExcludesFilter() {
+        return new RowFilter() { // Do not filter SQL commands
+            public boolean include(RowFilter.Entry entry) {
+                PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)entry.getIdentifier();
+                return isSQL(node);
+            }
+        };
+    }
     
     protected ProfilerTable getResultsComponent() {
         return treeTable;
     }
     
-    
-//    private long getMaxValue(int row, int val) {
-//        TreePath path = treeTable.getPathForRow(row);
-//        if (path == null) return Long.MIN_VALUE; // TODO: prevents NPE from export but doesn't provide the actual value!
-//        if (path.getPathCount() < 2) return 1;
-//        
-//        PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)path.getPathComponent(1);
-//        if (val == 0) return Math.abs(node.getTotalTime0());
-//        else if (val == 1) return Math.abs(node.getTotalTime1());
-//        else return Math.abs(node.getNCalls());
-//    }
     
     protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
         PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)treeTable.getValueForRow(row);
@@ -329,19 +319,6 @@ abstract class JDBCTreeTableView extends JDBCView {
         String[] name = node.getMethodClassNameAndSig();
         return new ClientUtils.SourceCodeSelection(name[0], name[1], name[2]);
     }
-    
-//    private ClientUtils.SourceCodeSelection selectionForId(int methodId) {
-//        ProfilingSessionStatus sessionStatus = client.getStatus();
-//        sessionStatus.beginTrans(false);
-//        try {
-//            String className = sessionStatus.getInstrMethodClasses()[methodId];
-//            String methodName = sessionStatus.getInstrMethodNames()[methodId];
-//            String methodSig = sessionStatus.getInstrMethodSignatures()[methodId];
-//            return new ClientUtils.SourceCodeSelection(className, methodName, methodSig);
-//        } finally {
-//            sessionStatus.endTrans();
-//        }
-//    }
     
     static boolean isSQL(PresoObjAllocCCTNode node) {
 //        CCTNode p = node.getParent();
