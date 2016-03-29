@@ -100,10 +100,10 @@ abstract class SQLFilterPanel extends JPanel {
         
         setBorder(new CompoundBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("controlShadow")), // NOI18N
                                      BorderFactory.createMatteBorder(6, 3, 6, 3, UIUtils.getProfilerResultsBackground())));
+        setOpaque(true);
+        setBackground(UIUtils.getProfilerResultsBackground());
         
         JToolBar toolbar = new InvisibleToolbar();
-        toolbar.setOpaque(true);
-        toolbar.setBackground(UIUtils.getProfilerResultsBackground());
         if (UIUtils.isWindowsModernLookAndFeel())
             toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 2));
         else if (!UIUtils.isNimbusLookAndFeel() && !UIUtils.isAquaLookAndFeel())
@@ -155,7 +155,14 @@ abstract class SQLFilterPanel extends JPanel {
             public void changedUpdate(DocumentEvent e) { changed(); }
         };
         
-        commandsF = new JTextField(10);
+        commandsF = new JTextField(10) {
+            public Dimension getMaximumSize() {
+                Dimension dim = super.getMaximumSize();
+                dim.height = super.getPreferredSize().height;
+                if (UIUtils.isMetalLookAndFeel()) dim.height += 4;
+                return dim;
+            }
+        };
         commandsF.getDocument().addDocumentListener(dl);
         commandsF.getActionMap().put(APPLY_ACTION_KEY, applyAction);
         commandsF.getInputMap().put(applyKey, APPLY_ACTION_KEY);
@@ -166,7 +173,14 @@ abstract class SQLFilterPanel extends JPanel {
         toolbar.add(new JLabel("Tables:"));
         toolbar.add(Box.createHorizontalStrut(3));
         
-        tablesF = new JTextField(10);
+        tablesF = new JTextField(10) {
+            public Dimension getMaximumSize() {
+                Dimension dim = super.getMaximumSize();
+                dim.height = super.getPreferredSize().height;
+                if (UIUtils.isMetalLookAndFeel()) dim.height += 4;
+                return dim;
+            }
+        };
         tablesF.getDocument().addDocumentListener(dl);
         tablesF.getActionMap().put(APPLY_ACTION_KEY, applyAction);
         tablesF.getInputMap().put(applyKey, APPLY_ACTION_KEY);
