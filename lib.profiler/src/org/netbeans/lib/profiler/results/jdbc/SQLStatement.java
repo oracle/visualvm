@@ -450,6 +450,9 @@ class SQLStatement {
         if (par instanceof String) {
             return "'"+par+"'";
         }
+        if (par == null) {
+            return "*NULL*";    // NOI18N
+        }
         return par.toString();
     }
 
