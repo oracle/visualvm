@@ -41,6 +41,8 @@
  */
 package org.netbeans.lib.profiler.results.jdbc;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider.*;
@@ -107,15 +109,15 @@ class SQLParser {
         
         if (fromClause != null) {
             String[] tablesRefs = fromClause.trim().split(",");
-            String[] tables = new String[tablesRefs.length];
+            Set<String> tables = new HashSet(tablesRefs.length);
             
             for (int i = 0; i < tablesRefs.length; i++) {
                 Matcher m = wordPattern.matcher(tablesRefs[i]);
                 if (m.find()) {
-                    tables[i] = m.group();
+                    tables.add(m.group());
                 }
             }
-            return tables;
+            return tables.toArray(new String[0]);
         }
         return new String[0];
     }
