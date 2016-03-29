@@ -1760,6 +1760,7 @@ public abstract class NetBeansProfiler extends Profiler {
             switch (profilingSettings.getProfilingType()) {
                 case ProfilingSettings.PROFILE_CPU_ENTIRE:
                 case ProfilingSettings.PROFILE_CPU_PART:
+                case ProfilingSettings.PROFILE_CPU_JDBC:
                 case ProfilingSettings.PROFILE_CPU_SAMPLING:
                 case ProfilingSettings.PROFILE_CPU_STOPWATCH: {
                     cctProvider = Lookup.getDefault().lookup(CPUCCTProvider.class);
@@ -1815,6 +1816,7 @@ public abstract class NetBeansProfiler extends Profiler {
             Collection listeners = null;
             switch (profilingSettings.getProfilingType()) {
                 case ProfilingSettings.PROFILE_CPU_PART:
+                case ProfilingSettings.PROFILE_CPU_JDBC:
                 case ProfilingSettings.PROFILE_CPU_ENTIRE:
                 case ProfilingSettings.PROFILE_CPU_SAMPLING: {
                     listeners = Lookup.getDefault().lookupAll(CPUProfilingResultListener.class);
