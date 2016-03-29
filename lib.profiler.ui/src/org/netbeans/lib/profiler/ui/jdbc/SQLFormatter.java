@@ -86,6 +86,7 @@ final class SQLFormatter {
         "TRUNCATE TABLE",
         "DROP TABLE",
         "INSERT INTO",
+        "ALTER SESSION",
         "DELETE",
         "UPDATE",
         "VALUES",
