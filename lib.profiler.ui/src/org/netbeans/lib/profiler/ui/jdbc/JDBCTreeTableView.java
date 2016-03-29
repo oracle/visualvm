@@ -416,7 +416,7 @@ abstract class JDBCTreeTableView extends JDBCView {
                     switch (((SQLQueryNode)jdbcNode).getStatementType()) {
                         case JdbcCCTProvider.SQL_PREPARED_STATEMENT: return "prepared";
                         case JdbcCCTProvider.SQL_CALLABLE_STATEMENT: return "callable";
-                        default: return "reqular";
+                        default: return "regular";
                     }
                 } else {
                     return "-";
