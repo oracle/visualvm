@@ -641,6 +641,7 @@ public class CompareSnapshotsAction extends AbstractAction {
 
                             switch (ls.getType()) {
                                 case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
+                                case LoadedSnapshot.SNAPSHOT_TYPE_CPU_JDBC:
                                     c.setIcon(cpuIcon);
 
                                     break;
@@ -665,6 +666,7 @@ public class CompareSnapshotsAction extends AbstractAction {
 
                                 switch (ls.getType()) {
                                     case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
+                                    case LoadedSnapshot.SNAPSHOT_TYPE_CPU_JDBC:
                                         c.setIcon(cpuIcon);
 
                                         break;
@@ -684,6 +686,7 @@ public class CompareSnapshotsAction extends AbstractAction {
                                 c.setText(rm.getSnapshotDisplayName(fo.getName(), type));
                                 switch (type) {
                                     case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
+                                    case LoadedSnapshot.SNAPSHOT_TYPE_CPU_JDBC:
                                         c.setIcon(cpuIcon);
 
                                         break;
