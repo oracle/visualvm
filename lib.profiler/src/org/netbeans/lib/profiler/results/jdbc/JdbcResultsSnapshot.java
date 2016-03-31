@@ -265,7 +265,8 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
 
     public void readFromStream(DataInputStream in) throws IOException {
         super.readFromStream(in);
-
+        
+        StringCache strings = new StringCache();
         nProfiledSelects = in.readInt();
         selectNames = new String[nProfiledSelects];
         invocationsPerSelectId = new long[nProfiledSelects];
@@ -282,7 +283,7 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
             commandTypeForSelectId[i] = in.readInt();
             tablesForSelectId[i] = new String[in.readInt()];
             for (int j = 0; j < tablesForSelectId[i].length; j++) {
-                tablesForSelectId[i][j] = in.readUTF();
+                tablesForSelectId[i][j] = strings.intern(in.readUTF());
             }
         }
 

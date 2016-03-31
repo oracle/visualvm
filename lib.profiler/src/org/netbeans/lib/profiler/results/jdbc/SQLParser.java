@@ -76,6 +76,7 @@ class SQLParser {
     private final Pattern commandsPattern;
     private final Pattern fromPattern;
     private final Pattern wordPattern;
+    private final StringCache strings;
 
     SQLParser() {
         StringBuffer pattern = new StringBuffer();
@@ -88,6 +89,7 @@ class SQLParser {
         commandsPattern = Pattern.compile(pattern.substring(0, pattern.length()-1).toString(), Pattern.CASE_INSENSITIVE);
         fromPattern = Pattern.compile(fromRegexp, Pattern.CASE_INSENSITIVE);
         wordPattern = Pattern.compile(wordRegexp, Pattern.CASE_INSENSITIVE);
+        strings = new StringCache();
     }
     
     int extractSQLCommandType(String sql) {
@@ -114,7 +116,7 @@ class SQLParser {
             for (int i = 0; i < tablesRefs.length; i++) {
                 Matcher m = wordPattern.matcher(tablesRefs[i]);
                 if (m.find()) {
-                    tables.add(m.group());
+                    tables.add(strings.intern(m.group()));
                 }
             }
             return tables.toArray(new String[0]);
