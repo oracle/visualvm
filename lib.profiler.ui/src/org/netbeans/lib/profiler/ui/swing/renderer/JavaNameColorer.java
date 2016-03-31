@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2016 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -24,11 +24,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -39,56 +34,46 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2016 Sun Microsystems, Inc.
  */
-
 package org.netbeans.lib.profiler.ui.swing.renderer;
 
-import javax.swing.Icon;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class JavaNameRenderer extends NormalBoldGrayRenderer {
+final class JavaNameColorer {
     
-    private final Icon icon;
+    // TODO: will be replaced by customizable filters definition
+    private static final List<String> JAVA_REFLECTION = new ArrayList();
+    private static final Color JAVA_REFLECTION_COLOR = new Color(180, 180, 180);
     
-    public JavaNameRenderer() {
-        this(null);
+    private static final List<String> EE_FRAMEWORKS = new ArrayList();
+    private static final Color EE_FRAMEWORKS_COLOR = new Color(135, 135, 135);
+    
+    static {
+        JAVA_REFLECTION.add("java.lang.reflect.");
+        JAVA_REFLECTION.add("sun.reflect.");
+        JAVA_REFLECTION.add("com.sun.proxy.");
+        
+        EE_FRAMEWORKS.add("javax.servlet.");
+        EE_FRAMEWORKS.add("org.apache.catalina.");
+        EE_FRAMEWORKS.add("org.springframework.");
+        EE_FRAMEWORKS.add("org.eclipse.persistence.");
     }
     
-    public JavaNameRenderer(Icon icon) {
-        this.icon = icon;
-    }
-    
-    public void setValue(Object value, int row) {
-        if (value == null) {
-            setNormalValue(""); // NOI18N
-            setBoldValue(""); // NOI18N
-            setGrayValue(""); // NOI18N
-        } else {
-            String name = value.toString();
-            String gray = ""; // NOI18N
-
-            int bracketIndex = name.indexOf('('); // NOI18N
-            if (bracketIndex != -1) {
-                gray = " " + name.substring(bracketIndex); // NOI18N
-                name = name.substring(0, bracketIndex);
-            }
-
-            int dotIndex = name.lastIndexOf('.'); // NOI18N
-            setNormalValue(name.substring(0, dotIndex + 1));
-            setBoldValue(name.substring(dotIndex + 1));
-            setGrayValue(gray);
-        }
-        setIcon(icon);
-    }
-    
-    
-    // TODO: optimize to not slow down sort/search/filter by resolving color!
-    protected void setNormalValue(String value) {
-        super.setNormalValue(value);
-        setCustomForeground(JavaNameColorer.getForeground(value));
+    static Color getForeground(String name) {
+        for (String s : JAVA_REFLECTION) if (name.startsWith(s)) return JAVA_REFLECTION_COLOR;
+        for (String s : EE_FRAMEWORKS) if (name.startsWith(s)) return EE_FRAMEWORKS_COLOR;
+        
+        return null;
     }
     
 }
