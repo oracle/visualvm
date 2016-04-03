@@ -136,7 +136,7 @@ public class AllocMemoryResultsSnapshot extends MemoryResultsSnapshot {
 
     protected PresoObjAllocCCTNode createPresentationCCT(RuntimeMemoryCCTNode rootNode, int classId,
                                                          boolean dontShowZeroLiveObjAllocPaths) {
-        return PresoObjAllocCCTNode.createPresentationCCTFromSnapshot(this, rootNode, getClassName(classId));
+        return PresoObjAllocCCTNode.createPresentationCCTFromSnapshot(getJMethodIdTable(), rootNode, getClassName(classId));
     }
 
     void debugValues() {
