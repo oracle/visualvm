@@ -520,9 +520,9 @@ public class ProfilerInterface implements CommonConstants {
             GC.runGC();
 
             try {
+                // Give WeakReference collector thread a chance to register some (hopefully most of) object GCs
                 Thread.sleep(500);
 
-                // Give WeakReference collector thread a chance to register some (hopefully most of) object GCs
             } catch (Exception ex) {
             }
         }

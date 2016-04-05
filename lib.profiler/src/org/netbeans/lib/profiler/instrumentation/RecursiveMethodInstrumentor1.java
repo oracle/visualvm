@@ -125,7 +125,8 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
                 }
 
                 if (isMatch) { // This root class is loaded
-
+                    boolean checkSubClasses = loadedClassInfos[j].isInterface() && rootMethods.markerMethods[rIdx];
+                    
                     if (Wildcards.isPackageWildcard(rootClassName) || Wildcards.isMethodWildcard(rootMethods.methodNames[rIdx])) {
                         if (rootMethods.markerMethods[rIdx]) {
                             markAllMethodsMarker(loadedClassInfos[j]);
@@ -138,12 +139,12 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
 
                         for (int methodIdx = 0; methodIdx < methodNames.length; methodIdx++) {
                             locateAndMarkMethodReachable(loadedClassInfos[j], methodNames[methodIdx], signatures[methodIdx],
-                                                         false, false, false);
+                                                         false, false, checkSubClasses);
                         }
                     } else {
                         markMethod(loadedClassInfos[j], rIdx);
                         locateAndMarkMethodReachable(loadedClassInfos[j], rootMethods.methodNames[rIdx],
-                                                     rootMethods.methodSignatures[rIdx], false, false, false);
+                                                     rootMethods.methodSignatures[rIdx], false, false, checkSubClasses);
                     }
                 }
             }
@@ -223,6 +224,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
                 }
 
                 if (isMatch) { // it is indeed a root class
+                    boolean checkSubClasses = clazz.isInterface() && rootMethods.markerMethods[rIdx];
 
                     if (Wildcards.isPackageWildcard(rootClassName) || Wildcards.isMethodWildcard(rootMethods.methodNames[rIdx])) {
                         if (rootMethods.markerMethods[rIdx]) {
@@ -235,12 +237,12 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
                         String[] signatures = clazz.getMethodSignatures();
 
                         for (int methodIdx = 0; methodIdx < methodNames.length; methodIdx++) {
-                            locateAndMarkMethodReachable(clazz, methodNames[methodIdx], signatures[methodIdx], false, false, false);
+                            locateAndMarkMethodReachable(clazz, methodNames[methodIdx], signatures[methodIdx], false, false, checkSubClasses);
                         }
                     } else {
                         markMethod(clazz, rIdx);
                         locateAndMarkMethodReachable(clazz, rootMethods.methodNames[rIdx], rootMethods.methodSignatures[rIdx],
-                                                     false, false, false);
+                                                     false, false, checkSubClasses);
                     }
                 }
             }
@@ -318,7 +320,11 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
             // for whether a method with the same name and signature in subclass really overrrides a method in superclass, given all other
             // conditions that we have already checked (e.g. that the method in superclass is not private), will only detect a pathological
             // case when both method versions are package-private. This is rare, if ever happens at all.
-            locateAndMarkMethodReachable(subClass, methodNames[i], methodSignatures[i], true, false, false);
+            boolean ok = locateAndMarkMethodReachable(subClass, methodNames[i], methodSignatures[i], true, false, false);
+            if (ok && superClass.isMethodMarker(i)) {
+                int subIdx = subClass.getMethodIndex(methodNames[i], methodSignatures[i]);
+                subClass.setMethodMarker(subIdx);
+            }
         }
     }
 
@@ -475,8 +481,12 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
                     // on why this seems to be of no use.
                     if (!subClass.isInterface()) {
                         boolean searchSuper = clazz.isInterface() && !subclasses.contains(subClass.getSuperClass());
-                        locateAndMarkMethodReachable(subClass, methodName, methodSignature, virtualCall,
+                        boolean ok = locateAndMarkMethodReachable(subClass, methodName, methodSignature, virtualCall,
                                                       searchSuper, false);
+                        if (ok && clazz.isMethodMarker(idx)) {
+                            int subIdx = subClass.getMethodIndex(methodName, methodSignature);
+                            subClass.setMethodMarker(subIdx);
+                        }
                     }
                 }
             }

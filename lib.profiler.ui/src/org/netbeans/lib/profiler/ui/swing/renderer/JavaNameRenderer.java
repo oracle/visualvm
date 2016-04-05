@@ -84,4 +84,11 @@ public class JavaNameRenderer extends NormalBoldGrayRenderer {
         setIcon(icon);
     }
     
+    
+    // TODO: optimize to not slow down sort/search/filter by resolving color!
+    protected void setNormalValue(String value) {
+        super.setNormalValue(value);
+        setCustomForeground(JavaNameColorer.getForeground(value));
+    }
+    
 }
