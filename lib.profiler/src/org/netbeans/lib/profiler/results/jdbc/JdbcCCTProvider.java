@@ -55,6 +55,7 @@ public interface JdbcCCTProvider extends CCTProvider, FlatProfileProvider {
     public static final int SQL_PREPARED_STATEMENT = 1;
     public static final int SQL_CALLABLE_STATEMENT = 2;
 
+    public static final int SQL_COMMAND_BATCH = -2;
     public static final int SQL_COMMAND_OTHER = -1;
     public static final int SQL_COMMAND_ALTER = 0;
     public static final int SQL_COMMAND_CREATE = 1;

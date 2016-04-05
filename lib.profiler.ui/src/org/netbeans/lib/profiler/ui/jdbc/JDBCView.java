@@ -103,6 +103,7 @@ public abstract class JDBCView extends DataView {
             case JdbcCCTProvider.SQL_COMMAND_SELECT: return "SELECT"; // NOI18N
             case JdbcCCTProvider.SQL_COMMAND_SET: return "SET"; // NOI18N
             case JdbcCCTProvider.SQL_COMMAND_UPDATE: return "UPDATE"; // NOI18N
+            case JdbcCCTProvider.SQL_COMMAND_BATCH: return "BATCH"; // NOI18N
             default: return "other command";
         }
     }

@@ -93,6 +93,9 @@ class SQLParser {
     }
     
     int extractSQLCommandType(String sql) {
+        if (sql != null && sql.startsWith("[")) {
+            return SQL_COMMAND_BATCH;
+        }
         Matcher m = commandsPattern.matcher(sql);
         
         if (m.find()) {

@@ -57,6 +57,7 @@ import java.sql.SQLXML;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
@@ -112,7 +113,11 @@ class SQLStatement {
                 }
                 break;
             case "addBatch":
-                addBatch((String) parameters.get(1));
+                if (parameters.size() == 1) {
+                    addBatch();
+                } else {
+                    addBatch((String) parameters.get(1));
+                }
                 break;
             case "clearBatch":
                 clearBatch();
@@ -158,6 +163,10 @@ class SQLStatement {
         return sql;
     }
 
+    void addBatch() {
+        batch.add(getFullSql());
+    }
+
     void addBatch(String sql) {
         batch.add(sql);
     }
@@ -168,9 +177,9 @@ class SQLStatement {
 
     String executeBatch() {
         if (JDBC_LOGGER.isLoggable(Level.FINE)) {
-            JDBC_LOGGER.log(Level.FINE, "executeBatch {0}", new Object[]{batch.toArray()});
+            JDBC_LOGGER.log(Level.FINE, "executeBatch {0}", new Object[]{Arrays.toString(batch.toArray())});
         }
-        return batch.toArray().toString();
+        return Arrays.toString(batch.toArray());
     }
 
     void setNull(int parameterIndex, int sqlType) {
