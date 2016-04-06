@@ -47,9 +47,9 @@ import org.netbeans.lib.profiler.global.TransactionalSupport;
  *
  * @author Jaroslav Bachorik
  */
-class ThreadInfos {
+public class ThreadInfos {
 
-    ThreadInfo[] threadInfos;
+    public ThreadInfo[] threadInfos;
     String[] threadNames;
     String[] threadClassNames;
     int threadInfosLastIdx;
@@ -59,7 +59,7 @@ class ThreadInfos {
         reset();
     }
 
-    void beginTrans(boolean mutable) {
+    public void beginTrans(boolean mutable) {
         transaction.beginTrans(mutable);
     }
 
@@ -67,11 +67,11 @@ class ThreadInfos {
         return transaction.beginTrans(mutable, failEarly);
     }
 
-    void endTrans() {
+    public void endTrans() {
         transaction.endTrans();
     }
 
-    boolean isEmpty() {
+    public boolean isEmpty() {
         beginTrans(false);
         try {
             if ((threadInfos == null) || (threadInfos.length == 0)) {
@@ -88,7 +88,7 @@ class ThreadInfos {
         }
     }
 
-    String[] getThreadNames() {
+    public String[] getThreadNames() {
         beginTrans(false);
         try {
             return threadNames;
@@ -97,7 +97,7 @@ class ThreadInfos {
         }
     }
 
-    void newThreadInfo(int threadId, String threadName, String threadClassName) {
+    public void newThreadInfo(int threadId, String threadName, String threadClassName) {
         beginTrans(true);
         try {
             if ((threadId > threadInfosLastIdx) || (threadInfos == null)) {
@@ -125,7 +125,7 @@ class ThreadInfos {
         }
     }
 
-    void reset() {
+    public void reset() {
         beginTrans(true);
         try {
             threadInfos = null;
