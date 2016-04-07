@@ -159,6 +159,11 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
 
     /** Called upon exit from the marker method. */
     public static void markerMethodExit(char methodId) {
+      markerMethodExit(NO_RET_VALUE, methodId);
+    }
+    
+    /** Called upon exit from the marker method. */
+    public static void markerMethodExit(Object ret, char methodId) {
         if (recursiveInstrumentationDisabled) {
             return;
         }
@@ -178,11 +183,14 @@ public class ProfilerRuntimeCPUSampledInstr extends ProfilerRuntimeCPU {
 
             if (ti.stackDepth < 1) {
                 ti.inCallGraph = false; // We are exiting the marker method of our call subgraph
+                writeRetValue(ret, ti);
                 writeTimeStampedEvent(MARKER_EXIT, ti, methodId);
             } else if (ti.stackDepth <= stackDepthLimit) {
                 if (!ti.sampleDue) {
+                    writeRetValue(ret, ti);
                     writeUnstampedEvent(MARKER_EXIT_UNSTAMPED, ti, methodId);
                 } else {
+                    writeRetValue(ret, ti);
                     writeTimeStampedEvent(MARKER_EXIT, ti, methodId);
                     ti.sampleDue = false;
                 }

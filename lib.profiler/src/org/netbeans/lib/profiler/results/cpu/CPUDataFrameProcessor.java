@@ -212,13 +212,20 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                             break;
                         }
                         case CommonConstants.MARKER_EXIT: {
+                            List parameters = (List) methodParameters.get(Integer.valueOf(currentThreadId));
+                            Object retVal = parameters == null ? null : parameters.get(0);
+                            
                             if (LOGGER.isLoggable(Level.FINEST)) {
-                                LOGGER.log(Level.FINEST, "Marker exit , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                                if (retVal != null) {
+                                    LOGGER.log(Level.FINEST, "Marker exit , tId={0}, mId={1}, retVal={2}", new Object[]{currentThreadId, methodId, retVal}); // NOI18N                                    
+                                } else {
+                                    LOGGER.log(Level.FINEST, "Marker exit , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                                }
                             }
 
                             fireMethodExit(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER, timeStamp0,
-                                           timeStamp1);
-
+                                           timeStamp1, retVal);
+                            methodParameters.remove(Integer.valueOf(currentThreadId));
                             break;
                         }
                         case CommonConstants.ROOT_EXIT: {
@@ -227,7 +234,7 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                             }
 
                             fireMethodExit(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_ROOT, timeStamp0,
-                                           timeStamp1);
+                                           timeStamp1, null);
 
                             break;
                         }
@@ -237,7 +244,7 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                             }
 
                             fireMethodExit(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_NORMAL, timeStamp0,
-                                           timeStamp1);
+                                           timeStamp1, null);
 
                             break;
                         }
@@ -527,10 +534,10 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
     }
 
     private void fireMethodExit(final int methodId, final int threadId, final int methodType, final long timeStamp0,
-                                final long timeStamp1) {
+                                final long timeStamp1, final Object retVal) {
         foreachListener(new ListenerFunctor() {
                 public void execute(ProfilingResultListener listener) {
-                    ((CPUProfilingResultListener) listener).methodExit(methodId, threadId, methodType, timeStamp0, timeStamp1);
+                    ((CPUProfilingResultListener) listener).methodExit(methodId, threadId, methodType, timeStamp0, timeStamp1, retVal);
                 }
             });
     }

@@ -254,7 +254,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
     }
 
     public void methodExit(final int methodId, final int threadId, final int methodType, final long timeStamp0,
-                           final long timeStamp1) {
+                           final long timeStamp1, final Object retVal) {
         if (!isReady() || (threadInfos.threadInfos == null)) {
             return;
         }

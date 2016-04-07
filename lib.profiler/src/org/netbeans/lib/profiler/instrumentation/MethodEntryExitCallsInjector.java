@@ -72,6 +72,12 @@ class MethodEntryExitCallsInjector extends Injector implements CommonConstants {
     protected static int injCodeMethodIdxPos2;
     protected static int injCodeMethodIdPos2;
 
+    // Stuff used for markerMethodExit(Object, char) injection 
+    protected static byte[] injCode3;
+    protected static int injCodeLen3;
+    protected static int injCodeMethodIdxPos3;
+    protected static int injCodeMethodIdPos3;
+
     static {
         initializeInjectedCode();
     }
@@ -143,6 +149,17 @@ class MethodEntryExitCallsInjector extends Injector implements CommonConstants {
         injCodeMethodIdxPos2 = 5;
         injCode2[7] = (byte) opc_aload_1;
         injCode2[8] = (byte) opc_athrow;
+
+        injCodeLen3 = 8;
+        injCode3 = new byte[injCodeLen3];
+        injCode3[0] = (byte) opc_dup;
+        injCode3[1] = (byte) opc_sipush;
+        // Positions 2, 3 are occupied by methodId
+        injCodeMethodIdPos3 = 2;
+        injCode3[4] = (byte) opc_invokestatic;
+        // Positions 5, 6 are occupied by method index
+        injCodeMethodIdxPos3 = 5;
+        injCode3[7] = (byte) opc_nop;
     }
 
     /**
@@ -237,14 +254,20 @@ class MethodEntryExitCallsInjector extends Injector implements CommonConstants {
     private void injectMethodExits(int totalReturns) {
         // Prepare the methodExit(char methodId) code packet
         int targetMethodIdx;
+        int targetParMethodIdx = -1;
 
         if ((injType == INJ_RECURSIVE_MARKER_METHOD) || (injType == INJ_RECURSIVE_SAMPLED_MARKER_METHOD)) {
             targetMethodIdx = CPExtensionsRepository.rootContents_MarkerExitMethodIdx + baseRootCPoolCount;
+            targetParMethodIdx = CPExtensionsRepository.rootContents_MarkerExitParMethodIdx + baseRootCPoolCount;
         } else {
             targetMethodIdx = CPExtensionsRepository.normalContents_MethodExitMethodIdx + baseCPoolCount;
         }
 
         putU2(injCode1, injCodeMethodIdxPos1, targetMethodIdx);
+        if (targetParMethodIdx != -1) {
+            putU2(injCode3, injCodeMethodIdPos3, methodId);
+            putU2(injCode3, injCodeMethodIdxPos3, targetParMethodIdx);            
+        }        
 
         for (int i = 0; i < totalReturns; i++) {
             int retIdx = -1;
@@ -257,8 +280,11 @@ class MethodEntryExitCallsInjector extends Injector implements CommonConstants {
                     retIdx++;
 
                     if (retIdx == i) {
-                        injectCodeAndRewrite(injCode1, injCodeLen1, bci, true);
-
+                        if (bc == opc_areturn && targetParMethodIdx != -1) {
+                            injectCodeAndRewrite(injCode3, injCodeLen3, bci, true);                            
+                        } else {
+                            injectCodeAndRewrite(injCode1, injCodeLen1, bci, true);
+                        }
                         break;
                     }
                 }

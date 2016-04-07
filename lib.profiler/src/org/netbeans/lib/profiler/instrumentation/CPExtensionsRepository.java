@@ -79,6 +79,7 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
     public static int miContents_AddParLongMethodIdx;
     public static int miContents_AddParObjectMethodIdx;
     public static int rootContents_MarkerExitMethodIdx;
+    public static int rootContents_MarkerExitParMethodIdx;
     public static int miContents_HandleReflectInvokeMethodIdx;
     public static int miContents_HandleServletDoMethodIdx;
     public static int codeRegionContents_CodeRegionEntryMethodIdx;
@@ -170,13 +171,15 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
         standardCPFragments[INJ_RECURSIVE_SAMPLED_ROOT_METHOD] = new PackedCPFragment(entries);
 
         // Additional constant pool contents for markerMethodEntry(char methodId) and markerMethodExit(char methodId) injection
-        entries = new CPEntry[36];
+        entries = new CPEntry[39];
         i = 0;
         int markerEntryMethodRefIdx = i;
         i = addMethod(profilerRuntimeClassRefIdx + 0x10000, MARKER_ENTRY_METHOD_NAME, charVoidSignatureIdx + 0x10000, entries, i);
         int markerExitMethodRefIdx = i;
         i = addMethod(profilerRuntimeClassRefIdx + 0x10000, MARKER_EXIT_METHOD_NAME, charVoidSignatureIdx + 0x10000, entries, i);
         
+        rootContents_MarkerExitParMethodIdx = i;        
+        i = addMethod(profilerRuntimeClassRefIdx + 0x10000, MARKER_EXIT_METHOD_NAME, OBJECT_CHAR_VOID_SIGNATURE, entries, i);
         miContents_AddParCharMethodIdx = i;
         i = addMethod(PROFRUNTIME_CPU_CLASS_NAME, ADD_PARAMETER, CHAR_VOID_SIGNATURE, entries, i);
         miContents_AddParByteMethodIdx = i;
@@ -259,6 +262,16 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
         entries[index++] = new CPEntry(CONSTANT_Methodref);
         int nameAndTypeIdx = index;
         index = addNameAndType(methodName, signatureIdx, entries, index);
+        entries[methodRef].setIndex1(classRefIdx);
+        entries[methodRef].setIndex2(nameAndTypeIdx);
+        return index;
+    }
+
+    static int addMethod(int classRefIdx, String methodName, String signature, CPEntry[] entries, int index) {
+        int methodRef = index;
+        entries[index++] = new CPEntry(CONSTANT_Methodref);
+        int nameAndTypeIdx = index;
+        index = addNameAndType(methodName, signature, entries, index);
         entries[methodRef].setIndex1(classRefIdx);
         entries[methodRef].setIndex2(nameAndTypeIdx);
         return index;

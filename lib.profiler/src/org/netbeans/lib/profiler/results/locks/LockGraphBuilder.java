@@ -320,7 +320,7 @@ public class LockGraphBuilder extends BaseCallGraphBuilder implements LockProfil
         }
 
         @Override
-        public void methodExit(int methodId, int threadId, int methodType, long timeStamp0, long timeStamp1) {
+        public void methodExit(int methodId, int threadId, int methodType, long timeStamp0, long timeStamp1, Object retVal) {
         }
 
         @Override

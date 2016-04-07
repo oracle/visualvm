@@ -92,9 +92,10 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     private Map connections;
     private Map<Select,Integer> selectsToId;
     private Map<Integer, Select> idsToSelect;
+    private Map<ThreadInfo, SQLConnection> currentObject;
+    private Map<ThreadInfo, Integer> currentSqlLevel;
     private int maxSelectId;
     private RuntimeMemoryCCTNode[] stacksForSelects; // [1- maxSelectId] selectId -> root of its allocation traces tree
-    private int sqlCallLevel;
     final private ThreadInfos threadInfos = new ThreadInfos();
     private final SQLParser sqlParser = new SQLParser();
 
@@ -180,8 +181,9 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
             threadInfos.reset();
             selectsToId.clear();
             idsToSelect.clear();
+            currentObject.clear();
+            currentSqlLevel.clear();
             maxSelectId = 0;
-            sqlCallLevel = 0;
             if (stacksForSelects != null) {
                 Arrays.fill(stacksForSelects, null);
             }
@@ -196,6 +198,8 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         connections = null;
         selectsToId = null;
         idsToSelect = null;
+        currentObject = null;
+        currentSqlLevel = null;
     }
 
     @Override
@@ -204,8 +208,9 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         connections = new HashMap();
         selectsToId = new HashMap();
         idsToSelect = new HashMap();
+        currentObject = new HashMap();
+        currentSqlLevel = new HashMap();
         maxSelectId = 0;
-        sqlCallLevel = 0;
         profilerClient.registerJdbcCCTProvider(this);
     }
 
@@ -223,7 +228,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
             if (ti == null) {
                 return;
             }
-            sqlCallLevel++;
+            int sqlCallLevel = incrementSqlLevel(ti); 
             if (JDBC_LOGGER.isLoggable(Level.FINEST)) {
                 String className = status.getInstrMethodClasses()[methodId];
                 String methodName = status.getInstrMethodNames()[methodId];
@@ -250,10 +255,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
                     String select;
 
                     if (statement == null) {
-                        statement = getNewStatement(thisClass);
-                        if (statement == null) {
-                            statement = new SQLStatement(SQL_STATEMENT_UNKNOWN);
-                        }
+                        statement = new SQLStatement(SQL_STATEMENT_UNKNOWN);
                         statements.put(thisHash, statement);
                     }
                     select = statement.invoke(status.getInstrMethodNames()[methodId], status.getInstrMethodSignatures()[methodId], parameters);
@@ -273,7 +275,9 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
                         connection = new SQLConnection();
                         connections.put(thisHash, connection);
                     }
-                    connection.invoke(status.getInstrMethodNames()[methodId], status.getInstrMethodSignatures()[methodId], parameters, statements);
+                    connection.invoke(status.getInstrMethodNames()[methodId], status.getInstrMethodSignatures()[methodId], parameters);
+                    assert currentObject.get(ti) == null;
+                    currentObject.put(ti, connection);
                 }
             }
         }
@@ -284,9 +288,8 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     }
 
     @Override
-    public void methodExit(int methodId, int threadId, int methodType, long timeStamp0, long timeStamp1) {
+    public void methodExit(int methodId, int threadId, int methodType, long timeStamp0, long timeStamp1, Object retVal) {
         if (methodType == METHODTYPE_MARKER) {
-            sqlCallLevel--;
             if (status == null || (threadInfos.threadInfos == null)) {
                 return;
             }
@@ -296,8 +299,28 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
             if (ti == null) {
                 return;
             }
+            int sqlCallLevel = decrementSqlLevel(ti);
 
             plainMethodExit(methodId, ti, timeStamp0, timeStamp1, true);
+            if (sqlCallLevel == 0) {
+                SQLConnection connection = currentObject.get(ti);
+                
+                if (connection != null) {
+                    SQLStatement st = connection.useCurrentStatement();
+
+                    if (st != null && retVal instanceof String) {
+                        String thisString = (String) retVal;
+                        int index = thisString.indexOf('@');
+                        String thisClass = thisString.substring(0, index);
+                        String thisHash = thisString.substring(index + 1);
+                        if (implementsInterface(thisClass, STATEMENT_INTERFACE)) {
+                            assert st != null;
+                            statements.put(thisHash, st);
+                        }
+                    }
+                    currentObject.remove(ti);
+                }
+            }
             batchNotEmpty = true;
         }
     }
@@ -435,16 +458,6 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
             Logger.getLogger(JdbcGraphBuilder.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
-    }
-
-    private SQLStatement getNewStatement(String thisClass) {
-        if (implementsInterface(thisClass, CALLABLE_STATEMENT_INTERFACE)) {
-            return (SQLStatement) statements.remove(SQLStatement.NEW_CALLABLE_STATEMENT);
-        }
-        if (implementsInterface(thisClass, PREPARED_STATEMENT_INTERFACE)) {
-            return (SQLStatement) statements.remove(SQLStatement.NEW_PREPARED_STATEMENT);
-        }
-        return (SQLStatement) statements.remove(SQLStatement.NEW_STATEMENT);
     }
 
     private int getSelectId(int type, String select) {
@@ -801,6 +814,27 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         }
         return new String[0];
     }
+
+    private int incrementSqlLevel(ThreadInfo ti) {
+        Integer sqlLevel = currentSqlLevel.get(ti);
+        if (sqlLevel == null) {
+            sqlLevel = Integer.valueOf(1);
+        } else {
+            sqlLevel = Integer.valueOf(sqlLevel.intValue()+1);
+        }
+        currentSqlLevel.put(ti, sqlLevel);
+        return sqlLevel.intValue();
+    }
+
+    private int decrementSqlLevel(ThreadInfo ti) {
+        Integer sqlLevel = currentSqlLevel.get(ti);
+
+        assert sqlLevel != null;
+        sqlLevel = Integer.valueOf(sqlLevel.intValue()-1);
+        currentSqlLevel.put(ti, sqlLevel);
+        return sqlLevel.intValue();
+    }
+
 
     private class JdbcCCTFlattener extends CCTFlattener {
 

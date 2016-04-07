@@ -65,7 +65,7 @@ public interface CPUProfilingResultListener extends LockProfilingResultListener 
 
     void methodEntryUnstamped(final int methodId, final int threadId, final int methodType, final List parameters, final int[] methodIds);
 
-    void methodExit(final int methodId, final int threadId, final int methodType, final long timeStamp0, final long timeStamp1);
+    void methodExit(final int methodId, final int threadId, final int methodType, final long timeStamp0, final long timeStamp1, final Object retVal);
 
     void methodExitUnstamped(final int methodId, final int threadId, final int methodType);
 

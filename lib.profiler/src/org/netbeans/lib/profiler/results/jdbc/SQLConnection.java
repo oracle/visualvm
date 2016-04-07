@@ -50,30 +50,41 @@ import java.util.Map;
  */
 class SQLConnection {
 
-    void invoke(String methodName, String methodSignature, List parameters, Map statements) {
+    SQLStatement currentStatement;
+    
+    void invoke(String methodName, String methodSignature, List parameters) {
         switch (methodName) {
             case "createStatement":
-                createStatement(statements);
+                createStatement();
                 break;
             case "prepareStatement":
-                prepareStatement(statements, (String) parameters.get(1));
+                prepareStatement((String) parameters.get(1));
                 break;
             case "prepareCall":
-                prepareCall(statements, (String) parameters.get(1));
+                prepareCall((String) parameters.get(1));
                 break;
         }
     }
 
-    void createStatement(Map statements) {
-        statements.put(SQLStatement.NEW_STATEMENT, new SQLStatement(JdbcCCTProvider.SQL_STATEMENT));
+    void createStatement() {
+        assert currentStatement == null;
+        currentStatement = new SQLStatement(JdbcCCTProvider.SQL_STATEMENT);
     }
 
-    void prepareStatement(Map statements, String sql) {
-        statements.put(SQLStatement.NEW_PREPARED_STATEMENT, new SQLStatement(JdbcCCTProvider.SQL_PREPARED_STATEMENT, sql));
+    void prepareStatement(String sql) {
+         assert currentStatement == null;
+       currentStatement = new SQLStatement(JdbcCCTProvider.SQL_PREPARED_STATEMENT, sql);
     }
 
-    void prepareCall(Map statements, String sql) {
-        statements.put(SQLStatement.NEW_CALLABLE_STATEMENT, new SQLStatement(JdbcCCTProvider.SQL_CALLABLE_STATEMENT, sql));
+    void prepareCall(String sql) {
+        assert currentStatement == null;
+        currentStatement = new SQLStatement(JdbcCCTProvider.SQL_CALLABLE_STATEMENT, sql);
+    }
+
+    SQLStatement useCurrentStatement() {
+        SQLStatement st = currentStatement;
+        currentStatement = null;
+        return st;
     }
 
 }
