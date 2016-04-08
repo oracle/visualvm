@@ -44,6 +44,7 @@ package org.netbeans.lib.profiler.ui.results;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
+import java.util.Objects;
 import javax.swing.Icon;
 
 /**
@@ -131,7 +132,7 @@ public final class PackageColor {
         final PackageColor other = (PackageColor)obj;
         if (!name.equals(other.name)) return false;
         if (!value.equals(other.value)) return false;
-        if (!color.equals(other.color)) return false;
+        if (!Objects.equals(color, other.color)) return false;
 
         return true;
     }
@@ -140,7 +141,7 @@ public final class PackageColor {
         int hash = 3;
         hash = 67 * hash + name.hashCode();
         hash = 67 * hash + value.hashCode();
-        hash = 67 * hash + color.hashCode();
+        hash = 67 * hash + (color == null ? 0 : color.hashCode());
         return hash;
     }
     
