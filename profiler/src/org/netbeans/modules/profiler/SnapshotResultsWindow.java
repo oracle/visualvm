@@ -65,6 +65,7 @@ import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
+import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.cpu.SnapshotCPUView;
 import org.netbeans.lib.profiler.ui.jdbc.SnapshotJDBCView;
 import org.netbeans.lib.profiler.ui.memory.SnapshotMemoryView;
@@ -80,6 +81,8 @@ import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.spi.actions.AbstractSavable;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
@@ -106,7 +109,9 @@ import org.openide.util.lookup.ServiceProvider;
     "SnapshotResultsWindow_FragmentSnapshotAccessDescr=Profiler snapshot with code fragment results",
     "SnapshotResultsWindow_MemorySnapshotAccessDescr=Profiler snapshot with memory results",
     "SnapshotResultsWindow_ProfileClass=Profile Class",
-    "SnapshotResultsWindow_ProfileMethod=Profile Method"
+    "SnapshotResultsWindow_ProfileMethod=Profile Method",
+    "SnapshotResultsWindow_SqlQueryCaption=SQL Query Viewer",
+    "SnapshotResultsWindow_SqlQueryLabel=SQL Query:"
 })
 public final class SnapshotResultsWindow extends ProfilerTopComponent {
     //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
@@ -633,6 +638,23 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                     String methodName = value.getMethodName();
                     String methodSig = value.getMethodSignature();
                     GoToSource.openSource(project, className, methodName, methodSig);
+                }
+                protected void showSQLQuery(String query, String htmlQuery) {
+                    HTMLTextArea area = new HTMLTextArea(htmlQuery);
+                    JScrollPane areaScroll = new JScrollPane(area);
+                    areaScroll.setPreferredSize(new Dimension(500, 250));
+                    JLabel label = new JLabel(Bundle.SnapshotResultsWindow_SqlQueryLabel(), JLabel.LEADING);
+                    label.setBorder(BorderFactory.createEmptyBorder(0, 0, 3, 0));
+                    label.setLabelFor(area);
+                    JPanel panel = new JPanel(new BorderLayout());
+                    panel.add(label, BorderLayout.NORTH);
+                    panel.add(areaScroll, BorderLayout.CENTER);
+                    panel.setBorder(BorderFactory.createEmptyBorder(12, 10, 0, 10));
+                    HelpCtx help = new HelpCtx("SqlQueryViewer.HelpCtx"); // NOI18N
+                    DialogDisplayer.getDefault().notify(new DialogDescriptor(panel,
+                            Bundle.SnapshotResultsWindow_SqlQueryCaption(), false,
+                            new Object[] { DialogDescriptor.CLOSED_OPTION },
+                            DialogDescriptor.CLOSED_OPTION, DialogDescriptor.BOTTOM_ALIGN, help, null));
                 }
                 protected void selectForProfiling(final ClientUtils.SourceCodeSelection value) {
                     RequestProcessor.getDefault().post(new Runnable() {

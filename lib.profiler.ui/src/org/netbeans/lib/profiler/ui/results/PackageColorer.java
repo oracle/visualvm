@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2016 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.ui.swing.renderer;
+package org.netbeans.lib.profiler.ui.results;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -49,31 +49,57 @@ import java.util.List;
  *
  * @author Jiri Sedlacek
  */
-final class JavaNameColorer {
+public final class PackageColorer {
     
-    // TODO: will be replaced by customizable filters definition
-    private static final List<String> JAVA_REFLECTION = new ArrayList();
-    private static final Color JAVA_REFLECTION_COLOR = new Color(180, 180, 180);
+    private static final List<PackageColor> COLORS = initColors();
     
-    private static final List<String> EE_FRAMEWORKS = new ArrayList();
-    private static final Color EE_FRAMEWORKS_COLOR = new Color(135, 135, 135);
     
-    static {
-        JAVA_REFLECTION.add("java.lang.reflect.");
-        JAVA_REFLECTION.add("sun.reflect.");
-        JAVA_REFLECTION.add("com.sun.proxy.");
-        
-        EE_FRAMEWORKS.add("javax.servlet.");
-        EE_FRAMEWORKS.add("org.apache.catalina.");
-        EE_FRAMEWORKS.add("org.springframework.");
-        EE_FRAMEWORKS.add("org.eclipse.persistence.");
+    public static boolean registerColor(PackageColor color) {
+        if (COLORS.contains(color)) return false;
+        else return COLORS.add(color);
     }
     
-    static Color getForeground(String name) {
-        for (String s : JAVA_REFLECTION) if (name.startsWith(s)) return JAVA_REFLECTION_COLOR;
-        for (String s : EE_FRAMEWORKS) if (name.startsWith(s)) return EE_FRAMEWORKS_COLOR;
+    public static boolean unregisterColor(PackageColor color) {
+        return COLORS.remove(color);
+    }
+    
+    public static boolean hasRegisteredColors() {
+        return !COLORS.isEmpty();
+    }
+    
+    public static List<PackageColor> getRegisteredColors() {
+        List<PackageColor> colors = new ArrayList();
+        for (PackageColor color : COLORS) colors.add(new PackageColor(color));
+        return colors;
+    }
+    
+    public static void setRegisteredColors(List<PackageColor> colors) {
+        COLORS.clear();
+        COLORS.addAll(colors);
+    }
+    
+    
+    public static Color getForeground(String pkg) {
+        for (PackageColor color : COLORS)
+            for (String value : color.getValues())
+                if (pkg.startsWith(value))
+                    return color.getColor();
         
         return null;
+    }
+    
+    
+    // TODO: implement persistent storage
+    private static List<PackageColor> initColors() {
+        List<PackageColor> colors = new ArrayList();
+        
+        String reflection = new String("java.lang.reflect., sun.reflect., com.sun.proxy.");
+        colors.add(new PackageColor("Java Reflection", reflection, new Color(180, 180, 180)));
+        
+        String javaee = new String("javax.servlet., org.apache.catalina., org.springframework., org.eclipse.persistence.");
+        colors.add(new PackageColor("Java EE Frameworks", javaee, new Color(135, 135, 135)));
+        
+        return colors;
     }
     
 }

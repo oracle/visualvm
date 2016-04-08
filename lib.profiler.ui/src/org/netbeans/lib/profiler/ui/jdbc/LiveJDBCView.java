@@ -62,9 +62,11 @@ import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
 import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
+import static org.netbeans.lib.profiler.ui.jdbc.JDBCTreeTableView.isSQL;
 import org.netbeans.lib.profiler.ui.memory.LiveMemoryView;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.openide.util.Lookup;
@@ -241,6 +243,8 @@ public abstract class LiveJDBCView extends JPanel {
     
     protected abstract void showSource(ClientUtils.SourceCodeSelection value);
     
+    protected abstract void showSQLQuery(String query, String htmlQuery);
+    
     protected abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
     
     protected void popupShowing() {};
@@ -269,6 +273,21 @@ public abstract class LiveJDBCView extends JPanel {
         setLayout(new BorderLayout(0, 0));
         
         jdbcCallsView = new JDBCTreeTableView(selection, false) {
+            protected void installDefaultAction() {
+                getResultsComponent().setDefaultAction(new AbstractAction() {
+                    public void actionPerformed(ActionEvent e) {
+                        ProfilerTable t = getResultsComponent();
+                        int row = t.getSelectedRow();
+                        PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)t.getValueForRow(row);
+                        if (isSQL(node)) {
+                            showQueryImpl(node);
+                        } else {
+                            ClientUtils.SourceCodeSelection userValue = getUserValueForRow(row);
+                            if (userValue != null) performDefaultAction(userValue);
+                        }
+                    }
+                });
+            }
             protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
                 if (showSourceSupported()) showSource(userValue);
             }
@@ -339,8 +358,19 @@ public abstract class LiveJDBCView extends JPanel {
         return lastFocused;
     }
     
+    private void showQueryImpl(PresoObjAllocCCTNode node) {
+        showSQLQuery(node.getNodeName(), ((JDBCTreeTableView.SQLQueryNode)node).htmlName);
+    }
+    
     private void populatePopup(final DataView invoker, JPopupMenu popup, final Object value, final ClientUtils.SourceCodeSelection userValue) {
-        if (showSourceSupported()) {
+        final PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)value;
+        if (JDBCTreeTableView.isSQL(node)) {
+            popup.add(new JMenuItem(JDBCView.ACTION_VIEWSQLQUERY) {
+                { setFont(getFont().deriveFont(Font.BOLD)); }
+                protected void fireActionPerformed(ActionEvent e) { showQueryImpl((JDBCTreeTableView.SQLQueryNode)value); }
+            });
+            popup.addSeparator();
+        } else if (showSourceSupported()) {
             popup.add(new JMenuItem(JDBCView.ACTION_GOTOSOURCE) {
                 { setEnabled(userValue != null); setFont(getFont().deriveFont(Font.BOLD)); }
                 protected void fireActionPerformed(ActionEvent e) { showSource(userValue); }
@@ -349,7 +379,7 @@ public abstract class LiveJDBCView extends JPanel {
         }
         
         popup.add(new JMenuItem(JDBCView.ACTION_PROFILE_METHOD) {
-            { setEnabled(userValue != null && JDBCTreeTableView.isSelectable((PresoObjAllocCCTNode)value)); }
+            { setEnabled(userValue != null && JDBCTreeTableView.isSelectable(node)); }
             protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
         });
         

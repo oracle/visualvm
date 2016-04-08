@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.ui.swing.renderer;
 
 import javax.swing.Icon;
+import org.netbeans.lib.profiler.ui.results.PackageColorer;
 
 /**
  *
@@ -88,7 +89,7 @@ public class JavaNameRenderer extends NormalBoldGrayRenderer {
     // TODO: optimize to not slow down sort/search/filter by resolving color!
     protected void setNormalValue(String value) {
         super.setNormalValue(value);
-        setCustomForeground(JavaNameColorer.getForeground(value));
+        setCustomForeground(PackageColorer.getForeground(value));
     }
     
 }

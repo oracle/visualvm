@@ -62,6 +62,7 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 
@@ -74,14 +75,14 @@ public abstract class SnapshotJDBCView extends JPanel {
     // -----
     // I18N String constants
     private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.cpu.Bundle"); // NOI18N
-    private static final String TOOLBAR_VIEW = messages.getString("SnapshotCPUView_ToolbarView"); // NOI18N
-    private static final String VIEW_FORWARD = messages.getString("SnapshotCPUView_ViewForward"); // NOI18N
-    private static final String VIEW_HOTSPOTS = messages.getString("SnapshotCPUView_ViewHotSpots"); // NOI18N
-    private static final String VIEW_REVERSE = messages.getString("SnapshotCPUView_ViewReverse"); // NOI18N
-    private static final String TOOLBAR_AGGREGATION = messages.getString("SnapshotCPUView_ToolbarAggregation"); // NOI18N
-    private static final String AGGREGATION_METHODS = messages.getString("SnapshotCPUView_AggregationMethods"); // NOI18N
-    private static final String AGGREGATION_CLASSES = messages.getString("SnapshotCPUView_AggregationClasses"); // NOI18N
-    private static final String AGGREGATION_PACKAGES = messages.getString("SnapshotCPUView_AggregationPackages"); // NOI18N
+//    private static final String TOOLBAR_VIEW = messages.getString("SnapshotCPUView_ToolbarView"); // NOI18N
+//    private static final String VIEW_FORWARD = messages.getString("SnapshotCPUView_ViewForward"); // NOI18N
+//    private static final String VIEW_HOTSPOTS = messages.getString("SnapshotCPUView_ViewHotSpots"); // NOI18N
+//    private static final String VIEW_REVERSE = messages.getString("SnapshotCPUView_ViewReverse"); // NOI18N
+//    private static final String TOOLBAR_AGGREGATION = messages.getString("SnapshotCPUView_ToolbarAggregation"); // NOI18N
+//    private static final String AGGREGATION_METHODS = messages.getString("SnapshotCPUView_AggregationMethods"); // NOI18N
+//    private static final String AGGREGATION_CLASSES = messages.getString("SnapshotCPUView_AggregationClasses"); // NOI18N
+//    private static final String AGGREGATION_PACKAGES = messages.getString("SnapshotCPUView_AggregationPackages"); // NOI18N
     private static final String COMPARE_SNAPSHOTS = messages.getString("SnapshotCPUView_CompareSnapshots"); // NOI18N
     private static final String RESET_COMPARE_SNAPSHOTS = messages.getString("SnapshotCPUView_ResetCompareSnapshots"); // NOI18N
     // -----
@@ -128,6 +129,8 @@ public abstract class SnapshotJDBCView extends JPanel {
     
     protected abstract void showSource(ClientUtils.SourceCodeSelection value);
     
+    protected abstract void showSQLQuery(String query, String htmlQuery);
+    
     protected abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
     
     
@@ -156,6 +159,21 @@ public abstract class SnapshotJDBCView extends JPanel {
         setLayout(new BorderLayout(0, 0));
         
         forwardCallsView = new JDBCTreeTableView(null, false) {
+            protected void installDefaultAction() {
+                getResultsComponent().setDefaultAction(new AbstractAction() {
+                    public void actionPerformed(ActionEvent e) {
+                        ProfilerTable t = getResultsComponent();
+                        int row = t.getSelectedRow();
+                        PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)t.getValueForRow(row);
+                        if (isSQL(node)) {
+                            showQueryImpl(node);
+                        } else {
+                            ClientUtils.SourceCodeSelection userValue = getUserValueForRow(row);
+                            if (userValue != null) performDefaultAction(userValue);
+                        }
+                    }
+                });
+            }
             protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
                 if (showSourceSupported()) showSource(value);
             }
@@ -405,8 +423,19 @@ public abstract class SnapshotJDBCView extends JPanel {
         return lastFocused;
     }
     
+    private void showQueryImpl(PresoObjAllocCCTNode node) {
+        showSQLQuery(node.getNodeName(), ((JDBCTreeTableView.SQLQueryNode)node).htmlName);
+    }
+    
     private void populatePopup(final DataView invoker, JPopupMenu popup, final Object value, final ClientUtils.SourceCodeSelection userValue) {
-        if (showSourceSupported()) {
+        final PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)value;
+        if (JDBCTreeTableView.isSQL(node)) {
+            popup.add(new JMenuItem(JDBCView.ACTION_VIEWSQLQUERY) {
+                { setFont(getFont().deriveFont(Font.BOLD)); }
+                protected void fireActionPerformed(ActionEvent e) { showQueryImpl((JDBCTreeTableView.SQLQueryNode)value); }
+            });
+            popup.addSeparator();
+        } else if (showSourceSupported()) {
             popup.add(new JMenuItem(JDBCView.ACTION_GOTOSOURCE) {
                 { setEnabled(userValue != null); setFont(getFont().deriveFont(Font.BOLD)); }
                 protected void fireActionPerformed(ActionEvent e) { showSource(userValue); }
@@ -415,7 +444,7 @@ public abstract class SnapshotJDBCView extends JPanel {
         }
         
         popup.add(new JMenuItem(JDBCView.ACTION_PROFILE_METHOD) {
-            { setEnabled(userValue != null && JDBCTreeTableView.isSelectable((PresoObjAllocCCTNode)value)); }
+            { setEnabled(userValue != null && JDBCTreeTableView.isSelectable(node)); }
             protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
         });
         

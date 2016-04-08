@@ -72,6 +72,8 @@ import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.CloseButton;
+import org.netbeans.lib.profiler.ui.results.PackageColor;
+import org.netbeans.lib.profiler.ui.results.PackageColorer;
 import org.netbeans.modules.profiler.api.ActionsSupport;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
@@ -120,7 +122,7 @@ public final class FilterUtils {
         final int mainColumn = table.getMainColumn();
         
         if (text != null && !matchCase) text = text.toLowerCase();
-        final String[] texts = text == null || text.isEmpty() ? new String[0] : text.split(" +"); // NOI18N
+        final String[] texts = text == null || text.isEmpty() ? new String[0] : text.replace(',', ' ').split(" +"); // NOI18N
         Filter filter = new Filter() {
             public boolean include(RowFilter.Entry entry) {
                 if (texts.length == 0) return true;
@@ -197,6 +199,36 @@ public final class FilterUtils {
         comboContainer.setMaximumSize(combo.getMaximumSize());
         
         toolbar.add(comboContainer);
+        
+        if (PackageColorer.hasRegisteredColors()) {
+            toolbar.add(new PopupButton() {
+                {
+                    setToolTipText("Insert Defined Filter");
+                }
+//                protected void displayPopup() {
+//                    JPopupMenu menu = new JPopupMenu();
+//                    populatePopup(menu);
+//                    if (menu.getComponentCount() > 0) {
+//                        Dimension size = menu.getPreferredSize();
+//                        size.width = Math.max(size.width, getWidth());
+//                        menu.setPreferredSize(size);
+//                        menu.show(this, 0, -size.height);
+//                    }
+//                }
+                protected void populatePopup(JPopupMenu popup) {
+                    for (final PackageColor color : PackageColorer.getRegisteredColors())
+                        popup.add(new JMenuItem(color.getName(), color.getIcon(12, 12)) {
+                            protected void fireActionPerformed(ActionEvent event) {
+                                String current = getFilterString(combo);
+                                if (current == null) current = ""; // NOI18N
+                                if (!current.isEmpty()) current += " ";
+                                current += color.getValue();
+                                textC.setText(current);
+                            }
+                        });
+                }
+            });
+        }
         
         toolbar.add(Box.createHorizontalStrut(5));
         

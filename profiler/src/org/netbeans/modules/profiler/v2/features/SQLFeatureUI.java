@@ -43,17 +43,22 @@
 
 package org.netbeans.modules.profiler.v2.features;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
+import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.jdbc.LiveJDBCView;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
@@ -63,6 +68,9 @@ import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
+import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -75,6 +83,8 @@ import org.openide.util.NbBundle;
 //    "LocksFeatureUI_aggregationByThreads=Threads",
 //    "LocksFeatureUI_aggregationByMonitors=Monitors",
 //    "LocksFeatureUI_aggregationHint=Results aggregation"
+    "LocksFeatureUI_SqlQueryCaption=SQL Query Viewer",
+    "LocksFeatureUI_SqlQueryLabel=SQL Query:"
 })
 abstract class SQLFeatureUI extends FeatureUI {
     
@@ -170,6 +180,23 @@ abstract class SQLFeatureUI extends FeatureUI {
                 String methodSig = value.getMethodSignature();
                 GoToSource.openSource(project, className, methodName, methodSig);
             }
+            protected void showSQLQuery(String query, String htmlQuery) {
+                    HTMLTextArea area = new HTMLTextArea(htmlQuery);
+                    JScrollPane areaScroll = new JScrollPane(area);
+                    areaScroll.setPreferredSize(new Dimension(500, 250));
+                    JLabel label = new JLabel(Bundle.LocksFeatureUI_SqlQueryLabel(), JLabel.LEADING);
+                    label.setBorder(BorderFactory.createEmptyBorder(0, 0, 3, 0));
+                    label.setLabelFor(area);
+                    JPanel panel = new JPanel(new BorderLayout());
+                    panel.add(label, BorderLayout.NORTH);
+                    panel.add(areaScroll, BorderLayout.CENTER);
+                    panel.setBorder(BorderFactory.createEmptyBorder(12, 10, 0, 10));
+                    HelpCtx help = new HelpCtx("SqlQueryViewer.HelpCtx"); // NOI18N
+                    DialogDisplayer.getDefault().notify(new DialogDescriptor(panel,
+                            Bundle.LocksFeatureUI_SqlQueryCaption(), false,
+                            new Object[] { DialogDescriptor.CLOSED_OPTION },
+                            DialogDescriptor.CLOSED_OPTION, DialogDescriptor.BOTTOM_ALIGN, help, null));
+                }
             protected void selectForProfiling(ClientUtils.SourceCodeSelection value) {
                 SQLFeatureUI.this.selectForProfiling(value);
             }

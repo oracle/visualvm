@@ -63,6 +63,10 @@ public abstract class JDBCView extends DataView {
     static final String TOTAL_TIME_COLUMN_TOOLTIP = messages.getString("JDBCView_TimeColumnToolTip"); // NOI18N
     static final String INVOCATIONS_COLUMN_TOOLTIP = messages.getString("JDBCView_InvocationsColumnToolTip"); // NOI18N
     
+    static final String OTHER_COMMAND = messages.getString("JDBCView_OtherCommand"); // NOI18N
+    
+    static final String ACTION_VIEWSQLQUERY = messages.getString("JDBCView_ActionViewSqlQuery"); // NOI18N
+    
     
     static final String EXPORT_TOOLTIP = messages.getString("CPUView_ExportTooltip"); // NOI18N
     static final String EXPORT_METHODS = messages.getString("CPUView_ExportMethods"); // NOI18N
@@ -104,7 +108,7 @@ public abstract class JDBCView extends DataView {
             case JdbcCCTProvider.SQL_COMMAND_SET: return "SET"; // NOI18N
             case JdbcCCTProvider.SQL_COMMAND_UPDATE: return "UPDATE"; // NOI18N
             case JdbcCCTProvider.SQL_COMMAND_BATCH: return "BATCH"; // NOI18N
-            default: return "other command";
+            default: return OTHER_COMMAND;
         }
     }
     
