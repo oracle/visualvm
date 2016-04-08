@@ -158,6 +158,10 @@ public class DropdownButton extends JPanel {
         });
     }
     
+    public boolean requestFocusInWindow() {
+        return popup.isFocusable() ? popup.requestFocusInWindow() :
+                                     button.requestFocusInWindow();
+    }
     
     public void setEnabled(boolean enabled) {
         if (button != null) {
