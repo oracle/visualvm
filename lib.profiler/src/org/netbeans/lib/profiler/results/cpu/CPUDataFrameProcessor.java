@@ -44,12 +44,16 @@
 package org.netbeans.lib.profiler.results.cpu;
 
 import java.nio.ByteBuffer;
-import org.netbeans.lib.profiler.ProfilerClient;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.ProfilingResultListener;
 import org.netbeans.lib.profiler.results.locks.AbstractLockDataFrameProcessor;
-import java.util.logging.Level;
 
+import static org.netbeans.lib.profiler.utils.VMUtils.*;
 
 /**
  * This class main purpose is to parse a chunk of CPU related data received from
@@ -60,7 +64,7 @@ import java.util.logging.Level;
 public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
 
     private boolean hasMonitorInfo;
-
+    private Map methodParameters = new HashMap(); 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public void doProcessDataFrame(ByteBuffer buffer) {
@@ -78,7 +82,7 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                                                 CPUProfilingResultListener.METHODTYPE_NORMAL);
                     } else {
                         fireMethodEntryUnstamped(charEvent & CommonConstants.COMPACT_EVENT_METHOD_ID_MASK, currentThreadId,
-                                                 CPUProfilingResultListener.METHODTYPE_NORMAL);
+                                                 CPUProfilingResultListener.METHODTYPE_NORMAL, null, null);
                     }
 
                     continue;
@@ -86,7 +90,8 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
 
                 if (!((eventType == CommonConstants.BUFFEREVENT_PROFILEPOINT_HIT) || (eventType == CommonConstants.SERVLET_DO_METHOD)
                         || (eventType == CommonConstants.SET_FOLLOWING_EVENTS_THREAD) || (eventType == CommonConstants.NEW_THREAD)
-                        || (eventType == CommonConstants.RESET_COLLECTORS) || (eventType == CommonConstants.NEW_MONITOR))) {
+                        || (eventType == CommonConstants.RESET_COLLECTORS) || (eventType == CommonConstants.NEW_MONITOR)
+                        || (eventType == CommonConstants.MARKER_ENTRY_PARAMETERS))) {
                     int methodId = -1;
                     long timeStamp0 = 0;
                     long timeStamp1 = 0;
@@ -132,12 +137,13 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
 
                     switch (eventType) {
                         case CommonConstants.MARKER_ENTRY_UNSTAMPED: {
+                            List parameters = (List) methodParameters.get(Integer.valueOf(currentThreadId));
                             if (LOGGER.isLoggable(Level.FINEST)) {
-                                LOGGER.log(Level.FINEST, "Marker entry unstamped, tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                                LOGGER.log(Level.FINEST, "Marker entry unstamped, tId={0}, mId={1}, pars={2}", new Object[]{currentThreadId, methodId, parameters.toString()}); // NOI18N
                             }
 
-                            fireMethodEntryUnstamped(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER);
-
+                            fireMethodEntryUnstamped(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER, parameters, null);
+                            methodParameters.remove(Integer.valueOf(currentThreadId));
                             break;
                         }
                         case CommonConstants.METHOD_ENTRY_UNSTAMPED: {
@@ -145,7 +151,7 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                                 LOGGER.log(Level.FINEST, "Method entry unstamped, tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
                             }
 
-                            fireMethodEntryUnstamped(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_NORMAL);
+                            fireMethodEntryUnstamped(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_NORMAL, null, null);
 
                             break;
                         }
@@ -168,13 +174,21 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                             break;
                         }
                         case CommonConstants.MARKER_ENTRY: {
+                            List parameters = (List) methodParameters.get(Integer.valueOf(currentThreadId));
+                            int depth = getDepth(buffer);
+                            int[] methodIds = new int[depth];
+
                             if (LOGGER.isLoggable(Level.FINEST)) {
-                                LOGGER.log(Level.FINEST, "Marker entry , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                                LOGGER.log(Level.FINEST, "Marker entry , tId={0}, mId={1}, pars={2} depth={3}", new Object[]{currentThreadId, methodId, parameters.toString(), depth}); // NOI18N
+                            }
+
+                            for (int i = 0; i < depth; i++) {
+                                methodIds[i] = buffer.getInt();
                             }
 
                             fireMethodEntry(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER, timeStamp0,
-                                            timeStamp1);
-
+                                            timeStamp1, parameters, methodIds);
+                            methodParameters.remove(Integer.valueOf(currentThreadId));                            
                             break;
                         }
                         case CommonConstants.ROOT_ENTRY: {
@@ -198,13 +212,20 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                             break;
                         }
                         case CommonConstants.MARKER_EXIT: {
+                            List parameters = (List) methodParameters.get(Integer.valueOf(currentThreadId));
+                            Object retVal = parameters == null ? null : parameters.get(0);
+                            
                             if (LOGGER.isLoggable(Level.FINEST)) {
-                                LOGGER.log(Level.FINEST, "Marker exit , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                                if (retVal != null) {
+                                    LOGGER.log(Level.FINEST, "Marker exit , tId={0}, mId={1}, retVal={2}", new Object[]{currentThreadId, methodId, retVal}); // NOI18N                                    
+                                } else {
+                                    LOGGER.log(Level.FINEST, "Marker exit , tId={0}, mId={1}", new Object[]{currentThreadId, methodId}); // NOI18N
+                                }
                             }
 
                             fireMethodExit(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_MARKER, timeStamp0,
-                                           timeStamp1);
-
+                                           timeStamp1, retVal);
+                            methodParameters.remove(Integer.valueOf(currentThreadId));
                             break;
                         }
                         case CommonConstants.ROOT_EXIT: {
@@ -213,7 +234,7 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                             }
 
                             fireMethodExit(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_ROOT, timeStamp0,
-                                           timeStamp1);
+                                           timeStamp1, null);
 
                             break;
                         }
@@ -223,7 +244,7 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                             }
 
                             fireMethodExit(methodId, currentThreadId, CPUProfilingResultListener.METHODTYPE_NORMAL, timeStamp0,
-                                           timeStamp1);
+                                           timeStamp1, null);
 
                             break;
                         }
@@ -399,6 +420,20 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
 
                             break;
                         }
+                        case CommonConstants.MARKER_ENTRY_PARAMETERS: {
+                            if (LOGGER.isLoggable(Level.FINEST)) {
+                                LOGGER.log(Level.FINEST, "Marker method parameters , tId={0}", currentThreadId); // NOI18N
+                            }
+                            
+                            List parameters = new ArrayList();
+                            int pars = buffer.get();
+                            
+                            for (int i = 0; i < pars; i++) {
+                                parameters.add(readParameter(buffer));
+                            }
+                            methodParameters.put(Integer.valueOf(currentThreadId), parameters);
+                            break;
+                        }
                         case CommonConstants.RESET_COLLECTORS: {
                             if (LOGGER.isLoggable(Level.FINEST)) {
                                 LOGGER.finest("Profiling data reset"); // NOI18N
@@ -437,29 +472,72 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
             throw aioobe;
         }
     }
+    
+    private Object readParameter(ByteBuffer buffer) {
+        char type = (char) buffer.get();
+        switch (type) {
+            case BOOLEAN: {
+                byte val = buffer.get();
+                if (val == 0) {
+                    return Boolean.FALSE;
+                }
+                if (val == 1) {
+                    return Boolean.TRUE;
+                }
+                throw new IllegalArgumentException(Byte.toString(val));
+            }
+            case CHAR:
+                return Character.valueOf(buffer.getChar());
+            case BYTE:
+                return Byte.valueOf(buffer.get());
+            case SHORT:
+                return Short.valueOf(buffer.getShort());
+            case INT:
+                return Integer.valueOf(buffer.getInt());
+            case LONG:
+                return Long.valueOf(buffer.getLong());
+            case FLOAT:
+                return Float.valueOf(Float.intBitsToFloat(buffer.getInt()));
+            case DOUBLE:
+                return Double.valueOf(Double.longBitsToDouble(buffer.getLong()));
+            case REFERENCE:
+                int lengthChars = buffer.getShort()/2;
+                StringBuilder string = new StringBuilder(lengthChars);
+                for (int i = 0; i < lengthChars; i++) {
+                    string.append(buffer.getChar());
+                }
+                return string.toString();
+        }
+        throw new IllegalArgumentException(Integer.toString(type));
+    }
 
     private void fireMethodEntry(final int methodId, final int threadId, final int methodType, final long timeStamp0,
                                  final long timeStamp1) {
+        fireMethodEntry(methodId, threadId, methodType, timeStamp0, timeStamp1, null, null);
+    }
+
+    private void fireMethodEntry(final int methodId, final int threadId, final int methodType, final long timeStamp0,
+                                 final long timeStamp1, final List parameters, final int[] methodIds) {
         foreachListener(new ListenerFunctor() {
                 public void execute(ProfilingResultListener listener) {
-                    ((CPUProfilingResultListener) listener).methodEntry(methodId, threadId, methodType, timeStamp0, timeStamp1);
+                    ((CPUProfilingResultListener) listener).methodEntry(methodId, threadId, methodType, timeStamp0, timeStamp1, parameters, methodIds);
                 }
             });
     }
 
-    private void fireMethodEntryUnstamped(final int methodId, final int threadId, final int methodType) {
+    private void fireMethodEntryUnstamped(final int methodId, final int threadId, final int methodType, final List parameters, final int[] methodIds) {
         foreachListener(new ListenerFunctor() {
                 public void execute(ProfilingResultListener listener) {
-                    ((CPUProfilingResultListener) listener).methodEntryUnstamped(methodId, threadId, methodType);
+                    ((CPUProfilingResultListener) listener).methodEntryUnstamped(methodId, threadId, methodType, parameters, methodIds);
                 }
             });
     }
 
     private void fireMethodExit(final int methodId, final int threadId, final int methodType, final long timeStamp0,
-                                final long timeStamp1) {
+                                final long timeStamp1, final Object retVal) {
         foreachListener(new ListenerFunctor() {
                 public void execute(ProfilingResultListener listener) {
-                    ((CPUProfilingResultListener) listener).methodExit(methodId, threadId, methodType, timeStamp0, timeStamp1);
+                    ((CPUProfilingResultListener) listener).methodExit(methodId, threadId, methodType, timeStamp0, timeStamp1, retVal);
                 }
             });
     }
@@ -542,5 +620,11 @@ public class CPUDataFrameProcessor extends AbstractLockDataFrameProcessor {
                     ((CPUProfilingResultListener) listener).parkExit(threadId, timeStamp0, timeStamp1);
                 }
             });
+    }
+
+    private static int getDepth(ByteBuffer buffer) {
+        int depth = ((((int) buffer.get()) & 0xFF) << 16) | ((((int) buffer.get()) & 0xFF) << 8)
+                    | (((int) buffer.get()) & 0xFF);
+        return depth;
     }
 }

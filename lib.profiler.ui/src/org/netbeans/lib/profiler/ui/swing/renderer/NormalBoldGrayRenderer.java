@@ -45,7 +45,9 @@ package org.netbeans.lib.profiler.ui.swing.renderer;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.Objects;
 import javax.swing.Icon;
+import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 
@@ -55,26 +57,45 @@ import org.netbeans.lib.profiler.ui.UIUtils;
  */
 public class NormalBoldGrayRenderer extends MultiRenderer {
     
+    private static final Color REPLACEABLE_FOREGROUND = new JTable().getForeground();
+    
     private final LabelRenderer normalRenderer;
     private final LabelRenderer boldRenderer;
     private final LabelRenderer grayRenderer;
     
     private final ProfilerRenderer[] renderers;
     
+    private Color customForeground;
+    private Color replaceableForeground = REPLACEABLE_FOREGROUND;
+    
     
     public NormalBoldGrayRenderer() {
-        normalRenderer = new LabelRenderer(true);
+        normalRenderer = new LabelRenderer(true) {
+            public void setForeground(Color foreground) {
+                if (customForeground != null && Objects.equals(foreground, replaceableForeground)) foreground = customForeground;
+                super.setForeground(foreground);
+            }
+        };
         normalRenderer.setMargin(3, 3, 3, 0);
         
-        boldRenderer = new LabelRenderer(true);
+        boldRenderer = new LabelRenderer(true) {
+            public void setForeground(Color foreground) {
+                if (customForeground != null && Objects.equals(foreground, replaceableForeground)) foreground = customForeground;
+                super.setForeground(foreground);
+            }
+        };
         boldRenderer.setMargin(3, 0, 3, 0);
         Font font = boldRenderer.getFont();
         boldRenderer.setFont(font.deriveFont(Font.BOLD));
         
         grayRenderer = new LabelRenderer(true) {
             public void setForeground(Color foreground) {
-                if (foreground == null) foreground = Color.BLACK;
-                super.setForeground(UIUtils.getDisabledForeground(foreground));
+                if (Objects.equals(foreground, replaceableForeground)) {
+                    if (customForeground != null) super.setForeground(customForeground);
+                    else super.setForeground(UIUtils.getDisabledForeground(foreground == null ? Color.BLACK : foreground));
+                } else {
+                    super.setForeground(foreground);
+                }
             }
         };
         grayRenderer.setMargin(3, 0, 3, 3);
@@ -83,6 +104,15 @@ public class NormalBoldGrayRenderer extends MultiRenderer {
         
         setOpaque(true);
         setHorizontalAlignment(SwingConstants.LEADING);
+    }
+    
+    
+    protected void setCustomForeground(Color foreground) {
+        customForeground = foreground;
+    }
+    
+    public void setReplaceableForeground(Color foreground) {
+        replaceableForeground = foreground;
     }
 
     
