@@ -83,6 +83,7 @@ public class ProfilingSettings {
     public static final int PROFILE_CPU_STOPWATCH = 32; // cpu: code fragment
     public static final int PROFILE_CPU_SAMPLING = 64; // cpu: sampled profiling
     public static final int PROFILE_MEMORY_SAMPLING = 128; // memory: sampling 
+    public static final int PROFILE_CPU_JDBC = 256; // special type of cpu profiling (uses marker methods) 
     public static final boolean QUICK_FILTER_INCLUSIVE = true;
     public static final boolean QUICK_FILTER_EXCLUSIVE = false;
     public static final String LINES_PREFIX = "[lines]"; //NOI18N
@@ -199,7 +200,8 @@ public class ProfilingSettings {
 
     public static boolean isCPUSettings(int type) {
         return (type == ProfilingSettings.PROFILE_CPU_ENTIRE) || (type == ProfilingSettings.PROFILE_CPU_PART)
-               || (type == ProfilingSettings.PROFILE_CPU_STOPWATCH || type == PROFILE_CPU_SAMPLING);
+               || (type == ProfilingSettings.PROFILE_CPU_STOPWATCH || type == PROFILE_CPU_SAMPLING
+               || type == ProfilingSettings.PROFILE_CPU_JDBC);
     }
 
     public static boolean isMemorySettings(ProfilingSettings settings) {
