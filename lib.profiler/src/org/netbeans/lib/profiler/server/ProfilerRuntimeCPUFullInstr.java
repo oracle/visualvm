@@ -112,6 +112,8 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
                 }
             }
 
+            ProfilerServer.notifyClientOnResultsAvailability();
+            writeParametersEvent(ti);
             writeTimeStampedEvent(MARKER_ENTRY, ti, methodId);
         }
         ti.stackDepth++; //= 1;  // This is the logical stack depth
@@ -120,6 +122,11 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
 
     /** Called upon exit from the marker method. */
     public static void markerMethodExit(char methodId) {
+        markerMethodExit(NO_RET_VALUE, methodId);
+    }
+    
+    /** Called upon exit from the marker method. */
+    public static void markerMethodExit(Object ret, char methodId) {
         if (recursiveInstrumentationDisabled) {
             return;
         }
@@ -141,6 +148,7 @@ public class ProfilerRuntimeCPUFullInstr extends ProfilerRuntimeCPU {
                 ti.inCallGraph = false; // We are exiting the marker method of our call subgraph
             }
             if (ti.stackDepth <= stackDepthLimit) {
+                writeRetValue(ret, ti);
                 writeTimeStampedEvent(MARKER_EXIT, ti, methodId);
             }
             ti.inProfilingRuntimeMethod--;

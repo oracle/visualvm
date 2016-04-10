@@ -69,7 +69,17 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
     public static int normalContents_ProfilePointHitMethodIdx;
     public static int rootContents_RootEntryMethodIdx;
     public static int rootContents_MarkerEntryMethodIdx;
+    public static int miContents_AddParCharMethodIdx;
+    public static int miContents_AddParByteMethodIdx;
+    public static int miContents_AddParIntMethodIdx;
+    public static int miContents_AddParBooleanMethodIdx;
+    public static int miContents_AddParFloatMethodIdx;
+    public static int miContents_AddParDoubleMethodIdx;
+    public static int miContents_AddParShortMethodIdx;
+    public static int miContents_AddParLongMethodIdx;
+    public static int miContents_AddParObjectMethodIdx;
     public static int rootContents_MarkerExitMethodIdx;
+    public static int rootContents_MarkerExitParMethodIdx;
     public static int miContents_HandleReflectInvokeMethodIdx;
     public static int miContents_HandleServletDoMethodIdx;
     public static int codeRegionContents_CodeRegionEntryMethodIdx;
@@ -97,8 +107,16 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
     private static final String TRACE_OBJ_ALLOC_METHOD_NAME = "traceObjAlloc"; // NOI18N
     private static final String PROFILE_POINT_HIT = "profilePointHit"; // NOI18N
     private static final String HANDLE_SERVLET_DO_METHOD_NAME = "handleServletDoMethod"; // NOI18N
+    private static final String ADD_PARAMETER = "addParameter"; // NOI18N
     private static final String VOID_VOID_SIGNATURE = "()V"; // NOI18N
     private static final String CHAR_VOID_SIGNATURE = "(C)V"; // NOI18N
+    private static final String BYTE_VOID_SIGNATURE = "(B)V"; // NOI18N
+    private static final String INT_VOID_SIGNATURE = "(I)V"; // NOI18N
+    private static final String BOOLEAN_VOID_SIGNATURE = "(Z)V"; // NOI18N
+    private static final String FLOAT_VOID_SIGNATURE = "(F)V"; // NOI18N
+    private static final String DOUBLE_VOID_SIGNATURE = "(D)V"; // NOI18N
+    private static final String SHORT_VOID_SIGNATURE = "(S)V"; // NOI18N
+    private static final String LONG_VOID_SIGNATURE = "(J)V"; // NOI18N
     private static final String OBJECT_VOID_SIGNATURE = "(Ljava/lang/Object;)V"; // NOI18N
     private static final String OBJECT_CHAR_VOID_SIGNATURE = "(Ljava/lang/Object;C)V"; // NOI18N
     private static final String REFLECT_METHOD_VOID_SIGNATURE = "(Ljava/lang/reflect/Method;)V"; // NOI18N
@@ -153,12 +171,33 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
         standardCPFragments[INJ_RECURSIVE_SAMPLED_ROOT_METHOD] = new PackedCPFragment(entries);
 
         // Additional constant pool contents for markerMethodEntry(char methodId) and markerMethodExit(char methodId) injection
-        entries = new CPEntry[6];
+        entries = new CPEntry[39];
         i = 0;
         int markerEntryMethodRefIdx = i;
         i = addMethod(profilerRuntimeClassRefIdx + 0x10000, MARKER_ENTRY_METHOD_NAME, charVoidSignatureIdx + 0x10000, entries, i);
         int markerExitMethodRefIdx = i;
-        addMethod(profilerRuntimeClassRefIdx + 0x10000, MARKER_EXIT_METHOD_NAME, charVoidSignatureIdx + 0x10000, entries, i);
+        i = addMethod(profilerRuntimeClassRefIdx + 0x10000, MARKER_EXIT_METHOD_NAME, charVoidSignatureIdx + 0x10000, entries, i);
+        
+        rootContents_MarkerExitParMethodIdx = i;        
+        i = addMethod(profilerRuntimeClassRefIdx + 0x10000, MARKER_EXIT_METHOD_NAME, OBJECT_CHAR_VOID_SIGNATURE, entries, i);
+        miContents_AddParCharMethodIdx = i;
+        i = addMethod(PROFRUNTIME_CPU_CLASS_NAME, ADD_PARAMETER, CHAR_VOID_SIGNATURE, entries, i);
+        miContents_AddParByteMethodIdx = i;
+        i = addMethod(PROFRUNTIME_CPU_CLASS_NAME, ADD_PARAMETER, BYTE_VOID_SIGNATURE, entries, i);
+        miContents_AddParIntMethodIdx = i;
+        i = addMethod(PROFRUNTIME_CPU_CLASS_NAME, ADD_PARAMETER, INT_VOID_SIGNATURE, entries, i);
+        miContents_AddParBooleanMethodIdx = i;
+        i = addMethod(PROFRUNTIME_CPU_CLASS_NAME, ADD_PARAMETER, BOOLEAN_VOID_SIGNATURE, entries, i);
+        miContents_AddParFloatMethodIdx = i;
+        i = addMethod(PROFRUNTIME_CPU_CLASS_NAME, ADD_PARAMETER, FLOAT_VOID_SIGNATURE, entries, i);
+        miContents_AddParDoubleMethodIdx = i;
+        i = addMethod(PROFRUNTIME_CPU_CLASS_NAME, ADD_PARAMETER, DOUBLE_VOID_SIGNATURE, entries, i);
+        miContents_AddParShortMethodIdx = i;
+        i = addMethod(PROFRUNTIME_CPU_CLASS_NAME, ADD_PARAMETER, SHORT_VOID_SIGNATURE, entries, i);
+        miContents_AddParLongMethodIdx = i;
+        i = addMethod(PROFRUNTIME_CPU_CLASS_NAME, ADD_PARAMETER, LONG_VOID_SIGNATURE, entries, i);
+        miContents_AddParObjectMethodIdx = i;
+        addMethod(PROFRUNTIME_CPU_CLASS_NAME, ADD_PARAMETER, OBJECT_VOID_SIGNATURE, entries, i);
         standardCPFragments[INJ_RECURSIVE_MARKER_METHOD] = new PackedCPFragment(entries);
         rootContents_MarkerEntryMethodIdx = markerEntryMethodRefIdx;
         rootContents_MarkerExitMethodIdx = markerExitMethodRefIdx;
@@ -223,6 +262,16 @@ public class CPExtensionsRepository implements JavaClassConstants, CommonConstan
         entries[index++] = new CPEntry(CONSTANT_Methodref);
         int nameAndTypeIdx = index;
         index = addNameAndType(methodName, signatureIdx, entries, index);
+        entries[methodRef].setIndex1(classRefIdx);
+        entries[methodRef].setIndex2(nameAndTypeIdx);
+        return index;
+    }
+
+    static int addMethod(int classRefIdx, String methodName, String signature, CPEntry[] entries, int index) {
+        int methodRef = index;
+        entries[index++] = new CPEntry(CONSTANT_Methodref);
+        int nameAndTypeIdx = index;
+        index = addNameAndType(methodName, signature, entries, index);
         entries[methodRef].setIndex1(classRefIdx);
         entries[methodRef].setIndex2(nameAndTypeIdx);
         return index;
