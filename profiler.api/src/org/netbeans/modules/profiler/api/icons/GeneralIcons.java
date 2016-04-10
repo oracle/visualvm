@@ -106,5 +106,8 @@ public interface GeneralIcons extends Icons.Keys {
     public static final String BADGE_REMOVE = "GeneralIcons.BadgeRemove"; // NOI18N
     public static final String RENAME = "GeneralIcons.Rename"; // NOI18N
     public static final String MATCH_CASE = "GeneralIcons.MatchCase"; // NOI18N
+    public static final String ADD = "GeneralIcons.Add"; // NOI18N
+    public static final String EDIT = "GeneralIcons.Edit"; // NOI18N
+    public static final String REMOVE = "GeneralIcons.Remove"; // NOI18N
     
 }
