@@ -720,7 +720,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     }
 
     private void updateNumberOfSelects() {
-        int nProfiledSelects = maxSelectId;
+        int nProfiledSelects = maxSelectId + 1;
 
         if ((stacksForSelects == null) || (stacksForSelects.length <= nProfiledSelects)) {
             int newSize = (nProfiledSelects * 3) / 2;
