@@ -45,10 +45,12 @@ package org.netbeans.modules.profiler.v2;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -404,6 +406,13 @@ class ProfilerWindow extends ProfilerTopComponent {
         stop.setVisible(!_configure);
         configure.setVisible(_configure);
         
+        if (!this.isAncestorOf(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner())) {
+            final Component foc = _configure ? configure : start;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() { foc.requestFocusInWindow(); }
+            });
+        }
+        
         if (session.inProgress()) session.doModify(features.getSettings());
     }
     
@@ -734,6 +743,15 @@ class ProfilerWindow extends ProfilerTopComponent {
         
 //        if (preselect != null) MenuSelectionManager.defaultManager().setSelectedPath(
 //                               new MenuElement[] { popup, preselect });
+    }
+    
+    
+    // --- ProfilerTopComponent ------------------------------------------------
+    
+    protected Component defaultFocusOwner() {
+        if (configure != null && configure.isVisible()) return configure;
+        else if (start != null) return start;
+        else return null;
     }
     
     
