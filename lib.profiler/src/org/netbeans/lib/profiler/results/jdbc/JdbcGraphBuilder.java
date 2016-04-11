@@ -200,6 +200,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         idsToSelect = null;
         currentObject = null;
         currentSqlLevel = null;
+        stacksForSelects = null;
     }
 
     @Override
@@ -210,6 +211,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         idsToSelect = new HashMap();
         currentObject = new HashMap();
         currentSqlLevel = new HashMap();
+        stacksForSelects = null;
         maxSelectId = 0;
         profilerClient.registerJdbcCCTProvider(this);
     }
