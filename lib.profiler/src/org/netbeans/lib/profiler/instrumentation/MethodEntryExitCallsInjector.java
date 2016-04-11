@@ -40,17 +40,19 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.lib.profiler.instrumentation;
 
+import java.io.ByteArrayOutputStream;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.global.CommonConstants;
 
+import static org.netbeans.lib.profiler.utils.VMUtils.*;
 
 /**
- * Specialized subclass of Injector, that provides injection of our standard "recursive" instrumentation -
- * methodEntry(char methodId) (rootEntry(char methodId)) and methodExit(char methodId) calls - in appropriate places
- * in TA methods.
+ * Specialized subclass of Injector, that provides injection of our standard
+ * "recursive" instrumentation - methodEntry(char methodId) (rootEntry(char
+ * methodId)) and methodExit(char methodId) calls - in appropriate places in TA
+ * methods.
  *
  * @author Tomas Hurka
  * @author Misha Dmitriev
@@ -70,20 +72,24 @@ class MethodEntryExitCallsInjector extends Injector implements CommonConstants {
     protected static int injCodeMethodIdxPos2;
     protected static int injCodeMethodIdPos2;
 
+    // Stuff used for markerMethodExit(Object, char) injection 
+    protected static byte[] injCode3;
+    protected static int injCodeLen3;
+    protected static int injCodeMethodIdxPos3;
+    protected static int injCodeMethodIdPos3;
+
     static {
         initializeInjectedCode();
     }
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
     protected int baseRootCPoolCount; // cpool base for root method type injection cpool fragment
     protected int injType; // INJ_RECURSIVE_NORMAL_METHOD, INJ_RECURSIVE_ROOT_METHOD, or same with _SAMPLED_ added
     protected int methodId; // methodId (char parameter value) that methodEntry(methodId) etc. should be invoked with
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     MethodEntryExitCallsInjector(DynamicClassInfo clazz, int normalInstrBaseCPoolCount, int rootInstrBaseCPoolCount, int methodIdx,
-                                 int injType, int methodId) {
+            int injType, int methodId) {
         super(clazz, methodIdx);
         this.injType = injType;
         this.methodId = methodId;
@@ -92,7 +98,6 @@ class MethodEntryExitCallsInjector extends Injector implements CommonConstants {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
     public byte[] instrumentMethod() {
         // Determine the number of returns in this method
         int totalReturns = 0;
@@ -144,11 +149,23 @@ class MethodEntryExitCallsInjector extends Injector implements CommonConstants {
         injCodeMethodIdxPos2 = 5;
         injCode2[7] = (byte) opc_aload_1;
         injCode2[8] = (byte) opc_athrow;
+
+        injCodeLen3 = 8;
+        injCode3 = new byte[injCodeLen3];
+        injCode3[0] = (byte) opc_dup;
+        injCode3[1] = (byte) opc_sipush;
+        // Positions 2, 3 are occupied by methodId
+        injCodeMethodIdPos3 = 2;
+        injCode3[4] = (byte) opc_invokestatic;
+        // Positions 5, 6 are occupied by method index
+        injCodeMethodIdxPos3 = 5;
+        injCode3[7] = (byte) opc_nop;
     }
 
     /**
-     * Injects code that is effectively try { } catch (Throwable ex) { methodExit (); rethrow ex; }
-     * To have methodExit called even in case Errors/Exceptions are thrown.
+     * Injects code that is effectively try { } catch (Throwable ex) {
+     * methodExit (); rethrow ex; } To have methodExit called even in case
+     * Errors/Exceptions are thrown.
      */
     private void injectGlobalCatch() {
         int targetMethodIdx;
@@ -204,19 +221,53 @@ class MethodEntryExitCallsInjector extends Injector implements CommonConstants {
         putU2(injCode1, injCodeMethodIdPos1, methodId);
 
         injectCodeAndRewrite(injCode1, injCodeLen1, 0, true);
+        if (injType == INJ_RECURSIVE_MARKER_METHOD || injType == INJ_RECURSIVE_SAMPLED_MARKER_METHOD) {
+            // for marker method inject code to get parameters
+            ByteArrayOutputStream code = new ByteArrayOutputStream();
+            String parTypes = getParTypes();
+            int parIndex;
+            
+            if (clazz.isMethodStatic(methodIdx)) {
+                parIndex = 0;
+            } else {
+                parIndex = 1;
+                if ( !"<init>".equals(clazz.getMethodName(methodIdx))) {
+                    // 'this' is parameter at index 0
+                    getParInvocationCode(REFERENCE, 0, code);
+                }
+            }
+            for (char vmParType : parTypes.toCharArray()) {
+                getParInvocationCode(vmParType, parIndex, code);
+                switch (vmParType) {
+                    case DOUBLE:
+                    case LONG:
+                        parIndex+=2;
+                        break;
+                    default:
+                        parIndex++;
+                }
+            }
+            injectCodeAndRewrite(code.toByteArray(), code.size(), 0, true);        
+        }
     }
 
     private void injectMethodExits(int totalReturns) {
         // Prepare the methodExit(char methodId) code packet
         int targetMethodIdx;
+        int targetParMethodIdx = -1;
 
         if ((injType == INJ_RECURSIVE_MARKER_METHOD) || (injType == INJ_RECURSIVE_SAMPLED_MARKER_METHOD)) {
             targetMethodIdx = CPExtensionsRepository.rootContents_MarkerExitMethodIdx + baseRootCPoolCount;
+            targetParMethodIdx = CPExtensionsRepository.rootContents_MarkerExitParMethodIdx + baseRootCPoolCount;
         } else {
             targetMethodIdx = CPExtensionsRepository.normalContents_MethodExitMethodIdx + baseCPoolCount;
         }
 
         putU2(injCode1, injCodeMethodIdxPos1, targetMethodIdx);
+        if (targetParMethodIdx != -1) {
+            putU2(injCode3, injCodeMethodIdPos3, methodId);
+            putU2(injCode3, injCodeMethodIdxPos3, targetParMethodIdx);            
+        }        
 
         for (int i = 0; i < totalReturns; i++) {
             int retIdx = -1;
@@ -229,8 +280,11 @@ class MethodEntryExitCallsInjector extends Injector implements CommonConstants {
                     retIdx++;
 
                     if (retIdx == i) {
-                        injectCodeAndRewrite(injCode1, injCodeLen1, bci, true);
-
+                        if (bc == opc_areturn && targetParMethodIdx != -1) {
+                            injectCodeAndRewrite(injCode3, injCodeLen3, bci, true);                            
+                        } else {
+                            injectCodeAndRewrite(injCode1, injCodeLen1, bci, true);
+                        }
                         break;
                     }
                 }
@@ -238,5 +292,200 @@ class MethodEntryExitCallsInjector extends Injector implements CommonConstants {
                 bci += opcodeLength(bci);
             }
         }
+    }
+
+    private String getParTypes() {
+        String sig = clazz.getMethodSignature(methodIdx);
+        int idx1 = sig.indexOf('(') + 1; // NOI18N
+        int idx2 = sig.lastIndexOf(')'); // NOI18N
+        StringBuilder paramsBuf = new StringBuilder();
+        boolean arrayIndicator;
+
+        if (idx2 > 0) {
+            String paramsString = sig.substring(idx1, idx2);
+            arrayIndicator = false;
+            int curPos = 0;
+            char nextChar;
+
+            while (curPos < paramsString.length()) {
+                while (paramsString.charAt(curPos) == '[') { // NOI18N
+                    arrayIndicator = true;
+                    curPos++;
+                }
+
+                nextChar = paramsString.charAt(curPos++);
+
+                if (nextChar == REFERENCE) { // it's a class
+                    while (paramsString.charAt(curPos) != ';') { // NOI18N
+                        curPos++;
+                    }
+                    curPos++;
+                }
+
+                if (arrayIndicator) {
+                    paramsBuf.append(REFERENCE);
+                } else {
+                    paramsBuf.append(nextChar);
+                }
+            }
+        }
+        return paramsBuf.toString();
+    }
+
+    private void getParInvocationCode(char vmParType, int i, ByteArrayOutputStream code) {
+
+        switch (vmParType) {
+            case BOOLEAN: {
+                getIloadCode(i, code);
+                getInvokeStatic(CPExtensionsRepository.miContents_AddParBooleanMethodIdx + baseRootCPoolCount, code);
+                break;
+            }
+            case CHAR: {
+                getIloadCode(i, code);
+                getInvokeStatic(CPExtensionsRepository.miContents_AddParCharMethodIdx + baseRootCPoolCount, code);
+                break;
+            }
+            case BYTE: {
+                getIloadCode(i, code);
+                getInvokeStatic(CPExtensionsRepository.miContents_AddParByteMethodIdx + baseRootCPoolCount, code);
+                break;
+            }
+            case SHORT: {
+                getIloadCode(i, code);
+                getInvokeStatic(CPExtensionsRepository.miContents_AddParShortMethodIdx + baseRootCPoolCount, code);
+                break;
+            }
+            case INT: {
+                getIloadCode(i, code);
+                getInvokeStatic(CPExtensionsRepository.miContents_AddParIntMethodIdx + baseRootCPoolCount, code);
+                break;
+            }
+            case LONG: {
+                getLloadCode(i, code);
+                getInvokeStatic(CPExtensionsRepository.miContents_AddParLongMethodIdx + baseRootCPoolCount, code);
+                break;
+            }
+            case FLOAT: {
+                getFloadCode(i, code);
+                getInvokeStatic(CPExtensionsRepository.miContents_AddParFloatMethodIdx + baseRootCPoolCount, code);
+                break;
+            }
+            case DOUBLE: {
+                getDloadCode(i, code);
+                getInvokeStatic(CPExtensionsRepository.miContents_AddParDoubleMethodIdx + baseRootCPoolCount, code);
+                break;
+            }
+            case REFERENCE: {
+                getAloadCode(i, code);
+                getInvokeStatic(CPExtensionsRepository.miContents_AddParObjectMethodIdx + baseRootCPoolCount, code);
+                break;
+            }
+        }
+    }
+
+    private void getIloadCode(int index, ByteArrayOutputStream code) {
+        switch (index) {
+            case 0:
+                code.write(opc_iload_0);
+                break;
+            case 1:
+                code.write(opc_iload_1);
+                break;
+            case 2:
+                code.write(opc_iload_2);
+                break;
+            case 3:
+                code.write(opc_iload_3);
+                break;
+            default:
+                code.write(opc_iload);
+                code.write(index);
+        }
+    }
+
+    private void getLloadCode(int index, ByteArrayOutputStream code) {
+        switch (index) {
+            case 0:
+                code.write(opc_lload_0);
+                break;
+            case 1:
+                code.write(opc_lload_1);
+                break;
+            case 2:
+                code.write(opc_lload_2);
+                break;
+            case 3:
+                code.write(opc_lload_3);
+                break;
+            default:
+                code.write(opc_lload);
+                code.write(index);
+        }
+    }
+
+    private void getFloadCode(int index, ByteArrayOutputStream code) {
+        switch (index) {
+            case 0:
+                code.write(opc_fload_0);
+                break;
+            case 1:
+                code.write(opc_fload_1);
+                break;
+            case 2:
+                code.write(opc_fload_2);
+                break;
+            case 3:
+                code.write(opc_fload_3);
+                break;
+            default:
+                code.write(opc_fload);
+                code.write(index);
+        }
+    }
+
+    private void getDloadCode(int index, ByteArrayOutputStream code) {
+        switch (index) {
+            case 0:
+                code.write(opc_dload_0);
+                break;
+            case 1:
+                code.write(opc_dload_1);
+                break;
+            case 2:
+                code.write(opc_dload_2);
+                break;
+            case 3:
+                code.write(opc_dload_3);
+                break;
+            default:
+                code.write(opc_dload);
+                code.write(index);
+        }
+    }
+
+    private void getAloadCode(int index, ByteArrayOutputStream code) {
+        switch (index) {
+            case 0:
+                code.write(opc_aload_0);
+                break;
+            case 1:
+                code.write(opc_aload_1);
+                break;
+            case 2:
+                code.write(opc_aload_2);
+                break;
+            case 3:
+                code.write(opc_aload_3);
+                break;
+            default:
+                code.write(opc_aload);
+                code.write(index);
+        }
+    }
+    
+    private void getInvokeStatic(int cpIndex, ByteArrayOutputStream code) {
+        code.write(opc_invokestatic);
+        code.write((cpIndex >> 8) & 0xFF);
+        code.write(cpIndex & 0xFF);
     }
 }

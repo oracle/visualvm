@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.results.cpu;
 
+import java.util.List;
 import org.netbeans.lib.profiler.results.locks.LockProfilingResultListener;
 
 
@@ -59,11 +60,12 @@ public interface CPUProfilingResultListener extends LockProfilingResultListener 
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    void methodEntry(final int methodId, final int threadId, final int methodType, final long timeStamp0, final long timeStamp1);
+    void methodEntry(final int methodId, final int threadId, final int methodType, final long timeStamp0, final long timeStamp1,
+            final List parameters, final int[] methodIds);
 
-    void methodEntryUnstamped(final int methodId, final int threadId, final int methodType);
+    void methodEntryUnstamped(final int methodId, final int threadId, final int methodType, final List parameters, final int[] methodIds);
 
-    void methodExit(final int methodId, final int threadId, final int methodType, final long timeStamp0, final long timeStamp1);
+    void methodExit(final int methodId, final int threadId, final int methodType, final long timeStamp0, final long timeStamp1, final Object retVal);
 
     void methodExitUnstamped(final int methodId, final int threadId, final int methodType);
 
