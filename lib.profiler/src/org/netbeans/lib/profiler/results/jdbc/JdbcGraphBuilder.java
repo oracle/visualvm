@@ -211,6 +211,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         idsToSelect = new HashMap();
         currentObject = new HashMap();
         currentSqlLevel = new HashMap();
+        threadInfos.reset();
         stacksForSelects = null;
         maxSelectId = 0;
         profilerClient.registerJdbcCCTProvider(this);
@@ -734,7 +735,14 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     }
 
     private String debugSelect(int selectId) {
-        return idsToSelect.get(Integer.valueOf(selectId)).getSelect();
+        if (selectId == -1) {
+            return "-1";
+        }
+        Select sel = idsToSelect.get(Integer.valueOf(selectId));
+        if (sel == null) {
+            return "Null select for SelectId " + selectId;
+        }
+        return sel.getSelect();
     }
 
     private void debugStackTrace(int[] methoIds) {
@@ -851,7 +859,11 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
 
         @Override
         protected String getInstrMethodClass(int selectId) {
-            return idsToSelect.get(Integer.valueOf(selectId)).getSelect();
+            Select sel = idsToSelect.get(Integer.valueOf(selectId));
+            if (sel == null) {
+                return "Unknown select for selectId " + selectId;
+            }
+            return sel.getSelect();
         }
 
         @Override
