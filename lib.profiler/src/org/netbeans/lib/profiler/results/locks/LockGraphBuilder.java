@@ -312,15 +312,15 @@ public class LockGraphBuilder extends BaseCallGraphBuilder implements LockProfil
     public static final class CPULockGraphBuilder extends LockGraphBuilder implements CPUProfilingResultListener {
 
         @Override
-        public void methodEntry(int methodId, int threadId, int methodType, long timeStamp0, long timeStamp1) {
+        public void methodEntry(int methodId, int threadId, int methodType, long timeStamp0, long timeStamp1, List parameters, int[] methoIds) {
         }
 
         @Override
-        public void methodEntryUnstamped(int methodId, int threadId, int methodType) {
+        public void methodEntryUnstamped(int methodId, int threadId, int methodType, List parameters, int[] methoIds) {
         }
 
         @Override
-        public void methodExit(int methodId, int threadId, int methodType, long timeStamp0, long timeStamp1) {
+        public void methodExit(int methodId, int threadId, int methodType, long timeStamp0, long timeStamp1, Object retVal) {
         }
 
         @Override

@@ -148,6 +148,10 @@ public class GestureSubmitter {
                 paramList.add("TYPE_CPU_PART"); // NOI18N
 
                 break;
+            case ProfilingSettings.PROFILE_CPU_JDBC:
+                paramList.add("TYPE_CPU_JDBC"); // NOI18N
+
+                break;
             case ProfilingSettings.PROFILE_CPU_SAMPLING:
                 paramList.add("TYPE_CPU_SAMPLING"); // NOI18N
 
