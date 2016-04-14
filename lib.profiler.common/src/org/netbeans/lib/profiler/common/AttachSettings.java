@@ -76,35 +76,25 @@ public final class AttachSettings {
 
     // for remote:
     private String host = ""; // NOI18N
-    private String hostOS = ""; // NOI18N
-    private String hostOS_dbl = hostOS;
-    private String host_dbl = host;
-    private String remoteHostOS = "";
+    private String hostOS;
     private String serverType = ""; // NOI18N
-    private String serverType_dbl = serverType;
 
     // for persistence only:
     private String targetType = ""; // NOI18N
-    private String targetType_dbl = targetType;
 
     // Direct is true means what we also call "attach on startup" - when the target VM is started with all necessary options
     // and waits for us to connect. It can be used both for local and remote profiling. In fact, currently remote profiling
     // can only be done in this way, but later we can implement an equivalent of "remote Ctrl+Break" or something. In that case,
     // the constructor of the AttachSettings for remote profiling will have to be modified.
     private boolean direct = true;
-    private boolean direct_dbl = direct;
 
     // for local:
     private boolean dynamic16 = false;
-    private boolean dynamic16_dbl = dynamic16;
     private boolean remote = false;
-    private boolean remote_dbl = remote;
     private int pid = -1;
-    private int pid_dbl = pid;
     private String processName;
     private boolean autoSelect;
     private int transientPort = -1;
-    private int transientPort_dbl = transientPort;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -112,8 +102,6 @@ public final class AttachSettings {
     public AttachSettings() {
         remote = false;
         direct = true;
-
-        hostOS = IntegrationUtils.getLocalPlatform(-1);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -147,19 +135,11 @@ public final class AttachSettings {
     }
 
     public void setHostOS(final String hostOS) {
-        if (hostOS != null) {
-            this.hostOS = hostOS;
-        } else {
-            if (remote) {
-                this.hostOS = remoteHostOS;
-            } else {
-                this.hostOS = IntegrationUtils.getLocalPlatform(-1);
-            }
-        }
+        this.hostOS = hostOS;
     }
 
     public String getHostOS() {
-        return hostOS;
+        return hostOS == null ? IntegrationUtils.getLocalPlatform(-1) : hostOS;
     }
 
     public void setPid(final int pid) {
@@ -241,77 +221,17 @@ public final class AttachSettings {
         }
     }
 
-    public boolean commit() {
-        boolean dirty = false;
-
-        if (direct != direct_dbl) {
-            dirty = true;
-            direct_dbl = direct;
-        }
-
-        if (remote != remote_dbl) {
-            dirty = true;
-            remote_dbl = remote;
-        }
-
-        if (dynamic16 != dynamic16_dbl) {
-            dirty = true;
-            dynamic16_dbl = dynamic16;
-        }
-
-        // changing dynamic attach method doesn't mean changing attach parameters
-        //    if (pid != pid_dbl) {
-        //      dirty = true;
-        //      pid_dbl = pid;
-        //    }
-        if ((host_dbl == null) || !host.equalsIgnoreCase(host_dbl)) {
-            dirty = true;
-            host_dbl = host;
-        }
-
-        if (transientPort_dbl != transientPort) {
-            dirty = true;
-            transientPort_dbl = transientPort;
-        }
-
-        if ((targetType_dbl == null) || !targetType.equalsIgnoreCase(targetType_dbl)) {
-            dirty = true;
-            targetType_dbl = targetType;
-        }
-
-        if ((serverType_dbl == null) || !serverType.equalsIgnoreCase(serverType_dbl)) {
-            dirty = true;
-            serverType_dbl = serverType;
-        }
-
-        if ((hostOS_dbl == null) || !hostOS.equalsIgnoreCase(hostOS_dbl)) {
-            dirty = true;
-            hostOS_dbl = hostOS;
-        }
-
-        return dirty;
-    }
-
     public void copyInto(AttachSettings as) {
         as.direct = direct;
-        as.direct_dbl = direct_dbl;
         as.remote = remote;
-        as.remote_dbl = remote_dbl;
         as.dynamic16 = dynamic16;
-        as.dynamic16_dbl = dynamic16_dbl;
         as.pid = pid;
-        as.pid_dbl = pid_dbl;
         as.processName = processName;
         as.autoSelect = autoSelect;
         as.host = host;
-        as.host_dbl = host_dbl;
         as.targetType = targetType;
-        as.targetType_dbl = targetType_dbl;
         as.serverType = serverType;
-        as.serverType_dbl = serverType_dbl;
         as.hostOS = hostOS;
-        as.hostOS_dbl = hostOS_dbl;
-        as.remoteHostOS = remoteHostOS;
     }
 
     public String debug() {
@@ -325,7 +245,7 @@ public final class AttachSettings {
         host = ProfilingSettings.getProperty(props, PROP_ATTACH_HOST, ""); //NOI18N
         targetType = ProfilingSettings.getProperty(props, PROP_ATTACH_TARGET_TYPE, ""); //NOI18N
         serverType = ProfilingSettings.getProperty(props, PROP_ATTACH_SERVER_TYPE, ""); //NOI18N
-        remoteHostOS = ProfilingSettings.getProperty(props, PROP_ATTACH_HOST_OS, IntegrationUtils.getLocalPlatform(-1)); //NOI18N
+        hostOS = ProfilingSettings.getProperty(props, PROP_ATTACH_HOST_OS, null); //NOI18N
         pid = Integer.parseInt(ProfilingSettings.getProperty(props, PROP_ATTACH_DYNAMIC_PID, "-1")); //NOI18N
         processName = ProfilingSettings.getProperty(props, PROP_ATTACH_DYNAMIC_PROCESS_NAME, null); //NOI18
         autoSelect = Boolean.valueOf(ProfilingSettings.getProperty(props, PROP_ATTACH_DYNAMIC_AUTO, "false")).booleanValue(); //NOI18N
@@ -338,7 +258,8 @@ public final class AttachSettings {
         props.put(PROP_ATTACH_HOST, host);
         props.put(PROP_ATTACH_TARGET_TYPE, targetType);
         props.put(PROP_ATTACH_SERVER_TYPE, serverType);
-        props.put(PROP_ATTACH_HOST_OS, hostOS);
+        if (hostOS == null)  props.remove(PROP_ATTACH_HOST_OS);
+        else props.put(PROP_ATTACH_HOST_OS, hostOS);
         if (pid == -1) props.remove(PROP_ATTACH_DYNAMIC_PID);
         else props.put(PROP_ATTACH_DYNAMIC_PID, Integer.toString(pid));
         if (processName == null) props.remove(PROP_ATTACH_DYNAMIC_PROCESS_NAME);
@@ -367,7 +288,7 @@ public final class AttachSettings {
         sb.append("\n"); //NOI18N
         sb.append("host =").append(host); //NOI18N
         sb.append("\n"); //NOI18N
-        sb.append("host os =").append(hostOS); //NOI18N
+        sb.append("host os =").append(hostOS == null ? IntegrationUtils.getLocalPlatform(-1) : hostOS); //NOI18N
         sb.append("\n"); //NOI18N
         sb.append("transient port =").append(transientPort); //NOI18N
         sb.append("\n"); //NOI18N

@@ -29,7 +29,7 @@
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.35</specification-version>
+                        <specification-version>1.42</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
