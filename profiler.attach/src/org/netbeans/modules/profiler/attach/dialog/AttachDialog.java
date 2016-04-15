@@ -199,8 +199,8 @@ public class AttachDialog extends AttachWizard {
         settings.setTargetType(Bundle.AttachDialog_JavaApplication());
         settings.setServerType(Bundle.AttachDialog_JavaApplication());
                 
-        // Workaround for remote OS
-        if (settings.isRemote()) settings.setHostOS(null);
+//        // Workaround for remote OS
+//        if (settings.isRemote()) settings.setHostOS(null);
         
         panel = new Panel();
         panel.setup(settings);
@@ -271,31 +271,31 @@ public class AttachDialog extends AttachWizard {
         }
         
         void setup(AttachSettings as) {
-            this.as = as;
+            this.as = new AttachSettings();
+            as.copyInto(this.as);
+            
             updatingUI = true;
+            
             if (as.isRemote()) modeButton.selectAction(3);
             else if (as.isDirect()) modeButton.selectAction(2);
             else modeButton.selectAction(0);
             modeButton.getSelectedAction().actionPerformed(null);
-            if (as.isRemote()) {
-                hostname.setText(as.getHost());
-                String hostOS = as.getHostOS();
-                for (Action action : os.getActions())
-                    if (action != null && action.getValue(Action.NAME).equals(hostOS)) {
-                        os.selectAction(action);
-                        break;
-                    }
-            } else {
-                hostname.setText(""); // NOI18N
-                os.selectAction(0);
-            }
-            if (!as.isRemote() && as.isDynamic16()) {
-                selectedName = as.getProcessName();
-                selectedPid = as.getPid();
-                autoSelect.setSelected(as.isAutoSelectProcess());
-                updateAutoSelect();
-            }
+            
+            hostname.setText(as.getHost());
+            String hostOS = as.getHostOS();
+            for (Action action : os.getActions())
+                if (action != null && action.getValue(Action.NAME).equals(hostOS)) {
+                    os.selectAction(action);
+                    break;
+                }
+
+            selectedName = as.getProcessName();
+            selectedPid = as.getPid();
+            autoSelect.setSelected(as.isAutoSelectProcess());
+            updateAutoSelect();
+            
             updatingUI = false;
+            
             updateSteps();
         }
         
@@ -310,7 +310,8 @@ public class AttachDialog extends AttachWizard {
             } else {
                 as.setDirect(mode == 2);
                 as.setDynamic16(mode == 0);
-                as.setHostOS(IntegrationUtils.getLocalPlatform(-1));
+                as.setHost(""); // NOI18N
+                as.setHostOS(null);
                 as.setProcessName(selectedName);
                 as.setPid(selectedPid);
                 as.setAutoSelectProcess(autoSelect.isSelected());
@@ -564,7 +565,7 @@ public class AttachDialog extends AttachWizard {
             c.weightx = 1;
             c.anchor = GridBagConstraints.WEST;
             c.fill = GridBagConstraints.HORIZONTAL;
-            c.insets = new Insets(0, 5, 0, 10);
+            c.insets = new Insets(0, 5, 0, 20);
             remoteSettings.add(hostname, c);
             
             JLabel osJvmLabel = new JLabel();
