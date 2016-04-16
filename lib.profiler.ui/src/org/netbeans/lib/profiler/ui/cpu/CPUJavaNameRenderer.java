@@ -82,7 +82,7 @@ public class CPUJavaNameRenderer extends JavaNameRenderer {
                 setBoldValue(""); // NOI18N
                 setGrayValue(""); // NOI18N
             } else if (node.isThreadNode()) {
-                setNormalValue(""); // NOI18N
+                setNormalValueEx(""); // NOI18N
                 setBoldValue(node.getNodeName());
                 setGrayValue(""); // NOI18N
             } else if (node.isFiltered()) {
@@ -103,6 +103,13 @@ public class CPUJavaNameRenderer extends JavaNameRenderer {
         } else {
             super.setValue(value, row);
         }
+    }
+    
+    
+    // TODO: optimize to not slow down sort/search/filter by resolving color!
+    private void setNormalValueEx(String value) {
+        super.setNormalValue(value);
+        setCustomForeground(null);
     }
     
 }
