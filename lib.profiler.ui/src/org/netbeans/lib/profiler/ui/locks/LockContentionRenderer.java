@@ -45,6 +45,7 @@ package org.netbeans.lib.profiler.ui.locks;
 
 import javax.swing.Icon;
 import org.netbeans.lib.profiler.results.locks.LockCCTNode;
+import org.netbeans.lib.profiler.ui.results.PackageColorer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NormalBoldGrayRenderer;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
@@ -67,33 +68,36 @@ public class LockContentionRenderer extends NormalBoldGrayRenderer {
         } else {
             LockCCTNode node = (LockCCTNode)value;
 
-            boolean lockNode = node.isThreadLockNode();
+            boolean threadNode = node.isThreadLockNode();
             boolean monitorNode = node.isMonitorNode();
 
             String nodeName = node.getNodeName();
             int bracketIndex = nodeName.indexOf('('); // NOI18N
             int dotIndex = nodeName.lastIndexOf('.'); // NOI18N
 
-            String normalValue = getNormalValue(node, nodeName, bracketIndex, dotIndex, lockNode);
-            String boldValue = getBoldValue(node, nodeName, bracketIndex, dotIndex, lockNode);
-            String grayValue = getGrayValue(node, nodeName, bracketIndex, dotIndex, lockNode);
+            String normalValue = getNormalValue(node, nodeName, bracketIndex, dotIndex, threadNode);
+            String boldValue = getBoldValue(node, nodeName, bracketIndex, dotIndex, threadNode);
+            String grayValue = getGrayValue(node, nodeName, bracketIndex, dotIndex, threadNode);
 
             setNormalValue(normalValue);
             setBoldValue(boldValue);
             setGrayValue(grayValue);
 
             Icon icon = null;
-            if (lockNode) icon = THREAD_ICON;
+            if (threadNode) icon = THREAD_ICON;
             else if (monitorNode) icon = LOCK_ICON;
 
             setIcon(icon);
+            
+            // TODO: optimize to not slow down sort/search/filter by resolving color!
+            setCustomForeground(monitorNode ? PackageColorer.getForeground(normalValue) : null);
         }
     }
     
     private String getNormalValue(LockCCTNode node, String nodeName, int bracketIndex,
-                                  int dotIndex, boolean lockNode) {
+                                  int dotIndex, boolean threadNode) {
         
-        if (lockNode) return node.getParent().getParent() == null ? "" : nodeName; // NOI18N
+        if (threadNode) return node.getParent().getParent() == null ? "" : nodeName; // NOI18N
         
         if (dotIndex == -1 && bracketIndex == -1) return nodeName;
 
@@ -102,9 +106,9 @@ public class LockContentionRenderer extends NormalBoldGrayRenderer {
     }
     
     private String getBoldValue(LockCCTNode node, String nodeName, int bracketIndex,
-                                int dotIndex, boolean lockNode) {
+                                int dotIndex, boolean threadNode) {
         
-        if (lockNode) return node.getParent().getParent() == null ? nodeName : ""; // NOI18N
+        if (threadNode) return node.getParent().getParent() == null ? nodeName : ""; // NOI18N
         
         if (dotIndex == -1 && bracketIndex == -1) return ""; // NOI18N
 
@@ -113,9 +117,9 @@ public class LockContentionRenderer extends NormalBoldGrayRenderer {
     }
     
     private String getGrayValue(LockCCTNode node, String nodeName, int bracketIndex,
-                                int dotIndex, boolean lockNode) {
+                                int dotIndex, boolean threadNode) {
         
-        if (lockNode) return ""; // NOI18N
+        if (threadNode) return ""; // NOI18N
         
         return bracketIndex != -1 ? " " + nodeName.substring(bracketIndex) : ""; // NOI18N
     }
