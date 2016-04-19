@@ -87,6 +87,7 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.PopupButton;
+import org.netbeans.lib.profiler.ui.swing.ProfilerPopupFactory;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
@@ -406,7 +407,8 @@ class ProfilerWindow extends ProfilerTopComponent {
         stop.setVisible(!_configure);
         configure.setVisible(_configure);
         
-        if (!this.isAncestorOf(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner())) {
+        Component focused = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        if (!ProfilerPopupFactory.isInPopup(focused) && !this.isAncestorOf(focused)) {
             final Component foc = _configure ? configure : start;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() { foc.requestFocusInWindow(); }
