@@ -483,7 +483,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
                         boolean searchSuper = clazz.isInterface() && !subclasses.contains(subClass.getSuperClass());
                         boolean ok = locateAndMarkMethodReachable(subClass, methodName, methodSignature, virtualCall,
                                                       searchSuper, false);
-                        if (ok && clazz.isMethodMarker(idx)) {
+                        if (ok && idx != -1 && clazz.isMethodMarker(idx)) {
                             int subIdx = subClass.getMethodIndex(methodName, methodSignature);
                             subClass.setMethodMarker(subIdx);
                         }
