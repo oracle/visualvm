@@ -49,6 +49,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
+import org.netbeans.lib.profiler.classfile.BaseClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.classfile.PlaceholderClassInfo;
@@ -642,8 +643,9 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
         
         if (clazz.isLoaded()) {
             List classes = ClassRepository.getAllClassVersions(superClassName);
-            if (classes != null && classes.size()==1) {
-                return (DynamicClassInfo) classes.get(0);
+            if (classes != null && classes.size() == 1) {
+                BaseClassInfo bci = (BaseClassInfo)classes.get(0);
+                if (bci instanceof DynamicClassInfo) return (DynamicClassInfo)bci;
             }
         }
         return javaClassForName(superClassName, clazz.getLoaderId());
@@ -661,8 +663,11 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
                 if (isLoaded) {
                     List classes = ClassRepository.getAllClassVersions(interfaceNames[i]);
                     if (classes != null && classes.size()==1) {
-                        interfaces[i] = (DynamicClassInfo) classes.get(0);
-                        continue;
+                        BaseClassInfo bci = (BaseClassInfo)classes.get(0);
+                        if (bci instanceof DynamicClassInfo) {
+                            interfaces[i] = (DynamicClassInfo)classes.get(0);
+                            continue;
+                        }
                     }
                 }
                 interfaces[i] = javaClassForName(interfaceNames[i], loaderId);
