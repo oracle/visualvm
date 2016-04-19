@@ -663,8 +663,11 @@ public abstract class RecursiveMethodInstrumentor extends ClassManager {
                 if (isLoaded) {
                     List classes = ClassRepository.getAllClassVersions(interfaceNames[i]);
                     if (classes != null && classes.size()==1) {
-                        interfaces[i] = (DynamicClassInfo) classes.get(0);
-                        continue;
+                        BaseClassInfo bci = (BaseClassInfo)classes.get(0);
+                        if (bci instanceof DynamicClassInfo) {
+                            interfaces[i] = (DynamicClassInfo)classes.get(0);
+                            continue;
+                        }
                     }
                 }
                 interfaces[i] = javaClassForName(interfaceNames[i], loaderId);
