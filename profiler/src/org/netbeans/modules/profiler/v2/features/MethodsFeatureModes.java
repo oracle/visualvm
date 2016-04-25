@@ -492,9 +492,9 @@ final class MethodsFeatureModes {
                  } else {
                      filterStrings = getFlatValues(filterStrings.split("\\n")); // NOI18N
                      if (FilterSelector.FilterName.EXCLUDE_CUSTOM_FILTER.name().equals(filterType)) {
-                         settings.setSelectedInstrumentationFilter(new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_EXCLUSIVE, filterStrings)); // NOI18N
+                         settings.setSelectedInstrumentationFilter(new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_EXCLUSIVE_EXACT, filterStrings)); // NOI18N
                      } else if (FilterSelector.FilterName.INCLUDE_CUSTOM_FILTER.name().equals(filterType)) {
-                         settings.setSelectedInstrumentationFilter(new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE, filterStrings)); // NOI18N
+                         settings.setSelectedInstrumentationFilter(new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT, filterStrings)); // NOI18N
                      }
                  }
             }
@@ -968,7 +968,7 @@ final class MethodsFeatureModes {
                 settings.setSelectedInstrumentationFilter(SimpleFilter.NO_FILTER);
             } else {
                 int filterType = Boolean.parseBoolean(readFlag(FILTER_MODE_FLAG, Boolean.TRUE.toString())) == true ?
-                                 SimpleFilter.SIMPLE_FILTER_INCLUSIVE : SimpleFilter.SIMPLE_FILTER_EXCLUSIVE;
+                                 SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT : SimpleFilter.SIMPLE_FILTER_EXCLUSIVE_EXACT;
                 String filterValue = getFlatValues(filter.split("\\n")); // NOI18N
                 settings.setSelectedInstrumentationFilter(new SimpleFilter("", filterType, filterValue)); // NOI18N
             }
