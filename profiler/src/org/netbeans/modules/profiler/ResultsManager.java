@@ -350,11 +350,12 @@ public final class ResultsManager {
         private boolean isSomeResultsAvailable() {
             // check that we have data for snapshot, CPU profiling can have non-empty
             // batch, but this batch can contain only marker methods
-            ProfilerClient client = Profiler.getDefault().getTargetAppRunner().getProfilerClient();
-            int instrType = client.getCurrentInstrType();
+            Profiler profiler = Profiler.getDefault();
+            ProfilerClient client = profiler.getTargetAppRunner().getProfilerClient();
+            int profilingType = profiler.getLastProfilingSettings().getProfilingType();
 
-            if (instrType == ProfilerEngineSettings.INSTR_RECURSIVE_FULL ||
-                instrType == ProfilerEngineSettings.INSTR_RECURSIVE_SAMPLED) {
+            if (profilingType == ProfilingSettings.PROFILE_CPU_ENTIRE ||
+                profilingType == ProfilingSettings.PROFILE_CPU_PART) {
                 try {
                     // construct snapshot and check that it has some data
                     client.getCPUProfilingResultsSnapshot(false);
@@ -860,26 +861,31 @@ public final class ResultsManager {
         }
 
         try {
-            final TargetAppRunner runner = Profiler.getDefault().getTargetAppRunner();
+            final Profiler profiler = Profiler.getDefault();
+            final TargetAppRunner runner = profiler.getTargetAppRunner();
             final ProfilerClient client = runner.getProfilerClient();
-            final int currentInstrType = client.getCurrentInstrType();
+            final int currentProfilingType = profiler.getLastProfilingSettings().getProfilingType();
 
             try {
-                switch (currentInstrType) {
-                    case ProfilerEngineSettings.INSTR_OBJECT_ALLOCATIONS:
-                    case ProfilerEngineSettings.INSTR_OBJECT_LIVENESS:
-                    case ProfilerEngineSettings.INSTR_NONE_MEMORY_SAMPLING:
+                switch (currentProfilingType) {
+                    case ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS:
+                    case ProfilingSettings.PROFILE_MEMORY_LIVENESS:
+                    case ProfilingSettings.PROFILE_MEMORY_SAMPLING:
                         snapshot = client.getMemoryProfilingResultsSnapshot(reqeustData);
 
                         break;
-                    case ProfilerEngineSettings.INSTR_RECURSIVE_FULL:
-                    case ProfilerEngineSettings.INSTR_RECURSIVE_SAMPLED:
-                    case ProfilerEngineSettings.INSTR_NONE_SAMPLING:
+                    case ProfilingSettings.PROFILE_CPU_ENTIRE:
+                    case ProfilingSettings.PROFILE_CPU_PART:
+                    case ProfilingSettings.PROFILE_CPU_SAMPLING:
                         snapshot = client.getCPUProfilingResultsSnapshot(reqeustData);
 
                         break;
-                    case ProfilerEngineSettings.INSTR_CODE_REGION:
+                    case ProfilingSettings.PROFILE_CPU_STOPWATCH:
                         snapshot = client.getCodeRegionProfilingResultsSnapshot();
+
+                        break;
+                    case ProfilingSettings.PROFILE_CPU_JDBC:
+                        snapshot = client.getJdbcProfilingResultsSnapshot(reqeustData);
 
                         break;
                 }

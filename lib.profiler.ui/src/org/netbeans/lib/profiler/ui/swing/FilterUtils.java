@@ -72,6 +72,8 @@ import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.CloseButton;
+import org.netbeans.lib.profiler.ui.results.PackageColor;
+import org.netbeans.lib.profiler.ui.results.PackageColorer;
 import org.netbeans.modules.profiler.api.ActionsSupport;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
@@ -120,7 +122,7 @@ public final class FilterUtils {
         final int mainColumn = table.getMainColumn();
         
         if (text != null && !matchCase) text = text.toLowerCase();
-        final String[] texts = text == null || text.isEmpty() ? new String[0] : text.split(" +"); // NOI18N
+        final String[] texts = text == null || text.isEmpty() ? new String[0] : text.replace(',', ' ').split(" +"); // NOI18N
         Filter filter = new Filter() {
             public boolean include(RowFilter.Entry entry) {
                 if (texts.length == 0) return true;
@@ -198,6 +200,37 @@ public final class FilterUtils {
         
         toolbar.add(comboContainer);
         
+        if (PackageColorer.hasRegisteredColors()) {
+            toolbar.add(new PopupButton() {
+                {
+                    setToolTipText("Insert Defined Filter");
+                }
+//                protected void displayPopup() {
+//                    JPopupMenu menu = new JPopupMenu();
+//                    populatePopup(menu);
+//                    if (menu.getComponentCount() > 0) {
+//                        Dimension size = menu.getPreferredSize();
+//                        size.width = Math.max(size.width, getWidth());
+//                        menu.setPreferredSize(size);
+//                        menu.show(this, 0, -size.height);
+//                    }
+//                }
+                protected void populatePopup(JPopupMenu popup) {
+                    for (final PackageColor color : PackageColorer.getRegisteredColors())
+                        popup.add(new JMenuItem(color.getName(), color.getIcon(12, 12)) {
+                            protected void fireActionPerformed(ActionEvent event) {
+                                String current = getFilterString(combo);
+                                if (current == null) current = ""; // NOI18N
+                                if (!current.isEmpty()) current += " ";
+                                current += color.getValue();
+                                textC.setText(current);
+                                combo.requestFocusInWindow();
+                            }
+                        });
+                }
+            });
+        }
+        
         toolbar.add(Box.createHorizontalStrut(5));
         
         KeyStroke escKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
@@ -225,6 +258,20 @@ public final class FilterUtils {
         String filterAccelerator = ActionsSupport.keyAcceleratorString(filterKey);
         filter.setToolTipText(MessageFormat.format(BTN_FILTER_TOOLTIP, filterAccelerator));
         filterButton[0] = filter;
+        Action filterAction = new AbstractAction() {
+            public void actionPerformed(final ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if (filterButton[0].isEnabled()) {
+                            filterButton[0].doClick();
+                            combo.requestFocusInWindow();
+                        }
+                    }
+                });
+            }
+        };
+        filterButton[0].getActionMap().put(FILTER_ACTION_KEY, filterAction);
+        filterButton[0].getInputMap().put(filterKey, FILTER_ACTION_KEY);
         toolbar.add(filter);
         
         updateFilterButton(filter, activeFilter[0], getFilterString(combo));
@@ -342,7 +389,7 @@ public final class FilterUtils {
         
         if (textC != null) {
             map = textC.getInputMap();
-            Action nextAction = new AbstractAction() {
+            Action _filterAction = new AbstractAction() {
                 public void actionPerformed(final ActionEvent e) {
                     if (combo.isPopupVisible()) combo.hidePopup();
                     SwingUtilities.invokeLater(new Runnable() {
@@ -350,7 +397,7 @@ public final class FilterUtils {
                     });
                 }
             };
-            textC.getActionMap().put(FILTER_ACTION_KEY, nextAction);
+            textC.getActionMap().put(FILTER_ACTION_KEY, _filterAction);
             map.put(filterKey, FILTER_ACTION_KEY);
         }
         

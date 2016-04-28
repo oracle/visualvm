@@ -295,9 +295,9 @@ public abstract class SnapshotMemoryView extends JPanel {
             popup.addSeparator();
         }
         
-        if (userValue != null && !Wildcards.ALLWILDCARD.equals(userValue.getMethodName())) {
+        if (userValue == null || !Wildcards.ALLWILDCARD.equals(userValue.getMethodName())) {
             popup.add(new JMenuItem(MemoryView.ACTION_PROFILE_METHOD) {
-                { setEnabled(isSelectable(userValue, true)); }
+                { setEnabled(userValue != null && isSelectable(userValue, true)); }
                 protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
             });
         }
