@@ -66,6 +66,12 @@ public interface JdbcCCTProvider extends CCTProvider, FlatProfileProvider {
     public static final int SQL_COMMAND_SET = 6;
     public static final int SQL_COMMAND_UPDATE = 7;
         
+    public static final String STATEMENT_INTERFACE = java.sql.Statement.class.getName();
+    public static final String PREPARED_STATEMENT_INTERFACE = java.sql.PreparedStatement.class.getName();
+    public static final String CALLABLE_STATEMENT_INTERFACE = java.sql.CallableStatement.class.getName();
+    public static final String CONNECTION_INTERFACE = java.sql.Connection.class.getName();
+    public static final String DRIVER_INTERFACE = java.sql.Driver.class.getName();
+
     public static interface Listener extends CCTProvider.Listener {
     }
     
