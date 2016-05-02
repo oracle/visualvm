@@ -55,6 +55,7 @@ import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.netbeans.modules.profiler.ResultsListener;
@@ -81,12 +82,12 @@ import org.openide.util.lookup.ServiceProvider;
 })
 final class SQLFeature extends ProfilerFeature.Basic {
     
-    private static final Class[] jdbcMarkerClasses = {
-        Driver.class,
-        Connection.class,
-        Statement.class,
-        PreparedStatement.class,
-        CallableStatement.class
+    private static final String[] jdbcMarkerClasses = {
+        JdbcCCTProvider.DRIVER_INTERFACE,
+        JdbcCCTProvider.CONNECTION_INTERFACE,
+        JdbcCCTProvider.STATEMENT_INTERFACE,
+        JdbcCCTProvider.PREPARED_STATEMENT_INTERFACE,
+        JdbcCCTProvider.CALLABLE_STATEMENT_INTERFACE
     };
 
     private final WeakProcessor processor;
@@ -115,7 +116,7 @@ final class SQLFeature extends ProfilerFeature.Basic {
 
         ClientUtils.SourceCodeSelection[] roots = new ClientUtils.SourceCodeSelection[jdbcMarkerClasses.length];
         for (int i = 0; i < jdbcMarkerClasses.length; i++) {
-            roots[i] = new ClientUtils.SourceCodeSelection(jdbcMarkerClasses[i].getName(), "*", null); // NOI18N
+            roots[i] = new ClientUtils.SourceCodeSelection(jdbcMarkerClasses[i], "*", null); // NOI18N
             roots[i].setMarkerMethod(true);
         }
         settings.addRootMethods(roots);
