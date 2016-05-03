@@ -51,15 +51,15 @@ import java.util.List;
  */
 public final class PackageColorer {
     
-    private static final List<PackageColor> COLORS = initColors();
+    private static final List<ColoredFilter> COLORS = initColors();
     
     
-    public static boolean registerColor(PackageColor color) {
+    public static boolean registerColor(ColoredFilter color) {
         if (COLORS.contains(color)) return false;
         else return COLORS.add(color);
     }
     
-    public static boolean unregisterColor(PackageColor color) {
+    public static boolean unregisterColor(ColoredFilter color) {
         return COLORS.remove(color);
     }
     
@@ -67,37 +67,36 @@ public final class PackageColorer {
         return !COLORS.isEmpty();
     }
     
-    public static List<PackageColor> getRegisteredColors() {
-        List<PackageColor> colors = new ArrayList();
-        for (PackageColor color : COLORS) colors.add(new PackageColor(color));
+    public static List<ColoredFilter> getRegisteredColors() {
+        List<ColoredFilter> colors = new ArrayList();
+        for (ColoredFilter color : COLORS) colors.add(new ColoredFilter(color));
         return colors;
     }
     
-    public static void setRegisteredColors(List<PackageColor> colors) {
+    public static void setRegisteredColors(List<ColoredFilter> colors) {
         COLORS.clear();
         COLORS.addAll(colors);
     }
     
     
     public static Color getForeground(String pkg) {
-        for (PackageColor color : COLORS)
-            for (String value : color.getValues())
-                if (pkg.startsWith(value))
-                    return color.getColor();
+        for (ColoredFilter color : COLORS)
+            if (color.passes(pkg))
+                return color.getColor();
         
         return null;
     }
     
     
     // TODO: implement persistent storage
-    private static List<PackageColor> initColors() {
-        List<PackageColor> colors = new ArrayList();
+    private static List<ColoredFilter> initColors() {
+        List<ColoredFilter> colors = new ArrayList();
         
         String reflection = new String("java.lang.reflect., sun.reflect., com.sun.proxy.");
-        colors.add(new PackageColor("Java Reflection", reflection, new Color(180, 180, 180)));
+        colors.add(new ColoredFilter("Java Reflection", reflection, new Color(180, 180, 180)));
         
         String javaee = new String("javax.servlet., org.apache.catalina., org.springframework., org.eclipse.persistence.");
-        colors.add(new PackageColor("Java EE Frameworks", javaee, new Color(135, 135, 135)));
+        colors.add(new ColoredFilter("Java EE Frameworks", javaee, new Color(135, 135, 135)));
         
         return colors;
     }
