@@ -254,6 +254,9 @@ class HprofHeap implements Heap {
             classDump = classDumpBounds.getClassDumpByID(classId);
         }
 
+        if (classDump == null) {
+            return null;
+        }
         if (tag == INSTANCE_DUMP) {
             return new InstanceDump(classDump, start);
         } else if (tag == OBJECT_ARRAY_DUMP) {
