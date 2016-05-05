@@ -148,8 +148,11 @@ public final class PackageColorer {
         
         new SwingWorker() {
             protected Object doInBackground() throws Exception {
-                for (int i = 0; i < colors.size(); i++)
+                for (int i = 0; i < colors.size(); i++) try {
                     colors.get(i).store(properties, Integer.toString(i) + "_"); // NOI18N
+                } catch (Throwable t) {
+                    Logger.getLogger(PackageColorer.class.getName()).log(Level.INFO, null, t);
+                }
                 
                 try {
                     ProfilerStorage.saveGlobalProperties(properties, FILTERS_FILE);

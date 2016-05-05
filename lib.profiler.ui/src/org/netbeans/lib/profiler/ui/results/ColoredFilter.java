@@ -167,7 +167,7 @@ public class ColoredFilter extends GenericFilter {
     
     public void store(Properties properties, String id) {
         super.store(properties, id);
-        properties.put(id + PROP_COLOR, Integer.toString(color.getRGB()));
+        if (color != null) properties.put(id + PROP_COLOR, Integer.toString(color.getRGB()));
     }
     
     
