@@ -51,6 +51,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import org.netbeans.lib.profiler.filters.GenericFilter;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.api.ProfilerStorage;
 
 /**
@@ -92,6 +93,8 @@ public final class PackageColorer {
     
     
     public static Color getForeground(String pkg) {
+        if (!ProfilerIDESettings.getInstance().isSourcesColoringEnabled()) return null;
+        
         for (ColoredFilter color : COLORS)
             if (color.passes(pkg))
                 return color.getColor();
