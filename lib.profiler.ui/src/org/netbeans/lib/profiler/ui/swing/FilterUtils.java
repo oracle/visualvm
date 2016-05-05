@@ -182,17 +182,20 @@ public final class FilterUtils {
 //                    }
 //                }
                 protected void populatePopup(JPopupMenu popup) {
-                    for (final ColoredFilter color : PackageColorer.getRegisteredColors())
-                        popup.add(new JMenuItem(color.getName(), color.getIcon(12, 12)) {
+                    for (final ColoredFilter color : PackageColorer.getRegisteredColors()) {
+                        if (color.getValue().trim().isEmpty()) continue;
+                        Icon icon = color.getColor() == null ? null : color.getIcon(12, 12);
+                        popup.add(new JMenuItem(color.getName(), icon) {
                             protected void fireActionPerformed(ActionEvent event) {
                                 String current = getFilterString(combo);
                                 if (current == null) current = ""; // NOI18N
-                                if (!current.isEmpty()) current += " ";
+                                if (!current.isEmpty()) current += " "; // NOI18N
                                 current += color.getValue();
                                 textC.setText(current);
                                 combo.requestFocusInWindow();
                             }
                         });
+                    }
                 }
             });
         }
