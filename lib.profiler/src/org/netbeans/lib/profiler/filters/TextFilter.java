@@ -42,6 +42,7 @@
 package org.netbeans.lib.profiler.filters;
 
 import java.util.Locale;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 /**
@@ -66,6 +67,10 @@ public class TextFilter extends GenericFilter {
     public TextFilter(String value, int type, boolean caseSensitive) {
         super(null, value, type);
         setCaseSensitive(caseSensitive);
+    }
+    
+    public TextFilter(Properties properties, String id) {
+        super(properties, id);
     }
     
     

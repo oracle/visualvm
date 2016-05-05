@@ -45,6 +45,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.util.Objects;
+import java.util.Properties;
 import javax.swing.Icon;
 import org.netbeans.lib.profiler.filters.GenericFilter;
 
@@ -53,6 +54,8 @@ import org.netbeans.lib.profiler.filters.GenericFilter;
  * @author Jiri Sedlacek
  */
 public class ColoredFilter extends GenericFilter {
+    
+    private static final String PROP_COLOR = "COLOR"; // NOI18N
     
     private Color color;
     private transient Icon icon;
@@ -68,6 +71,12 @@ public class ColoredFilter extends GenericFilter {
         super(name, value, TYPE_INCLUSIVE);
         
         this.color = color;
+    }
+    
+    public ColoredFilter(Properties properties, String id) {
+        super(properties, id);
+        
+        color = loadColor(properties, id);
     }
     
     
@@ -153,6 +162,25 @@ public class ColoredFilter extends GenericFilter {
         if (color != null) hashBase = 67 * hashBase + color.hashCode();
         
         return hashBase;
+    }
+    
+    
+    public void store(Properties properties, String id) {
+        super.store(properties, id);
+        properties.put(id + PROP_COLOR, Integer.toString(color.getRGB()));
+    }
+    
+    
+    private static Color loadColor(Properties properties, String id) {
+        String _color = properties.getProperty(id + PROP_COLOR);
+        if (_color == null) return null;
+        
+        try {
+            int _colorI = Integer.parseInt(_color);
+            return new Color(_colorI);
+        } catch (NumberFormatException e) {
+            throw new InvalidFilterIdException("Bad color code specified", id); // NOI18N
+        }
     }
     
 }

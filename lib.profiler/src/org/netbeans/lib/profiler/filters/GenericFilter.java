@@ -42,6 +42,7 @@
 package org.netbeans.lib.profiler.filters;
 
 import java.util.Objects;
+import java.util.Properties;
 
 /**
  *
@@ -58,6 +59,10 @@ public class GenericFilter {
     protected static final int MODE_STARTS_WITH = 1020;
     protected static final int MODE_ENDS_WITH = 1030;
     
+    private static final String PROP_NAME = "NAME"; // NOI18N
+    private static final String PROP_VALUE = "VALUE"; // NOI18N
+    private static final String PROP_TYPE = "TYPE"; // NOI18N
+    
     
     private String name;
     private String value;
@@ -66,8 +71,8 @@ public class GenericFilter {
     private int type;
     private transient int[] modes;
     
-    private boolean isEmpty;
-    private boolean isAll;
+    private Boolean isEmpty;
+    private Boolean isAll;
     
     
     public GenericFilter(GenericFilter other) {
@@ -77,7 +82,11 @@ public class GenericFilter {
     public GenericFilter(String name, String value, int type) {
         this(name, value, null, type, null);
     }
-
+    
+    public GenericFilter(Properties properties, String id) {
+        this(loadName(properties, id), loadValue(properties, id), loadType(properties, id));
+    }
+    
     private GenericFilter(String name, String value, String[] values, int type, int[] modes) {
         this.name = name;
         this.value = value;
@@ -114,9 +123,8 @@ public class GenericFilter {
     protected void valueChanged() {
         values = null;
         modes = null;
-        
-        isEmpty = value.isEmpty();
-        isAll = isEmpty || "*".equals(value) || "**".equals(value); // NOI18N
+        isEmpty = null;
+        isAll = null;
     }
     
     public final String getValue() {
@@ -143,10 +151,12 @@ public class GenericFilter {
     
     
     public final boolean isEmpty() {
+        if (isEmpty == null) isEmpty = value.isEmpty();
         return isEmpty;
     }
     
     public boolean isAll() {
+        if (isAll == null) isAll = isEmpty() || "*".equals(value) || "**".equals(value); // NOI18N
         return isAll;
     }
 
@@ -283,6 +293,41 @@ public class GenericFilter {
         hashBase = 67 * hashBase + type;
         
         return hashBase;
+    }
+    
+    
+    public void store(Properties properties, String id) {
+        if (name == null) properties.remove(id + PROP_NAME); else properties.put(id + PROP_NAME, name);
+        properties.put(id + PROP_VALUE, value);
+        properties.put(id + PROP_TYPE, Integer.toString(type));
+    }
+    
+    
+    private static String loadName(Properties properties, String id) {
+        String _name = properties.getProperty(id + PROP_NAME);
+        return _name == null ? "" : _name; // NOI18N
+    }
+    
+    private static String loadValue(Properties properties, String id) {
+        String _value = properties.getProperty(id + PROP_VALUE);
+        if (_value == null) throw new InvalidFilterIdException("No filter value found", id); // NOI18N
+        return _value;
+    }
+    
+    private static int loadType(Properties properties, String id) {
+        String _type = properties.getProperty(id + PROP_TYPE);
+        if (_type == null) throw new InvalidFilterIdException("No filter type found", id); // NOI18N
+        try { return Integer.parseInt(_type); } catch (NumberFormatException e)
+            { throw new InvalidFilterIdException("Bad filter type specified", id); } // NOI18N
+    }
+    
+    
+    public static final class InvalidFilterIdException extends IllegalArgumentException {
+        
+        public InvalidFilterIdException(String message, String filterId) {
+            super(message + " for filter id " + filterId); // NOI18N
+        }
+        
     }
     
 }
