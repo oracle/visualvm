@@ -476,7 +476,7 @@ public class Platform implements CommonConstants {
 
             if (!d.exists()) {
                 if (!d.mkdir()) {
-                    throw new IOException("Could not create directory" + customDir); // NOI18N
+                    throw new IOException("Could not create directory " + customDir); // NOI18N
                 }
             }
 
@@ -488,7 +488,7 @@ public class Platform implements CommonConstants {
 
             if (!d.exists()) {
                 if (!d.mkdir()) {
-                    throw new IOException("Could not create directory" + dir); // NOI18N
+                    throw new IOException("Could not create directory " + dir); // NOI18N
                 }
             }
 

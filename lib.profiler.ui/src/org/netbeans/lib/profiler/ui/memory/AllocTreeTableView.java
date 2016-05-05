@@ -167,7 +167,13 @@ abstract class AllocTreeTableView extends MemoryView {
                 }
             }
             
-            if ((!includeEmpty && _nTotalAllocObjects[i] > 0) || (isAll(filter) && includeEmpty) || (isExact(filter) && includeEmpty && filter.contains(_classNames[i]))) {
+            if (!includeEmpty) { // old snapshot
+                if (_nTotalAllocObjects[i] > 0) {
+                    PresoObjAllocCCTNode node = new Node(_classNames[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i]);
+                    nodes.add(node);
+                    _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
+                }
+            } else if (isAll(filter) || (isExact(filter) && filter.contains(_classNames[i]))) {
                 PresoObjAllocCCTNode node = new Node(_classNames[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i]);
                 nodes.add(node);
                 _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
@@ -361,7 +367,7 @@ abstract class AllocTreeTableView extends MemoryView {
     
     protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
         PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)treeTable.getValueForRow(row);
-        if (node == null) return null;
+        if (node == null || node.isFiltered()) return null;
         String[] name = node.getMethodClassNameAndSig();
         return new ClientUtils.SourceCodeSelection(name[0], name[1], name[2]);
     }

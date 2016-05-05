@@ -192,7 +192,13 @@ abstract class LivenessTreeTableView extends MemoryView {
                 }
             }
             
-            if ((!includeEmpty && _nTrackedLiveObjects[i] > 0) || (isAll(filter) && includeEmpty) || (isExact(filter) && includeEmpty && filter.contains(_classNames[i]))) {
+            if (!includeEmpty) { // old snapshot
+                if (_nTrackedLiveObjects[i] > 0) {
+                    PresoObjLivenessCCTNode node = new Node(_classNames[i], _nTrackedAllocObjects[i], _objectsSizePerClass[i], _nTrackedLiveObjects[i], _nTotalAllocObjects[i], _avgObjectAge[i], _maxSurvGen[i]);
+                    nodes.add(node);
+                    _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
+                }
+            } else if (isAll(filter) || (isExact(filter) && filter.contains(_classNames[i]))) {
                 PresoObjLivenessCCTNode node = new Node(_classNames[i], _nTrackedAllocObjects[i], _objectsSizePerClass[i], _nTrackedLiveObjects[i], _nTotalAllocObjects[i], _avgObjectAge[i], _maxSurvGen[i]);
                 nodes.add(node);
                 _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
@@ -450,7 +456,7 @@ abstract class LivenessTreeTableView extends MemoryView {
     
     protected ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
         PresoObjLivenessCCTNode node = (PresoObjLivenessCCTNode)treeTable.getValueForRow(row);
-        if (node == null) return null;
+        if (node == null || node.isFiltered()) return null;
         String[] name = node.getMethodClassNameAndSig();
         return new ClientUtils.SourceCodeSelection(name[0], name[1], name[2]);
     }
