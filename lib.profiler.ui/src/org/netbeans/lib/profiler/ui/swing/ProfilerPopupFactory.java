@@ -101,6 +101,15 @@ public class ProfilerPopupFactory {
     }
     
     
+    public static boolean isInPopup(Component component) {
+        Container parent = component.getParent();
+        while (parent != null)
+            if (parent instanceof PopupPane) return true;
+            else parent = parent.getParent();
+        return false;
+    }
+    
+    
     public static abstract class Listener {
         
         protected void popupShown() {}

@@ -77,6 +77,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.common.AttachSettings;
@@ -87,6 +88,7 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.PopupButton;
+import org.netbeans.lib.profiler.ui.swing.ProfilerPopupFactory;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
@@ -406,14 +408,37 @@ class ProfilerWindow extends ProfilerTopComponent {
         stop.setVisible(!_configure);
         configure.setVisible(_configure);
         
-        if (!this.isAncestorOf(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner())) {
-            final Component foc = _configure ? configure : start;
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() { foc.requestFocusInWindow(); }
-            });
-        }
+        new Timer(0, null) {
+            {
+                setRepeats(false);
+                setInitialDelay(50);
+            }
+            protected void fireActionPerformed(ActionEvent e) {
+                updateFocus();
+            }
+        }.start();
         
         if (session.inProgress()) session.doModify(features.getSettings());
+    }
+    
+    private void updateFocus() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                Component focused = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+
+                // Do not change focus for these special cases:
+                if (focused != null) {
+                    if (profilePopupVisible) return; // focus in the Profile popup
+                    if (ProfilerPopupFactory.isInPopup(focused)) return; // focus in a profiler popup
+                    if (ProfilerWindow.this.isAncestorOf(focused)) return; // focus inside the ProfilerWindow
+                }
+
+                final Component foc = configure.isVisible() ? configure : start;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() { foc.requestFocusInWindow(); }
+                });
+            }
+        });
     }
     
     private void updateFeatureToolbar() {
@@ -531,6 +556,8 @@ class ProfilerWindow extends ProfilerTopComponent {
     
     // --- Profile/Attach popup ------------------------------------------------
     
+    private boolean profilePopupVisible;
+    
     private void displayPopupImpl() {
         final Set<ProfilerFeature> _features = features.getAvailable();
         final Set<ProfilerFeature> _selected = features.getActivated();
@@ -555,6 +582,8 @@ class ProfilerWindow extends ProfilerTopComponent {
                 if (visible) features.addListener(listener);
                 else features.removeListener(listener);
                 super.setVisible(visible);
+                profilePopupVisible = visible;
+                if (!visible) updateFocus();
             }
         };
         popup.setLayout(new GridBagLayout());
