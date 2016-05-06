@@ -42,8 +42,17 @@
 package org.netbeans.lib.profiler.ui.results;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.SwingWorker;
+import org.netbeans.lib.profiler.filters.GenericFilter;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
+import org.netbeans.modules.profiler.api.ProfilerStorage;
 
 /**
  *
@@ -51,15 +60,17 @@ import java.util.List;
  */
 public final class PackageColorer {
     
-    private static final List<PackageColor> COLORS = initColors();
+    private static final String FILTERS_FILE = "filters"; // NOI18N
+    
+    private static final List<ColoredFilter> COLORS = loadColors();
     
     
-    public static boolean registerColor(PackageColor color) {
+    public static boolean registerColor(ColoredFilter color) {
         if (COLORS.contains(color)) return false;
         else return COLORS.add(color);
     }
     
-    public static boolean unregisterColor(PackageColor color) {
+    public static boolean unregisterColor(ColoredFilter color) {
         return COLORS.remove(color);
     }
     
@@ -67,39 +78,102 @@ public final class PackageColorer {
         return !COLORS.isEmpty();
     }
     
-    public static List<PackageColor> getRegisteredColors() {
-        List<PackageColor> colors = new ArrayList();
-        for (PackageColor color : COLORS) colors.add(new PackageColor(color));
+    public static List<ColoredFilter> getRegisteredColors() {
+        List<ColoredFilter> colors = new ArrayList();
+        for (ColoredFilter color : COLORS) colors.add(new ColoredFilter(color));
         return colors;
     }
     
-    public static void setRegisteredColors(List<PackageColor> colors) {
-        COLORS.clear();
-        COLORS.addAll(colors);
+    public static void setRegisteredColors(List<ColoredFilter> colors) {
+        if (!COLORS.equals(colors)) {
+            COLORS.clear();
+            COLORS.addAll(colors);
+        }
     }
     
     
     public static Color getForeground(String pkg) {
-        for (PackageColor color : COLORS)
-            for (String value : color.getValues())
-                if (pkg.startsWith(value))
-                    return color.getColor();
+        if (!ProfilerIDESettings.getInstance().isSourcesColoringEnabled()) return null;
+        
+        for (ColoredFilter color : COLORS)
+            if (color.passes(pkg))
+                return color.getColor();
         
         return null;
     }
     
     
-    // TODO: implement persistent storage
-    private static List<PackageColor> initColors() {
-        List<PackageColor> colors = new ArrayList();
+    private static List<ColoredFilter> loadColors() {
+        List<ColoredFilter> colors = new ArrayList<ColoredFilter>() {
+            public boolean add(ColoredFilter e) {
+                boolean ret = super.add(e);
+                if (ret && COLORS != null) storeColors();
+                return ret;
+            }
+            public boolean addAll(Collection<? extends ColoredFilter> c) {
+                boolean ret = super.addAll(c);
+                if (ret && COLORS != null) storeColors();
+                return ret;
+            }
+            public boolean remove(Object o) {
+                boolean ret = super.remove(o);
+                if (ret && COLORS != null) storeColors();
+                return ret;
+            }
+        };
         
-        String reflection = new String("java.lang.reflect., sun.reflect., com.sun.proxy.");
-        colors.add(new PackageColor("Java Reflection", reflection, new Color(180, 180, 180)));
+        // Load persisted filters to Properties
+        Properties properties = new Properties();
+        try {
+            ProfilerStorage.loadGlobalProperties(properties, FILTERS_FILE);
+        } catch (IOException e) {
+            Logger.getLogger(PackageColorer.class.getName()).log(Level.INFO, null, e);
+        }
         
-        String javaee = new String("javax.servlet., org.apache.catalina., org.springframework., org.eclipse.persistence.");
-        colors.add(new PackageColor("Java EE Frameworks", javaee, new Color(135, 135, 135)));
+        // Create filter instances from Properties
+        if (!properties.isEmpty()) {
+            int i = 0;
+            while (true) {
+                try { colors.add(new ColoredFilter(properties, Integer.toString(i++) + "_")); } // NOI18N
+                catch (GenericFilter.InvalidFilterIdException e) { break; }
+            }
+        }
+        
+        // Fallback to default filters if no persisted filters
+        if (colors.isEmpty()) createDefaultFilters(colors);
         
         return colors;
+    }
+    
+    private static void storeColors() {
+        final Properties properties = new Properties();
+        final List<ColoredFilter> colors = getRegisteredColors();
+        
+        new SwingWorker() {
+            protected Object doInBackground() throws Exception {
+                for (int i = 0; i < colors.size(); i++) try {
+                    colors.get(i).store(properties, Integer.toString(i) + "_"); // NOI18N
+                } catch (Throwable t) {
+                    Logger.getLogger(PackageColorer.class.getName()).log(Level.INFO, null, t);
+                }
+                
+                try {
+                    ProfilerStorage.saveGlobalProperties(properties, FILTERS_FILE);
+                } catch (IOException e) {
+                    Logger.getLogger(PackageColorer.class.getName()).log(Level.INFO, null, e);
+                }
+                
+                return null;
+            }
+        }.execute();
+    }
+    
+    private static void createDefaultFilters(List<ColoredFilter> colors) {
+        String reflection = new String("java.lang.reflect., sun.reflect., com.sun.proxy."); // NOI18N
+        colors.add(new ColoredFilter("Java Reflection", reflection, new Color(180, 180, 180)));
+        
+        String javaee = new String("javax.servlet., org.apache.catalina., org.springframework., org.eclipse.persistence."); // NOI18N
+        colors.add(new ColoredFilter("Java EE Frameworks", javaee, new Color(135, 135, 135)));
     }
     
 }

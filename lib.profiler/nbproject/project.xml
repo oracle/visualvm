@@ -107,6 +107,7 @@ made subject to such option by the copyright holder.
                 <package>org.netbeans.lib.profiler</package>
                 <package>org.netbeans.lib.profiler.classfile</package>
                 <package>org.netbeans.lib.profiler.client</package>
+                <package>org.netbeans.lib.profiler.filters</package>
                 <package>org.netbeans.lib.profiler.global</package>
                 <package>org.netbeans.lib.profiler.heap</package>
                 <package>org.netbeans.lib.profiler.instrumentation</package>
