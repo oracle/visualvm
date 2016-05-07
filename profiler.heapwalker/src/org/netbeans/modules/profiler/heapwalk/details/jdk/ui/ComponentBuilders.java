@@ -44,6 +44,7 @@ package org.netbeans.modules.profiler.heapwalk.details.jdk.ui;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
@@ -152,6 +153,9 @@ final class ComponentBuilders {
     
     static class ComponentBuilder<T extends Component> extends InstanceBuilder<T> {
         
+        private final static int MAX_WIDTH = 10000;
+        private final static int MAX_HEIGHT = 10000;
+        
         protected final String className;
         
         private final RectangleBuilder bounds;
@@ -182,7 +186,11 @@ final class ComponentBuilders {
         protected void setupInstance(T instance) {
             super.setupInstance(instance);
             
-            instance.setBounds(bounds.createInstance());
+            // #250485 - large components may cause OOME when previewing
+            Rectangle rect = bounds.createInstance();
+            rect.width = Math.min(rect.width, MAX_WIDTH);
+            rect.height = Math.min(rect.height, MAX_HEIGHT);
+            instance.setBounds(rect);
             
 //            if (foreground != null) instance.setForeground(foreground.createInstance());
 //            if (background != null) instance.setBackground(background.createInstance());
