@@ -100,6 +100,7 @@ public final class FilterUtils {
     private static final String FILTER_NOT_CONTAINS = messages.getString("FilterUtils_FilterNotContains"); // NOI18N
     private static final String FILTER_REGEXP = messages.getString("FilterUtils_FilterRegexp"); // NOI18N
     private static final String FILTER_TYPE = messages.getString("FilterUtils_FilterType"); // NOI18N
+    private static final String INSERT_FILTER = messages.getString("FilterUtils_InsertFilter"); // NOI18N
     // -----
     
     public static final String FILTER_ACTION_KEY = "filter-action-key"; // NOI18N
@@ -169,7 +170,7 @@ public final class FilterUtils {
         if (PackageColorer.hasRegisteredColors()) {
             toolbar.add(new PopupButton() {
                 {
-                    setToolTipText("Insert Defined Filter");
+                    setToolTipText(INSERT_FILTER);
                 }
 //                protected void displayPopup() {
 //                    JPopupMenu menu = new JPopupMenu();
