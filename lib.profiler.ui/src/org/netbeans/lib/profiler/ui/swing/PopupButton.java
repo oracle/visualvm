@@ -125,7 +125,7 @@ public class PopupButton extends SmallButton {
     
     public Dimension getPreferredSize() {
         Dimension size = super.getPreferredSize();
-        size.width += DROPDOWN_ICON_WIDTH + 5;
+        size.width += DROPDOWN_ICON_WIDTH + (isEmpty() ? 3 : 5);
         return size;
     }
     
@@ -147,8 +147,20 @@ public class PopupButton extends SmallButton {
     
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        DROPDOWN_ICON.paintIcon(this, g, getWidth() - DROPDOWN_ICON_WIDTH - iconOffset,
-                                        (getHeight() - DROPDOWN_ICON_HEIGHT) / 2);
+        if (isEmpty()) {
+            DROPDOWN_ICON.paintIcon(this, g, (getWidth() - DROPDOWN_ICON_WIDTH) / 2,
+                                             (getHeight() - DROPDOWN_ICON_HEIGHT) / 2);
+        } else {
+            DROPDOWN_ICON.paintIcon(this, g, getWidth() - DROPDOWN_ICON_WIDTH - iconOffset,
+                                            (getHeight() - DROPDOWN_ICON_HEIGHT) / 2);
+        }
+    }
+    
+    
+    private boolean isEmpty() {
+        if (getIcon() != NO_ICON) return false;
+        String text = getText();
+        return text == null || text.isEmpty();
     }
     
 }
