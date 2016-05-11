@@ -106,6 +106,8 @@ public class TextArea extends JTextArea {
     private boolean changeListener;
     
     public void setText(String t) {
+        if (showsHint() && !Objects.equals(t, hint)) hideHint();
+        
         if (!changeListener) {
             changeListener = true;
             getDocument().addDocumentListener(new DocumentListener() {
@@ -115,6 +117,7 @@ public class TextArea extends JTextArea {
                 private void updated() { if (!showsHint()) changed(); }
             });
         }
+        
         super.setText(t);
     }
     
@@ -126,7 +129,7 @@ public class TextArea extends JTextArea {
     public void setHint(String hint) {
         hideHint();
         this.hint = hint;
-        showHint();
+        if (!isFocusOwner()) showHint();
     }
     
     public String getHint() {
