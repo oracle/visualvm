@@ -50,6 +50,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -156,7 +157,7 @@ public class TextArea extends JTextArea {
         if (showsHint) {
             showsHint = false;
             setForeground(hintFg);
-            setText(null);
+            if (Objects.equals(getText(), hint)) setText(""); // NOI18N
         }
     }
     
