@@ -444,13 +444,10 @@ class HprofHeap implements Heap {
         while (refIdsIt.hasNext()) {
             long foundInstanceId = ((Long)refIdsIt.next()).longValue();
             offset[0] = idToOffsetMap.get(foundInstanceId).getOffset();
-            int classIdOffset = 0;
-            int instanceIdOffset = 0;
             long start = offset[0];
             int tag = readDumpTag(offset);
 
             if (tag == INSTANCE_DUMP) {
-                classIdOffset = idSize + 4;
                 int size = dumpBuffer.getInt(start + 1 + idSize + 4 + idSize);
                 byte[] fields = new byte[size];
                 dumpBuffer.get(start + 1 + idSize + 4 + idSize + 4, fields);
