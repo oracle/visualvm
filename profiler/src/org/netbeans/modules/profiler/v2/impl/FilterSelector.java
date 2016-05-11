@@ -65,6 +65,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import org.netbeans.lib.profiler.ui.results.ColoredFilter;
 import org.netbeans.lib.profiler.ui.results.PackageColorer;
@@ -250,7 +251,8 @@ public abstract class FilterSelector {
                     filterChanged(true);
                 }
                 public Point getToolTipLocation(MouseEvent event) {
-                    return new Point(-1, getHeight() + 2);
+                    Component scroll = getParent().getParent();
+                    return SwingUtilities.convertPoint(scroll, 0, scroll.getHeight(), this);
                 }
                 public void setEnabled(boolean enabled) {
                     super.setEnabled(enabled);
