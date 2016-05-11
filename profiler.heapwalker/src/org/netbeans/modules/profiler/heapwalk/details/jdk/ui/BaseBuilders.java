@@ -42,7 +42,6 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details.jdk.ui;
 
-import org.netbeans.modules.profiler.heapwalk.details.jdk.image.ImageDetailProvider;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
