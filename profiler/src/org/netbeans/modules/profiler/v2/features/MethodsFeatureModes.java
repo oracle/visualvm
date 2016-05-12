@@ -1112,7 +1112,8 @@ final class MethodsFeatureModes {
                         popup.add(createResizeMenu());
                     }
                     public Point getToolTipLocation(MouseEvent event) {
-                        return new Point(-1, getHeight() + 2);
+                        Component scroll = getParent().getParent();
+                        return SwingUtilities.convertPoint(scroll, 0, scroll.getHeight(), this);
                     }
                 };
                 classesArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N
@@ -1213,7 +1214,8 @@ final class MethodsFeatureModes {
                         popup.add(createResizeMenu());
                     }
                     public Point getToolTipLocation(MouseEvent event) {
-                        return new Point(-1, getHeight() + 2);
+                        Component scroll = getParent().getParent();
+                        return SwingUtilities.convertPoint(scroll, 0, scroll.getHeight(), this);
                     }
                 };
                 filterArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N
