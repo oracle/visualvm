@@ -44,7 +44,6 @@
 package org.netbeans.lib.profiler.heap;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -145,17 +144,19 @@ class NearestGCRoot {
     private void computeOneLevel(Set processedClasses) throws IOException {
         int idSize = heap.dumpBuffer.getIDSize();
         for (;;) {
-            long instanceId = readLong();
+            long instanceId;
             Instance instance;
+            long instanceOffset = readLong();
             List fieldValues;
             Iterator valuesIt;
             boolean hasValues = false;
             
-            if (instanceId == 0L) { // end of level
+            if (instanceOffset == 0L) { // end of level
                 break;
             }
             HeapProgress.progress(processedInstances++,allInstances);
-            instance = heap.getInstanceByID(instanceId);
+            instance = heap.getInstanceByOffset(instanceOffset);
+            instanceId = instance.getInstanceId();
             if (instance instanceof ObjectArrayInstance) {
                 ObjectArrayDump array = (ObjectArrayDump) instance;
                 int size = array.getLength();
@@ -251,8 +252,9 @@ class NearestGCRoot {
 
         while (gcIt.hasNext()) {
             HprofGCRoot root = (HprofGCRoot) gcIt.next();
-
-            writeLong(root.getInstanceId());
+            long id = root.getInstanceId();
+            
+            writeLong(heap.idToOffsetMap.get(id).getOffset());
         }
     }
 
@@ -295,7 +297,7 @@ class NearestGCRoot {
             LongMap.Entry entry = heap.idToOffsetMap.get(refInstanceId);
 
             if (entry != null && entry.getNearestGCRootPointer() == 0L && heap.getGCRoot(refInstanceId) == null) {
-                writeLong(refInstanceId);
+                writeLong(entry.getOffset());
                 if (addRefInstanceId) {
                     if (!checkReferences(refInstanceId, instanceId)) {
                         entry.addReference(instanceId);
