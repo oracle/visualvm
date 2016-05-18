@@ -787,6 +787,9 @@ public class ProfilerRuntimeCPU extends ProfilerRuntime {
         if (clazz.equals("java.sql.Timestamp")) {
             return String.valueOf(((java.sql.Timestamp)o).getTime());            
         }
+        if (clazz.equals("java.math.BigDecimal")) {
+            return o.toString();
+        }
         return getObjectId(o, clazz);
     }
     
