@@ -74,7 +74,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellRenderer;
-import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 
 /**
@@ -122,12 +121,6 @@ final class ProfilerTableHovers {
         
         closer = new Closer();
         
-//        table.add(crp = new CellRendererPane() {
-//            public void paintComponent(Graphics g, Component c, Container p, int x, int y, int w, int h, boolean v) {
-//                super.paintComponent(g, c, p, x, y, w, h, v);
-//                remove(c); // Prevent leaking ProfilerTreeTable.ProfilerTreeTableTree and transitively all the UI/models
-//            }
-//        });
         crp = new CellRendererPane() {
             public void paintComponent(Graphics g, Component c, Container p, int x, int y, int w, int h, boolean v) {
                 super.paintComponent(g, c, p, x, y, w, h, v);
@@ -251,9 +244,9 @@ final class ProfilerTableHovers {
         Rectangle rendererRect = getRendererRect(column, renderer);
         if (rendererRect == null) return null;
         
-        Rectangle cellRect = table.getCellRect(row, column, false);
+        Rectangle cellRect = table.getCellRect(row, column, true);
         rendererRect.translate(cellRect.x, cellRect.y);
-        if (UIUtils.isNimbusLookAndFeel()) cellRect.width -= 1; // Column lines visible next to hovers on Nimbus LaF
+        cellRect.width -= 1;
         if (cellRect.contains(rendererRect)) return null; // Value fully visible
         
         Rectangle visibleRect = cellRect.intersection(rendererRect);
