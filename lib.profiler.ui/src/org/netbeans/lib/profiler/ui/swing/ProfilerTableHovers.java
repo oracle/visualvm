@@ -61,6 +61,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -74,6 +75,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellRenderer;
+import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 
 /**
@@ -174,7 +176,8 @@ final class ProfilerTableHovers {
         // org.netbeans.lib.profiler.ui.swing.renderer.Movable.move()
         renderer.move(0, 0);
         
-        Image i = table.createVolatileImage(width, height);
+        Image i = !Platform.isMac() ? table.createVolatileImage(width, height) :
+                  new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
         try {
             g.setColor(table.getBackground());
