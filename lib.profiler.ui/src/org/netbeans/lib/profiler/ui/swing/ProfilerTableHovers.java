@@ -84,9 +84,6 @@ import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
  * 
  * TODO:
  * 
- *  - limit image size by screen bounds
- *  - limit window size(s) by screen bounds
- * 
  *  - handle value changes when value hover is displayed
  *  - keep the value hover displayed when (left?)clicking the table?
  * 
@@ -99,6 +96,8 @@ final class ProfilerTableHovers {
         new ProfilerTableHovers(table).install();
     }
     
+    
+    private static final int MAX_RENDERER_WIDTH = 5000;
     
     private final ProfilerTable table;
     
@@ -295,7 +294,9 @@ final class ProfilerTableHovers {
     
     private Component getRenderer(int row, int column) {
         TableCellRenderer renderer = table.getCellRenderer(row, column);
-        return table.getRenderer(renderer, row, column, true);
+        Component _renderer = table.getRenderer(renderer, row, column, true);
+        _renderer.setSize(Math.min(_renderer.getWidth(), MAX_RENDERER_WIDTH), _renderer.getHeight());
+        return _renderer;
     }
     
     
