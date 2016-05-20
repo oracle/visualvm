@@ -63,7 +63,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
@@ -89,7 +88,6 @@ import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
  *  - limit window size(s) by screen bounds
  * 
  *  - handle value changes when value hover is displayed
- *  - keep the value hover displayed when scrolling the table
  *  - keep the value hover displayed when (left?)clicking the table?
  * 
  *  - do not show value hovers over other popups (menus)
@@ -301,33 +299,63 @@ final class ProfilerTableHovers {
     }
     
     
-    private class Opener extends MouseAdapter {
+    private class Opener extends MouseAdapter implements ComponentListener {
+        private Point currentScreenPoint;
+        
         void install() {
+            table.addMouseListener(this);
             table.addMouseMotionListener(this);
+            table.addComponentListener(this);
         }
         void deinstall() {
+            hidePopups();
+            
+            table.removeMouseListener(this);
             table.removeMouseMotionListener(this);
+            table.removeComponentListener(this);
+            
+            currentScreenPoint = null;
         }
         
+        // MouseAdapter
         public void mouseMoved(MouseEvent e) {
             // Do not display popup when a modifier is pressed (can't read all keys)
             if (e.getModifiers() != 0) return;
-
-            Point point = e.getPoint();
-            checkPopup(table.rowAtPoint(point), table.columnAtPoint(point), point);
+            
+            Point p = e.getPoint();
+            
+            currentScreenPoint = new Point(p);
+            SwingUtilities.convertPointToScreen(currentScreenPoint, table);
+            
+            checkPopup(table.rowAtPoint(p), table.columnAtPoint(p), p);
+        }
+        
+        // ComponentListener
+        public void componentResized(ComponentEvent e) {}
+        public void componentMoved(ComponentEvent e) { updatePopups(); }
+        public void componentShown(ComponentEvent e) {}
+        public void componentHidden(ComponentEvent e) {}
+        
+        void updatePopups() {
+            hidePopups();
+            
+            if (currentScreenPoint != null) {
+                Point p = new Point(currentScreenPoint);
+                SwingUtilities.convertPointFromScreen(p, table);
+                checkPopup(table.rowAtPoint(p), table.columnAtPoint(p), p);
+            }
         }
     }
     
-    private class Closer extends MouseAdapter implements TableModelListener, KeyListener, ComponentListener,
-                                      HierarchyListener, HierarchyBoundsListener,
-                                      FocusListener, PropertyChangeListener {
+    private class Closer extends MouseAdapter implements TableModelListener, KeyListener,
+                                                         ComponentListener, HierarchyListener,
+                                                         HierarchyBoundsListener, FocusListener {
         
         private Component focusOwner;
                 
         void install() {
             table.addMouseListener(this);
             table.addMouseMotionListener(this);
-//            table.addMouseWheelListener(this);
             
             focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
             if (focusOwner != null) {
@@ -344,7 +372,6 @@ final class ProfilerTableHovers {
         void deinstall() {
             table.removeMouseListener(this);
             table.removeMouseMotionListener(this);
-//            table.removeMouseWheelListener(this);
             
             if (focusOwner != null) {
                 focusOwner.removeKeyListener(this);
@@ -363,7 +390,6 @@ final class ProfilerTableHovers {
         public void mouseDragged(MouseEvent e) { hidePopups(); }
         public void mousePressed(MouseEvent e) { hidePopups(); }
         public void mouseReleased(MouseEvent e) { hidePopups(); }
-//        public void mouseWheelMoved(MouseWheelEvent e) { hidePopups(); }
         
         // TableModelListener
         public void tableChanged(TableModelEvent e) {
@@ -384,7 +410,7 @@ final class ProfilerTableHovers {
         
         // ComponentListener
         public void componentResized(ComponentEvent e) { hidePopups(); }
-        public void componentMoved(ComponentEvent e) { hidePopups(); }
+        public void componentMoved(ComponentEvent e) { }
         public void componentShown(ComponentEvent e) { hidePopups(); }
         public void componentHidden(ComponentEvent e) { hidePopups(); }
 
