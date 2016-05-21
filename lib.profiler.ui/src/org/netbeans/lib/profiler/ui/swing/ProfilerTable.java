@@ -183,7 +183,8 @@ public class ProfilerTable extends JTable {
             setForeground(UIManager.getColor("text")); // NOI18N
         
         ProfilerTableActions.install(this);
-        ProfilerTableHover.install(this);
+//        ProfilerTableHover.install(this);
+        ProfilerTableHovers.install(this);
         
         getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "DEFAULT_ACTION"); // NOI18N
@@ -343,7 +344,7 @@ public class ProfilerTable extends JTable {
         isCustomRendering = true;
         try {
             Component comp = prepareRenderer(renderer, row, column);
-            comp.setSize(comp.getPreferredSize().width, getRowHeight());
+//            comp.setSize(comp.getPreferredSize().width, getRowHeight());
             if (sized) {
                 comp.setSize(comp.getPreferredSize().width, getRowHeight());
                 if (!isLeadingAlign(comp)) {
