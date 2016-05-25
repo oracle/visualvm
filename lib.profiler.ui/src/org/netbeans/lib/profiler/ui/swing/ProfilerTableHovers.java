@@ -46,7 +46,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
@@ -63,14 +62,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.CellRendererPane;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellRenderer;
@@ -84,20 +83,16 @@ import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
  * 
  * TODO:
  * 
- *  - handle value changes when value hover is displayed
- *  - keep the value hover displayed when (left?)clicking the table?
- * 
  *  - do not show value hovers over other popups (menus)
  * 
  */
 final class ProfilerTableHovers {
     
-    static void install(ProfilerTable table) {
-        new ProfilerTableHovers(table).install();
-    }
-    
-    
     private static final int MAX_RENDERER_WIDTH = 5000;
+    
+    private static final int POPUP_LEFT = 0;
+    private static final int POPUP_RIGHT = 1;
+    
     
     private final ProfilerTable table;
     
@@ -108,7 +103,19 @@ final class ProfilerTableHovers {
     
     private int currentRow = -1;
     private int currentColumn = -1;
+    private Point currentScreenPoint;
     
+    private final JWindow[] windows = new JWindow[2];
+    
+    
+    // --- Internal API --------------------------------------------------------
+    
+    static void install(ProfilerTable table) {
+        new ProfilerTableHovers(table).install();
+    }
+    
+    
+    // --- Implementation ------------------------------------------------------
     
     private ProfilerTableHovers(ProfilerTable table) {
         this.table = table;
@@ -117,52 +124,75 @@ final class ProfilerTableHovers {
     private void install() {
         opener = new Opener();
         opener.install();
-        
-        closer = new Closer();
-        
-        crp = new CellRendererPane() {
-            public void paintComponent(Graphics g, Component c, Container p, int x, int y, int w, int h, boolean v) {
-                super.paintComponent(g, c, p, x, y, w, h, v);
-                remove(c); // Prevent leaking ProfilerTreeTable.ProfilerTreeTableTree and transitively all the UI/models
-            }
-        };
     }
     
-    private final List<Window> windows = new ArrayList(2);
+    
+    private void updatePopups(Point p, boolean repaint) {
+        if (currentScreenPoint == null) {
+            hidePopups();
+        } else {
+            if (p == null) {
+                p = new Point(currentScreenPoint);
+                SwingUtilities.convertPointFromScreen(p, table);
+            }
+            checkPopup(table.rowAtPoint(p), table.columnAtPoint(p), p, repaint);
+        }
+    }
+    
+    private void checkPopup(int row, int column, Point point, boolean repaint) {
+        if (row < 0 || column < 0 || row >= table.getRowCount() ||
+            column >= table.getColumnCount()) { hidePopups(); return; }
+        
+        Component renderer = getRenderer(row, column);
+        Rectangle[] popups = computePopups(row, column, point, renderer);
+        
+        if (popups == null) {
+            hidePopups();
+        } else if (repaint || currentRow != row || currentColumn != column) {
+//            // If reusing the popup for a new cell hide the current popup
+//            // to honor window transitions (Linux) 
+//            // !!! ACTUALLY NOT WORKING UNTIL Window.dispose() !!!
+//            if (!repaint) {
+//                if (windows[POPUP_LEFT] != null) windows[POPUP_LEFT].setVisible(false);
+//                if (windows[POPUP_RIGHT] != null) windows[POPUP_RIGHT].setVisible(false);
+//            }
+            
+            currentRow = row;
+            currentColumn = column;
+            
+            showPopups(renderer, popups); //XXX Fix - doesnt hide popup for table XXX
+        }
+    }
     
     private void showPopups(Component renderer, Rectangle[] popups) {
         Image img = createPopupImage(renderer);
         Color border = table.getGridColor();
         
-        if (popups[0] != null) {
-            Window left = createWindow(popups[0], img, true, border);
-            left.setVisible(true);
-            windows.add(left);
-        }
+        if (popups[POPUP_LEFT] != null) openWindow(popups[POPUP_LEFT], img, POPUP_LEFT, border);
+        else if (windows[POPUP_LEFT] != null) closeWindow(POPUP_LEFT);
         
-        if (popups[1] != null) {
-            Window right = createWindow(popups[1], img, false, border);
-            right.setVisible(true);
-            windows.add(right);
-        }
+        if (popups[POPUP_RIGHT] != null) openWindow(popups[POPUP_RIGHT], img, POPUP_RIGHT, border);
+        else if (windows[POPUP_RIGHT] != null) closeWindow(POPUP_RIGHT);
         
-        closer.install();
+        if (closer == null) {
+            closer = new Closer();
+            closer.install();
+        }
     }
     
     private void hidePopups() {
-        if (windows.isEmpty()) return;
+        if (windows[POPUP_LEFT] == null && windows[POPUP_RIGHT] == null) return;
         
         currentRow = -1;
         currentColumn = -1;
         
-        for (Window w : windows) {
-            w.setVisible(false);
-            w.dispose();
+        if (windows[POPUP_LEFT] != null) closeWindow(POPUP_LEFT);
+        if (windows[POPUP_RIGHT] != null) closeWindow(POPUP_RIGHT);
+        
+        if (closer != null) {
+            closer.deinstall();
+            closer = null;
         }
-        
-        windows.clear();
-        
-        closer.deinstall();
     }
     
     
@@ -170,15 +200,24 @@ final class ProfilerTableHovers {
         int width = renderer.getWidth();
         int height = renderer.getHeight();
         
-        // org.netbeans.lib.profiler.ui.swing.renderer.Movable.move()
-        renderer.move(0, 0);
-        
         Image i = !Platform.isMac() ? table.createVolatileImage(width, height) :
                   new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics g = i.getGraphics();
+        
         try {
             g.setColor(table.getBackground());
             g.fillRect(0, 0, width, height);
+            
+            // org.netbeans.lib.profiler.ui.swing.renderer.Movable.move()
+            renderer.move(0, 0);
+            
+            if (crp == null) crp = new CellRendererPane() {
+                public void paintComponent(Graphics g, Component c, Container p, int x, int y, int w, int h, boolean v) {
+                    super.paintComponent(g, c, p, x, y, w, h, v);
+                    remove(c); // Prevent leaking ProfilerTreeTable.ProfilerTreeTableTree and transitively all the UI/models
+                }
+            };
+            
             crp.paintComponent(g, renderer, null, 0, 0, width, height, false);
         } finally {
             g.dispose();
@@ -187,58 +226,58 @@ final class ProfilerTableHovers {
         return i;
     }
     
-    private Window createWindow(Rectangle popup, final Image img, final boolean leading, final Color border) {
+    private void openWindow(Rectangle popup, final Image img, int popupId, Color border) {
+        final boolean left = popupId == POPUP_LEFT;
+        
         final int popupW = popup.width;
         final int popupH = popup.height;
         final int imageW = img.getWidth(null);
         final int imageH = img.getHeight(null);
         
         JPanel l = new JPanel(null) {
-            {
-                if (leading) setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, border));
-                else         setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, border));
-            }
             protected void paintComponent(Graphics g) {
-                if (leading) g.drawImage(img, 1, 1, 1 + popupW, 1 + popupH, 0, 0, popupW, popupH, null);
-                else         g.drawImage(img, 0, 1, 0 + popupW, 1 + popupH, imageW - popupW, 0, imageW, imageH, null);
+                if (left) g.drawImage(img, 1, 1, 1 + popupW, 1 + popupH, 0, 0, popupW, popupH, null);
+                else      g.drawImage(img, 0, 1, 0 + popupW, 1 + popupH, imageW - popupW, 0, imageW, imageH, null);
             }
         };
+        if (left) l.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, border));
+        else      l.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, border));
         l.setSize(popupW + 1, popupH + 2);
         
-        JWindow win = new JWindow(SwingUtilities.getWindowAncestor(table));
-        win.setType(Window.Type.POPUP);
-        win.setFocusable(false);
-        win.setAutoRequestFocus(false);
-        win.setFocusableWindowState(false);
-        win.getContentPane().add(l);
-
-        // Make sure there's no shadow behind the native window
-        win.setBackground(new Color(255, 255, 255, 0)); // Linux
-        win.getRootPane().putClientProperty("Window.shadow", Boolean.FALSE.toString()); // Mac OS X // NOI18N
+        JWindow win = windows[popupId];
+        if (win == null) {
+            win = new JWindow(SwingUtilities.getWindowAncestor(table));
+            win.setType(Window.Type.POPUP);
+            win.setFocusable(false);
+            win.setAutoRequestFocus(false);
+            win.setFocusableWindowState(false);
+            win.getContentPane().add(l);
+            
+            // Make sure there's no shadow behind the native window
+            win.setBackground(new Color(255, 255, 255, 0)); // Linux
+            win.getRootPane().putClientProperty("Window.shadow", Boolean.FALSE.toString()); // Mac OS X // NOI18N
+            
+            win.setVisible(true);
+        } else {
+            win.getContentPane().removeAll();
+            win.getContentPane().add(l);
+            
+            if (win.isVisible()) win.repaint();
+            else win.setVisible(true);
+        }
         
         Point p = table.getLocationOnScreen();
-        win.setBounds(popup.x + p.x - (leading ? 1 : 0), popup.y + p.y - 1, popupW + 1, popupH + 2);
+        win.setBounds(popup.x + p.x - (left ? 1 : 0), popup.y + p.y - 1, popupW + 1, popupH + 2);
         
-        return win;
+        windows[popupId] = win;
     }
     
-    
-    private void checkPopup(int row, int column, Point point) {
-        if (row < 0 || column < 0 || row >= table.getRowCount() ||
-            column >= table.getColumnCount()) hidePopups();
-        
-        Component renderer = getRenderer(row, column);
-        Rectangle[] popups = computePopups(row, column, point, renderer);
-        
-        if (popups == null) {
-            hidePopups();
-        } else if (currentRow != row || currentColumn != column) {
-            hidePopups();
-            currentRow = row;
-            currentColumn = column;
-            showPopups(renderer, popups);
-        }
+    private void closeWindow(int index) {
+        windows[index].setVisible(false);
+        windows[index].dispose();
+        windows[index] = null;
     }
+    
     
     private Rectangle[] computePopups(int row, int column, Point point, Component renderer) {
         Rectangle rendererRect = getRendererRect(column, renderer);
@@ -258,7 +297,7 @@ final class ProfilerTableHovers {
         if (rendererRect.x < visibleRect.x) {
             Rectangle left = new Rectangle(rendererRect);
             left.width = visibleRect.x - left.x;
-            ret[0] = left;
+            ret[POPUP_LEFT] = left;
         }
 
         // rendererRect.x + rendererRect.width *- 1*: workaround for extra space for correctly right-aligned values
@@ -266,7 +305,7 @@ final class ProfilerTableHovers {
             Rectangle right = new Rectangle(rendererRect);
             right.x = visibleRect.x + visibleRect.width;
             right.width = rendererRect.x + rendererRect.width - right.x;
-            ret[1] = right;
+            ret[POPUP_RIGHT] = right;
         }
         
         return ret;
@@ -300,13 +339,13 @@ final class ProfilerTableHovers {
     }
     
     
-    private class Opener extends MouseAdapter implements ComponentListener {
-        private Point currentScreenPoint;
+    private class Opener extends MouseAdapter implements ComponentListener, TableModelListener {
         
         void install() {
             table.addMouseListener(this);
             table.addMouseMotionListener(this);
             table.addComponentListener(this);
+            table.getModel().addTableModelListener(this);
         }
         void deinstall() {
             hidePopups();
@@ -314,57 +353,62 @@ final class ProfilerTableHovers {
             table.removeMouseListener(this);
             table.removeMouseMotionListener(this);
             table.removeComponentListener(this);
-            
-            currentScreenPoint = null;
+            table.getModel().removeTableModelListener(this);
         }
         
         // MouseAdapter
         public void mouseMoved(MouseEvent e) {
             // Do not display popup when a modifier is pressed (can't read all keys)
-            if (e.getModifiers() != 0) return;
+//            if (e.getModifiers() != 0) return;
             
-            Point p = e.getPoint();
+            currentScreenPoint = e.getLocationOnScreen();
             
-            currentScreenPoint = new Point(p);
-            SwingUtilities.convertPointToScreen(currentScreenPoint, table);
+            updatePopups(e.getPoint(), false);
+        }
+        
+        public void mouseDragged(MouseEvent e) {
+//            if (e.getModifiers() != 0) return;
             
-            checkPopup(table.rowAtPoint(p), table.columnAtPoint(p), p);
+            currentScreenPoint = e.getLocationOnScreen();
+            
+            updatePopups(e.getPoint(), false);
         }
         
         // ComponentListener
-        public void componentResized(ComponentEvent e) {}
-        public void componentMoved(ComponentEvent e) { updatePopups(); }
+        public void componentResized(ComponentEvent e) {} // Lines added/removed to/from table
+        public void componentMoved(ComponentEvent e) { updatePopups(null, false); } // Table scrolled (mouse wheel, gesture)
         public void componentShown(ComponentEvent e) {}
         public void componentHidden(ComponentEvent e) {}
         
-        void updatePopups() {
-            hidePopups();
-            
-            if (currentScreenPoint != null) {
-                Point p = new Point(currentScreenPoint);
-                SwingUtilities.convertPointFromScreen(p, table);
-                checkPopup(table.rowAtPoint(p), table.columnAtPoint(p), p);
-            }
+        // TableModelListener
+        public void tableChanged(TableModelEvent e) {
+            // Must invoke later, column widths not ready yet
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() { updatePopups(null, true); }
+            });
         }
+        
     }
     
-    private class Closer extends MouseAdapter implements TableModelListener, KeyListener,
+    private class Closer extends MouseAdapter implements /*TableModelListener,*/ KeyListener,
                                                          ComponentListener, HierarchyListener,
-                                                         HierarchyBoundsListener, FocusListener {
+                                                         HierarchyBoundsListener, FocusListener,
+                                                         ListSelectionListener {
         
-        private Component focusOwner;
+//        private Component focusOwner;
                 
         void install() {
             table.addMouseListener(this);
             table.addMouseMotionListener(this);
             
-            focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-            if (focusOwner != null) {
-                focusOwner.addKeyListener(this);
-                focusOwner.addFocusListener(this);
-            }
+//            focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+//            if (focusOwner != null) {
+//                focusOwner.addKeyListener(this);
+//                focusOwner.addFocusListener(this);
+//            }
             
-            table.getModel().addTableModelListener(this);
+//            table.getModel().addTableModelListener(this);
+            table.getSelectionModel().addListSelectionListener(this);
             table.addComponentListener(this);
             table.addHierarchyListener(this);
             table.addHierarchyBoundsListener(this);
@@ -374,13 +418,14 @@ final class ProfilerTableHovers {
             table.removeMouseListener(this);
             table.removeMouseMotionListener(this);
             
-            if (focusOwner != null) {
-                focusOwner.removeKeyListener(this);
-                focusOwner.removeFocusListener(this);
-                focusOwner = null;
-            }
+//            if (focusOwner != null) {
+//                focusOwner.removeKeyListener(this);
+//                focusOwner.removeFocusListener(this);
+//                focusOwner = null;
+//            }
             
-            table.getModel().removeTableModelListener(this);
+//            table.getModel().removeTableModelListener(this);
+            table.getSelectionModel().removeListSelectionListener(this);
             table.removeComponentListener(this);
             table.removeHierarchyListener(this);
             table.removeHierarchyBoundsListener(this);
@@ -388,21 +433,18 @@ final class ProfilerTableHovers {
         
         // MouseAdapter
         public void mouseExited(MouseEvent e) { hidePopups(); }
-        public void mouseDragged(MouseEvent e) { hidePopups(); }
-        public void mousePressed(MouseEvent e) { hidePopups(); }
-        public void mouseReleased(MouseEvent e) { hidePopups(); }
+//        public void mouseDragged(MouseEvent e) { updatePopups(e.getPoint(), false); }
+//        public void mouseDragged(MouseEvent e) { hidePopups(); }
+//        public void mousePressed(MouseEvent e) { hidePopups(); }
+//        public void mouseReleased(MouseEvent e) { hidePopups(); }
+        public void mousePressed(MouseEvent e) { updatePopups(e.getPoint(), true); }
+        public void mouseReleased(MouseEvent e) { updatePopups(e.getPoint(), true); }
         
-        // TableModelListener
-        public void tableChanged(TableModelEvent e) {
-//            if (painter.valueChanged()) {
-//                final int row = painter.getRow();
-//                final int column = painter.getColumn();
-//                hidePopup();
-//                SwingUtilities.invokeLater(new Runnable() {
-//                    public void run() { checkPopup(row, column, null); }
-//                });
-//            }
-        }
+//        // TableModelListener
+//        public void tableChanged(TableModelEvent e) { updatePopups(null, true); }
+        
+        // ListSelectionListener
+        public void valueChanged(ListSelectionEvent e) { updatePopups(null, true); }
 
         // KeyListener
         public void keyTyped(KeyEvent e) { hidePopups(); }
@@ -410,8 +452,8 @@ final class ProfilerTableHovers {
         public void keyReleased(KeyEvent e) { hidePopups(); }
         
         // ComponentListener
-        public void componentResized(ComponentEvent e) { hidePopups(); }
-        public void componentMoved(ComponentEvent e) { }
+        public void componentResized(ComponentEvent e) { /*hidePopups();*/ } // Lines added/removed to/from table
+        public void componentMoved(ComponentEvent e) { }  // Table scrolled (mouse wheel, gesture
         public void componentShown(ComponentEvent e) { hidePopups(); }
         public void componentHidden(ComponentEvent e) { hidePopups(); }
 
