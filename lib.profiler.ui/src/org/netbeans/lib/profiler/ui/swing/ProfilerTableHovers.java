@@ -64,8 +64,12 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import javax.swing.BorderFactory;
 import javax.swing.CellRendererPane;
+import javax.swing.JApplet;
 import javax.swing.JComponent;
+import javax.swing.JInternalFrame;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -79,12 +83,6 @@ import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 /**
  *
  * @author Jiri Sedlacek
- * 
- * 
- * TODO:
- * 
- *  - do not show value hovers over other popups (menus)
- * 
  */
 final class ProfilerTableHovers {
     
@@ -156,12 +154,38 @@ final class ProfilerTableHovers {
 //                if (windows[POPUP_LEFT] != null) windows[POPUP_LEFT].setVisible(false);
 //                if (windows[POPUP_RIGHT] != null) windows[POPUP_RIGHT].setVisible(false);
 //            }
-            
-            currentRow = row;
-            currentColumn = column;
-            
-            showPopups(renderer, popups); //XXX Fix - doesnt hide popup for table XXX
+
+            if (isLwPopupOpen(table)) {
+                // Do not show value hovers when a lightweight popup is showing,
+                // might be drawn on top of it - overlap it.
+                hidePopups();
+            } else {
+                currentRow = row;
+                currentColumn = column;
+
+                showPopups(renderer, popups);
+            }
         }
+    }
+    
+    private static boolean isLwPopupOpen(Component c) {
+        Container cc = c.getParent();
+        
+        for (Container p = cc; p != null; p = p.getParent()) {
+            if (p instanceof JRootPane) {
+                if (p.getParent() instanceof JInternalFrame) continue;
+                cc = ((JRootPane)p).getLayeredPane();
+                if (cc instanceof JLayeredPane)
+                    return ((JLayeredPane)cc).getComponentsInLayer(
+                             JLayeredPane.POPUP_LAYER).length > 0;
+            } else if (p instanceof Window) {
+                break;
+            } else if (p instanceof JApplet) {
+                break;
+            }
+        }
+        
+        return false;
     }
     
     private void showPopups(Component renderer, Rectangle[] popups) {
