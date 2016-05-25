@@ -498,9 +498,9 @@ public class ProfilerTreeTable extends ProfilerTable {
                         RowFilter filter = treeModel != null ? treeModel.getFilter() : null;
                         treeModel = treeModelImpl(newRoot, comparator, filter);
                         tree.setModel(treeModel);
-                        fireTableDataChanged();
-
-                        if (uiState != null) restoreUIState(tree, uiState);
+                        if (uiState != null) restoreExpandedNodes(tree, uiState);
+                        fireTableDataChanged(); // Clears selection
+                        if (uiState != null) restoreSelectedNodes(tree, uiState);
                     } finally {
                         tree.setChangingModel(false);
                     }
@@ -517,8 +517,9 @@ public class ProfilerTreeTable extends ProfilerTable {
                                         Object[] children) {
                     UIState uiState = tree == null ? null : getUIState(tree);
                     super.fireTreeStructureChanged(source, path, childIndices, children);
-                    if (uiState != null) restoreUIState(tree, uiState);
-                    fireTableDataChanged();
+                    if (uiState != null) restoreExpandedNodes(tree, uiState);
+                    fireTableDataChanged(); // Clears selection
+                    if (uiState != null) restoreSelectedNodes(tree, uiState);
                 }
             };
         }
@@ -812,7 +813,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         return new UIState(selectedPaths, expandedPaths);
     }
     
-    static void restoreUIState(JTree tree, UIState uiState) {
+    static void restoreExpandedNodes(JTree tree, UIState uiState) {
         try {
             tree.putClientProperty(UIUtils.PROP_EXPANSION_TRANSACTION, Boolean.TRUE);
             Enumeration<TreePath> paths = uiState.getExpandedPaths();
@@ -821,6 +822,9 @@ public class ProfilerTreeTable extends ProfilerTable {
         } finally {
             tree.putClientProperty(UIUtils.PROP_EXPANSION_TRANSACTION, null);
         }
+    }
+    
+    static void restoreSelectedNodes(JTree tree, UIState uiState) {
         tree.setSelectionPaths(uiState.getSelectedPaths());
     }
     
