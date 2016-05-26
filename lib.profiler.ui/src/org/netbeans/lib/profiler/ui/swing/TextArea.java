@@ -50,6 +50,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -105,6 +106,8 @@ public class TextArea extends JTextArea {
     private boolean changeListener;
     
     public void setText(String t) {
+        if (showsHint() && !Objects.equals(t, hint)) hideHint();
+        
         if (!changeListener) {
             changeListener = true;
             getDocument().addDocumentListener(new DocumentListener() {
@@ -114,6 +117,7 @@ public class TextArea extends JTextArea {
                 private void updated() { if (!showsHint()) changed(); }
             });
         }
+        
         super.setText(t);
     }
     
@@ -125,7 +129,7 @@ public class TextArea extends JTextArea {
     public void setHint(String hint) {
         hideHint();
         this.hint = hint;
-        showHint();
+        if (!isFocusOwner()) showHint();
     }
     
     public String getHint() {
@@ -156,7 +160,7 @@ public class TextArea extends JTextArea {
         if (showsHint) {
             showsHint = false;
             setForeground(hintFg);
-            setText(null);
+            if (Objects.equals(getText(), hint)) setText(""); // NOI18N
         }
     }
     

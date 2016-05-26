@@ -219,50 +219,12 @@ class HprofHeap implements Heap {
         }
 
         computeInstances();
-
-        ClassDump classDump;
-        ClassDumpSegment classDumpBounds = getClassDumpSegment();
-        int idSize = dumpBuffer.getIDSize();
-        int classIdOffset = 0;
         LongMap.Entry entry = idToOffsetMap.get(instanceID);
 
         if (entry == null) {
             return null;
         }
-
-        long start = entry.getOffset();
-        assert start != 0L;
-
-        long[] offset = new long[] { start };
-
-        int tag = readDumpTag(offset);
-
-        if (tag == INSTANCE_DUMP) {
-            classIdOffset = idSize + 4;
-        } else if (tag == OBJECT_ARRAY_DUMP) {
-            classIdOffset = idSize + 4 + 4;
-        } else if (tag == PRIMITIVE_ARRAY_DUMP) {
-            classIdOffset = idSize + 4 + 4;
-        }
-
-        if (tag == PRIMITIVE_ARRAY_DUMP) {
-            classDump = classDumpBounds.getPrimitiveArrayClass(dumpBuffer.get(start + 1 + classIdOffset));
-
-            return new PrimitiveArrayDump(classDump, start);
-        } else {
-            long classId = dumpBuffer.getID(start + 1 + classIdOffset);
-            classDump = classDumpBounds.getClassDumpByID(classId);
-        }
-
-        if (tag == INSTANCE_DUMP) {
-            return new InstanceDump(classDump, start);
-        } else if (tag == OBJECT_ARRAY_DUMP) {
-            return new ObjectArrayDump(classDump, start);
-        } else if (tag == CLASS_DUMP) {
-            return new ClassDumpInstance(classDump);
-        } else {
-            throw new IllegalArgumentException("Illegal tag " + tag); // NOI18N
-        }
+        return getInstanceByOffset(entry.getOffset());
     }
 
     public JavaClass getJavaClassByID(long javaclassId) {
@@ -376,6 +338,48 @@ class HprofHeap implements Heap {
         }
     }
 
+    Instance getInstanceByOffset(long start) {
+        assert start != 0L;
+        ClassDump classDump;
+        ClassDumpSegment classDumpBounds = getClassDumpSegment();
+        int idSize = dumpBuffer.getIDSize();
+        int classIdOffset = 0;
+
+        long[] offset = new long[] { start };
+
+        int tag = readDumpTag(offset);
+
+        if (tag == INSTANCE_DUMP) {
+            classIdOffset = idSize + 4;
+        } else if (tag == OBJECT_ARRAY_DUMP) {
+            classIdOffset = idSize + 4 + 4;
+        } else if (tag == PRIMITIVE_ARRAY_DUMP) {
+            classIdOffset = idSize + 4 + 4;
+        }
+
+        if (tag == PRIMITIVE_ARRAY_DUMP) {
+            classDump = classDumpBounds.getPrimitiveArrayClass(dumpBuffer.get(start + 1 + classIdOffset));
+
+            return new PrimitiveArrayDump(classDump, start);
+        } else {
+            long classId = dumpBuffer.getID(start + 1 + classIdOffset);
+            classDump = classDumpBounds.getClassDumpByID(classId);
+        }
+
+        if (classDump == null) {
+            return null;
+        }
+        if (tag == INSTANCE_DUMP) {
+            return new InstanceDump(classDump, start);
+        } else if (tag == OBJECT_ARRAY_DUMP) {
+            return new ObjectArrayDump(classDump, start);
+        } else if (tag == CLASS_DUMP) {
+            return new ClassDumpInstance(classDump);
+        } else {
+            throw new IllegalArgumentException("Illegal tag " + tag); // NOI18N
+        }
+    }
+
     synchronized void computeInstances() {
         if (instancesCountComputed) {
             return;
@@ -441,13 +445,10 @@ class HprofHeap implements Heap {
         while (refIdsIt.hasNext()) {
             long foundInstanceId = ((Long)refIdsIt.next()).longValue();
             offset[0] = idToOffsetMap.get(foundInstanceId).getOffset();
-            int classIdOffset = 0;
-            int instanceIdOffset = 0;
             long start = offset[0];
             int tag = readDumpTag(offset);
 
             if (tag == INSTANCE_DUMP) {
-                classIdOffset = idSize + 4;
                 int size = dumpBuffer.getInt(start + 1 + idSize + 4 + idSize);
                 byte[] fields = new byte[size];
                 dumpBuffer.get(start + 1 + idSize + 4 + idSize + 4, fields);

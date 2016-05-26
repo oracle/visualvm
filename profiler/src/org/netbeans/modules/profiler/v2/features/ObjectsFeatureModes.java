@@ -63,7 +63,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -873,7 +872,8 @@ final class ObjectsFeatureModes {
                         popup.add(createResizeMenu());
                     }
                     public Point getToolTipLocation(MouseEvent event) {
-                        return new Point(-1, getHeight() + 2);
+                        Component scroll = getParent().getParent();
+                        return SwingUtilities.convertPoint(scroll, 0, scroll.getHeight(), this);
                     }
                 };
                 classesArea.setFont(new Font("Monospaced", Font.PLAIN, classesArea.getFont().getSize())); // NOI18N

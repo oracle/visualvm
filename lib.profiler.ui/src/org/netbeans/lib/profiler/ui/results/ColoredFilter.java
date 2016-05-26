@@ -45,48 +45,55 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.util.Objects;
+import java.util.Properties;
 import javax.swing.Icon;
+import org.netbeans.lib.profiler.filters.GenericFilter;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public final class PackageColor {
+public class ColoredFilter extends GenericFilter {
     
-    private String name;
-    private String value;
-    private String[] values;
+    private static final String PROP_COLOR = "COLOR"; // NOI18N
+    
     private Color color;
+    private transient Icon icon;
     
-    private Icon icon;
     
-    
-    public PackageColor(PackageColor other) {
-        this(other.name, other.value, other.values, other.color);
+    public ColoredFilter(ColoredFilter other) {
+        super(other);
+        
+        this.color = other.color;
     }
     
-    public PackageColor(String name, String value, Color color) {
-        this(name, value, null, color);
-    }
-
-    private PackageColor(String name, String value, String[] values, Color color) {
-        this.name = name;
-        this.value = value;
-        this.values = values;
+    public ColoredFilter(String name, String value, Color color) {
+        super(name, value, TYPE_INCLUSIVE);
+        
         this.color = color;
     }
-
-    public final void setName(String name) { this.name = name; }
-    public final String getName() { return name; }
     
-    public final void setValue(String value) { this.value = value; values = null; }
-    public final String getValue() { return value; }
-
-//    public final void setValues(String[] values) { this.values = values; }
-    public final String[] getValues() { if (values == null) values = values(value); return values; }
-
-    public final void setColor(Color color) { this.color = color; }
-    public final Color getColor() { return color; }
+    public ColoredFilter(Properties properties, String id) {
+        super(properties, id);
+        
+        color = loadColor(properties, id);
+    }
+    
+    
+    public void copyFrom(ColoredFilter other) {
+        super.copyFrom(other);
+        
+        color = other.color;
+    }
+    
+    
+    public final void setColor(Color color) {
+        this.color = color;
+    }
+    
+    public final Color getColor() {
+        return color;
+    }
     
     
     public final Icon getIcon(int width, int height) {
@@ -121,47 +128,59 @@ public final class PackageColor {
         }
         return icon;
     }
+    
+    
+    protected String[] computeValues(String value) {
+        return super.computeValues(value.replace('*', ' ')); // NOI18N
+    }
+    
+    
+    public boolean passes(String string) {
+        if (simplePasses(string)) return true;
 
-
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-
-        if (getClass() != obj.getClass()) return false;
-
-        final PackageColor other = (PackageColor)obj;
-        if (!name.equals(other.name)) return false;
-        if (!value.equals(other.value)) return false;
+        String[] values = getValues();
+        for (int i = 0; i < values.length; i++)
+            if (string.startsWith(values[i]))
+                return true;
+        
+        return false;
+    }
+    
+    
+    protected boolean valuesEquals(Object obj) {
+        if (!super.valuesEquals(obj)) return false;
+        
+        ColoredFilter other = (ColoredFilter)obj;
         if (!Objects.equals(color, other.color)) return false;
-
+        
         return true;
     }
-
-    public int hashCode() {
-        int hash = 3;
-        hash = 67 * hash + name.hashCode();
-        hash = 67 * hash + value.hashCode();
-        hash = 67 * hash + (color == null ? 0 : color.hashCode());
-        return hash;
+    
+    protected int valuesHashCode(int hashBase) {
+        hashBase = super.valuesHashCode(hashBase);
+        
+        if (color != null) hashBase = 67 * hashBase + color.hashCode();
+        
+        return hashBase;
     }
     
     
-//    private static String value(String[] values) {
-//        int length = values.length;
-//
-//        if (length == 0) return ""; // NOI18N
-//        if (length == 1) return values[0];
-//
-//        StringBuilder b = new StringBuilder();
-//        for (int i = 0; i < length - 1; i++)
-//            b.append(values[i]).append(", "); // NOI18N
-//        b.append(values[values.length - 1]);
-//
-//        return b.toString().trim();
-//    }
+    public void store(Properties properties, String id) {
+        super.store(properties, id);
+        if (color != null) properties.put(id + PROP_COLOR, Integer.toString(color.getRGB()));
+    }
     
-    private static String[] values(String value) {
-        return value.replace(',', ' ').split(" +"); // NOI18N
+    
+    private static Color loadColor(Properties properties, String id) {
+        String _color = properties.getProperty(id + PROP_COLOR);
+        if (_color == null) return null;
+        
+        try {
+            int _colorI = Integer.parseInt(_color);
+            return new Color(_colorI);
+        } catch (NumberFormatException e) {
+            throw new InvalidFilterIdException("Bad color code specified", id); // NOI18N
+        }
     }
     
 }
