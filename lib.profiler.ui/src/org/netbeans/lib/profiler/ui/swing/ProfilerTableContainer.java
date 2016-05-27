@@ -358,7 +358,7 @@ public class ProfilerTableContainer extends JPanel {
         if (column != -1) {
             JScrollBar scroll = getScroller(column);
             int offset = table.getColumnOffset(column);
-            int columnPref = table.getColumnPreferredWidth(column) + 0; // Workaround to fully fit focused cells
+            int columnPref = table.getColumnPreferredWidth(column);
             int _column = table.convertColumnIndexToView(column);
             int columnAct = table.getTableHeader().getHeaderRect(_column).width;
             if (columnPref > columnAct) {
