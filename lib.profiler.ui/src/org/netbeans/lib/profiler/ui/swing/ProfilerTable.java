@@ -690,10 +690,11 @@ public class ProfilerTable extends JTable {
         } else {
             getModel().addTableModelListener(new TableModelListener() {
                 public void tableChanged(TableModelEvent e) {
-                    // Must invoke later, JTree.getRowCount() not ready yet
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() { updateColumnsPreferredWidth(); }
-                    });
+//                    // Must invoke later, JTree.getRowCount() not ready yet
+//                    SwingUtilities.invokeLater(new Runnable() {
+//                        public void run() { updateColumnsPreferredWidth(); }
+//                    });
+                    updateColumnsPreferredWidth();
                 }
             }); 
         }
