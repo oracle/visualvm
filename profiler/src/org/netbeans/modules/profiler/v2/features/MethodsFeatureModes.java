@@ -83,7 +83,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.filters.FilterUtils;
+import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.lib.profiler.filters.JavaTypeFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -955,7 +955,7 @@ final class MethodsFeatureModes {
                                          CommonConstants.CPU_INSTR_SAMPLED);
             
             String[] rootsLines = readFlag(CLASSES_FLAG, "").split("\\n"); // NOI18N
-            String[] rootsValues = FilterUtils.getSeparateFilters(getFlatValues(rootsLines));
+            String[] rootsValues = GenericFilter.values(getFlatValues(rootsLines));
             ClientUtils.SourceCodeSelection[] roots = (rootsValues.length == 1 && rootsValues[0].isEmpty()) ?
                 new ClientUtils.SourceCodeSelection[0] :
                 new ClientUtils.SourceCodeSelection[rootsValues.length];
