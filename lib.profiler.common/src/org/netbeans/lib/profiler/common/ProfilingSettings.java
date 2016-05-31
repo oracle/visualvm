@@ -54,6 +54,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 import org.netbeans.lib.profiler.filters.GenericFilter;
+import org.netbeans.lib.profiler.filters.JavaTypeFilter;
 
 
 /**
@@ -779,10 +780,11 @@ public class ProfilingSettings {
 
         Properties pr = new Properties();
         pr.putAll(props);
+        // Load JavaTypeFilter instead of GenericFilter, covers the most typical scenario for saved snapshots
         try {
-            setInstrumentationFilter(new GenericFilter(pr, prefix + PROP_INSTR_FILTER));
+            setInstrumentationFilter(new JavaTypeFilter(pr, prefix + PROP_INSTR_FILTER));
         } catch (GenericFilter.InvalidFilterIdException e) {
-            setInstrumentationFilter(new GenericFilter());
+            setInstrumentationFilter(new JavaTypeFilter());
         }
 
         // CPU Profiling: Sampled
