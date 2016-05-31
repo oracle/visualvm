@@ -1270,8 +1270,44 @@ public abstract class NetBeansProfiler extends Profiler {
     }
 
     public boolean runCalibration(boolean checkForSaved, String jvmExecutable, String jdkString, int architecture) {
-        calibrating = true;
+        boolean result;
 
+        if (checkForSaved) {
+            result = getTargetAppRunner().readSavedCalibrationData();
+
+            if (!result) {
+                ProfilerDialogs.displayInfo(Bundle.NetBeansProfiler_InitialCalibrationMsg());
+                result = runCalibrationImpl(jvmExecutable, jdkString, architecture);
+            }
+            
+            // NOTE: use -Dprofiler.disableFTSRecalibration=true to skip fast
+            //       timestamp recalibration for each profiling session on old
+            //       linux kernels not supporting Time Stamp Counter.
+            if (!Boolean.getBoolean("profiler.disableFTSRecalibration")) { // NOI18N
+                boolean shouldCalibrate = false;
+                ProfilerEngineSettings pes = getTargetAppRunner().getProfilerEngineSettings();
+                getTargetAppRunner().getProfilingSessionStatus().beginTrans(false);
+                try {
+                    // the calibration was executed without the usage of "-XX:+UseLinuxPosixThreadCPUClocks" flag
+                    // ---> recalibrate <---
+                    shouldCalibrate = Platform.isLinux() &&
+                                      Platform.JDK_16_STRING.equals(pes.getTargetJDKVersionString()) &&
+                                      getTargetAppRunner().getProfilingSessionStatus().methodEntryExitCallTime[1] > 20000; // 20us
+                } finally {
+                    getTargetAppRunner().getProfilingSessionStatus().endTrans();
+                }
+                if (shouldCalibrate) {
+                    result = runCalibrationImpl(jvmExecutable, jdkString, architecture);
+                }
+            }
+        } else {
+            result = runCalibrationImpl(jvmExecutable, jdkString, architecture);
+        }
+
+        return result;
+    }
+    
+    private boolean runCalibrationImpl(String jvmExecutable, String jdkString, int architecture) {
         ProfilerEngineSettings pes = getTargetAppRunner().getProfilerEngineSettings();
 
         int savedPort = pes.getPortNo();
@@ -1290,42 +1326,16 @@ public abstract class NetBeansProfiler extends Profiler {
         pes.setPortNo(ideSettings.getCalibrationPortNo());
         pes.setInstrumentationFilter(new GenericFilter());
         pes.setMainClassPath(""); //NOI18N
-
+        
         boolean result = false;
-
-        if (checkForSaved) {
-            result = getTargetAppRunner().readSavedCalibrationData();
-
-            if (!result) {
-                ProfilerDialogs.displayInfo(Bundle.NetBeansProfiler_InitialCalibrationMsg());
-                result = getTargetAppRunner().calibrateInstrumentationCode();
-            }
-            
-            // NOTE: use -Dprofiler.disableFTSRecalibration=true to skip fast
-            //       timestamp recalibration for each profiling session on old
-            //       linux kernels not supporting Time Stamp Counter.
-            if (!Boolean.getBoolean("profiler.disableFTSRecalibration")) { // NOI18N
-                boolean shouldCalibrate = false;
-                getTargetAppRunner().getProfilingSessionStatus().beginTrans(false);
-                try {
-                    // the calibration was executed without the usage of "-XX:+UseLinuxPosixThreadCPUClocks" flag
-                    // ---> recalibrate <---
-                    shouldCalibrate = Platform.isLinux() &&
-                                      Platform.JDK_16_STRING.equals(pes.getTargetJDKVersionString()) &&
-                                      getTargetAppRunner().getProfilingSessionStatus().methodEntryExitCallTime[1] > 20000; // 20us
-                } finally {
-                    getTargetAppRunner().getProfilingSessionStatus().endTrans();
-                }
-                if (shouldCalibrate) {
-                    result = getTargetAppRunner().calibrateInstrumentationCode();
-                }
-            }
-        } else {
+        calibrating = true;
+        
+        try {
             result = getTargetAppRunner().calibrateInstrumentationCode();
+        } finally {
+            calibrating = false;
         }
-
-        calibrating = false;
-
+        
         // restore original values
         pes.setPortNo(savedPort);
         pes.setInstrumentationFilter(savedInstrFilter);
@@ -1333,7 +1343,7 @@ public abstract class NetBeansProfiler extends Profiler {
         pes.setSystemArchitecture(savedArch);
         pes.setTargetJVMExeFile(savedJVMExeFile);
         pes.setMainClassPath(savedCP);
-
+        
         return result;
     }
 
