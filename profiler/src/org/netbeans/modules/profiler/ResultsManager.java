@@ -68,6 +68,8 @@ import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsDiff;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
+import org.netbeans.lib.profiler.results.jdbc.JdbcResultsDiff;
+import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
@@ -450,6 +452,8 @@ public final class ResultsManager {
                                                  (LivenessMemoryResultsSnapshot)snap2);
         } else if (snap1 instanceof CPUResultsSnapshot && snap2 instanceof CPUResultsSnapshot) {
             diff = new CPUResultsDiff((CPUResultsSnapshot)snap1, (CPUResultsSnapshot)snap2);
+        } else if (snap1 instanceof JdbcResultsSnapshot && snap2 instanceof JdbcResultsSnapshot) {
+            diff = new JdbcResultsDiff((JdbcResultsSnapshot)snap1, (JdbcResultsSnapshot)snap2);
         }
         
         return diff;

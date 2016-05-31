@@ -67,6 +67,7 @@ import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.cpu.SnapshotCPUView;
+import org.netbeans.lib.profiler.ui.jdbc.JDBCView;
 import org.netbeans.lib.profiler.ui.jdbc.SnapshotJDBCView;
 import org.netbeans.lib.profiler.ui.memory.SnapshotMemoryView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
@@ -505,6 +506,9 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             return true;
         } else if (displayedPanel instanceof SnapshotMemoryView && s instanceof MemoryResultsSnapshot) {
             ((SnapshotMemoryView)displayedPanel).setRefSnapshot((MemoryResultsSnapshot)s);
+            return true;
+        } else if (displayedPanel instanceof SnapshotJDBCView && s instanceof JdbcResultsSnapshot) {
+            ((SnapshotJDBCView)displayedPanel).setRefSnapshot((JdbcResultsSnapshot)s);
             return true;
         }
         
