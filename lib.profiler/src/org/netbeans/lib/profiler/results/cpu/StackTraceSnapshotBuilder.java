@@ -53,8 +53,8 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 
@@ -200,7 +200,7 @@ public class StackTraceSnapshotBuilder {
                 
                 for (i=0; i<st.length; i++) {
                     StackTraceElement frame = st[i];
-                    if (filter.passesFilter(frame.getClassName().replace('.','/'))) {
+                    if (filter.passes(frame.getClassName().replace('.','/'))) { // NOI18N
                         if (i>1) {
                             stackTrace = new StackTraceElement[st.length-i+1];
                             System.arraycopy(st,i-1,stackTrace,0,stackTrace.length);
@@ -308,7 +308,7 @@ public class StackTraceSnapshotBuilder {
         //        builderBatchSize = batchSize;
         filter = f;
         setDefaultTiming();
-        ccgb = new StackTraceCallGraphBuilder(mapper);
+        ccgb = new StackTraceCallGraphBuilder(mapper, f);
         status = null;
     }
     
@@ -668,8 +668,8 @@ public class StackTraceSnapshotBuilder {
     
     private class StackTraceCallGraphBuilder extends CPUCallGraphBuilder {
 
-        StackTraceCallGraphBuilder (MethodInfoMapper mapper) {
-            setFilter(InstrumentationFilter.getDefault());
+        StackTraceCallGraphBuilder (MethodInfoMapper mapper, InstrumentationFilter filter) {
+            setFilter(filter);
             setMethodInfoMapper(mapper);
         }
 

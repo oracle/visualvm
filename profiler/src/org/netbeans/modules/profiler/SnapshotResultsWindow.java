@@ -61,6 +61,7 @@ import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.filters.FilterUtils;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
@@ -575,12 +576,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     private void setupMemoryResultsView() {
         ResultsSnapshot _snapshot = snapshot.getSnapshot();
         if (_snapshot instanceof MemoryResultsSnapshot) {
-            Object f = snapshot.getSettings().getSelectedInstrumentationFilter();
-            SimpleFilter sf = f instanceof SimpleFilter ? (SimpleFilter)f : null;
-            String value = sf == null ? null : sf.getFilterValue();
-            Collection<String> filter = value == null || value.isEmpty() ? null :
-                               Arrays.asList(FilterUtils.getSeparateFilters(value));
-            
+            GenericFilter filter = snapshot.getSettings().getInstrumentationFilter();
             if (filter != null && filter.isEmpty()) filter = null;
             
             MemoryResultsSnapshot s = (MemoryResultsSnapshot)_snapshot;

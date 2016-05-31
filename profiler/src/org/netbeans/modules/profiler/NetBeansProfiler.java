@@ -90,9 +90,9 @@ import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.client.ProfilingPointsProcessor;
 import org.netbeans.lib.profiler.common.*;
+import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.lib.profiler.global.CalibrationDataFileIO;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.instrumentation.BadLocationException;
 import org.netbeans.lib.profiler.instrumentation.InstrumentationException;
@@ -1275,7 +1275,7 @@ public abstract class NetBeansProfiler extends Profiler {
         ProfilerEngineSettings pes = getTargetAppRunner().getProfilerEngineSettings();
 
         int savedPort = pes.getPortNo();
-        InstrumentationFilter savedInstrFilter = pes.getInstrumentationFilter();
+        GenericFilter savedInstrFilter = pes.getInstrumentationFilter();
         String savedJVMExeFile = pes.getTargetJVMExeFile();
         String savedJDKVersionString = pes.getTargetJDKVersionString();
         int savedArch = pes.getSystemArchitecture();
@@ -1288,7 +1288,7 @@ public abstract class NetBeansProfiler extends Profiler {
         }
 
         pes.setPortNo(ideSettings.getCalibrationPortNo());
-        pes.setInstrumentationFilter(new InstrumentationFilter());
+        pes.setInstrumentationFilter(new GenericFilter());
         pes.setMainClassPath(""); //NOI18N
 
         boolean result = false;
@@ -1961,7 +1961,7 @@ public abstract class NetBeansProfiler extends Profiler {
         return false;
     }
     
-    private static void logActionConfig(String actionTitle, ProfilingSettings ps, SessionSettings ss, AttachSettings as, InstrumentationFilter f) {
+    private static void logActionConfig(String actionTitle, ProfilingSettings ps, SessionSettings ss, AttachSettings as, GenericFilter f) {
         assert actionTitle != null;
         assert ps != null;
         assert f != null;
@@ -1979,7 +1979,7 @@ public abstract class NetBeansProfiler extends Profiler {
                 ps.debug(),
                 (ss != null ? "Session" : (as != null ? "Attach" : null)),  // NOI18N
                 (ss != null ? ss.debug() : (as != null ? as.debug() : null)),                    
-                f.debug()
+                f.toString()
             }
         );
     }

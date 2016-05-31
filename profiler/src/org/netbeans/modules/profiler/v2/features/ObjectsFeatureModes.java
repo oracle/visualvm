@@ -83,7 +83,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.lib.profiler.filters.JavaTypeFilter;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
@@ -182,7 +182,7 @@ final class ObjectsFeatureModes {
         void configureSettings(ProfilingSettings settings) {
             super.configureSettings(settings);
             
-            settings.setSelectedInstrumentationFilter(null);
+            settings.setInstrumentationFilter(new JavaTypeFilter());
         }
         
     }
@@ -235,9 +235,9 @@ final class ObjectsFeatureModes {
                 filter.append(" "); // NOI18N
             }
             
-            SimpleFilter f = new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE, // NOI18N
-                                                  filter.toString().trim());
-            settings.setSelectedInstrumentationFilter(f);
+            String s  = filter.toString().replace(". ", ".* ").replace(".,", ".*,").trim(); // NOI18N
+            JavaTypeFilter f = new JavaTypeFilter(s, JavaTypeFilter.TYPE_INCLUSIVE);
+            settings.setInstrumentationFilter(f);
         }
         
         void confirmSettings() {
@@ -449,8 +449,8 @@ final class ObjectsFeatureModes {
                 if (i < classes.length - 1) b.append(", "); // NOI18N
             }
 
-            SimpleFilter ff = new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT, b.toString()); // NOI18N
-            settings.setSelectedInstrumentationFilter(ff);
+            JavaTypeFilter ff = new JavaTypeFilter(b.toString(), JavaTypeFilter.TYPE_INCLUSIVE);
+            settings.setInstrumentationFilter(ff);
         }
         
         void confirmSettings() {
@@ -734,8 +734,7 @@ final class ObjectsFeatureModes {
             super.configureSettings(settings);
             
             String filterValue = getFlatValues(readFlag(CLASSES_FLAG, "").split("\\n")); // NOI18N
-            settings.setSelectedInstrumentationFilter(new SimpleFilter("", // NOI18N
-                    SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT, filterValue));
+            settings.setInstrumentationFilter(new JavaTypeFilter(filterValue, JavaTypeFilter.TYPE_INCLUSIVE));
             
             boolean lifecycle = Boolean.parseBoolean(readFlag(LIFECYCLE_FLAG, Boolean.TRUE.toString()));
             settings.setProfilingType(lifecycle ? ProfilingSettings.PROFILE_MEMORY_LIVENESS :

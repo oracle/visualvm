@@ -42,7 +42,7 @@
 package org.netbeans.modules.profiler.spi.project;
 
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.filters.FilterUtils;
+import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.modules.profiler.api.ProjectUtilities;
 import org.netbeans.modules.profiler.api.project.ProfilingSettingsSupport.SettingsCustomizer;
 import org.openide.util.Lookup;
@@ -111,7 +111,7 @@ public abstract class ProfilingSettingsSupportProvider {
                     o += 0.1f; // just JDBC methods are instrumented
                 }
 
-                if (FilterUtils.NONE_FILTER.equals(settings.getSelectedInstrumentationFilter()) &&
+                if (settings.getInstrumentationFilter().getType() == GenericFilter.TYPE_NONE &&
                     profilingType != ProfilingSettings.PROFILE_CPU_SAMPLING) {
                     o += 0.5f; // profile all classes
                 }

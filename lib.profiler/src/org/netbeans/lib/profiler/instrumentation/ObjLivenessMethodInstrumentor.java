@@ -49,7 +49,7 @@ import org.netbeans.lib.profiler.classfile.BaseClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 
 
@@ -282,7 +282,7 @@ public class ObjLivenessMethodInstrumentor extends MemoryProfMethodInstrumentor 
     }
     
     private boolean trackAllAllocations() {
-        return instrFilter.getFilterType() == InstrumentationFilter.INSTR_FILTER_NONE && allUnprofiledClassStatusArray == null;
+        return instrFilter.getType() == InstrumentationFilter.TYPE_NONE && allUnprofiledClassStatusArray == null;
     }
     
     static boolean isObjectConstructor(ClassInfo clazz, int methodIdx) {

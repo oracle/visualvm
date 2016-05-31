@@ -49,7 +49,7 @@ import org.netbeans.lib.profiler.classfile.BaseClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.utils.VMUtils;
@@ -96,7 +96,7 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
 
                     int classCPIdx = getU2(bci + 1);
                     String refClassName = clazz.getRefClassName(classCPIdx);
-                    if (instrFilter.passesFilter(refClassName)) {
+                    if (instrFilter.passes(refClassName)) {
                         found = true;
                         BaseClassInfo refClazz = javaClassOrPlaceholderForName(refClassName, loaderId);
 
@@ -110,11 +110,11 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
                     String refClassName = clazz.getRefClassName(classCPIdx);
                     BaseClassInfo refClazz = null;
                     if (bc == opc_anewarray) {
-                        if (instrFilter.passesFilter(refClassName.concat("[]"))) {    // NOI18N
+                        if (instrFilter.passes(refClassName.concat("[]"))) {    // NOI18N
                             refClazz = javaClassForObjectArrayType(refClassName);
                         }
                     } else { // opc_multianewarray
-                        if (instrFilter.passesFilter(getMultiArrayClassName(refClassName))) {
+                        if (instrFilter.passes(getMultiArrayClassName(refClassName))) {
                             refClazz = ClassRepository.lookupSpecialClass(refClassName);
                         }
                     }
@@ -131,7 +131,7 @@ public abstract class MemoryProfMethodInstrumentor extends ClassManager {
                     BaseClassInfo refClazz = javaClassForPrimitiveArrayType(arrayClassId);
                     String className = StringUtils.userFormClassName(refClazz.getName());
 
-                    if (instrFilter.passesFilter(className)) {
+                    if (instrFilter.passes(className)) {
                         found = true;
                         if (refClazz.getInstrClassId() == -1) {
                             refClazz.setInstrClassId(minstr.getNextClassId(refClazz.getName()));

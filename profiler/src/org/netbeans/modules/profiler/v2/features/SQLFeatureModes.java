@@ -52,7 +52,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.lib.profiler.filters.TextFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -106,7 +106,7 @@ class SQLFeatureModes {
         
         void configureSettings(ProfilingSettings settings) {
             super.configureSettings(settings);
-            settings.setSelectedInstrumentationFilter(SimpleFilter.NO_FILTER);
+            settings.setInstrumentationFilter(new TextFilter());
         }
         
         void confirmSettings() {}
@@ -135,7 +135,7 @@ class SQLFeatureModes {
             super.configureSettings(settings);
             
             String filter = readFlag(QUERIES_FILTER_FLAG, ""); // NOI18N
-            settings.setSelectedInstrumentationFilter(new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE, filter)); // NOI18N
+            settings.setInstrumentationFilter(new TextFilter(filter, TextFilter.TYPE_INCLUSIVE, false));
         }
         
         void confirmSettings() {

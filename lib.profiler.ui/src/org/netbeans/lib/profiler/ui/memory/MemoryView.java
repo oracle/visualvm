@@ -42,8 +42,8 @@
  */
 package org.netbeans.lib.profiler.ui.memory;
 
-import java.util.Collection;
 import java.util.ResourceBundle;
+import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
@@ -87,7 +87,7 @@ public abstract class MemoryView extends DataView {
     // -----
     
     
-    public abstract void setData(MemoryResultsSnapshot snapshot, Collection<String> filter, int aggregation);
+    public abstract void setData(MemoryResultsSnapshot snapshot, GenericFilter filter, int aggregation);
     
     public abstract void resetData();
     
@@ -105,15 +105,6 @@ public abstract class MemoryView extends DataView {
         String[] classNames = snapshot == null ? null : snapshot.getClassNames();
         if (classNames != null) for (int i = 0; i < classNames.length; i++)
             classNames[i] = StringUtils.userFormClassName(classNames[i]);
-    }
-    
-    static final boolean isAll(Collection<String> filter) {
-        return filter.contains("*") || filter.contains("**"); // NOI18N
-    }
-    
-    static final boolean isExact(Collection<String> filter) {
-        for (String f : filter) if (f.endsWith("*")) return false; // NOI18N
-        return true;
     }
     
 }

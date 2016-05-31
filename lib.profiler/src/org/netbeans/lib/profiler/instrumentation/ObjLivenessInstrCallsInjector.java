@@ -47,8 +47,8 @@ import java.io.IOException;
 import org.netbeans.lib.profiler.classfile.BaseClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.utils.VMUtils;
@@ -134,17 +134,17 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                                 String refClassName = clazz.getRefClassName(classCPIdx);
 
                                 if (bc == opc_new) {
-                                    if (!instrFilter.passesFilter(refClassName)) {
+                                    if (!instrFilter.passes(refClassName)) {
                                         break;
                                     }
                                     refClazz = ClassManager.javaClassOrPlaceholderForName(refClassName, loaderId);
                                 } else if (bc == opc_anewarray) {
-                                    if (!instrFilter.passesFilter(refClassName.concat("[]"))) {    // NOI18N
+                                    if (!instrFilter.passes(refClassName.concat("[]"))) {    // NOI18N
                                         break;
                                     }
                                     refClazz = ClassManager.javaClassForObjectArrayType(refClassName);
                                 } else {
-                                    if (!instrFilter.passesFilter(getMultiArrayClassName(refClassName))) {
+                                    if (!instrFilter.passes(getMultiArrayClassName(refClassName))) {
                                         break;
                                     }
                                     refClazz = ClassRepository.lookupSpecialClass(refClassName);
@@ -211,7 +211,7 @@ class ObjLivenessInstrCallsInjector extends Injector implements CommonConstants 
                                 int classId = refClazz.getInstrClassId();
                                 String className = StringUtils.userFormClassName(refClazz.getName());
 
-                                if (!instrFilter.passesFilter(className)) {
+                                if (!instrFilter.passes(className)) {
                                     break;
                                 }
                                 if ((allUnprofiledClassStatusArray == null) || !allUnprofiledClassStatusArray[classId]) {

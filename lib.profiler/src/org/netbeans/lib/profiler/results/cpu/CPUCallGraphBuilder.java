@@ -51,8 +51,8 @@ import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ProfilingPointsProcessor;
 import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.marker.Mark;
 import org.netbeans.lib.profiler.results.BaseCallGraphBuilder;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
@@ -1144,7 +1144,7 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
                 ProfilerClient client = getClient();
 
                 if (client != null) {
-                    if (!client.getSettings().getInstrumentationFilter().passesFilter(jvmClassName)) {
+                    if (!client.getSettings().getInstrumentationFilter().passes(jvmClassName)) {
                         curNode.setFilteredStatus(TimedCPUCCTNode.FILTERED_YES);
                     }
                 } else {
@@ -1219,11 +1219,11 @@ public class CPUCallGraphBuilder extends BaseCallGraphBuilder implements CPUProf
         if (!ti.isInRoot()) {
             try {
                 methodInfoMapper.lock(false);
-                String jvmClassName = methodInfoMapper.getInstrMethodClass(((MethodCPUCCTNode) curNode).getMethodId()).replace('.', '/');
+                String jvmClassName = methodInfoMapper.getInstrMethodClass(((MethodCPUCCTNode) curNode).getMethodId()).replace('.', '/'); // NOI18N
                 ProfilerClient client = getClient();
 
                 if (client != null) {
-                    if (!client.getSettings().getInstrumentationFilter().passesFilter(jvmClassName)) {
+                    if (!client.getSettings().getInstrumentationFilter().passes(jvmClassName)) {
                         curNode.setFilteredStatus(TimedCPUCCTNode.FILTERED_YES);
                     }
                 } else {
