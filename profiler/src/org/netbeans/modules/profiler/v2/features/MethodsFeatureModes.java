@@ -275,7 +275,11 @@ final class MethodsFeatureModes {
         }
         
         boolean currentSettingsValid() {
-            return !selectedProjects.isEmpty();
+            assert SwingUtilities.isEventDispatchThread();
+            
+            if (selectedProjects.isEmpty()) return false;
+            
+            return true;
         }
         
         
@@ -547,18 +551,16 @@ final class MethodsFeatureModes {
         }
         
         boolean currentSettingsValid() {
-            if (ui != null) {
-                assert SwingUtilities.isEventDispatchThread();
-                
-                if (FilterSelector.FilterName.EXCLUDE_CUSTOM_FILTER.equals(filterName) ||
-                    FilterSelector.FilterName.INCLUDE_CUSTOM_FILTER.equals(filterName))
-                    return !filterValue.isEmpty();
-                
-                if (getSelection().isEmpty()) return false;
-                
-                return true;
-            }
-            return false;
+            assert SwingUtilities.isEventDispatchThread();
+
+            String filter = readFlag(FILTER_CALLS_FLAG, FilterSelector.FilterName.EXCLUDE_JAVA_FILTER.name());
+            if (FilterSelector.FilterName.EXCLUDE_CUSTOM_FILTER.name().equals(filter) ||
+                FilterSelector.FilterName.INCLUDE_CUSTOM_FILTER.name().equals(filter))
+                if (readFlag(FILTER_CALLS_VALUE_FLAG, "").isEmpty()) return false; // NOI18N
+            
+            if (getSelection().isEmpty()) return false;
+
+            return true;
         }
         
         HashSet<ClientUtils.SourceCodeSelection> getSelection() {
@@ -1012,15 +1014,11 @@ final class MethodsFeatureModes {
         }
 
         boolean currentSettingsValid() {
-            if (ui != null) {
-                assert SwingUtilities.isEventDispatchThread();
-                
-                if (classesArea.showsHint() || classesArea.getText().trim().isEmpty()) return false;
-//                if (filterArea.showsHint() || filterArea.getText().trim().isEmpty()) return false;
-                
-                return true;
-            }
-            return false;
+            assert SwingUtilities.isEventDispatchThread();
+            
+            if (readFlag(CLASSES_FLAG, "").isEmpty()) return false; // NOI18N
+            
+            return true;
         }
 
         JComponent getUI() {

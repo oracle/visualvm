@@ -158,14 +158,11 @@ class SQLFeatureModes {
         }
 
         boolean currentSettingsValid() {
-            if (ui != null) {
-                assert SwingUtilities.isEventDispatchThread();
-                
-                if (filterField.getText().trim().isEmpty()) return false;
-                
-                return true;
-            }
-            return false;
+            assert SwingUtilities.isEventDispatchThread();
+            
+            if (readFlag(QUERIES_FILTER_FLAG, "").isEmpty()) return false; // NOI18N
+            
+            return true;
         }
         
         JComponent getUI() {

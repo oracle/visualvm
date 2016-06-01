@@ -258,7 +258,11 @@ final class ObjectsFeatureModes {
         }
         
         boolean currentSettingsValid() {
-            return !selectedProjects.isEmpty();
+            assert SwingUtilities.isEventDispatchThread();
+            
+            if (selectedProjects.isEmpty()) return false;
+            
+            return true;
         }
         
         
@@ -490,7 +494,11 @@ final class ObjectsFeatureModes {
         }
 
         boolean currentSettingsValid() {
-            return !getSelection().isEmpty();
+            assert SwingUtilities.isEventDispatchThread();
+            
+            if (getSelection().isEmpty()) return false;
+            
+            return true;
         }
         
         HashSet<ClientUtils.SourceCodeSelection> getSelection() {
@@ -787,14 +795,11 @@ final class ObjectsFeatureModes {
         }
 
         boolean currentSettingsValid() {
-            if (ui != null) {
-                assert SwingUtilities.isEventDispatchThread();
-                
-                if (classesArea.showsHint() || classesArea.getText().trim().isEmpty()) return false;
-                
-                return true;
-            }
-            return false;
+            assert SwingUtilities.isEventDispatchThread();
+            
+            if (readFlag(CLASSES_FLAG, "").isEmpty()) return false; // NOI18N
+            
+            return true;
         }
         
         private static String getFlatValues(String[] values) {
