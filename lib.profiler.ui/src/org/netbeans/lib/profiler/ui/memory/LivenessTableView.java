@@ -46,7 +46,6 @@ package org.netbeans.lib.profiler.ui.memory;
 import java.awt.BorderLayout;
 import java.text.Format;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JLabel;
@@ -56,6 +55,7 @@ import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
@@ -184,7 +184,7 @@ abstract class LivenessTableView extends MemoryView {
         });
     }
     
-    public void setData(MemoryResultsSnapshot snapshot, Collection<String> filter, int aggregation) {
+    public void setData(MemoryResultsSnapshot snapshot, GenericFilter filter, int aggregation) {
         LivenessMemoryResultsSnapshot _snapshot = (LivenessMemoryResultsSnapshot)snapshot;
         boolean diff = _snapshot instanceof LivenessMemoryResultsDiff;
         
@@ -214,9 +214,9 @@ abstract class LivenessTableView extends MemoryView {
             List<Float> fAvgObjectAge = new ArrayList();
             List<Integer> fMaxSurvGen = new ArrayList();
 //            List<Integer> fTotalAllocObjects = new ArrayList();
-            
-            if (isAll(filter)) {
-                for (int i = 0; i < _nTrackedItems; i++) {
+
+            for (int i = 0; i < _nTrackedItems; i++) {
+                if (filter.passes(_classNames[i].replace('.', '/'))) { // NOI18N
                     fClassNames.add(_classNames[i]);
                     fTrackedLiveObjects.add(_nTrackedLiveObjects[i]);
                     fTrackedLiveObjectsSize.add(_trackedLiveObjectsSize[i]);
@@ -224,69 +224,6 @@ abstract class LivenessTableView extends MemoryView {
                     fAvgObjectAge.add(_avgObjectAge[i]);
                     fMaxSurvGen.add(_maxSurvGen[i]);
 //                    fTotalAllocObjects.add(_nTotalAllocObjects[i]);
-                }
-            } else if (isExact(filter)) {
-                for (int i = 0; i < _nTrackedItems; i++) {
-                    if (filter.contains(_classNames[i])) {
-                        fClassNames.add(_classNames[i]);
-                        fTrackedLiveObjects.add(_nTrackedLiveObjects[i]);
-                        fTrackedLiveObjectsSize.add(_trackedLiveObjectsSize[i]);
-                        fTrackedAllocObjects.add(_nTrackedAllocObjects[i]);
-                        fAvgObjectAge.add(_avgObjectAge[i]);
-                        fMaxSurvGen.add(_maxSurvGen[i]);
-    //                    fTotalAllocObjects.add(_nTotalAllocObjects[i]);
-                    }
-                }
-            } else {
-                for (String f : filter) {
-                    if (f.endsWith("**")) { // NOI18N
-                        f = f.substring(0, f.length() - 2);
-                        for (int i = 0; i < _nTrackedItems; i++) {
-                            if (_classNames[i].startsWith(f)) {
-                                fClassNames.add(_classNames[i]);
-                                fTrackedLiveObjects.add(_nTrackedLiveObjects[i]);
-                                fTrackedLiveObjectsSize.add(_trackedLiveObjectsSize[i]);
-                                fTrackedAllocObjects.add(_nTrackedAllocObjects[i]);
-                                fAvgObjectAge.add(_avgObjectAge[i]);
-                                fMaxSurvGen.add(_maxSurvGen[i]);
-            //                    fTotalAllocObjects.add(_nTotalAllocObjects[i]);
-                            }
-                        }
-                    } else if (f.endsWith("*")) { // NOI18N
-                        f = f.substring(0, f.length() - 1);
-                        for (int i = 0; i < _nTrackedItems; i++) {
-                            if (!_classNames[i].startsWith(f)) continue;
-                            
-                            boolean subpackage = false;
-                            for (int ii = f.length(); ii < _classNames[i].length(); ii++)
-                                if (_classNames[i].charAt(ii) == '.') { // NOI18N
-                                    subpackage = true;
-                                    break;
-                                }
-                            
-                            if (!subpackage) {
-                                fClassNames.add(_classNames[i]);
-                                fTrackedLiveObjects.add(_nTrackedLiveObjects[i]);
-                                fTrackedLiveObjectsSize.add(_trackedLiveObjectsSize[i]);
-                                fTrackedAllocObjects.add(_nTrackedAllocObjects[i]);
-                                fAvgObjectAge.add(_avgObjectAge[i]);
-                                fMaxSurvGen.add(_maxSurvGen[i]);
-            //                    fTotalAllocObjects.add(_nTotalAllocObjects[i]);
-                            }
-                        }
-                    } else {
-                        for (int i = 0; i < _nTrackedItems; i++) {
-                            if (_classNames[i].equals(f)) {
-                                fClassNames.add(_classNames[i]);
-                                fTrackedLiveObjects.add(_nTrackedLiveObjects[i]);
-                                fTrackedLiveObjectsSize.add(_trackedLiveObjectsSize[i]);
-                                fTrackedAllocObjects.add(_nTrackedAllocObjects[i]);
-                                fAvgObjectAge.add(_avgObjectAge[i]);
-                                fMaxSurvGen.add(_maxSurvGen[i]);
-            //                    fTotalAllocObjects.add(_nTotalAllocObjects[i]);
-                            }
-                        }
-                    }
                 }
             }
             

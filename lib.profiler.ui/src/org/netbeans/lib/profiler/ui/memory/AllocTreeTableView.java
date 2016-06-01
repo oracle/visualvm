@@ -46,7 +46,6 @@ import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +60,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
@@ -111,7 +111,7 @@ abstract class AllocTreeTableView extends MemoryView {
     protected ProfilerTable getResultsComponent() { return treeTable; }
     
     
-    public void setData(MemoryResultsSnapshot snapshot, Collection<String> filter, int aggregation) {
+    public void setData(MemoryResultsSnapshot snapshot, GenericFilter filter, int aggregation) {
         final boolean includeEmpty = filter != null;
         final boolean diff = snapshot instanceof AllocMemoryResultsDiff;
         final AllocMemoryResultsSnapshot _snapshot = (AllocMemoryResultsSnapshot)snapshot;
@@ -173,47 +173,10 @@ abstract class AllocTreeTableView extends MemoryView {
                     nodes.add(node);
                     _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
                 }
-            } else if (isAll(filter) || (isExact(filter) && filter.contains(_classNames[i]))) {
+            } else if (filter.passes(_classNames[i].replace('.', '/'))) { // NOI18N
                 PresoObjAllocCCTNode node = new Node(_classNames[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i]);
                 nodes.add(node);
                 _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
-            } else {
-                for (String f : filter) {
-                    if (f.endsWith("**")) { // NOI18N
-                        f = f.substring(0, f.length() - 2);
-                        if (_classNames[i].startsWith(f)) {
-                            PresoObjAllocCCTNode node = new Node(_classNames[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i]);
-                            nodes.add(node);
-                            _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
-                            break;
-                        }
-                    } else if (f.endsWith("*")) { // NOI18N
-                        f = f.substring(0, f.length() - 1);
-                        
-                        if (!_classNames[i].startsWith(f)) continue;
-                            
-                        boolean subpackage = false;
-                        for (int ii = f.length(); ii < _classNames[i].length(); ii++)
-                            if (_classNames[i].charAt(ii) == '.') { // NOI18N
-                                subpackage = true;
-                                break;
-                            }
-
-                        if (!subpackage) {
-                            PresoObjAllocCCTNode node = new Node(_classNames[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i]);
-                            nodes.add(node);
-                            _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
-                            break;
-                        }
-                    } else {
-                        if (_classNames[i].equals(f)) {
-                            PresoObjAllocCCTNode node = new Node(_classNames[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i]);
-                            nodes.add(node);
-                            _nodesMap.put(node, new ClientUtils.SourceCodeSelection(_classNames[i], Wildcards.ALLWILDCARD, null));
-                            break;
-                        }
-                    }
-                }
             }
         }
         

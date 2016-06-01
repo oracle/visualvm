@@ -437,7 +437,7 @@ public class ProfilerClient implements CommonConstants {
         appStatusHandler = ash;
         serverCommandHandler = sch;
         instrumentor = new Instrumentor(status, settings);
-        histogramManager = new HeapHistogramManager(settings.getInstrumentationFilter());
+        histogramManager = new HeapHistogramManager(settings);
         EventBufferProcessor.initialize(this);
         EventBufferResultsProvider.getDefault().addDispatcher(ProfilingResultsDispatcher.getDefault());
     }

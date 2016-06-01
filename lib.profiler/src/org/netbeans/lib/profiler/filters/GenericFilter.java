@@ -75,6 +75,10 @@ public class GenericFilter {
     private Boolean isAll;
     
     
+    public GenericFilter() {
+        this(null, "", TYPE_NONE); // NOI18N
+    }
+    
     public GenericFilter(GenericFilter other) {
         this(other.name, other.value, other.values, other.type, other.modes);
     }
@@ -90,9 +94,9 @@ public class GenericFilter {
     private GenericFilter(String name, String value, String[] values, int type, int[] modes) {
         this.name = name;
         this.value = value;
-        this.values = values;
+        this.values = values; // arrays are shared as long as the instances don't change, array of the changed instance is nulled
         this.type = type;
-        this.modes = modes;
+        this.modes = modes; // arrays are shared as long as the instances don't change, array of the changed instance is nulled
     }
     
     
@@ -296,6 +300,29 @@ public class GenericFilter {
     }
     
     
+    public String toString() {
+        StringBuilder b = new StringBuilder();
+        
+        b.append(getClass().getName());
+        b.append("["); // NOI18N
+        b.append("name: ").append(getName()); // NOI18N
+        b.append(", value: ").append(getValue()); // NOI18N
+        b.append(", type: ").append(typeString(getType())); // NOI18N
+        b.append("]"); // NOI18N
+        
+        return b.toString();
+    }
+    
+    private static String typeString(int type) {
+        switch (type) {
+            case TYPE_NONE: return "TYPE_NONE"; // NOI18N
+            case TYPE_INCLUSIVE: return "TYPE_INCLUSIVE"; // NOI18N
+            case TYPE_EXCLUSIVE: return "TYPE_EXCLUSIVE"; // NOI18N
+            default: return "unknown"; // NOI18N
+        }
+    }
+    
+    
     public void store(Properties properties, String id) {
         if (name == null) properties.remove(id + PROP_NAME); else properties.put(id + PROP_NAME, name);
         properties.put(id + PROP_VALUE, value);
@@ -304,8 +331,7 @@ public class GenericFilter {
     
     
     private static String loadName(Properties properties, String id) {
-        String _name = properties.getProperty(id + PROP_NAME);
-        return _name == null ? "" : _name; // NOI18N
+        return properties.getProperty(id + PROP_NAME);
     }
     
     private static String loadValue(Properties properties, String id) {

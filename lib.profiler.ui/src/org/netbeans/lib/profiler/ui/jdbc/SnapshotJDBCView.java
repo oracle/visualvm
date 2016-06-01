@@ -56,6 +56,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.results.jdbc.JdbcResultsDiff;
 import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
@@ -471,17 +472,16 @@ public abstract class SnapshotJDBCView extends JPanel {
     protected void customizeNodePopup(DataView invoker, JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {}
     
     private void setData() {
-//        JdbcResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
-//                                       snapshot.createDiff(refSnapshot);
-        JdbcResultsSnapshot _snapshot = snapshot;
+        JdbcResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
+                                       snapshot.createDiff(refSnapshot);
         
 //        final FlatProfileContainer flatData = _snapshot.getFlatProfile(selectedThreads, aggregation);
 //        
 //        final Map<Integer, ClientUtils.SourceCodeSelection> idMap = _snapshot.getMethodIDMap(aggregation);
 
-//        boolean diff = _snapshot instanceof JdbcResultsDiff;
+        boolean diff = _snapshot instanceof JdbcResultsDiff;
 //        forwardCallsView.setData(_snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled, diff);
-        forwardCallsView.setData(_snapshot, null, -1, null, false, false, false);
+        forwardCallsView.setData(_snapshot, null, -1, null, false, false, diff);
     }
     
     protected final void setSnapshot(JdbcResultsSnapshot snapshot) {

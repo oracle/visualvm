@@ -44,7 +44,6 @@
 package org.netbeans.lib.profiler.results.cpu;
 
 import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.MethodCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.RuntimeCPUCCTNode;
 import org.netbeans.lib.profiler.results.cpu.cct.nodes.TimedCPUCCTNode;
@@ -55,6 +54,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 
 
@@ -611,7 +611,7 @@ public class CPUCCTContainer {
                     methodInfoMapper.lock(false);
                     try {
                         locals.className = methodInfoMapper.getInstrMethodClass(((MethodCPUCCTNode) locals.node).getMethodId()).replace('.', '/'); // NOI18N
-                        if (!filter.passesFilter(locals.className)) {
+                        if (!filter.passes(locals.className)) {
                             locals.compParent = locals.parent;
                         } else {
                             locals.newChild = (TimedCPUCCTNode) locals.node.clone();

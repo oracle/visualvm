@@ -46,13 +46,14 @@ package org.netbeans.lib.profiler;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.marker.Marker;
 import org.netbeans.lib.profiler.utils.MiscUtils;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import java.io.File;
 import java.io.IOException;
+import org.netbeans.lib.profiler.filters.GenericFilter;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
 
 
 /**
@@ -64,7 +65,7 @@ import java.io.IOException;
 public final class ProfilerEngineSettings implements CommonConstants, Cloneable {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private InstrumentationFilter instrumentationFilter = InstrumentationFilter.getDefault();
+    private InstrumentationFilter instrumentationFilter = new InstrumentationFilter();
     private Marker methodMarker = Marker.DEFAULT;
     private String jFluidRootDirName;
     private String jvmArgs; // the arguments for JVM running the TA
@@ -218,8 +219,8 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
         return instrumentSpawnedThreads;
     }
 
-    public void setInstrumentationFilter(InstrumentationFilter f) {
-        instrumentationFilter = f;
+    public void setInstrumentationFilter(GenericFilter f) {
+        instrumentationFilter = new InstrumentationFilter(f);
     }
 
     public InstrumentationFilter getInstrumentationFilter() {
@@ -327,7 +328,7 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
     }
 
     public boolean isInstrumentArrayAllocation() {
-        return instrumentationFilter.acceptsArrays();
+        return instrumentationFilter.hasArray();
     }
 
     public boolean isInstrumentObjectInit() {
@@ -504,7 +505,7 @@ public final class ProfilerEngineSettings implements CommonConstants, Cloneable 
             }
 
             // clone instrumentation filter
-            clone.instrumentationFilter = (InstrumentationFilter) instrumentationFilter.clone();
+            clone.instrumentationFilter = new InstrumentationFilter(instrumentationFilter);
 
             return clone;
         } catch (CloneNotSupportedException e) {

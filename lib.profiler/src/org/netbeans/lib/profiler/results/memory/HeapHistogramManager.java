@@ -47,7 +47,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
+import org.netbeans.lib.profiler.ProfilerEngineSettings;
+import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.lib.profiler.wireprotocol.HeapHistogramResponse;
 
 /**
@@ -57,10 +58,10 @@ import org.netbeans.lib.profiler.wireprotocol.HeapHistogramResponse;
 public class HeapHistogramManager {
 
     private Map<Integer, String> classesIdMap = new HashMap(8000);
-    private final InstrumentationFilter classFilter;
+    private final ProfilerEngineSettings settings;
 
-    public HeapHistogramManager(InstrumentationFilter filter) {
-        classFilter = filter;
+    public HeapHistogramManager(ProfilerEngineSettings settings) {
+        this.settings = settings;
     }
 
     public HeapHistogram getHistogram(HeapHistogramResponse resp) {
@@ -74,10 +75,11 @@ public class HeapHistogramManager {
         long instances[] = resp.getInstances();
         long bytes[] = resp.getBytes();
         HeapHistogramImpl histogram = new HeapHistogramImpl(resp.getTime());
+        GenericFilter classFilter = settings.getInstrumentationFilter();
         for (int i = 0; i < ids.length; i++) {
             String className = classesIdMap.get(ids[i]);
             
-            if (classFilter.passesFilter(className.replace('.', '/'))) {
+            if (classFilter.passes(className.replace('.', '/'))) { // NOI18N
                 ClassInfoImpl ci = new ClassInfoImpl(className, instances[i], bytes[i]);
                 histogram.addClassInfo(ci, false);
             }

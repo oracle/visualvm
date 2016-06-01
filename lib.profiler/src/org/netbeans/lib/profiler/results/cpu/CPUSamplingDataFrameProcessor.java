@@ -53,8 +53,8 @@ import java.util.logging.Level;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.client.ClientUtils.TargetAppOrVMTerminated;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.results.ProfilingResultListener;
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder.SampledThreadInfo;
 import org.netbeans.lib.profiler.results.locks.AbstractLockDataFrameProcessor;
@@ -290,7 +290,7 @@ public class CPUSamplingDataFrameProcessor extends AbstractLockDataFrameProcesso
                     if (el == null) {
                         JMethodIdTableEntry entry = methodIdTable.getEntry(methodId);
                         String method = formatter.formatMethodName(entry.className, entry.methodName, entry.methodSig).toFormatted();
-                        String className = entry.className.replace('/','.');
+                        String className = entry.className.replace('/','.'); // NOI18N
                         String methodName = method+StackTraceSnapshotBuilder.NAME_SIG_SPLITTER+entry.methodSig;
                         el = new StackTraceElement(className, methodName, null, entry.isNative?-2:-1);
                         stackTraceElements.put(Integer.valueOf(methodId),el);

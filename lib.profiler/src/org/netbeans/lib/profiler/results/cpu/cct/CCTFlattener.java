@@ -50,8 +50,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
@@ -210,9 +210,9 @@ public class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
 
         if (!filteredOut && (cpuProfilingType == CommonConstants.CPU_SAMPLED || nodeFilerStatus == TimedCPUCCTNode.FILTERED_MAYBE)) { // filter out all methods not complying to instrumentation filter & secure to remove
 
-            String jvmClassName = getInstrMethodClass(nodeMethodId).replace('.', '/');
+            String jvmClassName = getInstrMethodClass(nodeMethodId).replace('.', '/'); // NOI18N
 
-            if (!instrFilter.passesFilter(jvmClassName)) {
+            if (!instrFilter.passes(jvmClassName)) {
                 filteredOut = true;
             }
         }
