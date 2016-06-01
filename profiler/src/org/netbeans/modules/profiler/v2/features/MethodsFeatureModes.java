@@ -552,11 +552,17 @@ final class MethodsFeatureModes {
         
         boolean currentSettingsValid() {
             assert SwingUtilities.isEventDispatchThread();
-
-            String filter = readFlag(FILTER_CALLS_FLAG, FilterSelector.FilterName.EXCLUDE_JAVA_FILTER.name());
-            if (FilterSelector.FilterName.EXCLUDE_CUSTOM_FILTER.name().equals(filter) ||
-                FilterSelector.FilterName.INCLUDE_CUSTOM_FILTER.name().equals(filter))
-                if (readFlag(FILTER_CALLS_VALUE_FLAG, "").isEmpty()) return false; // NOI18N
+            
+            if (ui != null) {
+                if (FilterSelector.FilterName.EXCLUDE_CUSTOM_FILTER.equals(filterName) ||
+                    FilterSelector.FilterName.INCLUDE_CUSTOM_FILTER.equals(filterName))
+                    if (filterValue.isEmpty()) return false;
+            } else {
+                String filter = readFlag(FILTER_CALLS_FLAG, FilterSelector.FilterName.EXCLUDE_JAVA_FILTER.name());
+                if (FilterSelector.FilterName.EXCLUDE_CUSTOM_FILTER.name().equals(filter) ||
+                    FilterSelector.FilterName.INCLUDE_CUSTOM_FILTER.name().equals(filter))
+                    if (readFlag(FILTER_CALLS_VALUE_FLAG, "").isEmpty()) return false; // NOI18N
+            }
             
             if (getSelection().isEmpty()) return false;
 
@@ -1016,7 +1022,11 @@ final class MethodsFeatureModes {
         boolean currentSettingsValid() {
             assert SwingUtilities.isEventDispatchThread();
             
-            if (readFlag(CLASSES_FLAG, "").isEmpty()) return false; // NOI18N
+            if (ui != null) {
+                if (classesArea.showsHint() || classesArea.getText().trim().isEmpty()) return false;
+            } else {
+                if (readFlag(CLASSES_FLAG, "").isEmpty()) return false; // NOI18N
+            }
             
             return true;
         }

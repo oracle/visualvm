@@ -797,7 +797,11 @@ final class ObjectsFeatureModes {
         boolean currentSettingsValid() {
             assert SwingUtilities.isEventDispatchThread();
             
-            if (readFlag(CLASSES_FLAG, "").isEmpty()) return false; // NOI18N
+            if (ui != null) {
+                if (classesArea.showsHint() || classesArea.getText().trim().isEmpty()) return false;
+            } else {
+                if (readFlag(CLASSES_FLAG, "").isEmpty()) return false; // NOI18N
+            }
             
             return true;
         }

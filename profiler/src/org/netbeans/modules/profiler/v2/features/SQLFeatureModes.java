@@ -160,7 +160,11 @@ class SQLFeatureModes {
         boolean currentSettingsValid() {
             assert SwingUtilities.isEventDispatchThread();
             
-            if (readFlag(QUERIES_FILTER_FLAG, "").isEmpty()) return false; // NOI18N
+            if (ui != null) {
+                if (filterField.getText().trim().isEmpty()) return false;
+            } else {
+                if (readFlag(QUERIES_FILTER_FLAG, "").isEmpty()) return false; // NOI18N
+            }
             
             return true;
         }
