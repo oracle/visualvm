@@ -780,11 +780,12 @@ public class ProfilingSettings {
 
         Properties pr = new Properties();
         pr.putAll(props);
-        // Load JavaTypeFilter instead of GenericFilter, covers the most typical scenario for saved snapshots
         try {
+            // Try to load JavaTypeFilter, covers the most typical scenario for saved snapshots
             setInstrumentationFilter(new JavaTypeFilter(pr, prefix + PROP_INSTR_FILTER));
         } catch (GenericFilter.InvalidFilterIdException e) {
-            setInstrumentationFilter(new JavaTypeFilter());
+            // Fallback to GenericFilter if no filter is stored for this instance
+            setInstrumentationFilter(new GenericFilter("#fallback#", "", GenericFilter.TYPE_NONE)); // NOI18N
         }
 
         // CPU Profiling: Sampled
