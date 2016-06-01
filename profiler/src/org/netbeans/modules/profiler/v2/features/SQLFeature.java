@@ -92,14 +92,6 @@ import org.openide.util.lookup.ServiceProvider;
 })
 final class SQLFeature extends ProfilerFeature.Basic {
     
-    private static final String[] jdbcMarkerClasses = {
-        JdbcCCTProvider.DRIVER_INTERFACE,
-        JdbcCCTProvider.CONNECTION_INTERFACE,
-        JdbcCCTProvider.STATEMENT_INTERFACE,
-        JdbcCCTProvider.PREPARED_STATEMENT_INTERFACE,
-        JdbcCCTProvider.CALLABLE_STATEMENT_INTERFACE
-    };
-
     private final WeakProcessor processor;
     
     private FeatureMode currentMode;
@@ -234,26 +226,6 @@ final class SQLFeature extends ProfilerFeature.Basic {
     }
     
     
-//    // --- Settings ------------------------------------------------------------
-//    
-//    public boolean supportsSettings(ProfilingSettings psettings) {
-//        return !ProfilingSettings.isMemorySettings(psettings);
-//    }
-//    
-//    public void configureSettings(ProfilingSettings settings) {
-//        settings.setProfilingType(ProfilingSettings.PROFILE_CPU_JDBC);
-//        settings.setCPUProfilingType(CommonConstants.CPU_INSTR_FULL);
-//
-//        ClientUtils.SourceCodeSelection[] roots = new ClientUtils.SourceCodeSelection[jdbcMarkerClasses.length];
-//        for (int i = 0; i < jdbcMarkerClasses.length; i++) {
-//            roots[i] = new ClientUtils.SourceCodeSelection(jdbcMarkerClasses[i], "*", null); // NOI18N
-//            roots[i].setMarkerMethod(true);
-//        }
-//        settings.addRootMethods(roots);
-//        settings.setSelectedInstrumentationFilter(SimpleFilter.NO_FILTER);
-//    }
-    
-    
     // --- Settings UI ---------------------------------------------------------
     
     private static final String SETTINGS_FLAG = "SETTINGS_FLAG"; // NOI18N
@@ -301,7 +273,6 @@ final class SQLFeature extends ProfilerFeature.Basic {
                     protected void fireActionPerformed(ActionEvent e) { setMode(allQueriesMode); }
                 });
                 popup.add(new JRadioButtonMenuItem(filteredQueriesMode.getName(), currentMode == filteredQueriesMode) {
-                    { setEnabled(false); } // TODO: delete once filtering is implemented
                     protected void fireActionPerformed(ActionEvent e) { setMode(filteredQueriesMode); }
                 });
             }

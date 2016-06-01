@@ -46,6 +46,8 @@ package org.netbeans.lib.profiler.filters;
  * @author Jiri Sedlacek
  */
 public class InstrumentationFilter extends JavaTypeFilter {
+
+    private boolean fake;
     
     public InstrumentationFilter() {
         super();
@@ -53,6 +55,15 @@ public class InstrumentationFilter extends JavaTypeFilter {
     
     public InstrumentationFilter(GenericFilter other) {
         super(other);
+        if (!(other instanceof JavaTypeFilter)) {
+            fake = true;
+        }
+    }
+
+    @Override
+    public boolean passes(String string) {
+        if (fake) return true;
+        return super.passes(string);
     }
     
 }
