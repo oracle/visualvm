@@ -152,7 +152,10 @@ import org.openide.util.RequestProcessor;
     "SnapshotInfoPanel_SelectedMethods=Selected Methods:",
     "SnapshotInfoPanel_RecordLifecycle=Track only live objects:",
     "SnapshotInfoPanel_RecordAllocations=Record allocations:",
-    "SnapshotInfoPanel_LimitAllocations=Limit allocation calls:"
+    "SnapshotInfoPanel_LimitAllocations=Limit allocation calls:",
+    "SnapshotInfoPanel_SqlAllQueries=SQL Queries - All Queries",
+    "SnapshotInfoPanel_SqlDefinedQueries=SQL Queries - Defined Queries",
+    "SnapshotInfoPanel_DefinedQueries=Defined Queries:"
 })
 public class SnapshotInfoPanel extends JPanel {
 
@@ -388,7 +391,7 @@ public class SnapshotInfoPanel extends JPanel {
             case ProfilingSettings.PROFILE_CPU_SAMPLING:
                 GenericFilter filter = ps.getInstrumentationFilter();
                 int filterType = filter.getType();
-                if (filterType == GenericFilter.TYPE_NONE) {
+                if (filterType == GenericFilter.TYPE_NONE && filter.getName() == null) {
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
                     htmlText.append("</strong>"); // NOI18N
@@ -401,7 +404,7 @@ public class SnapshotInfoPanel extends JPanel {
                     htmlText.append("<br>"); // NOI18N
                     htmlText.append("<br>"); // NOI18N
                     appendSampledCPUText(htmlText, false, ps);
-                } else if (filterType == GenericFilter.TYPE_INCLUSIVE && "".equals(filter.getName())) { // NOI18N
+                } else if (filterType == GenericFilter.TYPE_INCLUSIVE && filter.getName() == null) {
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
                     htmlText.append("</strong>"); // NOI18N
@@ -487,16 +490,25 @@ public class SnapshotInfoPanel extends JPanel {
 
                 break;
             case ProfilingSettings.PROFILE_CPU_JDBC:
+                filter = ps.getInstrumentationFilter();
+                
                 htmlText.append("<strong>"); // NOI18N
                 htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
                 htmlText.append("</strong>"); // NOI18N
-                htmlText.append("SQL Queries");
+                htmlText.append(filter.isAll() ? Bundle.SnapshotInfoPanel_SqlAllQueries() :
+                                                 Bundle.SnapshotInfoPanel_SqlDefinedQueries());
+                
+                if (!filter.isAll()) {
+                    htmlText.append("<br>"); // NOI18N
+                    htmlText.append("<br>"); // NOI18N
+                    formattedRow(htmlText, Bundle.SnapshotInfoPanel_DefinedQueries(), filter.getValue());
+                }
                 
                 break;
             case ProfilingSettings.PROFILE_MEMORY_SAMPLING:
                 filter = ps.getInstrumentationFilter();
                 filterType = filter.getType();
-                if (filterType == GenericFilter.TYPE_NONE) {
+                if (filterType == GenericFilter.TYPE_NONE && filter.getName() == null) {
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
                     htmlText.append("</strong>"); // NOI18N
@@ -509,7 +521,7 @@ public class SnapshotInfoPanel extends JPanel {
                     htmlText.append("<br>"); // NOI18N
                     htmlText.append("<br>"); // NOI18N
                     appendSampledMemoryText(htmlText, false, ps);
-                } else if (filterType == GenericFilter.TYPE_INCLUSIVE && "".equals(filter.getName())) { // NOI18N
+                } else if (filterType == GenericFilter.TYPE_INCLUSIVE && filter.getName() == null) {
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
                     htmlText.append("</strong>"); // NOI18N
@@ -541,7 +553,7 @@ public class SnapshotInfoPanel extends JPanel {
             case ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS:
                 filter = ps.getInstrumentationFilter();
                 filterType = filter.getType();
-                if (filterType == GenericFilter.TYPE_INCLUSIVE && "".equals(filter.getName())) { // NOI18N
+                if (filterType == GenericFilter.TYPE_INCLUSIVE && filter.getName() == null) {
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
                     htmlText.append("</strong>"); // NOI18N
@@ -574,7 +586,7 @@ public class SnapshotInfoPanel extends JPanel {
             case ProfilingSettings.PROFILE_MEMORY_LIVENESS:
                 filter = ps.getInstrumentationFilter();
                 filterType = filter.getType();
-                if (filterType == GenericFilter.TYPE_INCLUSIVE && "".equals(filter.getName())) { // NOI18N
+                if (filterType == GenericFilter.TYPE_INCLUSIVE && filter.getName() == null) {
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
                     htmlText.append("</strong>"); // NOI18N
@@ -867,6 +879,10 @@ public class SnapshotInfoPanel extends JPanel {
         htmlText.append(allocLimit < 0 ? "No" : allocLimit);
         htmlText.append("<br>"); //NOI18N
         htmlText.append("<br>"); //NOI18N
+        
+        String filter = ps.getInstrumentationFilter().getValue();
+        formattedRow(htmlText, Bundle.SnapshotInfoPanel_SelectedClasses(), filter);
+        htmlText.append("<br>"); // NOI18N
         
         if (ps.getAllocTrackEvery() == 1) {
             htmlText.append("<strong>"); // NOI18N
