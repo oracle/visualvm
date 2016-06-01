@@ -541,7 +541,7 @@ final class MethodsFeatureModes {
                     return true;
                 
                 String filter = readFlag(FILTER_CALLS_FLAG, FilterSelector.FilterName.EXCLUDE_JAVA_FILTER.name());
-                if (!filterName.equals(FilterSelector.FilterName.valueOf(filter))) return true;
+                if (!filter.equals(filterName.name())) return true;
                 
                 if (!readFlag(FILTER_CALLS_VALUE_FLAG, "").equals(filterValue)) return true; // NOI18N
                 
