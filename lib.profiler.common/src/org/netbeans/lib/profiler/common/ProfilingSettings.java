@@ -784,8 +784,17 @@ public class ProfilingSettings {
             // Try to load JavaTypeFilter, covers the most typical scenario for saved snapshots
             setInstrumentationFilter(new JavaTypeFilter(pr, prefix + PROP_INSTR_FILTER));
         } catch (GenericFilter.InvalidFilterIdException e) {
-            // Fallback to GenericFilter if no filter is stored for this instance
-            setInstrumentationFilter(new GenericFilter("#fallback#", "", GenericFilter.TYPE_NONE)); // NOI18N
+            if ("profiler.simple.filter".equals(getProperty(props, prefix + "profiler.settings.instrumentation.filter.selectedprofiler.filter.type", null))) { // NOI18N
+                // Import previously used SimpleFilter
+                String filterValue = getProperty(props, prefix + "profiler.settings.instrumentation.filter.selectedprofiler.simple.filter.value", ""); // NOI18N
+                int filterType = Integer.parseInt(getProperty(props, prefix + "profiler.settings.instrumentation.filter.selectedprofiler.simple.filter.type", "0")); // NOI18N
+                if (filterType == 1 || filterType == 3) setInstrumentationFilter(new JavaTypeFilter(filterValue, JavaTypeFilter.TYPE_EXCLUSIVE));
+                else if (filterType == 2 || filterType == 4) setInstrumentationFilter(new JavaTypeFilter(filterValue, JavaTypeFilter.TYPE_INCLUSIVE));
+                else setInstrumentationFilter(new JavaTypeFilter(filterValue, JavaTypeFilter.TYPE_NONE));
+            } else {
+                // Fallback to GenericFilter if no filter is stored for this instance
+               setInstrumentationFilter(new GenericFilter("#fallback#", "", GenericFilter.TYPE_NONE)); // NOI18N
+            }
         }
 
         // CPU Profiling: Sampled
