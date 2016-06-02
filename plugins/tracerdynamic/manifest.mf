@@ -3,5 +3,5 @@ OpenIDE-Module: com.sun.tools.visualvm.modules.tracer.dynamic/0
 OpenIDE-Module-Install: com/sun/tools/visualvm/modules/tracer/dynamic/impl/DynamicPackageProvider.class
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/modules/tracer/dynamic/Bundle.properties
 OpenIDE-Module-Provides: com.sun.tools.visualvm.modules.tracer.dynamic
-OpenIDE-Module-Specification-Version: 1.3
+OpenIDE-Module-Specification-Version: 1.4
 
