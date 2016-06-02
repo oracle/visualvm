@@ -428,7 +428,7 @@ final class MethodsFeatureModes {
         
         
         // --- API implementation ----------------------------------------------
-        private static final String CORE_JAVA_FILTER = "apple.laf., apple.awt., com.apple., com.sun., java., javax., sun., sunw., org.omg.CORBA, org.omg.CosNaming., COM.rsa."; // NOI18N
+        private static final String CORE_JAVA_FILTER = "apple.laf.**, apple.awt.**, com.apple.**, com.sun.**, java.**, javax.**, sun.**, sunw.**, org.omg.CORBA.**, org.omg.CosNaming.**, COM.rsa.**"; // NOI18N
         
         private static final String OUTGOING_CALLS_ENABLED_FLAG = "OUTGOING_CALLS_ENABLED_FLAG"; // NOI18N
         private static final String OUTGOING_CALLS_FLAG = "OUTGOING_CALLS_FLAG"; // NOI18N
