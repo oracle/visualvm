@@ -121,7 +121,6 @@ import org.openide.util.RequestProcessor;
     "SnapshotInfoPanel_OffString=Off",
     "SnapshotInfoPanel_InvalidString=<Invalid>",
     "SnapshotInfoPanel_NoMethodsString=No methods, main(String[] args) method of first loaded class becomes root method",
-    "SnapshotInfoPanel_MethodsCountString={0} methods:",
     "SnapshotInfoPanel_LinesDefString={0}, lines: {1} to {2}",
     "SnapshotInfoPanel_InstrumentationProfTypeString=Instrumentation",
     "SnapshotInfoPanel_SampledInstrProfTypeString=Sampled Instrumentation",
@@ -142,6 +141,7 @@ import org.openide.util.RequestProcessor;
     "SnapshotInfoPanel_MethodsProjectClasses=Methods - Project Classes",
     "SnapshotInfoPanel_MethodsSelectedClasses=Methods - Selected Classes",
     "SnapshotInfoPanel_MethodsSelectedMethods=Methods - Selected Methods",
+    "SnapshotInfoPanel_MethodsDefinedClasses=Methods - Defined Classes",
     "SnapshotInfoPanel_ObjectsAllClasses=Objects - All Classes",
     "SnapshotInfoPanel_ObjectsProjectClasses=Objects - Project Classes",
     "SnapshotInfoPanel_ObjectsSelectedClasses=Objects - Selected Classes",
@@ -452,11 +452,12 @@ public class SnapshotInfoPanel extends JPanel {
                 break;
             case ProfilingSettings.PROFILE_CPU_PART:
                 ClientUtils.SourceCodeSelection[] roots = ps.getInstrumentationRootMethods();
-                if (ps.getStackDepthLimit() != Integer.MAX_VALUE && roots != null && roots.length > 0) {
+                if (ps.getInstrumentationFilter().getName() == null && roots != null && roots.length > 0) {
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
                     htmlText.append("</strong>"); // NOI18N
                     boolean classes;
+                     // NOTE: currently not possible to detect Defined Clases
                     if (Wildcards.ALLWILDCARD.equals(roots[0].getMethodName())) {
                         htmlText.append(Bundle.SnapshotInfoPanel_MethodsSelectedClasses());
                         classes = true;
@@ -557,7 +558,7 @@ public class SnapshotInfoPanel extends JPanel {
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
                     htmlText.append("</strong>"); // NOI18N
-                    htmlText.append(Bundle.SnapshotInfoPanel_ObjectsSelectedClasses());
+                    htmlText.append(Bundle.SnapshotInfoPanel_ObjectsSelectedClasses()); // NOTE: currently not possible to detect Defined Clases
                     htmlText.append("<br>"); // NOI18N
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
@@ -590,7 +591,7 @@ public class SnapshotInfoPanel extends JPanel {
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingMode()).append(" "); // NOI18N
                     htmlText.append("</strong>"); // NOI18N
-                    htmlText.append(Bundle.SnapshotInfoPanel_ObjectsSelectedClasses());
+                    htmlText.append(Bundle.SnapshotInfoPanel_ObjectsSelectedClasses()); // NOTE: currently not possible to detect Defined Clases
                     htmlText.append("<br>"); // NOI18N
                     htmlText.append("<strong>"); // NOI18N
                     htmlText.append(Bundle.SnapshotInfoPanel_ProfilingTypeString()).append(" "); // NOI18N
@@ -816,7 +817,7 @@ public class SnapshotInfoPanel extends JPanel {
         htmlText.append("<strong>"); // NOI18N
         htmlText.append(Bundle.SnapshotInfoPanel_InstrumentationFilterString()).append(" "); // NOI18N
         htmlText.append("</strong>"); // NOI18N
-        htmlText.append(ps.getInstrumentationFilter().toString());
+        htmlText.append(ps.getInstrumentationFilter().getValue());
         htmlText.append("<br>"); // NOI18N // TODO: text
         if (!sampling) {
             htmlText.append("<strong>"); // NOI18N
@@ -1011,24 +1012,10 @@ public class SnapshotInfoPanel extends JPanel {
         } else {
             StringBuilder ret = new StringBuilder();
 
-            ret.append(Bundle.SnapshotInfoPanel_MethodsCountString("" + methods.length)); // NOI18N
-            ret.append("<br>"); // NOI18N
-
             java.util.List<String> rootNames = new ArrayList<String>();
-
-            for (int i = 0; i < methods.length; i++) {
-                String frm = formatRootMethod(methods[i]);
-                rootNames.add(frm);
-            }
-
+            for (int i = 0; i < methods.length; i++) rootNames.add(formatRootMethod(methods[i]));
             Collections.sort(rootNames);
-
-            for (String rootName : rootNames) {
-                ret.append("&nbsp;&nbsp;&nbsp;&nbsp;"); // NOI18N
-                ret.append(rootName);
-                ret.append("<br>"); // NOI18N
-            }
-            
+            for (String rootName : rootNames) ret.append(rootName).append("<br>"); // NOI18N
 
             return ret.toString();
         }
