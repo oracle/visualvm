@@ -44,7 +44,6 @@
 package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
-import java.util.Collection;
 import java.util.Set;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
@@ -52,6 +51,7 @@ import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
@@ -94,7 +94,7 @@ abstract class SampledTableView extends MemoryView {
     protected ProfilerTable getResultsComponent() { return table; }
     
     
-    public void setData(MemoryResultsSnapshot snapshot, Collection<String> filter, final int aggregation) {
+    public void setData(MemoryResultsSnapshot snapshot, GenericFilter filter, final int aggregation) {
         final SampledMemoryResultsSnapshot _snapshot = (SampledMemoryResultsSnapshot)snapshot;
         
         SwingUtilities.invokeLater(new Runnable() {

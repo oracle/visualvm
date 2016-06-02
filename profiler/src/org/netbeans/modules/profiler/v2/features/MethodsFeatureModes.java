@@ -83,8 +83,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.filters.FilterUtils;
-import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.lib.profiler.filters.GenericFilter;
+import org.netbeans.lib.profiler.filters.JavaTypeFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSpinner;
@@ -199,7 +199,7 @@ final class MethodsFeatureModes {
         void configureSettings(ProfilingSettings settings) {
             super.configureSettings(settings);
             
-            settings.setSelectedInstrumentationFilter(null);
+            settings.setInstrumentationFilter(new JavaTypeFilter());
         }
         
     }
@@ -252,9 +252,9 @@ final class MethodsFeatureModes {
                 filter.append(" "); // NOI18N
             }
             
-            SimpleFilter f = new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE, // NOI18N
-                                                  filter.toString().trim());
-            settings.setSelectedInstrumentationFilter(f);
+            String s  = filter.toString().replace(". ", ".* ").replace(".,", ".*,").trim(); // NOI18N
+            JavaTypeFilter f = new JavaTypeFilter(s, JavaTypeFilter.TYPE_INCLUSIVE);
+            settings.setInstrumentationFilter(f);
         }
         
         void confirmSettings() {
@@ -275,7 +275,11 @@ final class MethodsFeatureModes {
         }
         
         boolean currentSettingsValid() {
-            return !selectedProjects.isEmpty();
+            assert SwingUtilities.isEventDispatchThread();
+            
+            if (selectedProjects.isEmpty()) return false;
+            
+            return true;
         }
         
         
@@ -482,19 +486,19 @@ final class MethodsFeatureModes {
             
             String filterType = readFlag(FILTER_CALLS_FLAG, FilterSelector.FilterName.EXCLUDE_JAVA_FILTER.name());
             if (FilterSelector.FilterName.NO_FILTER.name().equals(filterType)) {
-                settings.setSelectedInstrumentationFilter(SimpleFilter.NO_FILTER);
+                settings.setInstrumentationFilter(new JavaTypeFilter());
             } else if (FilterSelector.FilterName.EXCLUDE_JAVA_FILTER.name().equals(filterType)) {
-                settings.setSelectedInstrumentationFilter(new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_EXCLUSIVE, CORE_JAVA_FILTER)); // NOI18N
+                settings.setInstrumentationFilter(new JavaTypeFilter(CORE_JAVA_FILTER, JavaTypeFilter.TYPE_EXCLUSIVE));
             } else {
                  String filterStrings = readFlag(FILTER_CALLS_VALUE_FLAG, CORE_JAVA_FILTER);
                  if (filterStrings.isEmpty() || "*".equals(filterStrings) || "**".equals(filterStrings)) { // NOI18N
-                     settings.setSelectedInstrumentationFilter(SimpleFilter.NO_FILTER);
+                     settings.setInstrumentationFilter(new JavaTypeFilter());
                  } else {
                      filterStrings = getFlatValues(filterStrings.split("\\n")); // NOI18N
                      if (FilterSelector.FilterName.EXCLUDE_CUSTOM_FILTER.name().equals(filterType)) {
-                         settings.setSelectedInstrumentationFilter(new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_EXCLUSIVE_EXACT, filterStrings)); // NOI18N
+                         settings.setInstrumentationFilter(new JavaTypeFilter(filterStrings, JavaTypeFilter.TYPE_EXCLUSIVE));
                      } else if (FilterSelector.FilterName.INCLUDE_CUSTOM_FILTER.name().equals(filterType)) {
-                         settings.setSelectedInstrumentationFilter(new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT, filterStrings)); // NOI18N
+                         settings.setInstrumentationFilter(new JavaTypeFilter(filterStrings, JavaTypeFilter.TYPE_INCLUSIVE)); // NOI18N
                      }
                  }
             }
@@ -537,7 +541,7 @@ final class MethodsFeatureModes {
                     return true;
                 
                 String filter = readFlag(FILTER_CALLS_FLAG, FilterSelector.FilterName.EXCLUDE_JAVA_FILTER.name());
-                if (!filterName.equals(FilterSelector.FilterName.valueOf(filter))) return true;
+                if (!filter.equals(filterName.name())) return true;
                 
                 if (!readFlag(FILTER_CALLS_VALUE_FLAG, "").equals(filterValue)) return true; // NOI18N
                 
@@ -547,18 +551,22 @@ final class MethodsFeatureModes {
         }
         
         boolean currentSettingsValid() {
+            assert SwingUtilities.isEventDispatchThread();
+            
             if (ui != null) {
-                assert SwingUtilities.isEventDispatchThread();
-                
                 if (FilterSelector.FilterName.EXCLUDE_CUSTOM_FILTER.equals(filterName) ||
                     FilterSelector.FilterName.INCLUDE_CUSTOM_FILTER.equals(filterName))
-                    return !filterValue.isEmpty();
-                
-                if (getSelection().isEmpty()) return false;
-                
-                return true;
+                    if (filterValue.isEmpty()) return false;
+            } else {
+                String filter = readFlag(FILTER_CALLS_FLAG, FilterSelector.FilterName.EXCLUDE_JAVA_FILTER.name());
+                if (FilterSelector.FilterName.EXCLUDE_CUSTOM_FILTER.name().equals(filter) ||
+                    FilterSelector.FilterName.INCLUDE_CUSTOM_FILTER.name().equals(filter))
+                    if (readFlag(FILTER_CALLS_VALUE_FLAG, "").isEmpty()) return false; // NOI18N
             }
-            return false;
+            
+            if (getSelection().isEmpty()) return false;
+
+            return true;
         }
         
         HashSet<ClientUtils.SourceCodeSelection> getSelection() {
@@ -955,7 +963,7 @@ final class MethodsFeatureModes {
                                          CommonConstants.CPU_INSTR_SAMPLED);
             
             String[] rootsLines = readFlag(CLASSES_FLAG, "").split("\\n"); // NOI18N
-            String[] rootsValues = FilterUtils.getSeparateFilters(getFlatValues(rootsLines));
+            String[] rootsValues = GenericFilter.values(getFlatValues(rootsLines));
             ClientUtils.SourceCodeSelection[] roots = (rootsValues.length == 1 && rootsValues[0].isEmpty()) ?
                 new ClientUtils.SourceCodeSelection[0] :
                 new ClientUtils.SourceCodeSelection[rootsValues.length];
@@ -965,12 +973,12 @@ final class MethodsFeatureModes {
             
             String filter = readFlag(FILTER_FLAG, ""); // NOI18N
             if (filter.isEmpty() || "*".equals(filter) || "**".equals(filter)) { // NOI18N
-                settings.setSelectedInstrumentationFilter(SimpleFilter.NO_FILTER);
+                settings.setInstrumentationFilter(new JavaTypeFilter());
             } else {
                 int filterType = Boolean.parseBoolean(readFlag(FILTER_MODE_FLAG, Boolean.TRUE.toString())) == true ?
-                                 SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT : SimpleFilter.SIMPLE_FILTER_EXCLUSIVE_EXACT;
+                                 JavaTypeFilter.TYPE_INCLUSIVE : JavaTypeFilter.TYPE_EXCLUSIVE;
                 String filterValue = getFlatValues(filter.split("\\n")); // NOI18N
-                settings.setSelectedInstrumentationFilter(new SimpleFilter("", filterType, filterValue)); // NOI18N
+                settings.setInstrumentationFilter(new JavaTypeFilter(filterValue, filterType));
             }
             
             settings.setStackDepthLimit(Integer.MAX_VALUE);
@@ -1012,15 +1020,15 @@ final class MethodsFeatureModes {
         }
 
         boolean currentSettingsValid() {
+            assert SwingUtilities.isEventDispatchThread();
+            
             if (ui != null) {
-                assert SwingUtilities.isEventDispatchThread();
-                
                 if (classesArea.showsHint() || classesArea.getText().trim().isEmpty()) return false;
-//                if (filterArea.showsHint() || filterArea.getText().trim().isEmpty()) return false;
-                
-                return true;
+            } else {
+                if (readFlag(CLASSES_FLAG, "").isEmpty()) return false; // NOI18N
             }
-            return false;
+            
+            return true;
         }
 
         JComponent getUI() {
