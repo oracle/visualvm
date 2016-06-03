@@ -371,7 +371,12 @@ function delta(valProvider) {
 function getKeys(map) {
     var ret = new Array();
     if (map == undefined || map == null) return 0;
-    if (map.length != undefined && map.length > 0 && map[0].getCompositeType != undefined) {
+    if (map instanceof javax.management.openmbean.TabularData) {
+        var iter2 = map.keySet().iterator();
+        while (iter2.hasNext()) {
+            ret[ret.length] = iter2.next().get(0);
+        }        
+    } else if (map.length != undefined && map.length > 0 && map[0].getCompositeType != undefined) {
         for(var counter=0; counter < map.length; counter++) {
             ret[ret.length] = map[counter].get("key");
         }
@@ -399,7 +404,16 @@ function get(map, keys) {
     var keyArray = isArray(keys);
     var key = keyArray ? keys[0] : keys;
     if (map == undefined || map == null) return 0;
-    if (map.length != undefined && map.length > 0 && map[0].getCompositeType != undefined) {
+    if (map instanceof javax.management.openmbean.TabularData) {
+        // javax.management.openmbean.TabularDataSupport -> effectively a Map instance
+        if (!keyArray || keys.length == 1) {
+            ret = map.get([key]).get(["value"]);
+            return ret;
+        } else {
+            ret = get(map.get([key]).get(["value"]), keys.slice(1));
+            return ret;
+        }
+    } else if (map.length != undefined && map.length > 0 && map[0].getCompositeType != undefined) {
         for(var counter=0; counter < map.length; counter++) {
             if (map[counter].get("key") == key) {
                 if (!keyArray || keys.length == 1) {
