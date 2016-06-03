@@ -46,8 +46,8 @@ import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
 
 /**
  *
@@ -401,9 +401,10 @@ public class BasicTest extends CPUTestCase {
             addJVMArgs(settings, "-server");
         }
 
+        // TODO: fix for the new filters!
         InstrumentationFilter filter = new InstrumentationFilter();
-        filter.setFilterType(InstrumentationFilter.INSTR_FILTER_EXCLUSIVE);
-        filter.setFilterStrings("java");
+        filter.setType(InstrumentationFilter.TYPE_EXCLUSIVE);
+        filter.setValue("java");
         settings.setInstrumentationFilter(filter);
         startCPUTest(settings,
                 new String[]{
