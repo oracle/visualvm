@@ -45,16 +45,16 @@ package org.netbeans.lib.profiler.common;
 
 import org.netbeans.lib.profiler.ProfilerEngineSettings;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.filters.FilterUtils;
-import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
+import org.netbeans.lib.profiler.filters.GenericFilter;
+import org.netbeans.lib.profiler.filters.JavaTypeFilter;
 
 
 /**
@@ -118,7 +118,7 @@ public class ProfilingSettings {
     public static final String PROP_RUN_GC_ON_GET_RESULTS_IN_MEMORY_PROFILING = "profiler.settings.run.gc.on.get.results.in.memory.profiling"; //NOI18N
     public static final String PROP_OBJ_ALLOC_STACK_SAMPLING_INTERVAL = "profiler.settings.obj.alloc.stack.sampling.interval"; //NOI18N
     public static final String PROP_OBJ_ALLOC_STACK_SAMPLING_DEPTH = "profiler.settings.obj.alloc.stack.sampling.depth"; //NOI18N
-    public static final String PROP_SELECTED_INSTR_FILTER = "profiler.settings.instrumentation.filter.selected"; //NOI18N
+    public static final String PROP_INSTR_FILTER = "profiler.settings.instrumentation.filter."; //NOI18N
     public static final String PROP_PROFILE_UNDERLYING_FRAMEWORK = "profiler.settings.profile.underlying.framework"; // NOI18N
     public static final String PROP_PROFILING_POINTS_ENABLED = "profiler.settings.profilingpoints.enabled"; //NOI18N
     public static final String PROP_QUICK_FILTER = "profiler.settings.cpu.quick.filter"; //NOI18N
@@ -134,9 +134,8 @@ public class ProfilingSettings {
     private List instrumentationRootMethods = new ArrayList();
 
     // CPU instrumentation filter related settings
-    private Object selectedInstrumentationFilter = SimpleFilter.NO_FILTER; //NOI18N
-                                                                           // QuickFilter: just for persistence
-    private SimpleFilter quickFilter = FilterUtils.QUICK_FILTER;
+    private GenericFilter instrumentationFilter = new GenericFilter();
+    
     private String jvmArgs = ""; //NOI18N
     private String platformName = null; // from project
     private String settingsName = DEFAULT_PROFILING_SETTINGS_NAME;
@@ -450,14 +449,6 @@ public class ProfilingSettings {
         return profilingType;
     }
 
-    public void setQuickFilter(SimpleFilter quickFilter) {
-        this.quickFilter = quickFilter;
-    }
-
-    public SimpleFilter getQuickFilter() {
-        return quickFilter;
-    }
-
     public void setRunGCOnGetResultsInMemoryProfiling(final boolean runGCOnGetResultsInMemoryProfiling) {
         this.runGCOnGetResultsInMemoryProfiling = runGCOnGetResultsInMemoryProfiling;
     }
@@ -475,12 +466,12 @@ public class ProfilingSettings {
         return samplingInterval;
     }
 
-    public void setSelectedInstrumentationFilter(final Object sif) {
-        selectedInstrumentationFilter = sif != null ? sif : SimpleFilter.NO_FILTER;
+    public void setInstrumentationFilter(final GenericFilter filter) {
+        instrumentationFilter = filter;
     }
 
-    public Object getSelectedInstrumentationFilter() {
-        return selectedInstrumentationFilter;
+    public GenericFilter getInstrumentationFilter() {
+        return instrumentationFilter;
     }
 
     public void setSettingsName(final String name) {
@@ -614,70 +605,9 @@ public class ProfilingSettings {
         //    settings.setInstrumentationRootMethods((ClientUtils.SourceCodeSelection[])rootMethods.toArray(new ClientUtils.SourceCodeSelection[0]));
         settings.setInstrumentationRootMethods(getInstrumentationMethods());
 
-        // Now applySettings the filters to the Engine's instrumentation filter
-        final InstrumentationFilter instrumentationFilter = settings.getInstrumentationFilter();
-        instrumentationFilter.clearFilter(); // lets start from scratch
+        // Now apply the filters to the Engine's instrumentation filter
+        settings.setInstrumentationFilter(instrumentationFilter);
 
-        // No filter
-        if (getSelectedInstrumentationFilter().equals(FilterUtils.NONE_FILTER)) {
-            instrumentationFilter.clearFilter();
-
-            return;
-        }
-
-        // Quick Filter
-        if (getSelectedInstrumentationFilter().equals(quickFilter)) {
-            if (quickFilter.getFilterValue().length() > 0) {
-                // Quick Filter defined
-                instrumentationFilter.setFilterType(getInstrumentationFilterType(quickFilter));
-                instrumentationFilter.setFilterStrings(quickFilter.getFilterValue());
-            } else {
-                // Quick Filter cancelled and no previous filter defined => filterType=INSTR_FILTER_NONE
-                instrumentationFilter.clearFilter();
-            }
-
-            return;
-        }
-
-        // Filter defined by ProjectTypeProfiler
-        if (getSelectedInstrumentationFilter() instanceof SimpleFilter) {
-            SimpleFilter ptpFilter = (SimpleFilter) getSelectedInstrumentationFilter();
-            instrumentationFilter.setFilterType(getInstrumentationFilterType(ptpFilter));
-            instrumentationFilter.setFilterStrings(ptpFilter.getFilterValue());
-
-            return;
-        }
-
-//        // Filter Set
-//        if (getSelectedInstrumentationFilter() instanceof FilterSet) {
-//            FilterSet filterSet = (FilterSet) getSelectedInstrumentationFilter();
-//            GlobalFilters globalFilters = Profiler.getDefault().getGlobalFilters();
-//
-//            // set filter type
-//            instrumentationFilter.setFilterType((filterSet.getFilterSetType() == FilterSet.FILTER_SET_EXCLUSIVE)
-//                                                ? InstrumentationFilter.INSTR_FILTER_EXCLUSIVE
-//                                                : InstrumentationFilter.INSTR_FILTER_INCLUSIVE);
-//
-//            // set filter value
-//            final StringBuffer flatFilterStringsBuffer = new StringBuffer();
-//            final String[] activeGlobalFilters = filterSet.getActiveGlobalFilters();
-//
-//            for (int i = 0; i < activeGlobalFilters.length; i++) {
-//                final String activeGlobalFilterValue = globalFilters.getFilterValue(activeGlobalFilters[i]);
-//
-//                if (activeGlobalFilterValue != null) {
-//                    flatFilterStringsBuffer.append(activeGlobalFilterValue);
-//                    flatFilterStringsBuffer.append(" "); //NOI18N
-//                }
-//            }
-//
-//            instrumentationFilter.setFilterStrings(flatFilterStringsBuffer.toString());
-//
-//            return;
-//        }
-
-        // Unknown or no filter
-        instrumentationFilter.clearFilter();
     }
 
     // -- Settings duplication -------------------------------------------------------------------------------------------
@@ -723,8 +653,7 @@ public class ProfilingSettings {
         settings.setAllocTrackEvery(getAllocTrackEvery());
         settings.setAllocStackTraceLimit(getAllocStackTraceLimit());
 
-        settings.setSelectedInstrumentationFilter(getSelectedInstrumentationFilter());
-        settings.setQuickFilter(getQuickFilter());
+        settings.setInstrumentationFilter(getInstrumentationFilter());
 
         settings.setProfileUnderlyingFramework(getProfileUnderlyingFramework());
     }
@@ -791,7 +720,7 @@ public class ProfilingSettings {
         sb.append('\n'); //NOI18N
         sb.append("allocStackTraceLimit: ").append(getAllocStackTraceLimit()); //NOI18N
         sb.append('\n'); //NOI18N
-        sb.append("selectedInstrFilter: ").append(getSelectedInstrumentationFilter()); //NOI18N
+        sb.append("selectedInstrFilter: ").append(getInstrumentationFilter()); //NOI18N
         sb.append('\n'); //NOI18N
         sb.append("profileUnderlyingFramework: ").append(getProfileUnderlyingFramework()); //NOI18N
         sb.append('\n'); //NOI18N
@@ -849,24 +778,23 @@ public class ProfilingSettings {
                                              .booleanValue()); //NOI18N
         setSamplingFrequency(Integer.parseInt(getProperty(props, prefix + PROP_SAMPLING_FREQUENCY, "10"))); // NOI18N
 
-        Object iFilter = FilterUtils.loadFilter(props, prefix + PROP_SELECTED_INSTR_FILTER);
-
-        if (iFilter == null) {
-            iFilter = SimpleFilter.NO_FILTER; // if loading fails
-        }
-
-        setSelectedInstrumentationFilter(iFilter);
-
-        SimpleFilter qFilter = (SimpleFilter) FilterUtils.loadFilter(props, prefix + PROP_QUICK_FILTER);
-
-        if (qFilter == null) {
-            qFilter = FilterUtils.QUICK_FILTER; // if loading fails
-        }
-
-        setQuickFilter(qFilter);
-
-        if (getSelectedInstrumentationFilter() == null) {
-            setSelectedInstrumentationFilter(SimpleFilter.NO_FILTER);
+        Properties pr = new Properties();
+        pr.putAll(props);
+        try {
+            // Try to load JavaTypeFilter, covers the most typical scenario for saved snapshots
+            setInstrumentationFilter(new JavaTypeFilter(pr, prefix + PROP_INSTR_FILTER));
+        } catch (GenericFilter.InvalidFilterIdException e) {
+            if ("profiler.simple.filter".equals(getProperty(props, prefix + "profiler.settings.instrumentation.filter.selectedprofiler.filter.type", null))) { // NOI18N
+                // Import previously used SimpleFilter
+                String filterValue = getProperty(props, prefix + "profiler.settings.instrumentation.filter.selectedprofiler.simple.filter.value", ""); // NOI18N
+                int filterType = Integer.parseInt(getProperty(props, prefix + "profiler.settings.instrumentation.filter.selectedprofiler.simple.filter.type", "0")); // NOI18N
+                if (filterType == 1 || filterType == 3) setInstrumentationFilter(new JavaTypeFilter(filterValue, JavaTypeFilter.TYPE_EXCLUSIVE));
+                else if (filterType == 2 || filterType == 4) setInstrumentationFilter(new JavaTypeFilter(filterValue, JavaTypeFilter.TYPE_INCLUSIVE));
+                else setInstrumentationFilter(new JavaTypeFilter(filterValue, JavaTypeFilter.TYPE_NONE));
+            } else {
+                // Fallback to GenericFilter if no filter is stored for this instance
+               setInstrumentationFilter(new GenericFilter("#fallback#", "", GenericFilter.TYPE_NONE)); // NOI18N
+            }
         }
 
         // CPU Profiling: Sampled
@@ -965,8 +893,13 @@ public class ProfilingSettings {
         props.put(prefix + PROP_SORT_RESULTS_BY_THREAD_CPU_TIME, Boolean.toString(getSortResultsByThreadCPUTime()));
         props.put(prefix + PROP_SAMPLING_FREQUENCY, Integer.toString(getSamplingFrequency()));
 
-        FilterUtils.storeFilter(props, getSelectedInstrumentationFilter(), prefix + PROP_SELECTED_INSTR_FILTER);
-        FilterUtils.storeFilter(props, getQuickFilter(), prefix + PROP_QUICK_FILTER);
+        if (instrumentationFilter != null) {
+            Properties pr = new Properties();
+            instrumentationFilter.store(pr, prefix + PROP_INSTR_FILTER);
+            props.putAll(pr);
+        } else {
+            props.remove(prefix + PROP_INSTR_FILTER);
+        }
 
         props.put(prefix + PROP_PROFILE_UNDERLYING_FRAMEWORK, Boolean.toString(getProfileUnderlyingFramework()));
 
@@ -1020,20 +953,4 @@ public class ProfilingSettings {
         return (ret != null) ? (String) ret : defaultValue;
     }
     
-    private static int getInstrumentationFilterType(SimpleFilter simpleFiler) {        
-        switch (simpleFiler.getFilterType()) {
-            case SimpleFilter.SIMPLE_FILTER_NONE:
-                return InstrumentationFilter.INSTR_FILTER_NONE;
-            case SimpleFilter.SIMPLE_FILTER_EXCLUSIVE:
-                return InstrumentationFilter.INSTR_FILTER_EXCLUSIVE;
-            case SimpleFilter.SIMPLE_FILTER_INCLUSIVE:
-                return InstrumentationFilter.INSTR_FILTER_INCLUSIVE;
-            case SimpleFilter.SIMPLE_FILTER_EXCLUSIVE_EXACT:
-                return InstrumentationFilter.INSTR_FILTER_EXCLUSIVE_EXACT;
-            case SimpleFilter.SIMPLE_FILTER_INCLUSIVE_EXACT:
-                return InstrumentationFilter.INSTR_FILTER_INCLUSIVE_EXACT;
-            default:
-                throw new IllegalArgumentException("Illegal Simple filter type:"+simpleFiler.getFilterType());
-        }
-    }
 }

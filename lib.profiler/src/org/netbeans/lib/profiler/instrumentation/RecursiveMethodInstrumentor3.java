@@ -144,7 +144,7 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
             }
         }
 
-        boolean normallyFilteredOut = !instrFilter.passesFilter(className);
+        boolean normallyFilteredOut = !instrFilter.passes(className);
 
         if (!isRootClass) {
             if (normallyFilteredOut) {
@@ -330,7 +330,7 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
             clazz.setMethodReachable(idx);
 
             if (clazz.isMethodNative(idx) || clazz.isMethodAbstract(idx)
-                    || (!clazz.isMethodRoot(idx) && !clazz.isMethodMarker(idx) && !instrFilter.passesFilter(className))
+                    || (!clazz.isMethodRoot(idx) && !clazz.isMethodMarker(idx) && !instrFilter.passes(className))
                     || (className == OBJECT_SLASHED_CLASS_NAME) // Actually, just the Object.<init> method?
             ) {
                 clazz.setMethodUnscannable(idx);
