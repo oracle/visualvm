@@ -52,13 +52,13 @@ import org.netbeans.lib.profiler.results.FilterSortSupport;
  *
  * @author Jiri Sedlacek
  */
-class DiffObjAllocCCTNode extends PresoObjAllocCCTNode {
+public class DiffObjAllocCCTNode extends PresoObjAllocCCTNode {
     
     private final PresoObjAllocCCTNode node1;
     private final PresoObjAllocCCTNode node2;
     
     
-    DiffObjAllocCCTNode(PresoObjAllocCCTNode node1, PresoObjAllocCCTNode node2) {
+    public DiffObjAllocCCTNode(PresoObjAllocCCTNode node1, PresoObjAllocCCTNode node2) {
         this.node1 = node1;
         this.node2 = node2;
         

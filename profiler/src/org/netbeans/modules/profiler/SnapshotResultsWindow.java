@@ -53,14 +53,12 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import javax.swing.*;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.filters.FilterUtils;
-import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.lib.profiler.results.ResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
@@ -506,6 +504,9 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
         } else if (displayedPanel instanceof SnapshotMemoryView && s instanceof MemoryResultsSnapshot) {
             ((SnapshotMemoryView)displayedPanel).setRefSnapshot((MemoryResultsSnapshot)s);
             return true;
+        } else if (displayedPanel instanceof SnapshotJDBCView && s instanceof JdbcResultsSnapshot) {
+            ((SnapshotJDBCView)displayedPanel).setRefSnapshot((JdbcResultsSnapshot)s);
+            return true;
         }
         
         return false;
@@ -571,12 +572,7 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
     private void setupMemoryResultsView() {
         ResultsSnapshot _snapshot = snapshot.getSnapshot();
         if (_snapshot instanceof MemoryResultsSnapshot) {
-            Object f = snapshot.getSettings().getSelectedInstrumentationFilter();
-            SimpleFilter sf = f instanceof SimpleFilter ? (SimpleFilter)f : null;
-            String value = sf == null ? null : sf.getFilterValue();
-            Collection<String> filter = value == null || value.isEmpty() ? null :
-                               Arrays.asList(FilterUtils.getSeparateFilters(value));
-            
+            GenericFilter filter = snapshot.getSettings().getInstrumentationFilter();
             if (filter != null && filter.isEmpty()) filter = null;
             
             MemoryResultsSnapshot s = (MemoryResultsSnapshot)_snapshot;

@@ -45,7 +45,6 @@ package org.netbeans.lib.profiler.ui.memory;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.util.Collection;
 import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -56,6 +55,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
@@ -88,14 +88,14 @@ public abstract class SnapshotMemoryView extends JPanel {
     private final MemoryView dataView;
     
     private int aggregation;
-    private final Collection<String> filter;
+    private final GenericFilter filter;
     private final MemoryResultsSnapshot snapshot;
     private MemoryResultsSnapshot refSnapshot;
     
     private JToggleButton compareButton;
     
     
-    public SnapshotMemoryView(MemoryResultsSnapshot snapshot, Collection<String> filter, Action saveAction, final Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
+    public SnapshotMemoryView(MemoryResultsSnapshot snapshot, GenericFilter filter, Action saveAction, final Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
         this.filter = filter;
         this.snapshot = snapshot;
         

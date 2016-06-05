@@ -52,7 +52,6 @@ import org.netbeans.lib.profiler.client.AppStatusHandler;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.lib.profiler.tests.jfluid.utils.DumpStream;
 import org.netbeans.lib.profiler.utils.MiscUtils;
@@ -63,6 +62,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
 
 
 public abstract class CommonProfilerTestCase extends NbTestCase {
@@ -706,10 +706,11 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
 
         InstrumentationFilter filter = settings.getInstrumentationFilter();
 
+        // TODO: fix for the new filters!
         if (filter != null) {
-            map.put("profiler.settings.instrumentation.filter.string", toString(filter.getFilterStrings()));
+            map.put("profiler.settings.instrumentation.filter.string", toString(filter.getValues()));
             map.put("profiler.settings.instrumentation.filter.type",
-                    ((filter.getFilterType() == InstrumentationFilter.INSTR_FILTER_EXCLUSIVE) ? "EXCLUSIVE" : "INCLUSIVE"));
+                    ((filter.getType() == InstrumentationFilter.TYPE_EXCLUSIVE) ? "EXCLUSIVE" : "INCLUSIVE"));
         } else {
             map.put("profiler.settings.instrumentation.filter.selected", "NONE");
         }
