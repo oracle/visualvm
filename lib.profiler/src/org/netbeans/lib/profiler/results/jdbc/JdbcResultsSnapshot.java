@@ -263,6 +263,11 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
         return createPresentationCCT(rootNode, selectId, dontShowZeroLiveObjAllocPaths);
     }
 
+    public JdbcResultsSnapshot createDiff(JdbcResultsSnapshot snapshot) {
+        if (!(snapshot instanceof JdbcResultsSnapshot)) return null;
+        return new JdbcResultsDiff(this, (JdbcResultsSnapshot)snapshot);
+    }
+
     public void readFromStream(DataInputStream in) throws IOException {
         super.readFromStream(in);
         

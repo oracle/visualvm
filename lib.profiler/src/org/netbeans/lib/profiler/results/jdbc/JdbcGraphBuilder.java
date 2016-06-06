@@ -55,6 +55,8 @@ import org.netbeans.lib.profiler.classfile.ClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
+import org.netbeans.lib.profiler.filters.TextFilter;
 import org.netbeans.lib.profiler.results.BaseCallGraphBuilder;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
@@ -98,6 +100,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     private RuntimeMemoryCCTNode[] stacksForSelects; // [1- maxSelectId] selectId -> root of its allocation traces tree
     final private ThreadInfos threadInfos = new ThreadInfos();
     private final SQLParser sqlParser = new SQLParser();
+    private TextFilter filter;
 
     @Override
     protected RuntimeCCTNode getAppRootNode() {
@@ -215,6 +218,8 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         stacksForSelects = null;
         lastSelectId = 0;
         profilerClient.registerJdbcCCTProvider(this);
+        InstrumentationFilter f = profilerClient.getSettings().getInstrumentationFilter();
+        filter = new TextFilter(f.getValue(), f.getType(), false);
     }
 
     @Override
@@ -262,7 +267,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
                         statements.put(thisHash, statement);
                     }
                     select = statement.invoke(status.getInstrMethodNames()[methodId], status.getInstrMethodSignatures()[methodId], parameters);
-                    if (select != null) {
+                    if (select != null && filter.passes(select)) {
                         int selectId = getSelectId(statement.getType(), select);
                         markerMethodEntry(selectId, ti, timeStamp0, timeStamp1, true);
                         RuntimeObjAllocTermCCTNode term = (RuntimeObjAllocTermCCTNode) processStackTrace(selectId, methoIds);
