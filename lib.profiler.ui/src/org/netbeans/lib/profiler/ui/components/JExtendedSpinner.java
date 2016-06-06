@@ -43,6 +43,7 @@
 
 package org.netbeans.lib.profiler.ui.components;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -50,6 +51,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.UIManager;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 /**
@@ -122,6 +124,23 @@ public class JExtendedSpinner extends JSpinner {
              .setAccessibleName(getAccessibleContext().getAccessibleName());
             ((JSpinner.DefaultEditor) getEditor()).getTextField().getAccessibleContext()
              .setAccessibleDescription(getAccessibleContext().getAccessibleDescription());
+        }
+    }
+    
+    
+    public Dimension getPreferredSize() {
+        if (UIUtils.isWindowsClassicLookAndFeel()) {
+            return new Dimension(super.getPreferredSize().width, getDefaultSpinnerHeight());
+        } else {
+            return super.getPreferredSize();
+        }
+    }
+
+    public Dimension getMinimumSize() {
+        if (UIUtils.isWindowsClassicLookAndFeel()) {
+            return getPreferredSize();
+        } else {
+            return super.getMinimumSize();
         }
     }
     

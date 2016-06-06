@@ -95,9 +95,7 @@ abstract class JDBCTreeTableView extends JDBCView {
     }
     
     
-    void setData(final JdbcResultsSnapshot newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final int aggregation, final Collection<Integer> selectedThreads, final boolean mergeThreads, final boolean _sampled, final boolean _diff) {
-//        final boolean diff = snapshot instanceof AllocMemoryResultsDiff;
-        final boolean diff = false;
+    void setData(final JdbcResultsSnapshot newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final int aggregation, final Collection<Integer> selectedThreads, final boolean mergeThreads, final boolean _sampled, final boolean diff) {
         
         String[] _names = newData.getSelectNames();
         long[] _nTotalAllocObjects = newData.getInvocationsPerSelectId();
@@ -112,10 +110,10 @@ abstract class JDBCTreeTableView extends JDBCView {
         
         for (int i = 1; i < _names.length; i++) {
             if (diff) {
-//                totalObjects = Math.max(totalObjects, _nTotalAllocObjects[i]);
-//                _totalObjects = Math.min(_totalObjects, _nTotalAllocObjects[i]);
-//                totalBytes = Math.max(totalBytes, _totalAllocObjectsSize[i]);
-//                _totalBytes = Math.min(_totalBytes, _totalAllocObjectsSize[i]);
+                totalObjects = Math.max(totalObjects, _nTotalAllocObjects[i]);
+                _totalObjects = Math.min(_totalObjects, _nTotalAllocObjects[i]);
+                totalBytes = Math.max(totalBytes, _totalAllocObjectsSize[i]);
+                _totalBytes = Math.min(_totalBytes, _totalAllocObjectsSize[i]);
             } else {
                 totalObjects += _nTotalAllocObjects[i];
                 totalBytes += _totalAllocObjectsSize[i];
