@@ -52,8 +52,8 @@ import org.netbeans.lib.profiler.classfile.ClassLoaderTable;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection;
 import org.netbeans.lib.profiler.client.RuntimeProfilingPoint;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
 import org.netbeans.lib.profiler.utils.StringUtils;
 import org.netbeans.lib.profiler.wireprotocol.ClassLoadedCommand;
@@ -122,7 +122,7 @@ public class Instrumentor implements CommonConstants {
                 className = new StringBuffer(className).deleteCharAt(className.length() - 1).deleteCharAt(elIndex).toString();
             }
             String filterName = StringUtils.userFormClassName(className);
-            if (!filter.passesFilter(filterName.replace('.', '/'))) {
+            if (!filter.passes(filterName.replace('.', '/'))) { // NOI18N
                 return -1;
             }
 
@@ -131,7 +131,7 @@ public class Instrumentor implements CommonConstants {
                 clazz.setInstrClassId(oms.getNextClassId(className));
             }
         } else {
-            if (!filter.passesFilter(className.replace('.', '/'))) {
+            if (!filter.passes(className.replace('.', '/'))) { // NOI18N
                 return -1;
             }
             clazz = ClassRepository.lookupClassOrCreatePlaceholder(className, classLoaderId);

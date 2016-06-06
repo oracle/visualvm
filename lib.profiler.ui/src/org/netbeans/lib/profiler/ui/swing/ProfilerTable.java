@@ -742,10 +742,11 @@ public class ProfilerTable extends JTable {
             };
             HeaderComponent corner = !hideable ? new HeaderComponent(chooser) :
                                                  new HeaderComponent(chooser) {
-                private Icon icon = Icons.getIcon(GeneralIcons.POPUP_ARROW);
+                private final int offsetX = UIUtils.isWindowsClassicLookAndFeel() ? 0 : -1;
+                private final Icon icon = Icons.getIcon(GeneralIcons.POPUP_ARROW);
                 protected void paintComponent(Graphics g) {
                     super.paintComponent(g);
-                    int x = (getWidth() - icon.getIconWidth()) / 2 - 1;
+                    int x = (getWidth() - icon.getIconWidth()) / 2 + offsetX;
                     int y = (getHeight() - icon.getIconHeight()) / 2;
                     icon.paintIcon(this, g, x, y);
                 }
