@@ -60,6 +60,7 @@ import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
+import org.netbeans.lib.profiler.results.jdbc.JdbcResultsDiff;
 import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import static org.netbeans.lib.profiler.ui.jdbc.JDBCTreeTableView.isSQL;
@@ -159,15 +160,13 @@ public abstract class LiveJDBCView extends JPanel {
             resetData();
             refreshIsRunning = false;
         } else {
-//            final JdbcResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
-//                                                 refSnapshot.createDiff(snapshot);
-            final JdbcResultsSnapshot _snapshot = snapshot;
-//
+            final JdbcResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
+                                                 refSnapshot.createDiff(snapshot);
+
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     try {
-//                        boolean diff = _snapshot instanceof JdbcResultsDiff;
-                        boolean diff = false;
+                        boolean diff = _snapshot instanceof JdbcResultsDiff;
                         jdbcCallsView.setData(_snapshot, null, -1, null, false, false, diff);
                     } finally {
                         refreshIsRunning = false;

@@ -46,9 +46,6 @@ package org.netbeans.lib.profiler.ui.memory;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,8 +57,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
@@ -97,7 +94,7 @@ public abstract class LiveMemoryView extends JPanel {
     private MemoryResultsSnapshot snapshot;
     private MemoryResultsSnapshot refSnapshot;
     
-    private Collection<String> filter;
+    private GenericFilter filter;
     
     
     @ServiceProvider(service=MemoryCCTProvider.Listener.class)
@@ -144,17 +141,22 @@ public abstract class LiveMemoryView extends JPanel {
             MemoryView.userFormClassNames(_snapshot);
 
             // class names in VM format
-            InstrumentationFilter ifilter = client.getSettings().getInstrumentationFilter();
-            String[] _ifilter = ifilter == null ? null : ifilter.getUserFilterStrings();
-            final Collection<String> _filter = _ifilter == null ? Collections.EMPTY_LIST :
-                                               Arrays.asList(_ifilter);
+            final GenericFilter ifilter = client.getSettings().getInstrumentationFilter();
+            // --- TODO: rewrite down to all usages
+//            String[] _ifilter = ifilter == null ? null : ifilter.getUserFilterStrings();
+//            final Collection<String> _filter = _ifilter == null ? Collections.EMPTY_LIST :
+//                                               Arrays.asList(_ifilter);
+            // ---
+//            final Collection<String> _filter = Arrays.asList(ifilter.getValues()); // Actually wrong, cuts trailing *
+            
+            
 //            if (_ifilter != null) for (String s : _ifilter)
 //                    _filter.add(StringUtils.userFormClassName(s));
 
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     try {
-                        refreshDataImpl(_snapshot, _filter);
+                        refreshDataImpl(_snapshot, ifilter);
                     } finally {
                         refreshIsRunning = false;
                     }
@@ -172,7 +174,7 @@ public abstract class LiveMemoryView extends JPanel {
         forceRefresh = false;
     }
     
-    private void refreshDataImpl(MemoryResultsSnapshot _snapshot, Collection<String> _filter) {
+    private void refreshDataImpl(MemoryResultsSnapshot _snapshot, GenericFilter _filter) {
         assert SwingUtilities.isEventDispatchThread();
         
         updateDataView(_snapshot);
