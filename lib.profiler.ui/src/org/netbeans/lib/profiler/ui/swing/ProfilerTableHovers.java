@@ -138,6 +138,13 @@ final class ProfilerTableHovers {
     }
     
     private void checkPopup(int row, int column, Point point, boolean repaint) {
+        if (!table.isShowing()) {
+            // Prevent "IllegalComponentStateException: component must be showing on the screen..."
+            hidePopups();
+            currentScreenPoint = null;
+            return;
+        }
+        
         if (row < 0 || column < 0 || row >= table.getRowCount() ||
             column >= table.getColumnCount()) { hidePopups(); return; }
         
@@ -378,6 +385,8 @@ final class ProfilerTableHovers {
             table.removeMouseMotionListener(this);
             table.removeComponentListener(this);
             table.getModel().removeTableModelListener(this);
+            
+            currentScreenPoint = null;
         }
         
         // MouseAdapter
@@ -479,7 +488,7 @@ final class ProfilerTableHovers {
         public void componentResized(ComponentEvent e) { /*hidePopups();*/ } // Lines added/removed to/from table
         public void componentMoved(ComponentEvent e) { }  // Table scrolled (mouse wheel, gesture
         public void componentShown(ComponentEvent e) { hidePopups(); }
-        public void componentHidden(ComponentEvent e) { hidePopups(); }
+        public void componentHidden(ComponentEvent e) { hidePopups(); currentScreenPoint = null; }
 
         // HierarchyListener
         public void hierarchyChanged(HierarchyEvent e) { hidePopups(); }
@@ -490,7 +499,7 @@ final class ProfilerTableHovers {
         
         // FocusListener
         public void focusGained(FocusEvent e) {}
-        public void focusLost(FocusEvent e) { hidePopups(); }
+        public void focusLost(FocusEvent e) { hidePopups(); currentScreenPoint = null; }
 
         // PropertyChangeListener
         public void propertyChange(PropertyChangeEvent evt) { hidePopups(); }
