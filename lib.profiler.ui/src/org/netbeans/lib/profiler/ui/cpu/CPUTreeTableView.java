@@ -105,7 +105,8 @@ abstract class CPUTreeTableView extends CPUView {
             public void run() {
                 boolean structureChange = sampled != _sampled;
                 sampled = _sampled;
-                twoTimeStamps = newData == null ? false : newData.isCollectingTwoTimeStamps();
+                boolean _twoTimeStamps = twoTimeStamps;
+                twoTimeStamps = newData == null ? !_twoTimeStamps : newData.isCollectingTwoTimeStamps();
                 idMap = newIdMap;
                 renderers[0].setDiffMode(_diff);
                 renderers[1].setDiffMode(_diff);
@@ -135,7 +136,7 @@ abstract class CPUTreeTableView extends CPUView {
                     repaint();
                 }
                 
-                if (newData != null) {
+                if (newData != null && twoTimeStamps != _twoTimeStamps) {
                     int column = selection == null ? 2 : 3;
                     boolean cpuColumnVisible = treeTable.isColumnVisible(column);
                     if (twoTimeStamps && !cpuColumnVisible) treeTable.setColumnVisibility(column, true);

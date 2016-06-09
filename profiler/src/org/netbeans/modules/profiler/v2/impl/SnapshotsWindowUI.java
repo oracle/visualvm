@@ -711,6 +711,7 @@ public final class SnapshotsWindowUI extends ProfilerTopComponent {
         // 2: Memory snapshot
         // 3: Thread dump
         // 4: Heap dump
+        // 5: JDBC snapshot
         
         public int getSnapshotType() {
             return snapshotType;
@@ -722,6 +723,7 @@ public final class SnapshotsWindowUI extends ProfilerTopComponent {
                 case 2: return ProfilerIcons.MEMORY;
                 case 3: return ProfilerIcons.SNAPSHOT_THREADS;
                 case 4: return ProfilerIcons.HEAP_DUMP;
+                case 5: return ProfilerIcons.WINDOW_SQL;
                 default: return null;
             }
         }
@@ -750,7 +752,9 @@ public final class SnapshotsWindowUI extends ProfilerTopComponent {
 //                this.isHeapDump = false;
             } else {
                 int type = ResultsManager.getDefault().getSnapshotType(fo);
-                snapshotType = type == LoadedSnapshot.SNAPSHOT_TYPE_CPU ? 1 : 2;
+                if (type == LoadedSnapshot.SNAPSHOT_TYPE_CPU) snapshotType = 1; // CPU snapshot
+                else if (type == LoadedSnapshot.SNAPSHOT_TYPE_CPU_JDBC) snapshotType = 5; // JDBC snapshot
+                else snapshotType = 2; // Memory snapshot
                 displayName = ResultsManager.getDefault().getSnapshotDisplayName(fileName, type);
                 isHeapDump = false;
             }
