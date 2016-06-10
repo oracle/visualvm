@@ -615,7 +615,8 @@ class HprofHeap implements Heap {
             if (!isTreeObj && (instanceEntry.getNearestGCRootPointer() != 0 || getGCRoot(new Long(instanceId)) != null)) {
                 long origSize = instanceEntry.getRetainedSize();
                 if (origSize < 0) origSize = 0;
-                instSize = getInstanceByID(instanceId).getSize();
+                Instance instance = getInstanceByID(instanceId);
+                instSize = instance != null ? instance.getSize() : getClassDumpSegment().getMinimumInstanceSize();
                 instanceEntry.setRetainedSize(origSize + instSize);
             }
             if (idom != 0) {
@@ -665,9 +666,11 @@ class HprofHeap implements Heap {
             }
             long instanceId = dumpBuffer.getID(start + instanceIdOffset);
             Instance i = getInstanceByID(instanceId);
-            ClassDump javaClass = (ClassDump) i.getJavaClass();
-            if (javaClass != null && !domTree.hasInstanceInChain(tag, i)) {
-                javaClass.addSizeForInstance(i);
+            if (i != null) {
+                ClassDump javaClass = (ClassDump) i.getJavaClass();
+                if (javaClass != null && !domTree.hasInstanceInChain(tag, i)) {
+                    javaClass.addSizeForInstance(i);
+                }
             }
         }
         // all done, release domTree
