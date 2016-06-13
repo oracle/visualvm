@@ -250,6 +250,7 @@ final class MethodsFeatureModes {
                 ProjectContentsSupport pcs = ProjectContentsSupport.get(project);
                 filter.append(pcs.getInstrumentationFilter(false));
                 filter.append(" "); // NOI18N
+                pcs.reset();
             }
             
             String s  = filter.toString().replace(". ", ".* ").replace(".,", ".*,").trim(); // NOI18N
