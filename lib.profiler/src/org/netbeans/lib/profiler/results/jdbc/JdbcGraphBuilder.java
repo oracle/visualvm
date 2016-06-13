@@ -94,7 +94,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     private Map connections;
     private Map<Select,Integer> selectsToId;
     private Map<Integer, Select> idsToSelect;
-    private Map<ThreadInfo, SQLConnection> currentObject;
+    private Map<ThreadInfo, SQLStatement> currentObject;
     private Map<ThreadInfo, Integer> currentSqlLevel;
     private int lastSelectId;
     private RuntimeMemoryCCTNode[] stacksForSelects; // [1- maxSelectId] selectId -> root of its allocation traces tree
@@ -285,7 +285,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
                     }
                     connection.invoke(status.getInstrMethodNames()[methodId], status.getInstrMethodSignatures()[methodId], parameters);
                     assert currentObject.get(ti) == null;
-                    currentObject.put(ti, connection);
+                    currentObject.put(ti, connection.useCurrentStatement());
                 }
             }
         }
@@ -311,23 +311,19 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
 
             plainMethodExit(methodId, ti, timeStamp0, timeStamp1, true);
             if (sqlCallLevel == 0) {
-                SQLConnection connection = currentObject.get(ti);
+                SQLStatement st = currentObject.get(ti);
                 
-                if (connection != null) {
-                    SQLStatement st = connection.useCurrentStatement();
-
-                    if (st != null && retVal instanceof String) {
-                        String thisString = (String) retVal;
-                        int index = thisString.indexOf('@');
-                        String thisClass = thisString.substring(0, index);
-                        String thisHash = thisString.substring(index + 1);
-                        if (implementsInterface(thisClass, STATEMENT_INTERFACE)) {
-                            assert st != null;
-                            statements.put(thisHash, st);
-                        }
+                if (st != null && retVal instanceof String) {
+                    String thisString = (String) retVal;
+                    int index = thisString.indexOf('@');
+                    String thisClass = thisString.substring(0, index);
+                    String thisHash = thisString.substring(index + 1);
+                    if (implementsInterface(thisClass, STATEMENT_INTERFACE)) {
+                        assert st != null;
+                        statements.put(thisHash, st);
                     }
-                    currentObject.remove(ti);
                 }
+                currentObject.remove(ti);
             }
             batchNotEmpty = true;
         }
