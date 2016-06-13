@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015, 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2016 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -36,36 +36,34 @@
  * made subject to such option by the copyright holder.
  *
  * Contributor(s):
+ *
+ * Portions Copyrighted 2016 Sun Microsystems, Inc.
  */
-package org.netbeans.lib.profiler.ui.swing;
-
-import java.awt.Insets;
-import javax.swing.BorderFactory;
+package org.netbeans.lib.profiler.filters;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class InvisibleToolbar extends GenericToolbar {
+public class InstrumentationFilter extends JavaTypeFilter {
 
-    public InvisibleToolbar() { super(); tweak(); }
-
-    public InvisibleToolbar(int orientation) { super(orientation); tweak(); }
-
-    public InvisibleToolbar(String name) { super(name); tweak(); }
-
-    public InvisibleToolbar(String name, int orientation) { super(name, orientation); tweak(); }
-
-
-    private void tweak() {
-        setBorder(BorderFactory.createEmptyBorder());
-        setBorderPainted(false);
-        setFloatable(false);
-        setRollover(true);
-        setOpaque(false);
-        setMargin(new Insets(0, 0, 0, 0));
-
-        putClientProperty("Toolbar.noGTKBorder", Boolean.TRUE); // NOI18N
+    private boolean fake;
+    
+    public InstrumentationFilter() {
+        super();
+    }
+    
+    public InstrumentationFilter(GenericFilter other) {
+        super(other);
+        if (!(other instanceof JavaTypeFilter)) {
+            fake = true;
+        }
     }
 
+    @Override
+    public boolean passes(String string) {
+        if (fake) return true;
+        return super.passes(string);
+    }
+    
 }

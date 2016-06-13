@@ -125,10 +125,11 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
                 }
 
                 if (isMatch) { // This root class is loaded
-                    boolean checkSubClasses = loadedClassInfos[j].isInterface() && rootMethods.markerMethods[rIdx];
+                    boolean isMarkerMethod = rootMethods.markerMethods[rIdx];
+                    boolean checkSubClasses = loadedClassInfos[j].isInterface() && isMarkerMethod;
                     
                     if (Wildcards.isPackageWildcard(rootClassName) || Wildcards.isMethodWildcard(rootMethods.methodNames[rIdx])) {
-                        if (rootMethods.markerMethods[rIdx]) {
+                        if (isMarkerMethod) {
                             markAllMethodsMarker(loadedClassInfos[j]);
                         } else {
                             markAllMethodsRoot(loadedClassInfos[j]);
@@ -139,12 +140,12 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
 
                         for (int methodIdx = 0; methodIdx < methodNames.length; methodIdx++) {
                             locateAndMarkMethodReachable(loadedClassInfos[j], methodNames[methodIdx], signatures[methodIdx],
-                                                         false, false, checkSubClasses, false);
+                                                         false, false, checkSubClasses, isMarkerMethod);
                         }
                     } else {
                         markMethod(loadedClassInfos[j], rIdx);
                         locateAndMarkMethodReachable(loadedClassInfos[j], rootMethods.methodNames[rIdx],
-                                                     rootMethods.methodSignatures[rIdx], false, false, checkSubClasses, true);
+                                                     rootMethods.methodSignatures[rIdx], false, false, checkSubClasses, isMarkerMethod);
                     }
                 }
             }
@@ -185,7 +186,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
             }
         }
 
-        boolean normallyFilteredOut = !instrFilter.passesFilter(className);
+        boolean normallyFilteredOut = !instrFilter.passes(className);
 
         if (!isRootClass) {
             if (normallyFilteredOut) {
@@ -441,7 +442,7 @@ public class RecursiveMethodInstrumentor1 extends RecursiveMethodInstrumentor {
             }
 
             if (clazz.isMethodNative(idx) || clazz.isMethodAbstract(idx)
-                    || (!clazz.isMethodRoot(idx) && !clazz.isMethodMarker(idx) && !instrFilter.passesFilter(className))
+                    || (!clazz.isMethodRoot(idx) && !clazz.isMethodMarker(idx) && !instrFilter.passes(className))
                     || (className == OBJECT_SLASHED_CLASS_NAME)) {  // Actually, just the Object.<init> method?
                 clazz.setMethodUnscannable(idx);
             } else {
