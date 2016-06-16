@@ -41,8 +41,6 @@
  */
 package org.netbeans.modules.profiler.api.project;
 
-import java.util.Map;
-import java.util.Properties;
 import org.netbeans.lib.profiler.common.SessionSettings;
 import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.netbeans.modules.profiler.spi.project.ProjectProfilingSupportProvider;
@@ -90,6 +88,15 @@ public final class ProjectProfilingSupport {
     }
     
     /**
+     * Returns true if Profiling Points can be processed by this project.
+     * 
+     * @return true if Profiling Points can be processed by this project, false otherwise.
+     */
+    public boolean areProfilingPointsSupported() {
+        return provider.areProfilingPointsSupported();
+    }
+    
+    /**
      * Returns the Java platform configured for running the project.
      * 
      * @return Java platform configured for running the project
@@ -99,32 +106,13 @@ public final class ProjectProfilingSupport {
     }
     
     /**
-     * Returns true if the project is properly set up to be profiled (e.g. main class has a main method).
+     * Returns true if the project is configured and properly set up to be profiled (e.g. profiler is integrated with the project, main class has a main method etc.).
      * 
      * @param profiledClassFile profiled file or null for profiling the entire project
-     * @return true if the project is properly set up to be profiled, false otherwise
+     * @return true if the project is configured and properly set up to be profiled, false otherwise
      */
     public boolean checkProjectCanBeProfiled(FileObject profiledClassFile) {
         return provider.checkProjectCanBeProfiled(profiledClassFile);
-    }
-    
-    /**
-     * Returns true if the project is configured to be profiled (e.g. build script is customized if needed).
-     * 
-     * @return true if the project is configured to be profiled, false otherwise
-     */
-    public boolean checkProjectIsModifiedForProfiler() {
-        return provider.checkProjectIsModifiedForProfiler();
-    }
-    
-    /**
-     * Configures profiling properties passed to the Ant environment (to be moved to AntProjectSupport?).
-     * 
-     * @param props properties
-     * @param profiledClassFile profiled file or null for profiling the entire project
-     */
-    public void configurePropertiesForProfiling(Map props, FileObject profiledClassFile) {
-        provider.configurePropertiesForProfiling(props, profiledClassFile);
     }
     
     /**
@@ -137,40 +125,14 @@ public final class ProjectProfilingSupport {
     }
     
     /**
-     * Returns true if profiling settings can be customized by the user (working directory, Java platform etc.)
-     * 
-     * @return true if profiling settings can be customized by the user, false otherwise
-     */
-    public boolean supportsSettingsOverride() {
-        return provider.supportsSettingsOverride();
-    }
-    
-    /**
-     * Returns true if profiler integration can be removed from the project.
-     * 
-     * @return true if profiler integration can be removed from the project, false otherwise
-     */
-    public boolean supportsUnintegrate() {
-        return provider.supportsUnintegrate();
-    }
-    
-    /**
-     * Removes profiler integration from a project.
-     */
-    public void unintegrateProfiler() {
-        provider.unintegrateProfiler();
-    }
-    
-    /**
-     * Allows to start a profiling session directly by the ProjectProfilingSupport instance (workaround for Maven projects).
+     * Allows to start a profiling session directly by the ProjectProfilingSupport instance.
      * 
      * @param profiledClassFile profiled file
      * @param isTest true if profiledClassFile is a test, false otherwise
-     * @param properties profiling properties
      * @return true if the ProjectProfilingSupport instance started a profiling session, false otherwise
      */
-    public boolean startProfilingSession(FileObject profiledClassFile, boolean isTest, Properties properties) {
-        return provider.startProfilingSession(profiledClassFile, isTest, properties);
+    public boolean startProfilingSession(FileObject profiledClassFile, boolean isTest) {
+        return provider.startProfilingSession(profiledClassFile, isTest);
     }
     
     
