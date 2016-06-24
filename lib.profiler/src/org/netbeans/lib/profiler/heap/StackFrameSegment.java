@@ -43,11 +43,18 @@
 
 package org.netbeans.lib.profiler.heap;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  *
  * @author Tomas Hurka
  */
 class StackFrameSegment extends TagBounds {
+
+    private static final int FRAME_DIV = 512;
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     HprofHeap hprofHeap;
@@ -59,6 +66,8 @@ class StackFrameSegment extends TagBounds {
     final int timeOffset;
     final int classSerialNumberOffset;
     final int lineNumberOffset;
+    private Map idToFrame;
+    private Map classCache = Collections.synchronizedMap(new LoadClassCache());
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -80,8 +89,15 @@ class StackFrameSegment extends TagBounds {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     StackFrame getStackFrameByID(long stackFrameID) {
-        long[] offset = new long[] { startOffset };
-
+        Long initialOffset;
+        long[] offset;
+        
+        initIdToFrame();
+        initialOffset = (Long) idToFrame.get(new Long(stackFrameID/FRAME_DIV));
+        if (initialOffset == null) {
+            initialOffset = new Long(startOffset);
+        }
+        offset = new long[] { initialOffset.longValue() };
         while (offset[0] < endOffset) {
             long start = offset[0];
             long frameID = readStackFrameTag(offset);
@@ -106,4 +122,56 @@ class StackFrameSegment extends TagBounds {
 
         return getDumpBuffer().getID(start + stackFrameIDOffset);
     }
+    
+    private synchronized void initIdToFrame() {
+        if (idToFrame == null) {
+            long[] offset = new long[] { startOffset };
+
+            idToFrame = new HashMap();
+            while (offset[0] < endOffset) {
+                long start = offset[0];
+                long frameID = readStackFrameTag(offset);
+                Long frameIDMask = new Long(frameID/FRAME_DIV);
+                Long minOffset = (Long) idToFrame.get(frameIDMask);
+                
+                if (minOffset == null || minOffset > start) {
+                    idToFrame.put(frameIDMask, new Long(start));
+                }
+            }
+//            System.out.println("idToFrame size:"+idToFrame.size());
+        }
+    }
+    
+    String getClassNameBySerialNumber(int classSerialNumber) {
+        Integer classSerialNumberObj = Integer.valueOf(classSerialNumber);
+        String className = (String) classCache.get(classSerialNumberObj);
+        
+        if (className == null) {
+            LoadClass loadClass = hprofHeap.getLoadClassSegment().getClassBySerialNumber(classSerialNumber);
+            
+            if (loadClass != null) {
+                className = loadClass.getName();
+            } else {
+                className = "N/A";      // NOI18N
+            }
+            classCache.put(classSerialNumberObj, className);
+        }
+        return className;
+    }
+
+    private static class LoadClassCache extends LinkedHashMap {
+        private static final int SIZE = 1000;
+        
+        LoadClassCache() {
+            super(SIZE,0.75f,true);
+        }
+
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            if (size() > SIZE) {
+                return true;
+            }
+            return false;
+        }
+    }
+
 }
