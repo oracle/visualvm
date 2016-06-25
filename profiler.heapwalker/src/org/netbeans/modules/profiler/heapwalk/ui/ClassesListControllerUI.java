@@ -981,6 +981,10 @@ public class ClassesListControllerUI extends JTitledPanel {
     }
 
     private void showSubclassesForClass(JavaClass jClass) {
-        filterComponent.setFilter(jClass.getName(),ClassesListController.FILTER_SUBCLASS);
+        if (classesListController.isDiff() && jClass == null) {
+            ProfilerDialogs.displayInfo(Bundle.ClassesListControllerUI_NoClassInBaseMsg());
+        } else {
+            filterComponent.setFilter(jClass.getName(),ClassesListController.FILTER_SUBCLASS);
+        }
     }
 }

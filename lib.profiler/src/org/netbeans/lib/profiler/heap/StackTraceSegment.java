@@ -43,11 +43,16 @@
 
 package org.netbeans.lib.profiler.heap;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author Tomas Hurka
  */
 class StackTraceSegment extends TagBounds {
+
+    private static final int SERIALNUM_DIV = 16;
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     HprofHeap hprofHeap;
@@ -57,6 +62,7 @@ class StackTraceSegment extends TagBounds {
     final int framesListOffset;
     final int numberOfFramesOffset;
     final int timeOffset;
+    private Map serialNumToStackTrace;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -75,8 +81,15 @@ class StackTraceSegment extends TagBounds {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     StackTrace getStackTraceBySerialNumber(long stackTraceSerialNumber) {
-        long[] offset = new long[] { startOffset };
-
+        Long initialOffset;
+        long[] offset;
+        
+        initSerialNumToFrame();
+        initialOffset = (Long) serialNumToStackTrace.get(new Long(stackTraceSerialNumber/SERIALNUM_DIV));
+        if (initialOffset == null) {
+            initialOffset = new Long(startOffset);
+        }
+        offset = new long[] { initialOffset.longValue() };
         while (offset[0] < endOffset) {
             long start = offset[0];
             long serialNumber = readStackTraceTag(offset);
@@ -101,5 +114,24 @@ class StackTraceSegment extends TagBounds {
             return 0;
         }
         return getDumpBuffer().getInt(start + stackTraceSerialNumberOffset);
+    }
+
+    private synchronized void initSerialNumToFrame() {
+        if (serialNumToStackTrace == null) {
+            long[] offset = new long[] { startOffset };
+
+            serialNumToStackTrace = new HashMap();
+            while (offset[0] < endOffset) {
+                long start = offset[0];
+                long serialNumber = readStackTraceTag(offset);
+                Long serialNumberMask = new Long(serialNumber/SERIALNUM_DIV);
+                Long minOffset = (Long) serialNumToStackTrace.get(serialNumberMask);
+                
+                if (minOffset == null || minOffset > start) {
+                    serialNumToStackTrace.put(serialNumberMask, new Long(start));
+                }
+            }
+//            System.out.println("serialNumToStackTrace size:"+serialNumToStackTrace.size());
+        }
     }
 }

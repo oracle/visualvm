@@ -87,8 +87,7 @@ class StackFrame extends HprofObject {
     
     String getClassName() {
         int classSerial = getHprofBuffer().getInt(fileOffset + stackFrameSegment.classSerialNumberOffset);
-        LoadClass loadClass = stackFrameSegment.hprofHeap.getLoadClassSegment().getClassBySerialNumber(classSerial);
-        return loadClass.getName();
+        return stackFrameSegment.getClassNameBySerialNumber(classSerial);
     }
     
     int getLineNumber() {
