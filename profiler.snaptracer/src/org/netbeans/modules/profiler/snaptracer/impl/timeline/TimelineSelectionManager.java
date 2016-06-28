@@ -230,14 +230,15 @@ class TimelineSelectionManager implements ChartSelectionModel {
         ItemSelection sel = getClosestSelection(bounds.x, bounds.y);
         if (!(sel instanceof XYItemSelection)) return;
 
-        ChartContext context = chart.getChartContext();
+//      #262588 : Do not change selection view bounds
+//        ChartContext context = chart.getChartContext();
 
         XYItemSelection xySel = (XYItemSelection)sel;
-        XYItem item = xySel.getItem();
+//        XYItem item = xySel.getItem();
         startIndex = xySel.getValueIndex();
         endIndex = startIndex;
-        long valX = item.getXValue(startIndex);
-        bounds.x = Utils.checkedInt(context.getViewX(valX));
+//        long valX = item.getXValue(startIndex);
+//        bounds.x = Utils.checkedInt(context.getViewX(valX));
 
         if (bounds.width == 0) return;
 
@@ -245,10 +246,10 @@ class TimelineSelectionManager implements ChartSelectionModel {
         if (!(sel instanceof XYItemSelection)) return;
 
         xySel = (XYItemSelection)sel;
-        item = xySel.getItem();
+//        item = xySel.getItem();
         endIndex = xySel.getValueIndex();
-        valX = item.getXValue(endIndex);
-        bounds.width = Utils.checkedInt(context.getViewX(valX)) - bounds.x;
+//        long valX = item.getXValue(endIndex);
+//        bounds.width = Utils.checkedInt(context.getViewX(valX)) - bounds.x;
     }
 
 
