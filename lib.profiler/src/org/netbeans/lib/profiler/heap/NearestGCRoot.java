@@ -299,7 +299,7 @@ class NearestGCRoot {
         if (refInstanceId != 0) {
             LongMap.Entry entry = heap.idToOffsetMap.get(refInstanceId);
 
-            if (entry != null && entry.getNearestGCRootPointer() == 0L && heap.getGCRoot(refInstanceId) == null) {
+            if (entry != null && entry.getNearestGCRootPointer() == 0L && heap.gcRoots.getGCRoot(refInstanceId) == null) {
                 writeLong(entry.getOffset());
                 if (addRefInstanceId) {
                     if (!checkReferences(refInstanceId, instanceId)) {

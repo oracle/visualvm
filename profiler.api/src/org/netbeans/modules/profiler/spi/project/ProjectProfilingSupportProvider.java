@@ -41,8 +41,6 @@
  */
 package org.netbeans.modules.profiler.spi.project;
 
-import java.util.Map;
-import java.util.Properties;
 import org.netbeans.lib.profiler.common.SessionSettings;
 import org.netbeans.modules.profiler.api.JavaPlatform;
 import org.openide.filesystems.FileObject;
@@ -77,6 +75,13 @@ public abstract class ProjectProfilingSupportProvider {
     public abstract boolean isFileObjectSupported(FileObject fo);
     
     /**
+     * Returns true if Profiling Points can be processed by this project.
+     * 
+     * @return true if Profiling Points can be processed by this project, false otherwise.
+     */
+    public abstract boolean areProfilingPointsSupported();
+    
+    /**
      * Returns the Java platform configured for running the project.
      * 
      * @return Java platform configured for running the project
@@ -84,27 +89,12 @@ public abstract class ProjectProfilingSupportProvider {
     public abstract JavaPlatform getProjectJavaPlatform();
     
     /**
-     * Returns true if the project is properly set up to be profiled (e.g. main class has a main method).
+     * Returns true if the project is configured and properly set up to be profiled (e.g. main class has a main method etc.).
      * 
      * @param profiledClassFile profiled file or null for profiling the entire project
-     * @return true if the project is properly set up to be profiled, false otherwise
+     * @return true if the project is configured and properly set up to be profiled, false otherwise
      */
     public abstract boolean checkProjectCanBeProfiled(FileObject profiledClassFile);
-    
-    /**
-     * Returns true if the project is configured to be profiled (e.g. build script is customized if needed).
-     * 
-     * @return true if the project is configured to be profiled, false otherwise
-     */
-    public abstract boolean checkProjectIsModifiedForProfiler();
-    
-    /**
-     * Configures profiling properties passed to the Ant environment (to be moved to AntProjectSupport?).
-     * 
-     * @param props properties
-     * @param profiledClassFile profiled file or null for profiling the entire project
-     */
-    public abstract void configurePropertiesForProfiling(Map<String, String> props, FileObject profiledClassFile);
     
     /**
      * Configures project-specific session settings.
@@ -114,33 +104,13 @@ public abstract class ProjectProfilingSupportProvider {
     public abstract void setupProjectSessionSettings(SessionSettings ss);
     
     /**
-     * Returns true if profiling settings can be customized by the user (working directory, Java platform etc.)
-     * 
-     * @return true if profiling settings can be customized by the user, false otherwise
-     */
-    public abstract boolean supportsSettingsOverride();
-    
-    /**
-     * Returns true if profiler integration can be removed from the project.
-     * 
-     * @return true if profiler integration can be removed from the project, false otherwise
-     */
-    public abstract boolean supportsUnintegrate();
-    
-    /**
-     * Removes profiler integration from a project.
-     */
-    public abstract void unintegrateProfiler();
-    
-    /**
-     * Allows to start a profiling session directly by the ProjectProfilingSupport instance (workaround for Maven projects).
+     * Allows to start a profiling session directly by the ProjectProfilingSupport instance.
      * 
      * @param profiledClassFile profiled file
      * @param isTest true if profiledClassFile is a test, false otherwise
-     * @param properties profiling properties
      * @return true if the ProjectProfilingSupport instance started a profiling session, false otherwise
      */
-    public abstract boolean startProfilingSession(FileObject profiledClassFile, boolean isTest, Properties properties);
+    public abstract boolean startProfilingSession(FileObject profiledClassFile, boolean isTest);
     
     
     public static class Basic extends ProjectProfilingSupportProvider {
@@ -159,6 +129,11 @@ public abstract class ProjectProfilingSupportProvider {
         public boolean isFileObjectSupported(FileObject fo) {
             return false;
         }
+        
+        @Override
+        public boolean areProfilingPointsSupported() {
+            return false;
+        }
 
         @Override
         public JavaPlatform getProjectJavaPlatform() {
@@ -171,38 +146,11 @@ public abstract class ProjectProfilingSupportProvider {
         }
 
         @Override
-        public boolean checkProjectIsModifiedForProfiler() {
-            return true;
-        }
-
-        public void configurePropertiesForProfiling(Properties props, FileObject profiledClassFile) {
-            // transitional implementation
-        }
-        
-        @Override
-        public void configurePropertiesForProfiling(Map<String, String> props, FileObject profiledClassFile) {
-        }
-
-        @Override
         public void setupProjectSessionSettings(SessionSettings ss) {
         }
 
         @Override
-        public boolean supportsSettingsOverride() {
-            return false;
-        }
-
-        @Override
-        public boolean supportsUnintegrate() {
-            return false;
-        }
-
-        @Override
-        public void unintegrateProfiler() {
-        }
-
-        @Override
-        public boolean startProfilingSession(FileObject profiledClassFile, boolean isTest, Properties properties) {
+        public boolean startProfilingSession(FileObject profiledClassFile, boolean isTest) {
             return false;
         }
         
