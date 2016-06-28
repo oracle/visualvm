@@ -111,11 +111,9 @@ class HprofHeap implements Heap {
     HprofByteBuffer dumpBuffer;
     LongMap idToOffsetMap;
     private NearestGCRoot nearestGCRoot;
+    final HprofGCRoots gcRoots;
     private ComputedSummary computedSummary;
-    private Map gcRoots;
-    private List gcRootsList;
     private DominatorTree domTree;
-    final private Object gcRootLock = new Object();
     private TagBounds allInstanceDumpBounds;
     private TagBounds heapDumpSegment;
     private TagBounds[] heapTagBounds;
@@ -141,6 +139,7 @@ class HprofHeap implements Heap {
 
         idToOffsetMap = new LongMap(idMapSize,dumpBuffer.getIDSize(),dumpBuffer.getFoffsetSize());
         nearestGCRoot = new NearestGCRoot(this);
+        gcRoots = new HprofGCRoots(this);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -175,42 +174,14 @@ class HprofHeap implements Heap {
     
     public GCRoot getGCRoot(Instance instance) {
        Long instanceId = Long.valueOf(instance.getInstanceId());
-       return getGCRoot(instanceId);
+       return gcRoots.getGCRoot(instanceId);
     }
 
     public Collection getGCRoots() {
-        synchronized (gcRootLock) {
-            if (heapDumpSegment == null) {
-                return Collections.EMPTY_LIST;
-            }
-            if (gcRoots == null) {
-                gcRoots = computeGCRootsFor(heapTagBounds[ROOT_UNKNOWN]);
-                gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_JNI_GLOBAL]));
-                gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_JNI_LOCAL]));
-                gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_JAVA_FRAME]));
-                gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_NATIVE_STACK]));
-                gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_STICKY_CLASS]));
-                gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_THREAD_BLOCK]));
-                gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_MONITOR_USED]));
-                gcRoots.putAll(computeGCRootsFor(heapTagBounds[ROOT_THREAD_OBJECT]));
-
-                gcRootsList = new ArrayList(gcRoots.values());
-                Collections.sort(gcRootsList, new Comparator() {
-                    public int compare(Object o1, Object o2) {
-                        HprofGCRoot r1 = (HprofGCRoot) o1;
-                        HprofGCRoot r2 = (HprofGCRoot) o2;
-                        int kind = r1.getKind().compareTo(r2.getKind());
-
-                        if (kind != 0) {
-                            return kind;
-                        }
-                        return Long.compare(r1.getInstanceId(), r2.getInstanceId());
-                    }
-                });
-            }
-
-            return gcRootsList;
+        if (heapDumpSegment == null) {
+            return Collections.EMPTY_LIST;
         }
+        return gcRoots.getGCRoots();
     }
 
     public Instance getInstanceByID(long instanceID) {
@@ -301,16 +272,6 @@ class HprofHeap implements Heap {
     long getRetainedSize(Instance instance) {
         computeRetainedSize();
         return idToOffsetMap.get(instance.getInstanceId()).getRetainedSize();
-    }
-    
-    GCRoot getGCRoot(Long instanceId) {
-        synchronized (gcRootLock) {
-            if (gcRoots == null) {
-                getGCRoots();
-            }
-
-            return (GCRoot) gcRoots.get(instanceId);
-        }
     }
 
     int getValueSize(final byte type) {
@@ -612,7 +573,7 @@ class HprofHeap implements Heap {
             boolean isTreeObj = instanceEntry.isTreeObj();
             long instSize = 0;
             
-            if (!isTreeObj && (instanceEntry.getNearestGCRootPointer() != 0 || getGCRoot(new Long(instanceId)) != null)) {
+            if (!isTreeObj && (instanceEntry.getNearestGCRootPointer() != 0 || gcRoots.getGCRoot(new Long(instanceId)) != null)) {
                 long origSize = instanceEntry.getRetainedSize();
                 if (origSize < 0) origSize = 0;
                 Instance instance = getInstanceByID(instanceId);
@@ -961,31 +922,8 @@ class HprofHeap implements Heap {
         return tag;
     }
 
-    private Map computeGCRootsFor(TagBounds tagBounds) {
-        Map roots = new HashMap();
-
-        if (tagBounds != null) {
-            int rootTag = tagBounds.tag;
-            long[] offset = new long[] { tagBounds.startOffset };
-
-            while (offset[0] < tagBounds.endOffset) {
-                long start = offset[0];
-
-                if (readDumpTag(offset) == rootTag) {
-                    HprofGCRoot root;
-                    if (rootTag == ROOT_THREAD_OBJECT) {
-                        root = new ThreadObjectHprofGCRoot(this, start);                        
-                    } else if (rootTag == ROOT_JAVA_FRAME) {
-                        root = new JavaFrameHprofGCRoot(this, start);
-                    } else {
-                        root = new HprofGCRoot(this, start);
-                    }
-                    roots.put(Long.valueOf(root.getInstanceId()), root);
-                }
-            }
-        }
-
-        return roots;
+    TagBounds getHeapTagBound(int heapTag) {
+        return heapTagBounds[heapTag];
     }
 
     private TagBounds computeHeapDumpStart() throws IOException {
