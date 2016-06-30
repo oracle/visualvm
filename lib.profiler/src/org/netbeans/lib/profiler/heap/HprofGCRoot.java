@@ -71,28 +71,32 @@ class HprofGCRoot extends HprofObject implements GCRoot {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    HprofHeap heap;
+    HprofGCRoots roots;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    HprofGCRoot(HprofHeap h, long offset) {
+    HprofGCRoot(HprofGCRoots r, long offset) {
         super(offset);
-        heap = h;
+        roots = r;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public Instance getInstance() {
-        return heap.getInstanceByID(getInstanceId());
+        return roots.heap.getInstanceByID(getInstanceId());
     }
 
     public String getKind() {
-        int k = heap.dumpBuffer.get(fileOffset);
+        int k = getHprofBuffer().get(fileOffset);
 
         return (String) kindMap.get(Integer.valueOf(k & 0xff));
     }
 
     long getInstanceId() {
-        return heap.dumpBuffer.getID(fileOffset + 1);
+        return getHprofBuffer().getID(fileOffset + 1);
+    }
+    
+    HprofByteBuffer getHprofBuffer() {
+        return roots.heap.dumpBuffer;
     }
 }

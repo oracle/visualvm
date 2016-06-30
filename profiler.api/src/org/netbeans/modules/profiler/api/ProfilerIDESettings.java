@@ -143,6 +143,7 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     private final String LOG_PROFILER_STATUS_KEY = "LOG_PROFILER_STATUS"; // NOI18N
     private final String REOPEN_SNAPSHOTS_KEY = "REOPEN_SNAPSHOTS_KEY"; // NOI18N
     private final String REOPEN_HDUMPS_KEY = "REOPEN_HDUMPS_KEY"; // NOI18N
+    private final String SOURCES_COLORING_KEY = "SOURCES_COLORING_KEY"; // NOI18N
     
     // Defaults for tracked properties
     private final String CUSTOM_HEAPDUMP_PATH_DEFAULT = ""; // NOI18N
@@ -173,6 +174,7 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     private final boolean LOG_PROFILER_STATUS_DEFAULT = false;
     private final boolean REOPEN_SNAPSHOTS_DEFAULT = false;
     private final boolean REOPEN_HDUMPS_DEFAULT = false;
+    private final boolean SOURCES_COLORING_DEFAULT = false;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -390,6 +392,18 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     
     public boolean getReopenHeapDumps() {
         return getPreferences().getBoolean(REOPEN_HDUMPS_KEY, REOPEN_HDUMPS_DEFAULT);
+    }
+    
+    private Boolean sourcesColoringEnabled; // needs to be as fast as possible for rendering tables
+    public void setSourcesColoringEnabled(boolean value) {
+        getPreferences().putBoolean(SOURCES_COLORING_KEY, value);
+        sourcesColoringEnabled = value;
+    }
+    
+    public boolean isSourcesColoringEnabled() {
+        if (sourcesColoringEnabled == null) sourcesColoringEnabled =
+                getPreferences().getBoolean(SOURCES_COLORING_KEY, SOURCES_COLORING_DEFAULT);
+        return sourcesColoringEnabled;
     }
 
     /**

@@ -45,7 +45,6 @@ package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JLabel;
@@ -55,6 +54,7 @@ import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
@@ -147,7 +147,7 @@ abstract class AllocTableView extends MemoryView {
         });
     }
     
-    public void setData(MemoryResultsSnapshot snapshot, Collection<String> filter, int aggregation) {
+    public void setData(MemoryResultsSnapshot snapshot, GenericFilter filter, int aggregation) {
         AllocMemoryResultsSnapshot _snapshot = (AllocMemoryResultsSnapshot)snapshot;
         boolean diff = _snapshot instanceof AllocMemoryResultsDiff;
         
@@ -169,58 +169,11 @@ abstract class AllocTableView extends MemoryView {
             List<Integer> fTotalAllocObjects = new ArrayList();
             List<Long> fTotalAllocObjectsSize = new ArrayList();
             
-            if (isAll(filter)) {
-                for (int i = 0; i < _nTrackedItems; i++) {
+            for (int i = 0; i < _nTrackedItems; i++) {
+                if (filter.passes(_classNames[i].replace('.', '/'))) { // NOI18N
                     fClassNames.add(_classNames[i]);
                     fTotalAllocObjects.add(_nTotalAllocObjects[i]);
                     fTotalAllocObjectsSize.add(_totalAllocObjectsSize[i]);
-                }
-            } else if (isExact(filter)) {
-                for (int i = 0; i < _nTrackedItems; i++) {
-                    if (filter.contains(_classNames[i])) {
-                        fClassNames.add(_classNames[i]);
-                        fTotalAllocObjects.add(_nTotalAllocObjects[i]);
-                        fTotalAllocObjectsSize.add(_totalAllocObjectsSize[i]);
-                    }
-                }
-            } else {
-                for (String f : filter) {
-                    if (f.endsWith("**")) { // NOI18N
-                        f = f.substring(0, f.length() - 2);
-                        for (int i = 0; i < _nTrackedItems; i++) {
-                            if (_classNames[i].startsWith(f)) {
-                                fClassNames.add(_classNames[i]);
-                                fTotalAllocObjects.add(_nTotalAllocObjects[i]);
-                                fTotalAllocObjectsSize.add(_totalAllocObjectsSize[i]);
-                            }
-                        }
-                    } else if (f.endsWith("*")) { // NOI18N
-                        f = f.substring(0, f.length() - 1);
-                        for (int i = 0; i < _nTrackedItems; i++) {
-                            if (!_classNames[i].startsWith(f)) continue;
-                            
-                            boolean subpackage = false;
-                            for (int ii = f.length(); ii < _classNames[i].length(); ii++)
-                                if (_classNames[i].charAt(ii) == '.') { // NOI18N
-                                    subpackage = true;
-                                    break;
-                                }
-                            
-                            if (!subpackage) {
-                                fClassNames.add(_classNames[i]);
-                                fTotalAllocObjects.add(_nTotalAllocObjects[i]);
-                                fTotalAllocObjectsSize.add(_totalAllocObjectsSize[i]);
-                            }
-                        }
-                    } else {
-                        for (int i = 0; i < _nTrackedItems; i++) {
-                            if (_classNames[i].equals(f)) {
-                                fClassNames.add(_classNames[i]);
-                                fTotalAllocObjects.add(_nTotalAllocObjects[i]);
-                                fTotalAllocObjectsSize.add(_totalAllocObjectsSize[i]);
-                            }
-                        }
-                    }
                 }
             }
             

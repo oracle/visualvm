@@ -96,6 +96,7 @@ class TreeObject {
     private boolean computeOneLevel() throws IOException {
 //nextLevelSize = 0;
         boolean changed = false;
+        int idSize = heap.dumpBuffer.getIDSize();
         for (;;) {
             long instanceId = readLong();
             Instance instance;
@@ -108,11 +109,14 @@ class TreeObject {
             }
             instance = heap.getInstanceByID(instanceId);
             if (instance instanceof ObjectArrayInstance) {
-                Iterator instanceIt = ((ObjectArrayInstance) instance).getValues().iterator();
+                ObjectArrayDump array = (ObjectArrayDump) instance;
+                int arrSize = array.getLength();
+                long offset = array.getOffset();
                 long size = 0;
-                while (instanceIt.hasNext() && size != -1) {
-                    Instance refInstance = (Instance) instanceIt.next();
-                    size = checkInstance(instanceId, refInstance);
+                
+                for  (int i=0; i<arrSize && size != -1; i++) {
+                    long refInstanceId = heap.dumpBuffer.getID(offset + (i * idSize));
+                    size = checkInstance(instanceId, refInstanceId);
                     retainedSize += size;
                 }
                 changed |= processInstance(instance, size, retainedSize);
@@ -198,8 +202,18 @@ class TreeObject {
     
     private long checkInstance(long instanceId, Instance refInstance) throws IOException {
         if (refInstance != null) {
-            LongMap.Entry refEntry = heap.idToOffsetMap.get(refInstance.getInstanceId());
+            return checkInstance(instanceId, refInstance.getInstanceId());
+        }
+        return 0;
+    }
+    
+    private long checkInstance(long instanceId, long refInstanceId) throws IOException {
+        if (refInstanceId != 0L) {
+            LongMap.Entry refEntry = heap.idToOffsetMap.get(refInstanceId);
             
+            if (refEntry == null) {
+                return 0;
+            }
             if (!refEntry.hasOnlyOneReference()) {
                 return -1;
             }

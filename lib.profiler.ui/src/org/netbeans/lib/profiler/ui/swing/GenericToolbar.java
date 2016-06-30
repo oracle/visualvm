@@ -98,6 +98,8 @@ public class GenericToolbar extends JToolBar {
             setBorder(BorderFactory.createEmptyBorder(-2, 0, -2, 0));
         else if (UIUtils.isAquaLookAndFeel())
             setBorder(BorderFactory.createEmptyBorder(0, 1, 0, 1));
+        
+        if (UIUtils.isWindowsClassicLookAndFeel()) setRollover(true);
     }
     
     
@@ -155,6 +157,11 @@ public class GenericToolbar extends JToolBar {
                 if (ab.getClientProperty("JButton.segmentPosition") == null) // NOI18N
                     ab.putClientProperty("JButton.segmentPosition", "only"); // NOI18N
                 ab.setMargin(new Insets(-1, -1, -2, -1));
+            }
+        } else if (UIUtils.isWindowsClassicLookAndFeel()) {
+            if (comp instanceof AbstractButton && !(comp instanceof JCheckBox) && !(comp instanceof JRadioButton)) {
+                AbstractButton ab = (AbstractButton)comp;
+                ab.setMargin(new Insets(1, 1, 1, 1));
             }
         }
         

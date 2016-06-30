@@ -42,7 +42,6 @@
 package org.netbeans.lib.profiler.results.jdbc;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  *

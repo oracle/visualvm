@@ -389,7 +389,7 @@ final class TracerView {
         
         private final PrestimeCPUCCTNode node;
         
-        @NbBundle.Messages("LBL_FindMethod=Select intervals")
+        @NbBundle.Messages("LBL_FindMethod=Select Intervals")
         private FindMethodAction(PrestimeCPUCCTNode node) {
             super(Bundle.LBL_FindMethod());
             this.node = node;

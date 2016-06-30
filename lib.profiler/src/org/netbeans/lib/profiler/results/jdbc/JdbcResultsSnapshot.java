@@ -263,6 +263,11 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
         return createPresentationCCT(rootNode, selectId, dontShowZeroLiveObjAllocPaths);
     }
 
+    public JdbcResultsSnapshot createDiff(JdbcResultsSnapshot snapshot) {
+        if (!(snapshot instanceof JdbcResultsSnapshot)) return null;
+        return new JdbcResultsDiff(this, (JdbcResultsSnapshot)snapshot);
+    }
+
     public void readFromStream(DataInputStream in) throws IOException {
         super.readFromStream(in);
         
@@ -372,37 +377,41 @@ public class JdbcResultsSnapshot extends ResultsSnapshot {
     protected void performInit(ProfilerClient client, JdbcCCTProvider provider)
                                  throws ClientUtils.TargetAppOrVMTerminated {
         FlatProfileContainer fpc = provider.createFlatProfile();
-        nProfiledSelects = fpc.getNRows() + 1;
+        if (fpc != null) {
+            nProfiledSelects = fpc.getNRows() + 1;
 
-        invocationsPerSelectId = new long[nProfiledSelects];
-        timePerSelectId = new long[nProfiledSelects];
-        typeForSelectId = new int[nProfiledSelects];
-        commandTypeForSelectId = new int[nProfiledSelects];
-        tablesForSelectId = new String[nProfiledSelects][];
-        selectNames = new String[nProfiledSelects];
-        for (int i=0; i<fpc.getNRows() ; i++) {
-            int selectId = fpc.getMethodIdAtRow(i);
-            selectNames[selectId] = fpc.getMethodNameAtRow(i);
-            invocationsPerSelectId[selectId] = fpc.getNInvocationsAtRow(i);
-            timePerSelectId[selectId] = fpc.getTotalTimeInMcs0AtRow(i);
-            typeForSelectId[selectId] = provider.getCommandType(selectId);
-            commandTypeForSelectId[selectId] = provider.getSQLCommand(selectId);
-            tablesForSelectId[selectId] = provider.getTables(selectId);
-        }
-
-        RuntimeMemoryCCTNode[] stacks = provider.getStacksForSelects();
-        if ((stacks != null) && checkContainsStacks(stacks)) {
-            stacksForSelects = new RuntimeMemoryCCTNode[stacks.length];
-            PresoObjAllocCCTNode.getNamesForMethodIdsFromVM(client, stacks);
-
-            for (int i = 0; i < nProfiledSelects; i++) {
-                if (stacks[i] != null) {
-                    stacksForSelects[i] = (RuntimeMemoryCCTNode) stacks[i].clone();
-                    updateTime(stacksForSelects[i], timePerSelectId[i]/invocationsPerSelectId[i]);
-                }
+            invocationsPerSelectId = new long[nProfiledSelects];
+            timePerSelectId = new long[nProfiledSelects];
+            typeForSelectId = new int[nProfiledSelects];
+            commandTypeForSelectId = new int[nProfiledSelects];
+            tablesForSelectId = new String[nProfiledSelects][];
+            selectNames = new String[nProfiledSelects];
+            for (int i=0; i<fpc.getNRows() ; i++) {
+                int selectId = fpc.getMethodIdAtRow(i);
+                selectNames[selectId] = fpc.getMethodNameAtRow(i);
+                invocationsPerSelectId[selectId] = fpc.getNInvocationsAtRow(i);
+                timePerSelectId[selectId] = fpc.getTotalTimeInMcs0AtRow(i);
+                typeForSelectId[selectId] = provider.getCommandType(selectId);
+                commandTypeForSelectId[selectId] = provider.getSQLCommand(selectId);
+                tablesForSelectId[selectId] = provider.getTables(selectId);
             }
-            table = new JMethodIdTable(JMethodIdTable.getDefault());
-        }        
+
+            RuntimeMemoryCCTNode[] stacks = provider.getStacksForSelects();
+            if ((stacks != null) && checkContainsStacks(stacks)) {
+                stacksForSelects = new RuntimeMemoryCCTNode[stacks.length];
+                PresoObjAllocCCTNode.getNamesForMethodIdsFromVM(client, stacks);
+
+                for (int i = 0; i < nProfiledSelects; i++) {
+                    if (stacks[i] != null) {
+                        stacksForSelects[i] = (RuntimeMemoryCCTNode) stacks[i].clone();
+                        updateTime(stacksForSelects[i], timePerSelectId[i]/invocationsPerSelectId[i]);
+                    }
+                }
+                table = new JMethodIdTable(JMethodIdTable.getDefault());
+            }
+        } else {
+            selectNames = new String[0];
+        }
     }
 
     private boolean checkContainsStacks(RuntimeMemoryCCTNode[] stacksForSelects) {

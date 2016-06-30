@@ -88,7 +88,12 @@ public class DropdownButton extends JPanel {
     private static final int POPUP_MARGIN;
     
     static {
-        if (UIUtils.isWindowsLookAndFeel()) {
+        if (UIUtils.isWindowsClassicLookAndFeel()) {
+            POPUP_EXTENT = 18;
+            POPUP_OFFSET = 6;
+            POPUP_XWIDTH = -1;
+            POPUP_MARGIN = 6;
+        } else if (UIUtils.isWindowsLookAndFeel()) {
             POPUP_EXTENT = 15;
             POPUP_OFFSET = 4;
             POPUP_XWIDTH = -1;
@@ -429,7 +434,16 @@ public class DropdownButton extends JPanel {
         
         public Insets getMargin() {
             Insets i = super.getMargin();
-            if (UIUtils.isNimbusLookAndFeel()) {
+            if (UIUtils.isWindowsClassicLookAndFeel()) {
+                if (i == null) {
+                    i = new Insets(1, 1, 1, 1);
+                } else {
+                    i.top = 1;
+                    i.left = 1;
+                    i.bottom = 1;
+                    i.right = 1;
+                }
+            } else if (UIUtils.isNimbusLookAndFeel()) {
                 if (i == null) {
                     i = new Insets(0, 2, 0, 2);
                 } else {

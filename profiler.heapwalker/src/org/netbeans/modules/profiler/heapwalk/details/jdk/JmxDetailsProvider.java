@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2016 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -37,46 +37,34 @@
  *
  * Contributor(s):
  *
- * Portions Copyrighted 2011 Sun Microsystems, Inc.
+ * Portions Copyrighted 2016 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.spi.project;
+package org.netbeans.modules.profiler.heapwalk.details.jdk;
 
-import org.openide.filesystems.FileObject;
+import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
+import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
- * Provider of support for profiling Ant projects.
  *
- * @author Jiri Sedlacek
+ * @author Tomas Hurka
  */
-public abstract class AntProjectSupportProvider {
-    /**
-     * Returns build script of a project.
-     * 
-     * @return build script of a project
-     */
-    public abstract FileObject getProjectBuildScript();
-    
-    /**
-     * Returns build script according to provided file name.
-     * 
-     * @param buildFileName file name of the build script
-     * @return build script according to provided file name
-     */
-    public abstract FileObject getProjectBuildScript(String buildFileName);
-    
-    
-    public static class Basic extends AntProjectSupportProvider {
-        
-        @Override
-        public FileObject getProjectBuildScript() {
-            return null;
-        }
+@ServiceProvider(service=DetailsProvider.class)
+public class JmxDetailsProvider extends DetailsProvider.Basic {
 
-        @Override
-        public FileObject getProjectBuildScript(String buildFileName) {
-            return null;
-        }
-        
+    private static final String OBJECT_NAME_MASK = "javax.management.ObjectName";    // NOI18N
+    
+    public JmxDetailsProvider() {
+        super(OBJECT_NAME_MASK);
     }
     
+    public String getDetailsString(String className, Instance instance, Heap heap) {
+        if (OBJECT_NAME_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "_canonicalName", heap);     // NOI18N
+        }
+        return null;
+    }
+        
 }

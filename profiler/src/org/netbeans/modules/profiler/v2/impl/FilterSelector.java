@@ -47,18 +47,33 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
+import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
+import org.netbeans.lib.profiler.ui.results.ColoredFilter;
+import org.netbeans.lib.profiler.ui.results.PackageColorer;
+import org.netbeans.lib.profiler.ui.swing.PopupButton;
 import org.netbeans.lib.profiler.ui.swing.ProfilerPopupFactory;
 import org.netbeans.lib.profiler.ui.swing.TextArea;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.openide.util.NbBundle;
 
 /**
@@ -77,7 +92,8 @@ import org.openide.util.NbBundle;
     "FilterSelector_filterTooltip=<html>Include/exclude profiling outgoing calls from these classes or packages:<br><br>"
             + "<code>&nbsp;org.mypackage.**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package and subpackages<br>"
             + "<code>&nbsp;org.mypackage.*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package<br>"
-            + "<code>&nbsp;org.mypackage.MyClass&nbsp;&nbsp;</code>single class<br></html>"
+            + "<code>&nbsp;org.mypackage.MyClass&nbsp;&nbsp;</code>single class<br></html>",
+    "FilterSelector_insertFilter=Insert Defined Filter"
 })
 public abstract class FilterSelector {
     
@@ -115,6 +131,7 @@ public abstract class FilterSelector {
         private JRadioButton excludeCustomChoice;
         private JRadioButton includeCustomChoice;
         private TextArea customClasses;
+        private PopupButton insertFilter;
         
         private JPanel panel;
         
@@ -134,82 +151,112 @@ public abstract class FilterSelector {
             hint.setBorder(BorderFactory.createEmptyBorder(0, 0, 7, 0));
             content.add(hint, BorderLayout.NORTH);
             
-            JPanel filters = new JPanel(new GridBagLayout());
             ButtonGroup bg = new ButtonGroup() {
                 public void setSelected(ButtonModel m, boolean b) {
                     super.setSelected(m, b);
                     if (b && m.isSelected()) filterChanged(true);
                 }
             };
-            GridBagConstraints c;
-            int y = 0;
+            
+            JPanel filters = new JPanel(new GridLayout(3, 1));
             
             noFilterChoice = new JRadioButton(Bundle.FilterSelector_noFilter(),
                                 FilterName.NO_FILTER.equals(filterName));
             bg.add(noFilterChoice);
-            c = new GridBagConstraints();
-            c.gridx = 0;
-            c.gridy = y++;
-            c.gridwidth = 1;
-            c.anchor = GridBagConstraints.WEST;
-            c.fill = GridBagConstraints.NONE;
-            c.insets = new Insets(3, 0, 0, 0);
-            filters.add(noFilterChoice, c);
+            filters.add(noFilterChoice);
             
             javaClassesChoice = new JRadioButton(Bundle.FilterSelector_excludeCoreJava(),
                                 FilterName.EXCLUDE_JAVA_FILTER.equals(filterName));
             bg.add(javaClassesChoice);
-            c = new GridBagConstraints();
-            c.gridx = 0;
-            c.gridy = y;
-            c.gridwidth = 1;
-            c.anchor = GridBagConstraints.WEST;
-            c.fill = GridBagConstraints.NONE;
-            c.insets = new Insets(3, 0, 0, 0);
-            filters.add(javaClassesChoice, c);
             
             JLabel javaClassesHint = new JLabel("(java.*, javax.*, sun.*, com.sun.*, etc.)", JLabel.LEADING);
             javaClassesHint.setFont(javaClassesHint.getFont().deriveFont(javaClassesHint.getFont().getSize2D() - 1));
             javaClassesHint.setEnabled(false);
-            c = new GridBagConstraints();
-            c.gridx = 1;
-            c.gridy = y++;
-            c.gridwidth = GridBagConstraints.REMAINDER;
-            c.anchor = GridBagConstraints.WEST;
-            c.fill = GridBagConstraints.NONE;
-            c.insets = new Insets(3, 5, 0, 0);
-            filters.add(javaClassesHint, c);
+            
+            JPanel javaFilters = new JPanel(null);
+            javaFilters.setLayout(new BoxLayout(javaFilters, BoxLayout.LINE_AXIS));
+            javaFilters.add(javaClassesChoice);
+            javaFilters.add(createStrut(javaClassesChoice, 5, false));
+            javaFilters.add(javaClassesHint);
+            filters.add(javaFilters);
             
             excludeCustomChoice = new JRadioButton(Bundle.FilterSelector_excludeCustomEx(),
                                   FilterName.EXCLUDE_CUSTOM_FILTER.equals(filterName));
             bg.add(excludeCustomChoice);
-            c = new GridBagConstraints();
-            c.gridx = 0;
-            c.gridy = y;
-            c.gridwidth = GridBagConstraints.REMAINDER;
-            c.anchor = GridBagConstraints.WEST;
-            c.fill = GridBagConstraints.NONE;
-            c.insets = new Insets(3, 0, 0, 0);
-            filters.add(excludeCustomChoice, c);
             
             includeCustomChoice = new JRadioButton(Bundle.FilterSelector_includeCustomEx(),
                                   FilterName.INCLUDE_CUSTOM_FILTER.equals(filterName));
             bg.add(includeCustomChoice);
+            
+            JPanel customFilters = new JPanel(null);
+            customFilters.setLayout(new BoxLayout(customFilters, BoxLayout.LINE_AXIS));
+            customFilters.add(excludeCustomChoice);
+            customFilters.add(createStrut(excludeCustomChoice, 8, false));
+            customFilters.add(includeCustomChoice);
+            filters.add(customFilters);
+            
+            if (PackageColorer.hasRegisteredColors()) {
+                insertFilter = new PopupButton(Icons.getIcon(GeneralIcons.FILTER)) {
+                    {
+                        setToolTipText(Bundle.FilterSelector_insertFilter());
+                    }
+                    protected void populatePopup(JPopupMenu popup) {
+                        for (final ColoredFilter color : PackageColorer.getRegisteredColors()) {
+                            if (color.getValue().trim().isEmpty()) continue;
+                            Icon icon = color.getColor() == null ? null : color.getIcon(12, 12);
+                            popup.add(new JMenuItem(color.getName(), icon) {
+                                protected void fireActionPerformed(ActionEvent event) {
+                                    StringBuilder added = new StringBuilder();
+                                    for (String f : color.getValues()) {
+                                        if (added.length() > 0) added.append(", "); // NOI18N
+                                        added.append(f);
+                                        if (f.endsWith(".")) added.append("**"); // NOI18N
+                                    }
+                                    
+                                    String current = customClasses.showsHint() ? "" : customClasses.getText(); // NOI18N
+                                    if (!current.isEmpty()) current += "\n"; // NOI18N
+                                    current += added.toString();
+                                    
+                                    customClasses.requestFocusInWindow();
+                                    customClasses.setText(current);
+                                }
+                            });
+                        }
+                    }
+                    public Dimension getPreferredSize() {
+                        Dimension dim = super.getPreferredSize();
+                        dim.width -= 2;
+                        dim.height -= 2;
+                        return dim;
+                    }
+                };
+                customFilters.add(Box.createHorizontalGlue());
+                customFilters.add(insertFilter);
+            }
+            
+            JPanel filtersOut = new JPanel(new GridBagLayout());
+            GridBagConstraints c;
+            int y = 0;
             c = new GridBagConstraints();
-            c.gridx = 1;
+            c.gridx = 0;
             c.gridy = y++;
             c.gridwidth = GridBagConstraints.REMAINDER;
-            c.anchor = GridBagConstraints.WEST;
-            c.fill = GridBagConstraints.NONE;
+            c.anchor = GridBagConstraints.NORTHWEST;
+            c.fill = GridBagConstraints.HORIZONTAL;
             c.insets = new Insets(3, 0, 0, 0);
-            filters.add(includeCustomChoice, c);
+            filtersOut.add(filters, c);
             
             customClasses = new TextArea() {
                 protected void changed() {
                     filterChanged(true);
                 }
                 public Point getToolTipLocation(MouseEvent event) {
-                    return new Point(-1, getHeight() + 2);
+                    Component scroll = getParent().getParent();
+                    return SwingUtilities.convertPoint(scroll, 0, scroll.getHeight(), this);
+                }
+                public void setEnabled(boolean enabled) {
+                    super.setEnabled(enabled);
+                    if (insertFilter != null) insertFilter.setEnabled(enabled);
                 }
             };
             customClasses.setFont(new Font("Monospaced", Font.PLAIN, customClasses.getFont().getSize())); // NOI18N
@@ -218,7 +265,7 @@ public abstract class FilterSelector {
             JScrollPane customClassesScroll = new JScrollPane(customClasses);
             Dimension d = customClassesScroll.getPreferredSize();
             customClasses.setRows(3);
-            customClasses.setColumns(50);
+            customClasses.setColumns(56);
             Dimension _d = customClasses.getPreferredScrollableViewportSize();
             d.width += _d.width;
             d.height += _d.height;
@@ -236,11 +283,11 @@ public abstract class FilterSelector {
             c.anchor = GridBagConstraints.NORTHWEST;
             c.fill = GridBagConstraints.BOTH;
             c.insets = new Insets(3, 20, 0, 0);
-            filters.add(customClassesScroll, c);
+            filtersOut.add(customClassesScroll, c);
             
             filterChanged(false);
             
-            content.add(filters, BorderLayout.CENTER);
+            content.add(filtersOut, BorderLayout.CENTER);
             
             panel = content;
         }
@@ -264,6 +311,14 @@ public abstract class FilterSelector {
             }
         }
         
+    }
+    
+    
+    private static Component createStrut(JComponent c, int width, boolean before) {
+        Border b = c.getBorder();
+        Insets i = b != null ? b.getBorderInsets(c) : null;
+        int w = i == null ? width : Math.max(width - (before ? i.left : i.right), 0);
+        return Box.createHorizontalStrut(w);
     }
     
 }

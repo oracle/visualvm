@@ -44,7 +44,6 @@
 package org.netbeans.lib.profiler.heap;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -145,21 +144,22 @@ class NearestGCRoot {
     private void computeOneLevel(Set processedClasses) throws IOException {
         int idSize = heap.dumpBuffer.getIDSize();
         for (;;) {
-            long instanceId = readLong();
             Instance instance;
+            long instanceOffset = readLong();
             List fieldValues;
             Iterator valuesIt;
             boolean hasValues = false;
             
-            if (instanceId == 0L) { // end of level
+            if (instanceOffset == 0L) { // end of level
                 break;
             }
             HeapProgress.progress(processedInstances++,allInstances);
-            instance = heap.getInstanceByID(instanceId);
+            instance = heap.getInstanceByOffset(instanceOffset);
             if (instance instanceof ObjectArrayInstance) {
                 ObjectArrayDump array = (ObjectArrayDump) instance;
                 int size = array.getLength();
                 long offset = array.getOffset();
+                long instanceId = instance.getInstanceId();
 
                 for (int i=0;i<size;i++) {
                     long referenceId = heap.dumpBuffer.getID(offset + (i * idSize));
@@ -173,7 +173,7 @@ class NearestGCRoot {
                 }
                 continue;
             } else if (instance instanceof PrimitiveArrayInstance) {
-                writeLeaf(instanceId,instance.getSize());
+                writeLeaf(instance.getInstanceId(),instance.getSize());
                 continue;
             } else if (instance instanceof ClassDumpInstance) {
                 ClassDump javaClass = ((ClassDumpInstance) instance).classDump;
@@ -183,11 +183,12 @@ class NearestGCRoot {
                 fieldValues = instance.getFieldValues();
             } else {
                 if (instance == null) {
-                    System.err.println("HeapWalker Warning - null instance for " + instanceId); // NOI18N
+                    System.err.println("HeapWalker Warning - null instance for " + heap.dumpBuffer.getID(instanceOffset + 1)); // NOI18N
                     continue;
                 }
                 throw new IllegalArgumentException("Illegal type " + instance.getClass()); // NOI18N
             }
+            long instanceId = instance.getInstanceId();
             valuesIt = fieldValues.iterator();
             while (valuesIt.hasNext()) {
                 FieldValue val = (FieldValue) valuesIt.next();
@@ -251,8 +252,12 @@ class NearestGCRoot {
 
         while (gcIt.hasNext()) {
             HprofGCRoot root = (HprofGCRoot) gcIt.next();
-
-            writeLong(root.getInstanceId());
+            long id = root.getInstanceId();
+            LongMap.Entry entry = heap.idToOffsetMap.get(id);
+            
+            if (entry != null) {
+                writeLong(entry.getOffset());
+            }
         }
     }
 
@@ -294,8 +299,8 @@ class NearestGCRoot {
         if (refInstanceId != 0) {
             LongMap.Entry entry = heap.idToOffsetMap.get(refInstanceId);
 
-            if (entry != null && entry.getNearestGCRootPointer() == 0L && heap.getGCRoot(refInstanceId) == null) {
-                writeLong(refInstanceId);
+            if (entry != null && entry.getNearestGCRootPointer() == 0L && heap.gcRoots.getGCRoot(refInstanceId) == null) {
+                writeLong(entry.getOffset());
                 if (addRefInstanceId) {
                     if (!checkReferences(refInstanceId, instanceId)) {
                         entry.addReference(instanceId);

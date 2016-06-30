@@ -42,7 +42,6 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details.jdk.ui;
 
-import org.netbeans.modules.profiler.heapwalk.details.jdk.image.ImageDetailProvider;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -90,18 +89,13 @@ final class BaseBuilders {
     
     static final class DimensionBuilder extends InstanceBuilder<Dimension> {
         
-        private final static int MAX_WIDTH = 10000;
-        private final static int MAX_HEIGHT = 10000;
-        
-        private int width;
-        private int height;
+        private final int width;
+        private final int height;
         
         DimensionBuilder(Instance instance, Heap heap) {
             super(instance, heap);
             width = DetailsUtils.getIntFieldValue(instance, "width", 0);
             height = DetailsUtils.getIntFieldValue(instance, "height", 0);
-            if (width > MAX_WIDTH) width = MAX_WIDTH;
-            if (height > MAX_HEIGHT) height = MAX_HEIGHT;
         }
         
         static DimensionBuilder fromField(Instance instance, String field, Heap heap) {

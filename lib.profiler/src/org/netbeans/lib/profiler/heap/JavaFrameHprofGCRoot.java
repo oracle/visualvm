@@ -51,8 +51,8 @@ import java.util.Iterator;
  */
 class JavaFrameHprofGCRoot extends HprofGCRoot implements JavaFrameGCRoot {
     
-    JavaFrameHprofGCRoot(HprofHeap h, long offset) {
-        super(h,offset);
+    JavaFrameHprofGCRoot(HprofGCRoots r, long offset) {
+        super(r, offset);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -60,28 +60,15 @@ class JavaFrameHprofGCRoot extends HprofGCRoot implements JavaFrameGCRoot {
 
     
     private int getThreadSerialNumber() {
-        return heap.dumpBuffer.getInt(fileOffset + 1 + heap.dumpBuffer.getIDSize());
+        return getHprofBuffer().getInt(fileOffset + 1 + getHprofBuffer().getIDSize());
     }
 
     public int getFrameNumber() {
-        return heap.dumpBuffer.getInt(fileOffset + 1 + heap.dumpBuffer.getIDSize() + 4);
+        return getHprofBuffer().getInt(fileOffset + 1 + getHprofBuffer().getIDSize() + 4);
     }    
 
     public ThreadObjectGCRoot getThreadGCRoot() {
-        int serial = getThreadSerialNumber();
-        Iterator gcRootsIt = heap.getGCRoots().iterator();
-        
-        while(gcRootsIt.hasNext()) {
-            Object gcRoot = gcRootsIt.next();
-            
-            if (gcRoot instanceof ThreadObjectHprofGCRoot) {
-                ThreadObjectHprofGCRoot threadObjGC = (ThreadObjectHprofGCRoot) gcRoot;
-                if (serial == threadObjGC.getThreadSerialNumber()) {
-                    return threadObjGC;
-                }
-            }
-        }
-        return null;
+        return roots.getThreadGCRoot(getThreadSerialNumber());
     }
 
 }

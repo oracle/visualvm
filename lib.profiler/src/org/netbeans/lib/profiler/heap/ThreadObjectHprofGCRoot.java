@@ -43,18 +43,14 @@
 
 package org.netbeans.lib.profiler.heap;
 
-import java.util.HashMap;
-import java.util.Map;
-
-
 /**
  *
  * @author Tomas Hurka
  */
 class ThreadObjectHprofGCRoot extends HprofGCRoot implements ThreadObjectGCRoot {
     
-    ThreadObjectHprofGCRoot(HprofHeap h, long offset) {
-        super(h,offset);
+    ThreadObjectHprofGCRoot(HprofGCRoots r, long offset) {
+        super(r, offset);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -63,7 +59,7 @@ class ThreadObjectHprofGCRoot extends HprofGCRoot implements ThreadObjectGCRoot 
         int stackTraceSerialNumber = getStackTraceSerialNumber();
         
         if (stackTraceSerialNumber != 0) {
-            StackTrace stackTrace = heap.getStackTraceSegment().getStackTraceBySerialNumber(stackTraceSerialNumber);
+            StackTrace stackTrace = roots.heap.getStackTraceSegment().getStackTraceBySerialNumber(stackTraceSerialNumber);
             if (stackTrace != null) {
                 StackFrame[] frames = stackTrace.getStackFrames();
                 StackTraceElement[] stackElements = new StackTraceElement[frames.length];
@@ -89,11 +85,11 @@ class ThreadObjectHprofGCRoot extends HprofGCRoot implements ThreadObjectGCRoot 
     }
     
     int getThreadSerialNumber() {
-        return heap.dumpBuffer.getInt(fileOffset + 1 + heap.dumpBuffer.getIDSize());
+        return getHprofBuffer().getInt(fileOffset + 1 + getHprofBuffer().getIDSize());
     }
 
     private int getStackTraceSerialNumber() {
-        return heap.dumpBuffer.getInt(fileOffset + 1 + heap.dumpBuffer.getIDSize() + 4);
+        return getHprofBuffer().getInt(fileOffset + 1 + getHprofBuffer().getIDSize() + 4);
     }    
 
 }

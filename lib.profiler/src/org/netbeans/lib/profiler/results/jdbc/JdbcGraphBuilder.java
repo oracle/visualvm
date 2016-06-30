@@ -55,6 +55,8 @@ import org.netbeans.lib.profiler.classfile.ClassInfo;
 import org.netbeans.lib.profiler.classfile.ClassRepository;
 import org.netbeans.lib.profiler.classfile.DynamicClassInfo;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
+import org.netbeans.lib.profiler.filters.TextFilter;
 import org.netbeans.lib.profiler.results.BaseCallGraphBuilder;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
@@ -92,12 +94,13 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     private Map connections;
     private Map<Select,Integer> selectsToId;
     private Map<Integer, Select> idsToSelect;
-    private Map<ThreadInfo, SQLConnection> currentObject;
+    private Map<ThreadInfo, SQLStatement> currentObject;
     private Map<ThreadInfo, Integer> currentSqlLevel;
-    private int maxSelectId;
+    private int lastSelectId;
     private RuntimeMemoryCCTNode[] stacksForSelects; // [1- maxSelectId] selectId -> root of its allocation traces tree
     final private ThreadInfos threadInfos = new ThreadInfos();
     private final SQLParser sqlParser = new SQLParser();
+    private TextFilter filter;
 
     @Override
     protected RuntimeCCTNode getAppRootNode() {
@@ -112,7 +115,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         try {
             ProfilerClient client = getClient();
             if (client != null) {
-                appNode = new SimpleCPUCCTNode(maxSelectId);
+                appNode = new SimpleCPUCCTNode(lastSelectId + 1);
             } else {
                 appNode = new SimpleCPUCCTNode(true);
             }
@@ -183,7 +186,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
             idsToSelect.clear();
             currentObject.clear();
             currentSqlLevel.clear();
-            maxSelectId = 0;
+            lastSelectId = 0;
             if (stacksForSelects != null) {
                 Arrays.fill(stacksForSelects, null);
             }
@@ -213,8 +216,10 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         currentSqlLevel = new HashMap();
         threadInfos.reset();
         stacksForSelects = null;
-        maxSelectId = 0;
+        lastSelectId = 0;
         profilerClient.registerJdbcCCTProvider(this);
+        InstrumentationFilter f = profilerClient.getSettings().getInstrumentationFilter();
+        filter = new TextFilter(f.getValue(), f.getType(), false);
     }
 
     @Override
@@ -262,7 +267,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
                         statements.put(thisHash, statement);
                     }
                     select = statement.invoke(status.getInstrMethodNames()[methodId], status.getInstrMethodSignatures()[methodId], parameters);
-                    if (select != null) {
+                    if (select != null && filter.passes(select)) {
                         int selectId = getSelectId(statement.getType(), select);
                         markerMethodEntry(selectId, ti, timeStamp0, timeStamp1, true);
                         RuntimeObjAllocTermCCTNode term = (RuntimeObjAllocTermCCTNode) processStackTrace(selectId, methoIds);
@@ -280,7 +285,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
                     }
                     connection.invoke(status.getInstrMethodNames()[methodId], status.getInstrMethodSignatures()[methodId], parameters);
                     assert currentObject.get(ti) == null;
-                    currentObject.put(ti, connection);
+                    currentObject.put(ti, connection.useCurrentStatement());
                 }
             }
         }
@@ -306,23 +311,19 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
 
             plainMethodExit(methodId, ti, timeStamp0, timeStamp1, true);
             if (sqlCallLevel == 0) {
-                SQLConnection connection = currentObject.get(ti);
+                SQLStatement st = currentObject.get(ti);
                 
-                if (connection != null) {
-                    SQLStatement st = connection.useCurrentStatement();
-
-                    if (st != null && retVal instanceof String) {
-                        String thisString = (String) retVal;
-                        int index = thisString.indexOf('@');
-                        String thisClass = thisString.substring(0, index);
-                        String thisHash = thisString.substring(index + 1);
-                        if (implementsInterface(thisClass, STATEMENT_INTERFACE)) {
-                            assert st != null;
-                            statements.put(thisHash, st);
-                        }
+                if (st != null && retVal instanceof String) {
+                    String thisString = (String) retVal;
+                    int index = thisString.indexOf('@');
+                    String thisClass = thisString.substring(0, index);
+                    String thisHash = thisString.substring(index + 1);
+                    if (implementsInterface(thisClass, STATEMENT_INTERFACE)) {
+                        assert st != null;
+                        statements.put(thisHash, st);
                     }
-                    currentObject.remove(ti);
                 }
+                currentObject.remove(ti);
             }
             batchNotEmpty = true;
         }
@@ -468,7 +469,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
         
         Integer selectId = selectsToId.get(sel);
         if (selectId == null) {
-            selectId = Integer.valueOf(++maxSelectId);
+            selectId = Integer.valueOf(++lastSelectId);
             sel.setCommandType(extractSQLCommandType(select));
             sel.setTables(extractTables(select));
             selectsToId.put(sel, selectId);
@@ -721,7 +722,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
     }
 
     private void updateNumberOfSelects() {
-        int nProfiledSelects = maxSelectId + 1;
+        int nProfiledSelects = lastSelectId + 1;
 
         if ((stacksForSelects == null) || (stacksForSelects.length <= nProfiledSelects)) {
             int newSize = (nProfiledSelects * 3) / 2;
@@ -854,7 +855,7 @@ public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfili
 
         @Override
         protected int getMaxMethodId() {
-            return maxSelectId;
+            return lastSelectId + 1;
         }
 
         @Override

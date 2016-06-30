@@ -173,8 +173,8 @@ class ProfilerWindow extends ProfilerTopComponent {
     void updateSession() {
         updateWindowName();
         
-        start.setText(session.isAttach() ? Bundle.ProfilerWindow_attach() :
-                                           Bundle.ProfilerWindow_profile());
+        if (start != null) start.setText(session.isAttach() ? Bundle.ProfilerWindow_attach() :
+                                                              Bundle.ProfilerWindow_profile());
     }
     
     void selectFeature(ProfilerFeature feature) {
@@ -254,7 +254,7 @@ class ProfilerWindow extends ProfilerTopComponent {
         toolbar.add(configure);
         
         String command = session.isAttach() ? Bundle.ProfilerWindow_attach() :
-                                            Bundle.ProfilerWindow_profile();
+                                              Bundle.ProfilerWindow_profile();
         start = new DropdownButton(command, Icons.getIcon(GeneralIcons.START), true) {
             public void displayPopup() { displayPopupImpl(); }
             protected void performAction() { performStartImpl(); }

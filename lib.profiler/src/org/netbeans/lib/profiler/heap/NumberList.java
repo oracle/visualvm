@@ -201,10 +201,10 @@ class NumberList {
     }
     
     private void mmapData() {
-        if (buf == null && blockSize*blocks < Integer.MAX_VALUE) {
+        if (buf == null) {
             try {
-                buf = data.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, data.length());
-                mappedSize = blockSize*blocks;
+                mappedSize = Math.min(blockSize*blocks, Integer.MAX_VALUE-blockSize+1);
+                buf = data.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, mappedSize);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
