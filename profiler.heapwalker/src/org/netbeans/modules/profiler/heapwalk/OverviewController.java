@@ -470,7 +470,7 @@ public class OverviewController extends AbstractController {
                             sb.append(" tid=").append(threadId);    // NOI18N
                         }
                         if (threadStatus != null) {
-                            State tState = sun.misc.VM.toThreadState(threadStatus.intValue());
+                            State tState = toThreadState(threadStatus.intValue());
                             sb.append(" ").append(tState);          // NOI18N
                         }
                         // --- Use this to enable VisualVM color scheme for threads dumps: ---
@@ -591,4 +591,37 @@ public class OverviewController extends AbstractController {
     private static String htmlize(String value) {
             return value.replace(">", "&gt;").replace("<", "&lt;");     // NOI18N
     }
+
+    /** taken from sun.misc.VM
+     * 
+     * Returns Thread.State for the given threadStatus
+     */
+    private static Thread.State toThreadState(int threadStatus) {
+        if ((threadStatus & JVMTI_THREAD_STATE_RUNNABLE) != 0) {
+            return State.RUNNABLE;
+        } else if ((threadStatus & JVMTI_THREAD_STATE_BLOCKED_ON_MONITOR_ENTER) != 0) {
+            return State.BLOCKED;
+        } else if ((threadStatus & JVMTI_THREAD_STATE_WAITING_INDEFINITELY) != 0) {
+            return State.WAITING;
+        } else if ((threadStatus & JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT) != 0) {
+            return State.TIMED_WAITING;
+        } else if ((threadStatus & JVMTI_THREAD_STATE_TERMINATED) != 0) {
+            return State.TERMINATED;
+        } else if ((threadStatus & JVMTI_THREAD_STATE_ALIVE) == 0) {
+            return State.NEW;
+        } else {
+            return State.RUNNABLE;
+        }
+    }
+
+    /* The threadStatus field is set by the VM at state transition
+     * in the hotspot implementation. Its value is set according to
+     * the JVM TI specification GetThreadState function.
+     */
+    private final static int JVMTI_THREAD_STATE_ALIVE = 0x0001;
+    private final static int JVMTI_THREAD_STATE_TERMINATED = 0x0002;
+    private final static int JVMTI_THREAD_STATE_RUNNABLE = 0x0004;
+    private final static int JVMTI_THREAD_STATE_BLOCKED_ON_MONITOR_ENTER = 0x0400;
+    private final static int JVMTI_THREAD_STATE_WAITING_INDEFINITELY = 0x0010;
+    private final static int JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT = 0x0020;
 }
