@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.ui.graphs;
 
 import java.awt.Color;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  * Utility class to access colors predefined for VisualVM.
@@ -59,11 +60,18 @@ final class ColorFactory {
                                                 new Color(158, 156,   0)
     };
 
-    private static final Color[][] PREDEFINED_GRADIENTS = new Color[][] {
+    private static final Color[][] PREDEFINED_GRADIENTS = !UIUtils.isDarkResultsBackground() ?
+    new Color[][] {
         new Color[] { new Color(245, 204, 152), new Color(255, 243, 226) },
         new Color[] { new Color(151, 223, 246), new Color(227, 248, 255) },
         new Color[] { new Color(200, 163, 248), new Color(242, 232, 255) },
         new Color[] { new Color(212, 211, 131), new Color(244, 243, 217) }
+    } :
+    new Color[][] {
+        new Color[] { new Color(145, 104, 052), new Color(155, 143, 126) },
+        new Color[] { new Color(051, 123, 146), new Color(127, 148, 155) },
+        new Color[] { new Color(100, 063, 148), new Color(142, 132, 155) },
+        new Color[] { new Color(112, 111, 031), new Color(144, 143, 117) }
     };
     
 
