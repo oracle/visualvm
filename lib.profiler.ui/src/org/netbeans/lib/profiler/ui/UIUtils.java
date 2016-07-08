@@ -46,7 +46,6 @@ package org.netbeans.lib.profiler.ui;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.PixelGrabber;
 import java.lang.reflect.InvocationTargetException;
@@ -58,7 +57,6 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
-import javax.swing.plaf.basic.BasicButtonListener;
 import javax.swing.table.JTableHeader;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -359,6 +357,18 @@ public final class UIUtils {
         }
         
         return profilerResultsBackground;
+    }
+    
+    private static Boolean darkResultsBackground;
+    
+    public static boolean isDarkResultsBackground() {
+        if (darkResultsBackground == null) {
+            Color c = getProfilerResultsBackground();
+            int b = (int)(0.3 * c.getRed() + 0.59 * c.getGreen() + 0.11 * c.getBlue());
+            darkResultsBackground = b < 85;
+        }
+        
+        return darkResultsBackground;
     }
 
     /** Determines if current L&F is Windows Classic LookAndFeel */

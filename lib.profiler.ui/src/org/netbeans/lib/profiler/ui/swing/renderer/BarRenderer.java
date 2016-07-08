@@ -46,6 +46,7 @@ package org.netbeans.lib.profiler.ui.swing.renderer;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 
 /**
@@ -117,16 +118,16 @@ public class BarRenderer extends BaseRenderer implements RelativeRenderer {
                 g.setColor(color);
                 g.fillRect(BAR_RECT.x, BAR_RECT.y, width2, BAR_RECT.height);
                 
-                g.setColor(brighter(color));
+                g.setColor(alternate(color));
                 g.fillRect(BAR_RECT.x + width2, BAR_RECT.y, width - width2, BAR_RECT.height);
             } else if (value >= 1) {
-                g.setColor(brighter(color));
+                g.setColor(alternate(color));
                 g.fillRect(BAR_RECT.x, BAR_RECT.y, width2, BAR_RECT.height);
                 
                 g.setColor(color);
                 g.fillRect(BAR_RECT.x + width2, BAR_RECT.y, width - width2, BAR_RECT.height);
             } else {
-                g.setColor(brighter(color));
+                g.setColor(alternate(color));
                 g.fillRect(BAR_RECT.x, BAR_RECT.y, width, BAR_RECT.height);
 
                 BAR_RECT.width = (int)(width2 * Math.min(Math.abs(value), 1));
@@ -149,7 +150,7 @@ public class BarRenderer extends BaseRenderer implements RelativeRenderer {
             if (BAR_RECT.width < width) {
                 BAR_RECT.x += BAR_RECT.width;
                 BAR_RECT.width = width - BAR_RECT.width;
-                g.setColor(brighter(COLOR_POS));
+                g.setColor(alternate(COLOR_POS));
                 g.fillRect(BAR_RECT.x, BAR_RECT.y, BAR_RECT.width, BAR_RECT.height);
             }
         }
@@ -157,6 +158,10 @@ public class BarRenderer extends BaseRenderer implements RelativeRenderer {
     
     private static final double FACTOR = 0.55d;
 //    private static final double FACTOR = 0.20d;
+    
+    private static Color alternate(Color c) {
+        return !UIUtils.isDarkResultsBackground() ? brighter(c) : darker(c);
+    }
     
     private static Color brighter(Color c) {
         int r = c.getRed();
@@ -171,6 +176,12 @@ public class BarRenderer extends BaseRenderer implements RelativeRenderer {
         return new Color(Math.min((int)(r/FACTOR), 255),
                          Math.min((int)(g/FACTOR), 255),
                          Math.min((int)(b/FACTOR), 255));
+    }
+    
+    private static Color darker(Color c) {
+        return new Color(Math.max((int)(c.getRed()  *FACTOR), 0),
+                         Math.max((int)(c.getGreen()*FACTOR), 0),
+                         Math.max((int)(c.getBlue() *FACTOR), 0));
     }
     
 }
