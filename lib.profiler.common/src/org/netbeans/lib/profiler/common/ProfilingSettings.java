@@ -199,8 +199,19 @@ public class ProfilingSettings {
 
     public static boolean isCPUSettings(int type) {
         return (type == ProfilingSettings.PROFILE_CPU_ENTIRE) || (type == ProfilingSettings.PROFILE_CPU_PART)
-               || (type == ProfilingSettings.PROFILE_CPU_STOPWATCH || type == PROFILE_CPU_SAMPLING
-               || type == ProfilingSettings.PROFILE_CPU_JDBC);
+               || (type == ProfilingSettings.PROFILE_CPU_STOPWATCH || type == PROFILE_CPU_SAMPLING);
+    }
+    
+    public static boolean isJDBCSettings(ProfilingSettings settings) {
+        if (settings == null) {
+            return false;
+        }
+
+        return isJDBCSettings(settings.getProfilingType());
+    }
+    
+    public static boolean isJDBCSettings(int type) {
+        return type == ProfilingSettings.PROFILE_CPU_JDBC;
     }
 
     public static boolean isMemorySettings(ProfilingSettings settings) {
