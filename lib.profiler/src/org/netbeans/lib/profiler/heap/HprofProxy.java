@@ -60,34 +60,42 @@ class HprofProxy {
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     static Properties getProperties(Instance propertiesInstance) {
+        Instance defaultsObj = (Instance) propertiesInstance.getValueOfField("defaults"); // NOI18N
         ObjectArrayDump entriesObj = (ObjectArrayDump) propertiesInstance.getValueOfField("table"); // NOI18N
+        Properties props;
+
+        if (defaultsObj != null) {
+            props = new Properties(getProperties(defaultsObj));
+        } else {
+            props = new Properties();
+        }
         if (entriesObj != null) {
-            Instance defaultsObj = (Instance) propertiesInstance.getValueOfField("defaults"); // NOI18N
-            Iterator enIt = entriesObj.getValues().iterator();
-            Properties props;
-
-            if (defaultsObj != null) {
-                props = new Properties(getProperties(defaultsObj));
-            } else {
-                props = new Properties();
+            return getPropertiesFromTable(entriesObj, props, "key", "value");   // NOI18N
+        } else {    // JDK 9
+            Instance map = (Instance) propertiesInstance.getValueOfField("map"); // NOI18N
+            if (map != null) {
+                entriesObj = (ObjectArrayDump) map.getValueOfField("table"); // NOI18N
+                return getPropertiesFromTable(entriesObj, props, "key", "val"); // NOI18N
             }
-            while (enIt.hasNext()) {
-                Instance entry = (Instance) enIt.next();
+        }
+        return null;
+    }
 
-                for (; entry != null; entry = (Instance) entry.getValueOfField("next")) { // NOI18N
-                    Instance key = (Instance) entry.getValueOfField("key"); // NOI18N
-                    Instance val = (Instance) entry.getValueOfField("value"); // NOI18N
-
-                    if (key != null) {
-                        props.setProperty(getString(key), getString(val));
-                    }
+    private static Properties getPropertiesFromTable(ObjectArrayDump entriesObj, Properties props, String keyName, String valueName) {
+        Iterator enIt = entriesObj.getValues().iterator();
+        while (enIt.hasNext()) {
+            Instance entry = (Instance) enIt.next();
+            
+            for (; entry != null; entry = (Instance) entry.getValueOfField("next")) { // NOI18N
+                Instance key = (Instance) entry.getValueOfField(keyName);
+                Instance val = (Instance) entry.getValueOfField(valueName);
+                if (key != null) {
+                    props.setProperty(getString(key), getString(val));
                 }
             }
-
-            return props;
         }
- 
-        return null;
+        
+        return props;
     }
 
     static String getString(Instance stringInstance) {

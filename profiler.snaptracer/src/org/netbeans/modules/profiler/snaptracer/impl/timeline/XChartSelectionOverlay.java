@@ -57,6 +57,7 @@ import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.charts.ChartConfigurationListener;
 import org.netbeans.lib.profiler.charts.ChartContext;
@@ -313,76 +314,41 @@ public class XChartSelectionOverlay extends ChartOverlay {
     }
 
     private void rectBoundsChanged(Rectangle newBounds, Rectangle oldBounds, int lineW) {
-        if (newBounds != null && oldBounds != null) {
-            int x = newBounds.x + newBounds.width;
-            int y = newBounds.y + newBounds.height;
-
+        if (Objects.equals(newBounds, oldBounds)) return; // No change, return
+        
+        if (newBounds != null && oldBounds != null) { // Updating changed selection
             if (renderingOptimized) { // Painting just selection changes
-                int selX = newBounds.x;
-                int selY = newBounds.y;
-
-                int oldX = oldBounds.x + oldBounds.width;
-                int oldY = oldBounds.y + oldBounds.height;
-
-                int dx = Math.min(x, oldX);
-                int dwidth = Math.max(x, oldX) - dx;
-                int dy = Math.min(y, oldY);
-                int dheight = Math.max(y, oldY) - dy;
-
-                boolean crossX = oldBounds.width * newBounds.width < 0;
-                boolean crossY = oldBounds.height * newBounds.height < 0;
-
-                if (crossX || crossY) {
-                    // Cross-quadrant move
-                    if (crossX && !crossY) {
-                        int cheight = oldBounds.height < 0 ?
-                              Math.min(oldBounds.height, newBounds.height) :
-                              Math.max(oldBounds.height, newBounds.height);
-                        paintRect(dx, selY, dwidth, cheight, lineW);
-                    } else if (!crossX && crossY) {
-                        int cwidth = oldBounds.width < 0 ?
-                                Math.min(oldBounds.width, newBounds.width) :
-                                Math.max(oldBounds.width, newBounds.width);
-                        paintRect(selX, dy, cwidth, dheight, lineW);
-                    } else {
-                        paintRect(dx, dy, dwidth, dheight, lineW);
-                    }
+                if (newBounds.x == oldBounds.x) {
+                    int x1 = Math.min(newBounds.x + newBounds.width, oldBounds.x + oldBounds.width);
+                    int x2 = Math.max(newBounds.x + newBounds.width, oldBounds.x + oldBounds.width);
+                    paintRect(x1, 0, x2 - x1, getHeight(), lineW);
+                } else if (newBounds.x + newBounds.width == oldBounds.x + oldBounds.width) {
+                    int x1 = Math.min(newBounds.x, oldBounds.x);
+                    int x2 = Math.max(newBounds.x, oldBounds.x);
+                    paintRect(x1, 0, x2 - x1, getHeight(), lineW);
                 } else {
-                    // Move within the same quadrant
-                    if (selX <= x) {
-                        if (selY <= y) {
-                            paintRect(dx, selY, dwidth, dy - selY + dheight, lineW);
-                            paintRect(selX, dy, dx - selX + dwidth, dheight, lineW);
-                        } else {
-                            paintRect(dx, dy, dwidth, selY - dy, lineW);
-                            paintRect(selX, dy, dx - selX, dheight, lineW);
-                        }
-                    } else {
-                        if (selY <= y) {
-                            paintRect(dx, selY, dwidth, dy - selY + dheight, lineW);
-                            paintRect(dx + dwidth, dy, selX - dx, dheight, lineW);
-                        } else {
-                            paintRect(dx, dy, dwidth, selY - dy, lineW);
-                            paintRect(dx + dwidth, dy, selX - dx - dwidth, dheight, lineW);
-                        }
-                    }
+                    int x1 = Math.min(newBounds.x, oldBounds.x);
+                    int x2 = Math.max(newBounds.x + newBounds.width, oldBounds.x + oldBounds.width);
+                    paintRect(x1, 0, x2 - x1, getHeight(), lineW);
                 }
             } else { // Painting whole selection area
-                Rectangle oldB = normalizeRect(oldBounds, lineW);
-                Rectangle newB = normalizeRect(new Rectangle(newBounds), lineW);
-                repaint(oldB.union(newB));
+                int x1 = Math.min(newBounds.x, oldBounds.x);
+                int x2 = Math.max(newBounds.x + newBounds.width, oldBounds.x + oldBounds.width);
+                paintRect(x1, 0, x2 - x1, getHeight(), lineW);
             }
-            return;
+        } else if (oldBounds != null) { // Clearing old selection
+            paintRect(oldBounds.x, oldBounds.y, oldBounds.width, oldBounds.height, lineW);
+        } else if (newBounds != null) { // Painting new selection
+            paintRect(newBounds.x, newBounds.y, newBounds.width, newBounds.height, lineW);
         }
-
-        if (oldBounds != null)
-            paintImmediately(normalizeRect(new Rectangle(oldBounds), lineW));
-        else if (newBounds != null)
-            paintImmediately(normalizeRect(new Rectangle(newBounds), lineW));
     }
 
     private void paintRect(int x, int y, int w, int h, int t) {
-        paintImmediately(normalizeRect(new Rectangle(x, y, w, h), t));
+        if (w != 0 && h != 0) {
+            Rectangle rect = new Rectangle(x, y, w, h);
+            rect.grow(t, t);
+            paintImmediately(rect);
+        }
     }
 
 

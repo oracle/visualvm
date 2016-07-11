@@ -106,7 +106,7 @@ public class OQLEditor extends JPanel {
                 }
             });
         } else {
-            queryEditor = new JEditorPane("text/x-oql", "") { // NOI18N
+            queryEditor = new JEditorPane() {
                 public void setText(String text) {
                     Document doc = getDocument();
                     if (doc != null) doc.removeDocumentListener(listener);
@@ -116,6 +116,12 @@ public class OQLEditor extends JPanel {
                     super.setText(text);
                 }
             };
+            
+            // #262619 (workaround for JDK9 bug)
+            try {
+                queryEditor.setContentType("text/x-oql"); // NOI18N
+            } catch (NullPointerException e) {}
+            
             int fontsize = new JTextArea().getFont().getSize();
             queryEditor.setFont(new Font("Monospaced", Font.PLAIN, fontsize)); // NOI18N
             lexervalid = true; // no lexer info available; assume the lexing info is valid
