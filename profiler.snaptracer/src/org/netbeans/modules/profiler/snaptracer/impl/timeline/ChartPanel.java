@@ -67,6 +67,7 @@ import org.netbeans.lib.profiler.charts.ChartSelectionModel;
 import org.netbeans.lib.profiler.charts.Timeline;
 import org.netbeans.lib.profiler.charts.swing.Utils;
 import org.netbeans.lib.profiler.charts.xy.synchronous.SynchronousXYItemsModel;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.snaptracer.impl.icons.TracerIcons;
@@ -117,7 +118,7 @@ final class ChartPanel extends JPanel {
 
         boolean speed = Utils.forceSpeed();
 
-        chart.setBackground(Color.WHITE);
+        chart.setBackground(!UIUtils.isDarkResultsBackground() ? Color.WHITE : new Color(70, 70, 70));
         if (speed && TracerOptions.getInstance().isRowsSelectionEnabled())
             chart.addPreDecorator(new RowBackgroundDecorator(chart));
         chart.addPreDecorator(new RowBoundsDecorator(chart));

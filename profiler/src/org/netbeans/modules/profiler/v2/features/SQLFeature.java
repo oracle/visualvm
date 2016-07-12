@@ -62,7 +62,6 @@ import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.swing.PopupButton;
 import org.netbeans.lib.profiler.ui.swing.SmallButton;
@@ -175,7 +174,8 @@ final class SQLFeature extends ProfilerFeature.Basic {
     // --- Settings ------------------------------------------------------------
     
     public boolean supportsSettings(ProfilingSettings psettings) {
-        return !ProfilingSettings.isMemorySettings(psettings); // TODO: introduce isJDBCSettings()
+        return !ProfilingSettings.isCPUSettings(psettings) &&
+               !ProfilingSettings.isMemorySettings(psettings);
     }
 
     public void configureSettings(ProfilingSettings psettings) {
