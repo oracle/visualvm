@@ -309,7 +309,8 @@ final class MethodsFeature extends ProfilerFeature.Basic {
     // --- Settings ------------------------------------------------------------
     
     public boolean supportsSettings(ProfilingSettings psettings) {
-        return !ProfilingSettings.isMemorySettings(psettings);
+        return !ProfilingSettings.isMemorySettings(psettings) &&
+               !ProfilingSettings.isJDBCSettings(psettings);
     }
 
     public void configureSettings(ProfilingSettings psettings) {
