@@ -51,6 +51,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
 import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.snaptracer.TracerProbe;
 import org.netbeans.modules.profiler.snaptracer.TracerProbeDescriptor;
 
@@ -62,11 +63,18 @@ public final class ProbePresenter extends JLabel {
 
     private static final Color SELECTED_FILTER = new Color(0, 0, 200, 40);
     private static final float[] FRACTIONS = new float[] { 0.0f, 0.49f, 0.51f, 1.0f };
-    private static final Color[] COLORS = new Color[] { new Color(250, 251, 252, 120),
-                                                        new Color(237, 240, 242, 120),
-                                                        new Color(229, 233, 236, 125),
-                                                        new Color(215, 221, 226, 130) };
-    private static final Color BACKGROUND = UIManager.getColor("Panel.background"); // NOI18N
+    private static final Color[] COLORS = !UIUtils.isDarkResultsBackground() ?
+        new Color[] { new Color(250, 251, 252, 120),
+                      new Color(237, 240, 242, 120),
+                      new Color(229, 233, 236, 125),
+                      new Color(215, 221, 226, 130) } : 
+        new Color[] { new Color(050, 051, 052, 220),
+                      new Color(037, 040, 042, 220),
+                      new Color(29, 033, 036, 225),
+                      new Color(015, 021, 026, 230) };
+    
+    private static final Color BACKGROUND = !UIUtils.isDarkResultsBackground() ?
+            UIManager.getColor("Panel.background") : new Color(30, 30, 30); // NOI18N
 
     private LinearGradientPaint gradientPaint;
 

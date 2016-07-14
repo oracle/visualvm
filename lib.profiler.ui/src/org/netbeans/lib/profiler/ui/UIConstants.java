@@ -54,7 +54,8 @@ public interface UIConstants {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     /** Color used to draw vertical gridlines in JTables */
-    public static final Color TABLE_VERTICAL_GRID_COLOR = new Color(214, 223, 247); //Color.LIGHT_GRAY;
+    public static final Color TABLE_VERTICAL_GRID_COLOR = !UIUtils.isDarkResultsBackground() ?
+                              new Color(214, 223, 247) : new Color(84, 93, 117);
 
     /** if true, results tables display the horizontal grid lines */
     public static final boolean SHOW_TABLE_HORIZONTAL_GRID = false;

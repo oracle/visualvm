@@ -270,7 +270,8 @@ final class ObjectsFeature extends ProfilerFeature.Basic {
     // --- Settings ------------------------------------------------------------
     
     public boolean supportsSettings(ProfilingSettings psettings) {
-        return !ProfilingSettings.isCPUSettings(psettings);
+        return !ProfilingSettings.isCPUSettings(psettings) &&
+               !ProfilingSettings.isJDBCSettings(psettings);
     }
 
     public void configureSettings(ProfilingSettings psettings) {
