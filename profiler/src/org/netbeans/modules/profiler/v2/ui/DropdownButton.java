@@ -290,24 +290,47 @@ public class DropdownButton extends JPanel {
         }
     }
     
+    private boolean wasIn;
     private void processChildMouseEvent(MouseEvent e) {
-        if (e.getX() >= getWidth() - POPUP_EXTENT && contains(e.getX(), e.getY())) {
-            if (exposePopup()) {
-                button.processEventImpl(fromEvent((MouseEvent)e, button, MouseEvent.MOUSE_EXITED));
-                popup.processEventImpl(fromEvent((MouseEvent)e, popup, MouseEvent.MOUSE_ENTERED));
-            } else {
-                popup.processEventImpl(e);
-            }
-            if (e.getID() == MouseEvent.MOUSE_MOVED) ToolTipManager.sharedInstance().mouseMoved(fromEvent((MouseEvent)e, popup, MouseEvent.MOUSE_MOVED));
-        } else {
-            if (exposeButton()) {
-                popup.processEventImpl(fromEvent((MouseEvent)e, popup, MouseEvent.MOUSE_EXITED));
-                if (contains(e.getX(), e.getY())) button.processEventImpl(fromEvent((MouseEvent)e, button, MouseEvent.MOUSE_ENTERED));
-            } else {
-                button.processEventImpl(e);
-            }
-            if (e.getID() == MouseEvent.MOUSE_MOVED) ToolTipManager.sharedInstance().mouseMoved(fromEvent((MouseEvent)e, button, MouseEvent.MOUSE_MOVED));
+        boolean isIn = contains(e.getX(), e.getY());
+        boolean isPopupSide = e.getX() >= getWidth() - POPUP_EXTENT;
+        
+        switch (e.getID()) {
+            case MouseEvent.MOUSE_ENTERED:
+                if (!wasIn) {
+                    button.processEventImpl(fromEvent((MouseEvent)e, button, MouseEvent.MOUSE_ENTERED));
+                    popup.processEventImpl(fromEvent((MouseEvent)e, popup, MouseEvent.MOUSE_ENTERED));
+                }
+                break;
+            case MouseEvent.MOUSE_EXITED:
+                if (!isIn) {
+                    popup.processEventImpl(fromEvent((MouseEvent)e, popup, MouseEvent.MOUSE_EXITED));
+                    button.processEventImpl(fromEvent((MouseEvent)e, button, MouseEvent.MOUSE_EXITED));
+                    exposeButton();
+                }
+                break;
+            case MouseEvent.MOUSE_MOVED:
+                if (isPopupSide) {
+                    exposePopup();
+                    MouseEvent ee = fromEvent((MouseEvent)e, popup, MouseEvent.MOUSE_MOVED);
+                    popup.processEventImpl(ee);
+                    ToolTipManager.sharedInstance().mouseMoved(ee);
+                } else {
+                    exposeButton();
+                    MouseEvent ee = fromEvent((MouseEvent)e, button, MouseEvent.MOUSE_MOVED);
+                    button.processEventImpl(ee);
+                    ToolTipManager.sharedInstance().mouseMoved(ee);
+                }
+                break;
+            default:
+                if (isPopupSide) {
+                    popup.processEventImpl(e);
+                } else {
+                    button.processEventImpl(e);
+                }
         }
+        
+        wasIn = isIn;
     }
     
     private static MouseEvent fromEvent(MouseEvent e, Component source, int id) {
