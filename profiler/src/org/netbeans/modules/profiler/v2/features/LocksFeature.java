@@ -152,9 +152,10 @@ final class LocksFeature extends ProfilerFeature.Basic {
             try {
                 ProfilingSettings settings = getSession().getProfilingSettings();
                 if (ProfilingSettings.isCPUSettings(settings)
+                   || ProfilingSettings.isJDBCSettings(settings)
                    || ProfilingSettings.isMemorySettings(settings)) {
                     // CPU or memory profiling will do refresh for us,
-                    // it will call ProfilerClinet.forceObtainedResultsDump()
+                    // it will call ProfilerClient.forceObtainedResultsDump()
                     return;
                 }
                 ui.refreshData();

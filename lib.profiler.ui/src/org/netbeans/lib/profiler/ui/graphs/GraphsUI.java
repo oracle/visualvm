@@ -175,7 +175,8 @@ public interface GraphsUI {
     public static final Color  USED_HEAP_MARKER_FILL_COLOR = PROFILER_BLUE;
     public static final long   USED_HEAP_INITIAL_VALUE = 16777216; // 16 MB
 
-    public static final Color  HEAP_LIMIT_FILL_COLOR = new Color(220, 220, 220);
+    public static final Color  HEAP_LIMIT_FILL_COLOR = !UIUtils.isDarkResultsBackground() ?
+                               new Color(220, 220, 220) : new Color(100, 100, 100);
 
     public static final float  SURVGEN_PAINTER_LINE_WIDTH = 2f;
     public static final Color  SURVGEN_PAINTER_LINE_COLOR = PROFILER_RED;

@@ -63,6 +63,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.ToolTipManager;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.GenericToolbar;
 import org.netbeans.lib.profiler.ui.swing.SmallButton;
@@ -289,22 +290,47 @@ public class DropdownButton extends JPanel {
         }
     }
     
+    private boolean wasIn;
     private void processChildMouseEvent(MouseEvent e) {
-        if (e.getX() >= getWidth() - POPUP_EXTENT && contains(e.getX(), e.getY())) {
-            if (exposePopup()) {
-                button.processEventImpl(fromEvent((MouseEvent)e, button, MouseEvent.MOUSE_EXITED));
-                popup.processEventImpl(fromEvent((MouseEvent)e, popup, MouseEvent.MOUSE_ENTERED));
-            } else {
-                popup.processEventImpl(e);
-            }
-        } else {
-            if (exposeButton()) {
-                popup.processEventImpl(fromEvent((MouseEvent)e, popup, MouseEvent.MOUSE_EXITED));
-                if (contains(e.getX(), e.getY())) button.processEventImpl(fromEvent((MouseEvent)e, button, MouseEvent.MOUSE_ENTERED));
-            } else {
-                button.processEventImpl(e);
-            }
+        boolean isIn = contains(e.getX(), e.getY());
+        boolean isPopupSide = e.getX() >= getWidth() - POPUP_EXTENT;
+        
+        switch (e.getID()) {
+            case MouseEvent.MOUSE_ENTERED:
+                if (!wasIn) {
+                    button.processEventImpl(fromEvent((MouseEvent)e, button, MouseEvent.MOUSE_ENTERED));
+                    popup.processEventImpl(fromEvent((MouseEvent)e, popup, MouseEvent.MOUSE_ENTERED));
+                }
+                break;
+            case MouseEvent.MOUSE_EXITED:
+                if (!isIn) {
+                    popup.processEventImpl(fromEvent((MouseEvent)e, popup, MouseEvent.MOUSE_EXITED));
+                    button.processEventImpl(fromEvent((MouseEvent)e, button, MouseEvent.MOUSE_EXITED));
+                    exposeButton();
+                }
+                break;
+            case MouseEvent.MOUSE_MOVED:
+                if (isPopupSide) {
+                    exposePopup();
+                    MouseEvent ee = fromEvent((MouseEvent)e, popup, MouseEvent.MOUSE_MOVED);
+                    popup.processEventImpl(ee);
+                    ToolTipManager.sharedInstance().mouseMoved(ee);
+                } else {
+                    exposeButton();
+                    MouseEvent ee = fromEvent((MouseEvent)e, button, MouseEvent.MOUSE_MOVED);
+                    button.processEventImpl(ee);
+                    ToolTipManager.sharedInstance().mouseMoved(ee);
+                }
+                break;
+            default:
+                if (isPopupSide) {
+                    popup.processEventImpl(e);
+                } else {
+                    button.processEventImpl(e);
+                }
         }
+        
+        wasIn = isIn;
     }
     
     private static MouseEvent fromEvent(MouseEvent e, Component source, int id) {
@@ -314,34 +340,14 @@ public class DropdownButton extends JPanel {
     
     private boolean exposeButton() {
         if (container.getComponent(0) == button) return false;
-        Component c = button.isEnabled() ? button : popup;
-        boolean focus = c.isFocusOwner();
-        if (focus) {
-            setFocusable(true);
-            requestFocusInWindow();
-        }
-        container.add(popup);
-        if (focus) {
-            c.requestFocusInWindow();
-            setFocusable(false);
-        }
+        container.setComponentZOrder(button, 0);
         repaint();
         return true;
     }
     
     private boolean exposePopup() {
         if (container.getComponent(0) == popup) return false;
-        Component c = button.isEnabled() ? button : popup;
-        boolean focus = c.isFocusOwner();
-        if (focus) {
-            setFocusable(true);
-            requestFocusInWindow();
-        }
-        container.add(button);
-        if (focus) {
-            c.requestFocusInWindow();
-            setFocusable(false);
-        }
+        container.setComponentZOrder(popup, 0);
         repaint();
         return true;
     }
