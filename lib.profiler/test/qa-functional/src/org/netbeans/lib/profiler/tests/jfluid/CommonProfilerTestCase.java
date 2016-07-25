@@ -434,6 +434,8 @@ public abstract class CommonProfilerTestCase extends NbTestCase {
             settings.setTargetJDKVersionString(CommonConstants.JDK_18_STRING);
         } else if (vers.startsWith("1.9")) {
             settings.setTargetJDKVersionString(CommonConstants.JDK_19_STRING);
+        } else if (vers.startsWith("9")) {
+            settings.setTargetJDKVersionString(CommonConstants.JDK_19_STRING);
         }
 
         String home = System.getProperty("java.home");
