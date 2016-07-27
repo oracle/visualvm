@@ -737,6 +737,8 @@ public class ProfilerInterface implements CommonConstants {
             int classLoaderId = loadedClassesLoaders[i];
             String name = loadedClass.getName();
             
+            // At the client side we treat classes loaded by the bootstrap and by the system classloaders in the same way
+            if (classLoaderId == -1) classLoaderId = 0;
             for (int j = 0; j < classNames.length; j++) {
                 if (classLoaderIds[j] == classLoaderId && classNames[j].equals(name)) {
                     classes[j] = loadedClass;
