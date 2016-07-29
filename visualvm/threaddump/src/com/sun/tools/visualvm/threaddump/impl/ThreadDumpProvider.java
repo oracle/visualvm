@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.snapshot.Snapshot;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
@@ -81,7 +82,7 @@ public class ThreadDumpProvider {
                     try {
                         final ThreadDumpImpl threadDump = new ThreadDumpImpl(jvm.takeThreadDump(), application);
                         application.getRepository().addDataSource(threadDump);
-                        if (openView) SwingUtilities.invokeLater(new Runnable() {
+                        if (openView) DataSource.EVENT_QUEUE.post(new Runnable() {
                             public void run() { DataSourceWindowManager.sharedInstance().openDataSource(threadDump); }
                         });
                     } catch (IOException ex) {
@@ -117,7 +118,7 @@ public class ThreadDumpProvider {
                             os.close();
                             final ThreadDumpImpl threadDump = new ThreadDumpImpl(dumpFile, coreDump);
                             coreDump.getRepository().addDataSource(threadDump);
-                            if (openView) SwingUtilities.invokeLater(new Runnable() {
+                            if (openView) DataSource.EVENT_QUEUE.post(new Runnable() {
                                 public void run() { DataSourceWindowManager.sharedInstance().openDataSource(threadDump); }
                             });
                         } catch (Exception ex) {

@@ -149,7 +149,7 @@ class ApplicationSnapshotProvider {
         SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
         
         if (openSnapshot && DataSourceWindowManager.sharedInstance().canOpenDataSource(snapshot))
-            DataSourceWindowManager.sharedInstance().openDataSource(snapshot);
+            DataSourceWindowManager.sharedInstance().openDataSource(snapshot); // TODO: check #VISUALVM-636
     }
     
     private static String getDisplayNameSuffix(Application application) {
@@ -198,7 +198,7 @@ class ApplicationSnapshotProvider {
                         if (persistent) SnapshotsContainer.sharedInstance().getRepository().addDataSource(snapshot);
                         if (openSnapshot) {
                             if (DataSourceWindowManager.sharedInstance().canOpenDataSource(snapshot)) {
-                                DataSourceWindowManager.sharedInstance().openDataSource(snapshot);
+                                DataSourceWindowManager.sharedInstance().openDataSource(snapshot); // TODO: check #VISUALVM-636
                             } else {
                                 DialogDisplayer.getDefault().notifyLater(
                                         new NotifyDescriptor.Message(NbBundle.

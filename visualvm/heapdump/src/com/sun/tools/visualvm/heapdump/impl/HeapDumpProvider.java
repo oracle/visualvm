@@ -98,7 +98,7 @@ public class HeapDumpProvider {
                         if (file != null && file.isFile()) {
                             final HeapDumpImpl heapDump = new HeapDumpImpl(file, application);
                             application.getRepository().addDataSource(heapDump);
-                            if (openView) SwingUtilities.invokeLater(new Runnable() {
+                            if (openView) DataSource.EVENT_QUEUE.post(new Runnable() {
                                 public void run() { DataSourceWindowManager.sharedInstance().openDataSource(heapDump); }
                             });
                         } else {
@@ -238,7 +238,7 @@ public class HeapDumpProvider {
                         if (saAget.takeHeapDump(dumpFile.getAbsolutePath())) {
                             final HeapDumpImpl heapDump = new HeapDumpImpl(dumpFile, coreDump);
                             coreDump.getRepository().addDataSource(heapDump);
-                            if (openView) SwingUtilities.invokeLater(new Runnable() {
+                            if (openView) DataSource.EVENT_QUEUE.post(new Runnable() {
                                 public void run() { DataSourceWindowManager.sharedInstance().openDataSource(heapDump); }
                             });
                         } else {

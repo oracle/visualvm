@@ -37,7 +37,6 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import javax.swing.SwingUtilities;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -50,7 +49,7 @@ final class ProfilerSnapshotProvider {
     void createSnapshot(File snapshotFile, Application application, final boolean openView) {
         final ProfilerSnapshot snapshot = ProfilerSnapshot.createSnapshot(snapshotFile, application);
         application.getRepository().addDataSource(snapshot);
-        if (openView) SwingUtilities.invokeLater(new Runnable() {
+        if (openView) DataSource.EVENT_QUEUE.post(new Runnable() {
             public void run() {
                 DataSourceWindowManager.sharedInstance().openDataSource(snapshot);
             }

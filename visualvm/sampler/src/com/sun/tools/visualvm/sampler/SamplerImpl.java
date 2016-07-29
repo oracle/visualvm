@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.HeapHistogram;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.jvm.JvmFactory;
+import com.sun.tools.visualvm.core.datasource.DataSource;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.datasupport.Utils;
@@ -509,10 +510,13 @@ final class SamplerImpl {
                                     LOGGER.log(Level.WARNING, "Failed to save profiler snapshot for " + application, t); // NOI18N
                                 }
                                 if (ls != null) {
-                                    ProfilerSnapshot ps = ProfilerSnapshot.createSnapshot(ls.getFile(), application);
+                                    final ProfilerSnapshot ps = ProfilerSnapshot.createSnapshot(ls.getFile(), application);
                                     application.getRepository().addDataSource(ps);
-                                    if (openView)
-                                        DataSourceWindowManager.sharedInstance().openDataSource(ps);
+                                    if (openView) DataSource.EVENT_QUEUE.post(new Runnable() {
+                                        public void run() {
+                                            DataSourceWindowManager.sharedInstance().openDataSource(ps);
+                                        }
+                                    });
                                 }
                             }
                         });
@@ -707,10 +711,13 @@ final class SamplerImpl {
                                     }
                                 }
                                 if (ls != null) {
-                                    ProfilerSnapshot ps = ProfilerSnapshot.createSnapshot(ls.getFile(), application);
+                                    final ProfilerSnapshot ps = ProfilerSnapshot.createSnapshot(ls.getFile(), application);
                                     application.getRepository().addDataSource(ps);
-                                    if (openView)
-                                        DataSourceWindowManager.sharedInstance().openDataSource(ps);
+                                    if (openView) DataSource.EVENT_QUEUE.post(new Runnable() {
+                                        public void run() {
+                                            DataSourceWindowManager.sharedInstance().openDataSource(ps);
+                                        }
+                                    });
                                 }
                             }
                         });
