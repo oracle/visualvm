@@ -82,11 +82,16 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             add(multiViewContainer, BorderLayout.CENTER);
             tabbedContainer.addViewTab(dataSource, singleViewContainer.getView());
             tabbedContainer.addViewTab(dataSource, view);
+// Use after switching to new implementation of DataSourceWindowTabbedPane
+//            tabbedContainer.addView(dataSource, singleViewContainer.getView());
+//            tabbedContainer.addView(dataSource, view);
             doLayout();
             singleViewContainer.getCaption().finish();
             singleViewContainer = null;
         } else {
             tabbedContainer.addViewTab(dataSource, view);
+// Use after switching to new implementation of DataSourceWindowTabbedPane
+//            tabbedContainer.addView(dataSource, view);
         }
         viewsCount++;
         view.addPropertyChangeListener(WeakListeners.propertyChange(alertListener,view));
@@ -97,6 +102,8 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             int viewIndex = indexOf(view);
             if (viewIndex == -1) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this);   // NOI18N
             else tabbedContainer.setSelectedIndex(viewIndex);
+// Use after switching to new implementation of DataSourceWindowTabbedPane
+//            else tabbedContainer.setViewIndex(viewIndex);
         }
     }
     
@@ -110,11 +117,15 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             int viewIndex = indexOf(view);
             if (viewIndex == -1) throw new RuntimeException("View " + view + " not present in DataSourceWindow " + this);   // NOI18N
             else tabbedContainer.removeTabAt(viewIndex);
+// Use after switching to new implementation of DataSourceWindowTabbedPane
+//            else tabbedContainer.removeView(viewIndex);
             
             if (viewsCount == 2) {
                 singleViewContainer = new DataSourceWindowTabbedPane.ViewContainer(new DataSourceCaption(dataSource), tabbedContainer.getViews().iterator().next());
                 remove(multiViewContainer);
                 tabbedContainer.removeTabAt(0);
+// Use after switching to new implementation of DataSourceWindowTabbedPane
+//                tabbedContainer.removeView(0);
                 add(singleViewContainer, BorderLayout.CENTER);
                 doLayout();
             }
@@ -182,6 +193,9 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             });
         } else if (DataSourceWindowTabbedPane.PROP_CLOSE.equals(propertyName)) {
             removeView(tabbedContainer.getDataSourceView((DataSourceWindowTabbedPane.ViewContainer)evt.getNewValue()));
+// Use after switching to new implementation of DataSourceWindowTabbedPane
+//        } else if (tabbedContainer.isCloseEvent(evt)) {
+//            removeView(tabbedContainer.getView((DataSourceWindowTabbedPane.ViewContainer)evt.getNewValue()));
         }
     }
     
@@ -201,6 +215,8 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
         // tabbedContainer
         tabbedContainer = new DataSourceWindowTabbedPane();
         tabbedContainer.addPropertyChangeListener(DataSourceWindowTabbedPane.PROP_CLOSE, this);
+// Use after switching to new implementation of DataSourceWindowTabbedPane
+//        tabbedContainer.addCloseListener(this);
 
         // multiViewContainer
         multiViewContainer = new JPanel(new BorderLayout());
@@ -217,6 +233,8 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
         int viewIndex = tabbedContainer.indexOfView(view);
         
         tabbedContainer.setBackgroundAt(viewIndex,getAlertColor(alert));
+// Use after switching to new implementation of DataSourceWindowTabbedPane
+//        tabbedContainer.setViewBackground(viewIndex,getAlertColor(alert));
         if (alert != Alert.OK) {
             requestAttention(false);
         } else if (getApplicationAlert(alert) == Alert.OK) {

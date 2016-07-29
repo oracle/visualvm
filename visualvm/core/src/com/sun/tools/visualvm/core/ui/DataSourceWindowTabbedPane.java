@@ -32,7 +32,6 @@ import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Insets;
@@ -186,12 +185,21 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   public void setTitleAt(int idx, String title) {
     ViewContainer container = (ViewContainer)getComponentAt(idx);
     if (container.getView().isClosable()) {
-      String nue = title.indexOf("</html>") != -1 ? // NOI18N
-        title.replace("</html>", "&nbsp;&nbsp;</html>") // NOI18N
-        : title + "  "; // NOI18N
-      if (!title.equals(getTitleAt(idx))) {
+        String nue;
+        if (isWindows8LaF() || isWindows10LaF()) {
+            nue = title.indexOf("</html>") != -1 ? // NOI18N
+            title.replace("</html>", "&nbsp;&nbsp;&nbsp;&nbsp;</html>") // NOI18N
+            : title + "    "; // NOI18N
+        } else if (isWindowsVistaLaF()) {
+            nue = title.indexOf("</html>") != -1 ? // NOI18N
+            title.replace("</html>", "&nbsp;&nbsp;&nbsp;</html>") // NOI18N
+            : title + "   "; // NOI18N
+        } else {
+            nue = title.indexOf("</html>") != -1 ? // NOI18N
+            title.replace("</html>", "&nbsp;&nbsp;</html>") // NOI18N
+            : title + "  "; // NOI18N
+        }
         super.setTitleAt(idx, nue);
-      }
     } else {
       super.setTitleAt(idx, title);
     }
@@ -222,14 +230,20 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
       if (b.width == 0 || b.height == 0) {
         return null;
       }
-      if( (isWindowsVistaLaF() || isWindowsXPLaF() || isWindowsLaF()) && i == getSelectedIndex() ) {
+      if( (isWindows8LaF() || isWindows10LaF()) && i == getSelectedIndex() ) {
+        b.x -= 5;
+        b.y -= 3;
+      } else if( isWindows8LaF() || isWindows10LaF() ) {
+        b.x -= 4;
+        b.y -= 1;
+      } else if( (isWindowsVistaLaF() || isWindowsXPLaF() || isWindowsLaF()) && i == getSelectedIndex() ) {
         b.x -= 3;
         b.y -= 2;
       } else if( isWindowsXPLaF() || isWindowsLaF() || isAquaLaF() ) {
         b.x -= 2;
       }
       if( i == getTabCount()-1 ) {
-        if( isMetalLaF() )
+        if( isMetalLaF() || isWindows8LaF() || isWindows10LaF() )
           b.x--;
         else if( isAquaLaF() )
           b.x -= 3;
@@ -242,31 +256,65 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   }
   
   
-  private boolean isWindowsVistaLaF() {
-    String osName = System.getProperty("os.name");  // NOI18N
-    return osName.indexOf("Vista") >= 0     // NOI18N
-      || (osName.equals( "Windows NT (unknown)" ) && "6.0".equals( System.getProperty("os.version") ));  // NOI18N
-  }
-  
-  private boolean isWindowsXPLaF() {
-    Boolean isXP = (Boolean)Toolkit.getDefaultToolkit().
-      getDesktopProperty("win.xpstyle.themeActive"); // NOI18N
-    return isWindowsLaF() && (isXP == null ? false : isXP.booleanValue());
-  }
-  
-  private boolean isWindowsLaF() {
-    String lfID = UIManager.getLookAndFeel().getID();
-    return lfID.endsWith("Windows"); // NOI18N
-  }
-  
-  private boolean isAquaLaF() {
-    return "Aqua".equals( UIManager.getLookAndFeel().getID() );  // NOI18N
-  }
-  
-  private boolean isMetalLaF() {
-    String lfID = UIManager.getLookAndFeel().getID();
-    return "Metal".equals( lfID ); // NOI18N
-  }
+  private static boolean isWindowsVistaLaF() {
+        return isWindowsLaF() && (isWindowsVista() || isWindows7()) && isWindowsXPLaF();
+    }
+
+    private static boolean isWindows8LaF() {
+        return isWindowsLaF() && isWindows8() && isWindowsXPLaF();
+    }
+    
+    private static boolean isWindows10LaF() {
+        return isWindowsLaF() && isWindows10() && isWindowsXPLaF();
+    }
+
+    private static boolean isWindowsVista() {
+        String osName = System.getProperty ("os.name"); // NOI18N
+        return osName.indexOf("Vista") >= 0 // NOI18N
+            || (osName.equals( "Windows NT (unknown)" ) && "6.0".equals( System.getProperty("os.version") )); // NOI18N
+    }
+
+    private static boolean isWindows8() {
+        String osName = System.getProperty ("os.name"); // NOI18N
+        return osName.indexOf("Windows 8") >= 0 // NOI18N
+            || (osName.equals( "Windows NT (unknown)" ) && "6.2".equals( System.getProperty("os.version") )); // NOI18N
+    }
+    
+    private static boolean isWindows10() {
+        String osName = System.getProperty ("os.name"); // NOI18N
+        return osName.indexOf("Windows 10") >= 0 // NOI18N
+            || (osName.equals( "Windows NT (unknown)" ) && "10.0".equals( System.getProperty("os.version") )); // NOI18N
+    }
+
+    private static boolean isWindows7() {
+        String osName = System.getProperty ("os.name"); // NOI18N
+        return osName.indexOf("Windows 7") >= 0 // NOI18N
+            || (osName.equals( "Windows NT (unknown)" ) && "6.1".equals( System.getProperty("os.version") )); // NOI18N
+    }
+
+    private static boolean isWindowsXPLaF() {
+        Boolean isXP = (Boolean) Toolkit.getDefaultToolkit().
+                getDesktopProperty("win.xpstyle.themeActive"); //NOI18N
+        return isWindowsLaF() && (isXP == null ? false : isXP.booleanValue());
+    }
+
+    private static boolean isWindowsLaF() {
+        String lfID = UIManager.getLookAndFeel().getID();
+        return lfID.endsWith("Windows"); //NOI18N
+    }
+
+    private static boolean isAquaLaF() {
+        return "Aqua".equals(UIManager.getLookAndFeel().getID()); // NOI18N
+    }
+
+    private static boolean isGTKLaF () {
+        return "GTK".equals( UIManager.getLookAndFeel().getID() ); //NOI18N
+    }
+
+    private boolean isMetalLaF() {
+        String lfID = UIManager.getLookAndFeel().getID();
+        return "Metal".equals( lfID ); // NOI18N
+    }
   
   public void paint(Graphics g) {
     super.paint(g);
@@ -292,55 +340,85 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
   }
   
   private Image getCloseTabImage() {
-    if( null == closeTabImage ) {
-      if( isWindowsVistaLaF() ) {
-        closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/vista_close_enabled.png"); // NOI18N
-      } else if( isWindowsXPLaF() ) {
-        closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/xp_close_enabled.png"); // NOI18N
-      } else if( isWindowsLaF() ) {
-        closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/win_close_enabled.png"); // NOI18N
-      } else if( isAquaLaF() ) {
-        closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/mac_close_enabled.png"); // NOI18N
-      } else {
-        closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/metal_close_enabled.png"); // NOI18N
-      }
+        if( null == closeTabImage ) {
+            String path = UIManager.getString("nb.close.tab.icon.enabled.name" ); //NOI18N
+            if( null != path ) {
+                closeTabImage = ImageUtilities.loadImage(path, true); // NOI18N
+            }
+        }
+        if( null == closeTabImage ) {
+            if( isWindows8LaF() || isWindows10LaF() ) {
+                closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/win8_bigclose_enabled.png", true); // NOI18N
+            } else if( isWindowsVistaLaF() ) {
+                closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/vista_close_enabled.png", true); // NOI18N
+            } else if( isWindowsXPLaF() ) {
+                closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/xp_close_enabled.png", true); // NOI18N
+            } else if( isWindowsLaF() ) {
+                closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/win_close_enabled.png", true); // NOI18N
+            } else if( isAquaLaF() ) {
+                closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/mac_close_enabled.png", true); // NOI18N
+            } else if( isGTKLaF() ) {
+                closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/gtk_close_enabled.png", true); // NOI18N
+            } else {
+                closeTabImage = ImageUtilities.loadImage("org/openide/awt/resources/metal_close_enabled.png", true); // NOI18N
+            }
+        }
+        return closeTabImage;
     }
-    return closeTabImage;
-  }
-  
+
   private Image getCloseTabPressedImage() {
-    if( null == closeTabPressedImage ) {
-      if( isWindowsVistaLaF() ) {
-        closeTabPressedImage = ImageUtilities.loadImage("org/openide/awt/resources/vista_close_pressed.png"); // NOI18N
-      } else if( isWindowsXPLaF() ) {
-        closeTabPressedImage =ImageUtilities.loadImage("org/openide/awt/resources/xp_close_pressed.png"); // NOI18N
-      } else if( isWindowsLaF() ) {
-        closeTabPressedImage = ImageUtilities.loadImage("org/openide/awt/resources/win_close_pressed.png"); // NOI18N
-      } else if( isAquaLaF() ) {
-        closeTabPressedImage = ImageUtilities.loadImage("org/openide/awt/resources/mac_close_pressed.png"); // NOI18N
-      } else {
-        closeTabPressedImage = ImageUtilities.loadImage("org/openide/awt/resources/metal_close_pressed.png"); // NOI18N
-      }
+        if( null == closeTabPressedImage ) {
+            String path = UIManager.getString("nb.close.tab.icon.pressed.name" ); //NOI18N
+            if( null != path ) {
+                closeTabPressedImage = ImageUtilities.loadImage(path, true); // NOI18N
+            }
+        }
+        if( null == closeTabPressedImage ) {
+            if( isWindows8LaF() || isWindows10LaF() ) {
+                closeTabPressedImage = ImageUtilities.loadImage("org/openide/awt/resources/win8_bigclose_pressed.png", true); // NOI18N
+            } else if( isWindowsVistaLaF() ) {
+                closeTabPressedImage = ImageUtilities.loadImage("org/openide/awt/resources/vista_close_pressed.png", true); // NOI18N
+            } else if( isWindowsXPLaF() ) {
+                closeTabPressedImage = ImageUtilities.loadImage("org/openide/awt/resources/xp_close_pressed.png", true); // NOI18N
+            } else if( isWindowsLaF() ) {
+                closeTabPressedImage = ImageUtilities.loadImage("org/openide/awt/resources/win_close_pressed.png", true); // NOI18N
+            } else if( isAquaLaF() ) {
+                closeTabPressedImage = ImageUtilities.loadImage("org/openide/awt/resources/mac_close_pressed.png", true); // NOI18N
+            } else if( isGTKLaF() ) {
+                closeTabPressedImage = ImageUtilities.loadImage("org/openide/awt/resources/gtk_close_pressed.png", true); // NOI18N
+            } else {
+                closeTabPressedImage = ImageUtilities.loadImage("org/openide/awt/resources/metal_close_pressed.png", true); // NOI18N
+            }
+        }
+        return closeTabPressedImage;
     }
-    return closeTabPressedImage;
-  }
-  
+
   private Image getCloseTabMouseOverImage() {
-    if( null == closeTabMouseOverImage ) {
-      if( isWindowsVistaLaF() ) {
-        closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/vista_close_rollover.png"); // NOI18N
-      } else if( isWindowsXPLaF() ) {
-        closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/xp_close_rollover.png"); // NOI18N
-      } else if( isWindowsLaF() ) {
-        closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/win_close_rollover.png"); // NOI18N
-      } else if( isAquaLaF() ) {
-        closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/mac_close_rollover.png"); // NOI18N
-      } else {
-        closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/metal_close_rollover.png"); // NOI18N
-      }
+        if( null == closeTabMouseOverImage ) {
+            String path = UIManager.getString("nb.close.tab.icon.rollover.name" ); //NOI18N
+            if( null != path ) {
+                closeTabMouseOverImage = ImageUtilities.loadImage(path, true); // NOI18N
+            }
+        }
+        if( null == closeTabMouseOverImage ) {
+            if( isWindows8LaF() || isWindows10LaF() ) {
+                closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/win8_bigclose_rollover.png", true); // NOI18N
+            } else if( isWindowsVistaLaF() ) {
+                closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/vista_close_rollover.png", true); // NOI18N
+            } else if( isWindowsXPLaF() ) {
+                closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/xp_close_rollover.png", true); // NOI18N
+            } else if( isWindowsLaF() ) {
+                closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/win_close_rollover.png", true); // NOI18N
+            } else if( isAquaLaF() ) {
+                closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/mac_close_rollover.png", true); // NOI18N
+            } else if( isGTKLaF() ) {
+                closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/gtk_close_rollover.png", true); // NOI18N
+            } else {
+                closeTabMouseOverImage = ImageUtilities.loadImage("org/openide/awt/resources/metal_close_rollover.png", true); // NOI18N
+            }
+        }
+        return closeTabMouseOverImage;
     }
-    return closeTabMouseOverImage;
-  }
   
   private void setPressedCloseButtonIndex(int index) {
     if (pressedCloseButtonIndex == index)
@@ -604,5 +682,141 @@ class DataSourceWindowTabbedPane extends JTabbedPane {
       
       public DataViewComponent getViewComponent() { return viewComponent; }
   }
+  
+  
+// Cleaned-up version using public NetBeans API for closable tabs: TabbedPaneFactory.createCloseButtonTabbedPane()
+// Use once TabbedPaneFactory supports Windows 8+ close button icons
+//  private final JTabbedPane tabpane;
+//  
+//  
+//  DataSourceWindowTabbedPane() {
+//    super(new BorderLayout());
+//    
+//    tabpane = TabbedPaneFactory.createCloseButtonTabbedPane();
+//    tabpane.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);
+//      
+//    // Clear default border for fill up the entire DataSourceWindow
+//    tabpane.setOpaque(false);
+//    
+//    if (UIManager.getLookAndFeel().getID().equals("Aqua")) { // NOI18N
+//        tabpane.setBorder(BorderFactory.createEmptyBorder(0, -11, -13, -10));
+//    } else {
+//        tabpane.setBorder(BorderFactory.createEmptyBorder());
+//        Insets i = UIManager.getInsets("TabbedPane.contentBorderInsets"); // NOI18N
+//        if (i != null) tabpane.setBorder(BorderFactory.createEmptyBorder(0, -i.left, -i.bottom, -i.right));
+//    }
+//    
+//    add(tabpane, BorderLayout.CENTER);
+//  }
+//
+//
+//  public final boolean requestFocusInWindow() {
+//      Component sel = tabpane.getSelectedComponent();
+//      if (sel != null) return sel.requestFocusInWindow();
+//      else return super.requestFocusInWindow();
+//  }
+//  
+//  public void addView(DataSource dataSource, DataSourceView view) {
+//      ViewContainer container = new ViewContainer(new DataSourceCaption(dataSource), view);
+//      String viewName = view.getName();
+//      if (view.isClosable()) {
+//          if (viewName.indexOf("</html>") == -1) viewName += " "; // NOI18N
+//          else viewName.replace("</html>", "&nbsp;</html>"); // NOI18N
+//      }
+//      tabpane.addTab(viewName, new ImageIcon(view.getImage()), container);
+//  }
+//  
+//  public void removeView(int index) {
+//      ViewContainer container = (ViewContainer)tabpane.getComponentAt(index);
+//      tabpane.removeTabAt(index);
+//      container.getCaption().finish();
+//  }
+//  
+//  public DataSourceView getView(ViewContainer container) {
+//      return container.getView();
+//  }
+//  
+//  public int indexOfView(final DataSourceView view) {
+//      final int[] index = new int[1];
+//      index[0] = -1;
+//      UISupport.runInEventDispatchThreadAndWait(new Runnable() {
+//          public void run() {
+//              for (int i = 0; i < tabpane.getTabCount(); i++)
+//                  if (((ViewContainer)tabpane.getComponentAt(i)).getViewComponent() == view.getView()) index[0] = i;
+//          }
+//      });
+//      return index[0];
+//  }
+//  
+//  public Set<DataSourceView> getViews() {
+//      Set<DataSourceView> views = new HashSet();
+//      
+//      for (int i = 0; i < tabpane.getTabCount(); i++) {
+//          ViewContainer container = (ViewContainer)tabpane.getComponentAt(i);
+//          views.add(container.getView());
+//      }
+//      
+//      return views;
+//  }
+//  
+//  public void setViewIndex(int index) {
+//    tabpane.setSelectedIndex(index);
+//  }
+//  
+//  public void setViewBackground(int index, Color background) {
+//      tabpane.setBackgroundAt(index, background);
+//  }
+//  
+//  public void addCloseListener(PropertyChangeListener l) {
+//      tabpane.addPropertyChangeListener(TabbedPaneFactory.PROP_CLOSE, l);
+//  }
+//  
+//  public void removeCloseListener(PropertyChangeListener l) {
+//      tabpane.removePropertyChangeListener(TabbedPaneFactory.PROP_CLOSE, l);
+//  }
+//  
+//  public boolean isCloseEvent(PropertyChangeEvent evt) {
+//      return TabbedPaneFactory.PROP_CLOSE.equals(evt.getPropertyName());
+//  }
+//  
+//  
+//  static class ViewContainer extends JPanel {
+//      
+//      private DataSourceCaption caption;
+//      private DataSourceView view;
+//      private DataViewComponent viewComponent;
+//      
+//      public ViewContainer(DataSourceCaption caption, DataSourceView view) {
+//          Color backgroundColor = UISupport.getDefaultBackground();
+//
+//          this.caption = caption;
+//          this.view = view;
+//          this.viewComponent = view.getView();
+//          setLayout(new BorderLayout());
+//          setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, backgroundColor));
+//          setBackground(backgroundColor);
+//          setFocusable(false);
+//          
+//          add(viewComponent, BorderLayout.CENTER);
+//          if (caption != null) {
+//              caption.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+//              caption.setBackground(backgroundColor);
+//              add(caption, BorderLayout.NORTH);
+//          }
+//          
+//          putClientProperty(TabbedPaneFactory.NO_CLOSE_BUTTON, !view.isClosable());
+//      }
+//
+//      public final boolean requestFocusInWindow() {
+//        if (getComponentCount() > 0) return getComponent(0).requestFocusInWindow();
+//        else return super.requestFocusInWindow();
+//      }
+//      
+//      public DataSourceCaption getCaption() { return caption; }
+//      
+//      public DataSourceView getView() { return view; }
+//      
+//      public DataViewComponent getViewComponent() { return viewComponent; }
+//  }
   
 }
