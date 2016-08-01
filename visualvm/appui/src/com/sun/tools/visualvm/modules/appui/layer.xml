@@ -166,16 +166,7 @@
             <attr name="position" intvalue="2000"/>
         </file>
     </folder>
-    <folder name="OptionsExport">
-        <folder name="Advanced">
-            <file name="Files_hidden"/>
-            <file name="Toolbars_hidden"/>
-        </folder>
-        <folder name="General">
-            <file name="General_hidden"/>
-            <file name="Other_hidden"/>
-        </folder>
-    </folder>
+    <file name="OptionsExport_hidden"/>
     <folder name="Services">
         <folder name="JavaHelp">
             <file name="org-netbeans-modules-profiler-helpset.xml_hidden"/>
