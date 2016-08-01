@@ -133,7 +133,18 @@
             <file name="CloneDocumentAction.shadow_hidden"/>
             <file name="CloseAllButThisAction.shadow_hidden"/>
             <file name="CloseAllDocumentsAction.shadow_hidden"/>
+            <folder name="ConfigureWindow">
+                <file name="CloneDocumentAction.shadow_hidden"/>
+                <file name="CollapseDocumentTabGroupAction.shadow_hidden"/>
+                <file name="NewDocumentTabGroupAction.shadow_hidden"/>
+                <file name="Separator1.instance_hidden"/>
+                <file name="org-netbeans-core-multiview-SplitAction.instance_hidden"/>
+                <file name="org-netbeans-core-windows-actions-DockModeAction.shadow_hidden"/>
+                <file name="org-netbeans-core-windows-actions-MinimizeModeAction.shadow_hidden"/>
+                <file name="org-netbeans-core-windows-actions-UndockModeAction.shadow_hidden"/>
+            </folder>
             <file name="DocumentsAction.shadow_hidden"/>
+            <file name="GroupsMenuAction.shadow_hidden"/>
             <file name="Output_hidden"/>
             <file name="Profile_hidden"/>
             <file name="ProgressListAction.shadow_hidden"/>
