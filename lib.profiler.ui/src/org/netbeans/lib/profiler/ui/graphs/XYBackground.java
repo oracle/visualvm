@@ -51,6 +51,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import org.netbeans.lib.profiler.charts.swing.Utils;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
@@ -58,8 +59,10 @@ import org.netbeans.lib.profiler.charts.swing.Utils;
  */
 class XYBackground implements ChartDecorator {
 
-    private static final Color GRADIENT_TOP = new Color(240, 240, 240);
-    private static final Color GRADIENT_BOTTOM = new Color(250, 250, 250);
+    private static final Color GRADIENT_TOP = !UIUtils.isDarkResultsBackground() ?
+                               new Color(240, 240, 240) : new Color(60, 60, 60);
+    private static final Color GRADIENT_BOTTOM = !UIUtils.isDarkResultsBackground() ?
+                               new Color(250, 250, 250) : new Color(75, 75, 75);
 
     public void paint(Graphics2D g, Rectangle dirtyArea, ChartContext context) {
         if (Utils.forceSpeed()) g.setPaint(GRADIENT_BOTTOM);
