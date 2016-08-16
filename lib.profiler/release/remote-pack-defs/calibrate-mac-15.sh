@@ -42,11 +42,11 @@
 # Version 2 license, then the option applies only if the new code is
 # made subject to such option by the copyright holder.
 
-# This script expects JAVA_HOME to point to the correct JDK 5.0 installation
+# This script expects JAVA_HOME to point to the correct JDK 5.0+ installation
 # In case you need to customize it, please uncomment and modify the following lines
 
-JAVA_HOME=/Library/Java/Home
-export JAVA_HOME
+#JAVA_HOME=/Library/Java/Home
+#export JAVA_HOME
 
 OLD_PWD=`pwd`
 cd `dirname $0`
