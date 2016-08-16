@@ -48,9 +48,10 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.text.MessageFormat;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -62,6 +63,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.tree.TreeNode;
@@ -121,6 +123,8 @@ public abstract class SnapshotCPUView extends JPanel {
     
     private JToggleButton[] toggles;
     private JToggleButton compareButton;
+    
+    private ExecutorService executor;
     
     
     public SnapshotCPUView(CPUResultsSnapshot snapshot, boolean sampled, Action saveAction, Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
@@ -582,17 +586,25 @@ public abstract class SnapshotCPUView extends JPanel {
     private void setAggregation(int _aggregation) {
         aggregation = _aggregation;
         
-        CPUResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
-                                       snapshot.createDiff(refSnapshot);
-        
-        final FlatProfileContainer flatData = _snapshot.getFlatProfile(selectedThreads, aggregation);
-        
-        final Map<Integer, ClientUtils.SourceCodeSelection> idMap = _snapshot.getMethodIDMap(aggregation);
+        getExecutor().submit(new Runnable() {
+            public void run() {
+                final CPUResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
+                                               snapshot.createDiff(refSnapshot);
 
-        boolean diff = _snapshot instanceof CPUResultsDiff;
-        forwardCallsView.setData(_snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled, diff);
-        hotSpotsView.setData(flatData, idMap, sampled, diff);
-        reverseCallsView.setData(_snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled, diff);
+                final FlatProfileContainer flatData = _snapshot.getFlatProfile(selectedThreads, aggregation);
+
+                final Map<Integer, ClientUtils.SourceCodeSelection> idMap = _snapshot.getMethodIDMap(aggregation);
+                
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        boolean diff = _snapshot instanceof CPUResultsDiff;
+                        forwardCallsView.setData(_snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled, diff);
+                        hotSpotsView.setData(flatData, idMap, sampled, diff);
+                        reverseCallsView.setData(_snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled, diff);
+                    }
+                });
+            }
+        });
     }
     
     protected final void setSnapshot(CPUResultsSnapshot snapshot, boolean sampled) {
@@ -649,6 +661,11 @@ public abstract class SnapshotCPUView extends JPanel {
                 }
             }
         };
+    }
+    
+    private synchronized ExecutorService getExecutor() {
+        if (executor == null) executor = Executors.newSingleThreadExecutor();
+        return executor;
     }
     
 }
