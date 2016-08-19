@@ -69,7 +69,7 @@ public class ProfilerRuntime implements CommonConstants {
 
         public void handleFirstTimeMethodInvoke(char methodId);
 
-        public int handleFirstTimeVMObjectAlloc(String className, int classLoaderId);
+        public int handleFirstTimeVMObjectAlloc(String className, int definingClassLoaderId);
 
         public void handleReflectiveInvoke(Method method);
     }

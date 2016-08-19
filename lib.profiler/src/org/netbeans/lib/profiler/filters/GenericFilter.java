@@ -272,7 +272,8 @@ public class GenericFilter {
         if (this == obj) return true;
         if (obj == null) return false;
 
-        if (!obj.getClass().isAssignableFrom(getClass())) return false;
+        if (!obj.getClass().isAssignableFrom(getClass()) &&
+            !getClass().isAssignableFrom(obj.getClass())) return false;
 
         return valuesEquals(obj);
     }

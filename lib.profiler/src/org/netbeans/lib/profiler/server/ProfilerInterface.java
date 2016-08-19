@@ -581,8 +581,8 @@ public class ProfilerInterface implements CommonConstants {
                     reflectiveMethodInvokeHook(method);
                 }
 
-                public int handleFirstTimeVMObjectAlloc(String className, int classLoaderId) {
-                    return firstTimeVMObjectAlloc(className, classLoaderId);
+                public int handleFirstTimeVMObjectAlloc(String className, int definingClassLoaderId) {
+                    return firstTimeVMObjectAlloc(className, definingClassLoaderId);
                 }
 
                 public void handleEventBufferDump(byte[] eventBuffer, int startPos, int curPtrPos) {
@@ -1148,7 +1148,7 @@ public class ProfilerInterface implements CommonConstants {
         }
     }
 
-    private static int firstTimeVMObjectAlloc(String className, int classLoaderId) {
+    private static int firstTimeVMObjectAlloc(String className, int definingClassLoaderId) {
         GetClassIdResponse resp;
 
         if (internalClassName(className)) {
@@ -1158,12 +1158,7 @@ public class ProfilerInterface implements CommonConstants {
         serialClientOperationsLock.beginTrans(true);
 
         try {
-            if (classLoaderId > 0) { // neither bootstrap nor system class loader
-                                     // get defining classloader 
-                classLoaderId = ClassLoaderManager.getDefiningLoaderForClass(className, classLoaderId);
-            }
-
-            GetClassIdCommand cmd = new GetClassIdCommand(className, classLoaderId);
+            GetClassIdCommand cmd = new GetClassIdCommand(className, definingClassLoaderId);
             profilerServer.sendComplexCmdToClient(cmd);
             resp = (GetClassIdResponse) profilerServer.getLastResponse();
         }  finally {

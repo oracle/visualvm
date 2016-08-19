@@ -189,8 +189,8 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
 
     static int getClassId(Class clazz) {
         String className = clazz.getName();
-        int classLoaderId = ClassLoaderManager.registerLoader(clazz);
-        String classNameId = new StringBuffer(className).append('#').append(classLoaderId).toString();
+        int definingClassLoaderId = ClassLoaderManager.registerLoader(clazz);
+        String classNameId = new StringBuffer(className).append('#').append(definingClassLoaderId).toString();
         Integer classIdInt;
         
         synchronized (classIdMapLock) {
@@ -198,7 +198,7 @@ public class ProfilerRuntimeMemory extends ProfilerRuntime {
         }
 
         if (classIdInt == null) {
-            int newClassId = externalActionsHandler.handleFirstTimeVMObjectAlloc(className, classLoaderId);
+            int newClassId = externalActionsHandler.handleFirstTimeVMObjectAlloc(className, definingClassLoaderId);
 
             classIdInt = new Integer(newClassId);
             synchronized (classIdMapLock) {
