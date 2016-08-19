@@ -50,6 +50,8 @@ import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -111,6 +113,9 @@ public abstract class LiveCPUView extends JPanel {
     private volatile boolean paused;
     private volatile boolean forceRefresh;
     private volatile boolean refreshIsRunning;
+    
+    private ExecutorService executor;
+    
     
     @ServiceProvider(service=CPUCCTProvider.Listener.class)
     public static final class ResultsMonitor implements CPUCCTProvider.Listener {
@@ -185,12 +190,17 @@ public abstract class LiveCPUView extends JPanel {
             final CPUResultsSnapshot snapshotData =
                     client.getStatus().getInstrMethodClasses() == null ?
                     null : client.getCPUProfilingResultsSnapshot(false);
-            snapshot = snapshotData;
-            sampled = snapshotData == null ? true :
-                      client.getCurrentInstrType() == ProfilerClient.INSTR_NONE_SAMPLING;
-            setData();
-            lastupdate = System.currentTimeMillis();
-            forceRefresh = false;
+            final boolean _sampled = snapshotData == null ? true :
+                                     client.getCurrentInstrType() == ProfilerClient.INSTR_NONE_SAMPLING;
+            UIUtils.runInEventDispatchThread(new Runnable() {
+                public void run() {
+                    snapshot = snapshotData;
+                    sampled = _sampled;
+                    setData();
+                    lastupdate = System.currentTimeMillis();
+                    forceRefresh = false;
+                }
+            });
         } catch (CPUResultsSnapshot.NoDataAvailableException e) {
             refreshIsRunning = false;
         } catch (Throwable t) {
@@ -204,36 +214,48 @@ public abstract class LiveCPUView extends JPanel {
     }
     
     private void setData() {
-        if (snapshot == null) {
-            resetData();
-            refreshIsRunning = false;
-        } else {
-            final CPUResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
-                                                 refSnapshot.createDiff(snapshot);
-            
-            final FlatProfileContainer flatData = _snapshot.getFlatProfile(selectedThreads, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
-            
-            final Map<Integer, ClientUtils.SourceCodeSelection> idMap = _snapshot.getMethodIDMap(CPUResultsSnapshot.METHOD_LEVEL_VIEW);
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                if (snapshot == null) {
+                    resetData();
+                    refreshIsRunning = false;
+                } else {
+                    getExecutor().submit(new Runnable() {
+                        public void run() {
+                            final CPUResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
+                                                                 refSnapshot.createDiff(snapshot);
 
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    try {
-                        boolean diff = _snapshot instanceof CPUResultsDiff;
-                        forwardCallsView.setData(_snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled, diff);
-                        hotSpotsView.setData(flatData, idMap, sampled, diff);
-                        reverseCallsView.setData(_snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled, diff);
-                    } finally {
-                        refreshIsRunning = false;
-                    }
+                            final FlatProfileContainer flatData = _snapshot.getFlatProfile(selectedThreads, CPUResultsSnapshot.METHOD_LEVEL_VIEW);
+            
+                            final Map<Integer, ClientUtils.SourceCodeSelection> idMap = _snapshot.getMethodIDMap(CPUResultsSnapshot.METHOD_LEVEL_VIEW);
+
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    try {
+                                        boolean diff = _snapshot instanceof CPUResultsDiff;
+                                        forwardCallsView.setData(_snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled, diff);
+                                        hotSpotsView.setData(flatData, idMap, sampled, diff);
+                                        reverseCallsView.setData(_snapshot, idMap, CPUResultsSnapshot.METHOD_LEVEL_VIEW, selectedThreads, mergedThreads, sampled, diff);
+                                    } finally {
+                                        refreshIsRunning = false;
+                                    }
+                                }
+                            });
+                        }
+                    });
                 }
-            });
-        }
+            }
+        });
     }
     
-    public boolean setDiffView(boolean diff) {
+    public boolean setDiffView(final boolean diff) {
         if (snapshot == null) return false;
-        refSnapshot = diff ? snapshot : null;
-        setData();
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                refSnapshot = diff ? snapshot : null;
+                setData();
+            }
+        });
         return true;
     }
     
@@ -244,13 +266,17 @@ public abstract class LiveCPUView extends JPanel {
     }
     
     public void resetData() {
-        forwardCallsView.resetData();
-        hotSpotsView.resetData();
-        reverseCallsView.resetData();
-        snapshot = null;
-        refSnapshot = null;
-        sampled = true;
-        if (threadsSelector != null) threadsSelector.reset();
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                forwardCallsView.resetData();
+                hotSpotsView.resetData();
+                reverseCallsView.resetData();
+                snapshot = null;
+                refSnapshot = null;
+                sampled = true;
+                if (threadsSelector != null) threadsSelector.reset();
+            }
+        });
     }
     
     
@@ -547,6 +573,12 @@ public abstract class LiveCPUView extends JPanel {
         popup.add(new JMenuItem(SearchUtils.ACTION_FIND) {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
         });
+    }
+    
+    
+    private synchronized ExecutorService getExecutor() {
+        if (executor == null) executor = Executors.newSingleThreadExecutor();
+        return executor;
     }
     
 }
