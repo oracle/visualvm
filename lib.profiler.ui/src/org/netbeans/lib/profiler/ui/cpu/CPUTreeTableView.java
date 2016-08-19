@@ -53,7 +53,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -101,49 +100,45 @@ abstract class CPUTreeTableView extends CPUView {
     
     
     void setData(final CPUResultsSnapshot newData, final Map<Integer, ClientUtils.SourceCodeSelection> newIdMap, final int aggregation, final Collection<Integer> selectedThreads, final boolean mergeThreads, final boolean _sampled, final boolean _diff) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                boolean structureChange = sampled != _sampled;
-                sampled = _sampled;
-                boolean _twoTimeStamps = twoTimeStamps;
-                twoTimeStamps = newData == null ? !_twoTimeStamps : newData.isCollectingTwoTimeStamps();
-                idMap = newIdMap;
-                renderers[0].setDiffMode(_diff);
-                renderers[1].setDiffMode(_diff);
-                renderers[2].setDiffMode(_diff);
-                if (treeTableModel != null) {
-                    treeTableModel.setRoot(newData == null ? PrestimeCPUCCTNode.EMPTY :
-                                           !reverse ? newData.getRootNode(aggregation, selectedThreads, mergeThreads):
-                                           newData.getReverseRootNode(aggregation, selectedThreads, mergeThreads));
-                }
-                if (structureChange) {
-                    // Resolve Hits/Invocations column
-                    int col = treeTable.convertColumnIndexToView(selection == null ? 3 : 4);
-                    String colN = treeTableModel.getColumnName(selection == null ? 3 : 4);
-                    
-                    // Persist current Hits/Invocations column visibility
-                    if (sampled) invocationsVisible = treeTable.isColumnVisible(col);
-                    else hitsVisible = treeTable.isColumnVisible(col);
-                    
-                    // Update Hits/Invocations column name
-                    treeTable.getColumnModel().getColumn(col).setHeaderValue(colN);
-                    
-                    // Set new Hits/Invocations column visibility
-                    treeTable.setColumnVisibility(col, sampled ? hitsVisible : invocationsVisible);
-                    
-                    setToolTips();
-                    
-                    repaint();
-                }
-                
-                if (newData != null && twoTimeStamps != _twoTimeStamps) {
-                    int column = selection == null ? 2 : 3;
-                    boolean cpuColumnVisible = treeTable.isColumnVisible(column);
-                    if (twoTimeStamps && !cpuColumnVisible) treeTable.setColumnVisibility(column, true);
-                    else if (!twoTimeStamps && cpuColumnVisible) treeTable.setColumnVisibility(column, false);
-                }
-            }
-        });
+        boolean structureChange = sampled != _sampled;
+        sampled = _sampled;
+        boolean _twoTimeStamps = twoTimeStamps;
+        twoTimeStamps = newData == null ? !_twoTimeStamps : newData.isCollectingTwoTimeStamps();
+        idMap = newIdMap;
+        renderers[0].setDiffMode(_diff);
+        renderers[1].setDiffMode(_diff);
+        renderers[2].setDiffMode(_diff);
+        if (treeTableModel != null) {
+            treeTableModel.setRoot(newData == null ? PrestimeCPUCCTNode.EMPTY :
+                                   !reverse ? newData.getRootNode(aggregation, selectedThreads, mergeThreads):
+                                   newData.getReverseRootNode(aggregation, selectedThreads, mergeThreads));
+        }
+        if (structureChange) {
+            // Resolve Hits/Invocations column
+            int col = treeTable.convertColumnIndexToView(selection == null ? 3 : 4);
+            String colN = treeTableModel.getColumnName(selection == null ? 3 : 4);
+
+            // Persist current Hits/Invocations column visibility
+            if (sampled) invocationsVisible = treeTable.isColumnVisible(col);
+            else hitsVisible = treeTable.isColumnVisible(col);
+
+            // Update Hits/Invocations column name
+            treeTable.getColumnModel().getColumn(col).setHeaderValue(colN);
+
+            // Set new Hits/Invocations column visibility
+            treeTable.setColumnVisibility(col, sampled ? hitsVisible : invocationsVisible);
+
+            setToolTips();
+
+            repaint();
+        }
+
+        if (newData != null && twoTimeStamps != _twoTimeStamps) {
+            int column = selection == null ? 2 : 3;
+            boolean cpuColumnVisible = treeTable.isColumnVisible(column);
+            if (twoTimeStamps && !cpuColumnVisible) treeTable.setColumnVisibility(column, true);
+            else if (!twoTimeStamps && cpuColumnVisible) treeTable.setColumnVisibility(column, false);
+        }
     }
     
     public void resetData() {
