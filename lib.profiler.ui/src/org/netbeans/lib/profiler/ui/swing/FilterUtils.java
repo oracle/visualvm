@@ -146,6 +146,10 @@ public final class FilterUtils {
     }
     
     public static JComponent createFilterPanel(final ProfilerTable table, final RowFilter excludesFilter) {
+//        return createFilterPanel(table, excludesFilter, null);
+//    }
+//    
+//    public static JComponent createFilterPanel(final ProfilerTable table, final RowFilter excludesFilter, JComponent[] options) {
         JToolBar toolbar = new InvisibleToolbar();
         if (UIUtils.isWindowsModernLookAndFeel())
             toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 2));
@@ -313,6 +317,11 @@ public final class FilterUtils {
         toolbar.add(filterType);
         
         toolbar.add(matchCase);
+        
+//        if (options != null) {
+//            toolbar.add(Box.createHorizontalStrut(5));
+//            for (JComponent option : options) toolbar.add(option);
+//        }
         
         toolbar.add(Box.createHorizontalStrut(2));
         
