@@ -123,11 +123,16 @@ public abstract class DataView extends JPanel {
         return null;
     }
     
+//    protected JComponent[] getFilterOptions() {
+//        return null;
+//    }
+    
     public void activateFilter() {
         JComponent panel = getBottomPanel();
         
         if (filterPanel == null) {
             filterPanel = FilterUtils.createFilterPanel(getResultsComponent(), getExcludesFilter());
+//            filterPanel = FilterUtils.createFilterPanel(getResultsComponent(), getExcludesFilter(), getFilterOptions());
             panel.add(filterPanel);
             Container parent = panel.getParent();
             parent.invalidate();
