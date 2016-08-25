@@ -158,8 +158,8 @@ final class SQLFormatter {
         s.append("</html>"); // NOI18N
 
         formattedCommand = s.toString();
-        formattedCommand = formattedCommand.replace("(", "<font color='" + getGrayHTMLString() + "'>(");   // NOI18N
         formattedCommand = formattedCommand.replace(")", ")</font>");   // NOI18N
+        formattedCommand = formattedCommand.replace("(", "<font color='" + getGrayHTMLString() + "'>(");   // NOI18N
         return formattedCommand;
     }
 
