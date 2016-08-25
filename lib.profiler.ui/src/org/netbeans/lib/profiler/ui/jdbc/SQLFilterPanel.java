@@ -45,19 +45,23 @@ package org.netbeans.lib.profiler.ui.jdbc;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
@@ -69,6 +73,7 @@ import javax.swing.event.DocumentListener;
 import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.InvisibleToolbar;
+import org.netbeans.lib.profiler.ui.swing.PopupButton;
 
 /**
  *
@@ -80,20 +85,10 @@ abstract class SQLFilterPanel extends JPanel {
     
     private boolean initialized = false;
     
-    private JCheckBox regularC;
-    private JCheckBox preparedC;
-    private JCheckBox callableC;
-    private JTextField commandsF;
-    private JTextField tablesF;
     private JButton applyB;
     
-    private Configuration applied = new Configuration() {
-        {
-            statements.add(JdbcCCTProvider.SQL_STATEMENT);
-            statements.add(JdbcCCTProvider.SQL_PREPARED_STATEMENT);
-            statements.add(JdbcCCTProvider.SQL_CALLABLE_STATEMENT);
-        }
-    };
+    private Configuration current = new Configuration();
+    private Configuration applied = new Configuration();
     
     SQLFilterPanel() {
         super(new BorderLayout());
@@ -119,43 +114,10 @@ abstract class SQLFilterPanel extends JPanel {
         };
         
         toolbar.add(Box.createHorizontalStrut(3));
-        toolbar.add(new JLabel("Statements:"));
-        
-        toolbar.add(Box.createHorizontalStrut(3));
-        regularC = new JCheckBox("Regular", true) {
-            protected void fireItemStateChanged(ItemEvent event) { changed(); }
-        };
-        regularC.setOpaque(false);
-        regularC.getActionMap().put(APPLY_ACTION_KEY, applyAction);
-        regularC.getInputMap().put(applyKey, APPLY_ACTION_KEY);
-        toolbar.add(regularC);
-        preparedC = new JCheckBox("Prepared", true) {
-            protected void fireItemStateChanged(ItemEvent event) { changed(); }
-        };
-        preparedC.setOpaque(false);
-        preparedC.getActionMap().put(APPLY_ACTION_KEY, applyAction);
-        preparedC.getInputMap().put(applyKey, APPLY_ACTION_KEY);
-        toolbar.add(preparedC);
-        callableC = new JCheckBox("Callable", true) {
-            protected void fireItemStateChanged(ItemEvent event) { changed(); }
-        };
-        callableC.setOpaque(false);
-        callableC.getActionMap().put(APPLY_ACTION_KEY, applyAction);
-        callableC.getInputMap().put(applyKey, APPLY_ACTION_KEY);
-        toolbar.add(callableC);
-        toolbar.add(Box.createHorizontalStrut(14));
-        
-        toolbar.add(Box.createHorizontalStrut(3));
-        toolbar.add(new JLabel("Commands:"));
+        toolbar.add(new JLabel("Queries:"));
         toolbar.add(Box.createHorizontalStrut(3));
         
-        DocumentListener dl = new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) { changed(); }
-            public void removeUpdate(DocumentEvent e) { changed(); }
-            public void changedUpdate(DocumentEvent e) { changed(); }
-        };
-        
-        commandsF = new JTextField(10) {
+        final JTextField filterF = new JTextField(20) {
             public Dimension getMaximumSize() {
                 Dimension dim = super.getMaximumSize();
                 dim.height = super.getPreferredSize().height;
@@ -163,33 +125,18 @@ abstract class SQLFilterPanel extends JPanel {
                 return dim;
             }
         };
-        commandsF.getDocument().addDocumentListener(dl);
-        commandsF.getActionMap().put(APPLY_ACTION_KEY, applyAction);
-        commandsF.getInputMap().put(applyKey, APPLY_ACTION_KEY);
-        toolbar.add(commandsF);
-        toolbar.add(Box.createHorizontalStrut(14));
-        
-        toolbar.add(Box.createHorizontalStrut(3));
-        toolbar.add(new JLabel("Tables:"));
-        toolbar.add(Box.createHorizontalStrut(3));
-        
-        tablesF = new JTextField(10) {
-            public Dimension getMaximumSize() {
-                Dimension dim = super.getMaximumSize();
-                dim.height = super.getPreferredSize().height;
-                if (UIUtils.isMetalLookAndFeel()) dim.height += 4;
-                return dim;
-            }
-        };
-        tablesF.getDocument().addDocumentListener(dl);
-        tablesF.getActionMap().put(APPLY_ACTION_KEY, applyAction);
-        tablesF.getInputMap().put(applyKey, APPLY_ACTION_KEY);
-        toolbar.add(tablesF);
-        toolbar.add(Box.createHorizontalStrut(10));
-        
-        toolbar.addSeparator();
+        filterF.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e)  { handle(); }
+            public void removeUpdate(DocumentEvent e)  { handle(); }
+            public void changedUpdate(DocumentEvent e) { handle(); }
+            private void handle() { current.filter = filterF.getText().trim().toLowerCase(Locale.ENGLISH); changed(); }
+        });
+        filterF.getActionMap().put(APPLY_ACTION_KEY, applyAction);
+        filterF.getInputMap().put(applyKey, APPLY_ACTION_KEY);
+        toolbar.add(filterF);
         
         toolbar.add(Box.createHorizontalStrut(10));
+        
         applyB = new JButton("Apply") {
             protected void fireActionPerformed(ActionEvent e) { apply(); }
         };
@@ -200,6 +147,105 @@ abstract class SQLFilterPanel extends JPanel {
         applyP.add(applyB, BorderLayout.CENTER);
         applyP.setOpaque(false);
         toolbar.add(applyP);
+        
+        toolbar.add(Box.createHorizontalStrut(10));
+        
+        toolbar.addSeparator();
+        
+        toolbar.add(Box.createHorizontalStrut(8));
+        
+        PopupButton commands = new PopupButton(" Commands ") {
+            protected void populatePopup(JPopupMenu popup) {
+                List<String> commands = new ArrayList(getCommands());
+                if (commands.isEmpty()) {
+                    JLabel l = new JLabel("No commands available");
+                    l.setBorder(BorderFactory.createEmptyBorder(9, 6, 9, 6));
+                    popup.add(l);
+                } else {
+                    Collections.sort(commands);
+                    current.commands.retainAll(commands);
+                    for (final String command : commands) {
+                        JCheckBoxMenuItem i = new JCheckBoxMenuItem(command, !current.commands.contains(command)) {
+                            protected void fireActionPerformed(ActionEvent e) {
+                                if (!isSelected()) current.commands.add(command);
+                                else current.commands.remove(command);
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() { apply(); }
+                                });
+                            }
+                        };
+                        popup.add(i);
+                    }
+                }
+            }
+        };
+        toolbar.add(commands);
+        
+        toolbar.add(Box.createHorizontalStrut(5));
+        
+        PopupButton tables = new PopupButton(" Tables ") {
+            protected void displayPopup() {
+                Set<String> tables = new HashSet(getTables());
+                if (tables.isEmpty()) {
+                    super.displayPopup();
+                } else {
+                    current.tables.retainAll(tables);
+                    new TablesSelector(tables, current.tables) {
+                        protected void selectionChanged(Collection<String> selected) {
+                            current.tables.clear();
+                            current.tables.addAll(selected);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() { apply(); }
+                            });
+                        }
+                    }.show(this);
+                }
+            }
+            protected void populatePopup(JPopupMenu popup) {
+                JLabel l = new JLabel("No tables available");
+                l.setBorder(BorderFactory.createEmptyBorder(9, 6, 9, 6));
+                popup.add(l);
+            }
+        };
+        toolbar.add(tables);
+        
+        toolbar.add(Box.createHorizontalStrut(5));
+        
+        PopupButton statements = new PopupButton(" Statements ") {
+            protected void populatePopup(JPopupMenu popup) {
+                popup.add(new JCheckBoxMenuItem("Regular", !current.statements.contains(JdbcCCTProvider.SQL_STATEMENT)) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        if (!isSelected()) current.statements.add(JdbcCCTProvider.SQL_STATEMENT);
+                        else current.statements.remove(JdbcCCTProvider.SQL_STATEMENT);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() { apply(); }
+                        });
+                    }
+                });
+                
+                popup.add(new JCheckBoxMenuItem("Prepared", !current.statements.contains(JdbcCCTProvider.SQL_PREPARED_STATEMENT)) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        if (!isSelected()) current.statements.add(JdbcCCTProvider.SQL_PREPARED_STATEMENT);
+                        else current.statements.remove(JdbcCCTProvider.SQL_PREPARED_STATEMENT);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() { apply(); }
+                        });
+                    }
+                });
+                
+                popup.add(new JCheckBoxMenuItem("Callable", !current.statements.contains(JdbcCCTProvider.SQL_CALLABLE_STATEMENT)) {
+                    protected void fireActionPerformed(ActionEvent e) {
+                        if (!isSelected()) current.statements.add(JdbcCCTProvider.SQL_CALLABLE_STATEMENT);
+                        else current.statements.remove(JdbcCCTProvider.SQL_CALLABLE_STATEMENT);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() { apply(); }
+                        });
+                    }
+                });
+            }
+        };
+        toolbar.add(statements);
+        
         toolbar.add(Box.createHorizontalStrut(3));
         
         add(toolbar, BorderLayout.CENTER);
@@ -208,42 +254,34 @@ abstract class SQLFilterPanel extends JPanel {
         changed();
     }
     
-    private Configuration current() {
-        Configuration current = new Configuration();
-        
-        if (regularC.isSelected()) current.statements.add(JdbcCCTProvider.SQL_STATEMENT);
-        if (preparedC.isSelected()) current.statements.add(JdbcCCTProvider.SQL_PREPARED_STATEMENT);
-        if (callableC.isSelected()) current.statements.add(JdbcCCTProvider.SQL_CALLABLE_STATEMENT);
-        
-        String commands = commandsF.getText().trim();
-        if (!commands.isEmpty()) current.commands.addAll(Arrays.asList(commands.toLowerCase().split(" +"))); // NOI18N
-        
-        String tables = tablesF.getText().trim();
-        if (!tables.isEmpty()) current.tables.addAll(Arrays.asList(tables.toLowerCase().split(" +"))); // NOI18N
-        
-        return current;
-    }
-    
     private void changed() {
-        if (initialized) applyB.setEnabled(!applied.equals(current()));
+        if (initialized) applyB.setEnabled(!applied.equals(current));
     }
     
     private void apply() {
         applyB.setEnabled(false);
-        applied = current();
+        applied.set(current);
         applyFilter();
     }
     
     
+    abstract Set<String> getCommands();
+    
+    abstract Set<String> getTables();
+    
     abstract void applyFilter();
     
-    boolean passes(int statement, String command, String[] tables) {
-        if (!applied.statements.contains(statement)) return false;
+    
+    boolean passes(String query, String command, String[] tables, int statement) {
         
-        if (!applied.commands.isEmpty() && !applied.commands.contains(command.toLowerCase())) return false;
+        if (!applied.filter.isEmpty() && !query.toLowerCase(Locale.ENGLISH).contains(applied.filter)) return false;
+        
+        if (!applied.commands.isEmpty() && applied.commands.contains(command)) return false;
+        
+        if (!applied.statements.isEmpty() && applied.statements.contains(statement)) return false;
         
         if (applied.tables.isEmpty()) return true;
-        for (String table : tables) if (applied.tables.contains(table.toLowerCase())) return true;
+        for (String table : tables) if (!applied.tables.contains(table)) return true;
         
         return false;
     }
@@ -251,15 +289,31 @@ abstract class SQLFilterPanel extends JPanel {
     
     private static class Configuration {
         
-        final Set<Integer> statements = new HashSet();
+        String filter = ""; // NOI18N
+        
         final Set<String> commands = new HashSet();
         final Set<String> tables = new HashSet();
+        final Set<Integer> statements = new HashSet();
+        
+        void set(Configuration o) {
+            filter = o.filter;
+            
+            commands.clear();
+            commands.addAll(o.commands);
+            
+            tables.clear();
+            tables.addAll(o.tables);
+            
+            statements.clear();
+            statements.addAll(o.statements);
+        }
         
         public boolean equals(Object o) {
             Configuration c = (Configuration)o;
-            return statements.equals(c.statements) &&
+            return filter.equals(c.filter) &&
                    commands.equals(c.commands) &&
-                   tables.equals(c.tables);
+                   tables.equals(c.tables) &&
+                   statements.equals(c.statements);
         }
         
     }
