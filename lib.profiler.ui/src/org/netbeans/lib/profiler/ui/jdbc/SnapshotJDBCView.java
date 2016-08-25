@@ -80,20 +80,14 @@ public abstract class SnapshotJDBCView extends JPanel {
     private static final String RESET_COMPARE_SNAPSHOTS = messages.getString("SnapshotJDBCView_ResetCompareSnapshots"); // NOI18N
     // -----
     
-//    private boolean sampled;
     private JdbcResultsSnapshot snapshot;
     private JdbcResultsSnapshot refSnapshot;
     
 //    private int aggregation;
-//    private boolean mergedThreads;
-//    private Collection<Integer> selectedThreads;
     
     private DataView lastFocused;
-//    private CPUTableView hotSpotsView;
-    private JDBCTreeTableView forwardCallsView;
-//    private CPUTreeTableView reverseCallsView;
+    private JDBCTreeTableView jdbcCallsView;
     
-//    private JToggleButton[] toggles;
     private JToggleButton compareButton;
     
     
@@ -127,17 +121,6 @@ public abstract class SnapshotJDBCView extends JPanel {
     protected abstract void selectForProfiling(ClientUtils.SourceCodeSelection value);
     
     
-//    protected void foundInForwardCalls() {
-//        toggles[0].setSelected(true);
-//    }
-//    protected void foundInHotSpots() {
-//        toggles[1].setSelected(true);
-//    }
-//    protected void foundInReverseCalls() {
-//        toggles[2].setSelected(true);
-//    }
-    
-    
     private void profileMethod(ClientUtils.SourceCodeSelection value) {
         selectForProfiling(value);
     }
@@ -151,7 +134,7 @@ public abstract class SnapshotJDBCView extends JPanel {
     private void initUI(Action saveAction, final Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
         setLayout(new BorderLayout(0, 0));
         
-        forwardCallsView = new JDBCTreeTableView(null, false) {
+        jdbcCallsView = new JDBCTreeTableView(null, false) {
             protected void installDefaultAction() {
                 getResultsComponent().setDefaultAction(new AbstractAction() {
                     public void actionPerformed(ActionEvent e) {
@@ -171,59 +154,14 @@ public abstract class SnapshotJDBCView extends JPanel {
                 if (showSourceSupported()) showSource(value);
             }
             protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
-                SnapshotJDBCView.this.populatePopup(forwardCallsView, popup, value, userValue);
+                SnapshotJDBCView.this.populatePopup(jdbcCallsView, popup, value, userValue);
             }
         };
-        forwardCallsView.notifyOnFocus(new Runnable() {
-            public void run() { lastFocused = forwardCallsView; }
+        jdbcCallsView.notifyOnFocus(new Runnable() {
+            public void run() { lastFocused = jdbcCallsView; }
         });
         
-//        hotSpotsView = new CPUTableView(null) {
-//            protected void performDefaultAction(ClientUtils.SourceCodeSelection userValue) {
-//                if (showSourceSupported()) showSource(userValue);
-//            }
-//            protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
-//                SnapshotCPUView.this.populatePopup(hotSpotsView, popup, value, userValue);
-//            }
-//        };
-//        hotSpotsView.notifyOnFocus(new Runnable() {
-//            public void run() { lastFocused = hotSpotsView; }
-//        });
-//        
-//        reverseCallsView = new CPUTreeTableView(null, true) {
-//            protected void performDefaultAction(ClientUtils.SourceCodeSelection value) {
-//                if (showSourceSupported()) showSource(value);
-//            }
-//            protected void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
-//                SnapshotCPUView.this.populatePopup(reverseCallsView, popup, value, userValue);
-//            }
-//        };
-//        reverseCallsView.notifyOnFocus(new Runnable() {
-//            public void run() { lastFocused = reverseCallsView; }
-//        });
-        
-//        JSplitPane upperSplit = new JExtendedSplitPane(JSplitPane.VERTICAL_SPLIT) {
-//            {
-//                setBorder(null);
-//                setDividerSize(5);
-//
-//                if (getUI() instanceof BasicSplitPaneUI) {
-//                    BasicSplitPaneDivider divider = ((BasicSplitPaneUI)getUI()).getDivider();
-//                    if (divider != null) {
-//                        Color c = UIUtils.isNimbus() || UIUtils.isAquaLookAndFeel() ?
-//                                  UIUtils.getDisabledLineColor() : new JSeparator().getForeground();
-//                        divider.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, c));
-//                    }
-//                }
-//            }
-//        };
-//        upperSplit.setBorder(BorderFactory.createEmptyBorder());
-//        upperSplit.setTopComponent(forwardCallsView);
-//        upperSplit.setBottomComponent(hotSpotsView);
-//        upperSplit.setDividerLocation(0.5d);
-//        upperSplit.setResizeWeight(0.5d);
-        
-        add(forwardCallsView, BorderLayout.CENTER);
+        add(jdbcCallsView, BorderLayout.CENTER);
         
         ProfilerToolbar toolbar = ProfilerToolbar.create(true);
         
@@ -253,101 +191,6 @@ public abstract class SnapshotJDBCView extends JPanel {
             compareButton.setToolTipText(COMPARE_SNAPSHOTS);
             toolbar.add(compareButton);
         }
-        
-//        toolbar.addSpace(2);
-//        toolbar.addSeparator();
-//        toolbar.addSpace(5);
-//        
-//        GrayLabel viewL = new GrayLabel(TOOLBAR_VIEW);
-//        toolbar.add(viewL);
-        
-//        toolbar.addSpace(5);
-//        
-//        MultiButtonGroup group = new MultiButtonGroup();
-//        toggles = new JToggleButton[3];
-//        
-//        toggles[0] = new JToggleButton(Icons.getIcon(ProfilerIcons.NODE_FORWARD)) {
-//            protected void fireActionPerformed(ActionEvent e) {
-//                super.fireActionPerformed(e);
-//                setView(isSelected(), hotSpotsView.isVisible(), reverseCallsView.isVisible());
-//            }
-//        };
-//        toggles[0].setToolTipText(VIEW_FORWARD);
-//        group.add(toggles[0]);
-//        toolbar.add(toggles[0]);
-//        forwardCallsView.setVisible(true);
-//        toggles[0].setSelected(true);
-//        
-//        toggles[1] = new JToggleButton(Icons.getIcon(ProfilerIcons.TAB_HOTSPOTS)) {
-//            protected void fireActionPerformed(ActionEvent e) {
-//                super.fireActionPerformed(e);
-//                setView(forwardCallsView.isVisible(), isSelected(), reverseCallsView.isVisible());
-//            }
-//        };
-//        toggles[1].setToolTipText(VIEW_HOTSPOTS);
-//        group.add(toggles[1]);
-//        toolbar.add(toggles[1]);
-//        hotSpotsView.setVisible(false);
-//        toggles[1].setSelected(false);
-//        
-//        toggles[2] = new JToggleButton(Icons.getIcon(ProfilerIcons.NODE_REVERSE)) {
-//            protected void fireActionPerformed(ActionEvent e) {
-//                super.fireActionPerformed(e);
-//                setView(forwardCallsView.isVisible(), hotSpotsView.isVisible(), isSelected());
-//            }
-//        };
-//        toggles[2].setToolTipText(VIEW_REVERSE);
-//        group.add(toggles[2]);
-//        toolbar.add(toggles[2]);
-//        reverseCallsView.setVisible(false);
-//        toggles[2].setSelected(false);
-        
-//        Action aCallTree = new AbstractAction() {
-//            { putValue(NAME, VIEW_CALLTREE); }
-//            public void actionPerformed(ActionEvent e) { setView(true, false); }
-//            
-//        };
-//        Action aHotSpots = new AbstractAction() {
-//            { putValue(NAME, VIEW_HOTSPOTS); }
-//            public void actionPerformed(ActionEvent e) { setView(false, true); }
-//            
-//        };
-//        Action aCombined = new AbstractAction() {
-//            { putValue(NAME, VIEW_COMBINED); }
-//            public void actionPerformed(ActionEvent e) { setView(true, true); }
-//            
-//        };
-//        toolbar.add(new ActionPopupButton(2, aCallTree, aHotSpots, aCombined));
-        
-//        toolbar.addSpace(5);
-//        ThreadsSelector threadsPopup = new ThreadsSelector() {
-//            protected CPUResultsSnapshot getSnapshot() { return snapshot; }
-//            protected void selectionChanged(Collection<Integer> selected, boolean mergeThreads) {
-//                mergedThreads = mergeThreads;
-//                selectedThreads = selected;
-//                setAggregation(aggregation);
-//            }
-//            
-//        };
-//        toolbar.add(threadsPopup);
-        
-//        toolbar.addSpace(2);
-//        toolbar.addSeparator();
-//        toolbar.addSpace(5);
-        
-//        GrayLabel threadsL = new GrayLabel("Threads:");
-//        toolbar.add(threadsL);
-//        
-//        toolbar.addSpace(2);
-//        
-//        PopupButton threads = new PopupButton("All threads") {
-//            protected void populatePopup(JPopupMenu popup) {
-//                popup.add(new JRadioButtonMenuItem("All threads"));
-//                popup.add(new JRadioButtonMenuItem("main"));
-//                popup.add(new JRadioButtonMenuItem("AWT-EventQueue-0"));
-//            }
-//        };
-//        toolbar.add(threads);
 //        
 //        toolbar.addSpace(2);
 //        toolbar.addSeparator();
@@ -381,7 +224,7 @@ public abstract class SnapshotJDBCView extends JPanel {
             toolbar.addFiller();
             toolbar.add(infoAction);
         }
-//        
+        
         add(toolbar.getComponent(), BorderLayout.NORTH);
         
 //        // TODO: read last state?
@@ -410,7 +253,7 @@ public abstract class SnapshotJDBCView extends JPanel {
         if (lastFocused != null && !lastFocused.isShowing()) lastFocused = null;
         
         if (lastFocused == null) {
-            if (forwardCallsView.isShowing()) lastFocused = forwardCallsView;
+            if (jdbcCallsView.isShowing()) lastFocused = jdbcCallsView;
         }
         
         return lastFocused;
@@ -466,14 +309,9 @@ public abstract class SnapshotJDBCView extends JPanel {
     private void setData() {
         JdbcResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
                                        snapshot.createDiff(refSnapshot);
-        
-//        final FlatProfileContainer flatData = _snapshot.getFlatProfile(selectedThreads, aggregation);
-//        
-//        final Map<Integer, ClientUtils.SourceCodeSelection> idMap = _snapshot.getMethodIDMap(aggregation);
 
         boolean diff = _snapshot instanceof JdbcResultsDiff;
-//        forwardCallsView.setData(_snapshot, idMap, aggregation, selectedThreads, mergedThreads, sampled, diff);
-        forwardCallsView.setData(_snapshot, null, -1, null, false, false, diff);
+        jdbcCallsView.setData(_snapshot, null, -1, null, false, false, diff);
     }
     
     protected final void setSnapshot(JdbcResultsSnapshot snapshot) {
@@ -496,36 +334,14 @@ public abstract class SnapshotJDBCView extends JPanel {
             },
             new ExportUtils.Exportable() {
                 public boolean isEnabled() {
-                    return forwardCallsView.isVisible();
+                    return jdbcCallsView.isVisible();
                 }
                 public String getName() {
                     return MessageFormat.format(JDBCView.EXPORT_LBL, JDBCView.EXPORT_QUERIES);
                 }
                 public ExportUtils.ExportProvider[] getProviders() {
-                    return forwardCallsView.getExportProviders();
+                    return jdbcCallsView.getExportProviders();
                 }
-//            },
-//            new ExportUtils.Exportable() {
-//                public boolean isEnabled() {
-//                    return hotSpotsView.isVisible();
-//                }
-//                public String getName() {
-//                    return MessageFormat.format(CPUView.EXPORT_METHODS, CPUView.EXPORT_HOTSPOTS);
-//                }
-//                public ExportUtils.ExportProvider[] getProviders() {
-//                    return hotSpotsView.getExportProviders();
-//                }
-//            },
-//            new ExportUtils.Exportable() {
-//                public boolean isEnabled() {
-//                    return reverseCallsView.isVisible();
-//                }
-//                public String getName() {
-//                    return MessageFormat.format(CPUView.EXPORT_METHODS, CPUView.EXPORT_REVERSE_CALLS);
-//                }
-//                public ExportUtils.ExportProvider[] getProviders() {
-//                    return reverseCallsView.getExportProviders();
-//                }
             }
         };
     }
