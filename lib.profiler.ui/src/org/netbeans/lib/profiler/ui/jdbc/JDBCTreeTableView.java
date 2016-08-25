@@ -195,7 +195,7 @@ abstract class JDBCTreeTableView extends JDBCView {
     
     
     ExportUtils.ExportProvider[] getExportProviders() {
-        final String name = EXPORT_FORWARD_CALLS;
+        final String name = EXPORT_QUERIES;
         return treeTable.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
             new ExportUtils.CSVExportProvider(treeTable),
             new ExportUtils.HTMLExportProvider(treeTable, name),

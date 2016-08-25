@@ -75,17 +75,9 @@ public abstract class SnapshotJDBCView extends JPanel {
     
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.cpu.Bundle"); // NOI18N
-//    private static final String TOOLBAR_VIEW = messages.getString("SnapshotCPUView_ToolbarView"); // NOI18N
-//    private static final String VIEW_FORWARD = messages.getString("SnapshotCPUView_ViewForward"); // NOI18N
-//    private static final String VIEW_HOTSPOTS = messages.getString("SnapshotCPUView_ViewHotSpots"); // NOI18N
-//    private static final String VIEW_REVERSE = messages.getString("SnapshotCPUView_ViewReverse"); // NOI18N
-//    private static final String TOOLBAR_AGGREGATION = messages.getString("SnapshotCPUView_ToolbarAggregation"); // NOI18N
-//    private static final String AGGREGATION_METHODS = messages.getString("SnapshotCPUView_AggregationMethods"); // NOI18N
-//    private static final String AGGREGATION_CLASSES = messages.getString("SnapshotCPUView_AggregationClasses"); // NOI18N
-//    private static final String AGGREGATION_PACKAGES = messages.getString("SnapshotCPUView_AggregationPackages"); // NOI18N
-    private static final String COMPARE_SNAPSHOTS = messages.getString("SnapshotCPUView_CompareSnapshots"); // NOI18N
-    private static final String RESET_COMPARE_SNAPSHOTS = messages.getString("SnapshotCPUView_ResetCompareSnapshots"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.jdbc.Bundle"); // NOI18N
+    private static final String COMPARE_SNAPSHOTS = messages.getString("SnapshotJDBCView_CompareSnapshots"); // NOI18N
+    private static final String RESET_COMPARE_SNAPSHOTS = messages.getString("SnapshotJDBCView_ResetCompareSnapshots"); // NOI18N
     // -----
     
 //    private boolean sampled;
@@ -507,7 +499,7 @@ public abstract class SnapshotJDBCView extends JPanel {
                     return forwardCallsView.isVisible();
                 }
                 public String getName() {
-                    return MessageFormat.format(JDBCView.EXPORT_METHODS, JDBCView.EXPORT_FORWARD_CALLS);
+                    return MessageFormat.format(JDBCView.EXPORT_LBL, JDBCView.EXPORT_QUERIES);
                 }
                 public ExportUtils.ExportProvider[] getProviders() {
                     return forwardCallsView.getExportProviders();
