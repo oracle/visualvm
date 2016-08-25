@@ -47,7 +47,9 @@ import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.JComponent;
@@ -81,6 +83,9 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
  */
 abstract class JDBCTreeTableView extends JDBCView {
     
+    private Set<String> commands;
+    private Set<String> tables;
+    
     private JDBCTreeTableModel treeTableModel;
     private ProfilerTreeTable treeTable;
     
@@ -108,6 +113,11 @@ abstract class JDBCTreeTableView extends JDBCView {
         long totalBytes = 0;
         long _totalBytes = 0;
         
+        if (commands == null) commands = new HashSet();
+        commands.clear();
+        if (tables == null) tables = new HashSet();
+        tables.clear();
+        
         for (int i = 1; i < _names.length; i++) {
             if (diff) {
                 totalObjects = Math.max(totalObjects, _nTotalAllocObjects[i]);
@@ -121,10 +131,15 @@ abstract class JDBCTreeTableView extends JDBCView {
             
             int statementType = newData.getTypeForSelectId()[i];
             int commandType = newData.getCommandTypeForSelectId()[i];
-            String[] tables = newData.getTablesForSelectId()[i];
-            if (sqlFilter.passes(statementType, commandString(commandType), tables)) {
+            String commandString = commandString(commandType);
+            String[] sqlTables = newData.getTablesForSelectId()[i];
+            
+            commands.add(commandString.toUpperCase(Locale.ENGLISH));
+            tables.addAll(Arrays.asList(sqlTables));
+            
+            if (sqlFilter.passes(_names[i], commandString, sqlTables, statementType)) {
                 final int _i = i;
-                nodes.add(new SQLQueryNode(_names[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i], statementType, commandType, tables) {
+                nodes.add(new SQLQueryNode(_names[i], _nTotalAllocObjects[i], _totalAllocObjectsSize[i], statementType, commandType, sqlTables) {
                     PresoObjAllocCCTNode computeChildren() { return newData.createPresentationCCT(_i, false); }
                 });
             }
@@ -160,6 +175,9 @@ abstract class JDBCTreeTableView extends JDBCView {
                 renderers[1].setDiffMode(false);
                 
                 treeTableModel.setRoot(root);
+                
+                if (commands != null) commands.clear();
+                if (tables != null) tables.clear();
                 
                 currentData = null;
             }
@@ -270,6 +288,16 @@ abstract class JDBCTreeTableView extends JDBCView {
         add(tableContainer, BorderLayout.CENTER);
         
         sqlFilter = new SQLFilterPanel() {
+            Set<String> getCommands() {
+                if (commands == null) commands = new HashSet();
+                return commands;
+            }
+            
+            Set<String> getTables() {
+                if (tables == null) tables = new HashSet();
+                return tables;
+            }
+            
             void applyFilter() {
                 if (currentData != null) setData(currentData, null, -1, null, false, false, false);
             }
@@ -290,9 +318,9 @@ abstract class JDBCTreeTableView extends JDBCView {
                                         NAME_COLUMN_TOOLTIP,
                                         TOTAL_TIME_COLUMN_TOOLTIP,
                                         INVOCATIONS_COLUMN_TOOLTIP,
-                                        "SQL Statement Type",
                                         "SQL Command Type",
-                                        "Database Tables"
+                                        "Database Tables",
+                                        "SQL Statement Type"
                                     });
     }
     
@@ -319,9 +347,6 @@ abstract class JDBCTreeTableView extends JDBCView {
     }
     
     static boolean isSQL(PresoObjAllocCCTNode node) {
-//        CCTNode p = node.getParent();
-//        if (p != null && p.getParent() == null) return true;
-//        return false;
         return node instanceof SQLQueryNode;
     }
     
@@ -347,11 +372,11 @@ abstract class JDBCTreeTableView extends JDBCView {
             } else if (columnIndex == 2) {
                 return COLUMN_INVOCATIONS;
             }  else if (columnIndex == 3) {
-                return "Statement Type";
-            } else if (columnIndex == 4) {
                 return "Command Type";
-            } else if (columnIndex == 5) {
+            } else if (columnIndex == 4) {
                 return "Tables";
+            } else if (columnIndex == 5) {
+                return "Statement Type";
             }
             return null;
         }
@@ -359,10 +384,10 @@ abstract class JDBCTreeTableView extends JDBCView {
         public Class<?> getColumnClass(int columnIndex) {
             if (columnIndex == 0) {
                 return JTree.class;
-//            } else if (columnIndex == 1) {
-//                return Long.class;
-//            } else if (columnIndex == 2) {
-//                return Integer.class;
+            } else if (columnIndex == 1) {
+                return Long.class;
+            } else if (columnIndex == 2) {
+                return Integer.class;
             } else if (columnIndex == 3) {
                 return String.class;
             } else if (columnIndex == 4) {
@@ -371,7 +396,6 @@ abstract class JDBCTreeTableView extends JDBCView {
                 return String.class;
             }
             return Long.class;
-//            return null;
         }
 
         public int getColumnCount() {
@@ -388,23 +412,24 @@ abstract class JDBCTreeTableView extends JDBCView {
                 return jdbcNode.nCalls;
             } else if (columnIndex == 3) {
                 if (jdbcNode instanceof SQLQueryNode) {
+                    return commandString(((SQLQueryNode)jdbcNode).getCommandType());
+                } else {
+                    return "-"; // NOI18N
+                }
+                
+            } else if (columnIndex == 4) {
+                if (jdbcNode instanceof SQLQueryNode) {
+                    return formatTables(((SQLQueryNode)jdbcNode).getTables());
+                } else {
+                    return "-"; // NOI18N
+                }
+            } else if (columnIndex == 5) {
+                if (jdbcNode instanceof SQLQueryNode) {
                     switch (((SQLQueryNode)jdbcNode).getStatementType()) {
                         case JdbcCCTProvider.SQL_PREPARED_STATEMENT: return "prepared";
                         case JdbcCCTProvider.SQL_CALLABLE_STATEMENT: return "callable";
                         default: return "regular";
                     }
-                } else {
-                    return "-";
-                }
-            } else if (columnIndex == 4) {
-                if (jdbcNode instanceof SQLQueryNode) {
-                    return commandString(((SQLQueryNode)jdbcNode).getCommandType());
-                } else {
-                    return "-";
-                }
-            } else if (columnIndex == 5) {
-                if (jdbcNode instanceof SQLQueryNode) {
-                    return Arrays.toString(((SQLQueryNode)jdbcNode).getTables());
                 } else {
                     return "-";
                 }
@@ -416,6 +441,18 @@ abstract class JDBCTreeTableView extends JDBCView {
 
         public boolean isCellEditable(TreeNode node, int columnIndex) {
             return false;
+        }
+        
+        private String formatTables(String[] tables) {
+            int count = tables.length - 1;
+            if (count == -1) return "-"; // NOI18N
+            
+            StringBuilder b = new StringBuilder();
+            for (int i = 0; ; i++) {
+                b.append(tables[i]);
+                if (i == count) return b.toString();
+                b.append(", "); // NOI18N
+            }
         }
         
     }
