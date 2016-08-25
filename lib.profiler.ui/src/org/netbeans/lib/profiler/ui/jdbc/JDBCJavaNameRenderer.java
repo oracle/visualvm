@@ -43,6 +43,10 @@
 
 package org.netbeans.lib.profiler.ui.jdbc;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -67,11 +71,8 @@ final class JDBCJavaNameRenderer extends JavaNameRenderer {
     private final Icon icon;
     private final Icon iconDisabled;
     
-    private JLabel sqlRenderer;
-    
     private String currentValue;
-    
-    private boolean isSQL;
+    private JLabel currentSQLRenderer;
     
     public JDBCJavaNameRenderer() {
         this(ProfilerIcons.NODE_REVERSE);
@@ -89,16 +90,14 @@ final class JDBCJavaNameRenderer extends JavaNameRenderer {
             boolean filtered = node.isFiltered();
             currentValue = node.getNodeName();
             
-            isSQL = JDBCTreeTableView.isSQL(node);
-            if (isSQL) {
+            if (JDBCTreeTableView.isSQL(node)) {
                 JDBCTreeTableView.SQLQueryNode sqlNode = (JDBCTreeTableView.SQLQueryNode)node;
                 String htmlName = sqlNode.htmlName;
                 if (htmlName == null) {
                     htmlName = SQLFormatter.format(currentValue);
                     sqlNode.htmlName = htmlName;
                 }
-                sqlRenderer().setText(htmlName);
-                sqlRenderer().setIcon(filtered ? SQL_ICON_DISABLED : SQL_ICON);
+                currentSQLRenderer = sqlRenderer(htmlName, filtered ? SQL_ICON_DISABLED : SQL_ICON);
             } else {
                 if (filtered) {
                     setNormalValue(""); // NOI18N
@@ -113,6 +112,7 @@ final class JDBCJavaNameRenderer extends JavaNameRenderer {
                 } else {
                     setIcon(filtered ? iconDisabled : icon);
                 }
+                currentSQLRenderer = null;
             }
         } else {
             super.setValue(value, row);
@@ -120,7 +120,7 @@ final class JDBCJavaNameRenderer extends JavaNameRenderer {
     }
     
     public JComponent getComponent() {
-        return isSQL ? sqlRenderer() : super.getComponent();
+        return currentSQLRenderer != null ? currentSQLRenderer : super.getComponent();
     }
     
     public String toString() {
@@ -128,8 +128,34 @@ final class JDBCJavaNameRenderer extends JavaNameRenderer {
     }
     
     
-    private JLabel sqlRenderer() {
-        if (sqlRenderer == null) sqlRenderer = new DefaultTableCellRenderer();
+    private static int CACHE_SIZE = 100;
+    private List<String> sqlRenderersKeys;
+    private Map<String, JLabel> sqlRenderersCache;
+    
+    private JLabel sqlRenderer(String text, Icon icon) {
+        if (sqlRenderersCache == null) {
+            sqlRenderersKeys = new ArrayList(CACHE_SIZE);
+            sqlRenderersCache = new HashMap(CACHE_SIZE);
+        }
+        
+        JLabel sqlRenderer = sqlRenderersCache.get(text);
+        
+        if (sqlRenderer == null) {
+            if (sqlRenderersKeys.size() < CACHE_SIZE) {
+                sqlRenderer = new DefaultTableCellRenderer();
+            } else {
+                String key = sqlRenderersKeys.remove(0);
+                sqlRenderer = sqlRenderersCache.remove(key);
+            }
+            
+            sqlRenderersKeys.add(text);
+            sqlRenderersCache.put(text, sqlRenderer);
+            
+            sqlRenderer.setText(text);
+        }
+        
+        sqlRenderer.setIcon(icon);
+        
         return sqlRenderer;
     }
     
