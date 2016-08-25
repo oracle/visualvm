@@ -251,13 +251,6 @@ public abstract class LiveJDBCView extends JPanel {
     protected void popupHidden() {};
     
     
-//    protected void foundInForwardCalls() {}
-//    
-//    protected void foundInHotSpots() {}
-//    
-//    protected void foundInReverseCalls() {}
-    
-    
     private void profileMethod(ClientUtils.SourceCodeSelection value) {
         selectForProfiling(value);
     }
@@ -301,27 +294,6 @@ public abstract class LiveJDBCView extends JPanel {
             public void run() { lastFocused = jdbcCallsView; }
         });
         
-//        JSplitPane upperSplit = new JExtendedSplitPane(JSplitPane.VERTICAL_SPLIT) {
-//            {
-//                setBorder(null);
-//                setDividerSize(5);
-//
-//                if (getUI() instanceof BasicSplitPaneUI) {
-//                    BasicSplitPaneDivider divider = ((BasicSplitPaneUI)getUI()).getDivider();
-//                    if (divider != null) {
-//                        Color c = UIUtils.isNimbus() || UIUtils.isAquaLookAndFeel() ?
-//                                  UIUtils.getDisabledLineColor() : new JSeparator().getForeground();
-//                        divider.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, c));
-//                    }
-//                }
-//            }
-//        };
-//        upperSplit.setBorder(BorderFactory.createEmptyBorder());
-//        upperSplit.setTopComponent(jdbcCallsView);
-////        upperSplit.setBottomComponent(hotSpotsView);
-//        upperSplit.setDividerLocation(0.5d);
-//        upperSplit.setResizeWeight(0.5d);
-        
         add(jdbcCallsView, BorderLayout.CENTER);
         
 //        // TODO: read last state?
@@ -351,7 +323,6 @@ public abstract class LiveJDBCView extends JPanel {
         
         if (lastFocused == null) {
             if (jdbcCallsView.isShowing()) lastFocused = jdbcCallsView;
-//            else if (hotSpotsView.isShowing()) lastFocused = hotSpotsView;
         }
         
         return lastFocused;

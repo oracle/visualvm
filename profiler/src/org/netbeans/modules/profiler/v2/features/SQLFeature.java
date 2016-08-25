@@ -87,7 +87,9 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @NbBundle.Messages({
     "SQLFeature_name=SQL Queries",
-    "SQLFeature_description=Display executed SQL queries, their duration and invocation paths"
+    "SQLFeature_description=Display executed SQL queries, their duration and invocation paths",
+    "SQLFeature_profileMethod=Profile Method",
+    "SQLFeature_profileClass=Profile Class"
 })
 final class SQLFeature extends ProfilerFeature.Basic {
     
@@ -374,8 +376,8 @@ final class SQLFeature extends ProfilerFeature.Basic {
                 RequestProcessor.getDefault().post(new Runnable() {
                     public void run() {
                         String name = Wildcards.ALLWILDCARD.equals(value.getMethodName()) ?
-                                      "Profile Class" :
-                                      "Profile Method";
+                                      Bundle.SQLFeature_profileClass() :
+                                      Bundle.SQLFeature_profileMethod();
                         ProfilerSession.findAndConfigure(Lookups.fixed(value), getProject(), name);
                     }
                 });

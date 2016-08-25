@@ -79,10 +79,6 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-//    "LocksFeatureUI_show=View by:",
-//    "LocksFeatureUI_aggregationByThreads=Threads",
-//    "LocksFeatureUI_aggregationByMonitors=Monitors",
-//    "LocksFeatureUI_aggregationHint=Results aggregation"
     "LocksFeatureUI_SqlQueryCaption=SQL Query Viewer",
     "LocksFeatureUI_SqlQueryLabel=SQL Query:"
 })
@@ -253,7 +249,6 @@ abstract class SQLFeatureUI extends FeatureUI {
 
         pdSnapshotButton = new JButton(TakeSnapshotAction.getInstance());
         pdSnapshotButton.setHideActionText(true);
-//        pdSnapshotButton.setText(Bundle.MethodsFeatureUI_snapshot());
 
         pdResetResultsButton = new JButton(ResetResultsAction.getInstance());
         pdResetResultsButton.setHideActionText(true);
@@ -272,14 +267,6 @@ abstract class SQLFeatureUI extends FeatureUI {
         toolbar.addSpace(5);
         toolbar.add(lrDeltasButton);
         
-//        toolbar.addSpace(2);
-//        toolbar.addSeparator();
-//        toolbar.addSpace(5);
-        
-//        toolbar.add(new GrayLabel(Bundle.MethodsFeatureUI_view()));
-//        toolbar.addSpace(2);
-//        toolbar.add(forwardCalls);
-//
         toolbar.addSpace(2);
         toolbar.addSeparator();
         toolbar.addSpace(5);
