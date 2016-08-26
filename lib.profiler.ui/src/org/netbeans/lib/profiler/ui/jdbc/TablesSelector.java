@@ -49,6 +49,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JLabel;
@@ -72,6 +73,20 @@ import org.openide.util.Lookup;
  * @author Jiri Sedlacek
  */
 abstract class TablesSelector {
+    
+    // -----
+    // I18N String constants
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.jdbc.Bundle"); // NOI18N
+    private static final String SELECT_TABLES = messages.getString("TablesSelector_SelectTables"); // NOI18N
+    private static final String FILTER_TABLES = messages.getString("TablesSelector_FilterTables"); // NOI18N
+    private static final String COLUMN_SELECTED = messages.getString("TablesSelector_ColumnSelected"); // NOI18N
+    private static final String COLUMN_TABLE = messages.getString("TablesSelector_ColumnTable"); // NOI18N
+    private static final String COLUMN_SELECTED_TOOLTIP = messages.getString("TablesSelector_ColumnSelectedToolTip"); // NOI18N
+    private static final String COLUMN_TABLE_TOOLTIP = messages.getString("TablesSelector_ColumnTableToolTip"); // NOI18N
+    private static final String ACT_SELECT_ALL = messages.getString("TablesSelector_ActSelectAll"); // NOI18N
+    private static final String ACT_UNSELECT_ALL = messages.getString("TablesSelector_ActUnselectAll"); // NOI18N
+    // -----
+    
     
     private final String[] tables;
     private final Collection<String> selected;
@@ -111,15 +126,15 @@ abstract class TablesSelector {
             JPanel content = new JPanel(new BorderLayout());
             content.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
             
-            JLabel hint = new JLabel("Select tables:", JLabel.LEADING);
+            JLabel hint = new JLabel(SELECT_TABLES, JLabel.LEADING);
             hint.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
             content.add(hint, BorderLayout.NORTH);
 
             final SelectedTablesModel tablesModel = new SelectedTablesModel();
             final ProfilerTable tablesTable = new ProfilerTable(tablesModel, true, false, null);
             tablesTable.setColumnToolTips(new String[] {
-                "Selected for displaying",
-                "Table name" });
+                COLUMN_SELECTED_TOOLTIP,
+                COLUMN_TABLE_TOOLTIP });
             tablesTable.setMainColumn(1);
             tablesTable.setFitWidthColumn(1);
             tablesTable.setDefaultSortOrder(1, SortOrder.ASCENDING);
@@ -137,7 +152,7 @@ abstract class TablesSelector {
             ProfilerTableContainer tableContainer = new ProfilerTableContainer(tablesTable, true, null);
             content.add(tableContainer, BorderLayout.CENTER);
 
-            JToolBar controls = new FilteringToolbar("Filter tables") {
+            JToolBar controls = new FilteringToolbar(FILTER_TABLES) {
                 protected void filterChanged(final String filter) {
                     if (filter == null) tablesTable.setRowFilter(null);
                     else tablesTable.setRowFilter(new RowFilter() {
@@ -152,7 +167,7 @@ abstract class TablesSelector {
             controls.addSeparator();
             controls.add(Box.createHorizontalStrut(3));
             
-            selectAll = new SmallButton(" Select All ") {
+            selectAll = new SmallButton(" " + ACT_SELECT_ALL + " ") { // NOI18N
                 protected void fireActionPerformed(ActionEvent e) {
                     super.fireActionPerformed(e);
                     SwingUtilities.invokeLater(new Runnable() {
@@ -165,7 +180,7 @@ abstract class TablesSelector {
                 }
             };
             controls.add(selectAll);
-            unselectAll = new SmallButton(" Unselect All ") {
+            unselectAll = new SmallButton(" " + ACT_UNSELECT_ALL + " ") { // NOI18N
                 protected void fireActionPerformed(ActionEvent e) {
                     super.fireActionPerformed(e);
                     SwingUtilities.invokeLater(new Runnable() {
@@ -201,9 +216,9 @@ abstract class TablesSelector {
             
             public String getColumnName(int columnIndex) {
                 if (columnIndex == 0) {
-                    return "Selected";
+                    return COLUMN_SELECTED;
                 } else if (columnIndex == 1) {
-                    return "Tables";
+                    return COLUMN_TABLE;
                 }
                 return null;
             }

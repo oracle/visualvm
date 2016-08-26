@@ -195,7 +195,7 @@ abstract class JDBCTreeTableView extends JDBCView {
     
     
     ExportUtils.ExportProvider[] getExportProviders() {
-        final String name = EXPORT_FORWARD_CALLS;
+        final String name = EXPORT_QUERIES;
         return treeTable.getRowCount() == 0 ? null : new ExportUtils.ExportProvider[] {
             new ExportUtils.CSVExportProvider(treeTable),
             new ExportUtils.HTMLExportProvider(treeTable, name),
@@ -318,9 +318,9 @@ abstract class JDBCTreeTableView extends JDBCView {
                                         NAME_COLUMN_TOOLTIP,
                                         TOTAL_TIME_COLUMN_TOOLTIP,
                                         INVOCATIONS_COLUMN_TOOLTIP,
-                                        "SQL Command Type",
-                                        "Database Tables",
-                                        "SQL Statement Type"
+                                        COMMANDS_COLUMN_TOOLTIP,
+                                        TABLES_COLUMN_TOOLTIP,
+                                        STATEMENTS_COLUMN_TOOLTIP
                                     });
     }
     
@@ -372,11 +372,11 @@ abstract class JDBCTreeTableView extends JDBCView {
             } else if (columnIndex == 2) {
                 return COLUMN_INVOCATIONS;
             }  else if (columnIndex == 3) {
-                return "Command Type";
+                return COLUMN_COMMANDS;
             } else if (columnIndex == 4) {
-                return "Tables";
+                return COLUMN_TABLES;
             } else if (columnIndex == 5) {
-                return "Statement Type";
+                return COLUMN_STATEMENTS;
             }
             return null;
         }
@@ -426,9 +426,9 @@ abstract class JDBCTreeTableView extends JDBCView {
             } else if (columnIndex == 5) {
                 if (jdbcNode instanceof SQLQueryNode) {
                     switch (((SQLQueryNode)jdbcNode).getStatementType()) {
-                        case JdbcCCTProvider.SQL_PREPARED_STATEMENT: return "prepared";
-                        case JdbcCCTProvider.SQL_CALLABLE_STATEMENT: return "callable";
-                        default: return "regular";
+                        case JdbcCCTProvider.SQL_PREPARED_STATEMENT: return STATEMENT_PREPARED;
+                        case JdbcCCTProvider.SQL_CALLABLE_STATEMENT: return STATEMENT_CALLABLE;
+                        default: return STATEMENT_REGULAR;
                     }
                 } else {
                     return "-";

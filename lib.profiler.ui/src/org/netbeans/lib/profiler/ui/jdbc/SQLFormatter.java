@@ -42,9 +42,12 @@
  */
 package org.netbeans.lib.profiler.ui.jdbc;
 
+import java.awt.Color;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JLabel;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
@@ -155,8 +158,8 @@ final class SQLFormatter {
         s.append("</html>"); // NOI18N
 
         formattedCommand = s.toString();
-        formattedCommand = formattedCommand.replace("(", "<font color='gray'>(");   // NOI18N
         formattedCommand = formattedCommand.replace(")", ")</font>");   // NOI18N
+        formattedCommand = formattedCommand.replace("(", "<font color='" + getGrayHTMLString() + "'>(");   // NOI18N
         return formattedCommand;
     }
 
@@ -171,4 +174,15 @@ final class SQLFormatter {
         }
         return "";
     }
+    
+    
+    private static String grayHTMLString;
+    private static String getGrayHTMLString() {
+        if (grayHTMLString == null) {
+            Color grayColor = UIUtils.getDisabledForeground(new JLabel().getForeground());
+            grayHTMLString = "rgb(" + grayColor.getRed() + "," + grayColor.getGreen() + "," + grayColor.getBlue() + ")"; //NOI18N
+        }
+        return grayHTMLString;
+    }
+    
 }

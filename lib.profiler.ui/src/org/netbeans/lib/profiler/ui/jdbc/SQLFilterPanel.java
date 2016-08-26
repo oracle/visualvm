@@ -52,6 +52,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -80,6 +81,22 @@ import org.netbeans.lib.profiler.ui.swing.PopupButton;
  * @author Jiri Sedlacek
  */
 abstract class SQLFilterPanel extends JPanel {
+    
+    // -----
+    // I18N String constants
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.jdbc.Bundle"); // NOI18N
+    private static final String QUERIES_CAPTION = messages.getString("SQLFilterPanel_QueriesCaption"); // NOI18N
+    private static final String FILTER_BUTTON = messages.getString("SQLFilterPanel_FilterButton"); // NOI18N
+    private static final String COMMANDS_DROPDOWN = messages.getString("SQLFilterPanel_CommandsDropdown"); // NOI18N
+    private static final String COMMANDS_NOTAVAILABLE = messages.getString("SQLFilterPanel_CommandsNotAvailable"); // NOI18N
+    private static final String TABLES_DROPDOWN = messages.getString("SQLFilterPanel_TablesDropdown"); // NOI18N
+    private static final String TABLES_NOTAVAILABLE = messages.getString("SQLFilterPanel_TablesNotAvailable"); // NOI18N
+    private static final String STATEMENTS_DROPDOWN = messages.getString("SQLFilterPanel_StatementsDropdown"); // NOI18N
+    private static final String STATEMENT_REGULAR = messages.getString("SQLFilterPanel_StatementRegular"); // NOI18N
+    private static final String STATEMENT_PREPARED = messages.getString("SQLFilterPanel_StatementPrepared"); // NOI18N
+    private static final String STATEMENT_CALLABLE = messages.getString("SQLFilterPanel_StatementCallable"); // NOI18N
+    // -----
+    
     
     private static final String APPLY_ACTION_KEY = "apply-action-key"; // NOI18N
     
@@ -114,7 +131,7 @@ abstract class SQLFilterPanel extends JPanel {
         };
         
         toolbar.add(Box.createHorizontalStrut(3));
-        toolbar.add(new JLabel("Queries:"));
+        toolbar.add(new JLabel(QUERIES_CAPTION));
         toolbar.add(Box.createHorizontalStrut(3));
         
         final JTextField filterF = new JTextField(20) {
@@ -137,7 +154,7 @@ abstract class SQLFilterPanel extends JPanel {
         
         toolbar.add(Box.createHorizontalStrut(10));
         
-        applyB = new JButton("Apply") {
+        applyB = new JButton(FILTER_BUTTON) {
             protected void fireActionPerformed(ActionEvent e) { apply(); }
         };
         applyB.setOpaque(false);
@@ -154,11 +171,11 @@ abstract class SQLFilterPanel extends JPanel {
         
         toolbar.add(Box.createHorizontalStrut(8));
         
-        PopupButton commands = new PopupButton(" Commands ") {
+        PopupButton commands = new PopupButton(" " + COMMANDS_DROPDOWN + " ") { // NOI18N
             protected void populatePopup(JPopupMenu popup) {
                 List<String> commands = new ArrayList(getCommands());
                 if (commands.isEmpty()) {
-                    JLabel l = new JLabel("No commands available");
+                    JLabel l = new JLabel(COMMANDS_NOTAVAILABLE);
                     l.setBorder(BorderFactory.createEmptyBorder(9, 6, 9, 6));
                     popup.add(l);
                 } else {
@@ -183,7 +200,7 @@ abstract class SQLFilterPanel extends JPanel {
         
         toolbar.add(Box.createHorizontalStrut(5));
         
-        PopupButton tables = new PopupButton(" Tables ") {
+        PopupButton tables = new PopupButton(" " + TABLES_DROPDOWN + " ") { // NOI18N
             protected void displayPopup() {
                 Set<String> tables = new HashSet(getTables());
                 if (tables.isEmpty()) {
@@ -202,7 +219,7 @@ abstract class SQLFilterPanel extends JPanel {
                 }
             }
             protected void populatePopup(JPopupMenu popup) {
-                JLabel l = new JLabel("No tables available");
+                JLabel l = new JLabel(TABLES_NOTAVAILABLE);
                 l.setBorder(BorderFactory.createEmptyBorder(9, 6, 9, 6));
                 popup.add(l);
             }
@@ -211,9 +228,9 @@ abstract class SQLFilterPanel extends JPanel {
         
         toolbar.add(Box.createHorizontalStrut(5));
         
-        PopupButton statements = new PopupButton(" Statements ") {
+        PopupButton statements = new PopupButton(" " + STATEMENTS_DROPDOWN + " ") { // NOI18N
             protected void populatePopup(JPopupMenu popup) {
-                popup.add(new JCheckBoxMenuItem("Regular", !current.statements.contains(JdbcCCTProvider.SQL_STATEMENT)) {
+                popup.add(new JCheckBoxMenuItem(STATEMENT_REGULAR, !current.statements.contains(JdbcCCTProvider.SQL_STATEMENT)) {
                     protected void fireActionPerformed(ActionEvent e) {
                         if (!isSelected()) current.statements.add(JdbcCCTProvider.SQL_STATEMENT);
                         else current.statements.remove(JdbcCCTProvider.SQL_STATEMENT);
@@ -223,7 +240,7 @@ abstract class SQLFilterPanel extends JPanel {
                     }
                 });
                 
-                popup.add(new JCheckBoxMenuItem("Prepared", !current.statements.contains(JdbcCCTProvider.SQL_PREPARED_STATEMENT)) {
+                popup.add(new JCheckBoxMenuItem(STATEMENT_PREPARED, !current.statements.contains(JdbcCCTProvider.SQL_PREPARED_STATEMENT)) {
                     protected void fireActionPerformed(ActionEvent e) {
                         if (!isSelected()) current.statements.add(JdbcCCTProvider.SQL_PREPARED_STATEMENT);
                         else current.statements.remove(JdbcCCTProvider.SQL_PREPARED_STATEMENT);
@@ -233,7 +250,7 @@ abstract class SQLFilterPanel extends JPanel {
                     }
                 });
                 
-                popup.add(new JCheckBoxMenuItem("Callable", !current.statements.contains(JdbcCCTProvider.SQL_CALLABLE_STATEMENT)) {
+                popup.add(new JCheckBoxMenuItem(STATEMENT_CALLABLE, !current.statements.contains(JdbcCCTProvider.SQL_CALLABLE_STATEMENT)) {
                     protected void fireActionPerformed(ActionEvent e) {
                         if (!isSelected()) current.statements.add(JdbcCCTProvider.SQL_CALLABLE_STATEMENT);
                         else current.statements.remove(JdbcCCTProvider.SQL_CALLABLE_STATEMENT);
