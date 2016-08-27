@@ -58,7 +58,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.CCTNode;
@@ -145,43 +144,30 @@ abstract class JDBCTreeTableView extends JDBCView {
             }
         }
         
-        final long __totalBytes = !diff ? totalBytes :
-                Math.max(Math.abs(totalBytes), Math.abs(_totalBytes));
-        final long __totalObjects = !diff ? totalObjects :
-                Math.max(Math.abs(totalObjects), Math.abs(_totalObjects));
-        final PresoObjAllocCCTNode root = PresoObjAllocCCTNode.rootNode(nodes.toArray(new PresoObjAllocCCTNode[0]));
+        long __totalBytes = !diff ? totalBytes : Math.max(Math.abs(totalBytes), Math.abs(_totalBytes));
+        long __totalObjects = !diff ? totalObjects : Math.max(Math.abs(totalObjects), Math.abs(_totalObjects));
         
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                renderers[0].setMaxValue(__totalBytes);
-                renderers[1].setMaxValue(__totalObjects);
-                renderers[0].setDiffMode(diff);
-                renderers[1].setDiffMode(diff);
-                treeTableModel.setRoot(root);
-                
-                currentData = newData;
-            }
-        });
+        renderers[0].setMaxValue(__totalBytes);
+        renderers[1].setMaxValue(__totalObjects);
+        renderers[0].setDiffMode(diff);
+        renderers[1].setDiffMode(diff);
+        treeTableModel.setRoot(PresoObjAllocCCTNode.rootNode(nodes.toArray(new PresoObjAllocCCTNode[0])));
+
+        currentData = newData;
     }
     
     public void resetData() {
-        final PresoObjAllocCCTNode root = PresoObjAllocCCTNode.rootNode(new PresoObjAllocCCTNode[0]);
-        
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                renderers[0].setMaxValue(0);
-                renderers[1].setMaxValue(0);
-                renderers[0].setDiffMode(false);
-                renderers[1].setDiffMode(false);
-                
-                treeTableModel.setRoot(root);
-                
-                if (commands != null) commands.clear();
-                if (tables != null) tables.clear();
-                
-                currentData = null;
-            }
-        });
+        renderers[0].setMaxValue(0);
+        renderers[1].setMaxValue(0);
+        renderers[0].setDiffMode(false);
+        renderers[1].setDiffMode(false);
+
+        treeTableModel.setRoot(PresoObjAllocCCTNode.rootNode(new PresoObjAllocCCTNode[0]));
+
+        if (commands != null) commands.clear();
+        if (tables != null) tables.clear();
+
+        currentData = null;
     }
     
     

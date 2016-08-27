@@ -46,6 +46,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -75,6 +76,7 @@ import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.InvisibleToolbar;
 import org.netbeans.lib.profiler.ui.swing.PopupButton;
+import org.netbeans.modules.profiler.api.ActionsSupport;
 
 /**
  *
@@ -95,6 +97,10 @@ abstract class SQLFilterPanel extends JPanel {
     private static final String STATEMENT_REGULAR = messages.getString("SQLFilterPanel_StatementRegular"); // NOI18N
     private static final String STATEMENT_PREPARED = messages.getString("SQLFilterPanel_StatementPrepared"); // NOI18N
     private static final String STATEMENT_CALLABLE = messages.getString("SQLFilterPanel_StatementCallable"); // NOI18N
+    private static final String FILTER_TOOLTIP = messages.getString("SQLFilterPanel_FilterTooltip"); // NOI18N
+    private static final String COMMANDS_TOOLTIP = messages.getString("SQLFilterPanel_CommandsTooltip"); // NOI18N
+    private static final String TABLES_TOOLTIP = messages.getString("SQLFilterPanel_TablesTooltip"); // NOI18N
+    private static final String STATEMENTS_TOOLTIP = messages.getString("SQLFilterPanel_StatementsTooltip"); // NOI18N
     // -----
     
     
@@ -157,6 +163,8 @@ abstract class SQLFilterPanel extends JPanel {
         applyB = new JButton(FILTER_BUTTON) {
             protected void fireActionPerformed(ActionEvent e) { apply(); }
         };
+        String filterAccelerator = ActionsSupport.keyAcceleratorString(applyKey);
+        applyB.setToolTipText(MessageFormat.format(FILTER_TOOLTIP, filterAccelerator));
         applyB.setOpaque(false);
         JPanel applyP = new JPanel(new BorderLayout()) {
             public Dimension getMaximumSize() { return getMinimumSize(); }
@@ -196,6 +204,7 @@ abstract class SQLFilterPanel extends JPanel {
                 }
             }
         };
+        commands.setToolTipText(COMMANDS_TOOLTIP);
         toolbar.add(commands);
         
         toolbar.add(Box.createHorizontalStrut(5));
@@ -224,6 +233,7 @@ abstract class SQLFilterPanel extends JPanel {
                 popup.add(l);
             }
         };
+        tables.setToolTipText(TABLES_TOOLTIP);
         toolbar.add(tables);
         
         toolbar.add(Box.createHorizontalStrut(5));
@@ -261,6 +271,7 @@ abstract class SQLFilterPanel extends JPanel {
                 });
             }
         };
+        statements.setToolTipText(STATEMENTS_TOOLTIP);
         toolbar.add(statements);
         
         toolbar.add(Box.createHorizontalStrut(3));
