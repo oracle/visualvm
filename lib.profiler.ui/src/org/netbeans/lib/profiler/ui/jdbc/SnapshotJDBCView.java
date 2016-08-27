@@ -47,6 +47,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -55,6 +57,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.jdbc.JdbcResultsDiff;
 import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
@@ -89,6 +92,8 @@ public abstract class SnapshotJDBCView extends JPanel {
     private JDBCTreeTableView jdbcCallsView;
     
     private JToggleButton compareButton;
+    
+    private ExecutorService executor;
     
     
     public SnapshotJDBCView(JdbcResultsSnapshot snapshot, Action saveAction, Action compareAction, Action infoAction, ExportUtils.Exportable exportProvider) {
@@ -307,11 +312,19 @@ public abstract class SnapshotJDBCView extends JPanel {
     protected void customizeNodePopup(DataView invoker, JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {}
     
     private void setData() {
-        JdbcResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
-                                       snapshot.createDiff(refSnapshot);
-
-        boolean diff = _snapshot instanceof JdbcResultsDiff;
-        jdbcCallsView.setData(_snapshot, null, -1, null, false, false, diff);
+        getExecutor().submit(new Runnable() {
+            public void run() {
+                final JdbcResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
+                                               snapshot.createDiff(refSnapshot);
+                
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        boolean diff = _snapshot instanceof JdbcResultsDiff;
+                        jdbcCallsView.setData(_snapshot, null, -1, null, false, false, diff);
+                    }
+                });
+            }
+        });
     }
     
     protected final void setSnapshot(JdbcResultsSnapshot snapshot) {
@@ -344,6 +357,11 @@ public abstract class SnapshotJDBCView extends JPanel {
                 }
             }
         };
+    }
+    
+    private synchronized ExecutorService getExecutor() {
+        if (executor == null) executor = Executors.newSingleThreadExecutor();
+        return executor;
     }
     
 }
