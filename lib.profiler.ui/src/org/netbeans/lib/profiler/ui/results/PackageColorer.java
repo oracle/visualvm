@@ -188,7 +188,7 @@ public final class PackageColorer {
         String jpa = new String("org.eclipse.persistence., org.hibernate., org.apache.openjpa."); // NOI18N
         colors.add(new ColoredFilter(FILTERS_JPA, jpa, new Color(135, 135, 135)));
         
-        String javaee = new String("javax.servlet., com.sun.enterprise., com.sun.ejb., org.jboss.weld., org.springframework."); // NOI18N
+        String javaee = new String("javax.servlet., com.sun.enterprise., com.sun.ejb., org.jboss.weld., org.jboss.logging., org.springframework."); // NOI18N
         colors.add(new ColoredFilter(FILTERS_JAVAEE, javaee, new Color(135, 135, 135)));
         
         String servers = new String("org.glassfish., com.sun.appserv., com.sun.gjc., weblogic., com.oracle.weblogic., com.bea., org.apache.tomcat., org.apache.catalina., org.jboss.as., org.eclipse.jetty."); // NOI18N
