@@ -72,6 +72,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
@@ -230,6 +231,12 @@ public abstract class LockContentionPanel extends DataView {
         treeTable.setShowsRootHandles(true);
         
         treeTable.providePopupMenu(true);
+        
+        treeTable.setMainColumn(0);
+        treeTable.setFitWidthColumn(0);
+        
+        treeTable.setSortColumn(1);
+        treeTable.setDefaultSortOrder(1, SortOrder.DESCENDING);
         
         LockContentionRenderer lcRenderer = new LockContentionRenderer();
         treeTable.setTreeCellRenderer(lcRenderer);
