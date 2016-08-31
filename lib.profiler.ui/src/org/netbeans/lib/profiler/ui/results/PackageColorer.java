@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
@@ -59,6 +60,18 @@ import org.netbeans.modules.profiler.api.ProfilerStorage;
  * @author Jiri Sedlacek
  */
 public final class PackageColorer {
+    
+    // -----
+    // I18N String constants
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.results.Bundle"); // NOI18N
+    private static final String FILTERS_REFLECTION = messages.getString("PackageColorer_FiltersReflection"); // NOI18N
+    private static final String FILTERS_JPA = messages.getString("PackageColorer_FiltersJpa"); // NOI18N
+    private static final String FILTERS_SERVERS = messages.getString("PackageColorer_FiltersServers"); // NOI18N
+    private static final String FILTERS_JAVASE = messages.getString("PackageColorer_FiltersJavaSe"); // NOI18N
+    private static final String FILTERS_JAVAEE = messages.getString("PackageColorer_FiltersJavaEe"); // NOI18N
+//    private static final String FILTERS_LIQUIBASE = messages.getString("PackageColorer_FiltersLiquibase"); // NOI18N
+    // -----
+    
     
     private static final String FILTERS_FILE = "filters"; // NOI18N
     
@@ -169,11 +182,23 @@ public final class PackageColorer {
     }
     
     private static void createDefaultFilters(List<ColoredFilter> colors) {
-        String reflection = new String("java.lang.reflect., sun.reflect., com.sun.proxy."); // NOI18N
-        colors.add(new ColoredFilter("Java Reflection", reflection, new Color(180, 180, 180)));
+//        String liquibase = new String("liquibase."); // NOI18N
+//        colors.add(new ColoredFilter(FILTERS_LIQUIBASE, liquibase, new Color(135, 135, 135)));
         
-        String javaee = new String("javax.servlet., org.apache.catalina., org.springframework., org.eclipse.persistence."); // NOI18N
-        colors.add(new ColoredFilter("Java EE Frameworks", javaee, new Color(135, 135, 135)));
+        String jpa = new String("org.eclipse.persistence., org.hibernate., org.apache.openjpa."); // NOI18N
+        colors.add(new ColoredFilter(FILTERS_JPA, jpa, new Color(135, 135, 135)));
+        
+        String javaee = new String("javax.servlet., com.sun.enterprise., com.sun.ejb., org.jboss.weld., org.springframework."); // NOI18N
+        colors.add(new ColoredFilter(FILTERS_JAVAEE, javaee, new Color(135, 135, 135)));
+        
+        String servers = new String("org.glassfish., com.sun.appserv., com.sun.gjc., weblogic., com.oracle.weblogic., com.bea., org.apache.tomcat., org.apache.catalina., org.jboss.as., org.eclipse.jetty."); // NOI18N
+        colors.add(new ColoredFilter(FILTERS_SERVERS, servers, new Color(135, 135, 135)));
+        
+        String reflection = new String("java.lang.reflect., sun.reflect., com.sun.proxy."); // NOI18N
+        colors.add(new ColoredFilter(FILTERS_REFLECTION, reflection, new Color(180, 180, 180)));
+        
+        String javase = new String("apple.laf., apple.awt., com.apple., com.sun., java., javax., sun., sunw., org.omg."); // NOI18N
+        colors.add(new ColoredFilter(FILTERS_JAVASE, javase, new Color(135, 135, 135)));
     }
     
 }
