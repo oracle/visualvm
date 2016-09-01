@@ -643,6 +643,8 @@ void JNICALL vm_object_alloc(jvmtiEnv *jvmti_env,
             jobject object,
             jclass object_klass,
             jlong size) {
+    jthrowable exception = NULL;
+
     if (jni_env == NULL) {
         return; // primordial phase
     }
@@ -650,8 +652,18 @@ void JNICALL vm_object_alloc(jvmtiEnv *jvmti_env,
     if (!trackingMethodsInitialized) {
         initializeMethods (jni_env);
     }
+    // if an exception was thrown, we need to catch and clear it for the exit handling
+    // and then rethrow
+    exception = (*jni_env)->ExceptionOccurred (jni_env);
+    if (exception != NULL) {
+        (*jni_env)->ExceptionClear (jni_env);
+    }
     (*jni_env)->CallStaticVoidMethod (jni_env, profilerRuntimeID, traceVMObjectAllocID, object, object_klass);
     (*jni_env)->ExceptionDescribe (jni_env);
+
+    if (exception != NULL) {
+        (*jni_env)->Throw (jni_env, exception);
+    }
 }
 
 /*
