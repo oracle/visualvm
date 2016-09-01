@@ -48,7 +48,7 @@ BuildForJDK()
         JDK_ID=$2
         echo $JAVA_HOME $JDK_ID
 	CC_FLAGS="-I$JAVA_HOME/include -I$JAVA_HOME/include/solaris -DSOLARIS -G -lrt \
-	-xO2 -v -mt -xc99=%none -xCC -Xa -xstrconst"
+	-xO2 -v -mt -KPIC -xCC -Xa -xstrconst"
 
 	cc $CC_FLAGS $PROC_FLAGS \
 	-o ../../release/lib/deployed/$JDK_ID/solaris-$PROC/libprofilerinterface.so \
