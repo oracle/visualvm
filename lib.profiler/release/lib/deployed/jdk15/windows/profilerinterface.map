@@ -1,11 +1,11 @@
  profilerinterface
 
- Timestamp is 5460bec0 (Mon Nov 10 14:33:52 2014)
+ Timestamp is 57c6ec7e (Wed Aug 31 16:41:02 2016)
 
  Preferred load address is 10000000
 
  Start         Length     Name                   Class
- 0001:00000000 000035d8H .text                   CODE
+ 0001:00000000 000035f8H .text                   CODE
  0002:00000000 0000004cH .idata$5                DATA
  0002:0000004c 00000004H .rdata                  DATA
  0002:00000050 00000028H .idata$2                DATA
@@ -81,20 +81,20 @@
  0001:00002b20       _monitor_contended_enter_hook@16 10003b20 f   class_file_cache.obj
  0001:00002eb0       _monitor_contended_entered_hook@16 10003eb0 f   class_file_cache.obj
  0001:00002f10       _vm_object_alloc@28        10003f10 f   class_file_cache.obj
- 0001:00002f60       _Java_org_netbeans_lib_profiler_server_system_Classes_setParkTrackingEnabled@12 10003f60 f   class_file_cache.obj
- 0001:00002fb0       _Java_org_netbeans_lib_profiler_server_system_Classes_setLockContentionMonitoringEnabled@12 10003fb0 f   class_file_cache.obj
- 0001:00002fc0       _Java_org_netbeans_lib_profiler_server_system_Classes_setWaitTrackingEnabled@12 10003fc0 f   class_file_cache.obj
- 0001:00003020       _Java_org_netbeans_lib_profiler_server_system_Classes_setSleepTrackingEnabled@12 10004020 f   class_file_cache.obj
- 0001:00003070       _Java_org_netbeans_lib_profiler_server_system_Classes_setVMObjectAllocEnabled@12 10004070 f   class_file_cache.obj
- 0001:000030b0       _parse_options_and_extract_params 100040b0 f   attach.obj
- 0001:00003230       _vm_init_hook@12           10004230 f   attach.obj
- 0001:00003380       __alldiv                   10004380 f   MSVCRT:lldiv.obj
- 0001:00003430       __allmul                   10004430 f   MSVCRT:llmul.obj
- 0001:00003464       __ftol                     10004464 f   MSVCRT:MSVCRT.dll
- 0001:0000346a       __CRT_INIT@12              1000446a f   MSVCRT:crtdll.obj
- 0001:00003515       __DllMainCRTStartup@12     10004515 f   MSVCRT:crtdll.obj
- 0001:000035b2       __initterm                 100045b2 f   MSVCRT:MSVCRT.dll
- 0001:000035b8       _DllMain@12                100045b8 f   MSVCRT:dllmain.obj
+ 0001:00002f80       _Java_org_netbeans_lib_profiler_server_system_Classes_setParkTrackingEnabled@12 10003f80 f   class_file_cache.obj
+ 0001:00002fd0       _Java_org_netbeans_lib_profiler_server_system_Classes_setLockContentionMonitoringEnabled@12 10003fd0 f   class_file_cache.obj
+ 0001:00002fe0       _Java_org_netbeans_lib_profiler_server_system_Classes_setWaitTrackingEnabled@12 10003fe0 f   class_file_cache.obj
+ 0001:00003040       _Java_org_netbeans_lib_profiler_server_system_Classes_setSleepTrackingEnabled@12 10004040 f   class_file_cache.obj
+ 0001:00003090       _Java_org_netbeans_lib_profiler_server_system_Classes_setVMObjectAllocEnabled@12 10004090 f   class_file_cache.obj
+ 0001:000030d0       _parse_options_and_extract_params 100040d0 f   attach.obj
+ 0001:00003250       _vm_init_hook@12           10004250 f   attach.obj
+ 0001:000033a0       __alldiv                   100043a0 f   MSVCRT:lldiv.obj
+ 0001:00003450       __allmul                   10004450 f   MSVCRT:llmul.obj
+ 0001:00003484       __ftol                     10004484 f   MSVCRT:MSVCRT.dll
+ 0001:0000348a       __CRT_INIT@12              1000448a f   MSVCRT:crtdll.obj
+ 0001:00003535       __DllMainCRTStartup@12     10004535 f   MSVCRT:crtdll.obj
+ 0001:000035d2       __initterm                 100045d2 f   MSVCRT:MSVCRT.dll
+ 0001:000035d8       _DllMain@12                100045d8 f   MSVCRT:dllmain.obj
  0002:00000000       __imp__GetModuleHandleA@4  10005000     kernel32:KERNEL32.dll
  0002:00000004       __imp__GetProcAddress@8    10005004     kernel32:KERNEL32.dll
  0002:00000008       __imp__DisableThreadLibraryCalls@4 10005008     kernel32:KERNEL32.dll
@@ -130,11 +130,11 @@
  0003:00001860       ___onexitbegin             10008860     <common>
  0003:00001864       __pRawDllMain              10008864     <common>
 
- entry point at        0001:00003515
+ entry point at        0001:00003535
 
  Static symbols
 
- 0001:00003250       _setupAndCallProfilerRuntimeActivate 10004250 f   attach.obj
+ 0001:00003270       _setupAndCallProfilerRuntimeActivate 10004270 f   attach.obj
  0001:00002060       _isSameObject              10003060 f   class_file_cache.obj
  0001:00002090       _hash                      10003090 f   class_file_cache.obj
  0001:000021f0       _save_class_file_bytes     100031f0 f   class_file_cache.obj
