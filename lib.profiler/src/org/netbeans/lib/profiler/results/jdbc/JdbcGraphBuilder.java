@@ -85,10 +85,6 @@ import org.netbeans.lib.profiler.results.memory.RuntimeObjAllocTermCCTNode;
 public class JdbcGraphBuilder extends BaseCallGraphBuilder implements CPUProfilingResultListener, JdbcCCTProvider {
 
     static final Logger JDBC_LOGGER = Logger.getLogger(JdbcGraphBuilder.class.getName());
-    private static final String STATEMENT_INTERFACE = java.sql.Statement.class.getName();
-    private static final String PREPARED_STATEMENT_INTERFACE = java.sql.PreparedStatement.class.getName();
-    private static final String CALLABLE_STATEMENT_INTERFACE = java.sql.CallableStatement.class.getName();
-    private static final String CONNECTION_INTERFACE = java.sql.Connection.class.getName();
 
     private Map statements;
     private Map connections;

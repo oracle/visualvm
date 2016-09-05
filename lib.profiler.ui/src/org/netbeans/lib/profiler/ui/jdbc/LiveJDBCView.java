@@ -48,6 +48,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -63,6 +65,7 @@ import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
 import org.netbeans.lib.profiler.results.jdbc.JdbcResultsDiff;
 import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import static org.netbeans.lib.profiler.ui.jdbc.JDBCTreeTableView.isSQL;
 import org.netbeans.lib.profiler.ui.memory.LiveMemoryView;
 import org.netbeans.lib.profiler.ui.results.DataView;
@@ -93,6 +96,9 @@ public abstract class LiveJDBCView extends JPanel {
     private volatile boolean paused;
     private volatile boolean forceRefresh;
     private volatile boolean refreshIsRunning;
+    
+    private ExecutorService executor;
+    
     
     private final class ResultsMonitor implements JdbcCCTProvider.Listener {
         
@@ -141,10 +147,14 @@ public abstract class LiveJDBCView extends JPanel {
             final JdbcResultsSnapshot snapshotData =
                     client.getStatus().getInstrMethodClasses() == null ?
                     null : client.getJdbcProfilingResultsSnapshot(false);
-            snapshot = snapshotData;
-            setData();
-            lastupdate = System.currentTimeMillis();
-            forceRefresh = false;
+            UIUtils.runInEventDispatchThread(new Runnable() {
+                public void run() {
+                    snapshot = snapshotData;
+                    setData();
+                    lastupdate = System.currentTimeMillis();
+                    forceRefresh = false;
+                }
+            });
         } catch (Throwable t) {
             refreshIsRunning = false;
             if (t instanceof ClientUtils.TargetAppOrVMTerminated) {
@@ -156,30 +166,42 @@ public abstract class LiveJDBCView extends JPanel {
     }
     
     private void setData() {
-        if (snapshot == null) {
-            resetData();
-            refreshIsRunning = false;
-        } else {
-            final JdbcResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
-                                                 refSnapshot.createDiff(snapshot);
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                if (snapshot == null) {
+                    resetData();
+                    refreshIsRunning = false;
+                } else {
+                    getExecutor().submit(new Runnable() {
+                        public void run() {
+                            final JdbcResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
+                                                                 refSnapshot.createDiff(snapshot);
 
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    try {
-                        boolean diff = _snapshot instanceof JdbcResultsDiff;
-                        jdbcCallsView.setData(_snapshot, null, -1, null, false, false, diff);
-                    } finally {
-                        refreshIsRunning = false;
-                    }
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    try {
+                                        boolean diff = _snapshot instanceof JdbcResultsDiff;
+                                        jdbcCallsView.setData(_snapshot, null, -1, null, false, false, diff);
+                                    } finally {
+                                        refreshIsRunning = false;
+                                    }
+                                }
+                            });
+                        }
+                    });
                 }
-            });
-        }
+            }
+        });
     }
     
-    public boolean setDiffView(boolean diff) {
+    public boolean setDiffView(final boolean diff) {
         if (snapshot == null) return false;
-        refSnapshot = diff ? snapshot : null;
-        setData();
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                refSnapshot = diff ? snapshot : null;
+                setData();
+            }
+        });
         return true;
     }
     
@@ -190,9 +212,13 @@ public abstract class LiveJDBCView extends JPanel {
     }
     
     public void resetData() {
-        jdbcCallsView.resetData();
-        snapshot = null;
-        refSnapshot = null;
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                jdbcCallsView.resetData();
+                snapshot = null;
+                refSnapshot = null;
+            }
+        });
     }
     
     
@@ -251,13 +277,6 @@ public abstract class LiveJDBCView extends JPanel {
     protected void popupHidden() {};
     
     
-//    protected void foundInForwardCalls() {}
-//    
-//    protected void foundInHotSpots() {}
-//    
-//    protected void foundInReverseCalls() {}
-    
-    
     private void profileMethod(ClientUtils.SourceCodeSelection value) {
         selectForProfiling(value);
     }
@@ -301,27 +320,6 @@ public abstract class LiveJDBCView extends JPanel {
             public void run() { lastFocused = jdbcCallsView; }
         });
         
-//        JSplitPane upperSplit = new JExtendedSplitPane(JSplitPane.VERTICAL_SPLIT) {
-//            {
-//                setBorder(null);
-//                setDividerSize(5);
-//
-//                if (getUI() instanceof BasicSplitPaneUI) {
-//                    BasicSplitPaneDivider divider = ((BasicSplitPaneUI)getUI()).getDivider();
-//                    if (divider != null) {
-//                        Color c = UIUtils.isNimbus() || UIUtils.isAquaLookAndFeel() ?
-//                                  UIUtils.getDisabledLineColor() : new JSeparator().getForeground();
-//                        divider.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, c));
-//                    }
-//                }
-//            }
-//        };
-//        upperSplit.setBorder(BorderFactory.createEmptyBorder());
-//        upperSplit.setTopComponent(jdbcCallsView);
-////        upperSplit.setBottomComponent(hotSpotsView);
-//        upperSplit.setDividerLocation(0.5d);
-//        upperSplit.setResizeWeight(0.5d);
-        
         add(jdbcCallsView, BorderLayout.CENTER);
         
 //        // TODO: read last state?
@@ -351,7 +349,6 @@ public abstract class LiveJDBCView extends JPanel {
         
         if (lastFocused == null) {
             if (jdbcCallsView.isShowing()) lastFocused = jdbcCallsView;
-//            else if (hotSpotsView.isShowing()) lastFocused = hotSpotsView;
         }
         
         return lastFocused;
@@ -397,6 +394,11 @@ public abstract class LiveJDBCView extends JPanel {
         popup.add(new JMenuItem(SearchUtils.ACTION_FIND) {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
         });
+    }
+    
+    private synchronized ExecutorService getExecutor() {
+        if (executor == null) executor = Executors.newSingleThreadExecutor();
+        return executor;
     }
     
 }
