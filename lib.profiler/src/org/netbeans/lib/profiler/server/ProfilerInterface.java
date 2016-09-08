@@ -183,6 +183,18 @@ public class ProfilerInterface implements CommonConstants {
                 e.printStackTrace(System.err);
             }
 
+            if (Platform.getJDKVersionNumber() == CommonConstants.JDK_19) {
+                try {
+                    // preload classes for classLoadHook()
+                    Class.forName("java.lang.reflect.WeakPairMap$Pair"); // NOI18N
+                    Class.forName("java.lang.reflect.WeakPairMap$WeakRefPeer");    // NOI18N
+                    Class.forName("java.lang.reflect.WeakPairMap$Pair$Weak"); // NOI18N
+                    Class.forName("java.lang.reflect.WeakPairMap$Pair$Weak$1"); // NOI18N
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace(System.err);
+                }
+            }
+            
             // The following code is needed to enforce native method bind for Thread.sleep before instrumentation, so
             // that the NativeMethodBind it can be disabled as first thing in instrumentation
             // this is needed as a workaround for JDK bug:
