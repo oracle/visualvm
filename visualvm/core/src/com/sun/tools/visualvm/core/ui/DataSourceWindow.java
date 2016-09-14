@@ -36,7 +36,7 @@ import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.openide.util.RequestProcessor;
@@ -112,7 +112,7 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
             else tabbedContainer.removeView(viewIndex);
             
             if (viewsCount == 2) {
-                singleViewContainer = new DataSourceWindowTabbedPane.ViewContainer(new DataSourceCaption(dataSource), tabbedContainer.getViews().iterator().next());
+                singleViewContainer = new DataSourceWindowTabbedPane.ViewContainer(new DataSourceCaption(dataSource), tabbedContainer.getViews().get(0));
                 remove(multiViewContainer);
                 tabbedContainer.removeView(0);
                 add(singleViewContainer, BorderLayout.CENTER);
@@ -130,13 +130,13 @@ class DataSourceWindow extends TopComponent implements PropertyChangeListener {
     }
     
     public void removeAllViews() {
-        Set<DataSourceView> views = getViews();
+        List<DataSourceView> views = getViews();
         for (DataSourceView view : views) removeView(view);
     }
     
-    public Set<DataSourceView> getViews() {
+    public List<DataSourceView> getViews() {
         if (viewsCount == 1) {
-            return Collections.singleton(singleViewContainer.getView());
+            return Collections.singletonList(singleViewContainer.getView());
         } else {
             return tabbedContainer.getViews();
         }

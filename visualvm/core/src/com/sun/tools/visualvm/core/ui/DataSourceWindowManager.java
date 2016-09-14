@@ -97,7 +97,24 @@ public final class DataSourceWindowManager {
     public void openDataSource(final DataSource dataSource, final boolean selectView) {
         processor.post(new Runnable() {
             public void run() {
-                openWindowAndAddView(dataSource, null, selectView, selectView, selectView);
+                openDataSource(dataSource, selectView, 0);
+            }
+        });
+    }
+    
+    /**
+     * Opens the DataSource and optionally selects the view.
+     *
+     * @param dataSource DataSource to open
+     * @param selectView true if the view should be selected, false otherwise
+     * @param viewIndex index of the view to select
+     * 
+     * @since VisualVM 1.3.9
+     */
+    public void openDataSource(final DataSource dataSource, final boolean selectView, final int viewIndex) {
+        processor.post(new Runnable() {
+            public void run() {
+                openWindowAndAddView(dataSource, null, viewIndex, selectView, selectView, selectView);
             }
         });
     }
@@ -148,13 +165,13 @@ public final class DataSourceWindowManager {
     public void selectView(final DataSourceView view) {
         processor.post(new Runnable() {
             public void run() {
-                openWindowAndAddView(view.getDataSource(), view, true, true, true);
+                openWindowAndAddView(view.getDataSource(), view, 0, true, true, true);
             }
         });
     }
     
     
-    private void openWindowAndAddView(DataSource dataSource, DataSourceView view, final boolean selectView, final boolean selectWindow, final boolean windowToFront) {
+    private void openWindowAndAddView(DataSource dataSource, DataSourceView view, int viewIndex, final boolean selectView, final boolean selectWindow, final boolean windowToFront) {
         // Resolve viewmaster
         final DataSource viewMaster = getViewMaster(dataSource);
 
@@ -194,9 +211,19 @@ public final class DataSourceWindowManager {
             if (dataSource != viewMaster) {
                 List<? extends DataSourceView> views = DataSourceViewsManager.sharedInstance().getViews(dataSource);
                 addViews(window[0], views);
-                if (view == null && !views.isEmpty()) view = views.get(0);
+                if (selectView && view == null && viewIndex >= 0) {
+                    if (viewIndex >= views.size()) viewIndex = -1;
+                    if (viewIndex != -1) view = views.get(viewIndex);
+                }
             }
 
+            // Resolve view to select
+            if (selectView && view == null && viewIndex > 0) {
+                List<DataSourceView> views = window[0].getViews();
+                if (viewIndex >= views.size()) viewIndex = -1;
+                if (viewIndex != -1) view = views.get(viewIndex);
+            }
+            
             // Open window
             final DataSourceView viewToSelectF = selectView ? view : null;
             SwingUtilities.invokeLater(new Runnable() {

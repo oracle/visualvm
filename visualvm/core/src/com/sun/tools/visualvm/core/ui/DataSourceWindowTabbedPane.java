@@ -36,8 +36,8 @@ import java.awt.Toolkit;
 import javax.swing.ImageIcon;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -143,8 +143,8 @@ class DataSourceWindowTabbedPane extends JPanel {
       return index[0];
   }
   
-  public Set<DataSourceView> getViews() {
-      Set<DataSourceView> views = new HashSet();
+  public List<DataSourceView> getViews() {
+      List<DataSourceView> views = new ArrayList();
       
       for (int i = 0; i < tabpane.getTabCount(); i++) {
           ViewContainer container = (ViewContainer)tabpane.getComponentAt(i);
