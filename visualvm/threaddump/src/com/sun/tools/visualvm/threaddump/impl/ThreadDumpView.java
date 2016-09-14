@@ -46,6 +46,12 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Segment;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -130,7 +136,7 @@ class ThreadDumpView extends DataSourceView {
         }
 
         private static String htmlize(String value) {
-            return value.replace("&", "&amp;").replace("<", "&lt;");     // NOI18N
+            return value.replace("&", "&amp;").replace("<", "&lt;").replace("\t", "        ");     // NOI18N
         }
 
         private static String transform(String value) {
@@ -164,6 +170,7 @@ class ThreadDumpView extends DataSourceView {
                 }
                 try {
                   HTMLTextArea area = new HTMLTextArea();
+                  area.setEditorKit(new CustomHtmlEditorKit());
                   area.setForeground(new Color(0xcc, 0x33, 0));
                   area.setText("<pre>" + transform(htmlize(new String(data, "UTF-8"))) + "</pre>"); // NOI18N
                   area.setCaretPosition(0);
@@ -191,6 +198,60 @@ class ThreadDumpView extends DataSourceView {
           });
         }
         
+    }
+
+    private static class CustomHtmlEditorKit extends HTMLEditorKit {
+
+        @Override
+        public Document createDefaultDocument() {
+            StyleSheet styles = getStyleSheet();
+            StyleSheet ss = new StyleSheet();
+
+            ss.addStyleSheet(styles);
+
+            HTMLDocument doc = new CustomHTMLDocument(ss);
+            doc.setParser(getParser());
+            doc.setAsynchronousLoadPriority(4);
+            doc.setTokenThreshold(100);
+            return doc;
+        }
+    }
+    
+    private static class CustomHTMLDocument extends HTMLDocument {
+        private static final int CACHE_BOUNDARY = 1000;
+        private char[] segArray;
+        private int segOffset;
+        private int segCount;
+        private boolean segPartialReturn;
+        private int lastOffset;
+        private int lastLength;
+        
+        private CustomHTMLDocument(StyleSheet ss) {
+            super(ss);
+            lastOffset = -1;
+            lastLength = -1;
+            putProperty("multiByte", Boolean.TRUE);      // NOI18N
+        }
+
+        @Override
+        public void getText(int offset, int length, Segment txt) throws BadLocationException {
+            if (lastOffset == offset && lastLength == length) {
+                txt.array = segArray;
+                txt.offset = segOffset;
+                txt.count = segCount;
+                txt.setPartialReturn(segPartialReturn);
+                return;
+            }
+            super.getText(offset, length, txt);
+            if (length > CACHE_BOUNDARY || lastLength <= CACHE_BOUNDARY) {
+                segArray = txt.array;
+                segOffset = txt.offset;
+                segCount = txt.count;
+                segPartialReturn = txt.isPartialReturn();
+                lastOffset = offset;
+                lastLength = length;
+            }
+        }
     }
     
 }
