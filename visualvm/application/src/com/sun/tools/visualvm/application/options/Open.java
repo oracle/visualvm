@@ -55,7 +55,7 @@ public final class Open extends OptionProcessor {
     private Option openpid = Option.requiredArgument(Option.NO_SHORT_NAME,"openpid");    // NOI18N
     private Option openid = Option.requiredArgument(Option.NO_SHORT_NAME,"openid");    // NOI18N
     private static final int TIMEOUT = 5000;
-    private static final String ID = "visualvm.id";
+    private static final String ID = "visualvm.id"; // NOI18N
 
     public Open() {
         openpid = Option.shortDescription(openpid,"com.sun.tools.visualvm.application.options.Bundle","MSG_OPENPID"); // NOI18N
@@ -75,25 +75,53 @@ public final class Open extends OptionProcessor {
         String[] pids = optionValues.get(openpid);
         String[] ids = optionValues.get(openid);
         
+        Integer viewIndex = null;
+        
         if (pids != null && pids.length>0) {
-            pid = Integer.valueOf(pids[0]);
+            String pidStr = pids[0];
+            int idx = pidStr.indexOf('@'); // NOI18N
+            if (idx > -1) {
+                try {
+                    viewIndex = Integer.valueOf(pidStr.substring(idx + 1));
+                } catch (NumberFormatException e) {
+                    throw new CommandException(0, NbBundle.getMessage(Open.class,"MSG_VIEWIDX_FAILED",new Object[] {e.toString()})); // NOI18N
+                }
+                pidStr = pidStr.substring(0, idx);
+            }
+            try {
+                pid = Integer.valueOf(pidStr);
+            } catch (NumberFormatException e) {
+                throw new CommandException(0, NbBundle.getMessage(Open.class,"MSG_PID_FAILED",new Object[] {e.toString()})); // NOI18N
+            }
         }
         if (ids != null && ids.length>0) {
-            id = "-D"+ID+"="+ids[0];
+            String idStr = ids[0];
+            int idx = idStr.indexOf('@'); // NOI18N
+            if (idx > -1) {
+                try {
+                    viewIndex = Integer.valueOf(idStr.substring(idx + 1));
+                } catch (NumberFormatException e) {
+                    throw new CommandException(0, NbBundle.getMessage(Open.class,"MSG_VIEWIDX_FAILED",new Object[] {e.toString()})); // NOI18N
+                }
+                idStr = idStr.substring(0, idx);
+            }
+            id = "-D"+ID+"="+idStr; // NOI18N
         }
+        
         DataSourceContainer container = Host.LOCALHOST.getRepository();
         Set<Application> apps = container.getDataSources(Application.class);
-        if (openApplication(id, pid, apps)) {
+        if (openApplication(id, pid, viewIndex, apps)) {
             return;
         }
-        Listener l = new Listener(id, pid, container);
+        Listener l = new Listener(id, pid, viewIndex, container);
         container.addDataChangeListener(l,Application.class);
     }
 
-    private boolean openApplication(final String id, final Integer pid, final Set<Application> apps) {
+    private boolean openApplication(final String id, final Integer pid, final Integer viewIndex, final Set<Application> apps) {
         for (Application app : apps) {
             if (pid != null && app.getPid() == pid.intValue()) {
-                DataSourceWindowManager.sharedInstance().openDataSource(app);
+                int index = viewIndex != null ? viewIndex.intValue() - 1 : 0;
+                DataSourceWindowManager.sharedInstance().openDataSource(app, true, index);
                 return true;
             }
             if (id != null) {
@@ -101,7 +129,8 @@ public final class Open extends OptionProcessor {
                 if (jvm.isBasicInfoSupported()) {
                     String args = jvm.getJvmArgs();
                     if (args != null && args.contains(id)) {
-                        DataSourceWindowManager.sharedInstance().openDataSource(app);
+                        int index = viewIndex != null ? viewIndex.intValue() - 1 : 0;
+                        DataSourceWindowManager.sharedInstance().openDataSource(app, true, index);
                         return true;                        
                     }
                 }
@@ -113,13 +142,15 @@ public final class Open extends OptionProcessor {
     private class Listener implements DataChangeListener<Application>, ActionListener {
         private final Integer pid;
         private final String id;
+        private final Integer viewIndex;
         private final DataSourceContainer container;
         private volatile boolean removed;
         private final Timer timer;
 
-        private Listener(String i,Integer p,DataSourceContainer c) {
+        private Listener(String i,Integer p,Integer x,DataSourceContainer c) {
             id = i;
             pid = p;
+            viewIndex = x;
             container = c;
             timer = new Timer(TIMEOUT,this);
             timer.start();
@@ -127,7 +158,7 @@ public final class Open extends OptionProcessor {
 
         public synchronized void dataChanged(DataChangeEvent<Application> event) {
             Set<Application> added = event.getAdded();
-            if (openApplication(id,pid,added)) {
+            if (openApplication(id,pid,viewIndex,added)) {
                 if (!removed) {
                     container.removeDataChangeListener(this);
                     removed = true;
@@ -140,7 +171,7 @@ public final class Open extends OptionProcessor {
             if (!removed) {
                 container.removeDataChangeListener(this);
                 removed = true;
-                String msg = "";
+                String msg = ""; // NOI18N
                 if (pid != null) {
                     msg = NbBundle.getMessage(Open.class,"MSG_NO_APP_PID",new Object[] {Integer.toString(pid)});    // NOI18N
                 }
