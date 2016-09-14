@@ -76,9 +76,11 @@ public class NetBeansBasedApplicationType extends ApplicationType {
                 return fullVersionString.substring(0,index).trim();
             }
             index = fullVersionString.lastIndexOf(" "); // NOI18N
-            String buildNo = fullVersionString.substring(index+1);
-            if (buildNo.length()>19 && buildNo.charAt(8)=='-') { // NOI18N
-                return fullVersionString.substring(0,index);
+            if (index != -1) {
+                String buildNo = fullVersionString.substring(index+1);
+                if (buildNo.length()>19 && buildNo.charAt(8)=='-') { // NOI18N
+                    return fullVersionString.substring(0,index);
+                }
             }
             return fullVersionString;
         }
