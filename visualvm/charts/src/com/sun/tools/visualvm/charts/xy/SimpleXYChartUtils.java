@@ -170,7 +170,8 @@ public class SimpleXYChartUtils {
                                            String yAxisDescription, int chartType,
                                            Color[] itemColors, long initialYMargin,
                                            boolean hideItems, boolean legendVisible,
-                                           boolean supportsZooming, double chartFactor, XYStorage storage,
+                                           boolean supportsZooming, double chartFactor,
+                                           NumberFormat customFormat, XYStorage storage,
                                            SynchronousXYItemsModel itemsModel,
                                            XYPaintersModel paintersModel) {
 
@@ -246,8 +247,9 @@ public class SimpleXYChartUtils {
                          SwingConstants.VERTICAL) {
                 protected int getMinMarksDistance() { return VALUES_SPACING; }
             };
+            NumberFormat format = customFormat != null ? customFormat : DECIMAL_FORMATTER;
             vAxis = new XYAxisComponent(chart, vComputer, customizeMarksPainter(
-                         new XYDecimalMarksPainter(chartFactor, DECIMAL_FORMATTER)),
+                         new XYDecimalMarksPainter(chartFactor, format)),
                          SwingConstants.WEST, AxisComponent.MESH_FOREGROUND);
         }
 
@@ -256,6 +258,7 @@ public class SimpleXYChartUtils {
                                                                chartType,
                                                                itemColors,
                                                                chartFactor,
+                                                               customFormat,
                                                                storage,
                                                                itemsModel));
         chart.addOverlayComponent(new XYTooltipOverlay(chart, tooltipPainter));
@@ -473,6 +476,7 @@ public class SimpleXYChartUtils {
     public static XYTooltipModel createTooltipModel(final int chartType,
                                                     final Color[] itemColors,
                                                     final double chartFactor,
+                                                    final NumberFormat customFormat,
                                                     final XYStorage storage,
                                                     final SynchronousXYItemsModel itemsModel) {
 
@@ -502,7 +506,7 @@ public class SimpleXYChartUtils {
                 switch (chartType) {
                     case TYPE_BYTES  : return formatBytes((long)value);
                     case TYPE_PERCENT: return formatPercent(value);
-                    default:           return formatDecimal(value);
+                    default:           return formatDecimal(value, customFormat);
                 }
             }
 
@@ -517,6 +521,10 @@ public class SimpleXYChartUtils {
 
     public static String formatDecimal(double value) {
         return DECIMAL_FORMATTER.format(value);
+    }
+    
+    public static String formatDecimal(double value, NumberFormat format) {
+        return format != null ? format.format(value) : formatDecimal(value);
     }
 
     public static String formatBytes(long value) {

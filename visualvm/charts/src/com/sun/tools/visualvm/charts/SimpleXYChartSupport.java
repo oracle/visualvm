@@ -32,6 +32,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.NumberFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
@@ -66,6 +67,7 @@ public final class SimpleXYChartSupport {
     private final long initialYMargin;
     private final String[] detailsItems;
     private final double chartFactor;
+    private final NumberFormat customFormat;
 
     private final XYStorage storage;
     private final SynchronousXYItemsModel itemsModel;
@@ -91,7 +93,8 @@ public final class SimpleXYChartSupport {
                                                      yAxisDescription, chartType,
                                                      itemColors, initialYMargin,
                                                      hideItems, legendVisible,
-                                                     zoomingEnabled, chartFactor, storage,
+                                                     zoomingEnabled, chartFactor,
+                                                     customFormat, storage,
                                                      itemsModel, paintersModel);
             if (detailsItems != null)
                 detailsHandle = SimpleXYChartUtils.createDetailsArea(detailsItems,
@@ -247,7 +250,7 @@ public final class SimpleXYChartSupport {
      * @return formatted value in the same format as used in the chart
      */
     public String formatDecimal(long value) {
-        return SimpleXYChartUtils.formatDecimal(value * chartFactor);
+        return SimpleXYChartUtils.formatDecimal(value * chartFactor, customFormat);
     }
 
     /**
@@ -298,8 +301,8 @@ public final class SimpleXYChartSupport {
     SimpleXYChartSupport(String chartTitle, String xAxisDescription, String yAxisDescription,
                          int chartType, long initialYMargin, String[] itemNames, Color[] itemColors,
                          float[] lineWidths, Color[] lineColors, Color[] fillColors1, Color[] fillColors2,
-                         long minValue, long maxValue, double chartFactor, boolean hideItems,
-                         int valuesBuffer, String[] detailsItems) {
+                         long minValue, long maxValue, double chartFactor, NumberFormat customFormat,
+                         boolean hideItems, int valuesBuffer, String[] detailsItems) {
 
         this.chartTitle = chartTitle;
         this.xAxisDescription = xAxisDescription;
@@ -311,6 +314,7 @@ public final class SimpleXYChartSupport {
         this.initialYMargin = initialYMargin;
         this.detailsItems = detailsItems;
         this.chartFactor = chartFactor;
+        this.customFormat = customFormat;
         
         storage = SimpleXYChartUtils.createStorage(valuesBuffer);
         itemsModel = SimpleXYChartUtils.createItemsModel(storage, itemNames, minValue, maxValue);

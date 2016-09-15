@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.charts;
 
 import com.sun.tools.visualvm.charts.xy.SimpleXYChartUtils;
 import java.awt.Color;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +55,7 @@ public final class SimpleXYChartDescriptor {
         return decimal(0, SimpleXYChartSupport.MAX_UNDEFINED, initialYMargin,
                        chartFactor, hideableItems, valuesBuffer);
     }
-
+    
     public static SimpleXYChartDescriptor decimal(long minValue,
                                                   long maxValue,
                                                   long initialYMargin,
@@ -62,10 +63,22 @@ public final class SimpleXYChartDescriptor {
                                                   boolean hideableItems,
                                                   int valuesBuffer) {
 
+        return decimal(minValue, maxValue, initialYMargin, chartFactor,
+                       null, hideableItems, valuesBuffer);
+    }
+
+    public static SimpleXYChartDescriptor decimal(long minValue,
+                                                  long maxValue,
+                                                  long initialYMargin,
+                                                  double chartFactor,
+                                                  NumberFormat customFormat,
+                                                  boolean hideableItems,
+                                                  int valuesBuffer) {
+
         return new SimpleXYChartDescriptor(SimpleXYChartUtils.TYPE_DECIMAL,
                                            minValue, maxValue,
                                            initialYMargin, hideableItems,
-                                           chartFactor, valuesBuffer);
+                                           chartFactor, customFormat, valuesBuffer);
     }
 
 
@@ -86,7 +99,7 @@ public final class SimpleXYChartDescriptor {
         return new SimpleXYChartDescriptor(SimpleXYChartUtils.TYPE_BYTES,
                                            minValue, maxValue,
                                            initialYMargin, hideableItems,
-                                           1d, valuesBuffer);
+                                           1d, null, valuesBuffer);
     }
 
 
@@ -115,7 +128,7 @@ public final class SimpleXYChartDescriptor {
         return new SimpleXYChartDescriptor(SimpleXYChartUtils.TYPE_PERCENT,
                                            minValue, max,
                                            init, hideableItems,
-                                           chartFactor, valuesBuffer);
+                                           chartFactor, null, valuesBuffer);
     }
 
 
@@ -226,6 +239,8 @@ public final class SimpleXYChartDescriptor {
     boolean areItemsHideable() { return hideableItems; }
 
     double getChartFactor() { return chartFactor; }
+    
+    NumberFormat getCustomFormat() { return customFormat; }
 
     int getValuesBuffer() { return valuesBuffer; }
 
@@ -285,6 +300,7 @@ public final class SimpleXYChartDescriptor {
     private final long         initialYMargin;
     private final boolean      hideableItems;
     private final double       chartFactor;
+    private final NumberFormat customFormat;
     private final int          valuesBuffer;
 
     private final List<String> itemNames  = new ArrayList();
@@ -306,6 +322,7 @@ public final class SimpleXYChartDescriptor {
                                     long initialYMargin,
                                     boolean hideableItems,
                                     double chartFactor,
+                                    NumberFormat customFormat,
                                     int valuesBuffer) {
 
         this.chartType = chartType;
@@ -314,6 +331,7 @@ public final class SimpleXYChartDescriptor {
         this.initialYMargin = initialYMargin;
         this.hideableItems = hideableItems;
         this.chartFactor = chartFactor;
+        this.customFormat = customFormat;
         this.valuesBuffer = valuesBuffer;
     }
 

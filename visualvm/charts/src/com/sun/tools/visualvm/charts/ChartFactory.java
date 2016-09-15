@@ -53,6 +53,7 @@ public final class ChartFactory {
                                         descriptor.getMinValue(),
                                         descriptor.getMaxValue(),
                                         descriptor.getChartFactor(),
+                                        descriptor.getCustomFormat(),
                                         descriptor.areItemsHideable(),
                                         descriptor.getValuesBuffer(),
                                         descriptor.getDetailsItems());
