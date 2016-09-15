@@ -35,6 +35,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
@@ -155,12 +157,12 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public static String decode(String str) {
-            StringBuffer ostr = new StringBuffer();
+            StringBuilder ostr = new StringBuilder();
             int i1 = 0;
             int i2 = 0;
 
             while (i2 < str.length()) {
-                i1 = str.indexOf("&", i2); //NOI18N
+                i1 = str.indexOf('&', i2); //NOI18N
 
                 if (i1 == -1) {
                     ostr.append(str.substring(i2, str.length()));
@@ -169,7 +171,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
                 }
 
                 ostr.append(str.substring(i2, i1));
-                i2 = str.indexOf(";", i1); //NOI18N
+                i2 = str.indexOf(';', i1); //NOI18N
 
                 if (i2 == -1) {
                     ostr.append(str.substring(i1, str.length()));
@@ -552,7 +554,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
     private String pendingText;
     private String currentText;
     private boolean forceSetText;
-
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public HTMLTextArea() {
@@ -565,6 +567,13 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
         setFont(UIManager.getFont("Label.font")); //NOI18N
         setBackground(UIUtils.getProfilerResultsBackground());
         addMouseListener(this);
+        
+        addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_SPACE)
+                    invokeSelectedLink();
+            }
+        });
 
         // Bugfix #185777, update text only if visible
         addHierarchyListener(new HierarchyListener() {
@@ -582,6 +591,12 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    public void setOpaque(boolean o) {
+        super.setOpaque(o);
+        if (UIUtils.isNimbusLookAndFeel() && !o)
+            setBackground(new Color(0, 0, 0, 0));
+    }
 
     public void setForeground(Color color) {
         Color foreground = getForeground();
@@ -663,6 +678,15 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
         try {
             getDocument().remove(getSelectionStart(), getSelectionEnd() - getSelectionStart());
         } catch (Exception ex) {}
+    }
+    
+    private void invokeSelectedLink() {
+        for (Action action : getEditorKit().getActions()) {
+            if ("activate-link-action".equals(action.getValue(Action.NAME))) {  // NOI18N
+                action.actionPerformed(new ActionEvent(this, 0, null));
+                return;
+            }
+        }
     }
 
     public void hyperlinkUpdate(HyperlinkEvent e) {
