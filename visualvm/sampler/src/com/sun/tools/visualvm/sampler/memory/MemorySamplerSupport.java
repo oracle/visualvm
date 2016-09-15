@@ -44,7 +44,7 @@ import java.util.TimerTask;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.openide.util.NbBundle;
 
 /**
@@ -308,14 +308,14 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         
         public abstract void takeSnapshot(boolean openView);
         
-        public AllocMemoryResultsSnapshot createSnapshot(long time) {
+        public SampledMemoryResultsSnapshot createSnapshot(long time) {
             HeapHistogram histogram = lastHistogram;
 
             if (histogram != null) {
                 ByteArrayOutputStream output = new ByteArrayOutputStream(1024);
                 DataOutputStream dos = new DataOutputStream(output);
                 try {
-                    AllocMemoryResultsSnapshot result = new AllocMemoryResultsSnapshot();
+                    SampledMemoryResultsSnapshot result = new SampledMemoryResultsSnapshot();
                     Set<HeapHistogram.ClassInfo> classes = histogram.getHeapHistogram();
                     
                     dos.writeInt(1);    // version

@@ -32,6 +32,8 @@ import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsDiff;
 import org.netbeans.lib.profiler.results.memory.LivenessMemoryResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsDiff;
+import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 
 /**
@@ -79,6 +81,10 @@ final class SnapshotDiffContainer extends DataSource {
                  s2.getSnapshot() instanceof LivenessMemoryResultsSnapshot)
             return new LivenessMemoryResultsDiff((LivenessMemoryResultsSnapshot) s1.getSnapshot(),
                                                  (LivenessMemoryResultsSnapshot) s2.getSnapshot());
+        else if (s1.getSnapshot() instanceof SampledMemoryResultsSnapshot &&
+                 s2.getSnapshot() instanceof SampledMemoryResultsSnapshot)
+            return new SampledMemoryResultsDiff((SampledMemoryResultsSnapshot) s1.getSnapshot(),
+                                                 (SampledMemoryResultsSnapshot) s2.getSnapshot());
         return null;
     }
 

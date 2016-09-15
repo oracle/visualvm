@@ -86,7 +86,7 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
-import org.netbeans.lib.profiler.results.memory.AllocMemoryResultsSnapshot;
+import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.openide.DialogDisplayer;
@@ -686,7 +686,7 @@ final class SamplerImpl {
                                 DataOutputStream dos = null;
                                 try {
                                     long time = System.currentTimeMillis();
-                                    AllocMemoryResultsSnapshot snapshot = dumper.createSnapshot(time);
+                                    SampledMemoryResultsSnapshot snapshot = dumper.createSnapshot(time);
                                     if (snapshot == null) {
                                         DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(
                                                 NbBundle.getMessage(SamplerImpl.class, "MSG_No_save_data_memory"), // NOI18N

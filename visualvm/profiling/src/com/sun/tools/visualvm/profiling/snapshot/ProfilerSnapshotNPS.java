@@ -86,7 +86,8 @@ final class ProfilerSnapshotNPS extends ProfilerSnapshot {
             if (snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_CPU) {
                 return ImageUtilities.mergeImages(CPU_ICON, NODE_BADGE, 0, 0);
             } else if (snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS
-                    || snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS) {
+                    || snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS
+                    || snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_SAMPLED) {
                 return ImageUtilities.mergeImages(MEMORY_ICON, NODE_BADGE, 0, 0);
             } else {
                 return null;
