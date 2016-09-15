@@ -376,10 +376,10 @@ public class MiscUtils implements CommonConstants {
                     try {
                         getClassPathFromManifest(name,list);
                     } catch (URISyntaxException ex) {
-                        System.out.println("Error processing "+name);
+                        System.out.println("Error processing "+name);   // NOI18N
                         ex.printStackTrace();
                     } catch (IOException ex) {
-                        System.out.println("Error processing "+name);
+                        System.out.println("Error processing "+name);   // NOI18N
                         ex.printStackTrace();
                     }
                 }
@@ -389,7 +389,7 @@ public class MiscUtils implements CommonConstants {
     }
 
     private static void getClassPathFromManifest(String jarPath,List pathList) throws IOException, URISyntaxException {
-        if (jarPath.toLowerCase().endsWith(".jar")) {
+        if (jarPath.toLowerCase().endsWith(".jar")) {   // NOI18N
             File pathFile = new File(jarPath);
             JarFile jarFile = new JarFile(pathFile);
             Manifest manifest = jarFile.getManifest();
@@ -539,7 +539,7 @@ public class MiscUtils implements CommonConstants {
                     files.close();
                 }
             } catch (IOException ex) {
-                System.err.println("deleteHeapTempFiles failed");
+                System.err.println("deleteHeapTempFiles failed");   // NOI18N
                 ex.printStackTrace();
             }
         }
@@ -654,13 +654,13 @@ public class MiscUtils implements CommonConstants {
         } else if (jdkVersionString.startsWith("1.6")) { // NOI18N
             return true;
         } else if (jdkVersionString.startsWith("1.5")) { // NOI18N
-            if (jdkVersionString.equals("1.5.0") || jdkVersionString.startsWith("1.5.0_01") ||
+            if (jdkVersionString.equals("1.5.0") || jdkVersionString.startsWith("1.5.0_01") ||  // NOI18N
                 jdkVersionString.startsWith("1.5.0_02") || jdkVersionString.startsWith("1.5.0_03")) { // NOI18N
                 return false;
             } else {
                 return true;
             }
-        } else if (jdkVersionString.equals("CVM")) {
+        } else if (jdkVersionString.equals("CVM")) {    // NOI18N
             return true;
         }
         return false;
