@@ -40,6 +40,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.openide.util.NbPreferences;
 
 /**
@@ -288,4 +289,33 @@ public final class GlobalPreferences implements PreferenceChangeListener {
             prefs.putInt(property, value);
         }
     }
+    
+    
+    /**
+     * Allows to set or clear persistent do not show again value associated with given notification identified by the
+     * provided key.
+     *
+     * @param key A key that uniquely identifies the notification
+     * @param value The value that should be used without displaying the notification or null to clear the Do not show
+     *              again (i.e. start displaying the notifications again.
+     * 
+     * @since VisualVM 1.3.9
+     */
+    public void setDoNotShowAgain(String key, String value) {
+        ProfilerIDESettings.getInstance().setDoNotShowAgain(key, value);
+    }
+
+    /**
+     * Allows to get persistent do not show again value associated with given notification identified by the provided key.
+     *
+     * @param  key A key that uniquely identifies the notification
+     * @return The value that should be used without displaying the notification or null if the notification should
+     *         be displayed
+     *
+     * @since VisualVM 1.3.9
+     */
+    public String getDoNotShowAgain(String key) {
+        return ProfilerIDESettings.getInstance().getDoNotShowAgain(key);
+    }
+    
 }

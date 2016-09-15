@@ -38,6 +38,7 @@ import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.explorer.ExplorerSupport;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFactory;
+import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -49,6 +50,8 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -58,6 +61,7 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
@@ -77,6 +81,8 @@ public class HostProvider {
     private static final String CURRENT_SNAPSHOT_VERSION = CURRENT_SNAPSHOT_VERSION_MAJOR + SNAPSHOT_VERSION_DIVIDER + CURRENT_SNAPSHOT_VERSION_MINOR;
 
     private static final String PROPERTY_HOSTNAME = "prop_hostname";    // NOI18N
+    
+    private static final String DNSA_KEY = "HostProvider_NotifyUnresolved"; // NOI18N
 
     private static InetAddress localhostAddress2;
 
@@ -305,16 +311,35 @@ public class HostProvider {
     private static void notifyUnresolvedHosts(final Set<File> unresolvedHostsF, final Set<String> unresolvedHostsS) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                JPanel messagePanel = new JPanel(new BorderLayout(5, 5));
-                messagePanel.add(new JLabel(NbBundle.getMessage(HostProvider.class, "MSG_Unresolved_Hosts")), BorderLayout.NORTH); // NOI18N
-                JList list = new JList(unresolvedHostsS.toArray());
-                list.setVisibleRowCount(4);
-                messagePanel.add(new JScrollPane(list), BorderLayout.CENTER);
-                NotifyDescriptor dd = new NotifyDescriptor(
-                        messagePanel, NbBundle.getMessage(HostProvider.class, "Title_Unresolved_Hosts"), // NOI18N
-                        NotifyDescriptor.YES_NO_OPTION, NotifyDescriptor.ERROR_MESSAGE,
-                        null, NotifyDescriptor.YES_OPTION);
-                if (DialogDisplayer.getDefault().notify(dd) == NotifyDescriptor.NO_OPTION)
+                String s = GlobalPreferences.sharedInstance().getDoNotShowAgain(DNSA_KEY);
+                Boolean b = s == null ? null : Boolean.parseBoolean(s);
+                
+                if (b == null) {
+                    JPanel messagePanel = new JPanel(new BorderLayout(5, 5));
+                    messagePanel.add(new JLabel(NbBundle.getMessage(HostProvider.class, "MSG_Unresolved_Hosts")), BorderLayout.NORTH); // NOI18N
+                    JList list = new JList(unresolvedHostsS.toArray());
+                    list.setVisibleRowCount(4);
+                    messagePanel.add(new JScrollPane(list), BorderLayout.CENTER);
+                    JCheckBox dnsa = new JCheckBox();
+                    Mnemonics.setLocalizedText(dnsa, NbBundle.getMessage(HostProvider.class, "LBL_RememberAction")); // NOI18N
+                    dnsa.setToolTipText(NbBundle.getMessage(HostProvider.class, "TTP_RememberAction")); // NOI18N
+                    JPanel p = new JPanel(new BorderLayout());
+                    p.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 20));
+                    p.add(dnsa, BorderLayout.WEST);
+                    messagePanel.add(p, BorderLayout.SOUTH);
+                    NotifyDescriptor dd = new NotifyDescriptor(
+                            messagePanel, NbBundle.getMessage(HostProvider.class, "Title_Unresolved_Hosts"), // NOI18N
+                            NotifyDescriptor.YES_NO_OPTION, NotifyDescriptor.ERROR_MESSAGE,
+                            null, NotifyDescriptor.YES_OPTION);
+                    Object ret = DialogDisplayer.getDefault().notify(dd);
+                    
+                    if (ret == NotifyDescriptor.NO_OPTION) b = Boolean.FALSE;
+                    else if (ret == NotifyDescriptor.YES_OPTION) b = Boolean.TRUE;
+                    
+                    if (dnsa.isSelected() && b != null) GlobalPreferences.sharedInstance().setDoNotShowAgain(DNSA_KEY, b.toString());
+                }
+                
+                if (Boolean.FALSE.equals(b))
                     for (File file : unresolvedHostsF) Utils.delete(file, true);
 
                 unresolvedHostsF.clear();

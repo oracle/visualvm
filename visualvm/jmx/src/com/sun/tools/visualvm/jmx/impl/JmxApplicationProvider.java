@@ -39,6 +39,7 @@ import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptorFac
 import com.sun.tools.visualvm.core.datasupport.DataChangeListener;
 import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.datasupport.Utils;
+import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.jmx.JmxApplicationException;
 import com.sun.tools.visualvm.jmx.JmxApplicationsSupport;
 import com.sun.tools.visualvm.tools.jmx.JmxModel;
@@ -60,12 +61,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.management.remote.JMXServiceURL;
+import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
@@ -104,6 +108,8 @@ public class JmxApplicationProvider {
     
     private static final String PROPERTIES_FILE = "jmxapplication" + Storage.DEFAULT_PROPERTIES_EXT;  // NOI18N
     static final String JMX_SUFFIX = ".jmx";  // NOI18N
+    
+    private static final String DNSA_KEY = "JMXApplicationProvider_NotifyUnresolved"; // NOI18N
     
     
     private volatile boolean trackingNewHosts;
@@ -479,16 +485,35 @@ public class JmxApplicationProvider {
     private static void notifyUnresolvedApplications(final Set<String> failedHostsN, final Set<Storage> failedHostsS) {
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
-                JPanel messagePanel = new JPanel(new BorderLayout(5, 5));
-                messagePanel.add(new JLabel(NbBundle.getMessage(JmxApplicationProvider.class, "MSG_Unresolved_JMX")), BorderLayout.NORTH); // NOI18N
-                JList list = new JList(failedHostsN.toArray());
-                list.setVisibleRowCount(4);
-                messagePanel.add(new JScrollPane(list), BorderLayout.CENTER);
-                NotifyDescriptor dd = new NotifyDescriptor(
-                        messagePanel, NbBundle.getMessage(JmxApplicationProvider.class, "Title_Unresolved_JMX"), // NOI18N
-                        NotifyDescriptor.YES_NO_OPTION, NotifyDescriptor.ERROR_MESSAGE,
-                        null, NotifyDescriptor.YES_OPTION);
-                if (DialogDisplayer.getDefault().notify(dd) == NotifyDescriptor.NO_OPTION)
+                String s = GlobalPreferences.sharedInstance().getDoNotShowAgain(DNSA_KEY);
+                Boolean b = s == null ? null : Boolean.parseBoolean(s);
+                
+                if (b == null) {
+                    JPanel messagePanel = new JPanel(new BorderLayout(5, 5));
+                    messagePanel.add(new JLabel(NbBundle.getMessage(JmxApplicationProvider.class, "MSG_Unresolved_JMX")), BorderLayout.NORTH); // NOI18N
+                    JList list = new JList(failedHostsN.toArray());
+                    list.setVisibleRowCount(4);
+                    messagePanel.add(new JScrollPane(list), BorderLayout.CENTER);
+                    JCheckBox dnsa = new JCheckBox();
+                    Mnemonics.setLocalizedText(dnsa, NbBundle.getMessage(JmxApplicationProvider.class, "LBL_RememberAction")); // NOI18N
+                    dnsa.setToolTipText(NbBundle.getMessage(JmxApplicationProvider.class, "TTP_RememberAction")); // NOI18N
+                    JPanel p = new JPanel(new BorderLayout());
+                    p.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 20));
+                    p.add(dnsa, BorderLayout.WEST);
+                    messagePanel.add(p, BorderLayout.SOUTH);
+                    NotifyDescriptor dd = new NotifyDescriptor(
+                            messagePanel, NbBundle.getMessage(JmxApplicationProvider.class, "Title_Unresolved_JMX"), // NOI18N
+                            NotifyDescriptor.YES_NO_OPTION, NotifyDescriptor.ERROR_MESSAGE,
+                            null, NotifyDescriptor.YES_OPTION);
+                    Object ret = DialogDisplayer.getDefault().notify(dd);
+                    
+                    if (ret == NotifyDescriptor.NO_OPTION) b = Boolean.FALSE;
+                    else if (ret == NotifyDescriptor.YES_OPTION) b = Boolean.TRUE;
+                    
+                    if (dnsa.isSelected() && b != null) GlobalPreferences.sharedInstance().setDoNotShowAgain(DNSA_KEY, b.toString());
+                }
+                
+                if (Boolean.FALSE.equals(b))
                     for (Storage storage : failedHostsS) {
                         File appStorage = storage.getDirectory();
                         if (appStorage.isDirectory()) Utils.delete(appStorage, true);
