@@ -207,8 +207,8 @@ public class AboutDialog {
 //        
 //        aboutDialog.setCaption("About VisualVM");
 //        aboutDialog.setBuildID("Version: Dev (Build xxx)");
-//        aboutDialog.setMessage("<b>VisualVM for JDK 6.0</b> has been licensed under the GNU General Public License (GPL) Version 2. It is built on NetBeans Platform. For more information, please visit https://visualvm.java.net.");
-//        aboutDialog.setHTMLMessage("<b>VisualVM for JDK 6.0</b> has been licensed under the GNU General Public License (GPL) Version 2. It is built on <a href=\"https://platform.netbeans.org\">NetBeans Platform</a>. For more information, please visit <a href=\"https://visualvm.java.net\">https://visualvm.java.net</a>.");
+//        aboutDialog.setMessage("<b>VisualVM for JDK 6.0</b> has been licensed under the GNU General Public License (GPL) Version 2. It is built on NetBeans Platform. For more information, please visit https://visualvm.github.io.");
+//        aboutDialog.setHTMLMessage("<b>VisualVM for JDK 6.0</b> has been licensed under the GNU General Public License (GPL) Version 2. It is built on <a href=\"https://platform.netbeans.org\">NetBeans Platform</a>. For more information, please visit <a href=\"https://visualvm.github.io\">https://visualvm.github.io</a>.");
 //        aboutDialog.setDetails("<b>Version: </b> Dev");
 //        aboutDialog.setLogfile("E:\\Dev\\userdirdev\\var\\log\\messages.log");
 //        

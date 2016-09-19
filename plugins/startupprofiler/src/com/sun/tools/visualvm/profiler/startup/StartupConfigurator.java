@@ -107,7 +107,7 @@ import org.openide.util.RequestProcessor;
 })
 final class StartupConfigurator {
     
-    private static final String HELP = "https://visualvm.java.net/startupprofiler.html"; // NOI18N
+    private static final String HELP = "https://visualvm.github.io/startupprofiler.html"; // NOI18N
     
     private static final String CPU_ICON_PATH = "com/sun/tools/visualvm/profiler/startup/resources/cpu.png";  // NOI18N
     private static final String MEM_ICON_PATH = "com/sun/tools/visualvm/profiler/startup/resources/memory.png";  // NOI18N
