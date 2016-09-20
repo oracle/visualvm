@@ -40,7 +40,6 @@ import javax.swing.JRadioButtonMenuItem;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
-import org.openide.util.Utilities;
 import org.openide.util.actions.Presenter;
 
 /**
@@ -92,15 +91,11 @@ final class CoreDumpsSorting implements Presenter.Menu {
         };
         Mnemonics.setLocalizedText(menu, NbBundle.getMessage(CoreDumpsSorting.class,
                                    "ACT_SortCoreDumps")); // NOI18N
-
-        if (Utilities.isWindows()) {
-            menu.setEnabled(false);
-        } else {
-            menu.add(new SortAction(NbBundle.getMessage(CoreDumpsSorting.class,
-                                    "ACT_TimeAdded"), BY_TIME_COMPARATOR, sorter)); // NOI18N
-            menu.add(new SortAction(NbBundle.getMessage(CoreDumpsSorting.class,
-                                    "ACT_DisplayName"), BY_NAME_COMPARATOR, sorter)); // NOI18N
-        }
+        
+        menu.add(new SortAction(NbBundle.getMessage(CoreDumpsSorting.class,
+                                "ACT_TimeAdded"), BY_TIME_COMPARATOR, sorter)); // NOI18N
+        menu.add(new SortAction(NbBundle.getMessage(CoreDumpsSorting.class,
+                                "ACT_DisplayName"), BY_NAME_COMPARATOR, sorter)); // NOI18N
 
         return menu;
     }

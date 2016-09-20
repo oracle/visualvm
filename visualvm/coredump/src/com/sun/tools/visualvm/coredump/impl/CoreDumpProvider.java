@@ -55,7 +55,6 @@ import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.Utilities;
 import org.openide.windows.WindowManager;
 
 /**
@@ -263,7 +262,6 @@ public class CoreDumpProvider {
     }
     
     public static void register() {
-        if (Utilities.isWindows()) return;
         final CoreDumpProvider provider = new CoreDumpProvider();
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             public void run() {

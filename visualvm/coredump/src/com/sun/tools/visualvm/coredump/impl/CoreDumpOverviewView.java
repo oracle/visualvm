@@ -54,22 +54,25 @@ class CoreDumpOverviewView extends DataSourceView {
     
     protected DataViewComponent createComponent() {
         CoreDump coreDump = (CoreDump)getDataSource();
+        SaModel saAgent = SaModelFactory.getSAAgentFor(coreDump);
+        
         DataViewComponent dvc = new DataViewComponent(
-                new MasterViewSupport(coreDump).getMasterView(),
+                new MasterViewSupport(saAgent).getMasterView(),
                 new DataViewComponent.MasterViewConfiguration(false));
         
-        SaModel saAgent = SaModelFactory.getSAAgentFor(coreDump);
-        Properties jvmProperties = saAgent.getSystemProperties();
-        String jvmargs = saAgent.getJvmArgs();
-        
-        dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(0.25, 0, -1, -1, -1, -1));
-        
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Saved_data"), true), DataViewComponent.TOP_LEFT);  // NOI18N
-        dvc.addDetailsView(new OverviewViewSupport.SnapshotsViewSupport(coreDump).getDetailsView(), DataViewComponent.TOP_LEFT);
-        
-        dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Details"), true), DataViewComponent.TOP_RIGHT);    // NOI18N 
-        dvc.addDetailsView(new OverviewViewSupport.JVMArgumentsViewSupport(jvmargs).getDetailsView(), DataViewComponent.TOP_RIGHT);
-        dvc.addDetailsView(new OverviewViewSupport.SystemPropertiesViewSupport(jvmProperties).getDetailsView(), DataViewComponent.TOP_RIGHT);
+        if (saAgent != null) {
+            Properties jvmProperties = saAgent.getSystemProperties();
+            String jvmargs = saAgent.getJvmArgs();
+
+            dvc.configureDetailsView(new DataViewComponent.DetailsViewConfiguration(0.25, 0, -1, -1, -1, -1));
+
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Saved_data"), true), DataViewComponent.TOP_LEFT);  // NOI18N
+            dvc.addDetailsView(new OverviewViewSupport.SnapshotsViewSupport(coreDump).getDetailsView(), DataViewComponent.TOP_LEFT);
+
+            dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Details"), true), DataViewComponent.TOP_RIGHT);    // NOI18N 
+            dvc.addDetailsView(new OverviewViewSupport.JVMArgumentsViewSupport(jvmargs).getDetailsView(), DataViewComponent.TOP_RIGHT);
+            dvc.addDetailsView(new OverviewViewSupport.SystemPropertiesViewSupport(jvmProperties).getDetailsView(), DataViewComponent.TOP_RIGHT);
+        }
         
         return dvc;
     }
@@ -79,8 +82,8 @@ class CoreDumpOverviewView extends DataSourceView {
     
     private static class MasterViewSupport extends JPanel  {
         
-        public MasterViewSupport(CoreDump coreDump) {
-            initComponents(coreDump);
+        public MasterViewSupport(SaModel saAgent) {
+            initComponents(saAgent);
         }
         
         
@@ -89,11 +92,11 @@ class CoreDumpOverviewView extends DataSourceView {
         }
         
         
-        private void initComponents(CoreDump coreDump) {
+        private void initComponents(SaModel saAgent) {
             setLayout(new BorderLayout());
             setOpaque(false);
             
-            HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralProperties(coreDump) + "</nobr>");    // NOI18N
+            HTMLTextArea area = new HTMLTextArea("<nobr>" + getGeneralProperties(saAgent) + "</nobr>");    // NOI18N
             area.setBorder(BorderFactory.createEmptyBorder(14, 8, 14, 8));
             
             // TODO: implement listener for CoreDump.oomeHeapDumpEnabled
@@ -101,58 +104,61 @@ class CoreDumpOverviewView extends DataSourceView {
             add(area, BorderLayout.CENTER);
         }
         
-        private String getGeneralProperties(CoreDump coreDump) {
-            SaModel saAgent = SaModelFactory.getSAAgentFor(coreDump);
+        private String getGeneralProperties(SaModel saAgent) {
             StringBuilder data = new StringBuilder();
             
-            // CoreDump information
-            String commandLine = saAgent.getJavaCommand();
-            
-            if (commandLine != null) {
-                // Application information
-                int firstSpace = commandLine.indexOf(' ');
-                String mainClass;
-                String mainArgs = null;
-                if (firstSpace == -1) {
-                    mainClass = commandLine;
-                } else {
-                    mainClass = commandLine.substring(0,firstSpace);
-                    mainArgs = commandLine.substring(firstSpace+1);
-                }
-                String mainClassLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Main_class");    // NOI18N
-                String argsLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Arguments");  // NOI18N
-                data.append("<b>"+mainClassLbl+":</b> " + mainClass + "<br>");  // NOI18N
-                data.append("<b>"+argsLbl+":</b> " + (mainArgs == null ? NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_none") : mainArgs) + "<br>"); // NOI18N
-            }
-            
-            // JVM information
-            String jvmFlags = saAgent.getJvmFlags();
-            String jvmLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_JVM"); // NOI18N
-            String jLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Java"); // NOI18N
-            String verLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Java_Version"); // NOI18N
-            String vendorLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Java_Vendor"); // NOI18N
-            String jhLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Java_Home");    // NOI18N
-            String flagsLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_JVM_Flags"); // NOI18N
-            data.append("<br>");    // NOI18N
-            data.append("<b>"+jvmLbl+":</b> " + saAgent.getVmName() + " (" + saAgent.getVmVersion() + ", " + saAgent.getVmInfo() + ")<br>");    // NOI18N
-            Properties props = saAgent.getSystemProperties();
-            if (props != null) {
-                String javaVersion = props.getProperty("java.version"); // NOI18N
-                String javaVendor = props.getProperty("java.vendor"); // NOI18N
-                if (javaVersion != null || javaVendor != null) {
-                    data.append("<b>"+jLbl+":</b>");
-                    if (javaVersion != null) {
-                        data.append(" "+verLbl+" " + javaVersion);   // NOI18N
+            if (saAgent != null) {
+                // CoreDump information
+                String commandLine = saAgent.getJavaCommand();
+
+                if (commandLine != null) {
+                    // Application information
+                    int firstSpace = commandLine.indexOf(' ');
+                    String mainClass;
+                    String mainArgs = null;
+                    if (firstSpace == -1) {
+                        mainClass = commandLine;
+                    } else {
+                        mainClass = commandLine.substring(0,firstSpace);
+                        mainArgs = commandLine.substring(firstSpace+1);
                     }
-                    if (javaVendor != null) {
-                        if (javaVersion != null) data.append(",");
-                        data.append(" "+vendorLbl+" " + javaVendor);   // NOI18N
-                    }
-                    data.append("<br>");
+                    String mainClassLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Main_class");    // NOI18N
+                    String argsLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Arguments");  // NOI18N
+                    data.append("<b>"+mainClassLbl+":</b> " + mainClass + "<br>");  // NOI18N
+                    data.append("<b>"+argsLbl+":</b> " + (mainArgs == null ? NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_none") : mainArgs) + "<br>"); // NOI18N
                 }
+
+                // JVM information
+                String jvmFlags = saAgent.getJvmFlags();
+                String jvmLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_JVM"); // NOI18N
+                String jLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Java"); // NOI18N
+                String verLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Java_Version"); // NOI18N
+                String vendorLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Java_Vendor"); // NOI18N
+                String jhLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_Java_Home");    // NOI18N
+                String flagsLbl = NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_JVM_Flags"); // NOI18N
+                data.append("<br>");    // NOI18N
+                data.append("<b>"+jvmLbl+":</b> " + saAgent.getVmName() + " (" + saAgent.getVmVersion() + ", " + saAgent.getVmInfo() + ")<br>");    // NOI18N
+                Properties props = saAgent.getSystemProperties();
+                if (props != null) {
+                    String javaVersion = props.getProperty("java.version"); // NOI18N
+                    String javaVendor = props.getProperty("java.vendor"); // NOI18N
+                    if (javaVersion != null || javaVendor != null) {
+                        data.append("<b>"+jLbl+":</b>");
+                        if (javaVersion != null) {
+                            data.append(" "+verLbl+" " + javaVersion);   // NOI18N
+                        }
+                        if (javaVendor != null) {
+                            if (javaVersion != null) data.append(",");
+                            data.append(" "+vendorLbl+" " + javaVendor);   // NOI18N
+                        }
+                        data.append("<br>");
+                    }
+                }
+                data.append("<b>"+jhLbl+":</b> " + saAgent.getJavaHome() + "<br>"); // NOI18N
+                data.append("<b>"+flagsLbl+":</b> " + (jvmFlags == null || jvmFlags.length() == 0 ? NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_none") : jvmFlags) + "<br><br>");  // NOI18N
+            } else {
+                data.append(NbBundle.getMessage(CoreDumpOverviewView.class, "MSG_CoreDump_Failed")); // NOI18N
             }
-            data.append("<b>"+jhLbl+":</b> " + saAgent.getJavaHome() + "<br>"); // NOI18N
-            data.append("<b>"+flagsLbl+":</b> " + (jvmFlags == null || jvmFlags.length() == 0 ? NbBundle.getMessage(CoreDumpOverviewView.class, "LBL_none") : jvmFlags) + "<br><br>");  // NOI18N
             
             return data.toString();
             
