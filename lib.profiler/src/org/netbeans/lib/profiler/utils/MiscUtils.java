@@ -53,6 +53,9 @@ import org.netbeans.lib.profiler.global.Platform;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -373,10 +376,10 @@ public class MiscUtils implements CommonConstants {
                     try {
                         getClassPathFromManifest(name,list);
                     } catch (URISyntaxException ex) {
-                        System.out.println("Error processing "+name);
+                        System.out.println("Error processing "+name);   // NOI18N
                         ex.printStackTrace();
                     } catch (IOException ex) {
-                        System.out.println("Error processing "+name);
+                        System.out.println("Error processing "+name);   // NOI18N
                         ex.printStackTrace();
                     }
                 }
@@ -386,7 +389,7 @@ public class MiscUtils implements CommonConstants {
     }
 
     private static void getClassPathFromManifest(String jarPath,List pathList) throws IOException, URISyntaxException {
-        if (jarPath.toLowerCase().endsWith(".jar")) {
+        if (jarPath.toLowerCase().endsWith(".jar")) {   // NOI18N
             File pathFile = new File(jarPath);
             JarFile jarFile = new JarFile(pathFile);
             Manifest manifest = jarFile.getManifest();
@@ -520,19 +523,24 @@ public class MiscUtils implements CommonConstants {
     public static void deleteHeapTempFiles() {
         if (Platform.isWindows()) { // this is workaroud for JDK bug #6359560
 
-            File tempDir = new File(System.getProperty("java.io.tmpdir")); // NOI18N
-            File[] files = tempDir.listFiles();
+            try {
+                File tempDir = new File(System.getProperty("java.io.tmpdir")); // NOI18N
+                DirectoryStream<Path> files = Files.newDirectoryStream(tempDir.toPath());
 
-            // check that tempDir exists
-            if (files != null) {
-                for (int i = 0; i < files.length; i++) {
-                    File f = files[i];
-                    String fname = f.getName();
+                try {
+                    for (Path p : files) {
+                        String fname = p.toFile().getName();
 
-                    if (fname.startsWith("NBProfiler") && (fname.endsWith(".map") || fname.endsWith(".ref"))) { // NOI18N
-                        f.delete();
+                        if (fname.startsWith("NBProfiler") && (fname.endsWith(".map") || fname.endsWith(".ref") || fname.endsWith(".gc"))) { // NOI18N
+                            Files.delete(p);
+                        }
                     }
+                } finally {
+                    files.close();
                 }
+            } catch (IOException ex) {
+                System.err.println("deleteHeapTempFiles failed");   // NOI18N
+                ex.printStackTrace();
             }
         }
     }
@@ -646,13 +654,13 @@ public class MiscUtils implements CommonConstants {
         } else if (jdkVersionString.startsWith("1.6")) { // NOI18N
             return true;
         } else if (jdkVersionString.startsWith("1.5")) { // NOI18N
-            if (jdkVersionString.equals("1.5.0") || jdkVersionString.startsWith("1.5.0_01") ||
+            if (jdkVersionString.equals("1.5.0") || jdkVersionString.startsWith("1.5.0_01") ||  // NOI18N
                 jdkVersionString.startsWith("1.5.0_02") || jdkVersionString.startsWith("1.5.0_03")) { // NOI18N
                 return false;
             } else {
                 return true;
             }
-        } else if (jdkVersionString.equals("CVM")) {
+        } else if (jdkVersionString.equals("CVM")) {    // NOI18N
             return true;
         }
         return false;
