@@ -1,11 +1,11 @@
  profilerinterface
 
- Timestamp is 5460a8bc (Mon Nov 10 12:59:56 2014)
+ Timestamp is 57bebfa9 (Thu Aug 25 11:51:37 2016)
 
  Preferred load address is 10000000
 
  Start         Length     Name                   Class
- 0001:00000000 00003decH .text                   CODE
+ 0001:00000000 00003e0cH .text                   CODE
  0002:00000000 00000088H .idata$5                DATA
  0002:00000088 00000004H .CRT$XCA                DATA
  0002:0000008c 00000004H .CRT$XCZ                DATA
@@ -87,38 +87,38 @@
  0001:00002930       _monitor_contended_enter_hook@16 10003930 f   class_file_cache.obj
  0001:000029a0       _monitor_contended_entered_hook@16 100039a0 f   class_file_cache.obj
  0001:00002a00       _vm_object_alloc@28        10003a00 f   class_file_cache.obj
- 0001:00002a50       _Java_org_netbeans_lib_profiler_server_system_Classes_setParkTrackingEnabled@12 10003a50 f   class_file_cache.obj
- 0001:00002aa0       _Java_org_netbeans_lib_profiler_server_system_Classes_setLockContentionMonitoringEnabled@12 10003aa0 f   class_file_cache.obj
- 0001:00002ab0       _Java_org_netbeans_lib_profiler_server_system_Classes_setWaitTrackingEnabled@12 10003ab0 f   class_file_cache.obj
- 0001:00002b10       _Java_org_netbeans_lib_profiler_server_system_Classes_setSleepTrackingEnabled@12 10003b10 f   class_file_cache.obj
- 0001:00002b60       _Java_org_netbeans_lib_profiler_server_system_Classes_setVMObjectAllocEnabled@12 10003b60 f   class_file_cache.obj
- 0001:00002da0       _class_file_load_hook@40   10003da0 f   class_file_cache.obj
- 0001:00002ef0       _native_method_bind_hook@24 10003ef0 f   class_file_cache.obj
- 0001:000032b0       _parse_options_and_extract_params 100042b0 f   attach.obj
- 0001:00003560       _vm_init_hook@12           10004560 f   attach.obj
- 0001:00003570       _memcpy                    10004570 f   MSVCRT:msvcrt.dll
- 0001:00003580       __alldiv                   10004580 f   MSVCRT:lldiv.obj
- 0001:00003630       __allmul                   10004630 f   MSVCRT:llmul.obj
- 0001:00003664       __ftol2                    10004664 f   MSVCRT:msvcrt.dll
- 0001:0000366a       _memset                    1000466a f   MSVCRT:msvcrt.dll
- 0001:00003670       ___CppXcptFilter           10004670 f i MSVCRT:crtdll.obj
- 0001:00003690       __initterm_e               10004690 f i MSVCRT:crtdll.obj
- 0001:000036d6       __CRT_INIT@12              100046d6 f   MSVCRT:crtdll.obj
- 0001:00003ab9       __DllMainCRTStartup@12     10004ab9 f   MSVCRT:crtdll.obj
- 0001:00003ad0       __XcptFilter               10004ad0 f   MSVCRT:msvcrt.dll
- 0001:00003ae0       __ValidateImageBase        10004ae0 f   MSVCRT:pesect.obj
- 0001:00003b20       __FindPESection            10004b20 f   MSVCRT:pesect.obj
- 0001:00003b64       __IsNonwritableInCurrentImage 10004b64 f   MSVCRT:pesect.obj
- 0001:00003bd0       __initterm                 10004bd0 f   MSVCRT:msvcrt.dll
- 0001:00003bd6       __amsg_exit                10004bd6 f   MSVCRT:msvcrt.dll
- 0001:00003bdc       _DllMain@12                10004bdc f   MSVCRT:dllmain.obj
- 0001:00003be4       __SEH_prolog4              10004be4 f   MSVCRT:sehprolg4.obj
- 0001:00003c29       __SEH_epilog4              10004c29 f   MSVCRT:sehprolg4.obj
- 0001:00003c3d       __except_handler4          10004c3d f   MSVCRT:chandler4gs.obj
- 0001:00003c62       ___security_init_cookie    10004c62 f   MSVCRT:gs_support.obj
- 0001:00003cf3       @__security_check_cookie@4 10004cf3 f   MSVCRT:secchk.obj
- 0001:00003d04       __except_handler4_common   10004d04 f   MSVCRT:msvcrt.dll
- 0001:00003d0a       ___report_gsfailure        10004d0a f   MSVCRT:gs_report.obj
+ 0001:00002a70       _Java_org_netbeans_lib_profiler_server_system_Classes_setParkTrackingEnabled@12 10003a70 f   class_file_cache.obj
+ 0001:00002ac0       _Java_org_netbeans_lib_profiler_server_system_Classes_setLockContentionMonitoringEnabled@12 10003ac0 f   class_file_cache.obj
+ 0001:00002ad0       _Java_org_netbeans_lib_profiler_server_system_Classes_setWaitTrackingEnabled@12 10003ad0 f   class_file_cache.obj
+ 0001:00002b30       _Java_org_netbeans_lib_profiler_server_system_Classes_setSleepTrackingEnabled@12 10003b30 f   class_file_cache.obj
+ 0001:00002b80       _Java_org_netbeans_lib_profiler_server_system_Classes_setVMObjectAllocEnabled@12 10003b80 f   class_file_cache.obj
+ 0001:00002dc0       _class_file_load_hook@40   10003dc0 f   class_file_cache.obj
+ 0001:00002f10       _native_method_bind_hook@24 10003f10 f   class_file_cache.obj
+ 0001:000032d0       _parse_options_and_extract_params 100042d0 f   attach.obj
+ 0001:00003580       _vm_init_hook@12           10004580 f   attach.obj
+ 0001:00003590       _memcpy                    10004590 f   MSVCRT:msvcrt.dll
+ 0001:000035a0       __alldiv                   100045a0 f   MSVCRT:lldiv.obj
+ 0001:00003650       __allmul                   10004650 f   MSVCRT:llmul.obj
+ 0001:00003684       __ftol2                    10004684 f   MSVCRT:msvcrt.dll
+ 0001:0000368a       _memset                    1000468a f   MSVCRT:msvcrt.dll
+ 0001:00003690       ___CppXcptFilter           10004690 f i MSVCRT:crtdll.obj
+ 0001:000036b0       __initterm_e               100046b0 f i MSVCRT:crtdll.obj
+ 0001:000036f6       __CRT_INIT@12              100046f6 f   MSVCRT:crtdll.obj
+ 0001:00003ad9       __DllMainCRTStartup@12     10004ad9 f   MSVCRT:crtdll.obj
+ 0001:00003af0       __XcptFilter               10004af0 f   MSVCRT:msvcrt.dll
+ 0001:00003b00       __ValidateImageBase        10004b00 f   MSVCRT:pesect.obj
+ 0001:00003b40       __FindPESection            10004b40 f   MSVCRT:pesect.obj
+ 0001:00003b84       __IsNonwritableInCurrentImage 10004b84 f   MSVCRT:pesect.obj
+ 0001:00003bf0       __initterm                 10004bf0 f   MSVCRT:msvcrt.dll
+ 0001:00003bf6       __amsg_exit                10004bf6 f   MSVCRT:msvcrt.dll
+ 0001:00003bfc       _DllMain@12                10004bfc f   MSVCRT:dllmain.obj
+ 0001:00003c04       __SEH_prolog4              10004c04 f   MSVCRT:sehprolg4.obj
+ 0001:00003c49       __SEH_epilog4              10004c49 f   MSVCRT:sehprolg4.obj
+ 0001:00003c5d       __except_handler4          10004c5d f   MSVCRT:chandler4gs.obj
+ 0001:00003c82       ___security_init_cookie    10004c82 f   MSVCRT:gs_support.obj
+ 0001:00003d13       @__security_check_cookie@4 10004d13 f   MSVCRT:secchk.obj
+ 0001:00003d24       __except_handler4_common   10004d24 f   MSVCRT:msvcrt.dll
+ 0001:00003d2a       ___report_gsfailure        10004d2a f   MSVCRT:gs_report.obj
  0002:00000000       __imp__UnhandledExceptionFilter@4 10005000     kernel32:KERNEL32.dll
  0002:00000004       __imp__GetCurrentProcess@0 10005004     kernel32:KERNEL32.dll
  0002:00000008       __imp__TerminateProcess@8  10005008     kernel32:KERNEL32.dll
@@ -178,7 +178,7 @@
  0003:00002200       __pRawDllMain              10009200     <common>
  0003:00002204       ___dyn_tls_init_callback   10009204     <common>
 
- entry point at        0001:00003ab9
+ entry point at        0001:00003ad9
 
  Static symbols
 
@@ -193,7 +193,7 @@
  0001:00002120       _grow_ctable               10003120 f   class_file_cache.obj
  0001:000023f0       _getOwner                  100033f0 f   class_file_cache.obj
  0001:00002450       _initializeMethods         10003450 f   class_file_cache.obj
- 0001:00002ba0       _save_class_file_bytes     10003ba0 f   class_file_cache.obj
- 0001:00003420       _setupAndCallProfilerRuntimeActivate 10004420 f   attach.obj
- 0001:000036b4       _pre_c_init                100046b4 f   MSVCRT:crtdll.obj
- 0001:0000385d       ___DllMainCRTStartup@12    1000485d f   MSVCRT:crtdll.obj
+ 0001:00002bc0       _save_class_file_bytes     10003bc0 f   class_file_cache.obj
+ 0001:00003440       _setupAndCallProfilerRuntimeActivate 10004440 f   attach.obj
+ 0001:000036d4       _pre_c_init                100046d4 f   MSVCRT:crtdll.obj
+ 0001:0000387d       ___DllMainCRTStartup@12    1000487d f   MSVCRT:crtdll.obj

@@ -42,8 +42,12 @@
  */
 package org.netbeans.lib.profiler.ui.jdbc;
 
+import java.awt.Color;
+import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JLabel;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
  *
@@ -51,6 +55,12 @@ import java.util.regex.Pattern;
  * @author Tomas Hurka
  */
 final class SQLFormatter {
+    // I18N String constants
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.jdbc.Bundle"); // NOI18N
+    private static final String DATABASE_PING = messages.getString("SQLFormatter_DatabasePing"); // NOI18N
+
+    private static final String PING_TEXT = " - <b>"+DATABASE_PING+"</b>";  // NOI18N
+
     private static String keywords[] = {
         "AS",
         "ALL",
@@ -94,24 +104,32 @@ final class SQLFormatter {
         "'[^']*'"
     };
 
-    private static Pattern keywordsPattern = Pattern.compile(getKeywordPattern(), Pattern.CASE_INSENSITIVE);
+    private static final Pattern keywordsPattern = Pattern.compile(getPattern(keywords), Pattern.CASE_INSENSITIVE);
 
-    private static String getKeywordPattern() {
+    private static String getPattern(String[] patterns) {
         StringBuilder pattern = new StringBuilder();
 
-        for (String keyword : keywords) {
+        for (String patternString : patterns) {
             pattern.append("(");    // NOI18N
-            if (Character.isLetter(keyword.charAt(0))) {
-                pattern.append("\\b");  // NOi18N
-                pattern.append(keyword);
+            if (Character.isLetter(patternString.charAt(0))) {
+                pattern.append("\\b");  // NOI18N
+                pattern.append(patternString);
                 pattern.append("\\b");  // NOI18N
             } else {
-                pattern.append(keyword);
+                pattern.append(patternString);
             }
             pattern.append(")|");   // NOI18N
         }
         return pattern.substring(0, pattern.length()-1);
     }
+
+    private static final String pingSQL[] = {
+        "^SELECT\\s+1",
+        "^VALUES\\s*\\(\\s*1\\s*\\)"
+    };
+
+    private static final Pattern pingSQLPattern = Pattern.compile(getPattern(pingSQL), Pattern.CASE_INSENSITIVE);
+
 
     static String format(String command) {
         String formattedCommand;
@@ -136,16 +154,35 @@ final class SQLFormatter {
             offset = m.end();
         }
         s.append(command.substring(offset,command.length()));
+        s.append(checkPingSQL(command));
         s.append("</html>"); // NOI18N
 
         formattedCommand = s.toString();
-        formattedCommand = formattedCommand.replace("(", "<font color='gray'>(");   // NOI18N
         formattedCommand = formattedCommand.replace(")", ")</font>");   // NOI18N
+        formattedCommand = formattedCommand.replace("(", "<font color='" + getGrayHTMLString() + "'>(");   // NOI18N
         return formattedCommand;
     }
 
     private static String htmlize(String value) {
         return value.replace(">", "&gt;").replace("<", "&lt;");     // NOI18N
+    }
+    
+    private static String checkPingSQL(String command) {                         
+        Matcher m = pingSQLPattern.matcher(command);
+        if (m.find()) {
+            return PING_TEXT;
+        }
+        return "";
+    }
+    
+    
+    private static String grayHTMLString;
+    private static String getGrayHTMLString() {
+        if (grayHTMLString == null) {
+            Color grayColor = UIUtils.getDisabledForeground(new JLabel().getForeground());
+            grayHTMLString = "rgb(" + grayColor.getRed() + "," + grayColor.getGreen() + "," + grayColor.getBlue() + ")"; //NOI18N
+        }
+        return grayHTMLString;
     }
     
 }

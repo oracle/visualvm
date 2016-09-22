@@ -465,7 +465,7 @@ final class ProfilerTableHovers {
         }
         
         // MouseAdapter
-        public void mouseExited(MouseEvent e) { hidePopups(); }
+        public void mouseExited(MouseEvent e) { hidePopups(); currentScreenPoint = null; }
 //        public void mouseDragged(MouseEvent e) { updatePopups(e.getPoint(), false); }
 //        public void mouseDragged(MouseEvent e) { hidePopups(); }
 //        public void mousePressed(MouseEvent e) { hidePopups(); }

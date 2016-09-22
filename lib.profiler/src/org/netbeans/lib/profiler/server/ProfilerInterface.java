@@ -183,6 +183,18 @@ public class ProfilerInterface implements CommonConstants {
                 e.printStackTrace(System.err);
             }
 
+            if (Platform.getJDKVersionNumber() == CommonConstants.JDK_19) {
+                try {
+                    // preload classes for classLoadHook()
+                    Class.forName("java.lang.reflect.WeakPairMap$Pair"); // NOI18N
+                    Class.forName("java.lang.reflect.WeakPairMap$WeakRefPeer");    // NOI18N
+                    Class.forName("java.lang.reflect.WeakPairMap$Pair$Weak"); // NOI18N
+                    Class.forName("java.lang.reflect.WeakPairMap$Pair$Weak$1"); // NOI18N
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace(System.err);
+                }
+            }
+            
             // The following code is needed to enforce native method bind for Thread.sleep before instrumentation, so
             // that the NativeMethodBind it can be disabled as first thing in instrumentation
             // this is needed as a workaround for JDK bug:
@@ -581,8 +593,8 @@ public class ProfilerInterface implements CommonConstants {
                     reflectiveMethodInvokeHook(method);
                 }
 
-                public int handleFirstTimeVMObjectAlloc(String className, int classLoaderId) {
-                    return firstTimeVMObjectAlloc(className, classLoaderId);
+                public int handleFirstTimeVMObjectAlloc(String className, int definingClassLoaderId) {
+                    return firstTimeVMObjectAlloc(className, definingClassLoaderId);
                 }
 
                 public void handleEventBufferDump(byte[] eventBuffer, int startPos, int curPtrPos) {
@@ -1148,7 +1160,7 @@ public class ProfilerInterface implements CommonConstants {
         }
     }
 
-    private static int firstTimeVMObjectAlloc(String className, int classLoaderId) {
+    private static int firstTimeVMObjectAlloc(String className, int definingClassLoaderId) {
         GetClassIdResponse resp;
 
         if (internalClassName(className)) {
@@ -1158,12 +1170,7 @@ public class ProfilerInterface implements CommonConstants {
         serialClientOperationsLock.beginTrans(true);
 
         try {
-            if (classLoaderId > 0) { // neither bootstrap nor system class loader
-                                     // get defining classloader 
-                classLoaderId = ClassLoaderManager.getDefiningLoaderForClass(className, classLoaderId);
-            }
-
-            GetClassIdCommand cmd = new GetClassIdCommand(className, classLoaderId);
+            GetClassIdCommand cmd = new GetClassIdCommand(className, definingClassLoaderId);
             profilerServer.sendComplexCmdToClient(cmd);
             resp = (GetClassIdResponse) profilerServer.getLastResponse();
         }  finally {
