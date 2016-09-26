@@ -1,0 +1,10 @@
+/visualvm/nbproject/private/
+/visualvm/*/nbproject/private/
+/visualvm/launcher/windows-src/nbproject/private/
+/visualvm/*/build/
+/*/build/
+/*/dist/
+/visualvm/netbeans/
+/visualvm/nbantext.jar
+/l10n/en.nbms/
+/l10n/l10nantext.jar
