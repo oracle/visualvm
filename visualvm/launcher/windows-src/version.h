@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2014, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2016, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,11 +25,11 @@
 
 #define COMPANY "Oracle Corporation"
 #define COMPONENT "VisualVM"
-#define VER "0.0.0.0"
-#define FVER 0,0,0,0
+#define VER "1.3.9.0"
+#define FVER 1,3,9,0
 #define BUILD_ID "0"
 #define INTERNAL_NAME "visualvm"
-#define COPYRIGHT "\xA9 2007, 2014, Oracle and/or its affiliates. All rights reserved."
+#define COPYRIGHT "\xA9 2007, 2016, Oracle and/or its affiliates. All rights reserved."
 #define FNAME "visualvm.exe"
-#define NAME "VisualVM Dev. build"
+#define NAME "VisualVM"
 
