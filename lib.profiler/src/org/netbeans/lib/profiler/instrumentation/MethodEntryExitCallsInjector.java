@@ -247,6 +247,10 @@ class MethodEntryExitCallsInjector extends Injector implements CommonConstants {
                         parIndex++;
                 }
             }
+            int padding = (4 - code.size() % 4) % 4;
+            for (int i = 0; i < padding; i++) {
+                code.write(opc_nop);
+            }
             injectCodeAndRewrite(code.toByteArray(), code.size(), 0, true);        
         }
     }
