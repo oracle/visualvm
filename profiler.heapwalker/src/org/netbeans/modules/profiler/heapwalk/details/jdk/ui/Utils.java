@@ -54,7 +54,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.util.List;
+import java.lang.reflect.Method;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -69,8 +69,8 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
-import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -103,18 +103,13 @@ final class Utils {
     static String getFieldString(Instance instance, String field) {
         Object _s = instance.getValueOfField(field);
         if (_s instanceof Instance) {
-            Instance s = (Instance)_s;
-            int offset = DetailsUtils.getIntFieldValue(s, "offset", 0);         // NOI18N
-            int count = DetailsUtils.getIntFieldValue(s, "count", -1);          // NOI18N
-            List<String> ch = DetailsUtils.getPrimitiveArrayFieldValues(s, "value"); // NOI18N
-            if (ch != null) {
-                int valuesCount = count < 0 ? ch.size() - offset :
-                                  Math.min(count, ch.size() - offset);            
-                StringBuilder value = new StringBuilder(valuesCount * 2);
-                int lastValue = offset + valuesCount - 1;
-                for (int i = offset; i <= lastValue; i++)
-                    value.append(ch.get(i));
-                return value.toString();
+            try {
+                Class proxy = Class.forName("org.netbeans.lib.profiler.heap.HprofProxy"); // NOI18N
+                Method method = proxy.getDeclaredMethod("getString", Instance.class); // NOI18N
+                method.setAccessible(true);
+                return (String) method.invoke(proxy, _s);
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
             }
         }
         return null;
