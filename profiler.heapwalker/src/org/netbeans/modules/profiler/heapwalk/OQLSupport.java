@@ -49,6 +49,7 @@ import java.util.Properties;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.oql.repository.api.OQLQueryCategory;
@@ -144,9 +145,9 @@ public final class OQLSupport {
 
         if (model.hasCustomQueries()) {
             int i = -1;
-            Enumeration<OQLQueryNode> queries = model.customCategory.children();
+            Enumeration<TreeNode> queries = model.customCategory.children();
             while (queries.hasMoreElements()) {
-                OQLSupport.Query q = queries.nextElement().getUserObject();
+                OQLSupport.Query q = ((OQLQueryNode)queries.nextElement()).getUserObject();
                 properties.put(PROP_QUERY_NAME_KEY + "-" + ++i, q.getName().trim()); // NOI18N
                 properties.put(PROP_QUERY_SCRIPT_KEY + "-" + i, q.getScript().trim()); // NOI18N
                 if (q.getDescription() != null)
