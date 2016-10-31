@@ -53,6 +53,10 @@ public class Histogram {
     public static boolean isAvailable() {
         return false;
     }
+
+    public static boolean initialize(boolean jdk9) {
+        return false;
+    }
     
     public static InputStream getRawHistogram() {
         return null;
