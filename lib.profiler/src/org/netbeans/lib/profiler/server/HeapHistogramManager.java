@@ -165,8 +165,9 @@ class HeapHistogramManager {
         Date time = new Date();
         Scanner sc = new Scanner(in);
 
-        sc.nextLine();
-        sc.nextLine();
+        while(!sc.hasNext("------------------")) {      // NOI18N
+            sc.nextLine();
+        }
         sc.skip('-');       // NOI18N
         sc.nextLine();
 
@@ -260,6 +261,7 @@ class HeapHistogramManager {
             instances = sc.nextLong();
             bytes = sc.nextLong();
             jvmName = sc.next();
+            sc.nextLine();  // skip module name on JDK 9
             permGen = jvmName.charAt(0) == '<';     // NOI18N
             name = convertJVMName(jvmName);
         }
@@ -489,6 +491,19 @@ class HeapHistogramManager {
                 return true;
             }
             return false;
+        }
+
+        private boolean hasNext(String string) throws IOException {
+            reader.mark(string.length());
+            for (int i = 0; i < string.length(); i++) {
+                int ch = reader.read();
+                if (ch != string.charAt(i)) {
+                    reader.reset();
+                    return false;
+                }
+            }
+            reader.reset();
+            return true;
         }
     }
 
