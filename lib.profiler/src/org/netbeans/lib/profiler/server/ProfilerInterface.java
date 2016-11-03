@@ -466,14 +466,8 @@ public class ProfilerInterface implements CommonConstants {
         return ProfilerRuntime.profiledTargetAppThreadsExist();
     }
 
-    /**
-     * Deactivate the injected code for the current instrumentation type, and clean up all the supporting data structures
-     * maintained by the corresponding ProfilerRuntimeXXX class.
-     */
-    public static void deactivateInjectedCode() {
+    static void disableProfiling() {
         int instrType = getCurrentInstrType();
-
-        disableProfilerHooks();
 
         switch (instrType) {
             case INSTR_NONE:
@@ -511,8 +505,16 @@ public class ProfilerInterface implements CommonConstants {
                 ProfilerRuntimeObjLiveness.enableProfiling(false);
 
                 break;
-        }
+        }        
+    }
 
+    /**
+     * Deactivate the injected code for the current instrumentation type, and clean up all the supporting data structures
+     * maintained by the corresponding ProfilerRuntimeXXX class.
+     */
+    public static void deactivateInjectedCode() {
+        disableProfilerHooks();
+        disableProfiling();
         status.resetInstrClassAndMethodInfo();
         setCurrentInstrType(INSTR_NONE);
     }
