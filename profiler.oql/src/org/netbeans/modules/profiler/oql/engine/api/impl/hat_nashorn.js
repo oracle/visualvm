@@ -269,7 +269,7 @@ function wrapJavaValue(thing) {
     }
 
     //    printStackTrace();
-    //    println(thing);
+    //    print(thing);
 
     if (thing instanceof Packages.org.netbeans.lib.profiler.heap.FieldValue) {
         var type = thing.field.type;
@@ -318,19 +318,19 @@ function wrapJavaObject(thing) {
 
         //        print(jobject.getClass());
         if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.JavaClass) {
-            //            println("wrapping as Class");
+            //            print("wrapping as Class");
             return new JavaClassWrapper(jobject);
         } else if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.ObjectArrayInstance) {
-            //            println("wrapping as ObjectArray");
+            //            print("wrapping as ObjectArray");
             return new JavaObjectArrayWrapper(jobject);
         } else if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.PrimitiveArrayInstance) {
-            // println("wrapping as ValueArray");
+            // print("wrapping as ValueArray");
             return new JavaValueArrayWrapper(jobject);
         } else if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.Instance) {
-            //            println("wrapping as Instance");
+            //            print("wrapping as Instance");
             return new JavaObjectWrapper(jobject);
         } else {
-            //            println("unknown heap object type: " + jobject.getClass());
+            //            print("unknown heap object type: " + jobject.getClass());
             return jobject;
         }
     }
@@ -571,12 +571,12 @@ function wrapJavaObject(thing) {
 
 // unwrap a script object to corresponding HAT object
 function unwrapJavaObject(jobject) {
-    //    println("Unwrapping object");
-    //    println(typeof(jobject));
+    //    print("Unwrapping object");
+    //    print(typeof(jobject));
     
     if (!(jobject instanceof Packages.org.netbeans.lib.profiler.heap.Instance)) {
         if (jobject instanceof Array) {
-            //            println("Object is array");
+            //            print("Object is array");
             var arr = new java.util.ArrayList(jobject.length);
 
             for (var index in jobject) {
@@ -586,7 +586,7 @@ function unwrapJavaObject(jobject) {
         }
         
         try {
-            //            println(typeof(jobject));
+            //            print(typeof(jobject));
             var orig = jobject;
             jobject = orig["wrapped-object"];
             if (jobject == undefined) {
@@ -596,7 +596,7 @@ function unwrapJavaObject(jobject) {
                 jobject = orig;
             }
         } catch (e) {
-            //println("unwrapJavaObject: " + jobject + ", " + e);
+            //print("unwrapJavaObject: " + jobject + ", " + e);
             jobject = undefined;
         }
     } 
@@ -606,7 +606,7 @@ function unwrapJavaObject(jobject) {
 function unwrapMap(jobject) {
     var map = new java.util.HashMap();
     for(var prop in jobject) {
-        //        println("adding " + prop + " = " + unwrapJavaObject(jobject[prop]));
+        //        print("adding " + prop + " = " + unwrapJavaObject(jobject[prop]));
         map.put(prop, unwrapJavaObject(jobject[prop]));
     }
     return map;
@@ -1027,7 +1027,7 @@ function referrers(jobject, weak) {
         jobject = unwrapJavaObject(jobject);
         return wrapIterator(this.snapshot.getReferrers(jobject, weak));
     } catch (e) {
-        println("referrers: " + jobject + ", " + e);
+        print("referrers: " + jobject + ", " + e);
         return emptyEnumeration;
     }
 }
@@ -1047,7 +1047,7 @@ function referees(jobject, weak) {
         jobject = unwrapJavaObject(jobject);
         return wrapIterator(this.snapshot.getReferees(jobject, weak));
     } catch (e) {
-        println("referees: " + jobject + ", " + e);
+        print("referees: " + jobject + ", " + e);
         return emptyEnumeration;
     }
 }
@@ -1116,7 +1116,7 @@ function refers(from, to) {
             }
         }
     } catch (e) {
-        println("refers: " + from + ", " + e);
+        print("refers: " + from + ", " + e);
     }
     return false;
 }
