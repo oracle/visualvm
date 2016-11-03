@@ -141,7 +141,7 @@ public class ProfilerInterface implements CommonConstants {
                         initiateInstrumentation(instrType);
                         break;
                     case INSTR_NONE_MEMORY_SAMPLING:
-                        if (Histogram.isAvailable()) {
+                        if (Histogram.initialize(Platform.getJDKVersionNumber() >= Platform.JDK_19)) {
                             profilerServer.notifyClientOnResultsAvailability();
                         }
                         break;
