@@ -186,7 +186,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         node = (TreeNode)_model.getChild(parent, idx - 1);
         path = parentPath.pathByAddingChild(node);
 
-        while (_model.getChildCount(node) != 0) {
+        if (down) while (_model.getChildCount(node) != 0) {
             node = (TreeNode)_model.getChild(node, _model.getChildCount(node) - 1);
             path = path.pathByAddingChild(node);
         }
