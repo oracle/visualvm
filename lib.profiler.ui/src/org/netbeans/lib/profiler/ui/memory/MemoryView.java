@@ -84,7 +84,13 @@ public abstract class MemoryView extends DataView {
     static final String TOTAL_ALLOC_COUNT_COLUMN_TOOLTIP = messages.getString("MemoryView_TotalAllocCountColumnTooltip"); // NOI18N
     static final String AVG_AGE_COLUMN_TOOLTIP = messages.getString("MemoryView_AvgAgeColumnTooltip"); // NOI18N
     static final String GENERATIONS_COLUMN_TOOLTIP = messages.getString("MemoryView_GenerationsColumnTooltip"); // NOI18N
-    // -----
+    static final String FILTER_CLASSES_SCOPE = messages.getString("MemoryView_FilterClassesScope"); // NOI18N
+    static final String FILTER_ALLOCATIONS_SCOPE = messages.getString("MemoryView_FilterAllocationsScope"); // NOI18N
+    static final String FILTER_SCOPE_TOOLTIP = messages.getString("MemoryView_FilterScopeTooltip"); // NOI18N
+    static final String SEARCH_CLASSES_SCOPE = messages.getString("MemoryView_SearchClassesScope"); // NOI18N
+    static final String SEARCH_ALLOCATIONS_SCOPE = messages.getString("MemoryView_SearchAllocationsScope"); // NOI18N
+    static final String SEARCH_SCOPE_TOOLTIP = messages.getString("MemoryView_SearchScopeTooltip"); // NOI18N
+    // -----_GenerationsCo
     
     
     public abstract void setData(MemoryResultsSnapshot snapshot, GenericFilter filter, int aggregation);

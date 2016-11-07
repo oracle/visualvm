@@ -68,9 +68,11 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsDiff;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
+import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
@@ -497,8 +499,8 @@ public abstract class SnapshotCPUView extends JPanel {
             popup.add(new JMenuItem(CPUView.FIND_IN_REVERSECALLS) {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
-                    ProfilerTable table = reverseCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString)) {
+                    ProfilerTreeTable table = (ProfilerTreeTable)reverseCallsView.getResultsComponent();
+                    if (SearchUtils.findString(table, searchString, true, true, createSearchHelper())) {
                         toggles[2].setSelected(true);
                         reverseCallsView.setVisible(true);
                         table.requestFocusInWindow();
@@ -524,8 +526,8 @@ public abstract class SnapshotCPUView extends JPanel {
             popup.add(new JMenuItem(CPUView.FIND_IN_REVERSECALLS) {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
-                    ProfilerTable table = reverseCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString)) {
+                    ProfilerTreeTable table = (ProfilerTreeTable)reverseCallsView.getResultsComponent();
+                    if (SearchUtils.findString(table, searchString, true, true, createSearchHelper())) {
                         toggles[2].setSelected(true);
                         reverseCallsView.setVisible(true);
                         table.requestFocusInWindow();
@@ -573,6 +575,26 @@ public abstract class SnapshotCPUView extends JPanel {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
         });
         
+    }
+    
+    private static SearchUtils.TreeHelper createSearchHelper() {
+        return new SearchUtils.TreeHelper() {
+            public int getNodeType(TreeNode tnode) {
+                PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)tnode;
+                CCTNode parent = node.getParent();
+                if (parent == null) return SearchUtils.TreeHelper.NODE_SKIP_DOWN; // invisible root
+                
+                if (node.isThreadNode()) return SearchUtils.TreeHelper.NODE_SKIP_DOWN; // thread node
+                if (node.isSelfTimeNode()) return SearchUtils.TreeHelper.NODE_SKIP_NEXT; // self time node
+                
+                if (((PrestimeCPUCCTNode)parent).isThreadNode() || // toplevel method node (children of thread)
+                    parent.getParent() == null) {                  // toplevel method node (merged threads)
+                    return SearchUtils.TreeHelper.NODE_SEARCH_NEXT;
+                }
+                
+                return SearchUtils.TreeHelper.NODE_SKIP_NEXT; // reverse call tree node
+            }
+        };
     }
     
     protected void customizeNodePopup(DataView invoker, JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {}

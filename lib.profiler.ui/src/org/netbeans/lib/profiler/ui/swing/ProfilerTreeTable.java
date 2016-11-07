@@ -143,7 +143,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         return getNextPath(path, true);
     }
     
-    private TreePath getNextPath(TreePath path, boolean down) {
+    TreePath getNextPath(TreePath path, boolean down) {
         TreeModel _model = model.treeModel;
         TreeNode node = (TreeNode)path.getLastPathComponent();
         if (down && _model.getChildCount(node) > 0)
@@ -167,6 +167,10 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
     
     TreePath getPreviousPath(TreePath path) {
+        return getPreviousPath(path, true);
+    }
+    
+    TreePath getPreviousPath(TreePath path, boolean down) { // TODO: optimize the algorithm to use 'down'
         TreeModel _model = model.treeModel;
         TreeNode node = (TreeNode)path.getLastPathComponent();
         TreePath parentPath = path.getParentPath();
@@ -193,7 +197,7 @@ public class ProfilerTreeTable extends ProfilerTable {
     void selectPath(TreePath path, boolean scrollToVisible) {
         internal = true;
         try {
-            tree.expandPath(path);
+//            tree.expandPath(path); // actually should not bee needed, automatically expands the node further down
             tree.setSelectionPath(path);
             // Clear and select again to make sure the underlying tree is ready
             tree.setSelectionPath(null);

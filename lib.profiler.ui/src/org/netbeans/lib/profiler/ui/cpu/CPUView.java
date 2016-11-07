@@ -81,6 +81,12 @@ public abstract class CPUView extends DataView {
     static final String TOTAL_TIME_CPU_COLUMN_TOOLTIP = messages.getString("CPUView_TotalTimeCpuColumnTooltip"); // NOI18N
     static final String HITS_COLUMN_TOOLTIP = messages.getString("CPUView_HitsColumnTooltip"); // NOI18N
     static final String INVOCATIONS_COLUMN_TOOLTIP = messages.getString("CPUView_InvocationsColumnTooltip"); // NOI18N
+    static final String FILTER_CALLEES_SCOPE = messages.getString("CPUView_FilterCalleesScope"); // NOI18N
+    static final String FILTER_CALLERS_SCOPE = messages.getString("CPUView_FilterCallersScope"); // NOI18N
+    static final String FILTER_SCOPE_TOOLTIP = messages.getString("CPUView_FilterScopeTooltip"); // NOI18N
+    static final String SEARCH_CALLEES_SCOPE = messages.getString("CPUView_SearchCalleesScope"); // NOI18N
+    static final String SEARCH_CALLERS_SCOPE = messages.getString("CPUView_SearchCallersScope"); // NOI18N
+    static final String SEARCH_SCOPE_TOOLTIP = messages.getString("CPUView_SearchScopeTooltip"); // NOI18N
     // -----
     
 }

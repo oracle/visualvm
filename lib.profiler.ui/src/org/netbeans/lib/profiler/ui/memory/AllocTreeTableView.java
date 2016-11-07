@@ -43,6 +43,7 @@
 package org.netbeans.lib.profiler.ui.memory;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -51,6 +52,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
@@ -69,15 +72,20 @@ import org.netbeans.lib.profiler.results.memory.MemoryCCTManager;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.Formatters;
+import static org.netbeans.lib.profiler.ui.memory.MemoryView.SEARCH_CLASSES_SCOPE;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.ui.swing.PopupButton;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.utils.Wildcards;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 /**
  *
@@ -91,6 +99,11 @@ abstract class AllocTreeTableView extends MemoryView {
     private Map<TreeNode, ClientUtils.SourceCodeSelection> nodesMap;
     private final Set<ClientUtils.SourceCodeSelection> selection;
     
+    private boolean filterObjects = true;
+    private boolean filterAllocations = false;
+    private boolean searchObjects = true;
+    private boolean searchAllocations = false;
+    
     
     public AllocTreeTableView(Set<ClientUtils.SourceCodeSelection> selection) {
         this.selection = selection;
@@ -103,9 +116,91 @@ abstract class AllocTreeTableView extends MemoryView {
         return new RowFilter() { // Do not filter first level nodes
             public boolean include(RowFilter.Entry entry) {
                 PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)entry.getIdentifier();
-                return node.getParent() != null && node.getParent().getParent() == null;
+                CCTNode parent = node.getParent();
+                if (parent == null) return true;
+                if (parent.getParent() == null) return !filterObjects;
+                return !filterAllocations;
             }
         };
+    }
+    
+    protected Component[] getFilterOptions() {
+        PopupButton pb = new PopupButton (Icons.getIcon(ProfilerIcons.TAB_CALL_TREE)) {
+            protected void populatePopup(JPopupMenu popup) {
+                popup.add(new JCheckBoxMenuItem(FILTER_CLASSES_SCOPE, filterObjects) {
+                    {
+                        if (!filterAllocations) setEnabled(false);
+                    }
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        filterObjects = !filterObjects;
+                        enableFilter();
+                    }
+                });
+                popup.add(new JCheckBoxMenuItem(FILTER_ALLOCATIONS_SCOPE, filterAllocations) {
+                    {
+                        if (!filterObjects) setEnabled(false);
+                    }
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        filterAllocations = !filterAllocations;
+                        enableFilter();
+                    }
+                });
+            }
+        };
+        pb.setToolTipText(FILTER_SCOPE_TOOLTIP);
+        return new Component[] { Box.createHorizontalStrut(5), pb };
+    }
+    
+    protected SearchUtils.TreeHelper getSearchHelper() {
+        return new SearchUtils.TreeHelper() {
+            public int getNodeType(TreeNode tnode) {
+                PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)tnode;
+                CCTNode parent = node.getParent();
+                if (parent == null) return SearchUtils.TreeHelper.NODE_SKIP_DOWN; // invisible root
+                
+                if (parent.getParent() == null) {
+                    if (searchObjects) {
+                        return searchAllocations ? SearchUtils.TreeHelper.NODE_SEARCH_DOWN :
+                                                   SearchUtils.TreeHelper.NODE_SEARCH_NEXT;
+                    } else {
+                        return searchAllocations ? SearchUtils.TreeHelper.NODE_SKIP_DOWN :
+                                                   SearchUtils.TreeHelper.NODE_SKIP_NEXT;
+                    }
+                }
+                
+                return searchAllocations ? SearchUtils.TreeHelper.NODE_SEARCH_DOWN :
+                                           SearchUtils.TreeHelper.NODE_SKIP_NEXT;
+            }
+        };
+    }
+    
+    protected Component[] getSearchOptions() {
+        PopupButton pb = new PopupButton (Icons.getIcon(ProfilerIcons.TAB_CALL_TREE)) {
+            protected void populatePopup(JPopupMenu popup) {
+                popup.add(new JCheckBoxMenuItem(SEARCH_CLASSES_SCOPE, searchObjects) {
+                    {
+                        if (!searchAllocations) setEnabled(false);
+                    }
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        searchObjects = !searchObjects;
+                    }
+                });
+                popup.add(new JCheckBoxMenuItem(SEARCH_ALLOCATIONS_SCOPE, searchAllocations) {
+                    {
+                        if (!searchObjects) setEnabled(false);
+                    }
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        searchAllocations = !searchAllocations;
+                    }
+                });
+            }
+        };
+        pb.setToolTipText(SEARCH_SCOPE_TOOLTIP);
+        return new Component[] { Box.createHorizontalStrut(5), pb };
     }
     
     protected ProfilerTable getResultsComponent() { return treeTable; }
