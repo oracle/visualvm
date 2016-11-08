@@ -57,6 +57,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -481,7 +482,7 @@ public abstract class LiveCPUView extends JPanel {
         
         popup.addSeparator();
         if (invoker == forwardCallsView) {
-            ProfilerTreeTable ttable = (ProfilerTreeTable)forwardCallsView.getResultsComponent();
+            final ProfilerTreeTable ttable = (ProfilerTreeTable)forwardCallsView.getResultsComponent();
             int column = ttable.convertColumnIndexToView(ttable.getMainColumn());
             final String searchString = ttable.getStringValue((TreeNode)value, column);
             
@@ -506,6 +507,23 @@ public abstract class LiveCPUView extends JPanel {
                         foundInReverseCalls();
                         table.requestFocusInWindow();
                     }
+                }
+            });
+            
+            popup.addSeparator();
+            
+            JMenu expand = new JMenu(CPUView.EXPAND_MENU);
+            popup.add(expand);
+            
+            expand.add(new JMenuItem(CPUView.EXPAND_PLAIN_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.expandPlainPath(ttable.getSelectedRow(), 2);
+                }
+            });
+            
+            expand.add(new JMenuItem(CPUView.EXPAND_TOPMOST_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.expandFirstPath(ttable.getSelectedRow());
                 }
             });
         } else if (invoker == hotSpotsView) {
@@ -536,7 +554,7 @@ public abstract class LiveCPUView extends JPanel {
                 }
             });
         } else if (invoker == reverseCallsView) {
-            ProfilerTreeTable ttable = (ProfilerTreeTable)reverseCallsView.getResultsComponent();
+            final ProfilerTreeTable ttable = (ProfilerTreeTable)reverseCallsView.getResultsComponent();
             int column = ttable.convertColumnIndexToView(ttable.getMainColumn());
             final String searchString = ttable.getStringValue((TreeNode)value, column);
             
@@ -561,6 +579,23 @@ public abstract class LiveCPUView extends JPanel {
                         foundInHotSpots();
                         table.requestFocusInWindow();
                     }
+                }
+            });
+            
+            popup.addSeparator();
+            
+            JMenu expand = new JMenu(CPUView.EXPAND_MENU);
+            popup.add(expand);
+            
+            expand.add(new JMenuItem(CPUView.EXPAND_PLAIN_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.expandPlainPath(ttable.getSelectedRow(), 1);
+                }
+            });
+            
+            expand.add(new JMenuItem(CPUView.EXPAND_TOPMOST_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.expandFirstPath(ttable.getSelectedRow());
                 }
             });
         }

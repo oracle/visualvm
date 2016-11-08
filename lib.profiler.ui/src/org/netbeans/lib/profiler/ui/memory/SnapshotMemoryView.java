@@ -50,6 +50,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.Icon;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -66,6 +67,7 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 
@@ -306,6 +308,26 @@ public abstract class SnapshotMemoryView extends JPanel {
             { setEnabled(userValue != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW && isSelectable(userValue, false)); }
             protected void fireActionPerformed(ActionEvent e) { profileClass(userValue); }
         });
+        
+        popup.addSeparator();
+        
+        if (snapshot.containsStacks()) {
+            final ProfilerTreeTable ttable = (ProfilerTreeTable)dataView.getResultsComponent();
+            JMenu expand = new JMenu(MemoryView.EXPAND_MENU);
+            popup.add(expand);
+
+            expand.add(new JMenuItem(MemoryView.EXPAND_PLAIN_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.expandPlainPath(ttable.getSelectedRow(), 1);
+                }
+            });
+
+            expand.add(new JMenuItem(MemoryView.EXPAND_TOPMOST_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.expandFirstPath(ttable.getSelectedRow());
+                }
+            });
+        }
         
         popup.addSeparator();
         popup.add(invoker.createCopyMenuItem());

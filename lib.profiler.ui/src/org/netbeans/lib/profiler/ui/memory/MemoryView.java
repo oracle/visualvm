@@ -47,6 +47,7 @@ import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.utils.StringUtils;
 
 /**
@@ -90,6 +91,9 @@ public abstract class MemoryView extends DataView {
     static final String SEARCH_CLASSES_SCOPE = messages.getString("MemoryView_SearchClassesScope"); // NOI18N
     static final String SEARCH_ALLOCATIONS_SCOPE = messages.getString("MemoryView_SearchAllocationsScope"); // NOI18N
     static final String SEARCH_SCOPE_TOOLTIP = messages.getString("MemoryView_SearchScopeTooltip"); // NOI18N
+    static final String EXPAND_MENU = messages.getString("MemoryView_ExpandMenu"); // NOI18N
+    static final String EXPAND_PLAIN_ITEM = messages.getString("MemoryView_ExpandPlainItem"); // NOI18N
+    static final String EXPAND_TOPMOST_ITEM = messages.getString("MemoryView_ExpandTopmostItem"); // NOI18N
     // -----_GenerationsCo
     
     
@@ -104,6 +108,9 @@ public abstract class MemoryView extends DataView {
     
     
     public abstract ExportUtils.ExportProvider[] getExportProviders();
+    
+    
+    protected abstract ProfilerTable getResultsComponent();
     
     
     static final void userFormClassNames(MemoryResultsSnapshot snapshot) {

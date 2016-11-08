@@ -238,6 +238,44 @@ public class ProfilerTreeTable extends ProfilerTable {
         if (tree != null) tree.setRootVisible(rootVisible);
     }
     
+    
+    public void expandPlainPath(int row, int maxChildren) {
+        if (tree != null) {
+            boolean changed = false;
+            
+            TreeModel tmodel = tree.getModel();
+            TreePath tpath = tree.getPathForRow(row);
+            
+            int childCount = tmodel.getChildCount(tpath.getLastPathComponent());
+        
+            while (childCount > 0 && childCount <= maxChildren) {
+                tpath = tpath.pathByAddingChild(tmodel.getChild(tpath.getLastPathComponent(), 0));
+                childCount = tmodel.getChildCount(tpath.getLastPathComponent());
+                changed = true;
+            }
+
+            if (!changed) tree.expandPath(tpath);
+            else selectPath(tpath, true);
+        }
+    }
+    
+    public void expandFirstPath(int row) {
+        if (tree != null) {
+            boolean changed = false;
+            
+            TreeModel tmodel = tree.getModel();
+            TreePath tpath = tree.getPathForRow(row);
+        
+            while (tmodel.getChildCount(tpath.getLastPathComponent()) > 0) {
+                tpath = tpath.pathByAddingChild(tmodel.getChild(tpath.getLastPathComponent(), 0));
+                changed = true;
+            }
+
+            if (!changed) tree.expandPath(tpath);
+            else selectPath(tpath, true);
+        }
+    }
+    
     public void makeTreeAutoExpandable(int maxChildToExpand) {
         if (tree != null) UIUtils.makeTreeAutoExpandable(tree, maxChildToExpand);
     }
