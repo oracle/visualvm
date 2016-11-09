@@ -55,6 +55,8 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.netbeans.lib.profiler.filters.GenericFilter;
+import org.netbeans.lib.profiler.filters.TextFilter;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -64,6 +66,8 @@ import org.netbeans.modules.profiler.api.icons.Icons;
  * @author Jiri Sedlacek
  */
 public abstract class FilteringToolbar extends InvisibleToolbar {
+    
+    private TextFilter filter;
         
     private final List<Component> hiddenComponents = new ArrayList();
     private final AbstractButton filterButton;
@@ -82,8 +86,33 @@ public abstract class FilteringToolbar extends InvisibleToolbar {
     }
 
 
-    protected abstract void filterChanged(String filter);
+    protected abstract void filterChanged();
+    
+    
+    public final boolean isAll() {
+        return filter == null;
+    }
+    
+    public final boolean passes(String value) {
+        return filter == null ? true : filter.passes(value);
+    }
+    
+    public final GenericFilter getFilter() {
+        TextFilter copy = new TextFilter();
+        if (filter != null) copy.copyFrom(filter);
+        return copy;
+    }
 
+    
+    private void filterChanged(String value) {
+        if (value == null) {
+            filter = null;
+        } else {
+            if (filter == null) filter = new TextFilter();
+            filter.setValue(value);
+        }
+        filterChanged();
+    }
 
     private void showFilter() {
         filterButton.setSelected(true);

@@ -61,7 +61,6 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.prefs.Preferences;
@@ -88,6 +87,7 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.FilteringToolbar;
 import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
@@ -472,8 +472,8 @@ public final class ClassMethodSelector {
         FileSelector() {
             fileListModel = new DefaultListModel();
             final FilteredListModel<FileObject> filteredFiles = new FilteredListModel<FileObject>(fileListModel) {
-                protected boolean matchesFilter(FileObject file, String filter) {
-                    return file.getNameExt().contains(filter);
+                protected boolean matchesFilter(FileObject file, GenericFilter filter) {
+                    return filter.passes(file.getNameExt());
                 }
             };
             final HintRenderer hintRenderer = new HintRenderer();
@@ -515,8 +515,8 @@ public final class ClassMethodSelector {
             JLabel projectsLabel = new JLabel(Bundle.ClassMethodSelector_capFiles(), JLabel.LEADING);
             projectsLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
             JToolBar fileTools = new FilteringToolbar(Bundle.ClassMethodSelector_lblFilterItems()) {
-                protected void filterChanged(String filter) {
-                    filteredFiles.setFilter(filter);
+                protected void filterChanged() {
+                    filteredFiles.setFilter(getFilter());
                 }
             };
             String iconMask = GeneralIcons.FOLDER;
@@ -628,8 +628,8 @@ public final class ClassMethodSelector {
         ProjectSelector() {
             projectListModel = new DefaultListModel();
             final FilteredListModel<Lookup.Provider> filteredProjects = new FilteredListModel<Lookup.Provider>(projectListModel) {
-                protected boolean matchesFilter(Lookup.Provider proj, String filter) {
-                    return ProjectUtilities.getDisplayName(proj).contains(filter);
+                protected boolean matchesFilter(Lookup.Provider proj, GenericFilter filter) {
+                    return filter.passes(ProjectUtilities.getDisplayName(proj));
                 }
             };
             final HintRenderer hintRenderer = new HintRenderer();
@@ -668,8 +668,8 @@ public final class ClassMethodSelector {
             JLabel projectsLabel = new JLabel(Bundle.ClassMethodSelector_capProjects(), JLabel.LEADING);
             projectsLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
             JToolBar projectsTools = new FilteringToolbar(Bundle.ClassMethodSelector_lblFilterItems()) {
-                protected void filterChanged(String filter) {
-                    filteredProjects.setFilter(filter);
+                protected void filterChanged() {
+                    filteredProjects.setFilter(getFilter());
                 }
             };
             
@@ -780,8 +780,8 @@ public final class ClassMethodSelector {
         PackageSelector(boolean fromProject) {
             packageListModel = new DefaultListModel();
             final FilteredListModel<SourcePackageInfo> filteredPackages = new FilteredListModel<SourcePackageInfo>(packageListModel) {
-                protected boolean matchesFilter(SourcePackageInfo pkg, String filter) {
-                    return pkg.getBinaryName().contains(filter);
+                protected boolean matchesFilter(SourcePackageInfo pkg, GenericFilter filter) {
+                    return filter.passes(pkg.getBinaryName());
                 }
             };
             final HintRenderer hintRenderer = new HintRenderer();
@@ -822,8 +822,8 @@ public final class ClassMethodSelector {
             JLabel packagesLabel = new JLabel(Bundle.ClassMethodSelector_capPackages(), JLabel.LEADING);
             packagesLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
             JToolBar packagesTools = new FilteringToolbar(Bundle.ClassMethodSelector_lblFilterItems()) {
-                protected void filterChanged(String filter) {
-                    filteredPackages.setFilter(filter);
+                protected void filterChanged() {
+                    filteredPackages.setFilter(getFilter());
                 }
             };
             if (fromProject) {
@@ -946,8 +946,8 @@ public final class ClassMethodSelector {
         ClassSelector(boolean singleSelection) {
             classesListModel = new DefaultListModel();
             final FilteredListModel<SourceClassInfo> filteredClasses = new FilteredListModel<SourceClassInfo>(classesListModel) {
-                protected boolean matchesFilter(SourceClassInfo cls, String filter) {
-                    return cls.getSimpleName().contains(filter);
+                protected boolean matchesFilter(SourceClassInfo cls, GenericFilter filter) {
+                    return filter.passes(cls.getSimpleName());
                 }
             };
             final HintRenderer hintRenderer = new HintRenderer();
@@ -1016,8 +1016,8 @@ public final class ClassMethodSelector {
             classesAnonymousB.setToolTipText(Bundle.ClassMethodSelector_showAnonymousClasses());
             classesAnonymousB.setSelected(PREF.getBoolean("Profiler.CMS.classesAnonymousB", false)); // NOI18N
             JToolBar classesTools = new FilteringToolbar(Bundle.ClassMethodSelector_lblFilterItems()) {
-                protected void filterChanged(String filter) {
-                    filteredClasses.setFilter(filter);
+                protected void filterChanged() {
+                    filteredClasses.setFilter(getFilter());
                 }
             };
             classesTools.add(Box.createHorizontalStrut(2));
@@ -1111,8 +1111,8 @@ public final class ClassMethodSelector {
         MethodSelector() {
             methodsListModel = new DefaultListModel();
             final FilteredListModel<SourceMethodInfo> filteredMethods = new FilteredListModel<SourceMethodInfo>(methodsListModel) {
-                protected boolean matchesFilter(SourceMethodInfo mtd, String filter) {
-                    return mtd.getName().contains(filter);
+                protected boolean matchesFilter(SourceMethodInfo mtd, GenericFilter filter) {
+                    return filter.passes(mtd.getName());
                 }
             };
             final HintRenderer hintRenderer = new HintRenderer();
@@ -1186,8 +1186,8 @@ public final class ClassMethodSelector {
             methodsStaticB.setToolTipText(Bundle.ClassMethodSelector_showStaticMethods());
             methodsStaticB.setSelected(PREF.getBoolean("Profiler.CMS.methodsStaticB", true));
             JToolBar methodsTools = new FilteringToolbar(Bundle.ClassMethodSelector_lblFilterItems()) {
-                protected void filterChanged(String filter) {
-                    filteredMethods.setFilter(filter);
+                protected void filterChanged() {
+                    filteredMethods.setFilter(getFilter());
                 }
             };
             methodsTools.add(Box.createHorizontalStrut(2));
@@ -1236,7 +1236,7 @@ public final class ClassMethodSelector {
         private ListSelectionModel selection;
         private E selected;
         
-        private String filter;
+        private GenericFilter filter;
         private final List<Integer> indices;
         
         public FilteredListModel(ListModel data) {
@@ -1255,7 +1255,7 @@ public final class ClassMethodSelector {
         }
         
         
-        protected abstract boolean matchesFilter(E item, String filter);
+        protected abstract boolean matchesFilter(E item, GenericFilter filter);
         
         
         public void setSelectionModel(final ListSelectionModel selection) {
@@ -1271,16 +1271,13 @@ public final class ClassMethodSelector {
         }
         
         
-        public void setFilter(String filter) {
-            if (filter != null && filter.isEmpty()) filter = null;
-            if (Objects.equals(this.filter, filter)) return;
-            
-            this.filter = filter;
+        public void setFilter(GenericFilter filter) {
+            this.filter = filter.isAll() ? null : filter;
             doFilter();
         }
         
-        public String getFilter() {
-            return filter == null ? "" : filter; // NOI18N
+        public GenericFilter getFilter() {
+            return filter;
         }
         
 
