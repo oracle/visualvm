@@ -80,6 +80,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
+import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.lib.profiler.jps.JpsProxy;
 import org.netbeans.lib.profiler.jps.RunningVM;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
@@ -442,15 +443,16 @@ public class AttachDialog extends AttachWizard {
             });
             
             FilteringToolbar toolbar = new FilteringToolbar(Bundle.AttachDialog_FilterProcesses()) {
-                private String filter;
+                private GenericFilter _filter;
                 private final RowFilter rowFilter = new RowFilter() {
                     public boolean include(RowFilter.Entry entry) {
-                        return filter == null || entry.getValue(0).toString().toLowerCase().contains(filter);
+                        return _filter.passes(entry.getValue(0).toString());
                     }
                 };
-                protected void filterChanged(String filter) {
-                    this.filter = filter == null ? null : filter.toLowerCase();
-                    processes.addRowFilter(rowFilter);
+                protected void filterChanged() {
+                    _filter = isAll() ? null : getFilter();
+                    if (_filter != null) processes.addRowFilter(rowFilter);
+                    else processes.removeRowFilter(rowFilter);
                 }
             };
             toolbar.add(Box.createHorizontalStrut(2));
