@@ -568,15 +568,18 @@ public class ProfilerTreeTable extends ProfilerTable {
         }
         
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return treeTableModel.isCellEditable(nodeForRow(rowIndex), columnIndex);
+            TreeNode node = nodeForRow(rowIndex);
+            return node == null ? false : treeTableModel.isCellEditable(node, columnIndex);
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
-            return treeTableModel.getValueAt(nodeForRow(rowIndex), columnIndex);
+            TreeNode node = nodeForRow(rowIndex);
+            return node == null ? null : treeTableModel.getValueAt(node, columnIndex);
         }
         
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-            treeTableModel.setValueAt(aValue, nodeForRow(rowIndex), columnIndex);
+            TreeNode node = nodeForRow(rowIndex);
+            if (node != null) treeTableModel.setValueAt(aValue, node, columnIndex);
         }
         
         Object getValueAt(TreeNode node, int column) {

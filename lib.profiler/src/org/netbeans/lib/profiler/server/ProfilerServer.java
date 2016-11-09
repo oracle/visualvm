@@ -865,7 +865,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
     private static void cleanupOnShutdown() {
         Monitors.shutdown();
         ProfilerInterface.disableProfilerHooks();
-        ProfilerRuntimeCPU.enableProfiling(false); 
+        ProfilerInterface.disableProfiling();
 
         // Bugfix for 65947: Profiler blocks a finishing profiled application
         // The following connectionOpen = false is done just to prevent error message from listenToClient(). When the connection
