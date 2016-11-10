@@ -196,14 +196,17 @@ public class ProfilerTreeTable extends ProfilerTable {
     
     void selectPath(TreePath path, boolean scrollToVisible) {
         internal = true;
+        markExpansionTransaction();
         try {
-//            tree.expandPath(path); // actually should not bee needed, automatically expands the node further down
+//            tree.expandPath(path); // actually should not be needed, automatically expands the node further down
             tree.setSelectionPath(path);
             // Clear and select again to make sure the underlying tree is ready
             tree.setSelectionPath(null);
             tree.setSelectionPath(path);
+        } finally {
+            clearExpansionTransaction();
+            internal = false;
         }
-        finally { internal = false; }
         
         if (scrollToVisible) {
             Rectangle bounds = tree.getPathBounds(path);
@@ -264,8 +267,6 @@ public class ProfilerTreeTable extends ProfilerTable {
             int nchildren = tmodel.getChildCount(selected);
             for (int i = 0; i < nchildren; i++)
                 tree.collapsePath(tpath.pathByAddingChild(tmodel.getChild(selected, i)));
-            
-            tree.resetExpandedNodes();
         
         } finally {
             clearExpansionTransaction();
@@ -314,8 +315,9 @@ public class ProfilerTreeTable extends ProfilerTable {
                 childCount = tmodel.getChildCount(tpath.getLastPathComponent());
             }
 
-            tree.expandPath(tpath);
-            selectPath(tpath, true);
+            tree.putClientProperty(UIUtils.PROP_AUTO_EXPANDING, Boolean.TRUE);
+            try { tree.expandPath(tpath); selectPath(tpath, true); }
+            finally { tree.putClientProperty(UIUtils.PROP_AUTO_EXPANDING, null); }
             
         } finally {
             clearExpansionTransaction();
@@ -334,8 +336,9 @@ public class ProfilerTreeTable extends ProfilerTable {
             while (tmodel.getChildCount(tpath.getLastPathComponent()) > 0)
                 tpath = tpath.pathByAddingChild(tmodel.getChild(tpath.getLastPathComponent(), 0));
 
-            tree.expandPath(tpath);
-            selectPath(tpath, true);
+            tree.putClientProperty(UIUtils.PROP_AUTO_EXPANDING, Boolean.TRUE);
+            try { selectPath(tpath, true); }
+            finally { tree.putClientProperty(UIUtils.PROP_AUTO_EXPANDING, null); }
 
         } finally {
             clearExpansionTransaction();
@@ -1123,6 +1126,11 @@ public class ProfilerTreeTable extends ProfilerTable {
         void resetExpandedNodes() {
             clearToggledPaths();
             updateUI();
+        }
+        
+        public Enumeration<TreePath> getExpandedDescendants(TreePath parent) {
+            return Boolean.TRUE.equals(getClientProperty(UIUtils.PROP_AUTO_EXPANDING)) ?
+                   null : super.getExpandedDescendants(parent);
         }
         
         public void expandPath(TreePath path) {
