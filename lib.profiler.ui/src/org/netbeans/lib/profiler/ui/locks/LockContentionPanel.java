@@ -61,8 +61,10 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -83,6 +85,7 @@ import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.TargetAppRunner;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.global.ProfilingSessionStatus;
+import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.locks.LockCCTNode;
 import org.netbeans.lib.profiler.results.locks.LockCCTProvider;
@@ -93,6 +96,7 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
 import org.netbeans.lib.profiler.ui.results.DataView;
+import org.netbeans.lib.profiler.ui.swing.PopupButton;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
@@ -130,6 +134,9 @@ public abstract class LockContentionPanel extends DataView {
     private static final String DISPLAY_MODE = messages.getString("LockContentionPanel_DisplayMode"); // NOI18N
     private static final String MODE_THREADS = messages.getString("LockContentionPanel_ModeThreads"); // NOI18N
     private static final String MODE_MONITORS = messages.getString("LockContentionPanel_ModeMonitors"); // NOI18N
+    private static final String SEARCH_THREADS_SCOPE = messages.getString("LockContentionPanel_SearchThreadsScope"); // NOI18N
+    private static final String SEARCH_MONITORS_SCOPE = messages.getString("LockContentionPanel_SearchMonitorsScope"); // NOI18N
+    private static final String SEARCH_SCOPE_TOOLTIP = messages.getString("LockContentionPanel_SearchScopeTooltip"); // NOI18N
     // -----
     
     public static enum Aggregation { BY_THREADS, BY_MONITORS }
@@ -169,6 +176,10 @@ public abstract class LockContentionPanel extends DataView {
     private long lastupdate;
     private volatile boolean paused;
     private volatile boolean forceRefresh;
+    
+    private boolean searchThreads = true;
+    private boolean searchMonitors = true;
+    
     
     public LockContentionPanel() { 
     
@@ -334,6 +345,53 @@ public abstract class LockContentionPanel extends DataView {
         map.put(SearchUtils.FIND_ACTION_KEY, new AbstractAction() {
             public void actionPerformed(ActionEvent e) { activateSearch(); }
         });
+    }
+    
+    protected SearchUtils.TreeHelper getSearchHelper() {
+        return new SearchUtils.TreeHelper() {
+            public int getNodeType(TreeNode tnode) {
+                LockCCTNode node = (LockCCTNode)tnode;
+                CCTNode parent = node.getParent();
+                if (parent == null) return SearchUtils.TreeHelper.NODE_SKIP_DOWN;
+                
+                if (node.isThreadLockNode()) {
+                    return searchThreads  ? SearchUtils.TreeHelper.NODE_SEARCH_DOWN :
+                                            SearchUtils.TreeHelper.NODE_SKIP_DOWN;
+                } else if (node.isMonitorNode()) {
+                    return searchMonitors ? SearchUtils.TreeHelper.NODE_SEARCH_DOWN :
+                                            SearchUtils.TreeHelper.NODE_SKIP_DOWN;
+                }
+                
+                return SearchUtils.TreeHelper.NODE_SKIP_DOWN;
+            }
+        };
+    }
+    
+    protected Component[] getSearchOptions() {
+        PopupButton pb = new PopupButton (Icons.getIcon(ProfilerIcons.TAB_CALL_TREE)) {
+            protected void populatePopup(JPopupMenu popup) {
+                popup.add(new JCheckBoxMenuItem(SEARCH_THREADS_SCOPE, searchThreads) {
+                    {
+                        if (!searchMonitors) setEnabled(false);
+                    }
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        searchThreads = !searchThreads;
+                    }
+                });
+                popup.add(new JCheckBoxMenuItem(SEARCH_MONITORS_SCOPE, searchMonitors) {
+                    {
+                        if (!searchThreads) setEnabled(false);
+                    }
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        searchMonitors = !searchMonitors;
+                    }
+                });
+            }
+        };
+        pb.setToolTipText(SEARCH_SCOPE_TOOLTIP);
+        return new Component[] { Box.createHorizontalStrut(5), pb };
     }
     
     protected ProfilerTable getResultsComponent() {

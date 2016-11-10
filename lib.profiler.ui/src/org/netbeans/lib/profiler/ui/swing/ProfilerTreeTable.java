@@ -143,7 +143,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         return getNextPath(path, true);
     }
     
-    private TreePath getNextPath(TreePath path, boolean down) {
+    TreePath getNextPath(TreePath path, boolean down) {
         TreeModel _model = model.treeModel;
         TreeNode node = (TreeNode)path.getLastPathComponent();
         if (down && _model.getChildCount(node) > 0)
@@ -167,6 +167,10 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
     
     TreePath getPreviousPath(TreePath path) {
+        return getPreviousPath(path, true);
+    }
+    
+    TreePath getPreviousPath(TreePath path, boolean down) { // TODO: optimize the algorithm to use 'down'
         TreeModel _model = model.treeModel;
         TreeNode node = (TreeNode)path.getLastPathComponent();
         TreePath parentPath = path.getParentPath();
@@ -182,7 +186,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         node = (TreeNode)_model.getChild(parent, idx - 1);
         path = parentPath.pathByAddingChild(node);
 
-        while (_model.getChildCount(node) != 0) {
+        if (down) while (_model.getChildCount(node) != 0) {
             node = (TreeNode)_model.getChild(node, _model.getChildCount(node) - 1);
             path = path.pathByAddingChild(node);
         }
@@ -193,7 +197,7 @@ public class ProfilerTreeTable extends ProfilerTable {
     void selectPath(TreePath path, boolean scrollToVisible) {
         internal = true;
         try {
-            tree.expandPath(path);
+//            tree.expandPath(path); // actually should not bee needed, automatically expands the node further down
             tree.setSelectionPath(path);
             // Clear and select again to make sure the underlying tree is ready
             tree.setSelectionPath(null);
@@ -232,6 +236,44 @@ public class ProfilerTreeTable extends ProfilerTable {
     
     public void setRootVisible(boolean rootVisible) {
         if (tree != null) tree.setRootVisible(rootVisible);
+    }
+    
+    
+    public void expandPlainPath(int row, int maxChildren) {
+        if (tree != null) {
+            boolean changed = false;
+            
+            TreeModel tmodel = tree.getModel();
+            TreePath tpath = tree.getPathForRow(row);
+            
+            int childCount = tmodel.getChildCount(tpath.getLastPathComponent());
+        
+            while (childCount > 0 && childCount <= maxChildren) {
+                tpath = tpath.pathByAddingChild(tmodel.getChild(tpath.getLastPathComponent(), 0));
+                childCount = tmodel.getChildCount(tpath.getLastPathComponent());
+                changed = true;
+            }
+
+            if (!changed) tree.expandPath(tpath);
+            else selectPath(tpath, true);
+        }
+    }
+    
+    public void expandFirstPath(int row) {
+        if (tree != null) {
+            boolean changed = false;
+            
+            TreeModel tmodel = tree.getModel();
+            TreePath tpath = tree.getPathForRow(row);
+        
+            while (tmodel.getChildCount(tpath.getLastPathComponent()) > 0) {
+                tpath = tpath.pathByAddingChild(tmodel.getChild(tpath.getLastPathComponent(), 0));
+                changed = true;
+            }
+
+            if (!changed) tree.expandPath(tpath);
+            else selectPath(tpath, true);
+        }
     }
     
     public void makeTreeAutoExpandable(int maxChildToExpand) {

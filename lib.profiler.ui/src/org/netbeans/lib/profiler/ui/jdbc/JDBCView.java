@@ -84,6 +84,13 @@ public abstract class JDBCView extends DataView {
     static final String ACTION_GOTOSOURCE = messages.getString("JDBCView_ActionGoToSource"); // NOI18N
     static final String ACTION_PROFILE_METHOD = messages.getString("JDBCView_ActionProfileMethod"); // NOI18N
     static final String ACTION_PROFILE_CLASS = messages.getString("JDBCView_ActionProfileClass"); // NOI18N
+    static final String SEARCH_QUERIES_SCOPE = messages.getString("JDBCView_SearchQueriesScope"); // NOI18N
+    static final String SEARCH_CALLERS_SCOPE = messages.getString("JDBCView_SearchCallersScope"); // NOI18N
+    static final String SEARCH_SCOPE_TOOLTIP = messages.getString("JDBCView_SearchScopeTooltip"); // NOI18N
+    
+    static final String EXPAND_MENU = messages.getString("JDBCView_ExpandMenu"); // NOI18N
+    static final String EXPAND_PLAIN_ITEM = messages.getString("JDBCView_ExpandPlainItem"); // NOI18N
+    static final String EXPAND_TOPMOST_ITEM = messages.getString("JDBCView_ExpandTopmostItem"); // NOI18N
     // -----
     
     static String commandString(int command) {
