@@ -239,13 +239,42 @@ public class ProfilerTreeTable extends ProfilerTable {
     }
     
     
+    public void collapseChildren(int row) {
+        if (tree != null) {
+            TreePath tpath = tree.getPathForRow(row);
+            if (tpath == null || tree.isCollapsed(tpath)) return;
+            
+            TreeModel tmodel = tree.getModel();
+            Object selected = tpath.getLastPathComponent();
+            
+            int nchildren = tmodel.getChildCount(selected);
+            for (int i = 0; i < nchildren; i++)
+                tree.collapsePath(tpath.pathByAddingChild(tmodel.getChild(selected, i)));
+        }
+    }
+    
+    public void collapseAll() {
+        if (tree != null) {
+            TreePath selected = tree.getSelectionPath();
+            if (selected != null && selected.getPathCount() > 2) {
+                tree.setSelectionPath(new TreePath(new Object[] {
+                    selected.getPathComponent(0), selected.getPathComponent(1)
+                }));
+            }
+            
+            int row = tree.getRowCount() - 1;
+            while (row > 0) tree.collapseRow(row--);
+        }
+    }
+    
     public void expandPlainPath(int row, int maxChildren) {
         if (tree != null) {
             boolean changed = false;
             
-            TreeModel tmodel = tree.getModel();
             TreePath tpath = tree.getPathForRow(row);
+            if (tpath == null) return;
             
+            TreeModel tmodel = tree.getModel();            
             int childCount = tmodel.getChildCount(tpath.getLastPathComponent());
         
             while (childCount > 0 && childCount <= maxChildren) {
@@ -263,8 +292,10 @@ public class ProfilerTreeTable extends ProfilerTable {
         if (tree != null) {
             boolean changed = false;
             
-            TreeModel tmodel = tree.getModel();
             TreePath tpath = tree.getPathForRow(row);
+            if (tpath == null) return;
+            
+            TreeModel tmodel = tree.getModel();    
         
             while (tmodel.getChildCount(tpath.getLastPathComponent()) > 0) {
                 tpath = tpath.pathByAddingChild(tmodel.getChild(tpath.getLastPathComponent(), 0));

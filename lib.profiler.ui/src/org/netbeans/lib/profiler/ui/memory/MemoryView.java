@@ -94,6 +94,8 @@ public abstract class MemoryView extends DataView {
     static final String EXPAND_MENU = messages.getString("MemoryView_ExpandMenu"); // NOI18N
     static final String EXPAND_PLAIN_ITEM = messages.getString("MemoryView_ExpandPlainItem"); // NOI18N
     static final String EXPAND_TOPMOST_ITEM = messages.getString("MemoryView_ExpandTopmostItem"); // NOI18N
+    static final String COLLAPSE_CHILDREN_ITEM = messages.getString("MemoryView_CollapseChildrenItem"); // NOI18N
+    static final String COLLAPSE_ALL_ITEM = messages.getString("MemoryView_CollapseAllItem"); // NOI18N
     // -----_GenerationsCo
     
     

@@ -90,6 +90,8 @@ public abstract class CPUView extends DataView {
     static final String EXPAND_MENU = messages.getString("CPUView_ExpandMenu"); // NOI18N
     static final String EXPAND_PLAIN_ITEM = messages.getString("CPUView_ExpandPlainItem"); // NOI18N
     static final String EXPAND_TOPMOST_ITEM = messages.getString("CPUView_ExpandTopmostItem"); // NOI18N
+    static final String COLLAPSE_CHILDREN_ITEM = messages.getString("CPUView_CollapseChildrenItem"); // NOI18N
+    static final String COLLAPSE_ALL_ITEM = messages.getString("CPUView_CollapseAllItem"); // NOI18N
     // -----
     
 }

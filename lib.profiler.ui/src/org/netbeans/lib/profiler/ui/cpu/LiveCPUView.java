@@ -526,6 +526,20 @@ public abstract class LiveCPUView extends JPanel {
                     ttable.expandFirstPath(ttable.getSelectedRow());
                 }
             });
+            
+            expand.addSeparator();
+            
+            expand.add(new JMenuItem(CPUView.COLLAPSE_CHILDREN_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.collapseChildren(ttable.getSelectedRow());
+                }
+            });
+            
+            expand.add(new JMenuItem(CPUView.COLLAPSE_ALL_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.collapseAll();
+                }
+            });
         } else if (invoker == hotSpotsView) {
             // Ugly hack - there's a space between method name and parameters
             final String searchString = value.toString().replace("(", " ("); // NOI18N
@@ -596,6 +610,20 @@ public abstract class LiveCPUView extends JPanel {
             expand.add(new JMenuItem(CPUView.EXPAND_TOPMOST_ITEM) {
                 protected void fireActionPerformed(ActionEvent e) {
                     ttable.expandFirstPath(ttable.getSelectedRow());
+                }
+            });
+            
+            expand.addSeparator();
+            
+            expand.add(new JMenuItem(CPUView.COLLAPSE_CHILDREN_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.collapseChildren(ttable.getSelectedRow());
+                }
+            });
+            
+            expand.add(new JMenuItem(CPUView.COLLAPSE_ALL_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.collapseAll();
                 }
             });
         }

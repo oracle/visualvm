@@ -327,6 +327,20 @@ public abstract class SnapshotMemoryView extends JPanel {
                     ttable.expandFirstPath(ttable.getSelectedRow());
                 }
             });
+            
+            expand.addSeparator();
+            
+            expand.add(new JMenuItem(MemoryView.COLLAPSE_CHILDREN_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.collapseChildren(ttable.getSelectedRow());
+                }
+            });
+            
+            expand.add(new JMenuItem(MemoryView.COLLAPSE_ALL_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.collapseAll();
+                }
+            });
         }
         
         popup.addSeparator();

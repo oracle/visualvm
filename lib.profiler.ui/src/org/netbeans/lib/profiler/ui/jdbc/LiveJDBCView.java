@@ -404,6 +404,20 @@ public abstract class LiveJDBCView extends JPanel {
             }
         });
         
+        expand.addSeparator();
+            
+        expand.add(new JMenuItem(JDBCView.COLLAPSE_CHILDREN_ITEM) {
+            protected void fireActionPerformed(ActionEvent e) {
+                ttable.collapseChildren(ttable.getSelectedRow());
+            }
+        });
+
+        expand.add(new JMenuItem(JDBCView.COLLAPSE_ALL_ITEM) {
+            protected void fireActionPerformed(ActionEvent e) {
+                ttable.collapseAll();
+            }
+        });
+        
         popup.addSeparator();
         popup.add(invoker.createCopyMenuItem());
         
