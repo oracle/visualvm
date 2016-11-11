@@ -51,6 +51,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -68,6 +69,7 @@ import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
@@ -357,6 +359,40 @@ public abstract class LiveMemoryView extends JPanel {
             { setEnabled(userValue != null); }
             protected void fireActionPerformed(ActionEvent e) { selectForProfiling(userValue); }
         });
+        
+        popup.addSeparator();
+        
+        if (snapshot.containsStacks()) {
+            final ProfilerTreeTable ttable = (ProfilerTreeTable)dataView.getResultsComponent();
+            JMenu expand = new JMenu(MemoryView.EXPAND_MENU);
+            popup.add(expand);
+
+            expand.add(new JMenuItem(MemoryView.EXPAND_PLAIN_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.expandPlainPath(ttable.getSelectedRow(), 1);
+                }
+            });
+
+            expand.add(new JMenuItem(MemoryView.EXPAND_TOPMOST_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.expandFirstPath(ttable.getSelectedRow());
+                }
+            });
+            
+            expand.addSeparator();
+            
+            expand.add(new JMenuItem(MemoryView.COLLAPSE_CHILDREN_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.collapseChildren(ttable.getSelectedRow());
+                }
+            });
+            
+            expand.add(new JMenuItem(MemoryView.COLLAPSE_ALL_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.collapseAll();
+                }
+            });
+        }
         
         popup.addSeparator();
         popup.add(invoker.createCopyMenuItem());

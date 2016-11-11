@@ -44,10 +44,14 @@
 package org.netbeans.lib.profiler.ui.cpu;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.Box;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
@@ -56,18 +60,22 @@ import javax.swing.SortOrder;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.ui.swing.PopupButton;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.McsTimeRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 /**
@@ -89,6 +97,11 @@ abstract class CPUTreeTableView extends CPUView {
     
     private boolean hitsVisible = false;
     private boolean invocationsVisible = true;
+    
+    private boolean filterTopMethods = true;
+    private boolean filterCallerMethods = false;
+    private boolean searchTopMethods = true;
+    private boolean searchCallerMethods = false;
     
     
     public CPUTreeTableView(Set<ClientUtils.SourceCodeSelection> selection, boolean reverse) {
@@ -299,12 +312,116 @@ abstract class CPUTreeTableView extends CPUView {
     
     
     protected RowFilter getExcludesFilter() {
-        return new RowFilter() { // Do not filter threads and self time nodes
+        if (!reverse) return new RowFilter() { // Do not filter threads and self time nodes
             public boolean include(RowFilter.Entry entry) {
                 PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)entry.getIdentifier();
                 return node.isThreadNode() || node.isSelfTimeNode();
             }
+        }; else return new RowFilter() { // Do not filter threads and self time nodes
+            public boolean include(RowFilter.Entry entry) {
+                PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)entry.getIdentifier();
+                CCTNode parent = node.getParent();
+                if (parent == null) return true; // invisible root
+                
+                if (node.isThreadNode() || node.isSelfTimeNode()) return true; // thread or self time node
+                
+                if (((PrestimeCPUCCTNode)parent).isThreadNode() || // toplevel method node (children of thread)
+                    parent.getParent() == null) // toplevel method node (merged threads)
+                        return !filterTopMethods;
+                
+                return !filterCallerMethods; // reverse call tree node
+            }
         };
+    }
+    
+    protected Component[] getFilterOptions() {
+        if (!reverse) return super.getFilterOptions();
+        
+        PopupButton pb = new PopupButton (Icons.getIcon(ProfilerIcons.TAB_CALL_TREE)) {
+            protected void populatePopup(JPopupMenu popup) {
+                popup.add(new JCheckBoxMenuItem(FILTER_CALLEES_SCOPE, filterTopMethods) {
+                    {
+                        if (!filterCallerMethods) setEnabled(false);
+                    }
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        filterTopMethods = !filterTopMethods;
+                        enableFilter();
+                    }
+                });
+                popup.add(new JCheckBoxMenuItem(FILTER_CALLERS_SCOPE, filterCallerMethods) {
+                    {
+                        if (!filterTopMethods) setEnabled(false);
+                    }
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        filterCallerMethods = !filterCallerMethods;
+                        enableFilter();
+                    }
+                });
+            }
+        };
+        pb.setToolTipText(FILTER_SCOPE_TOOLTIP);
+        return new Component[] { Box.createHorizontalStrut(5), pb };
+    }
+    
+    protected SearchUtils.TreeHelper getSearchHelper() {
+        if (!reverse) return super.getSearchHelper();
+        
+        return new SearchUtils.TreeHelper() {
+            public int getNodeType(TreeNode tnode) {
+                PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)tnode;
+                CCTNode parent = node.getParent();
+                if (parent == null) return SearchUtils.TreeHelper.NODE_SKIP_DOWN; // invisible root
+                
+                if (node.isThreadNode()) return SearchUtils.TreeHelper.NODE_SKIP_DOWN; // thread node
+                if (node.isSelfTimeNode()) return SearchUtils.TreeHelper.NODE_SKIP_NEXT; // self time node
+                
+                if (((PrestimeCPUCCTNode)parent).isThreadNode() || // toplevel method node (children of thread)
+                    parent.getParent() == null) {                  // toplevel method node (merged threads)
+                    if (searchTopMethods) {
+                        return searchCallerMethods ? SearchUtils.TreeHelper.NODE_SEARCH_DOWN :
+                                                     SearchUtils.TreeHelper.NODE_SEARCH_NEXT;
+                    } else {
+                        return searchCallerMethods ? SearchUtils.TreeHelper.NODE_SKIP_DOWN :
+                                                     SearchUtils.TreeHelper.NODE_SKIP_NEXT;
+                    }
+                }
+                
+                return searchCallerMethods ? // reverse call tree node
+                       SearchUtils.TreeHelper.NODE_SEARCH_DOWN :
+                       SearchUtils.TreeHelper.NODE_SKIP_NEXT;
+            }
+        };
+    }
+    
+    protected Component[] getSearchOptions() {
+        if (!reverse) return super.getSearchOptions();
+        
+        PopupButton pb = new PopupButton (Icons.getIcon(ProfilerIcons.TAB_CALL_TREE)) {
+            protected void populatePopup(JPopupMenu popup) {
+                popup.add(new JCheckBoxMenuItem(SEARCH_CALLEES_SCOPE, searchTopMethods) {
+                    {
+                        if (!searchCallerMethods) setEnabled(false);
+                    }
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        searchTopMethods = !searchTopMethods;
+                    }
+                });
+                popup.add(new JCheckBoxMenuItem(SEARCH_CALLERS_SCOPE, searchCallerMethods) {
+                    {
+                        if (!searchTopMethods) setEnabled(false);
+                    }
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        searchCallerMethods = !searchCallerMethods;
+                    }
+                });
+            }
+        };
+        pb.setToolTipText(SEARCH_SCOPE_TOOLTIP);
+        return new Component[] { Box.createHorizontalStrut(5), pb };
     }
     
     protected ProfilerTable getResultsComponent() {

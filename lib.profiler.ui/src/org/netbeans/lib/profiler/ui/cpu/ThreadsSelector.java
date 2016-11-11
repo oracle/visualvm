@@ -175,11 +175,11 @@ public abstract class ThreadsSelector extends PopupButton {
             content.add(tableContainer, BorderLayout.CENTER);
             
             JToolBar controls = new FilteringToolbar(FILTER_THREADS) {
-                protected void filterChanged(final String filter) {
-                    if (filter == null) threadsTable.setRowFilter(null);
+                protected void filterChanged() {
+                    if (isAll()) threadsTable.setRowFilter(null);
                     else threadsTable.setRowFilter(new RowFilter() {
                         public boolean include(RowFilter.Entry entry) {
-                            return entry.getStringValue(1).contains(filter);
+                            return passes(entry.getStringValue(1));
                         }
                     });
                 }
