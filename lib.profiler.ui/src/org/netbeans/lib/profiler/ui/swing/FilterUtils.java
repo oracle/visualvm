@@ -43,6 +43,7 @@
 package org.netbeans.lib.profiler.ui.swing;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -105,6 +106,8 @@ public final class FilterUtils {
     
     public static final String FILTER_ACTION_KEY = "filter-action-key"; // NOI18N
     
+    private static final String FILTER_CHANGED = "filter-changed"; // NOI18N
+    
     
     public static boolean filterContains(ProfilerTable table, String filter) {
         return filterContains(table, filter, false, null);
@@ -146,10 +149,10 @@ public final class FilterUtils {
     }
     
     public static JComponent createFilterPanel(final ProfilerTable table, final RowFilter excludesFilter) {
-//        return createFilterPanel(table, excludesFilter, null);
-//    }
-//    
-//    public static JComponent createFilterPanel(final ProfilerTable table, final RowFilter excludesFilter, JComponent[] options) {
+        return createFilterPanel(table, excludesFilter, null);
+    }
+    
+    public static JComponent createFilterPanel(final ProfilerTable table, final RowFilter excludesFilter, Component[] options) {
         JToolBar toolbar = new InvisibleToolbar();
         if (UIUtils.isWindowsModernLookAndFeel())
             toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 2));
@@ -226,6 +229,7 @@ public final class FilterUtils {
                         activeFilter.copyFrom(currentFilter);
                         if (filter(table, activeFilter, excludesFilter))
                             combo.addItem(activeFilter.getValue());
+                        putClientProperty(FILTER_CHANGED, null);
                         updateFilterButton(_this, currentFilter, activeFilter);
                     }
                 });
@@ -318,10 +322,7 @@ public final class FilterUtils {
         
         toolbar.add(matchCase);
         
-//        if (options != null) {
-//            toolbar.add(Box.createHorizontalStrut(5));
-//            for (JComponent option : options) toolbar.add(option);
-//        }
+        if (options != null) for (Component option : options) toolbar.add(option);
         
         toolbar.add(Box.createHorizontalStrut(2));
         
@@ -380,6 +381,13 @@ public final class FilterUtils {
             map.put(filterKey, FILTER_ACTION_KEY);
         }
         
+        panel.putClientProperty("SET_FILTER_CHANGED", new AbstractAction() { // NOI18N
+            public void actionPerformed(final ActionEvent e) {
+                filter.putClientProperty(FILTER_CHANGED, Boolean.TRUE);
+                updateFilterButton(filter, currentFilter, activeFilter);
+            }
+        });
+        
         return panel;
     }
     
@@ -394,7 +402,8 @@ public final class FilterUtils {
     }
     
     private static void updateFilterButton(JButton button, TextFilter currentFilter, TextFilter activeFilter) {
-        button.setEnabled(!currentFilter.equals(activeFilter));
+        if (Boolean.TRUE.equals(button.getClientProperty(FILTER_CHANGED))) button.setEnabled(true);
+        else button.setEnabled(!currentFilter.equals(activeFilter));
     }
     
     private static abstract class Filter extends RowFilter {
