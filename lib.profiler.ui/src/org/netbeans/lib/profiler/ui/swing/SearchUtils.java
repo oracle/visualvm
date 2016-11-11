@@ -43,6 +43,7 @@
 package org.netbeans.lib.profiler.ui.swing;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -103,6 +104,7 @@ public final class SearchUtils {
     
     private static final String LAST_FIND_TEXT = "last-find-text"; // NOI18N
     private static final String LAST_FIND_MATCH_CASE = "last-find-match-case"; // NOI18N
+    private static final String FIND_TREE_HELPER = "find-tree-helper"; // NOI18N
     
     
     public static boolean findString(ProfilerTable table, String text) {
@@ -110,9 +112,6 @@ public final class SearchUtils {
     }
     
     public static boolean findString(ProfilerTable table, String text, boolean matchCase, boolean next) {
-        table.putClientProperty(LAST_FIND_TEXT, text);
-        table.putClientProperty(LAST_FIND_MATCH_CASE, matchCase);
-        
         int rowCount = table.getRowCount();
         
         ProfilerTreeTable treeTable = null;
@@ -128,30 +127,17 @@ public final class SearchUtils {
             if (node == null || node.isLeaf()) return false;
         }
         
-        if (!matchCase) text = text.toLowerCase();
-        
-        int mainColumn = table.convertColumnIndexToView(table.getMainColumn());
-        
         if (treeTable != null || table instanceof ProfilerTreeTable) {
             if (treeTable == null) treeTable = (ProfilerTreeTable)table;
-            TreePath selectedPath = treeTable.getSelectionPath();
-            if (selectedPath == null) selectedPath = treeTable.getRootPath();
-            boolean firstPath = true;
-            TreePath startPath = null;
-            do {
-                selectedPath = next ? treeTable.getNextPath(selectedPath) :
-                                      treeTable.getPreviousPath(selectedPath);
-                TreeNode node = (TreeNode)selectedPath.getLastPathComponent();
-                String nodeValue = treeTable.getStringValue(node, mainColumn);
-                if (!matchCase) nodeValue = nodeValue.toLowerCase();
-                if (nodeValue.contains(text)) {
-                    treeTable.selectPath(selectedPath, true);
-                    return true;
-                }
-                if (startPath == null) startPath = selectedPath;
-                else if (firstPath) firstPath = false;
-            } while (firstPath || !selectedPath.equals(startPath));
+            return findString(treeTable, text, matchCase, next, null);
         } else {
+            table.putClientProperty(LAST_FIND_TEXT, text);
+            table.putClientProperty(LAST_FIND_MATCH_CASE, matchCase);
+            
+            if (!matchCase) text = text.toLowerCase();
+            
+            int mainColumn = table.convertColumnIndexToView(table.getMainColumn());
+        
             int selectedRow = table.getSelectedRow();
             boolean fromSelection = selectedRow != -1;
         
@@ -170,12 +156,50 @@ public final class SearchUtils {
                 selectedRow = next ? table.getNextRow(selectedRow) :
                                      table.getPreviousRow(selectedRow);
             }
+            
+            ProfilerDialogs.displayInfo(MSG_NOTFOUND, ACTION_FIND, null);
+            return false;
         }
+    }
+    
+    public static boolean findString(ProfilerTreeTable treeTable, String text, boolean matchCase, boolean next, TreeHelper helper) {
+        treeTable.putClientProperty(LAST_FIND_TEXT, text);
+        treeTable.putClientProperty(LAST_FIND_MATCH_CASE, matchCase);
+        
+        if (!matchCase) text = text.toLowerCase();
+        
+        int mainColumn = treeTable.convertColumnIndexToView(treeTable.getMainColumn());
+        
+        TreePath selectedPath = treeTable.getSelectionPath();
+        if (selectedPath == null) selectedPath = treeTable.getRootPath();
+        boolean firstPath = true;
+        TreePath startPath = null;
+        
+        int nodeType = helper == null ? TreeHelper.NODE_SEARCH_DOWN : helper.getNodeType(selectedPath);
+        
+        do {
+            selectedPath = next ? treeTable.getNextPath(selectedPath, TreeHelper.isDown(nodeType)) :
+                                  treeTable.getPreviousPath(selectedPath, TreeHelper.isDown(nodeType));
+            TreeNode node = (TreeNode)selectedPath.getLastPathComponent();
+            
+            if (helper != null) nodeType = helper.getNodeType(node);
+            
+            if (TreeHelper.isSearch(nodeType)) {
+                String nodeValue = treeTable.getStringValue(node, mainColumn);
+                if (!matchCase) nodeValue = nodeValue.toLowerCase();
+                if (nodeValue.contains(text)) {
+                    treeTable.selectPath(selectedPath, true);
+                    return true;
+                }
+            }
+            
+            if (startPath == null) startPath = selectedPath;
+            else if (firstPath) firstPath = false;
+        } while (firstPath || !selectedPath.equals(startPath));
         
         ProfilerDialogs.displayInfo(MSG_NOTFOUND, ACTION_FIND, null);
         return false;
     }
-    
     
     public static void enableSearchActions(final ProfilerTable table) {
         ActionMap actionMap = table.getActionMap();
@@ -187,8 +211,11 @@ public final class SearchUtils {
                     public void run() {
                         Object text = table.getClientProperty(LAST_FIND_TEXT);
                         Object matchCase = table.getClientProperty(LAST_FIND_MATCH_CASE);
-                        if (text != null && matchCase != null)
-                            findString(table, text.toString(), Boolean.TRUE == matchCase, true);
+                        if (text != null && matchCase != null) {
+                            TreeHelper helper = (TreeHelper)table.getClientProperty(FIND_TREE_HELPER);
+                            if (helper == null) findString(table, text.toString(), Boolean.TRUE == matchCase, true);
+                            else findString((ProfilerTreeTable)table, text.toString(), Boolean.TRUE == matchCase, true, helper);
+                        }
                     }
                 });
             }
@@ -201,8 +228,12 @@ public final class SearchUtils {
                     public void run() {
                         Object text = table.getClientProperty(LAST_FIND_TEXT);
                         Object matchCase = table.getClientProperty(LAST_FIND_MATCH_CASE);
-                        if (text != null && matchCase != null)
-                            findString(table, text.toString(), Boolean.TRUE == matchCase, false);
+                        if (text != null && matchCase != null) {
+                            TreeHelper helper = (TreeHelper)table.getClientProperty(FIND_TREE_HELPER);
+                            if (helper == null) findString(table, text.toString(), Boolean.TRUE == matchCase, false);
+                            else findString((ProfilerTreeTable)table, text.toString(), Boolean.TRUE == matchCase, false, helper);
+                        }
+                            
                     }
                 });
             }
@@ -216,7 +247,9 @@ public final class SearchUtils {
                         int selectedRow = table.getSelectedRow();
                         if (selectedRow == -1) return;
                         int mainColumn = table.convertColumnIndexToView(table.getMainColumn());
-                        findString(table, table.getStringValue(selectedRow, mainColumn), true, true);
+                        TreeHelper helper = (TreeHelper)table.getClientProperty(FIND_TREE_HELPER);
+                        if (helper == null) findString(table, table.getStringValue(selectedRow, mainColumn), true, true);
+                        else findString((ProfilerTreeTable)table, table.getStringValue(selectedRow, mainColumn), true, true, helper);
                     }
                 });
             }
@@ -226,6 +259,18 @@ public final class SearchUtils {
     
     
     public static JComponent createSearchPanel(final ProfilerTable table) {
+        return createSearchPanel(table, null);
+    }
+    
+    public static JComponent createSearchPanel(final ProfilerTable table, Component[] options) {
+        return createSearchPanelImpl(table, null, options);
+    }
+    
+    public static JComponent createSearchPanel(final ProfilerTreeTable table, final TreeHelper helper, Component[] options) {
+        return createSearchPanelImpl(table, helper, options);
+    }
+    
+    private static JComponent createSearchPanelImpl(final ProfilerTable table, final TreeHelper helper, Component[] options) {
         JToolBar toolbar = new InvisibleToolbar();
         if (UIUtils.isWindowsModernLookAndFeel())
             toolbar.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 2));
@@ -264,7 +309,12 @@ public final class SearchUtils {
                     public void run() {
                         String search = getSearchString(combo);
                         if (search == null || search.isEmpty()) return;
-                        if (findString(table, search, matchCase.isSelected(), false)) combo.addItem(search);
+                        if (helper == null) {
+                            if (findString(table, search, matchCase.isSelected(), false)) combo.addItem(search);
+                        } else {
+                            if (findString((ProfilerTreeTable)table, search, matchCase.isSelected(), false, helper))
+                                combo.addItem(search);
+                        }
                     }
                 });
             }
@@ -285,7 +335,12 @@ public final class SearchUtils {
                     public void run() {
                         String search = getSearchString(combo);
                         if (search == null || search.isEmpty()) return;
-                        if (findString(table, search, matchCase.isSelected(), true)) combo.addItem(search);
+                        if (helper == null) {
+                            if (findString(table, search, matchCase.isSelected(), true)) combo.addItem(search);
+                        } else {
+                            if (findString((ProfilerTreeTable)table, search, matchCase.isSelected(), true, helper))
+                                combo.addItem(search);
+                        }
                     }
                 });
             }
@@ -304,6 +359,8 @@ public final class SearchUtils {
         toolbar.add(Box.createHorizontalStrut(1));
         
         toolbar.add(matchCase);
+        
+        if (options != null) for (Component option : options) toolbar.add(option);
         
         toolbar.add(Box.createHorizontalStrut(2));
         
@@ -381,6 +438,8 @@ public final class SearchUtils {
                                                          prevAccelerator + ", " + prevAccelerator2)); // NOI18N
         }
         
+        if (helper != null) table.putClientProperty(FIND_TREE_HELPER, helper);
+        
         return panel;
     }
     
@@ -392,6 +451,24 @@ public final class SearchUtils {
     
     // Do not create instances of this class
     private SearchUtils() {}
+    
+    
+    public static abstract class TreeHelper {
+        
+        public static final int NODE_SEARCH_DOWN =  10; // Node to be searched, search its children
+        public static final int NODE_SEARCH_NEXT =  11; // Node to be searched, do not search its children
+        public static final int NODE_SKIP_DOWN   = 100; // Node not to be searched, search its children
+        public static final int NODE_SKIP_NEXT   = 101; // Node not to be searched, do not search its children
+        
+        public abstract int getNodeType(TreeNode node);
+        
+        int getNodeType(TreePath path) { return getNodeType((TreeNode)path.getLastPathComponent()); }
+        
+        static boolean isSearch(int type) { return type < 100; }
+        
+        static boolean isDown(int type) { return (type & 1) == 0; }
+        
+    }
     
     
     // Default keybinding Ctrl+F and F3 variants for Find action

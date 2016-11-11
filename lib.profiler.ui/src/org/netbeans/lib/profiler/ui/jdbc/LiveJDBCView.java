@@ -54,6 +54,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -71,6 +72,7 @@ import org.netbeans.lib.profiler.ui.memory.LiveMemoryView;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
 import org.openide.util.Lookup;
@@ -382,6 +384,38 @@ public abstract class LiveJDBCView extends JPanel {
         popup.add(new JMenuItem(JDBCView.ACTION_PROFILE_CLASS) {
             { setEnabled(userValue != null); }
             protected void fireActionPerformed(ActionEvent e) { profileClass(userValue); }
+        });
+        
+        popup.addSeparator();
+        
+        final ProfilerTreeTable ttable = (ProfilerTreeTable)jdbcCallsView.getResultsComponent();
+        JMenu expand = new JMenu(JDBCView.EXPAND_MENU);
+        popup.add(expand);
+
+        expand.add(new JMenuItem(JDBCView.EXPAND_PLAIN_ITEM) {
+            protected void fireActionPerformed(ActionEvent e) {
+                ttable.expandPlainPath(ttable.getSelectedRow(), 1);
+            }
+        });
+
+        expand.add(new JMenuItem(JDBCView.EXPAND_TOPMOST_ITEM) {
+            protected void fireActionPerformed(ActionEvent e) {
+                ttable.expandFirstPath(ttable.getSelectedRow());
+            }
+        });
+        
+        expand.addSeparator();
+            
+        expand.add(new JMenuItem(JDBCView.COLLAPSE_CHILDREN_ITEM) {
+            protected void fireActionPerformed(ActionEvent e) {
+                ttable.collapseChildren(ttable.getSelectedRow());
+            }
+        });
+
+        expand.add(new JMenuItem(JDBCView.COLLAPSE_ALL_ITEM) {
+            protected void fireActionPerformed(ActionEvent e) {
+                ttable.collapseAll();
+            }
         });
         
         popup.addSeparator();
