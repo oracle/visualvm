@@ -48,7 +48,6 @@ import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -153,11 +152,11 @@ abstract class TablesSelector {
             content.add(tableContainer, BorderLayout.CENTER);
 
             JToolBar controls = new FilteringToolbar(FILTER_TABLES) {
-                protected void filterChanged(final String filter) {
-                    if (filter == null) tablesTable.setRowFilter(null);
+                protected void filterChanged() {
+                    if (isAll()) tablesTable.setRowFilter(null);
                     else tablesTable.setRowFilter(new RowFilter() {
                         public boolean include(RowFilter.Entry entry) {
-                            return entry.getStringValue(1).toLowerCase(Locale.ENGLISH).contains(filter.toLowerCase(Locale.ENGLISH));
+                            return passes(entry.getStringValue(1));
                         }
                     });
                 }

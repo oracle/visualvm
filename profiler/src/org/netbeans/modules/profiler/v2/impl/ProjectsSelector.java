@@ -141,11 +141,11 @@ public abstract class ProjectsSelector {
             content.add(tableContainer, BorderLayout.CENTER);
 
             JToolBar controls = new FilteringToolbar(Bundle.ProjectsSelector_filterProjects()) {
-                protected void filterChanged(final String filter) {
-                    if (filter == null) projectsTable.setRowFilter(null);
+                protected void filterChanged() {
+                    if (isAll()) projectsTable.setRowFilter(null);
                     else projectsTable.setRowFilter(new RowFilter() {
                         public boolean include(RowFilter.Entry entry) {
-                            return entry.getStringValue(1).contains(filter);
+                            return passes(entry.getStringValue(1));
                         }
                     });
                 }
