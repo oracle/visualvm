@@ -128,6 +128,40 @@ public abstract class ThreadsSelector extends PopupButton {
         });
     }
     
+    void addThread(final int id, final boolean exclusive) {
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                if (exclusive) selection.clear();
+                if (selection.add(id)) {
+                    displayAllThreads = false;
+                    fireSelectionChanged();
+                }
+            }
+        });
+    }
+    
+    void removeThread(final int id) {
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                if (displayAllThreads) {
+                    Set<Integer> threads = new HashSet();
+                    CPUResultsSnapshot snapshot = getSnapshot();
+                    if (snapshot != null)
+                        for (int i = 0; i < snapshot.getNThreads(); i++)
+                            threads.add(snapshot.getThreadIds()[i]);
+                    
+                    if (!threads.remove(id)) return;
+                    selection.addAll(threads);
+                } else {
+                    if (!selection.remove(id)) return;
+                }
+                
+                displayAllThreads = false;
+                fireSelectionChanged();
+            }
+        });
+    }
+    
     
     public String getToolTipText() {
         return displayAllThreads ? SELECTED_THREADS_ALL :
