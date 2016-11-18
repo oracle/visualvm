@@ -193,6 +193,7 @@ public abstract class ThreadsSelector extends PopupButton {
             threadsTable.setFitWidthColumn(1);
             threadsTable.setDefaultSortOrder(1, SortOrder.ASCENDING);
             threadsTable.setSortColumn(1);
+            threadsTable.setFixedColumnSelection(0); // #268298 - make sure SPACE always hits the Boolean column
             threadsTable.setColumnRenderer(0, new CheckBoxRenderer());
             LabelRenderer threadsRenderer = new LabelRenderer();
             threadsRenderer.setIcon(Icons.getIcon(ProfilerIcons.THREAD));
