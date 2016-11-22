@@ -127,6 +127,7 @@ public abstract class ProjectsSelector {
             projectsTable.setFitWidthColumn(1);
             projectsTable.setDefaultSortOrder(1, SortOrder.ASCENDING);
             projectsTable.setSortColumn(1);
+            projectsTable.setFixedColumnSelection(0); // #268298 - make sure SPACE always hits the Boolean column
             projectsTable.setColumnRenderer(0, new CheckBoxRenderer());
             LabelRenderer projectRenderer = new ProjectRenderer();
             projectsTable.setColumnRenderer(1, projectRenderer);
