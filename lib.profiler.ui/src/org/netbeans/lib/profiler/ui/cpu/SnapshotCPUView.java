@@ -127,6 +127,8 @@ public abstract class SnapshotCPUView extends JPanel {
     private JToggleButton[] toggles;
     private JToggleButton compareButton;
     
+    private ThreadsSelector threadsSelector;
+    
     private ExecutorService executor;
     
     
@@ -360,7 +362,7 @@ public abstract class SnapshotCPUView extends JPanel {
 //        toolbar.add(new ActionPopupButton(2, aCallTree, aHotSpots, aCombined));
         
         toolbar.addSpace(5);
-        ThreadsSelector threadsPopup = new ThreadsSelector() {
+        threadsSelector = new ThreadsSelector() {
             protected CPUResultsSnapshot getSnapshot() { return snapshot; }
             protected void selectionChanged(Collection<Integer> selected, boolean mergeThreads) {
                 mergedThreads = mergeThreads;
@@ -369,7 +371,7 @@ public abstract class SnapshotCPUView extends JPanel {
             }
             
         };
-        toolbar.add(threadsPopup);
+        toolbar.add(threadsSelector);
         
         toolbar.addSpace(2);
         toolbar.addSeparator();
@@ -458,7 +460,7 @@ public abstract class SnapshotCPUView extends JPanel {
         return lastFocused;
     }
     
-    private void populatePopup(final DataView invoker, JPopupMenu popup, Object value, final ClientUtils.SourceCodeSelection userValue) {
+    private void populatePopup(final DataView invoker, JPopupMenu popup, final Object value, final ClientUtils.SourceCodeSelection userValue) {
         if (showSourceSupported()) {
             popup.add(new JMenuItem(CPUView.ACTION_GOTOSOURCE) {
                 { setEnabled(userValue != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); setFont(getFont().deriveFont(Font.BOLD)); }
@@ -510,6 +512,31 @@ public abstract class SnapshotCPUView extends JPanel {
             });
             
             popup.addSeparator();
+            
+            JMenu threads = new JMenu(CPUView.SHOW_MENU);
+            popup.add(threads);
+            
+            threads.add(new JMenuItem(CPUView.SHOW_THREAD_ITEM) {
+                {
+                    setEnabled(!mergedThreads && threadsSelector != null && value instanceof PrestimeCPUCCTNode &&
+                              ((selectedThreads == null && snapshot.getNThreads() > 1) || selectedThreads.size() > 1));
+                }
+                protected void fireActionPerformed(ActionEvent e) {
+                    PrestimeCPUCCTNode thread = (PrestimeCPUCCTNode)value;
+                    threadsSelector.addThread(thread.getThreadId(), true);
+                }
+            });
+            
+            threads.add(new JMenuItem(CPUView.HIDE_THREAD_ITEM) {
+                {
+                    setEnabled(!mergedThreads && threadsSelector != null && value instanceof PrestimeCPUCCTNode &&
+                              ((selectedThreads == null && snapshot.getNThreads() > 1) || selectedThreads.size() > 1));
+                }
+                protected void fireActionPerformed(ActionEvent e) {
+                    PrestimeCPUCCTNode thread = (PrestimeCPUCCTNode)value;
+                    threadsSelector.removeThread(thread.getThreadId());
+                }
+            });
             
             JMenu expand = new JMenu(CPUView.EXPAND_MENU);
             popup.add(expand);
@@ -596,6 +623,31 @@ public abstract class SnapshotCPUView extends JPanel {
             });
             
             popup.addSeparator();
+            
+            JMenu threads = new JMenu(CPUView.SHOW_MENU);
+            popup.add(threads);
+            
+            threads.add(new JMenuItem(CPUView.SHOW_THREAD_ITEM) {
+                {
+                    setEnabled(!mergedThreads && threadsSelector != null && value instanceof PrestimeCPUCCTNode &&
+                              ((selectedThreads == null && snapshot.getNThreads() > 1) || selectedThreads.size() > 1));
+                }
+                protected void fireActionPerformed(ActionEvent e) {
+                    PrestimeCPUCCTNode thread = (PrestimeCPUCCTNode)value;
+                    threadsSelector.addThread(thread.getThreadId(), true);
+                }
+            });
+            
+            threads.add(new JMenuItem(CPUView.HIDE_THREAD_ITEM) {
+                {
+                    setEnabled(!mergedThreads && threadsSelector != null && value instanceof PrestimeCPUCCTNode &&
+                              ((selectedThreads == null && snapshot.getNThreads() > 1) || selectedThreads.size() > 1));
+                }
+                protected void fireActionPerformed(ActionEvent e) {
+                    PrestimeCPUCCTNode thread = (PrestimeCPUCCTNode)value;
+                    threadsSelector.removeThread(thread.getThreadId());
+                }
+            });
             
             JMenu expand = new JMenu(CPUView.EXPAND_MENU);
             popup.add(expand);

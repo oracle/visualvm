@@ -73,6 +73,7 @@ import java.util.Set;
 import javax.accessibility.AccessibleContext;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -429,6 +430,7 @@ public class ProfilerTable extends JTable {
     
     boolean internal;
     private Object selection;
+    private int fixedSelectionColumn = -1;
     private ListSelectionListener selectionListener;
     
     public void setSelectionModel(ListSelectionModel newModel) {
@@ -469,6 +471,23 @@ public class ProfilerTable extends JTable {
         try { setColumnSelectionInterval(column, column); }
         finally { internal = false; }
         if (scrollToVisible) scrollRectToVisible(getCellRect(getSelectedRow(), column, true));
+    }
+    
+    public void setFixedColumnSelection(final int column) {
+        if (fixedSelectionColumn == column) return;
+        
+        if (column == -1) {
+            getColumnModel().setSelectionModel(new DefaultListSelectionModel());
+        } else {
+            getColumnModel().setSelectionModel(new DefaultListSelectionModel() {
+                public void setSelectionInterval(int index0, int index1) {
+                    int index = convertColumnIndexToView(column);
+                    super.setSelectionInterval(index, index);
+                }
+            });
+        }
+        
+        fixedSelectionColumn = column;
     }
     
     public Object selectValue(Object value, int column, boolean scrollToVisible) {

@@ -138,6 +138,7 @@ abstract class TablesSelector {
             tablesTable.setFitWidthColumn(1);
             tablesTable.setDefaultSortOrder(1, SortOrder.ASCENDING);
             tablesTable.setSortColumn(1);
+            tablesTable.setFixedColumnSelection(0); // #268298 - make sure SPACE always hits the Boolean column
             tablesTable.setColumnRenderer(0, new CheckBoxRenderer());
             LabelRenderer projectRenderer = new LabelRenderer();
             tablesTable.setColumnRenderer(1, projectRenderer);
