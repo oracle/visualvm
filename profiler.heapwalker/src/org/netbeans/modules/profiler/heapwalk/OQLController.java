@@ -290,7 +290,7 @@ public class OQLController extends AbstractTopLevelController
                 }
                 sb.append(entry.getKey().toString().replace("<", "&lt;").replace(">", "&gt;")); // NOI18N
                 sb.append(" = "); // NOI18N
-                dump(entry.getValue(), sb);
+                dump(unwrap(entry.getValue()), sb);
             }
             sb.append("<br/><b>}</b></span>"); // NOI18N
         } else if (o instanceof Object[]) {
@@ -302,17 +302,17 @@ public class OQLController extends AbstractTopLevelController
                 } else {
                     first = false;
                 }
-                Object obj2 = engine.unwrapJavaObject(obj1,true);
-                if (obj2 != null) {
-                    dump(obj2, sb);
-                } else {
-                    dump(obj1, sb);
-                }
+                dump(unwrap(obj1), sb);
             }
             sb.append("&nbsp;<b>]</b></span>"); // NOI18N
         } else {
             sb.append(o.toString());
         }
+    }
+
+    private Object unwrap(Object obj1) {
+        Object obj2 = engine.unwrapJavaObject(obj1, true);
+        return obj2 != null ? obj2 : obj1;
     }
 
     private OQLEngine getEngine() {
