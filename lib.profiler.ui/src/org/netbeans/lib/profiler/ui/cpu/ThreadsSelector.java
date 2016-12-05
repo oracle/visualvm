@@ -151,6 +151,7 @@ public abstract class ThreadsSelector extends PopupButton {
                             threads.add(snapshot.getThreadIds()[i]);
                     
                     if (!threads.remove(id)) return;
+                    selection.clear();
                     selection.addAll(threads);
                 } else {
                     if (!selection.remove(id)) return;

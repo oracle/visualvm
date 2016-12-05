@@ -519,7 +519,7 @@ public abstract class SnapshotCPUView extends JPanel {
             threads.add(new JMenuItem(CPUView.SHOW_THREAD_ITEM) {
                 {
                     setEnabled(!mergedThreads && threadsSelector != null && value instanceof PrestimeCPUCCTNode &&
-                              ((selectedThreads == null && snapshot.getNThreads() > 1) || selectedThreads.size() > 1));
+                               snapshot.getNThreads() > 1 && (selectedThreads == null || selectedThreads.size() > 1));
                 }
                 protected void fireActionPerformed(ActionEvent e) {
                     PrestimeCPUCCTNode thread = (PrestimeCPUCCTNode)value;
@@ -530,7 +530,7 @@ public abstract class SnapshotCPUView extends JPanel {
             threads.add(new JMenuItem(CPUView.HIDE_THREAD_ITEM) {
                 {
                     setEnabled(!mergedThreads && threadsSelector != null && value instanceof PrestimeCPUCCTNode &&
-                              ((selectedThreads == null && snapshot.getNThreads() > 1) || selectedThreads.size() > 1));
+                               snapshot.getNThreads() > 1 && (selectedThreads == null || selectedThreads.size() > 1));
                 }
                 protected void fireActionPerformed(ActionEvent e) {
                     PrestimeCPUCCTNode thread = (PrestimeCPUCCTNode)value;
@@ -630,7 +630,7 @@ public abstract class SnapshotCPUView extends JPanel {
             threads.add(new JMenuItem(CPUView.SHOW_THREAD_ITEM) {
                 {
                     setEnabled(!mergedThreads && threadsSelector != null && value instanceof PrestimeCPUCCTNode &&
-                              ((selectedThreads == null && snapshot.getNThreads() > 1) || selectedThreads.size() > 1));
+                              snapshot.getNThreads() > 1 && (selectedThreads == null || selectedThreads.size() > 1));
                 }
                 protected void fireActionPerformed(ActionEvent e) {
                     PrestimeCPUCCTNode thread = (PrestimeCPUCCTNode)value;
@@ -641,7 +641,7 @@ public abstract class SnapshotCPUView extends JPanel {
             threads.add(new JMenuItem(CPUView.HIDE_THREAD_ITEM) {
                 {
                     setEnabled(!mergedThreads && threadsSelector != null && value instanceof PrestimeCPUCCTNode &&
-                              ((selectedThreads == null && snapshot.getNThreads() > 1) || selectedThreads.size() > 1));
+                              snapshot.getNThreads() > 1 && (selectedThreads == null || selectedThreads.size() > 1));
                 }
                 protected void fireActionPerformed(ActionEvent e) {
                     PrestimeCPUCCTNode thread = (PrestimeCPUCCTNode)value;
