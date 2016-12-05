@@ -59,7 +59,7 @@ import javax.swing.RowFilter;
 import javax.swing.SortOrder;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.ui.swing.FilteringToolbar;
-import org.netbeans.lib.profiler.ui.swing.ProfilerPopupFactory;
+import org.netbeans.lib.profiler.ui.swing.ProfilerPopup;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
@@ -107,7 +107,8 @@ public abstract class ProjectsSelector {
         }
         
         void show(Component invoker) {
-            ProfilerPopupFactory.getPopup(invoker, panel, -5, invoker.getHeight() - 1).show();
+//            ProfilerPopupFactory.getPopup(invoker, panel, -5, invoker.getHeight() - 1).show();
+            ProfilerPopup.create(invoker, panel, -5, invoker.getHeight() - 1).show();
         }
         
         private void populatePopup() {

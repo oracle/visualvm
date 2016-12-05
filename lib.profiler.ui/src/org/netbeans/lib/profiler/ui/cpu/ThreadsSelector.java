@@ -65,7 +65,7 @@ import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.swing.FilteringToolbar;
 import org.netbeans.lib.profiler.ui.swing.PopupButton;
-import org.netbeans.lib.profiler.ui.swing.ProfilerPopupFactory;
+import org.netbeans.lib.profiler.ui.swing.ProfilerPopup;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.renderer.CheckBoxRenderer;
@@ -275,7 +275,7 @@ public abstract class ThreadsSelector extends PopupButton {
             content.add(controls, BorderLayout.SOUTH);
         }
 
-        ProfilerPopupFactory.Listener listener = new ProfilerPopupFactory.Listener() {
+        ProfilerPopup.Listener listener = new ProfilerPopup.Listener() {
             protected void popupHidden() {
                 if (!displayAllThreads && selection.isEmpty()) {
                     displayAllThreads = true;
@@ -285,7 +285,8 @@ public abstract class ThreadsSelector extends PopupButton {
                 allThreadsResetter = null;
             }
         };
-        ProfilerPopupFactory.getPopup(this, content, -5, getHeight() - 1, listener).show();
+
+        ProfilerPopup.create(this, content, -5, getHeight() - 1, listener).show();
     }
     
     

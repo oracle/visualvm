@@ -165,6 +165,7 @@ final class ProfilerTableHovers {
             if (isLwPopupOpen(table)) {
                 // Do not show value hovers when a lightweight popup is showing,
                 // might be drawn on top of it - overlap it.
+                // TODO: value hovers overlap ProfilerPopup windows!
                 hidePopups();
             } else {
                 currentRow = row;
