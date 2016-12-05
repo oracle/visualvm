@@ -64,13 +64,11 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import javax.swing.BorderFactory;
 import javax.swing.CellRendererPane;
-import javax.swing.JApplet;
 import javax.swing.JComponent;
-import javax.swing.JInternalFrame;
-import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
-import javax.swing.JRootPane;
 import javax.swing.JWindow;
+import javax.swing.MenuElement;
+import javax.swing.MenuSelectionManager;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -162,10 +160,9 @@ final class ProfilerTableHovers {
 //                if (windows[POPUP_RIGHT] != null) windows[POPUP_RIGHT].setVisible(false);
 //            }
 
-            if (isLwPopupOpen(table)) {
+            if (!isInFocusedWindow(table) || isPopupOpen()) {
                 // Do not show value hovers when a lightweight popup is showing,
                 // might be drawn on top of it - overlap it.
-                // TODO: value hovers overlap ProfilerPopup windows!
                 hidePopups();
             } else {
                 currentRow = row;
@@ -176,25 +173,37 @@ final class ProfilerTableHovers {
         }
     }
     
-    private static boolean isLwPopupOpen(Component c) {
-        Container cc = c.getParent();
-        
-        for (Container p = cc; p != null; p = p.getParent()) {
-            if (p instanceof JRootPane) {
-                if (p.getParent() instanceof JInternalFrame) continue;
-                cc = ((JRootPane)p).getLayeredPane();
-                if (cc instanceof JLayeredPane)
-                    return ((JLayeredPane)cc).getComponentsInLayer(
-                             JLayeredPane.POPUP_LAYER).length > 0;
-            } else if (p instanceof Window) {
-                break;
-            } else if (p instanceof JApplet) {
-                break;
-            }
-        }
-        
-        return false;
+    private static boolean isInFocusedWindow(Component c) {
+        Window w = SwingUtilities.getWindowAncestor(c);
+        return w != null && w.isFocused();
     }
+    
+    private static boolean isPopupOpen() {
+        MenuElement[] menuSel = MenuSelectionManager.defaultManager().getSelectedPath();
+        return menuSel != null && menuSel.length > 0;
+//        // Doesn't work reliably, hovering to a sliding window (Palette) changes the focus owner
+//        return KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() instanceof JRootPane;
+    }
+    
+//    private static boolean isLwPopupOpen(Component c) {
+//        Container cc = c.getParent();
+//        
+//        for (Container p = cc; p != null; p = p.getParent()) {
+//            if (p instanceof JRootPane) {
+//                if (p.getParent() instanceof JInternalFrame) continue;
+//                cc = ((JRootPane)p).getLayeredPane();
+//                if (cc instanceof JLayeredPane)
+//                    return ((JLayeredPane)cc).getComponentsInLayer(
+//                             JLayeredPane.POPUP_LAYER).length > 0;
+//            } else if (p instanceof Window) {
+//                break;
+//            } else if (p instanceof JApplet) {
+//                break;
+//            }
+//        }
+//        
+//        return false;
+//    }
     
     private void showPopups(Component renderer, Rectangle[] popups) {
         Image img = createPopupImage(renderer);
