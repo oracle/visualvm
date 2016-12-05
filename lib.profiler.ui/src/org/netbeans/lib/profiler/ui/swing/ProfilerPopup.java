@@ -123,9 +123,9 @@ public final class ProfilerPopup {
         window = new JWindow(owner);
         window.setType(Window.Type.POPUP);
         window.setAlwaysOnTop(false);
-//        window.setFocusable(true);
-//        window.setFocusableWindowState(true);
-//        window.setAutoRequestFocus(true);
+        window.setFocusable(true);
+        window.setFocusableWindowState(true);
+        window.setAutoRequestFocus(true);
         
         window.getContentPane().add(content);
         window.pack();
