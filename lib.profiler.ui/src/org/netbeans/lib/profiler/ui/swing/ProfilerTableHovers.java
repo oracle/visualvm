@@ -407,6 +407,11 @@ final class ProfilerTableHovers {
             updatePopups(e.getPoint(), false);
         }
         
+        public void mouseExited(MouseEvent e) {
+            hidePopups();
+            currentScreenPoint = null;
+        }
+        
         // ComponentListener
         public void componentResized(ComponentEvent e) {} // Lines added/removed to/from table
         public void componentMoved(ComponentEvent e) { updatePopups(null, false); } // Table scrolled (mouse wheel, gesture)
@@ -465,7 +470,7 @@ final class ProfilerTableHovers {
         }
         
         // MouseAdapter
-        public void mouseExited(MouseEvent e) { hidePopups(); currentScreenPoint = null; }
+//        public void mouseExited(MouseEvent e) { hidePopups(); currentScreenPoint = null; }
 //        public void mouseDragged(MouseEvent e) { updatePopups(e.getPoint(), false); }
 //        public void mouseDragged(MouseEvent e) { hidePopups(); }
 //        public void mousePressed(MouseEvent e) { hidePopups(); }

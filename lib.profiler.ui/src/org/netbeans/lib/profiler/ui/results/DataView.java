@@ -51,6 +51,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -60,6 +61,7 @@ import javax.swing.UIManager;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 
 /**
@@ -123,16 +125,22 @@ public abstract class DataView extends JPanel {
         return null;
     }
     
-//    protected JComponent[] getFilterOptions() {
-//        return null;
-//    }
+    protected Component[] getFilterOptions() {
+        return null;
+    }
+    
+    protected void enableFilter() {
+        if (filterPanel != null) {
+            Object a = filterPanel.getClientProperty("SET_FILTER_CHANGED"); // NOI18N
+            if (a instanceof Action) ((Action)a).actionPerformed(null);
+        }
+    }
     
     public void activateFilter() {
         JComponent panel = getBottomPanel();
         
         if (filterPanel == null) {
-            filterPanel = FilterUtils.createFilterPanel(getResultsComponent(), getExcludesFilter());
-//            filterPanel = FilterUtils.createFilterPanel(getResultsComponent(), getExcludesFilter(), getFilterOptions());
+            filterPanel = FilterUtils.createFilterPanel(getResultsComponent(), getExcludesFilter(), getFilterOptions());
             panel.add(filterPanel);
             Container parent = panel.getParent();
             parent.invalidate();
@@ -151,11 +159,21 @@ public abstract class DataView extends JPanel {
 //        return searchPanel == null ? false : searchPanel.isVisible();
 //    }
     
+    protected SearchUtils.TreeHelper getSearchHelper() {
+        return null;
+    }
+    
+    protected Component[] getSearchOptions() {
+        return null;
+    }
+    
     public void activateSearch() {
         JComponent panel = getBottomPanel();
         
         if (searchPanel == null) {
-            searchPanel = SearchUtils.createSearchPanel(getResultsComponent());
+            SearchUtils.TreeHelper searchHelper = getSearchHelper();
+            if (searchHelper == null) searchPanel = SearchUtils.createSearchPanel(getResultsComponent(), getSearchOptions());
+            else searchPanel = SearchUtils.createSearchPanel((ProfilerTreeTable)getResultsComponent(), searchHelper, getSearchOptions());
             panel.add(searchPanel);
             Container parent = panel.getParent();
             parent.invalidate();

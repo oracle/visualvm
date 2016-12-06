@@ -127,6 +127,7 @@ public abstract class ProjectsSelector {
             projectsTable.setFitWidthColumn(1);
             projectsTable.setDefaultSortOrder(1, SortOrder.ASCENDING);
             projectsTable.setSortColumn(1);
+            projectsTable.setFixedColumnSelection(0); // #268298 - make sure SPACE always hits the Boolean column
             projectsTable.setColumnRenderer(0, new CheckBoxRenderer());
             LabelRenderer projectRenderer = new ProjectRenderer();
             projectsTable.setColumnRenderer(1, projectRenderer);
@@ -141,11 +142,11 @@ public abstract class ProjectsSelector {
             content.add(tableContainer, BorderLayout.CENTER);
 
             JToolBar controls = new FilteringToolbar(Bundle.ProjectsSelector_filterProjects()) {
-                protected void filterChanged(final String filter) {
-                    if (filter == null) projectsTable.setRowFilter(null);
+                protected void filterChanged() {
+                    if (isAll()) projectsTable.setRowFilter(null);
                     else projectsTable.setRowFilter(new RowFilter() {
                         public boolean include(RowFilter.Entry entry) {
-                            return entry.getStringValue(1).contains(filter);
+                            return passes(entry.getStringValue(1));
                         }
                     });
                 }

@@ -128,6 +128,40 @@ public abstract class ThreadsSelector extends PopupButton {
         });
     }
     
+    void addThread(final int id, final boolean exclusive) {
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                if (exclusive) selection.clear();
+                if (selection.add(id)) {
+                    displayAllThreads = false;
+                    fireSelectionChanged();
+                }
+            }
+        });
+    }
+    
+    void removeThread(final int id) {
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                if (displayAllThreads) {
+                    Set<Integer> threads = new HashSet();
+                    CPUResultsSnapshot snapshot = getSnapshot();
+                    if (snapshot != null)
+                        for (int i = 0; i < snapshot.getNThreads(); i++)
+                            threads.add(snapshot.getThreadIds()[i]);
+                    
+                    if (!threads.remove(id)) return;
+                    selection.addAll(threads);
+                } else {
+                    if (!selection.remove(id)) return;
+                }
+                
+                displayAllThreads = false;
+                fireSelectionChanged();
+            }
+        });
+    }
+    
     
     public String getToolTipText() {
         return displayAllThreads ? SELECTED_THREADS_ALL :
@@ -159,6 +193,7 @@ public abstract class ThreadsSelector extends PopupButton {
             threadsTable.setFitWidthColumn(1);
             threadsTable.setDefaultSortOrder(1, SortOrder.ASCENDING);
             threadsTable.setSortColumn(1);
+            threadsTable.setFixedColumnSelection(0); // #268298 - make sure SPACE always hits the Boolean column
             threadsTable.setColumnRenderer(0, new CheckBoxRenderer());
             LabelRenderer threadsRenderer = new LabelRenderer();
             threadsRenderer.setIcon(Icons.getIcon(ProfilerIcons.THREAD));
@@ -175,11 +210,11 @@ public abstract class ThreadsSelector extends PopupButton {
             content.add(tableContainer, BorderLayout.CENTER);
             
             JToolBar controls = new FilteringToolbar(FILTER_THREADS) {
-                protected void filterChanged(final String filter) {
-                    if (filter == null) threadsTable.setRowFilter(null);
+                protected void filterChanged() {
+                    if (isAll()) threadsTable.setRowFilter(null);
                     else threadsTable.setRowFilter(new RowFilter() {
                         public boolean include(RowFilter.Entry entry) {
-                            return entry.getStringValue(1).contains(filter);
+                            return passes(entry.getStringValue(1));
                         }
                     });
                 }

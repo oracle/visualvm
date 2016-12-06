@@ -57,6 +57,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -68,11 +69,13 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.tree.TreeNode;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsDiff;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
+import org.netbeans.lib.profiler.results.cpu.PrestimeCPUCCTNode;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
 import org.netbeans.lib.profiler.ui.memory.LiveMemoryView;
@@ -458,7 +461,7 @@ public abstract class LiveCPUView extends JPanel {
         return lastFocused;
     }
     
-    private void populatePopup(final DataView invoker, JPopupMenu popup, Object value, final ClientUtils.SourceCodeSelection userValue) {
+    private void populatePopup(final DataView invoker, JPopupMenu popup, final Object value, final ClientUtils.SourceCodeSelection userValue) {
         if (showSourceSupported()) {
             popup.add(new JMenuItem(CPUView.ACTION_GOTOSOURCE) {
                 { setEnabled(userValue != null); setFont(getFont().deriveFont(Font.BOLD)); }
@@ -479,7 +482,7 @@ public abstract class LiveCPUView extends JPanel {
         
         popup.addSeparator();
         if (invoker == forwardCallsView) {
-            ProfilerTreeTable ttable = (ProfilerTreeTable)forwardCallsView.getResultsComponent();
+            final ProfilerTreeTable ttable = (ProfilerTreeTable)forwardCallsView.getResultsComponent();
             int column = ttable.convertColumnIndexToView(ttable.getMainColumn());
             final String searchString = ttable.getStringValue((TreeNode)value, column);
             
@@ -498,12 +501,68 @@ public abstract class LiveCPUView extends JPanel {
             popup.add(new JMenuItem(CPUView.FIND_IN_REVERSECALLS) {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
-                    ProfilerTable table = reverseCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString)) {
+                    ProfilerTreeTable table = (ProfilerTreeTable)reverseCallsView.getResultsComponent();
+                    if (SearchUtils.findString(table, searchString, true, true, createSearchHelper())) {
                         reverseCallsView.setVisible(true);
                         foundInReverseCalls();
                         table.requestFocusInWindow();
                     }
+                }
+            });
+            
+            popup.addSeparator();
+            
+            JMenu threads = new JMenu(CPUView.SHOW_MENU);
+            popup.add(threads);
+            
+            threads.add(new JMenuItem(CPUView.SHOW_THREAD_ITEM) {
+                {
+                    setEnabled(!mergedThreads && threadsSelector != null && value instanceof PrestimeCPUCCTNode &&
+                              ((selectedThreads == null && snapshot.getNThreads() > 1) || selectedThreads.size() > 1));
+                }
+                protected void fireActionPerformed(ActionEvent e) {
+                    PrestimeCPUCCTNode thread = (PrestimeCPUCCTNode)value;
+                    threadsSelector.addThread(thread.getThreadId(), true);
+                }
+            });
+            
+            threads.add(new JMenuItem(CPUView.HIDE_THREAD_ITEM) {
+                {
+                    setEnabled(!mergedThreads && threadsSelector != null && value instanceof PrestimeCPUCCTNode &&
+                              ((selectedThreads == null && snapshot.getNThreads() > 1) || selectedThreads.size() > 1));
+                }
+                protected void fireActionPerformed(ActionEvent e) {
+                    PrestimeCPUCCTNode thread = (PrestimeCPUCCTNode)value;
+                    threadsSelector.removeThread(thread.getThreadId());
+                }
+            });
+            
+            JMenu expand = new JMenu(CPUView.EXPAND_MENU);
+            popup.add(expand);
+            
+            expand.add(new JMenuItem(CPUView.EXPAND_PLAIN_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.expandPlainPath(ttable.getSelectedRow(), 2);
+                }
+            });
+            
+            expand.add(new JMenuItem(CPUView.EXPAND_TOPMOST_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.expandFirstPath(ttable.getSelectedRow());
+                }
+            });
+            
+            expand.addSeparator();
+            
+            expand.add(new JMenuItem(CPUView.COLLAPSE_CHILDREN_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.collapseChildren(ttable.getSelectedRow());
+                }
+            });
+            
+            expand.add(new JMenuItem(CPUView.COLLAPSE_ALL_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.collapseAll();
                 }
             });
         } else if (invoker == hotSpotsView) {
@@ -525,8 +584,8 @@ public abstract class LiveCPUView extends JPanel {
             popup.add(new JMenuItem(CPUView.FIND_IN_REVERSECALLS) {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) {
-                    ProfilerTable table = reverseCallsView.getResultsComponent();
-                    if (SearchUtils.findString(table, searchString)) {
+                    ProfilerTreeTable table = (ProfilerTreeTable)reverseCallsView.getResultsComponent();
+                    if (SearchUtils.findString(table, searchString, true, true, createSearchHelper())) {
                         reverseCallsView.setVisible(true);
                         foundInReverseCalls();
                         table.requestFocusInWindow();
@@ -534,7 +593,7 @@ public abstract class LiveCPUView extends JPanel {
                 }
             });
         } else if (invoker == reverseCallsView) {
-            ProfilerTreeTable ttable = (ProfilerTreeTable)reverseCallsView.getResultsComponent();
+            final ProfilerTreeTable ttable = (ProfilerTreeTable)reverseCallsView.getResultsComponent();
             int column = ttable.convertColumnIndexToView(ttable.getMainColumn());
             final String searchString = ttable.getStringValue((TreeNode)value, column);
             
@@ -561,6 +620,62 @@ public abstract class LiveCPUView extends JPanel {
                     }
                 }
             });
+            
+            popup.addSeparator();
+            
+            JMenu threads = new JMenu(CPUView.SHOW_MENU);
+            popup.add(threads);
+            
+            threads.add(new JMenuItem(CPUView.SHOW_THREAD_ITEM) {
+                {
+                    setEnabled(!mergedThreads && threadsSelector != null && value instanceof PrestimeCPUCCTNode &&
+                              ((selectedThreads == null && snapshot.getNThreads() > 1) || selectedThreads.size() > 1));
+                }
+                protected void fireActionPerformed(ActionEvent e) {
+                    PrestimeCPUCCTNode thread = (PrestimeCPUCCTNode)value;
+                    threadsSelector.addThread(thread.getThreadId(), true);
+                }
+            });
+            
+            threads.add(new JMenuItem(CPUView.HIDE_THREAD_ITEM) {
+                {
+                    setEnabled(!mergedThreads && threadsSelector != null && value instanceof PrestimeCPUCCTNode &&
+                              ((selectedThreads == null && snapshot.getNThreads() > 1) || selectedThreads.size() > 1));
+                }
+                protected void fireActionPerformed(ActionEvent e) {
+                    PrestimeCPUCCTNode thread = (PrestimeCPUCCTNode)value;
+                    threadsSelector.removeThread(thread.getThreadId());
+                }
+            });
+            
+            JMenu expand = new JMenu(CPUView.EXPAND_MENU);
+            popup.add(expand);
+            
+            expand.add(new JMenuItem(CPUView.EXPAND_PLAIN_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.expandPlainPath(ttable.getSelectedRow(), 1);
+                }
+            });
+            
+            expand.add(new JMenuItem(CPUView.EXPAND_TOPMOST_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.expandFirstPath(ttable.getSelectedRow());
+                }
+            });
+            
+            expand.addSeparator();
+            
+            expand.add(new JMenuItem(CPUView.COLLAPSE_CHILDREN_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.collapseChildren(ttable.getSelectedRow());
+                }
+            });
+            
+            expand.add(new JMenuItem(CPUView.COLLAPSE_ALL_ITEM) {
+                protected void fireActionPerformed(ActionEvent e) {
+                    ttable.collapseAll();
+                }
+            });
         }
         
         popup.addSeparator();
@@ -573,6 +688,26 @@ public abstract class LiveCPUView extends JPanel {
         popup.add(new JMenuItem(SearchUtils.ACTION_FIND) {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
         });
+    }
+    
+    private static SearchUtils.TreeHelper createSearchHelper() {
+        return new SearchUtils.TreeHelper() {
+            public int getNodeType(TreeNode tnode) {
+                PrestimeCPUCCTNode node = (PrestimeCPUCCTNode)tnode;
+                CCTNode parent = node.getParent();
+                if (parent == null) return SearchUtils.TreeHelper.NODE_SKIP_DOWN; // invisible root
+                
+                if (node.isThreadNode()) return SearchUtils.TreeHelper.NODE_SKIP_DOWN; // thread node
+                if (node.isSelfTimeNode()) return SearchUtils.TreeHelper.NODE_SKIP_NEXT; // self time node
+                
+                if (((PrestimeCPUCCTNode)parent).isThreadNode() || // toplevel method node (children of thread)
+                    parent.getParent() == null) {                  // toplevel method node (merged threads)
+                    return SearchUtils.TreeHelper.NODE_SEARCH_NEXT;
+                }
+                
+                return SearchUtils.TreeHelper.NODE_SKIP_NEXT; // reverse call tree node
+            }
+        };
     }
     
     

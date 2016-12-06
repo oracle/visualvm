@@ -66,7 +66,7 @@ class EditableHistoryCombo extends JComboBox {
         setEditable(true);
 //        putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE); // NOI18N
         
-        setPrototypeDisplayValue("java.lang.String.equals(Object)"); // NOI18N
+        setPrototypeDisplayValue("org.netbeans.lib.profiler.ui.swing.XXXXX"); // NOI18N
         Dimension dim = getPreferredSize();
         dim.height = !UIUtils.isNimbusLookAndFeel() ? getMinimumSize().height :
                      new JTextField("X").getPreferredSize().height; // NOI18N

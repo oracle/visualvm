@@ -81,6 +81,20 @@ public abstract class CPUView extends DataView {
     static final String TOTAL_TIME_CPU_COLUMN_TOOLTIP = messages.getString("CPUView_TotalTimeCpuColumnTooltip"); // NOI18N
     static final String HITS_COLUMN_TOOLTIP = messages.getString("CPUView_HitsColumnTooltip"); // NOI18N
     static final String INVOCATIONS_COLUMN_TOOLTIP = messages.getString("CPUView_InvocationsColumnTooltip"); // NOI18N
+    static final String FILTER_CALLEES_SCOPE = messages.getString("CPUView_FilterCalleesScope"); // NOI18N
+    static final String FILTER_CALLERS_SCOPE = messages.getString("CPUView_FilterCallersScope"); // NOI18N
+    static final String FILTER_SCOPE_TOOLTIP = messages.getString("CPUView_FilterScopeTooltip"); // NOI18N
+    static final String SEARCH_CALLEES_SCOPE = messages.getString("CPUView_SearchCalleesScope"); // NOI18N
+    static final String SEARCH_CALLERS_SCOPE = messages.getString("CPUView_SearchCallersScope"); // NOI18N
+    static final String SEARCH_SCOPE_TOOLTIP = messages.getString("CPUView_SearchScopeTooltip"); // NOI18N
+    static final String EXPAND_MENU = messages.getString("CPUView_ExpandMenu"); // NOI18N
+    static final String EXPAND_PLAIN_ITEM = messages.getString("CPUView_ExpandPlainItem"); // NOI18N
+    static final String EXPAND_TOPMOST_ITEM = messages.getString("CPUView_ExpandTopmostItem"); // NOI18N
+    static final String COLLAPSE_CHILDREN_ITEM = messages.getString("CPUView_CollapseChildrenItem"); // NOI18N
+    static final String COLLAPSE_ALL_ITEM = messages.getString("CPUView_CollapseAllItem"); // NOI18N
+    static final String SHOW_MENU = messages.getString("CPUView_ShowMenu"); // NOI18N
+    static final String SHOW_THREAD_ITEM = messages.getString("CPUView_ShowThreadItem"); // NOI18N
+    static final String HIDE_THREAD_ITEM = messages.getString("CPUView_HideThreadItem"); // NOI18N
     // -----
     
 }

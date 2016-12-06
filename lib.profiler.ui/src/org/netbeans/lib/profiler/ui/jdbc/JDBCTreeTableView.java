@@ -44,6 +44,8 @@
 package org.netbeans.lib.profiler.ui.jdbc;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -52,6 +54,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.Box;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -66,15 +70,19 @@ import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
 import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.swing.ExportUtils;
+import org.netbeans.lib.profiler.ui.swing.PopupButton;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTableModel;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.McsTimeRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 
 /**
  *
@@ -92,6 +100,9 @@ abstract class JDBCTreeTableView extends JDBCView {
     private SQLFilterPanel sqlFilter;
     
     private JdbcResultsSnapshot currentData;
+    
+    private boolean searchQueries = true;
+    private boolean searchCallerMethods = false;
     
     
     public JDBCTreeTableView(Set<ClientUtils.SourceCodeSelection> selection, boolean reverse) {
@@ -318,6 +329,57 @@ abstract class JDBCTreeTableView extends JDBCView {
                 return isSQL(node);
             }
         };
+    }
+    
+    protected SearchUtils.TreeHelper getSearchHelper() {
+        return new SearchUtils.TreeHelper() {
+            public int getNodeType(TreeNode tnode) {
+                PresoObjAllocCCTNode node = (PresoObjAllocCCTNode)tnode;
+                CCTNode parent = node.getParent();
+                if (parent == null) return SearchUtils.TreeHelper.NODE_SKIP_DOWN; // invisible root
+                
+                if (isSQL(node)) {
+                    if (searchQueries) {
+                        return searchCallerMethods ? SearchUtils.TreeHelper.NODE_SEARCH_DOWN :
+                                                     SearchUtils.TreeHelper.NODE_SEARCH_NEXT;
+                    } else {
+                        return searchCallerMethods ? SearchUtils.TreeHelper.NODE_SKIP_DOWN :
+                                                     SearchUtils.TreeHelper.NODE_SKIP_NEXT;
+                    }
+                }
+                
+                return searchCallerMethods ?
+                       SearchUtils.TreeHelper.NODE_SEARCH_DOWN :
+                       SearchUtils.TreeHelper.NODE_SKIP_NEXT;
+            }
+        };
+    }
+    
+    protected Component[] getSearchOptions() {
+        PopupButton pb = new PopupButton (Icons.getIcon(ProfilerIcons.TAB_CALL_TREE)) {
+            protected void populatePopup(JPopupMenu popup) {
+                popup.add(new JCheckBoxMenuItem(SEARCH_QUERIES_SCOPE, searchQueries) {
+                    {
+                        if (!searchCallerMethods) setEnabled(false);
+                    }
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        searchQueries = !searchQueries;
+                    }
+                });
+                popup.add(new JCheckBoxMenuItem(SEARCH_CALLERS_SCOPE, searchCallerMethods) {
+                    {
+                        if (!searchQueries) setEnabled(false);
+                    }
+                    protected void fireActionPerformed(ActionEvent e) {
+                        super.fireActionPerformed(e);
+                        searchCallerMethods = !searchCallerMethods;
+                    }
+                });
+            }
+        };
+        pb.setToolTipText(SEARCH_SCOPE_TOOLTIP);
+        return new Component[] { Box.createHorizontalStrut(5), pb };
     }
     
     protected ProfilerTable getResultsComponent() {

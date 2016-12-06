@@ -71,6 +71,7 @@ public final class UIUtils {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     // Used to mark explicit expand/collapse on JTree which shouldn't be handled by automatic expander
+    public static final String PROP_AUTO_EXPANDING = "auto_expanding"; // NOI18N
     public static final String PROP_EXPANSION_TRANSACTION = "expansion_transaction"; // NOI18N
     public static Dimension DIMENSION_SMALLEST = new Dimension(0, 0);
 
@@ -610,8 +611,13 @@ public final class UIUtils {
                     TreePath path = event.getPath();
                     JTree tree = (JTree) event.getSource();
                     internalChange = true;
-                    autoExpand(tree, path, MAX_TREE_AUTOEXPAND_LINES, maxChildToExpand, dontExpandToLeafs);
-                    internalChange = false;
+                    tree.putClientProperty(PROP_AUTO_EXPANDING, Boolean.TRUE);
+                    try {
+                        autoExpand(tree, path, MAX_TREE_AUTOEXPAND_LINES, maxChildToExpand, dontExpandToLeafs);
+                    } finally {
+                        tree.putClientProperty(PROP_AUTO_EXPANDING, null);
+                        internalChange = false;
+                    }
                 }
             });
     }
