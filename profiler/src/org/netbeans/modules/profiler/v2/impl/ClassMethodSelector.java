@@ -162,12 +162,6 @@ public final class ClassMethodSelector {
                                                    new Object[] { ui.getOKButton(), DialogDescriptor.CANCEL_OPTION },
                                                    ui.getOKButton(), DialogDescriptor.BOTTOM_ALIGN, helpCtx, null);
         Dialog d = DialogDisplayer.getDefault().createDialog(dd);
-        
-        if (d.getComponentCount() > 0) {
-            Component c = d.getComponent(0);
-            if (c instanceof JComponent) ((JComponent)c).putClientProperty("HidePopupKey", Boolean.FALSE); // NOI18N
-        }
-        
         d.setVisible(true);
         
         return dd.getValue() == ui.getOKButton() ? ui.selectedClasses() : Collections.EMPTY_LIST;
