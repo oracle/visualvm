@@ -59,7 +59,7 @@ import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.ui.swing.FilteringToolbar;
-import org.netbeans.lib.profiler.ui.swing.ProfilerPopupFactory;
+import org.netbeans.lib.profiler.ui.swing.ProfilerPopup;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.SmallButton;
@@ -118,7 +118,8 @@ abstract class TablesSelector {
         
         void show(Component invoker) {
             Dimension panelSize = panel.getPreferredSize();
-            ProfilerPopupFactory.getPopup(invoker, panel, invoker.getWidth() - panelSize.width - 6, -panelSize.height - 6).show();
+//            ProfilerPopupFactory.getPopup(invoker, panel, invoker.getWidth() - panelSize.width - 6, -panelSize.height - 6).show();
+            ProfilerPopup.create(invoker, panel, invoker.getWidth() - panelSize.width - 6, -panelSize.height - 6).show();
         }
         
         private void populatePopup() {
