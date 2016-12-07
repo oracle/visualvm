@@ -46,6 +46,7 @@ package org.netbeans.lib.profiler.ui.threads;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ResourceBundle;
+import javax.swing.SwingConstants;
 import org.netbeans.lib.profiler.results.threads.ThreadData;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.renderer.BaseRenderer;
@@ -73,6 +74,7 @@ public class TimelineRenderer extends BaseRenderer {
         this.view = view;
         
         setOpaque(true);
+        setHorizontalAlignment(SwingConstants.TRAILING); // #269252
         
         putClientProperty(ProfilerTable.PROP_NO_HOVER, this);
     }

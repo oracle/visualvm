@@ -88,7 +88,7 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.PopupButton;
-import org.netbeans.lib.profiler.ui.swing.ProfilerPopupFactory;
+import org.netbeans.lib.profiler.ui.swing.ProfilerPopup;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.modules.profiler.ProfilerTopComponent;
 import org.netbeans.modules.profiler.actions.HeapDumpAction;
@@ -429,7 +429,7 @@ class ProfilerWindow extends ProfilerTopComponent {
                 // Do not change focus for these special cases:
                 if (focused != null) {
                     if (profilePopupVisible) return; // focus in the Profile popup
-                    if (ProfilerPopupFactory.isInPopup(focused)) return; // focus in a profiler popup
+                    if (ProfilerPopup.isInPopup(focused)) return; // focus in a profiler popup
                     if (ProfilerWindow.this.isAncestorOf(focused)) return; // focus inside the ProfilerWindow
                 }
 
