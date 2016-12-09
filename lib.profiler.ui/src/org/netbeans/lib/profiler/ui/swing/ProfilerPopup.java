@@ -54,6 +54,7 @@ import java.awt.Window;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.lang.ref.Reference;
@@ -243,6 +244,18 @@ public final class ProfilerPopup {
                     // except of the owner
                     skippingEvents = true;
                     if (DEBUG) System.err.println(">>> LOST TO DIALOG " + getString(d) + " owned by " + getString(d.getOwner())); // NOI18N
+                    // NOTE: workaround for problem on Mac OS X,
+                    //       closing the dialog opened from ProfilerPopup
+                    //       doesn't bring the focus back to the ProfilerPopup
+                    final Window win = window;
+                    final Component comp = window.getMostRecentFocusOwner();
+                    d.addWindowListener(new WindowAdapter() {
+                        public void windowClosed(WindowEvent e) {
+                            if (DEBUG) System.err.println(">>> BLOCKING DIALOG CLOSED " + getString(d)); // NOI18N
+                            win.requestFocus();
+                            if (comp != null) comp.requestFocus();
+                        }
+                    });
                     return;
                 }
             } else if (e.getOppositeWindow() == owner) {
