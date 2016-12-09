@@ -121,18 +121,19 @@ public final class ClassMethodList {
         
         
         void show(Component invoker) {
-            ProfilerPopup.create(invoker, panel, -5, invoker.getHeight() - 1).show();
+            int resizeMode = ProfilerPopup.RESIZE_BOTTOM | ProfilerPopup.RESIZE_RIGHT;
+            ProfilerPopup.create(invoker, panel, -5, invoker.getHeight() - 1, resizeMode).show();
         }
         
         
         private UI(final ProfilerSession session, final Set<ClientUtils.SourceCodeSelection> selection, final boolean methods) {
             
-            JPanel content = new JPanel(new BorderLayout(8, 3));
-            content.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
+            JPanel content = new JPanel(new BorderLayout());
             
-            JLabel caption = new JLabel(methods ? Bundle.ClassMethodList_selectedMethods() :
+            JLabel hint = new JLabel(methods ? Bundle.ClassMethodList_selectedMethods() :
                                                   Bundle.ClassMethodList_selectedClasses(), JLabel.LEADING);
-            content.add(caption, BorderLayout.NORTH);
+            hint.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
+            content.add(hint, BorderLayout.NORTH);
             
             class XListModel extends AbstractListModel<ClientUtils.SourceCodeSelection> {
                 public int getSize() {
@@ -233,10 +234,11 @@ public final class ClassMethodList {
             });
             
             JScrollPane scroll = new JScrollPane(list);
-            caption.setLabelFor(scroll);
+            hint.setLabelFor(scroll);
             content.add(scroll, BorderLayout.CENTER);
             
             JPanel buttons = new JPanel(null);
+            buttons.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
             buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
             buttons.add(addB);
             buttons.add(removeB);

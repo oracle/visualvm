@@ -140,13 +140,12 @@ public abstract class FilterSelector {
         }
         
         void show(Component invoker) {
-//            ProfilerPopupFactory.getPopup(invoker, panel, invoker.getWidth() - panel.getPreferredSize().width, invoker.getHeight()).show();
-            ProfilerPopup.create(invoker, panel, invoker.getWidth() - panel.getPreferredSize().width, invoker.getHeight()).show();
+            int resizeMode = ProfilerPopup.RESIZE_LEFT | ProfilerPopup.RESIZE_BOTTOM;
+            ProfilerPopup.create(invoker, panel, invoker.getWidth() - panel.getPreferredSize().width, invoker.getHeight(), resizeMode).show();
         }
         
         private void populatePopup(FilterName filterName, String filterValue) {
             JPanel content = new JPanel(new BorderLayout());
-            content.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
             
             JLabel hint = new JLabel(Bundle.FilterSelector_outgoingCalls(), JLabel.LEADING);
             hint.setBorder(BorderFactory.createEmptyBorder(0, 0, 7, 0));
