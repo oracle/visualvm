@@ -201,10 +201,12 @@ public final class ProfilerPopup {
             setFocusTraversalPolicyProvider(true);
             setFocusTraversalPolicy(new PopupFocusTraversalPolicy());
             
-            JPopupMenu ref = new JPopupMenu();
-            if (!UIUtils.isNimbus()) setBorder(ref.getBorder());
-            else setBorder(BorderFactory.createLineBorder(UIUtils.getDisabledLineColor()));
-            setBackground(ref.getBackground());
+            if (!UIUtils.isAquaLookAndFeel()) {
+                JPopupMenu ref = new JPopupMenu();
+                if (!UIUtils.isNimbus()) setBorder(ref.getBorder());
+                else setBorder(BorderFactory.createLineBorder(UIUtils.getDisabledLineColor()));
+                setBackground(ref.getBackground());
+            }
         }
         
         
