@@ -111,6 +111,8 @@ public final class ProfilerPopup {
     private JWindow window;
     private Window owner;
     
+    private Point ownerLocation;
+    
     private final Listener listener;
     
     private final int resizeMode;
@@ -142,6 +144,7 @@ public final class ProfilerPopup {
 //        if (focusOwner != null) focusRef = new WeakReference(focusOwner);
             
         owner = ownerRef == null ? null : ownerRef.get();
+        ownerLocation = owner == null ? null : owner.getLocationOnScreen();
         
         window = new JWindow(owner);
         window.setType(Window.Type.POPUP);
@@ -166,7 +169,9 @@ public final class ProfilerPopup {
     
     public void hide() {
         content.uninstallListeners();
+        
         owner = null;
+        ownerLocation = null;
 
         window.setVisible(false);
         window.dispose();
@@ -519,7 +524,12 @@ public final class ProfilerPopup {
         
         public void componentResized(ComponentEvent e) { if (DEBUG) System.err.println(">>> Closed by componentResized"); ProfilerPopup.this.hide(); }
 
-        public void componentMoved(ComponentEvent e)   { if (DEBUG) System.err.println(">>> Closed by componentMoved"); ProfilerPopup.this.hide(); }
+        public void componentMoved(ComponentEvent e)   {
+            Point newLocation = owner.getLocationOnScreen();
+            window.setLocation(window.getX() + (newLocation.x - ownerLocation.x),
+                               window.getY() + (newLocation.y - ownerLocation.y));
+            ownerLocation = newLocation;
+        }
 
         public void componentShown(ComponentEvent e)   { }
 
