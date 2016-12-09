@@ -163,7 +163,10 @@ public abstract class FilterSelector {
             noFilterChoice = new JRadioButton(Bundle.FilterSelector_noFilter(),
                                 FilterName.NO_FILTER.equals(filterName));
             bg.add(noFilterChoice);
-            filters.add(noFilterChoice);
+            JPanel noFilter = new JPanel(null);
+            noFilter.setLayout(new BoxLayout(noFilter, BoxLayout.LINE_AXIS));
+            noFilter.add(noFilterChoice);
+            filters.add(noFilter);
             
             javaClassesChoice = new JRadioButton(Bundle.FilterSelector_excludeCoreJava(),
                                 FilterName.EXCLUDE_JAVA_FILTER.equals(filterName));
