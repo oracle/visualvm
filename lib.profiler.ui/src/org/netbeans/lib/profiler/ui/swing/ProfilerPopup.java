@@ -42,11 +42,15 @@
 package org.netbeans.lib.profiler.ui.swing;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.FocusTraversalPolicy;
 import java.awt.Frame;
+import java.awt.Graphics;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
@@ -54,6 +58,10 @@ import java.awt.Window;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.lang.ref.Reference;
@@ -74,6 +82,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 import org.netbeans.lib.profiler.ui.UIUtils;
 
 /**
@@ -83,7 +92,15 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 public final class ProfilerPopup {
     
     private static final boolean DEBUG = Boolean.getBoolean("ProfilerPopup.DebugWindows"); // NOI18N
+    
     private static final int IGNORE_OWNER_TIMEOUT = Integer.getInteger("ProfilerPopup.OwnerTimeout", 40); // NOI18N
+    private static final int RESIZE_STRIPE = Integer.getInteger("ProfilerPopup.ResizeStripe", 10); // NOI18N
+    
+    public static final int RESIZE_NONE    = 0;
+    public static final int RESIZE_TOP     = 1;
+    public static final int RESIZE_LEFT    = 2;
+    public static final int RESIZE_BOTTOM  = 4;
+    public static final int RESIZE_RIGHT   = 8;
     
 //    private Reference<Component> focusRef;
     private final Reference<Window> ownerRef;
@@ -94,14 +111,22 @@ public final class ProfilerPopup {
     private JWindow window;
     private Window owner;
     
+    private Point ownerLocation;
+    
     private final Listener listener;
+    
+    private final int resizeMode;
     
     
     public static ProfilerPopup create(Component invoker, Component content, int x, int y) {
-        return create(invoker, content, x, y, null);
+        return create(invoker, content, x, y, RESIZE_NONE, null);
     }
     
-    public static ProfilerPopup create(Component invoker, Component content, int x, int y, Listener listener) {
+    public static ProfilerPopup create(Component invoker, Component content, int x, int y, int resizeMode) {
+        return create(invoker, content, x, y, resizeMode, null);
+    }
+    
+    public static ProfilerPopup create(Component invoker, Component content, int x, int y, int resizeMode, Listener listener) {
         Point location = new Point(x, y);
         Window owner = null;
         
@@ -110,7 +135,7 @@ public final class ProfilerPopup {
             owner = SwingUtilities.getWindowAncestor(invoker);
         }
         
-        return new ProfilerPopup(content, location, owner, listener);
+        return new ProfilerPopup(content, location, owner, resizeMode, listener);
     }
     
     
@@ -119,6 +144,7 @@ public final class ProfilerPopup {
 //        if (focusOwner != null) focusRef = new WeakReference(focusOwner);
             
         owner = ownerRef == null ? null : ownerRef.get();
+        ownerLocation = owner == null ? null : owner.getLocationOnScreen();
         
         window = new JWindow(owner);
         window.setType(Window.Type.POPUP);
@@ -143,7 +169,9 @@ public final class ProfilerPopup {
     
     public void hide() {
         content.uninstallListeners();
+        
         owner = null;
+        ownerLocation = null;
 
         window.setVisible(false);
         window.dispose();
@@ -169,6 +197,15 @@ public final class ProfilerPopup {
     }
     
     
+    private ProfilerPopup(Component component, Point location, Window owner, int resizeMode, Listener listener) {
+        this.content = new PopupPane(component, resizeMode != RESIZE_NONE);
+        this.location = location;
+        this.ownerRef = owner == null ? null : new WeakReference(owner);
+        this.resizeMode = resizeMode;
+        this.listener = listener;
+    }
+    
+    
     public static abstract class Listener {
         
         protected void popupShown() {}
@@ -178,21 +215,14 @@ public final class ProfilerPopup {
     }
     
     
-    private ProfilerPopup(Component component, Point location, Window owner, Listener listener) {
-        this.content = new PopupPane(component);
-        this.location = location;
-        this.ownerRef = owner == null ? null : new WeakReference(owner);
-        this.listener = listener;
-    }
-    
-    
-    private class PopupPane extends JPanel implements WindowFocusListener, ComponentListener, KeyEventDispatcher {
+    private class PopupPane extends JPanel implements WindowFocusListener, ComponentListener, KeyEventDispatcher,
+                                                      MouseListener, MouseMotionListener {
         
         private boolean skippingEvents;
         private long gainedFocusTime;
         
         
-        PopupPane(Component content) {
+        PopupPane(Component content, boolean resize) {
             super(new BorderLayout());
             add(content, BorderLayout.CENTER);
             
@@ -200,12 +230,211 @@ public final class ProfilerPopup {
             setFocusTraversalPolicyProvider(true);
             setFocusTraversalPolicy(new PopupFocusTraversalPolicy());
             
-            JPopupMenu ref = new JPopupMenu();
-            if (!UIUtils.isNimbus()) setBorder(ref.getBorder());
-            else setBorder(BorderFactory.createLineBorder(UIUtils.getDisabledLineColor()));
-            setBackground(ref.getBackground());
+            if (UIUtils.isAquaLookAndFeel()) {
+                if (resize) {
+                    setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+                    addMouseListener(this);
+                    addMouseMotionListener(this);
+                }
+            } else {
+                JPopupMenu ref = new JPopupMenu();
+                Border border = !UIUtils.isNimbus() ? ref.getBorder() :
+                                 BorderFactory.createLineBorder(UIUtils.getDisabledLineColor());
+                
+                if (resize) {
+                    setBorder(BorderFactory.createCompoundBorder(border,
+                              BorderFactory.createEmptyBorder(8, 8, 8, 8)));
+                    addMouseListener(this);
+                    addMouseMotionListener(this);
+                } else {
+                    setBorder(border);
+                }
+
+                setBackground(ref.getBackground());
+            }
         }
         
+        
+        // --- Resizing --------------------------------------------------------
+        
+        private boolean dragging;
+        private int currentResizing;
+        private int dragX, dragY = -1;
+        
+        public void mouseClicked(MouseEvent e) { }
+        
+        public void mousePressed(MouseEvent e) {
+            dragging = true;
+            dragX = e.getXOnScreen();
+            dragY = e.getYOnScreen();
+        }
+
+        public void mouseReleased(MouseEvent e) {
+            dragging = false;
+            dragX = -1;
+            dragY = -1;
+            updateResizing(e);
+        }
+
+        public void mouseEntered(MouseEvent e) {
+            if (!dragging) updateResizing(e);
+        }
+
+        public void mouseExited(MouseEvent e)  {
+            if (!dragging) {
+                currentResizing = RESIZE_NONE;
+                setCursor(Cursor.getDefaultCursor());
+            }
+        }
+        
+        public void mouseMoved(MouseEvent e) {
+            if (!dragging) updateResizing(e);
+        }
+        
+        public void mouseDragged(MouseEvent e) {
+            if (dragX >= 0 && dragY >= 0) {
+                int x = e.getXOnScreen();
+                int y = e.getYOnScreen();
+                
+                int dx = x - dragX;
+                int dy = y - dragY;
+                
+                int newX = window.getX();
+                int newY = window.getY();
+                int newW = window.getWidth();
+                int newH = window.getHeight();
+                
+                int xx = 0;
+                int yy = 0;
+                Dimension min = window.getMinimumSize();
+                
+                if (isResizeLeft(currentResizing)) {
+                    newX += dx;
+                    newW -= dx;
+                    if (newW < min.width) {
+                        xx = newW - min.width;
+                        newX += xx;
+                        newW = min.width;
+                    }
+                } else if (isResizeRight(currentResizing)) {
+                    newW += dx;
+                    if (newW < min.width) {
+                        xx = min.width - newW;
+                        newW = min.width;
+                    }
+                }
+                if (isResizeTop(currentResizing)) {
+                    newY += dy;
+                    newH -= dy;
+                    if (newH < min.height) {
+                        yy = newH - min.height;
+                        newY += yy;
+                        newH = min.height;
+                    }
+                } else if (isResizeBottom(currentResizing)) {
+                    newH += dy;
+                    if (newH < min.height) {
+                        yy = min.height - newH;
+                        newH = min.height;
+                    }
+                }
+                
+                window.setBounds(newX, newY, newW, newH);
+                content.setSize(newW, newH);
+                
+                dragX = x + xx;
+                dragY = y + yy;
+            }
+        }
+
+        private void updateResizing(MouseEvent e) {
+            int newResizing = RESIZE_NONE;
+            
+            int x = e.getX();
+            int y = e.getY();
+            
+            if (isResizeLeft(resizeMode) && x < 8 && x >= 0) {
+                newResizing |= RESIZE_LEFT;
+            } else if (isResizeRight(resizeMode) && x > getWidth() - RESIZE_STRIPE && x < getWidth()) {
+                newResizing |= RESIZE_RIGHT;
+            }
+            
+            if (isResizeTop(resizeMode)&& y < 8 && y >= 0) {
+                newResizing |= RESIZE_TOP;
+            } else if (isResizeBottom(resizeMode)&& y > getHeight() - RESIZE_STRIPE && y < getHeight()) {
+                newResizing |= RESIZE_BOTTOM;
+            }
+            
+            currentResizing = newResizing;
+            
+            switch (currentResizing) {
+                case RESIZE_NONE:
+                    setCursor(Cursor.getDefaultCursor());
+                    break;
+                case RESIZE_TOP:
+                    setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
+                    break;
+                case RESIZE_LEFT:
+                    setCursor(Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR));
+                    break;
+                case RESIZE_BOTTOM:
+                    setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
+                    break;
+                case RESIZE_RIGHT:
+                    setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+                    break;
+                case RESIZE_TOP | RESIZE_LEFT:
+                    setCursor(Cursor.getPredefinedCursor(Cursor.NW_RESIZE_CURSOR));
+                    break;
+                case RESIZE_LEFT | RESIZE_BOTTOM:
+                    setCursor(Cursor.getPredefinedCursor(Cursor.SW_RESIZE_CURSOR));
+                    break;
+                case RESIZE_BOTTOM | RESIZE_RIGHT:
+                    setCursor(Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR));
+                    break;
+                case RESIZE_RIGHT | RESIZE_TOP:
+                    setCursor(Cursor.getPredefinedCursor(Cursor.NE_RESIZE_CURSOR));
+                    break;
+            }
+        }
+        
+        public void paint(Graphics g) {
+            super.paint(g);
+            
+            if (resizeMode > 0) {
+                g.setColor(Color.GRAY);
+                
+                switch (resizeMode) {
+                    case RESIZE_TOP | RESIZE_LEFT:
+                        g.drawLine(0, 5, 5, 0);
+                        g.drawLine(0, 9, 9, 0);
+                        break;
+                    case RESIZE_TOP | RESIZE_RIGHT:
+                        int w = getWidth();
+                        g.drawLine(w - 6, 0, w, 6);
+                        g.drawLine(w - 10, 0, w, 10);
+                        break;
+                    case RESIZE_BOTTOM | RESIZE_LEFT:
+                        int h = getHeight();
+                        g.drawLine(0, h - 6, 6, h);
+                        g.drawLine(0, h - 10, 10, h);
+                        break;
+                    default:
+                        w = getWidth();
+                        h = getHeight();
+                        g.drawLine(w, h - 7, w - 7, h);
+                        g.drawLine(w, h - 11, w - 11, h);
+                }
+            }
+        }
+        
+        boolean isResizeTop(int mode)    { return (mode & RESIZE_TOP) != 0; }
+        boolean isResizeLeft(int mode)   { return (mode & RESIZE_LEFT) != 0; }
+        boolean isResizeBottom(int mode) { return (mode & RESIZE_BOTTOM) != 0; }
+        boolean isResizeRight(int mode)  { return (mode & RESIZE_RIGHT) != 0; }
+        
+        
+        // --- Closing ---------------------------------------------------------
         
         void installListeners() {
             window.addWindowFocusListener(this);
@@ -243,6 +472,18 @@ public final class ProfilerPopup {
                     // except of the owner
                     skippingEvents = true;
                     if (DEBUG) System.err.println(">>> LOST TO DIALOG " + getString(d) + " owned by " + getString(d.getOwner())); // NOI18N
+                    // NOTE: workaround for problem on Mac OS X,
+                    //       closing the dialog opened from ProfilerPopup
+                    //       doesn't bring the focus back to the ProfilerPopup
+                    final Window win = window;
+                    final Component comp = window.getMostRecentFocusOwner();
+                    d.addWindowListener(new WindowAdapter() {
+                        public void windowClosed(WindowEvent e) {
+                            if (DEBUG) System.err.println(">>> BLOCKING DIALOG CLOSED " + getString(d)); // NOI18N
+                            win.requestFocus();
+                            if (comp != null) comp.requestFocus();
+                        }
+                    });
                     return;
                 }
             } else if (e.getOppositeWindow() == owner) {
@@ -275,7 +516,7 @@ public final class ProfilerPopup {
         private String getString(Component c) {
             if (c instanceof Dialog) return "[dialog] " + ((Dialog)c).getTitle(); // NOI18N
             else if (c instanceof Frame) return "[frame] " + ((Frame)c).getTitle(); // NOI18N
-            else return c.getClass().getName();
+            else return c == null ? "null" : c.getClass().getName(); // NOI18N
         }
         
         
@@ -283,7 +524,12 @@ public final class ProfilerPopup {
         
         public void componentResized(ComponentEvent e) { if (DEBUG) System.err.println(">>> Closed by componentResized"); ProfilerPopup.this.hide(); }
 
-        public void componentMoved(ComponentEvent e)   { if (DEBUG) System.err.println(">>> Closed by componentMoved"); ProfilerPopup.this.hide(); }
+        public void componentMoved(ComponentEvent e)   {
+            Point newLocation = owner.getLocationOnScreen();
+            window.setLocation(window.getX() + (newLocation.x - ownerLocation.x),
+                               window.getY() + (newLocation.y - ownerLocation.y));
+            ownerLocation = newLocation;
+        }
 
         public void componentShown(ComponentEvent e)   { }
 
@@ -304,7 +550,7 @@ public final class ProfilerPopup {
                 }
             
             return false;
-        }        
+        }
         
     }
     

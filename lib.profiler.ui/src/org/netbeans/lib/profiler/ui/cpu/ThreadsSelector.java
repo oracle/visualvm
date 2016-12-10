@@ -176,15 +176,18 @@ public abstract class ThreadsSelector extends PopupButton {
 //        String[] threadNames = snapshot == null ? null : snapshot.getThreadNames();
         
         JPanel content = new JPanel(new BorderLayout());
-        content.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        
+        int resizeMode;
         
         if (threadIDs == null || threadIDs.length == 0) {
+            content.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
             JLabel noThreads = new JLabel(NO_THREADS);
             noThreads.setOpaque(false);
             content.add(noThreads, BorderLayout.CENTER);
+            resizeMode = ProfilerPopup.RESIZE_NONE;
         } else {
             JLabel hint = new JLabel(SELECT_THREADS, JLabel.LEADING);
-            hint.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+            hint.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
             content.add(hint, BorderLayout.NORTH);
             
             final SelectedThreadsModel threadsModel = new SelectedThreadsModel();
@@ -208,7 +211,10 @@ public abstract class ThreadsSelector extends PopupButton {
             Dimension prefSize = new Dimension(threadsRenderer.getPreferredSize().width, h);
             threadsTable.setPreferredScrollableViewportSize(prefSize);
             ProfilerTableContainer tableContainer = new ProfilerTableContainer(threadsTable, true, null);
-            content.add(tableContainer, BorderLayout.CENTER);
+            JPanel tableContent = new JPanel(new BorderLayout());
+            tableContent.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+            tableContent.add(tableContainer, BorderLayout.CENTER);
+            content.add(tableContent, BorderLayout.CENTER);
             
             JToolBar controls = new FilteringToolbar(FILTER_THREADS) {
                 protected void filterChanged() {
@@ -273,6 +279,8 @@ public abstract class ThreadsSelector extends PopupButton {
             controls.add(Box.createHorizontalStrut(20));
             
             content.add(controls, BorderLayout.SOUTH);
+            
+            resizeMode = ProfilerPopup.RESIZE_BOTTOM | ProfilerPopup.RESIZE_RIGHT;
         }
 
         ProfilerPopup.Listener listener = new ProfilerPopup.Listener() {
@@ -285,8 +293,8 @@ public abstract class ThreadsSelector extends PopupButton {
                 allThreadsResetter = null;
             }
         };
-
-        ProfilerPopup.create(this, content, -5, getHeight() - 1, listener).show();
+        
+        ProfilerPopup.create(this, content, -5, getHeight() - 1, resizeMode, listener).show();
     }
     
     
