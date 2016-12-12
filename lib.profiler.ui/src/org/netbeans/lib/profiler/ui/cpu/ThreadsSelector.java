@@ -59,6 +59,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
+import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
@@ -294,7 +295,7 @@ public abstract class ThreadsSelector extends PopupButton {
             }
         };
         
-        ProfilerPopup.create(this, content, -5, getHeight() - 1, resizeMode, listener).show();
+        ProfilerPopup.createRelative(this, content, SwingConstants.SOUTH_WEST, resizeMode, listener).show();
     }
     
     

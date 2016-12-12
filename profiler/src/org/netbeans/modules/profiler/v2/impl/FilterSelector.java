@@ -65,6 +65,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import org.netbeans.lib.profiler.ui.results.ColoredFilter;
@@ -141,7 +142,7 @@ public abstract class FilterSelector {
         
         void show(Component invoker) {
             int resizeMode = ProfilerPopup.RESIZE_LEFT | ProfilerPopup.RESIZE_BOTTOM;
-            ProfilerPopup.create(invoker, panel, invoker.getWidth() - panel.getPreferredSize().width, invoker.getHeight(), resizeMode).show();
+            ProfilerPopup.createRelative(invoker, panel, SwingConstants.SOUTH_EAST, resizeMode).show();
         }
         
         private void populatePopup(FilterName filterName, String filterValue) {

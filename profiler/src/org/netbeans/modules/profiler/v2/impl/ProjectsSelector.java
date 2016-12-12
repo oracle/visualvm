@@ -57,6 +57,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
+import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.ui.swing.FilteringToolbar;
 import org.netbeans.lib.profiler.ui.swing.ProfilerPopup;
@@ -108,7 +109,7 @@ public abstract class ProjectsSelector {
         
         void show(Component invoker) {
             int resizeMode = ProfilerPopup.RESIZE_BOTTOM | ProfilerPopup.RESIZE_RIGHT;
-            ProfilerPopup.create(invoker, panel, -5, invoker.getHeight() - 1, resizeMode).show();
+            ProfilerPopup.createRelative(invoker, panel, SwingConstants.SOUTH_WEST, resizeMode).show();
         }
         
         private void populatePopup() {

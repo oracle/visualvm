@@ -53,6 +53,7 @@ import java.awt.Graphics;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -80,6 +81,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.JWindow;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -105,7 +107,8 @@ public final class ProfilerPopup {
     private final Reference<Window> ownerRef;
     
     private final PopupPane content;
-    private final Point location;
+    private final Rectangle location;
+    private final int popupAlign;
     
     private JWindow window;
     private Window owner;
@@ -118,23 +121,44 @@ public final class ProfilerPopup {
     
     
     public static ProfilerPopup create(Component invoker, Component content, int x, int y) {
-        return create(invoker, content, x, y, RESIZE_NONE, null);
+        return create(invoker, content, x, y, RESIZE_NONE);
+    }
+    
+    public static ProfilerPopup createRelative(Component invoker, Component content, int popupAlign) {
+        if (invoker == null) throw new IllegalArgumentException("Invoker cannot be null for relative popups"); // NOI18N
+        return createRelative(invoker, content, popupAlign, RESIZE_NONE);
     }
     
     public static ProfilerPopup create(Component invoker, Component content, int x, int y, int resizeMode) {
         return create(invoker, content, x, y, resizeMode, null);
     }
     
+    public static ProfilerPopup createRelative(Component invoker, Component content, int popupAlign, int resizeMode) {
+        if (invoker == null) throw new IllegalArgumentException("Invoker cannot be null for relative popups"); // NOI18N
+        return createRelative(invoker, content, popupAlign, resizeMode, null);
+    }
+    
     public static ProfilerPopup create(Component invoker, Component content, int x, int y, int resizeMode, Listener listener) {
+        return create(invoker, content, x, y, -1, resizeMode, listener);
+    }
+    
+    public static ProfilerPopup createRelative(Component invoker, Component content, int popupAlign, int resizeMode, Listener listener) {
+        if (invoker == null) throw new IllegalArgumentException("Invoker cannot be null for relative popups"); // NOI18N
+        return create(invoker, content, -1, -1, popupAlign, resizeMode, listener);
+    }
+    
+    private static ProfilerPopup create(Component invoker, Component content, int x, int y, int popupAlign, int resizeMode, Listener listener) {
         Point location = new Point(x, y);
+        Dimension size = new Dimension();
         Window owner = null;
         
         if (invoker != null) {
             SwingUtilities.convertPointToScreen(location, invoker);
+            size.setSize(invoker.getSize());
             owner = SwingUtilities.getWindowAncestor(invoker);
         }
         
-        return new ProfilerPopup(content, location, owner, resizeMode, listener);
+        return new ProfilerPopup(content, new Rectangle(location, size), popupAlign, owner, resizeMode, listener);
     }
     
     
@@ -154,7 +178,38 @@ public final class ProfilerPopup {
         
         window.getContentPane().add(content);
         window.pack();
-        window.setLocation(location);
+        
+        if (popupAlign == -1) {
+            window.setLocation(location.getLocation());
+        } else {
+            Dimension size = content.getSize();
+            
+            int x;
+            switch (popupAlign) {
+                case SwingConstants.EAST:
+                case SwingConstants.NORTH_EAST:
+                case SwingConstants.SOUTH_EAST:
+                    x = location.x + location.width - size.width + 1;
+                    break;
+                default:
+                    x = location.x + 1;
+                    break;
+            }
+            
+            int y;
+            switch (popupAlign) {
+                case SwingConstants.NORTH:
+                case SwingConstants.NORTH_EAST:
+                case SwingConstants.NORTH_WEST:
+                    y = location.y - size.height + 1;
+                    break;
+                default:
+                    y = location.y + location.height + 1;
+                    break;
+            }
+            
+            window.setLocation(x, y);
+        }
         
         window.setVisible(true);
         
@@ -196,9 +251,10 @@ public final class ProfilerPopup {
     }
     
     
-    private ProfilerPopup(Component component, Point location, Window owner, int resizeMode, Listener listener) {
+    private ProfilerPopup(Component component, Rectangle location, int popupAlign, Window owner, int resizeMode, Listener listener) {
         this.content = new PopupPane(component, resizeMode != RESIZE_NONE);
         this.location = location;
+        this.popupAlign = popupAlign;
         this.ownerRef = owner == null ? null : new WeakReference(owner);
         this.resizeMode = resizeMode;
         this.listener = listener;

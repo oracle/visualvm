@@ -63,6 +63,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -122,7 +123,7 @@ public final class ClassMethodList {
         
         void show(Component invoker) {
             int resizeMode = ProfilerPopup.RESIZE_BOTTOM | ProfilerPopup.RESIZE_RIGHT;
-            ProfilerPopup.create(invoker, panel, -5, invoker.getHeight() - 1, resizeMode).show();
+            ProfilerPopup.createRelative(invoker, panel, SwingConstants.SOUTH_WEST, resizeMode).show();
         }
         
         
