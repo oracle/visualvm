@@ -42,7 +42,6 @@
 package org.netbeans.lib.profiler.ui.swing;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -402,7 +401,7 @@ public final class ProfilerPopup {
             super.paint(g);
             
             if (resizeMode > 0) {
-                g.setColor(Color.GRAY);
+                g.setColor(UIUtils.getDisabledLineColor());
                 
                 switch (resizeMode) {
                     case RESIZE_TOP | RESIZE_LEFT:
