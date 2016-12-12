@@ -70,7 +70,7 @@ import javax.swing.border.Border;
 import org.netbeans.lib.profiler.ui.results.ColoredFilter;
 import org.netbeans.lib.profiler.ui.results.PackageColorer;
 import org.netbeans.lib.profiler.ui.swing.PopupButton;
-import org.netbeans.lib.profiler.ui.swing.ProfilerPopupFactory;
+import org.netbeans.lib.profiler.ui.swing.ProfilerPopup;
 import org.netbeans.lib.profiler.ui.swing.TextArea;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -140,7 +140,8 @@ public abstract class FilterSelector {
         }
         
         void show(Component invoker) {
-            ProfilerPopupFactory.getPopup(invoker, panel, invoker.getWidth() - panel.getPreferredSize().width, invoker.getHeight()).show();
+//            ProfilerPopupFactory.getPopup(invoker, panel, invoker.getWidth() - panel.getPreferredSize().width, invoker.getHeight()).show();
+            ProfilerPopup.create(invoker, panel, invoker.getWidth() - panel.getPreferredSize().width, invoker.getHeight()).show();
         }
         
         private void populatePopup(FilterName filterName, String filterValue) {
