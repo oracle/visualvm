@@ -42,6 +42,7 @@
 package org.netbeans.modules.profiler;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.lang.management.LockInfo;
 import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
@@ -78,6 +79,9 @@ public class ThreadDumpWindow extends ProfilerTopComponent {
     //~ Static fields/initializers -----------------------------------------------------------------------------------------------
     private static final String HELP_CTX_KEY = "ThreadDumpWindow.HelpCtx"; // NOI18N
     private static final HelpCtx HELP_CTX = new HelpCtx(HELP_CTX_KEY);
+    
+    
+    private HTMLTextArea a;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
     /**
@@ -97,7 +101,7 @@ public class ThreadDumpWindow extends ProfilerTopComponent {
 
         StringBuilder text = new StringBuilder();
         printThreads(text, td);
-        HTMLTextArea a = new HTMLTextArea() {
+        a = new HTMLTextArea() {
             protected void showURL(URL url) {
                 if (url == null) {
                     return;
@@ -113,6 +117,10 @@ public class ThreadDumpWindow extends ProfilerTopComponent {
         sp.setBorder(BorderFactory.createEmptyBorder());
         sp.setViewportBorder(BorderFactory.createEmptyBorder());
         add(sp, BorderLayout.CENTER);
+    }
+    
+    protected Component defaultFocusOwner() {
+        return a;
     }
 
     public int getPersistenceType() {
