@@ -67,6 +67,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
@@ -205,18 +206,19 @@ abstract class SQLFilterPanel extends JPanel {
             }
         };
         commands.setToolTipText(COMMANDS_TOOLTIP);
+        commands.setPopupAlign(SwingConstants.NORTH_WEST);
         toolbar.add(commands);
         
         toolbar.add(Box.createHorizontalStrut(5));
         
         PopupButton tables = new PopupButton(" " + TABLES_DROPDOWN + " ") { // NOI18N
             protected void displayPopup() {
-                Set<String> tables = new HashSet(getTables());
-                if (tables.isEmpty()) {
+                Set<String> tablesSet = new HashSet(getTables());
+                if (tablesSet.isEmpty()) {
                     super.displayPopup();
                 } else {
-                    current.tables.retainAll(tables);
-                    new TablesSelector(tables, current.tables) {
+                    current.tables.retainAll(tablesSet);
+                    new TablesSelector(tablesSet, current.tables) {
                         protected void selectionChanged(Collection<String> selected) {
                             current.tables.clear();
                             current.tables.addAll(selected);
@@ -272,6 +274,7 @@ abstract class SQLFilterPanel extends JPanel {
             }
         };
         statements.setToolTipText(STATEMENTS_TOOLTIP);
+        statements.setPopupAlign(SwingConstants.NORTH_EAST);
         toolbar.add(statements);
         
         toolbar.add(Box.createHorizontalStrut(3));
