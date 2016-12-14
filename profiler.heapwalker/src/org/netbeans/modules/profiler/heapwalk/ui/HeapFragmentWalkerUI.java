@@ -329,6 +329,11 @@ public class HeapFragmentWalkerUI extends JPanel {
                 }
             });
     }
+    
+    public void requestFocus() {
+        if (summaryControllerPresenter == null) super.requestFocus();
+        else summaryControllerPresenter.requestFocus();
+    }
 
     private void moveToNextView() {
         if (isSummaryViewActive()) {

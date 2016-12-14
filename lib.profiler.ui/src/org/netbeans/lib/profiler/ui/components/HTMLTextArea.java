@@ -56,7 +56,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -82,7 +81,7 @@ import org.netbeans.lib.profiler.ui.UIUtils;
  * @author Ian Formanek
  * @author Jiri Sedlacek
  */
-public class HTMLTextArea extends JEditorPane implements HyperlinkListener, MouseListener {
+public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     /** Private Writer that extracts correctly formatted string from HTMLDocument */
@@ -582,7 +581,6 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
         setTransferHandler(new HTMLTextAreaTransferHandler());
         setFont(UIManager.getFont("Label.font")); //NOI18N
         setBackground(UIUtils.getProfilerResultsBackground());
-        addMouseListener(this);
         
         addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
@@ -718,45 +716,56 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
             setCursor(Cursor.getDefaultCursor());
         }
     }
+    
+    protected void processMouseEvent(MouseEvent e) {
+        if (e.isPopupTrigger()) showPopupMenu(e);
+        super.processMouseEvent(e);
+    }
+    
+    protected void processKeyEvent(KeyEvent e) {
+        int code = e.getKeyCode();
+        if (code == KeyEvent.VK_CONTEXT_MENU ||
+           (code == KeyEvent.VK_F10 && e.getModifiers() == InputEvent.SHIFT_MASK)) {
+            e.consume();
+            showPopupMenu(null);
+        }
+        
+        super.processKeyEvent(e);
+    }
+    
+    private void showPopupMenu(MouseEvent e) {
+        if (isEnabled() && isFocusable() && showPopup) {
+            JPopupMenu popup = getPopupMenu();
 
-    public void mouseClicked(MouseEvent e) {
-        if (e.getModifiers() == InputEvent.BUTTON3_MASK) {
-            if (isEnabled() && isFocusable() && showPopup) {
-                JPopupMenu popup = getPopupMenu();
+            if (popup != null) {
+                updatePopupMenu();
 
-                if (popup != null) {
-                    updatePopupMenu();
-
-                    if (!hasFocus()) {
-                        requestFocus(); // required for Select All functionality
-                    }
-
-                    popup.show(this, e.getX(), e.getY());
+                if (!hasFocus()) requestFocus(); // required for Select All functionality
+                
+                int x, y;
+                if (e != null) {
+                    x = e.getX();
+                    y = e.getY();
+                } else {
+                    Rectangle vis = getVisibleRect();
+                    x = vis.x + vis.width / 2;
+                    y = vis.y + vis.height / 2;
+                    
+                    try {
+                        Rectangle pos = modelToView(getCaretPosition());
+                        if (pos != null) {
+                            pos.width = Math.max(pos.width, 1); // must have nonzero width for the intersects() to work
+                            if (vis.intersects(pos)) {
+                                x = pos.x + pos.width;
+                                y = pos.y + pos.height;
+                            }
+                        }
+                    } catch (BadLocationException ex) {}
                 }
+
+                popup.show(this, x, y);
             }
         }
-    }
-
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    public void mouseExited(MouseEvent e) {
-    }
-
-    public void mousePressed(MouseEvent e) {
-    }
-
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    public void paste() {
-        try {
-            replaceSelection(Toolkit.getDefaultToolkit().getSystemClipboard().getContents(this)
-                                    .getTransferData(DataFlavor.stringFlavor).toString());
-        } catch (Exception ex) {
-        }
-
-        ;
     }
 
     protected JPopupMenu getPopupMenu() {
@@ -792,6 +801,13 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener, Mous
         popup.add(itemSelectAll);
 
         return popup;
+    }
+    
+    public void paste() {
+        try {
+            replaceSelection(Toolkit.getDefaultToolkit().getSystemClipboard().getContents(this)
+                                    .getTransferData(DataFlavor.stringFlavor).toString());
+        } catch (Exception ex) {}
     }
 
     protected void showURL(URL url) {
