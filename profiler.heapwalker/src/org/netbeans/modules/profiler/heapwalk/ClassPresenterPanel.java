@@ -243,6 +243,12 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
                 super.setVisible(visible);
                 actionsDivider.setVisible(visible);
             }
+            public boolean isContentAreaFilled() {
+                return !UIUtils.isOracleLookAndFeel() ? false : isFocusOwner();
+            }
+            public boolean isOpaque() {
+                return !UIUtils.isOracleLookAndFeel() ? false : isFocusOwner();
+            }
         };
         actionsRenderer.setOpaque(false);
         actionsRenderer.setContentAreaFilled(false);

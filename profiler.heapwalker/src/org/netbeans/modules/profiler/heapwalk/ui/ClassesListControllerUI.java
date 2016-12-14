@@ -675,6 +675,12 @@ public class ClassesListControllerUI extends JTitledPanel {
                 public Dimension getMaximumSize() {
                     return getPreferredSize();
                 }
+                public boolean isContentAreaFilled() {
+                    return !UIUtils.isOracleLookAndFeel() ? false : isFocusOwner();
+                }
+                public boolean isOpaque() {
+                    return !UIUtils.isOracleLookAndFeel() ? false : isFocusOwner();
+                }
             };
             l.setContentAreaFilled(false);
             l.setBorderPainted(true);
