@@ -46,6 +46,7 @@ package org.netbeans.modules.profiler.heapwalk.ui;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
@@ -75,7 +76,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -102,7 +102,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import org.netbeans.lib.profiler.common.CommonUtils;
-import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.lib.profiler.ui.components.table.DiffBarCellRenderer;
 import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
 import org.netbeans.lib.profiler.utils.VMUtils;
@@ -656,24 +655,34 @@ public class ClassesListControllerUI extends JTitledPanel {
         }
     }
     
-    private HTMLLabel l;
+    private JButton l;
     private JLabel w;
     private JProgressBar p;
     
     protected Component[] getAdditionalControls() {
         if (l == null) {
-            l = new HTMLLabel() {
-                protected void showURL(URL url) {
+            l = new JButton() {
+                protected void fireActionPerformed(ActionEvent e) {
                     if (classesListController.isDiff()) {
                         classesListController.resetDiffAction();
                     } else {
                         classesListController.compareAction();
                     }
                 }
+                public Dimension getMinimumSize() {
+                    return getPreferredSize();
+                }
+                public Dimension getMaximumSize() {
+                    return getPreferredSize();
+                }
             };
+            l.setContentAreaFilled(false);
+            l.setBorderPainted(true);
+            l.setMargin(new Insets(0, 0, 0, 0));
             l.setBorder(BorderFactory.createEmptyBorder());
+            l.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             l.setFont(UIManager.getFont("ToolTip.font")); // NOI18N
-            l.setText("<nobr><a href='#'>" + Bundle.ClassesListControllerUI_CompareWithAnotherText() + "</a></nobr>"); // NOI18N
+            l.setText("<html><nobr><a href='#'>" + Bundle.ClassesListControllerUI_CompareWithAnotherText() + "</a></nobr></html>"); // NOI18N
         }
         
         if (w == null) {
@@ -726,10 +735,10 @@ public class ClassesListControllerUI extends JTitledPanel {
                 p.setIndeterminate(false);
                 
                 if (classesListController.isDiff()) {
-                    l.setText("<nobr>" + NbBundle.getMessage(ClassesListControllerUI.class, // NOI18N
-                              "ClassesListControllerUI_ShowingDiffText", "<a href='#'>", "</a>") + "</nobr>"); // NOI18N
+                    l.setText("<html><nobr>" + NbBundle.getMessage(ClassesListControllerUI.class, // NOI18N
+                              "ClassesListControllerUI_ShowingDiffText", "<a href='#'>", "</a>") + "</nobr></html>"); // NOI18N
                 } else {
-                    l.setText("<nobr><a href='#'>" + Bundle.ClassesListControllerUI_CompareWithAnotherText() + "</a></nobr>"); // NOI18N
+                    l.setText("<html><nobr><a href='#'>" + Bundle.ClassesListControllerUI_CompareWithAnotherText() + "</a></nobr></html>"); // NOI18N
                 }
                 l.setVisible(true);
             }

@@ -44,17 +44,17 @@
 package org.netbeans.modules.profiler.heapwalk;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import org.netbeans.modules.profiler.heapwalk.HeapFragmentWalker.StateEvent;
 import org.openide.util.NbBundle;
-import java.net.URL;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.HTMLLabel;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
@@ -126,7 +126,8 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
 
     private HeaderRenderer headerRenderer;
     private JLabel detailsRenderer;
-    private HTMLLabel actionsRenderer;
+    private JLabel actionsDivider;
+    private JButton actionsRenderer;
 
     private HeapFragmentWalker heapFragmentWalker;
 
@@ -216,9 +217,14 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
         detailsRenderer.setForeground(UIManager.getColor("ToolTip.foreground")); // NOI18N
         detailsRenderer.setFont(UIManager.getFont("ToolTip.font")); // NOI18N
         detailsRenderer.setOpaque(false);
+        
+        actionsDivider = new JLabel("  |  "); // NOI18N
+        actionsDivider.setForeground(UIManager.getColor("ToolTip.foreground")); // NOI18N
+        actionsDivider.setFont(UIManager.getFont("ToolTip.font")); // NOI18N
+        actionsDivider.setOpaque(false);
 
-        actionsRenderer = new HTMLLabel() {
-            protected void showURL(URL url) {
+        actionsRenderer = new JButton() {
+            protected void fireActionPerformed(ActionEvent e) {
                 if (heapFragmentWalker != null) {
                     BrowserUtils.performTask(new Runnable() {
                         public void run() {
@@ -230,17 +236,28 @@ public class ClassPresenterPanel extends JPanel implements HeapFragmentWalker.St
             public Dimension getMinimumSize() {
                 return getPreferredSize();
             }
+            public Dimension getMaximumSize() {
+                return getPreferredSize();
+            }
+            public void setVisible(boolean visible) {
+                super.setVisible(visible);
+                actionsDivider.setVisible(visible);
+            }
         };
-        actionsRenderer.setBorder(BorderFactory.createEmptyBorder());
-        actionsRenderer.setForeground(UIManager.getColor("ToolTip.foreground")); // NOI18N
-        actionsRenderer.setFont(UIManager.getFont("ToolTip.font")); // NOI18N
-        actionsRenderer.setText("&nbsp;&nbsp;|&nbsp;&nbsp;<a href='#'>" + Bundle.ClassPresenterPanel_RetainedSizesString() + "</a>"); // NOI18N
         actionsRenderer.setOpaque(false);
+        actionsRenderer.setContentAreaFilled(false);
+        actionsRenderer.setBorderPainted(true);
+        actionsRenderer.setMargin(new Insets(0, 0, 0, 0));
+        actionsRenderer.setBorder(BorderFactory.createEmptyBorder());
+        actionsRenderer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        actionsRenderer.setFont(UIManager.getFont("ToolTip.font")); // NOI18N
+        actionsRenderer.setText("<html><nobr><a href='#'>" + Bundle.ClassPresenterPanel_RetainedSizesString() + "</a></nobr></html>"); // NOI18N
         actionsRenderer.setVisible(false);
 
         JPanel detailsContainer = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         detailsContainer.setOpaque(false);
         detailsContainer.add(detailsRenderer);
+        detailsContainer.add(actionsDivider);
         detailsContainer.add(actionsRenderer);
         
         setLayout(new GridBagLayout());

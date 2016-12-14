@@ -129,6 +129,9 @@ public class OQLEditor extends JPanel {
 
         queryEditor.setOpaque(isOpaque());
         queryEditor.setBackground(getBackground());
+        
+        // Do not display NB TopComponent switcher, let the focus subsystem transfer the focus out of the editor
+        queryEditor.putClientProperty("nb.ctrltab.popupswitcher.disable", Boolean.TRUE); // NOI18N
 
         setLayout(new BorderLayout());
         add(queryEditor, BorderLayout.CENTER);
