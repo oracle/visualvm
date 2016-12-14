@@ -56,6 +56,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.ui.swing.FilteringToolbar;
@@ -117,17 +118,15 @@ abstract class TablesSelector {
         }
         
         void show(Component invoker) {
-            Dimension panelSize = panel.getPreferredSize();
-//            ProfilerPopupFactory.getPopup(invoker, panel, invoker.getWidth() - panelSize.width - 6, -panelSize.height - 6).show();
-            ProfilerPopup.create(invoker, panel, invoker.getWidth() - panelSize.width - 6, -panelSize.height - 6).show();
+            int resizeMode = ProfilerPopup.RESIZE_TOP | ProfilerPopup.RESIZE_LEFT;
+            ProfilerPopup.createRelative(invoker, panel, SwingConstants.NORTH_EAST, resizeMode).show();
         }
         
         private void populatePopup() {
             JPanel content = new JPanel(new BorderLayout());
-            content.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
             
             JLabel hint = new JLabel(SELECT_TABLES, JLabel.LEADING);
-            hint.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+            hint.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
             content.add(hint, BorderLayout.NORTH);
 
             final SelectedTablesModel tablesModel = new SelectedTablesModel();
@@ -151,7 +150,10 @@ abstract class TablesSelector {
             Dimension prefSize = new Dimension(w + projectRenderer.getPreferredSize().width, h);
             tablesTable.setPreferredScrollableViewportSize(prefSize);
             ProfilerTableContainer tableContainer = new ProfilerTableContainer(tablesTable, true, null);
-            content.add(tableContainer, BorderLayout.CENTER);
+            JPanel tableContent = new JPanel(new BorderLayout());
+            tableContent.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+            tableContent.add(tableContainer, BorderLayout.CENTER);
+            content.add(tableContent, BorderLayout.CENTER);
 
             JToolBar controls = new FilteringToolbar(FILTER_TABLES) {
                 protected void filterChanged() {

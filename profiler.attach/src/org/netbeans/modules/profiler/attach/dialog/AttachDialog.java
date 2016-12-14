@@ -535,7 +535,7 @@ public class AttachDialog extends AttachWizard {
                                                null,
                                                new ModeAction(Bundle.AttachDialog_LocalStartedProcess(), false, true),
                                                new ModeAction(Bundle.AttachDialog_RemoteStartedProcess(), true, true));
-            modeButton.setPopupAlign(SwingConstants.RIGHT);
+            modeButton.setPopupAlign(SwingConstants.EAST);
             profile.setLabelFor(modeButton);
             c = new GridBagConstraints();
             c.gridx = 1;
@@ -600,7 +600,7 @@ public class AttachDialog extends AttachWizard {
                                        new OsAction(IntegrationUtils.PLATFORM_SOLARIS_INTEL_OS),
                                        new OsAction(IntegrationUtils.PLATFORM_SOLARIS_AMD64_OS));
             osJvmLabel.setLabelFor(os);
-            os.setPopupAlign(SwingConstants.RIGHT);
+            os.setPopupAlign(SwingConstants.EAST);
             c = new GridBagConstraints();
             c.gridx = 3;
             c.gridy = 0;

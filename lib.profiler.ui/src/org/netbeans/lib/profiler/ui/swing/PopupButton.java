@@ -110,11 +110,34 @@ public class PopupButton extends SmallButton {
             Dimension size = menu.getPreferredSize();
             size.width = Math.max(size.width, getWidth());
             menu.setPreferredSize(size);
+            
             int align = getPopupAlign();
-            int x = align == SwingConstants.TRAILING ||
-                    align == SwingConstants.RIGHT ?
-                    getWidth() - size.width : 0;
-            menu.show(this, x, getHeight());
+            
+            int x;
+            switch (align) {
+                case SwingConstants.EAST:
+                case SwingConstants.NORTH_EAST:
+                case SwingConstants.SOUTH_EAST:
+                    x = getWidth() - size.width;
+                    break;
+                default:
+                    x = 0;
+                    break;
+            }
+            
+            int y;
+            switch (align) {
+                case SwingConstants.NORTH:
+                case SwingConstants.NORTH_EAST:
+                case SwingConstants.NORTH_WEST:
+                    y = -size.height;
+                    break;
+                default:
+                    y = getHeight();
+                    break;
+            }
+            
+            menu.show(this, x, y);
         }
     }
     

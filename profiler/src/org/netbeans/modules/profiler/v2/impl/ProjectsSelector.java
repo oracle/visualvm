@@ -57,6 +57,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
+import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.ui.swing.FilteringToolbar;
 import org.netbeans.lib.profiler.ui.swing.ProfilerPopup;
@@ -107,16 +108,15 @@ public abstract class ProjectsSelector {
         }
         
         void show(Component invoker) {
-//            ProfilerPopupFactory.getPopup(invoker, panel, -5, invoker.getHeight() - 1).show();
-            ProfilerPopup.create(invoker, panel, -5, invoker.getHeight() - 1).show();
+            int resizeMode = ProfilerPopup.RESIZE_BOTTOM | ProfilerPopup.RESIZE_RIGHT;
+            ProfilerPopup.createRelative(invoker, panel, SwingConstants.SOUTH_WEST, resizeMode).show();
         }
         
         private void populatePopup() {
             JPanel content = new JPanel(new BorderLayout());
-            content.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
             
             JLabel hint = new JLabel(Bundle.ProjectsSelector_selectProjects(), JLabel.LEADING);
-            hint.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+            hint.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
             content.add(hint, BorderLayout.NORTH);
 
             final SelectedProjectsModel projectsModel = new SelectedProjectsModel();
@@ -140,7 +140,10 @@ public abstract class ProjectsSelector {
             Dimension prefSize = new Dimension(w + projectRenderer.getPreferredSize().width, h);
             projectsTable.setPreferredScrollableViewportSize(prefSize);
             ProfilerTableContainer tableContainer = new ProfilerTableContainer(projectsTable, true, null);
-            content.add(tableContainer, BorderLayout.CENTER);
+            JPanel tableContent = new JPanel(new BorderLayout());
+            tableContent.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+            tableContent.add(tableContainer, BorderLayout.CENTER);
+            content.add(tableContent, BorderLayout.CENTER);
 
             JToolBar controls = new FilteringToolbar(Bundle.ProjectsSelector_filterProjects()) {
                 protected void filterChanged() {
