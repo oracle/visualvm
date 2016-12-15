@@ -456,7 +456,7 @@ public final class SnapshotsWindowUI extends ProfilerTopComponent {
                 setText(null);
                 setIcon(icon);
                 setToolTipText(action.getValue("BTN_TOOLTIP").toString()); // NOI18N
-                setOpaque(false);
+                if (!UIUtils.isOracleLookAndFeel()) setOpaque(false);
             }
             public Dimension getMinimumSize() {
                 Dimension d = super.getMinimumSize();
