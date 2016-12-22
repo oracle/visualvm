@@ -78,6 +78,8 @@ public interface JavaClassConstants {
     public static final int CONSTANT_MethodType = 16;
     public static final int CONSTANT_unused17 = 17;  // unused
     public static final int CONSTANT_InvokeDynamic = 18;
+    public static final int CONSTANT_Module = 19;
+    public static final int CONSTANT_Package = 20;
 
     /* Opcodes */
     static final int opc_try = -3;

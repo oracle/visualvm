@@ -302,6 +302,8 @@ public class ClassFileParser implements JavaClassConstants {
                     classRefsNo++;
                 case CONSTANT_String:
                 case CONSTANT_MethodType:
+                case CONSTANT_Module:
+                case CONSTANT_Package:
                     curBufPos += 2;
 
                     break;
