@@ -45,7 +45,7 @@ package org.netbeans.lib.profiler.heap;
 
 
 /**
- * represents value of of instance or static field
+ * represents value of instance or static field
  * @author Tomas Hurka
  */
 public interface FieldValue extends Value {

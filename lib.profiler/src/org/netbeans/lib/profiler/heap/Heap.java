@@ -65,13 +65,14 @@ public interface Heap {
     List /*<JavaClass>*/ getAllClasses();
     
     /**
-     * computes List of N biggest {@link JavaClass} instances in this heap.
-     * The classes are ordered according to their retained size.
+     * computes List of N biggest {@link Instance}-s in this heap.
+     * The instances are ordered according to their retained size.
      * <br>
      * Speed: slow for the first time, subsequent invocations are normal.
-     * @return list of N biggest {@link JavaClass} instances.
+     * @param number size of the returned List
+     * @return list of N biggest {@link Instance}.
      */
-    List /*<JavaClass>*/ getBiggestObjectsByRetainedSize(int number);
+    List /*<Instance>*/ getBiggestObjectsByRetainedSize(int number);
     
     /**
      * returns {@link GCRoot} for {@link Instance}.
