@@ -107,6 +107,8 @@ import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
  */
 public class ProfilerTreeTable extends ProfilerTable {
     
+    private static final boolean DISABLE_TREEUI_FIX = Boolean.getBoolean("ProfilerTreeTable.disableTreeUIFix"); // NOI18N
+    
     private final TableModelImpl model;
     private final ProfilerTreeTableTree tree;
     
@@ -1073,7 +1075,7 @@ public class ProfilerTreeTable extends ProfilerTable {
                 super.setUI(ui);
                 
                 // #269500 - performance workaround for BasicTreeUI
-                if (ui instanceof BasicTreeUI)
+                if (!DISABLE_TREEUI_FIX && ui instanceof BasicTreeUI)
                     workaroundVerticalLines = UIManager.getBoolean("Tree.paintLines"); // NOI18N
             }
         }
