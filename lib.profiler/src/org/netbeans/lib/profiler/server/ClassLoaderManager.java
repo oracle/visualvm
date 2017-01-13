@@ -344,8 +344,10 @@ class ClassLoaderManager implements CommonConstants {
             findBootstrapClassMethod = classLoaderClass.getDeclaredMethod("findBootstrapClass", stringArg); // NOI18N
             findBootstrapClassMethod.setAccessible(true); // access checks
         } catch (Exception ex) {
-            System.err.println("Profiler Agent Error: Internal error initializing ClassLoaderManager"); // NOI18N
-            ex.printStackTrace(System.err);
+            System.err.println(ENGINE_WARNING+"Cannot use ClassLoader.findLoadedClass() and/or ClassLoader.findBootstrapClass() in ClassLoaderManager"); // NOI18N
+            if (DEBUG) ex.printStackTrace(System.err);
+            findLoadedClassMethod = null;
+            findBootstrapClassMethod = null;          
         }
 
         // This is done to just initialize some reflection classes, which may otherwise be initialized only when
@@ -426,14 +428,24 @@ class ClassLoaderManager implements CommonConstants {
                 }
             }
 
-            try {
-                return (Class) findBootstrapClassMethod.invoke(ClassLoader.getSystemClassLoader(), args);
+            if (findBootstrapClassMethod != null) {
+                try {
+                    return (Class) findBootstrapClassMethod.invoke(ClassLoader.getSystemClassLoader(), args);
 
-                // targetLoader.findBootstrapClass(className);
-            } catch (Exception ex) { // ClassNotFoundException may be thrown
+                    // targetLoader.findBootstrapClass(className);
+                } catch (Exception ex) { // ClassNotFoundException may be thrown
+                    System.err.println("Profiler Agent Error: internal error in ClassLoaderManager 1"); // NOI18N
+                    ex.printStackTrace(System.err);
 
-                return null;
+                    return null;
+                }
+            } else {
+                // we don't have findBootstrapClassMethod - try inefficient way
+                return ClassLoader.getSystemClassLoader().loadClass(className);
             }
+        } catch (ClassNotFoundException ex) {
+            System.err.println(ENGINE_WARNING+"CNFE for "+className+" in ClassLoaderManager "); // NOI18N
+            if (DEBUG) ex.printStackTrace(System.err);
         } catch (Exception ex) {
             System.err.println("Profiler Agent Error: internal error in ClassLoaderManager 1"); // NOI18N
             ex.printStackTrace(System.err);
@@ -449,18 +461,21 @@ class ClassLoaderManager implements CommonConstants {
         if (loader == null) {
             return null;
         }
-        try {
-            Object[] args = new Object[] { className };
-            clazz = (Class) findLoadedClassMethod.invoke(loader, args);
-        } catch (Exception ex) {
-            System.err.println("Profiler Agent Error: internal error in ClassLoaderManager 2"); // NOI18N
-            ex.printStackTrace(System.err);
+        if (findLoadedClassMethod != null) {
+            try {
+                Object[] args = new Object[] { className };
+                clazz = (Class) findLoadedClassMethod.invoke(loader, args);
+            } catch (Exception ex) {
+                System.err.println("Profiler Agent Error: internal error in ClassLoaderManager 2"); // NOI18N
+                ex.printStackTrace(System.err);
+            }
         }
-        if (clazz == null && indexIntoManVec > 0) {
+        // if we don't have findLoadedClassMethod - try inefficient way
+        if (findLoadedClassMethod == null || (clazz == null && indexIntoManVec > 0)) {
             try {
                 clazz = loader.loadClass(className);
             } catch (ClassNotFoundException ex) {
-                System.err.println(ENGINE_WARNING+" CNFE in getLoadedClassInThisLoaderOnly "+ex.getLocalizedMessage()+" for "+className+" classloaderId "+indexIntoManVec+" classLoader: "+loader);
+                System.err.println(ENGINE_WARNING+"CNFE in getLoadedClassInThisLoaderOnly "+ex.getLocalizedMessage()+" for "+className+" classloaderId "+indexIntoManVec+" classLoader: "+loader);
             }
             //System.out.println("Loaded class "+className+" initial loader "+indexIntoManVec);
         }

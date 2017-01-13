@@ -126,7 +126,7 @@ public class ClassBytesLoader {
      *  getClassFileBytes() above (through ClassLoader.getSystemResourceAsStream().
      */
     public static void preloadClasses(boolean remote) {
-        getClassFileBytes("sun.misc.Launcher"); // NOI18N
+        getClassFileBytes("java.lang.Object"); // NOI18N
         new java.io.FilePermission("*", "read"); // NOI18N
 
         new java.util.HashMap().keySet().iterator();
