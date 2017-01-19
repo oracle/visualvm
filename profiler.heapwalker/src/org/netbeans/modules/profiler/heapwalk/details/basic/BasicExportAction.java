@@ -83,12 +83,12 @@ import org.openide.windows.WindowManager;
     "BasicExportAction_OomeExportingMsg=<html><b>Not enough memory to save the file.</b><br><br>To avoid this error increase the -Xmx<br>value in the etc/netbeans.conf file in NetBeans IDE installation.</html>",
     "BasicExportAction_IOException_Exporting_Msg=<html>IOException occurred during export, see IDE log for details</html>",
     "BasicExportAction_CannotWriteFileMsg=Failed to export File. Reason: {0}."})
-final class BasicExportAction extends AbstractAction {
+public final class BasicExportAction extends AbstractAction {
     private static final Logger LOGGER = Logger.getLogger(BasicExportAction.class.getName());
 
 //~ Inner Interfaces ---------------------------------------------------------------------------------------------------------
 
-    static interface ExportProvider {
+    public static interface ExportProvider {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         public void exportData(int exportedFileType, ExportDataDumper eDD);
@@ -140,9 +140,9 @@ final class BasicExportAction extends AbstractAction {
     private static final String FILE_EXTENSION_CSV = "csv"; // NOI18N
     private static final String FILE_EXTENSION_TXT = "txt"; // NOI18N
     private static final String FILE_EXTENSION_BIN = "bin"; // NOI18N
-    static final int MODE_CSV = 1;
-    static final int MODE_TXT = 2;
-    static final int MODE_BIN = 3;
+    public static final int MODE_CSV = 1;
+    public static final int MODE_TXT = 2;
+    public static final int MODE_BIN = 3;
     private static File exportDir;
 
 
