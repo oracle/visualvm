@@ -72,6 +72,7 @@ import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeExpansionEvent;
@@ -105,6 +106,8 @@ import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
  * @author Jiri Sedlacek
  */
 public class ProfilerTreeTable extends ProfilerTable {
+    
+    private static final boolean DISABLE_TREEUI_FIX = Boolean.getBoolean("ProfilerTreeTable.disableTreeUIFix"); // NOI18N
     
     private final TableModelImpl model;
     private final ProfilerTreeTableTree tree;
@@ -1036,6 +1039,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         private boolean customRendering;
         
         private SynthLikeTreeUI synthLikeUI;
+        private boolean workaroundVerticalLines;
 
         
         ProfilerTreeTableTree(SortedFilteredTreeModel model) {
@@ -1069,6 +1073,10 @@ public class ProfilerTreeTable extends ProfilerTable {
                 }
             } else {
                 super.setUI(ui);
+                
+                // #269500 - performance workaround for BasicTreeUI
+                if (!DISABLE_TREEUI_FIX && ui instanceof BasicTreeUI)
+                    workaroundVerticalLines = UIManager.getBoolean("Tree.paintLines"); // NOI18N
             }
         }
 
@@ -1114,7 +1122,15 @@ public class ProfilerTreeTable extends ProfilerTable {
             g.fillRect(rectX, 0, getWidth() - rectX, rowHeight);
             
             g.translate(customRendering ? -currentX : 0, -currentRowOffset);
-            super.paint(g);
+
+            // #269500 - performance workaround for BasicTreeUI
+            if (workaroundVerticalLines && !rootVisible && currentRowOffset > 0) {
+                rootVisible = true;
+                super.paint(g);
+                rootVisible = false;
+            } else {
+                super.paint(g);
+            }
         }
         
         private boolean isFirstColumn(TableColumnModel columns, int column) {
