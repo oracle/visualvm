@@ -224,7 +224,7 @@ class XSheet extends JPanel
                     if (xmb == mbean && mbi != null) {
                         if (!isSelectedNode(node, currentNode)) return;
                         mbeanInfo.loadMBeanInfo(xmb, mbi);
-                        invalidate();
+                        topPanelMetadata.invalidate();
                         topPanelMetadata.removeAll();
                         mbeansTab.getButtonAt(3).setEnabled(true);
                         JPanel mainPanelMetadata = new JPanel();
@@ -233,7 +233,7 @@ class XSheet extends JPanel
                         topPanelMetadata.add(mainPanelMetadata, BorderLayout.CENTER);
                         JPanel southPanelMetadata = new JPanel();
                         topPanelMetadata.add(southPanelMetadata, BorderLayout.SOUTH);
-                        validate();
+                        topPanelMetadata.validate();
                         repaint();
                     }
                 } catch (Exception e) {
@@ -271,7 +271,7 @@ class XSheet extends JPanel
                     mbeanAttributes.loadAttributes(xmb, mbi);
                     if (xmb == mbean && mbi != null && mbi.getAttributes() != null && mbi.getAttributes().length > 0) {
                         if (!isSelectedNode(node, currentNode)) return;
-                        invalidate();
+                        topPanelAttributes.invalidate();
                         topPanelAttributes.removeAll();
                         mbeansTab.getButtonAt(0).setEnabled(true);
                         JPanel borderPanel = new JPanel(new BorderLayout());
@@ -288,9 +288,9 @@ class XSheet extends JPanel
                         southPanelAttributes.setVisible(true);
                         refreshButton.setEnabled(true);
                         topPanelAttributes.add(southPanelAttributes, BorderLayout.SOUTH);
-                        validate();
+                        topPanelAttributes.validate();
                         repaint();
-                    }
+                            }
                 } catch (Exception e) {
                     Throwable t = Utils.getActualException(e);
                     LOGGER.log(Level.SEVERE, "Problem displaying MBean " + // NOI18N
@@ -326,7 +326,7 @@ class XSheet extends JPanel
                     if (xmb == mbean && mbi != null && mbi.getOperations() != null && mbi.getOperations().length > 0) {
                         if (!isSelectedNode(node, currentNode)) return;
                         mbeanOperations.loadOperations(xmb, mbi);
-                        invalidate();
+                        topPanelOperations.invalidate();
                         topPanelOperations.removeAll();
                         mbeansTab.getButtonAt(1).setEnabled(true);
                         JPanel borderPanel = new JPanel(new BorderLayout());
@@ -339,7 +339,7 @@ class XSheet extends JPanel
                         topPanelOperations.add(mainPanelOperations, BorderLayout.CENTER);
                         JPanel southPanelOperations = new JPanel();
                         topPanelOperations.add(southPanelOperations, BorderLayout.SOUTH);
-                        validate();
+                        topPanelOperations.validate();
                         repaint();
                     }
                 } catch (Exception e) {
@@ -376,7 +376,7 @@ class XSheet extends JPanel
                         if (!isSelectedNode(node, currentNode)) return;
                         mbeanNotifications.loadNotifications(xmb);
                         updateNotifications();
-                        invalidate();
+                        topPanelNotifications.invalidate();
                         topPanelNotifications.removeAll();
                         mbeansTab.getButtonAt(2).setEnabled(true);
                         JPanel borderPanel = new JPanel(new BorderLayout());
@@ -397,7 +397,7 @@ class XSheet extends JPanel
                         unsubscribeButton.setEnabled(true);
                         clearButton.setEnabled(true);
                         topPanelNotifications.add(southPanelNotifications, BorderLayout.SOUTH);
-                        validate();
+                        topPanelNotifications.validate();
                         repaint();
                     }
                 } catch (Exception e) {
