@@ -223,7 +223,7 @@ class ClassDump extends HprofObject implements JavaClass {
     }
 
     public Collection /*<JavaClass>*/ getSubClasses() {
-        List classes = classDumpSegment.hprofHeap.getAllClasses();
+        List classes = getHprof().getAllClasses();
         List subclasses = new ArrayList(classes.size() / 10);
         Map subclassesMap = new HashMap((classes.size() * 4) / 3);
 
