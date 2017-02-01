@@ -227,7 +227,7 @@ class ClassDumpSegment extends TagBounds {
             return classes;
         }
 
-        classes = new ArrayList /*<JavaClass>*/(1000);
+        List cls = new ArrayList /*<JavaClass>*/(1000);
 
         long[] offset = new long[] { startOffset };
 
@@ -240,11 +240,12 @@ class ClassDumpSegment extends TagBounds {
                 long classId = classDump.getJavaClassId();
                 LongMap.Entry classEntry = hprofHeap.idToOffsetMap.put(classId, start);
 
-                classes.add(classDump);
-                classEntry.setIndex(classes.size());
+                cls.add(classDump);
+                classEntry.setIndex(cls.size());
             }
         }
 
+        classes = Collections.unmodifiableList(cls);
         hprofHeap.getLoadClassSegment().setLoadClassOffsets();
         arrayMap = new HashMap(classes.size() / 15);
         extractSpecialClasses();
