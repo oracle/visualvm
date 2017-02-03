@@ -45,6 +45,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -295,7 +296,7 @@ final class ProfilerTableHovers {
             win.getContentPane().add(l);
             
             // Make sure there's no shadow behind the native window
-            win.setBackground(new Color(255, 255, 255, 0)); // Linux
+            safeSetBackground(win, new Color(255, 255, 255, 0)); // Linux // #269737
             win.getRootPane().putClientProperty("Window.shadow", Boolean.FALSE.toString()); // Mac OS X // NOI18N
             
             win.setVisible(true);
@@ -317,6 +318,16 @@ final class ProfilerTableHovers {
         windows[index].setVisible(false);
         windows[index].dispose();
         windows[index] = null;
+    }
+    
+    // See Window.setBackground() documentation
+    private static void safeSetBackground(JWindow window, Color background) {
+        GraphicsConfiguration gc = window.getGraphicsConfiguration();
+        
+        if (!gc.isTranslucencyCapable()) return; // PERPIXEL_TRANSLUCENT not supported
+        if (gc.getDevice().getFullScreenWindow() == window) return; // fullscreen windows not supported
+        
+        window.setBackground(background);
     }
     
     
