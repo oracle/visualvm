@@ -65,5 +65,6 @@ public interface HeapWalkerIcons extends Icons.Keys {
     public static final String SYSTEM_INFO = "HeapWalkerIcons.SystemInfo"; // NOI18N
     public static final String WINDOW = "HeapWalkerIcons.Window"; // NOI18N
     public static final String BIGGEST_OBJECTS = "HeapWalkerIcons.BiggestObjects"; // NOI18N
+    public static final String OQL_CONSOLE = "HeapWalkerIcons.OQLConsole"; // NOI18N
     
 }

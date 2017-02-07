@@ -185,6 +185,8 @@ public class ObjectNode extends InstanceNode {
                                 children[i] = HeapWalkerNodeFactory.createFieldNode((FieldValue) fieldValues.get(i),
                                                                                     ObjectNode.this);
                             }
+                            
+//                            children[0].
                         }
                     } else {
                         children = new HeapWalkerNode[0];

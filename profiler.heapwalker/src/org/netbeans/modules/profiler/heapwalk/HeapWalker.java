@@ -48,7 +48,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.lib.profiler.heap.*;
-import org.netbeans.modules.profiler.heapwalk.ui.HeapWalkerUI;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
@@ -56,9 +55,11 @@ import org.openide.windows.TopComponent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.ProfilerStorage;
+import org.netbeans.modules.profiler.heapwalker.v2.HeapWalkerTopComponent;
 import org.openide.util.Lookup;
 
 
@@ -75,7 +76,8 @@ public class HeapWalker {
 
     private File heapDumpFile;
     private HeapFragmentWalker mainHeapWalker;
-    private HeapWalkerUI heapWalkerUI;
+//    private HeapWalkerUI heapWalkerUI;
+    private TopComponent heapWalkerUI;
     private Lookup.Provider heapDumpProject;
     private String heapWalkerName;
 
@@ -85,6 +87,8 @@ public class HeapWalker {
     public HeapWalker(Heap heap) {
         heapWalkerName = Bundle.ClassesListController_HeapWalkerDefaultName();
         createMainFragment(heap);
+        
+        computeRetainedSizes();
     }
 
     public HeapWalker(File heapFile) throws FileNotFoundException, IOException {
@@ -133,7 +137,8 @@ public class HeapWalker {
 
     public TopComponent getTopComponent() {
         if (heapWalkerUI == null) {
-            heapWalkerUI = new HeapWalkerUI(this);
+//            heapWalkerUI = new HeapWalkerUI(this);
+            heapWalkerUI = new HeapWalkerTopComponent(this);
         }
 
         return heapWalkerUI;
@@ -157,6 +162,16 @@ public class HeapWalker {
                     // TODO: Open new tab or select existing one
                 }
             });
+    }
+    
+    private void computeRetainedSizes() {
+        List<JavaClass> classes = mainHeapWalker.getHeapFragment().getAllClasses();
+        if (classes.size() > 0) {
+            ProgressHandle pd = ProgressHandle.createHandle(Bundle.HeapFragmentWalker_ComputingRetainedMsg());
+            pd.start();
+            classes.get(0).getRetainedSizeByClass();
+            pd.finish();
+        }
     }
 
     // --- Private implementation ------------------------------------------------

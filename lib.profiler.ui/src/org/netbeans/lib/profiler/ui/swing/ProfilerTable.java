@@ -427,6 +427,7 @@ public class ProfilerTable extends JTable {
     // --- Selection -----------------------------------------------------------
     
     private boolean shadeUnfocusedSelection = false;
+    private boolean selectionOnMiddlePress = false;
     
     boolean internal;
     private Object selection;
@@ -563,6 +564,14 @@ public class ProfilerTable extends JTable {
     
     public final boolean shadesUnfocusedSelection() {
         return shadeUnfocusedSelection;
+    }
+    
+    public final void setSelectionOnMiddlePress(boolean select) {
+        selectionOnMiddlePress = select;
+    }
+    
+    public final boolean isSelectionOnMiddlePress() {
+        return selectionOnMiddlePress;
     }
     
     // --- Traversing rows -----------------------------------------------------
@@ -1054,11 +1063,21 @@ public class ProfilerTable extends JTable {
         }
         
         // Right-press selects row for popup
-        if (popupEvent && e.getID() == MouseEvent.MOUSE_PRESSED && row != -1) {
-            ListSelectionModel sel = getSelectionModel();
-            if (sel.getSelectionMode() == ListSelectionModel.SINGLE_SELECTION ||
-                !sel.isSelectedIndex(row)) selectRow(row, true);
+        // Middle-press selects if enabled
+        if (e.getID() == MouseEvent.MOUSE_PRESSED && row != -1) {
+            if (popupEvent || (selectionOnMiddlePress && SwingUtilities.isMiddleMouseButton(e))) {
+                ListSelectionModel sel = getSelectionModel();
+                if (sel.getSelectionMode() == ListSelectionModel.SINGLE_SELECTION || !sel.isSelectedIndex(row)) {
+                    selectRow(row, true);
+                    requestFocusInWindow();
+                }
+            }
         }
+//        if (popupEvent && e.getID() == MouseEvent.MOUSE_PRESSED && row != -1) {
+//            ListSelectionModel sel = getSelectionModel();
+//            if (sel.getSelectionMode() == ListSelectionModel.SINGLE_SELECTION ||
+//                !sel.isSelectedIndex(row)) selectRow(row, true);
+//        }
         
         super.processMouseEvent(e);
         

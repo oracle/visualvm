@@ -70,6 +70,7 @@ public final class HeapWalkerIconsProviderImpl extends IconsProvider.Basic {
         cache.put(HeapWalkerIcons.SYSTEM_INFO, "sysinfo.png"); // NOI18N
         cache.put(HeapWalkerIcons.WINDOW, "window.png"); // NOI18N
         cache.put(HeapWalkerIcons.BIGGEST_OBJECTS, "biggestObjects.png"); // NOI18N
+        cache.put(HeapWalkerIcons.OQL_CONSOLE, "oqlConsole.png"); // NOI18N
     }
     
 }

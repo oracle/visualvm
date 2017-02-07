@@ -43,8 +43,12 @@
 
 package org.netbeans.modules.profiler.heapwalk.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.netbeans.lib.profiler.results.CCTNode;
 import javax.swing.Icon;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 
 /**
@@ -103,4 +107,19 @@ public abstract class HeapWalkerNode extends CCTNode {
      * There are two different algorithms for generating childs in both Browsers.
      */
     public abstract int getMode();
+    
+    
+    public static TreePath fromNode(TreeNode node) {
+        return fromNode(node, null);
+    }
+    
+    public static TreePath fromNode(TreeNode node, TreeNode root) {
+        List l = new ArrayList();
+        while (node != root) {
+            l.add(0, node);
+            node = node.getParent();
+        }
+        if (node != null) l.add(0, node);
+        return new TreePath(l.toArray(new Object[0]));
+    }
 }

@@ -197,7 +197,7 @@ public class ProfilerTreeTable extends ProfilerTable {
         return path;
     }
     
-    void selectPath(TreePath path, boolean scrollToVisible) {
+    public void selectPath(TreePath path, boolean scrollToVisible) {
         internal = true;
         markExpansionTransaction();
         try {
@@ -240,8 +240,16 @@ public class ProfilerTreeTable extends ProfilerTable {
         if (tree != null) tree.setShowsRootHandles(newValue);
     }
     
+    public boolean getShowsRootHandles() {
+        return tree != null ? tree.getShowsRootHandles() : false;
+    }
+    
     public void setRootVisible(boolean rootVisible) {
         if (tree != null) tree.setRootVisible(rootVisible);
+    }
+    
+    public boolean isRootVisible() {
+        return tree != null ? tree.isRootVisible() : false;
     }
     
     
@@ -262,6 +270,24 @@ public class ProfilerTreeTable extends ProfilerTable {
             markExpansionTransaction();
             
             TreePath tpath = tree.getPathForRow(row);
+            if (tpath == null || tree.isCollapsed(tpath)) return;
+            
+            TreeModel tmodel = tree.getModel();
+            Object selected = tpath.getLastPathComponent();
+            
+            int nchildren = tmodel.getChildCount(selected);
+            for (int i = 0; i < nchildren; i++)
+                tree.collapsePath(tpath.pathByAddingChild(tmodel.getChild(selected, i)));
+        
+        } finally {
+            clearExpansionTransaction();
+        }
+    }
+    
+    public void collapseChildren(TreePath tpath) {
+        if (tree != null) try {
+            markExpansionTransaction();
+            
             if (tpath == null || tree.isCollapsed(tpath)) return;
             
             TreeModel tmodel = tree.getModel();
@@ -341,6 +367,32 @@ public class ProfilerTreeTable extends ProfilerTable {
 
             tree.putClientProperty(UIUtils.PROP_AUTO_EXPANDING, Boolean.TRUE);
             try { selectPath(tpath, true); }
+            finally { tree.putClientProperty(UIUtils.PROP_AUTO_EXPANDING, null); }
+
+        } finally {
+            clearExpansionTransaction();
+        }
+    }
+    
+    public void expandPath(TreePath path) {
+        if (tree != null) try {
+            markExpansionTransaction();
+
+            tree.putClientProperty(UIUtils.PROP_AUTO_EXPANDING, Boolean.TRUE);
+            try { tree.expandPath(path); }
+            finally { tree.putClientProperty(UIUtils.PROP_AUTO_EXPANDING, null); }
+
+        } finally {
+            clearExpansionTransaction();
+        }
+    }
+    
+    public void expandRow(int row) {
+        if (tree != null) try {
+            markExpansionTransaction();
+
+            tree.putClientProperty(UIUtils.PROP_AUTO_EXPANDING, Boolean.TRUE);
+            try { tree.expandRow(row); }
             finally { tree.putClientProperty(UIUtils.PROP_AUTO_EXPANDING, null); }
 
         } finally {
@@ -494,8 +546,18 @@ public class ProfilerTreeTable extends ProfilerTable {
         ProfilerRowSorter s = new ProfilerTreeTableSorter(getModel()) {
             public void allRowsChanged() {
                 // Must invoke later, JTree.getRowCount() not ready yet
+                final Exception ex = new Exception("Stack trace");
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() { updateColumnsPreferredWidth(); }
+                    public void run() { try {updateColumnsPreferredWidth();} catch (NullPointerException e) {
+                        System.err.println(">>> #################################");
+                        System.err.println(">>> #################################");
+                        System.err.println(">>> #################################");
+                        e.printStackTrace();
+                        System.err.println(">>> ---------------------------------");
+                        System.err.println(">>> --- caused in -------------------");
+                        System.err.println(">>> ---------------------------------");
+                        ex.printStackTrace();
+                    }}
                 });
             }
         };
@@ -1101,6 +1163,10 @@ public class ProfilerTreeTable extends ProfilerTable {
             currentSelected = isSelected;
             
             Rectangle cellBounds = getRowBounds(row);
+            if (cellBounds == null) {
+                System.err.println(">>> #################################");
+                System.err.println(">>> Null bounds for row " + row + " with value " + value);
+            }
             currentX = cellBounds.x;
             currentWidth = cellBounds.width;
             
