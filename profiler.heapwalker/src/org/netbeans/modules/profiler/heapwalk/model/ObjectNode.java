@@ -168,9 +168,11 @@ public class ObjectNode extends InstanceNode {
                 if (getMode() == HeapWalkerNode.MODE_FIELDS) {
                     if (hasInstance()) {
                         ArrayList fieldValues = new ArrayList();
+                        DynamicObject dynObj = new DynamicObject(getInstance());
+                        fieldValues.addAll(dynObj.getFieldValues());
+                        fieldValues.addAll(dynObj.getStaticFieldValues());
                         fieldValues.addAll(getInstance().getFieldValues());
                         fieldValues.addAll(getInstance().getStaticFieldValues());
-
                         if (fieldValues.size() == 0) {
                             // Instance has no fields
                             children = new HeapWalkerNode[1];
