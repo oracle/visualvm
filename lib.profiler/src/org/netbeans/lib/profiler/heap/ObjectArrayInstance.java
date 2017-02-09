@@ -65,7 +65,7 @@ public interface ObjectArrayInstance extends Instance {
      * returns list of elements. The elements are instances of {@link Instance}.
      * The list is ordered as the original array.
      * <br>
-     * Speed: normal
+     * Speed: fast
      * @return list {@link Instance} of elements.
      */
     List /*<Instance>*/ getValues();
