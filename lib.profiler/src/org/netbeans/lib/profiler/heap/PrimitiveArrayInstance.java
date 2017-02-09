@@ -65,8 +65,8 @@ public interface PrimitiveArrayInstance extends Instance {
      * returns list of element values. The elements are instances of {@link String}.
      * The list is ordered as the original array.
      * <br>
-     * Speed: slow
-     * @return list{@link String} of elements values.
+     * Speed: fast
+     * @return list of {@link String} of element values.
      */
     List /*<String>*/ getValues();
 }
