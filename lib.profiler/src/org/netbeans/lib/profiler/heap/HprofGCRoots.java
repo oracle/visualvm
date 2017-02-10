@@ -80,8 +80,8 @@ class HprofGCRoots {
                 gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_MONITOR_USED)));
                 gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_THREAD_OBJECT)));
 
-                gcRootsList = new ArrayList(gcRoots.values());
-                Collections.sort(gcRootsList, new Comparator() {
+                List rootList = new ArrayList(gcRoots.values());
+                Collections.sort(rootList, new Comparator() {
                     public int compare(Object o1, Object o2) {
                         HprofGCRoot r1 = (HprofGCRoot) o1;
                         HprofGCRoot r2 = (HprofGCRoot) o2;
@@ -93,6 +93,7 @@ class HprofGCRoots {
                         return Long.compare(r1.getInstanceId(), r2.getInstanceId());
                     }
                 });
+                gcRootsList = Collections.unmodifiableList(rootList);
             }
 
             return gcRootsList;

@@ -121,7 +121,7 @@ class ClassDump extends HprofObject implements JavaClass {
     public List /*<Field>*/ getFields() {
         List filedsList = (List) classDumpSegment.fieldsCache.get(this);
         if (filedsList == null) {
-            filedsList = computeFields();
+            filedsList = Collections.unmodifiableList(computeFields());
             classDumpSegment.fieldsCache.put(this,filedsList);
         }
         return filedsList;
@@ -223,7 +223,7 @@ class ClassDump extends HprofObject implements JavaClass {
     }
 
     public Collection /*<JavaClass>*/ getSubClasses() {
-        List classes = classDumpSegment.hprofHeap.getAllClasses();
+        List classes = getHprof().getAllClasses();
         List subclasses = new ArrayList(classes.size() / 10);
         Map subclassesMap = new HashMap((classes.size() * 4) / 3);
 
