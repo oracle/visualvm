@@ -97,22 +97,6 @@ public class ObjectFieldNode extends ObjectNode implements HeapWalkerFieldNode {
         return processLoopIcon(icon);
     }
 
-    protected String computeType() {
-        if ((getMode() == HeapWalkerNode.MODE_REFERENCES) && isStatic()) {
-            return fieldValue.getField().getDeclaringClass().getName();
-        }
-
-        return super.computeType();
-    }
-
-    protected String computeValue() {
-        if ((getMode() == HeapWalkerNode.MODE_REFERENCES) && isStatic()) {
-            return "class " + BrowserUtils.getSimpleType(fieldValue.getField().getDeclaringClass().getName()); // NOI18N
-        }
-
-        return super.computeValue();
-    }
-
     private HeapWalkerNode computeClassLoopTo() {
         JavaClass declaringClass = fieldValue.getField().getDeclaringClass();
         HeapWalkerNode parent = getParent();
