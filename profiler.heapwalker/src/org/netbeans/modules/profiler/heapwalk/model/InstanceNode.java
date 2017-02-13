@@ -56,7 +56,6 @@ import javax.swing.event.ChangeListener;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.lib.profiler.heap.HeapProgress;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
 
 
 /**
@@ -188,21 +187,6 @@ public abstract class InstanceNode extends AbstractHeapWalkerNode implements Hea
     protected String computeValue() {
         if (!hasInstance()) {
             return "null"; // NOI18N
-        }
-
-        // TODO: can/should this be implemented using a DetailsProvider?
-        if ("java.lang.Class".equals(instance.getJavaClass().getName())) { // NOI18N
-
-            HeapWalkerNode root = BrowserUtils.getRoot(this);
-
-            if (root instanceof org.netbeans.modules.profiler.heapwalk.model.RootNode) {
-                JavaClass javaClass = ((org.netbeans.modules.profiler.heapwalk.model.RootNode) root).getJavaClassByID(instance
-                                                                                                                                                             .getInstanceId());
-
-                if (javaClass != null) {
-                    return "#" + instance.getInstanceNumber() + " - " + BrowserUtils.getSimpleType(javaClass.getName()); // NOI18N
-                }
-            }
         }
         
         return "#" + instance.getInstanceNumber(); // NOI18N
