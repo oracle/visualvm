@@ -44,12 +44,16 @@ package org.netbeans.modules.profiler.heapwalk.oql.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Rectangle;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import javax.swing.text.Document;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -103,6 +107,15 @@ public class OQLEditor extends JPanel {
                 public void callback(boolean lexingResult) {
                     lexervalid = lexingResult;
                     validateScript();
+                }
+            });
+            
+            queryEditor.getCaret().addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
+                    try {
+                        Rectangle edit = queryEditor.getUI().modelToView(queryEditor, queryEditor.getCaretPosition());
+                        if (edit != null) queryEditor.scrollRectToVisible(edit);
+                    } catch (BadLocationException ex) {}
                 }
             });
         } else {
