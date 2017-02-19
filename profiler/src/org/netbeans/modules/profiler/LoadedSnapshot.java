@@ -384,12 +384,13 @@ public class LoadedSnapshot {
 
             // binary file format:
             // 1. magic number: "nbprofiler"
-            // 2. int type
-            // 3. int length of snapshot data size
-            // 4. snapshot data bytes
-            // 5. int length of settings data size
-            // 6. settings data bytes (.properties plain text file format)
-            // 7. String (UTF) custom comments
+            // 2. byte major, minor version
+            // 3. int type
+            // 4. int length of snapshot data size
+            // 5. snapshot data bytes
+            // 6. int length of settings data size
+            // 7. settings data bytes (.properties plain text file format)
+            // 8. String (UTF) custom comments
 
             // 1. magic number: "nbprofiler"
             byte[] magicArray = new byte[PROFILER_FILE_MAGIC_STRING.length()];
@@ -399,7 +400,7 @@ public class LoadedSnapshot {
                 throw new IOException(Bundle.LoadedSnapshot_InvalidSnapshotFileMsg());
             }
 
-            // 2. int type
+            // 2. byte major, minor version
             byte majorVersion = dis.readByte();
             byte minorVersion = dis.readByte();
 
@@ -470,6 +471,7 @@ public class LoadedSnapshot {
                 throw new IOException(Bundle.LoadedSnapshot_SnapshotFileCorruptedReason(Bundle.LoadedSnapshot_CannotReadSettingsDataMsg()));
             }
             
+            // 8. String (UTF) custom comments
             if (minorVersion >= SNAPSHOT_FILE_VERSION_MINOR) {
                 userComments = dis.readUTF();
             }
