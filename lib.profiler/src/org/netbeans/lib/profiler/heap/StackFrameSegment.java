@@ -72,7 +72,7 @@ class StackFrameSegment extends TagBounds {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     StackFrameSegment(HprofHeap heap, long start, long end) {
-        super(HprofHeap.STACK_TRACE, start, end);
+        super(HprofHeap.STACK_FRAME, start, end);
 
         int idSize = heap.dumpBuffer.getIDSize();
         hprofHeap = heap;
