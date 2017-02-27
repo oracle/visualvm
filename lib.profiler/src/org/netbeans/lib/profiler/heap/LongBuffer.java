@@ -50,7 +50,6 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -73,11 +72,13 @@ class LongBuffer {
     private int bufferSize;
     private int readOffset;
     private int longs;
+    private CacheDirectory cacheDirectory;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    LongBuffer(int size) {
+    LongBuffer(int size, CacheDirectory cacheDir) {
         buffer = new long[size];
+        cacheDirectory = cacheDir;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -168,8 +169,7 @@ class LongBuffer {
         }
 
         if (backingFile == null) {
-            backingFile = File.createTempFile("NBProfiler", ".gc"); // NOI18N
-            backingFile.deleteOnExit();
+            backingFile = cacheDirectory.createTempFile("NBProfiler", ".gc"); // NOI18N
         }
 
         if (writeStream == null) {
@@ -186,7 +186,7 @@ class LongBuffer {
     }
     
     LongBuffer revertBuffer() throws IOException {
-        LongBuffer reverted = new LongBuffer(buffer.length);
+        LongBuffer reverted = new LongBuffer(buffer.length, cacheDirectory);
         
         if (bufferSize < buffer.length) {
             for (int i=0;i<bufferSize;i++) {
@@ -210,4 +210,35 @@ class LongBuffer {
         return longs;
     }
     
+    // serialization support
+    void writeToStream(DataOutputStream out) throws IOException {
+        out.writeInt(bufferSize);
+        out.writeInt(readOffset);
+        out.writeInt(longs);
+        out.writeInt(buffer.length);
+        out.writeBoolean(useBackingFile);
+        if (useBackingFile) {
+            out.writeUTF(backingFile.getAbsolutePath());
+        } else {
+            for (int i=0; i<bufferSize; i++) {
+                out.writeLong(buffer[i]);
+            }
+        }
+    }
+
+    LongBuffer(DataInputStream dis, CacheDirectory cacheDir) throws IOException {
+        bufferSize = dis.readInt();
+        readOffset = dis.readInt();
+        longs = dis.readInt();
+        buffer = new long[dis.readInt()];
+        useBackingFile = dis.readBoolean();
+        if (useBackingFile) {
+            backingFile = cacheDir.getCacheFile(dis.readUTF());
+        } else {
+            for (int i=0; i<bufferSize; i++) {
+                buffer[i] = dis.readLong();
+            }
+        }
+        cacheDirectory = cacheDir;
+    } 
 }

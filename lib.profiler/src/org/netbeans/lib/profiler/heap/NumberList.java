@@ -43,6 +43,8 @@
 
 package org.netbeans.lib.profiler.heap;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -71,19 +73,20 @@ class NumberList {
     private long blocks;
     private MappedByteBuffer buf;
     private long mappedSize;
+    private CacheDirectory cacheDirectory;
     
-    NumberList(long dumpFileSize) throws IOException {
-        this(bytes(dumpFileSize));
+    NumberList(long dumpFileSize, CacheDirectory cacheDir) throws IOException {
+        this(bytes(dumpFileSize), cacheDir);
     }
     
-    NumberList(int elSize) throws IOException {
-        dataFile = File.createTempFile("NBProfiler", ".ref"); // NOI18N
+    NumberList(int elSize, CacheDirectory cacheDir) throws IOException {
+        dataFile = cacheDir.createTempFile("NBProfiler", ".ref"); // NOI18N
         data = new RandomAccessFile(dataFile, "rw"); // NOI18N
         numberSize = elSize;
         blockCache = new BlockLRUCache();
         dirtyBlocks = new HashSet(100000);
         blockSize = (NUMBERS_IN_BLOCK + 1) * numberSize;
-        dataFile.deleteOnExit();
+        cacheDirectory = cacheDir;
         addBlock(); // first block is unused, since it starts at offset 0
     }
      
@@ -113,7 +116,9 @@ class NumberList {
     }
     
     protected void finalize() throws Throwable {
-        dataFile.delete();
+        if (cacheDirectory.isTemporary()) {
+            dataFile.delete();
+        }
         super.finalize();
     }
     
@@ -340,6 +345,31 @@ class NumberList {
         data.write(blocks,0,dataOffset);
         dirtyBlocks.clear();
     }
+
+    //---- Serialization support
+    void writeToStream(DataOutputStream out) throws IOException {
+        out.writeUTF(dataFile.getAbsolutePath());
+        out.writeInt(numberSize);
+        out.writeLong(blocks);
+        out.writeBoolean(buf != null);        
+    }
+
+    NumberList(DataInputStream dis, CacheDirectory cacheDir) throws IOException {
+        boolean mmaped;
+        
+        cacheDirectory = cacheDir;
+        dataFile = cacheDirectory.getCacheFile(dis.readUTF());
+        data = new RandomAccessFile(dataFile, "rw"); // NOI18N
+        numberSize = dis.readInt();
+        blocks = dis.readLong();
+        mmaped = dis.readBoolean();
+        blockCache = new BlockLRUCache();
+        dirtyBlocks = new HashSet(100000);
+        blockSize = (NUMBERS_IN_BLOCK + 1) * numberSize;
+        if (mmaped) {
+            mmapData();
+        }
+    }    
     
     private class BlockLRUCache extends LinkedHashMap {
         

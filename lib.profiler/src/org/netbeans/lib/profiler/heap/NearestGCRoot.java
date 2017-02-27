@@ -43,6 +43,8 @@
 
 package org.netbeans.lib.profiler.heap;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -236,10 +238,10 @@ class NearestGCRoot {
     }
 
     private void createBuffers() {
-        readBuffer = new LongBuffer(BUFFER_SIZE);
-        writeBuffer = new LongBuffer(BUFFER_SIZE);
-        leaves = new LongBuffer(BUFFER_SIZE);
-        multipleParents = new LongBuffer(BUFFER_SIZE);
+        readBuffer = new LongBuffer(BUFFER_SIZE, heap.cacheDirectory);
+        writeBuffer = new LongBuffer(BUFFER_SIZE, heap.cacheDirectory);
+        leaves = new LongBuffer(BUFFER_SIZE, heap.cacheDirectory);
+        multipleParents = new LongBuffer(BUFFER_SIZE, heap.cacheDirectory);
     }
 
     private void deleteBuffers() {
@@ -372,5 +374,23 @@ class NearestGCRoot {
     LongBuffer getMultipleParents() {
         computeGCRoots();
         return multipleParents;
+    }
+
+    //---- Serialization support
+    void writeToStream(DataOutputStream out) throws IOException {
+        out.writeBoolean(gcRootsComputed);
+        if (gcRootsComputed) {
+            leaves.writeToStream(out);
+            multipleParents.writeToStream(out);
+        }
+    }
+
+    NearestGCRoot(HprofHeap h, DataInputStream dis) throws IOException {
+        this(h);
+        gcRootsComputed = dis.readBoolean();
+        if (gcRootsComputed) {
+            leaves = new LongBuffer(dis, heap.cacheDirectory);
+            multipleParents = new LongBuffer(dis, heap.cacheDirectory);
+        }
     }
 }

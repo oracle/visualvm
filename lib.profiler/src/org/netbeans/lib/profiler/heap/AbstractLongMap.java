@@ -43,6 +43,8 @@
 
 package org.netbeans.lib.profiler.heap;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -71,10 +73,11 @@ abstract class AbstractLongMap {
     final int ID_SIZE;
     final int FOFFSET_SIZE;
     Data dumpBuffer;
+    CacheDirectory cacheDirectory;
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    AbstractLongMap(int size,int idSize,int foffsetSize,int valueSize) throws FileNotFoundException, IOException {
+    AbstractLongMap(int size,int idSize,int foffsetSize,int valueSize,CacheDirectory cacheDir) throws FileNotFoundException, IOException {
         assert idSize == 4 || idSize == 8;
         assert foffsetSize == 4 || foffsetSize == 8;
         keys = (size * 4L) / 3L;
@@ -84,7 +87,7 @@ abstract class AbstractLongMap {
         VALUE_SIZE = valueSize;
         ENTRY_SIZE = KEY_SIZE + VALUE_SIZE;
         fileSize = keys * ENTRY_SIZE;
-        tempFile = File.createTempFile("NBProfiler", ".map"); // NOI18N
+        tempFile = cacheDir.createTempFile("NBProfiler", ".map"); // NOI18N
 
         RandomAccessFile file = new RandomAccessFile(tempFile, "rw"); // NOI18N
         if (Boolean.getBoolean("org.netbeans.lib.profiler.heap.zerofile")) {    // NOI18N
@@ -96,13 +99,15 @@ abstract class AbstractLongMap {
         }
         file.setLength(fileSize);
         setDumpBuffer(file);
-        tempFile.deleteOnExit();
+        cacheDirectory = cacheDir;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     protected void finalize() throws Throwable {
-        tempFile.delete();
+        if (cacheDirectory.isTemporary()) {
+            tempFile.delete();
+        }
         super.finalize();
     }
 
@@ -128,9 +133,12 @@ abstract class AbstractLongMap {
         long index = getIndex(key);
 
         while (true) {
-            if (getID(index) == 0L) {
+            long mapKey = getID(index);
+            if (mapKey == 0L) {
                 putID(index, key);
                 return createEntry(index,value);
+            } else if (mapKey == key) {
+                return createEntry(index);
             }
 
             index = getNextIndex(index);
@@ -185,6 +193,30 @@ abstract class AbstractLongMap {
         }
     }
 
+    //---- Serialization support
+    void writeToStream(DataOutputStream out) throws IOException {
+        out.writeLong(keys);
+        out.writeInt(ID_SIZE);
+        out.writeInt(FOFFSET_SIZE);
+        out.writeInt(VALUE_SIZE);
+        out.writeUTF(tempFile.getAbsolutePath());
+    }
+
+    AbstractLongMap(DataInputStream dis, CacheDirectory cacheDir) throws IOException {
+        keys = dis.readLong();
+        ID_SIZE = dis.readInt();
+        FOFFSET_SIZE = dis.readInt();
+        VALUE_SIZE = dis.readInt();
+        tempFile = cacheDir.getCacheFile(dis.readUTF());
+        
+        KEY_SIZE = ID_SIZE;
+        ENTRY_SIZE = KEY_SIZE + VALUE_SIZE;
+        fileSize = keys * ENTRY_SIZE;
+        RandomAccessFile file = new RandomAccessFile(tempFile, "rw"); // NOI18N
+        setDumpBuffer(file);
+        cacheDirectory = cacheDir;
+    }
+    
     private long getIndex(long key) {
         long hash = key & 0x7FFFFFFFFFFFFFFFL;
         return (hash % keys) * ENTRY_SIZE;

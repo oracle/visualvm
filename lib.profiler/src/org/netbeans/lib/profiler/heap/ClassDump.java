@@ -43,6 +43,9 @@
 
 package org.netbeans.lib.profiler.heap;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -526,4 +529,22 @@ class ClassDump extends HprofObject implements JavaClass {
             throw new NoSuchElementException();
         } 
     }
+
+    //---- Serialization support
+    void writeToStream(DataOutputStream out) throws IOException {
+        out.writeLong(fileOffset);
+        out.writeInt(instances);
+        out.writeLong(firstInstanceOffset);
+        out.writeLong(loadClassOffset);
+        out.writeLong(retainedSizeByClass);        
+    }
+
+    ClassDump(ClassDumpSegment segment, long offset, DataInputStream dis) throws IOException {
+        this(segment, offset);
+        instances = dis.readInt();
+        firstInstanceOffset = dis.readLong();
+        loadClassOffset = dis.readLong();
+        retainedSizeByClass = dis.readLong();        
+    }
+
 }

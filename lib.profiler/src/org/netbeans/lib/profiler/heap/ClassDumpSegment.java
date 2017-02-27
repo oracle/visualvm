@@ -43,6 +43,9 @@
 
 package org.netbeans.lib.profiler.heap;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -253,7 +256,7 @@ class ClassDumpSegment extends TagBounds {
         return classes;
     }
 
-    private void extractSpecialClasses() {
+    void extractSpecialClasses() {
         primitiveArrayMap = new HashMap();
 
         Iterator classIt = classes.iterator();
@@ -304,6 +307,35 @@ class ClassDumpSegment extends TagBounds {
             if (typeObj != null) {
                 primitiveArrayMap.put(typeObj, jcls);
             }
+        }
+    }
+
+    //---- Serialization support
+    void writeToStream(DataOutputStream out) throws IOException {
+        super.writeToStream(out);
+        if (classes == null) {
+            out.writeInt(0);
+        } else {
+            out.writeInt(classes.size());
+            for (int i=0; i<classes.size(); i++) {
+                ClassDump classDump = (ClassDump) classes.get(i);
+
+                classDump.writeToStream(out);
+            }
+        }
+    }
+
+    ClassDumpSegment(HprofHeap heap, long start, long end, DataInputStream dis) throws IOException {
+        this(heap, start, end);
+        int classesSize = dis.readInt();
+        if (classesSize != 0) {
+            List cls = new ArrayList /*<JavaClass>*/(classesSize);
+            
+            for (int i=0; i<classesSize; i++) {
+                cls.add(new ClassDump(this, dis.readLong(), dis));
+            }
+            classes = Collections.unmodifiableList(cls);
+            arrayMap = new HashMap(classes.size() / 15);
         }
     }
     

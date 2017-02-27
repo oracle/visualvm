@@ -95,8 +95,8 @@ class DomMap extends AbstractLongMap {
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    DomMap(int size,int idSize,int foffsetSize) throws FileNotFoundException, IOException {
-        super(size,idSize,foffsetSize,idSize);
+    DomMap(int size,int idSize,int foffsetSize, CacheDirectory cacheDir) throws FileNotFoundException, IOException {
+        super(size,idSize,foffsetSize,idSize,cacheDir);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------

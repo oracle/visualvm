@@ -43,6 +43,8 @@
 
 package org.netbeans.lib.profiler.heap;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
@@ -262,9 +264,9 @@ class LongMap extends AbstractLongMap {
     
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    LongMap(int size,int idSize,int foffsetSize) throws FileNotFoundException, IOException {
-        super(size,idSize,foffsetSize,foffsetSize + 4 + 1 + idSize + foffsetSize);
-        referenceList = new NumberList(ID_SIZE);
+    LongMap(int size,int idSize,int foffsetSize,CacheDirectory cacheDir) throws FileNotFoundException, IOException {
+        super(size,idSize,foffsetSize,foffsetSize + 4 + 1 + idSize + foffsetSize, cacheDir);
+        referenceList = new NumberList(ID_SIZE, cacheDir);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -313,5 +315,16 @@ class LongMap extends AbstractLongMap {
             bigIds[i++]=((RetainedSizeEntry)it.next()).instanceId;
         }
         return bigIds;
+    }
+
+    //---- Serialization support    
+    void writeToStream(DataOutputStream out) throws IOException {
+        super.writeToStream(out);
+        referenceList.writeToStream(out);
+    }
+    
+    LongMap(DataInputStream dis, CacheDirectory cacheDir) throws IOException {
+        super(dis, cacheDir);
+        referenceList = new NumberList(dis, cacheDir);
     }
 }

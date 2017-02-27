@@ -174,7 +174,7 @@ class TreeObject {
     }
     
     private void createBuffers() {
-        readBuffer = new LongBuffer(BUFFER_SIZE);
+        readBuffer = new LongBuffer(BUFFER_SIZE, heap.cacheDirectory);
     }
     
     private void deleteBuffers() {

@@ -43,8 +43,12 @@
 
 package org.netbeans.lib.profiler.heap;
 
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -105,6 +109,9 @@ class HprofHeap implements Heap {
     static final int LONG = 11;
     private static final boolean DEBUG = false;
 
+    private static final String SNAPSHOT_ID = "NBPHD";
+    private static final int SNAPSHOT_VERSION  = 1;
+    
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     HprofByteBuffer dumpBuffer;
@@ -124,9 +131,14 @@ class HprofHeap implements Heap {
     private int idMapSize;
     private int segment;
 
+    // for serialization
+    File heapDumpFile;
+    CacheDirectory cacheDirectory;
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    HprofHeap(File dumpFile, int seg) throws FileNotFoundException, IOException {
+    HprofHeap(File dumpFile, int seg, CacheDirectory cacheDir) throws FileNotFoundException, IOException {
+        cacheDirectory = cacheDir;
         dumpBuffer = HprofByteBuffer.createHprofByteBuffer(dumpFile);
         segment = seg;
         fillTagBounds(dumpBuffer.getHeaderSize());
@@ -136,9 +148,10 @@ class HprofHeap implements Heap {
             fillHeapTagBounds();
         }
 
-        idToOffsetMap = new LongMap(idMapSize,dumpBuffer.getIDSize(),dumpBuffer.getFoffsetSize());
+        idToOffsetMap = new LongMap(idMapSize,dumpBuffer.getIDSize(),dumpBuffer.getFoffsetSize(), cacheDirectory);
         nearestGCRoot = new NearestGCRoot(this);
         gcRoots = new HprofGCRoots(this);
+        heapDumpFile = dumpFile;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -273,6 +286,68 @@ class HprofHeap implements Heap {
         return null;
     }
 
+    //---- Serialization support
+    void writeToFile() {
+        if (!cacheDirectory.isTemporary()) {
+            try {
+                DataOutputStream out;
+                File outFile = cacheDirectory.getHeapDumpAuxFile();
+                out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(outFile), 32768));
+                writeToStream(out);
+                out.close();
+            } catch (IOException ex) {
+                ex.printStackTrace(System.err);
+            }
+        }
+    }
+    
+    void writeToStream(DataOutputStream out) throws IOException {
+        out.writeUTF(SNAPSHOT_ID);
+        out.writeInt(SNAPSHOT_VERSION);
+        out.writeUTF(heapDumpFile.getAbsolutePath());
+        nearestGCRoot.writeToStream(out);
+        allInstanceDumpBounds.writeToStream(out);
+        heapDumpSegment.writeToStream(out);
+        TagBounds.writeToStream(heapTagBounds, out);
+        TagBounds.writeToStream(tagBounds, out);
+        out.writeBoolean(instancesCountComputed);
+        out.writeBoolean(referencesComputed);
+        out.writeBoolean(retainedSizeComputed);
+        out.writeBoolean(retainedSizeByClassComputed);
+        out.writeInt(idMapSize);
+        out.writeInt(segment);        
+        idToOffsetMap.writeToStream(out);
+    }
+
+    HprofHeap(DataInputStream dis, CacheDirectory cacheDir) throws IOException {
+        String id = dis.readUTF();
+        if (!SNAPSHOT_ID.equals(id)) {
+            throw new IOException("Invalid HPROF dump id "+id);
+        }
+        int version = dis.readInt();
+        if (version != SNAPSHOT_VERSION) {
+            throw new IOException("Invalid HPROF version "+SNAPSHOT_VERSION+" loaded "+version);            
+        }
+        heapDumpFile = cacheDir.getHeapFile(dis.readUTF());
+        cacheDirectory = cacheDir;
+        dumpBuffer = HprofByteBuffer.createHprofByteBuffer(heapDumpFile);
+        nearestGCRoot = new NearestGCRoot(this, dis);
+        allInstanceDumpBounds = new TagBounds(dis);
+        heapDumpSegment = new TagBounds(dis);
+        heapTagBounds = new TagBounds[0x100];
+        TagBounds.readFromStream(dis, this, heapTagBounds);
+        TagBounds.readFromStream(dis, this, tagBounds);        
+        instancesCountComputed = dis.readBoolean();
+        referencesComputed = dis.readBoolean();
+        retainedSizeComputed = dis.readBoolean();
+        retainedSizeByClassComputed = dis.readBoolean();
+        idMapSize = dis.readInt();
+        segment = dis.readInt();
+        idToOffsetMap = new LongMap(dis, cacheDirectory);
+        gcRoots = new HprofGCRoots(this);
+        getClassDumpSegment().extractSpecialClasses();            
+    }
+    
     ClassDumpSegment getClassDumpSegment() {
         return (ClassDumpSegment) heapTagBounds[CLASS_DUMP];
     }
@@ -425,8 +500,9 @@ class HprofHeap implements Heap {
             }
             HeapProgress.progress(counter,allInstanceDumpBounds.startOffset,start,allInstanceDumpBounds.endOffset);
         }
-        HeapProgress.progressFinish();
         instancesCountComputed = true;
+        writeToFile();
+        HeapProgress.progressFinish();
     }
 
     List findReferencesFor(long instanceId) {
@@ -577,8 +653,9 @@ class HprofHeap implements Heap {
             }
         }
         idToOffsetMap.flush();
-        HeapProgress.progressFinish();        
         referencesComputed = true;
+        writeToFile();
+        HeapProgress.progressFinish();        
     }
     
     synchronized void computeRetainedSize() {
@@ -639,6 +716,7 @@ class HprofHeap implements Heap {
             }
         }
         retainedSizeComputed = true;
+        writeToFile();
     }
 
     synchronized void computeRetainedSizeByClass() {
@@ -674,6 +752,7 @@ class HprofHeap implements Heap {
         // all done, release domTree
         domTree = null;
         retainedSizeByClassComputed = true;
+        writeToFile();
     }
 
     synchronized Instance getNearestGCRootPointer(Instance instance) {
