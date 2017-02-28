@@ -321,6 +321,11 @@ class ClassDumpSegment extends TagBounds {
                 ClassDump classDump = (ClassDump) classes.get(i);
 
                 classDump.writeToStream(out);
+                Long size = (Long) arrayMap.get(classDump);
+                out.writeBoolean(size != null);
+                if (size != null) {
+                    out.writeLong(size.longValue());
+                }
             }
         }
     }
@@ -330,12 +335,17 @@ class ClassDumpSegment extends TagBounds {
         int classesSize = dis.readInt();
         if (classesSize != 0) {
             List cls = new ArrayList /*<JavaClass>*/(classesSize);
+            arrayMap = new HashMap(classesSize / 15);
             
             for (int i=0; i<classesSize; i++) {
-                cls.add(new ClassDump(this, dis.readLong(), dis));
+                ClassDump c = new ClassDump(this, dis.readLong(), dis);
+                cls.add(c);
+                if (dis.readBoolean()) {
+                    Long size = Long.valueOf(dis.readLong());
+                    arrayMap.put(c, size);
+                }
             }
             classes = Collections.unmodifiableList(cls);
-            arrayMap = new HashMap(classes.size() / 15);
         }
     }
     
