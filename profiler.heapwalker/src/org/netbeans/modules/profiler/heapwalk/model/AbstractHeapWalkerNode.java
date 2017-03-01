@@ -150,6 +150,10 @@ public abstract class AbstractHeapWalkerNode extends HeapWalkerNode {
 
         return name;
     }
+    
+    public void setParent(HeapWalkerNode parent) {
+        this.parent = parent;
+    }
 
     public HeapWalkerNode getParent() {
         return parent;

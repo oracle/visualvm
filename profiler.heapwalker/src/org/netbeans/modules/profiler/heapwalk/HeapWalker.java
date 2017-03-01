@@ -88,7 +88,7 @@ public class HeapWalker {
         heapWalkerName = Bundle.ClassesListController_HeapWalkerDefaultName();
         createMainFragment(heap);
         
-        computeRetainedSizes();
+//        computeRetainedSizes();
     }
 
     public HeapWalker(File heapFile) throws FileNotFoundException, IOException {

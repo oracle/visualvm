@@ -243,8 +243,7 @@ public class ProfilerTable extends JTable {
             c.setBackground(UIManager.getColor("TextField.inactiveBackground")); // NOI18N
         } else {
             if (cEnabled) c.setForeground(getForeground());
-            c.setBackground((row & 0x1) == 0 ? getBackground() :
-                            UIUtils.getDarker(getBackground()));
+            c.setBackground(background(row, column));
         }
         
         c.move(0, 0);
@@ -256,6 +255,18 @@ public class ProfilerTable extends JTable {
         } else {
             return c;
         }
+    }
+    
+    private Color background(int row, int column) {
+        Color background = (row & 0x1) == 0 ? getBackground() : UIUtils.getDarker(getBackground());
+//        if (convertColumnIndexToModel(column) == getSortColumn()) return UIUtils.getDarker(background);
+        if (convertColumnIndexToModel(column) == getSortColumn()) {
+            int r = background.getRed() - 4;
+            int g = background.getGreen() - 4;
+            int b = background.getBlue() + 6;
+            background = UIUtils.getSafeColor(r, g, b);
+        }
+        return background;
     }
     
     public Component prepareEditor(TableCellEditor editor, int row, int column) {
