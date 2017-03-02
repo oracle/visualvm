@@ -244,6 +244,26 @@ public class HeapTest {
         }
         assertEquals(instances, heap.getSummary().getTotalLiveInstances());
     }
+
+    /**
+     * Test of getInstancesIterator method, of class JavaClass.
+     */
+    @Test
+    public void getInstancesIterator() {
+        System.out.println("getInstancesIterator");
+        List<JavaClass> classes = heap.getAllClasses();
+        
+        for (JavaClass clazz : classes) {
+            List<Instance> instances = clazz.getInstances();
+            Iterator instIt = clazz.getInstancesIterator();
+            
+            for (Instance i : instances) {
+                assertTrue(instIt.hasNext());
+                assertEquals(i, instIt.next());
+            }
+            assertFalse(instIt.hasNext());
+        }
+    }
     
     @Test
     public void testHeapDumpLog() throws IOException, URISyntaxException {

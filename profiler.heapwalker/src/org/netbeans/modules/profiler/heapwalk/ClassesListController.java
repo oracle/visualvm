@@ -339,6 +339,11 @@ public class ClassesListController extends AbstractController {
             return null;
         }
 
+        public Iterator getInstancesIterator() {
+            // Not implemented
+            return null;
+        }
+
         public int getInstancesCount() {
             return instancesCount;
         }
