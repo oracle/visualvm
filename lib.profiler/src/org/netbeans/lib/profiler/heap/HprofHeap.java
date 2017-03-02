@@ -49,11 +49,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 
 /**
@@ -195,7 +194,7 @@ class HprofHeap implements Heap {
         if (entry == null) {
             return null;
         }
-        return getInstanceByOffset(entry.getOffset());
+        return getInstanceByOffset(new long[] {entry.getOffset()});
     }
 
     public JavaClass getJavaClassByID(long javaclassId) {
@@ -214,6 +213,35 @@ class HprofHeap implements Heap {
             return Collections.EMPTY_LIST;
         }
         return getClassDumpSegment().getJavaClassesByRegExp(regexp);
+    }
+    
+    
+    private class InstancesIterator implements Iterator {
+        private long[] offset;
+        
+        private InstancesIterator() {
+            offset = new long[] { allInstanceDumpBounds.startOffset };
+        }
+
+        public boolean hasNext() {
+            return offset[0] < allInstanceDumpBounds.endOffset;
+        }
+
+        public Object next() {
+            if (hasNext()) {
+                return getInstanceByOffset(offset);
+            }
+            throw new NoSuchElementException();
+        }
+    }
+        
+    public Iterator getAllInstancesIterator() {
+        // make sure java classes are initialized
+        List classes = getAllClasses();
+        if (classes.isEmpty()) {
+            return Collections.EMPTY_LIST.iterator();
+        }
+        return new InstancesIterator();
     }
     
     public synchronized HeapSummary getSummary() {
@@ -299,14 +327,17 @@ class HprofHeap implements Heap {
         }
     }
 
-    Instance getInstanceByOffset(long start) {
+    Instance getInstanceByOffset(long[] offset) {
+        return getInstanceByOffset(offset, -1);
+    }
+
+    Instance getInstanceByOffset(long[] offset, long instanceClassId) {
+        long start = offset[0];
         assert start != 0L;
         ClassDump classDump;
         ClassDumpSegment classDumpBounds = getClassDumpSegment();
         int idSize = dumpBuffer.getIDSize();
         int classIdOffset = 0;
-
-        long[] offset = new long[] { start };
 
         int tag = readDumpTag(offset);
 
@@ -320,10 +351,16 @@ class HprofHeap implements Heap {
 
         if (tag == PRIMITIVE_ARRAY_DUMP) {
             classDump = classDumpBounds.getPrimitiveArrayClass(dumpBuffer.get(start + 1 + classIdOffset));
+            if (instanceClassId != -1 && classDump.getJavaClassId() != instanceClassId) {
+                return null;
+            }
 
             return new PrimitiveArrayDump(classDump, start);
         } else {
             long classId = dumpBuffer.getID(start + 1 + classIdOffset);
+            if (instanceClassId != -1 && classId != instanceClassId) {
+                return null;
+            }
             classDump = classDumpBounds.getClassDumpByID(classId);
         }
 

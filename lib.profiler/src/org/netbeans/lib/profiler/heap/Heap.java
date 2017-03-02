@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.heap;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -132,6 +133,16 @@ public interface Heap {
      */
     Collection getJavaClassesByRegExp(String regexp);
 
+    /**
+     * returns an iterator over the {@link Instance}es in the whole heap. There are no
+     * guarantees concerning the order in which the {@link Instance}es are returned.
+     * <br>
+     * Speed: fast
+     *
+     * @return an <tt>Iterator</tt> over the {@link Instance}es in this heap
+     */
+    public Iterator getAllInstancesIterator();
+    
     /**
      * returns optional summary information of the heap.
      * If this information is not available in the dump,

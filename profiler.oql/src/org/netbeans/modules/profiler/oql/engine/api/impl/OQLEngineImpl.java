@@ -70,9 +70,6 @@ public class OQLEngineImpl {
     final private static Logger LOGGER = Logger.getLogger(OQLEngineImpl.class.getName());
 
     private static boolean oqlSupported;
-    private static final String HAT_JS_RHINO = "/org/netbeans/modules/profiler/oql/engine/api/impl/hat.js"; // NOI18N
-    private static final String NASHORN_ID = "Oracle Nashorn";          // NOI18N
-    private static final String HAT_JS_NASHORN = "/org/netbeans/modules/profiler/oql/engine/api/impl/hat_nashorn.js"; // NOI18N
 
     static {
         try {
@@ -402,7 +399,7 @@ public class OQLEngineImpl {
         try {
             ScriptEngineManager manager = new ScriptEngineManager();
             engine = manager.getEngineByName("JavaScript"); // NOI18N
-            InputStream strm = getInitStream(engine.getFactory().getParameter(ScriptEngine.ENGINE));
+            InputStream strm = getInitStream();
             CompiledScript cs = ((Compilable)engine).compile(new InputStreamReader(strm));
             cs.eval();
             Object heap = ((Invocable)engine).invokeFunction("wrapHeapSnapshot", snapshot); // NOI18N
@@ -414,15 +411,7 @@ public class OQLEngineImpl {
         }
     }
 
-    private InputStream getInitStream(Object engineId) {
-        String hatjs;
-        
-        if (engineId != null && NASHORN_ID.equals(engineId.toString())) {
-            hatjs = HAT_JS_NASHORN;            
-        } else {
-            hatjs = HAT_JS_RHINO;
-        }
-//        System.out.println("Loading "+hatjs);
-        return getClass().getResourceAsStream(hatjs);
+    private InputStream getInitStream() {
+        return getClass().getResourceAsStream("/org/netbeans/modules/profiler/oql/engine/api/impl/hat.js"); // NOI18N
     }
 }

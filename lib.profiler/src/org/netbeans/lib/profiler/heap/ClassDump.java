@@ -52,6 +52,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 
@@ -200,6 +201,14 @@ class ClassDump extends HprofObject implements JavaClass {
         }
 
         return instancesList;
+    }
+
+    public Iterator /*<Instance>*/ getInstancesIterator() {
+        int instancesCount = getInstancesCount();
+        if (instancesCount == 0) {
+            return Collections.EMPTY_LIST.iterator();
+        }
+        return new InstancesIterator(instancesCount);
     }
 
     public int getInstancesCount() {
@@ -479,5 +488,42 @@ class ClassDump extends HprofObject implements JavaClass {
         subclassesMap.put(jcls, b);
 
         return b;
+    }
+    
+    private class InstancesIterator implements Iterator {
+        
+        private long instancesCount;
+        private long[] offset;
+        TagBounds allInstanceDumpBounds;
+        HprofHeap heap;
+        long classId;
+        
+        InstancesIterator(long ic) {
+            instancesCount = ic;
+            allInstanceDumpBounds = getHprof().getAllInstanceDumpBounds();
+            offset = new long[] { firstInstanceOffset };
+            heap = getHprof();
+            classId = getJavaClassId();
+
+        }
+
+        
+        public boolean hasNext() {
+            if (instancesCount>0 && offset[0] < allInstanceDumpBounds.endOffset) {
+                return true;
+            }
+            return false;
+        }
+
+        public Object next() {
+            while (hasNext()) {
+                Instance i = heap.getInstanceByOffset(offset, classId);
+                if (i != null) {
+                    instancesCount--;
+                    return i;
+                }
+            }
+            throw new NoSuchElementException();
+        } 
     }
 }
