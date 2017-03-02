@@ -154,7 +154,7 @@ class NearestGCRoot {
                 break;
             }
             HeapProgress.progress(processedInstances++,allInstances);
-            instance = heap.getInstanceByOffset(instanceOffset);
+            instance = heap.getInstanceByOffset(new long[] {instanceOffset});
             if (instance instanceof ObjectArrayInstance) {
                 ObjectArrayDump array = (ObjectArrayDump) instance;
                 int size = array.getLength();
