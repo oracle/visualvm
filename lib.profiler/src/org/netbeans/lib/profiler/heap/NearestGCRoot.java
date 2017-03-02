@@ -336,8 +336,8 @@ class NearestGCRoot {
         return false;
     }
 
-    private void writeLong(long instanceId) throws IOException {
-        writeBuffer.writeLong(instanceId);
+    private void writeLong(long instanceOffset) throws IOException {
+        writeBuffer.writeLong(instanceOffset);
     }
 
     private void writeLeaf(long instanceId, long size) throws IOException {
