@@ -59,9 +59,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
@@ -228,6 +227,42 @@ public class HeapTest {
         assertEquals(18044, string.getRetainedSizeByClass());
         assertEquals(11315, hashMap.getRetainedSizeByClass());
         assertEquals(566, array.getRetainedSizeByClass());
+    }
+
+    /**
+     * Test of getAllInstancesIterator method, of class Heap.
+     */
+    @Test
+    public void getAllInstancesIterator() {
+        System.out.println("getAllInstancesIterator");
+        Iterator instanceIt = heap.getAllInstancesIterator();
+        int instances = 0;
+        
+        while (instanceIt.hasNext()) {
+            Instance i = (Instance) instanceIt.next();
+            instances++;
+        }
+        assertEquals(instances, heap.getSummary().getTotalLiveInstances());
+    }
+
+    /**
+     * Test of getInstancesIterator method, of class JavaClass.
+     */
+    @Test
+    public void getInstancesIterator() {
+        System.out.println("getInstancesIterator");
+        List<JavaClass> classes = heap.getAllClasses();
+        
+        for (JavaClass clazz : classes) {
+            List<Instance> instances = clazz.getInstances();
+            Iterator instIt = clazz.getInstancesIterator();
+            
+            for (Instance i : instances) {
+                assertTrue(instIt.hasNext());
+                assertEquals(i, instIt.next());
+            }
+            assertFalse(instIt.hasNext());
+        }
     }
     
     @Test

@@ -85,6 +85,9 @@ class LongBuffer {
     void delete() {
         if (backingFile != null) {
             backingFile.delete();
+            useBackingFile = false;
+            backingFile = null;
+            longs = 0;
         }
     }
 
