@@ -363,11 +363,13 @@ public final class ProfilerIDESettings implements GlobalProfilingSettings {
     }
     
     public void setEnableExpertSettings(boolean value) {
-        getPreferences().putBoolean(ENABLE_EXPERT_SETTINGS_KEY, value);
+        getPreferences().putBoolean(ENABLE_EXPERT_SETTINGS_KEY, true);
+//        getPreferences().putBoolean(ENABLE_EXPERT_SETTINGS_KEY, value);
     }
     
     public boolean getEnableExpertSettings() {
-        return getPreferences().getBoolean(ENABLE_EXPERT_SETTINGS_KEY, ENABLE_EXPERT_SETTINGS_DEFAULT);
+        return true;
+//        return getPreferences().getBoolean(ENABLE_EXPERT_SETTINGS_KEY, ENABLE_EXPERT_SETTINGS_DEFAULT);
     }
     
     public void setLogProfilerStatus(boolean value) {
