@@ -54,6 +54,7 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
@@ -176,17 +177,16 @@ public abstract class ThreadsSelector extends PopupButton {
         int[] threadIDs = snapshot == null ? null : snapshot.getThreadIds();
 //        String[] threadNames = snapshot == null ? null : snapshot.getThreadNames();
         
-        JPanel content = new JPanel(new BorderLayout());
-        
         int resizeMode;
+        JComponent content;
         
         if (threadIDs == null || threadIDs.length == 0) {
-            content.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-            JLabel noThreads = new JLabel(NO_THREADS);
-            noThreads.setOpaque(false);
-            content.add(noThreads, BorderLayout.CENTER);
+            content = new JLabel(NO_THREADS);
+            content.setBorder(BorderFactory.createEmptyBorder(9, 6, 9, 6));
             resizeMode = ProfilerPopup.RESIZE_NONE;
         } else {
+            content = new JPanel(new BorderLayout());
+            
             JLabel hint = new JLabel(SELECT_THREADS, JLabel.LEADING);
             hint.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
             content.add(hint, BorderLayout.NORTH);
