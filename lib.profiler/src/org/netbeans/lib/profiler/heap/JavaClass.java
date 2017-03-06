@@ -44,6 +44,7 @@
 package org.netbeans.lib.profiler.heap;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -119,6 +120,16 @@ public interface JavaClass extends Type {
      * @return list {@link Instance} of instances
      */
     List /*<Instance>*/ getInstances();
+
+   /**
+     * returns an iterator over the {@link Instance}es of this {@link JavaClass}. 
+     * The instances are ordered according to {@link Instance#getInstanceNumber()}.
+     * <br>
+     * Speed: fast
+     *
+     * @return an <tt>Iterator</tt> over the {@link Instance}es of this {@link JavaClass}.
+     */
+    public Iterator /*<Instance>*/ getInstancesIterator();
 
     /**
      * gets number of instances of this class.
