@@ -97,6 +97,17 @@ class HprofHeap implements Heap {
     static final int OBJECT_ARRAY_DUMP = 0x22;
     static final int PRIMITIVE_ARRAY_DUMP = 0x23;
 
+    //  HPROF HEAP 1.0.3 tags
+    static final int HEAP_DUMP_INFO                = 0xfe;
+    static final int ROOT_INTERNED_STRING          = 0x89;
+    static final int ROOT_FINALIZING               = 0x8a;
+    static final int ROOT_DEBUGGER                 = 0x8b;
+    static final int ROOT_REFERENCE_CLEANUP        = 0x8c;
+    static final int ROOT_VM_INTERNAL              = 0x8d;
+    static final int ROOT_JNI_MONITOR              = 0x8e;
+    static final int UNREACHABLE                   = 0x90; /* deprecated */
+    static final int PRIMITIVE_ARRAY_NODATA_DUMP   = 0xc3;
+
     // basic type
     static final int OBJECT = 2;
     static final int BOOLEAN = 4;
@@ -761,7 +772,7 @@ class HprofHeap implements Heap {
     
     int readDumpTag(long[] offset) {
         long position = offset[0];
-        int dumpTag = dumpBuffer.get(position++);
+        int dumpTag = dumpBuffer.get(position++) & 0xFF;
         long size = 0;
         long tagOffset = position;
         int idSize = dumpBuffer.getIDSize();
@@ -1014,6 +1025,100 @@ class HprofHeap implements Heap {
 
                 break;
             }
+
+             /* HPROF HEAP 1.0.3 tags */
+            case HEAP_DUMP_INFO: {
+
+                if (DEBUG) {
+                    System.out.println("Tag HPROF_HEAP_DUMP_INFO"); // NOI18N
+                    int heapId = dumpBuffer.getInt(position);
+                    position += 4;
+
+                    long stringID = dumpBuffer.getID(position);
+                    position += idSize;
+                    System.out.println(" Dump info id " + heapId + " String ID " + stringID); // NOI18N
+                }
+
+                size = 4 + idSize;
+
+                break;
+            }
+            case ROOT_INTERNED_STRING: {
+
+                if (DEBUG) {
+                    System.out.println("Tag HPROF_ROOT_INTERNED_STRING"); // NOI18N
+                }
+
+                size = idSize;
+
+                break;
+          }
+            case ROOT_FINALIZING: {
+
+                if (DEBUG) {
+                    System.out.println("Tag HPROF_ROOT_FINALIZING"); // NOI18N
+                }
+
+                size = idSize;
+
+                break;
+            }
+            case ROOT_DEBUGGER: {
+
+                if (DEBUG) {
+                    System.out.println("Tag HPROF_ROOT_DEBUGGER"); // NOI18N
+                }
+
+                size = idSize;
+
+                break;
+            }
+            case ROOT_REFERENCE_CLEANUP: {
+
+                if (DEBUG) {
+                    System.out.println("Tag HPROF_ROOT_REFERENCE_CLEANUP"); // NOI18N
+                }
+
+                size = idSize;
+
+                break;
+            }
+            case ROOT_VM_INTERNAL: {
+
+                if (DEBUG) {
+                    System.out.println("Tag HPROF_ROOT_VM_INTERNAL"); // NOI18N
+                }
+
+                size = idSize;
+
+                break;
+            }
+            case ROOT_JNI_MONITOR: {
+
+                if (DEBUG) {
+                    System.out.println("Tag HPROF_ROOT_JNI_MONITOR"); // NOI18N
+                }
+
+                size = idSize;
+
+                break;
+            }
+            case UNREACHABLE: {
+
+                if (DEBUG) {
+                    System.out.println("Tag HPROF_UNREACHABLE"); // NOI18N
+                }
+
+                size = idSize;
+
+                break;
+            }
+            case PRIMITIVE_ARRAY_NODATA_DUMP: {
+                    throw new IllegalArgumentException(
+                        "Don't know how to load a nodata array");
+                //break;
+            }
+
             default:throw new IllegalArgumentException("Invalid dump tag " + dumpTag + " at position " + (position - 1)); // NOI18N              
         }
 
@@ -1028,7 +1133,8 @@ class HprofHeap implements Heap {
 
         //int time = dumpBuffer.getInt(start+1);
         long len = dumpBuffer.getInt(start + 1 + 4) & 0xFFFFFFFFL;  // len is unsigned int
-        if (len == 0 && tag != HEAP_DUMP_END) { // only HEAP_DUMP_END can have zero length
+         // only HEAP_DUMP_END can have zero length
+        if (len == 0 && tag != HEAP_DUMP_END && dumpBuffer.version != HprofByteBuffer.JAVA_PROFILE_1_0_3) {
             // broken tag length
             offset[0] = -1;
         } else {

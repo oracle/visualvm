@@ -76,6 +76,11 @@ class HprofProxy {
             if (map != null) {
                 entriesObj = (ObjectArrayDump) map.getValueOfField("table"); // NOI18N
                 return getPropertiesFromTable(entriesObj, props, "key", "val"); // NOI18N
+            } else {    // old Hashtable
+                entriesObj = (ObjectArrayDump) propertiesInstance.getValueOfField("elementData"); // NOI18N
+                if (entriesObj != null) {
+                    return getPropertiesFromTable(entriesObj, props, "key", "value");   // NOI18N
+                }
             }
         }
         return null;

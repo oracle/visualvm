@@ -80,6 +80,14 @@ class HprofGCRoots {
                 gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_MONITOR_USED)));
                 gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_THREAD_OBJECT)));
 
+                // HPROF HEAP 1.0.3
+                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_INTERNED_STRING)));
+                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_FINALIZING)));
+                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_DEBUGGER)));
+                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_REFERENCE_CLEANUP)));
+                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_VM_INTERNAL)));
+                gcRoots.putAll(computeGCRootsFor(heap.getHeapTagBound(HprofHeap.ROOT_JNI_MONITOR)));
+
                 List rootList = new ArrayList(gcRoots.values());
                 Collections.sort(rootList, new Comparator() {
                     public int compare(Object o1, Object o2) {

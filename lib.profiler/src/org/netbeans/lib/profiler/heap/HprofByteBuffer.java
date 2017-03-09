@@ -59,8 +59,10 @@ abstract class HprofByteBuffer {
     // Magic header
     static final String magic1 = "JAVA PROFILE 1.0.1"; // NOI18N
     static final String magic2 = "JAVA PROFILE 1.0.2"; // NOI18N
+    static final String magic3 = "JAVA PROFILE 1.0.3"; // NOI18N
     static final int JAVA_PROFILE_1_0_1 = 1;
     static final int JAVA_PROFILE_1_0_2 = 2;
+    static final int JAVA_PROFILE_1_0_3 = 3;
     static final int MINIMAL_SIZE = 30;
     static final boolean DEBUG = false;
 
@@ -159,6 +161,8 @@ abstract class HprofByteBuffer {
             version = JAVA_PROFILE_1_0_1;
         } else if (magic2.equals(magic)) {
             version = JAVA_PROFILE_1_0_2;
+        } else if (magic3.equals(magic)) {
+            version = JAVA_PROFILE_1_0_3;
         } else {
             if (DEBUG) {
                 System.out.println("Invalid version"); // NOI18N
