@@ -77,7 +77,6 @@ import javax.swing.ButtonModel;
 import javax.swing.DefaultButtonModel;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.JWindow;
@@ -292,9 +291,7 @@ public final class ProfilerPopup {
                     addMouseMotionListener(this);
                 }
             } else {
-                JPopupMenu ref = new JPopupMenu();
-                Border border = !UIUtils.isNimbus() ? ref.getBorder() :
-                                 BorderFactory.createLineBorder(UIUtils.getDisabledLineColor());
+                Border border = BorderFactory.createLineBorder(UIUtils.getDisabledLineColor());
                 
                 if (resize) {
                     setBorder(BorderFactory.createCompoundBorder(border,
@@ -304,8 +301,6 @@ public final class ProfilerPopup {
                 } else {
                     setBorder(border);
                 }
-
-                setBackground(ref.getBackground());
             }
         }
         

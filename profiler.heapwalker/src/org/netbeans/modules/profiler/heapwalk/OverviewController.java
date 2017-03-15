@@ -56,24 +56,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import org.netbeans.lib.profiler.heap.GCRoot;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaFrameGCRoot;
-import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
-import org.netbeans.lib.profiler.heap.ThreadObjectGCRoot;
-import org.netbeans.modules.profiler.heapwalk.ui.OverviewControllerUI;
 import javax.swing.AbstractButton;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.heap.GCRoot;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.HeapSummary;
+import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.lib.profiler.heap.JavaFrameGCRoot;
+import org.netbeans.lib.profiler.heap.ThreadObjectGCRoot;
 import org.netbeans.modules.profiler.api.GoToSource;
-import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
+import org.netbeans.modules.profiler.heapwalk.ui.OverviewControllerUI;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.NbBundle;
 
@@ -90,6 +89,7 @@ import org.openide.util.NbBundle;
     "OverviewController_FileItemString=<b>File: </b>{0}",
     "OverviewController_FileSizeItemString=<b>File size: </b>{0}",
     "OverviewController_DateTakenItemString=<b>Date taken: </b>{0}",
+    "OverviewController_UpTimeItemString=<b>JVM Uptime: </b>{0}",
     "OverviewController_TotalBytesItemString=<b>Total bytes: </b>{0}",
     "OverviewController_TotalClassesItemString=<b>Total classes: </b>{0}",
     "OverviewController_TotalInstancesItemString=<b>Total instances: </b>{0}",
@@ -237,6 +237,10 @@ public class OverviewController extends AbstractController {
             return header + LINE_PREFIX + Bundle.OverviewController_NotAvailableMsg();
         }
         
+        Heap heap = heapFragmentWalker.getHeapFragment();
+        HeapSummary hsummary = heap.getSummary();
+        long startupTime = computeStartupTime(heap);
+
         String patchLevel = sysprops.getProperty("sun.os.patch.level", ""); // NOI18N
         String os = LINE_PREFIX
                 + Bundle.OverviewController_OsItemString(
@@ -269,8 +273,15 @@ public class OverviewController extends AbstractController {
         String vendor = LINE_PREFIX
                 + Bundle.OverviewController_JavaVendorItemString(
                     sysprops.getProperty("java.vendor", Bundle.OverviewController_NotAvailableMsg())); // NOI18N
+
+        String uptimeInfo = LINE_PREFIX
+                + Bundle.OverviewController_UpTimeItemString(startupTime >= 0 ? getTime(hsummary.getTime()-startupTime) :
+                          Bundle.OverviewController_NotAvailableMsg()
+                );
+
         
-        return header + os + "<br>" + arch + "<br>" + jdk + "<br>" + version + "<br>" + jvm + "<br>" + vendor; // NOI18N
+        return header + os + "<br>" + arch + "<br>" + jdk + "<br>" + version + "<br>" + jvm + "<br>" + vendor + // NOI18N
+                "<br>" + uptimeInfo ; // NOI18N
     }
     
     public String computeSystemProperties(boolean showSystemProperties) {
@@ -366,6 +377,23 @@ public class OverviewController extends AbstractController {
             Instance queue = (Instance) finalizerClass.getValueOfStaticField("queue"); // NOI18N
             if (queue != null) {
                 Long len = (Long) queue.getValueOfField("queueLength"); // NOI18N
+                if (len != null) {
+                    return len.longValue();
+                }
+            }
+        }
+        return -1;
+    }
+
+    private long computeStartupTime(Heap heap) {
+        JavaClass jmxFactoryClass = heap.getJavaClassByName("sun.management.ManagementFactoryHelper"); // NOI18N
+        if (jmxFactoryClass == null) {
+            jmxFactoryClass = heap.getJavaClassByName("sun.management.ManagementFactory"); // NOI18N
+        }
+        if (jmxFactoryClass != null) {
+            Instance runtimeImpl = (Instance) jmxFactoryClass.getValueOfStaticField("runtimeMBean"); // NOI18N
+            if (runtimeImpl != null) {
+                Long len = (Long) runtimeImpl.getValueOfField("vmStartupTime"); // NOI18N
                 if (len != null) {
                     return len.longValue();
                 }
@@ -590,6 +618,32 @@ public class OverviewController extends AbstractController {
 
     private static String htmlize(String value) {
             return value.replace(">", "&gt;").replace("<", "&lt;");     // NOI18N
+    }
+
+    @NbBundle.Messages({
+        "OverviewController_FORMAT_hms={0} hrs {1} min {2} sec",
+        "OverviewController_FORMAT_ms={0} min {1} sec"
+    })
+    private static String getTime(long millis) {
+        // Hours
+        long hours = millis / 3600000;
+        String sHours = (hours == 0 ? "" : "" + hours); // NOI18N
+        millis = millis % 3600000;
+
+        // Minutes
+        long minutes = millis / 60000;
+        String sMinutes = (((hours > 0) && (minutes < 10)) ? "0" + minutes : "" + minutes); // NOI18N
+        millis = millis % 60000;
+
+        // Seconds
+        long seconds = millis / 1000;
+        String sSeconds = ((seconds < 10) ? "0" + seconds : "" + seconds); // NOI18N
+
+        if (sHours.length() == 0) {
+            return Bundle.OverviewController_FORMAT_ms(sMinutes, sSeconds);
+        } else {
+            return Bundle.OverviewController_FORMAT_hms(sHours, sMinutes, sSeconds);
+        }
     }
 
     /** taken from sun.misc.VM
