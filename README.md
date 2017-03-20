@@ -14,7 +14,7 @@ First download or clone this repository into directory `visualvm.src`. There are
 
 ## Get the dependencies
   
-Then download the [NetBeans 8.0.2 platform and profiler binaries](https://github.com/visualvm/visualvm.src/blob/master/visualvm/nb802_visualvm_02102016.zip) and extract them into directory `visualvm.src/visualvm` (should create `visualvm.src/visualvm/netbeans`).
+Then download the [NetBeans 8.0.2 platform and profiler binaries](https://github.com/visualvm/visualvm.src/raw/master/visualvm/nb802_visualvm_02102016.zip) and extract them into directory `visualvm.src/visualvm` (should create `visualvm.src/visualvm/netbeans`).
 
 ## Build and run VisualVM tool
 
