@@ -3,10 +3,11 @@
 /visualvm/launcher/windows-src/nbproject/private/
 /visualvm/*/build/
 /plugins/*/build/
-/plugins/*/nbproject
+/plugins/*/nbproject/private/
 /plugins/visualvm/
 /plugins/glassfish/amx-api/build/
 /samples/*/build/
+/samples/*/nbproject/private/
 /*/build/
 /*/dist/
 /visualvm/netbeans/
