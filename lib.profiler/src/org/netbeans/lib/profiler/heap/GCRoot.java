@@ -97,6 +97,36 @@ public interface GCRoot {
      */
     public static final String UNKNOWN = "unknown"; // NOI18N
 
+    /**
+     * Interned string GC root kind.
+     */
+    public static final String INTERNED_STRING = "interned string"; // NOI18N
+
+    /**
+     * Finalizing GC root kind.
+     */
+    public static final String FINALIZING = "finalizing"; // NOI18N
+
+    /**
+     * Debugger GC root kind.
+     */
+    public static final String DEBUGGER = "debugger"; // NOI18N
+
+    /**
+     * Reference cleanup GC root kind.
+     */
+    public static final String REFERENCE_CLEANUP = "reference cleanup"; // NOI18N
+
+    /**
+     * VM internal GC root kind.
+     */
+    public static final String VM_INTERNAL = "VM internal"; // NOI18N
+
+    /**
+     * JNI monitor GC root kind.
+     */
+    public static final String JNI_MONITOR = "JNI monitor"; // NOI18N
+
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     /**

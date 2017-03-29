@@ -67,6 +67,13 @@ class HprofGCRoot extends HprofObject implements GCRoot {
         kindMap.put(Integer.valueOf(HprofHeap.ROOT_THREAD_BLOCK), GCRoot.THREAD_BLOCK);
         kindMap.put(Integer.valueOf(HprofHeap.ROOT_MONITOR_USED), GCRoot.MONITOR_USED);
         kindMap.put(Integer.valueOf(HprofHeap.ROOT_THREAD_OBJECT), GCRoot.THREAD_OBJECT);
+        // HPROF HEAP 1.0.3
+        kindMap.put(Integer.valueOf(HprofHeap.ROOT_INTERNED_STRING), GCRoot.INTERNED_STRING);
+        kindMap.put(Integer.valueOf(HprofHeap.ROOT_FINALIZING), GCRoot.FINALIZING);
+        kindMap.put(Integer.valueOf(HprofHeap.ROOT_DEBUGGER), GCRoot.DEBUGGER);
+        kindMap.put(Integer.valueOf(HprofHeap.ROOT_REFERENCE_CLEANUP), GCRoot.REFERENCE_CLEANUP);
+        kindMap.put(Integer.valueOf(HprofHeap.ROOT_VM_INTERNAL), GCRoot.VM_INTERNAL);
+        kindMap.put(Integer.valueOf(HprofHeap.ROOT_JNI_MONITOR), GCRoot.JNI_MONITOR);
     }
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
