@@ -1,6 +1,6 @@
 # VisualVM (master) sources repository
 
-VisualVM is a visual tool integrating commandline JDK tools and lightweight profiling capabilities. See https://visualvm.github.io for details and downloads.
+VisualVM is a visual tool integrating commandline JDK tools and lightweight profiling capabilities. See https://visualvm.github.io for details, downloads and documentation.
 
 ## Get the tools
 
