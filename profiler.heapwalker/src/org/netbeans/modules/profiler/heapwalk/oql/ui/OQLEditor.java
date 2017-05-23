@@ -117,7 +117,9 @@ public class OQLEditor extends JPanel {
             queryEditor.getCaret().addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent e) {
                     try {
-                        Rectangle edit = queryEditor.getUI().modelToView(queryEditor, queryEditor.getCaretPosition());
+                        Rectangle edit = queryEditor == null ? null :
+                                         queryEditor.getUI().modelToView(
+                                         queryEditor, queryEditor.getCaretPosition());
                         if (edit != null) queryEditor.scrollRectToVisible(edit);
                     } catch (BadLocationException ex) {
                         Exceptions.printStackTrace(ex);

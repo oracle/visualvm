@@ -59,7 +59,7 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.ProfilerStorage;
-import org.netbeans.modules.profiler.heapwalker.v2.HeapWalkerTopComponent;
+import org.netbeans.modules.profiler.heapwalker.v2.prototype.HeapWalkerTopComponent;
 import org.openide.util.Lookup;
 
 

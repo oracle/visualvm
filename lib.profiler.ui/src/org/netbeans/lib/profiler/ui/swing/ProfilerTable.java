@@ -660,7 +660,8 @@ public class ProfilerTable extends JTable {
         
         ProfilerColumnModel cModel = _getColumnModel();
         
-        if (getRowCount() == 0) {
+        int rowCount = getRowCount();
+        if (rowCount == 0) {
             for (int column : scrollableColumns)
                 cModel.setColumnPreferredWidth(column, 0);
             return;
@@ -673,6 +674,8 @@ public class ProfilerTable extends JTable {
         int first = rowAtPoint(visibleP);
         visibleP.translate(0, visible.height - 1);
         int last = rowAtPoint(visibleP);
+        
+        if (last == -1) last = rowCount - 1; // last column above the visible rect boundary
         
         for (int column : scrollableColumns) {
             int _column = convertColumnIndexToView(column);
