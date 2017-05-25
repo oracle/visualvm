@@ -520,7 +520,7 @@ class ClassDump extends HprofObject implements JavaClass {
 
         public Object next() {
             while (hasNext()) {
-                Instance i = heap.getInstanceByOffset(offset, classId);
+                Instance i = heap.getInstanceByOffset(offset, ClassDump.this, classId);
                 if (i != null) {
                     instancesCount--;
                     return i;
