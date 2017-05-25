@@ -414,10 +414,10 @@ class HprofHeap implements Heap {
     }
 
     Instance getInstanceByOffset(long[] offset) {
-        return getInstanceByOffset(offset, -1);
+        return getInstanceByOffset(offset, null, -1);
     }
 
-    Instance getInstanceByOffset(long[] offset, long instanceClassId) {
+    Instance getInstanceByOffset(long[] offset, ClassDump instanceClassDump, long instanceClassId) {
         long start = offset[0];
         assert start != 0L;
         ClassDump classDump;
@@ -447,7 +447,11 @@ class HprofHeap implements Heap {
             if (instanceClassId != -1 && classId != instanceClassId) {
                 return null;
             }
-            classDump = classDumpBounds.getClassDumpByID(classId);
+            if (instanceClassDump == null) {
+                classDump = classDumpBounds.getClassDumpByID(classId);
+            } else {
+                classDump = instanceClassDump;        
+            }
         }
 
         if (classDump == null) {
