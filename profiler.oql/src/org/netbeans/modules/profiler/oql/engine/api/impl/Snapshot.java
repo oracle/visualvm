@@ -191,6 +191,10 @@ public class Snapshot {
     }
 
     public Iterator getInstances(final JavaClass clazz, final boolean includeSubclasses) {
+        // special case for all subclasses of java.lang.Object
+        if (includeSubclasses && clazz.getSuperClass() == null) {
+            return delegate.getAllInstancesIterator();
+        }
         return new TreeIterator<Instance, JavaClass>(clazz) {
 
             @Override
