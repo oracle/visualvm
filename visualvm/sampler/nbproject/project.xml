@@ -137,7 +137,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>7.67.1</specification-version>
+                        <specification-version>7.62</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -173,11 +173,11 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.openide.util.ui</code-name-base>
+                    <code-name-base>org.openide.util</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>9.6.1</specification-version>
+                        <specification-version>8.39</specification-version>
                     </run-dependency>
                 </dependency>
             </module-dependencies>
