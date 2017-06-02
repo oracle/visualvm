@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.sampler.cpu;
 
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -82,8 +83,10 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
     private Refresher threadCPURefresher;
     private ThreadsCPUView threadCPUView;
     private ThreadsCPU threadsCPU;
+    private final Application app;
 
-    public CPUSamplerSupport(ThreadInfoProvider tip, ThreadsCPU tcpu, SnapshotDumper snapshotDumper, ThreadDumper threadDumper) {
+    public CPUSamplerSupport(Application app, ThreadInfoProvider tip, ThreadsCPU tcpu, SnapshotDumper snapshotDumper, ThreadDumper threadDumper) {
+        this.app = app;
         threadInfoProvider = tip;
         threadsCPU = tcpu;
         this.snapshotDumper = snapshotDumper;
@@ -131,7 +134,7 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
 
     public DataViewComponent.DetailsView[] getDetailsView() {
         if (detailsViews == null) {
-            cpuView = new CPUView(refresher, snapshotDumper, threadDumper);
+            cpuView = new CPUView(app, refresher, snapshotDumper, threadDumper);
             detailsViews = new DataViewComponent.DetailsView[threadsCPU != null ? 2:1];
             detailsViews[0] = new DataViewComponent.DetailsView(NbBundle.getMessage(
                 CPUSamplerSupport.class, "LBL_Cpu_samples"), null, 10, cpuView, null); // NOI18N

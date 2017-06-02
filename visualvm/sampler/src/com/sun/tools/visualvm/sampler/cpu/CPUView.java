@@ -25,25 +25,42 @@
 
 package com.sun.tools.visualvm.sampler.cpu;
 
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.ApplicationMethod;
 import com.sun.tools.visualvm.sampler.AbstractSamplerSupport;
 import com.sun.tools.visualvm.uisupport.TransparentToolBar;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.util.List;
+import java.util.MissingResourceException;
+import java.util.concurrent.TimeUnit;
 import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
-import org.openide.util.ImageUtilities;
-import org.openide.util.NbBundle;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import org.netbeans.lib.profiler.client.ClientUtils;
+import org.openide.awt.Actions;
+import org.openide.util.*;
+import org.openide.util.lookup.AbstractLookup;
+import org.openide.util.lookup.InstanceContent;
 
 /**
  *
@@ -60,13 +77,13 @@ final class CPUView extends JPanel {
     private SampledLivePanel resultsPanel;
 
 
-    CPUView(AbstractSamplerSupport.Refresher refresher, CPUSamplerSupport.SnapshotDumper
+    CPUView(Application app, AbstractSamplerSupport.Refresher refresher, CPUSamplerSupport.SnapshotDumper
             snapshotDumper, CPUSamplerSupport.ThreadDumper threadDumper) {
         this.refresher = refresher;
         this.snapshotDumper = snapshotDumper;
         this.threadDumper = threadDumper;
         
-        initComponents();
+        initComponents(app);
 
         addHierarchyListener(new HierarchyListener() {
             public void hierarchyChanged(HierarchyEvent e) {
@@ -124,7 +141,7 @@ final class CPUView extends JPanel {
     }
 
 
-    private void initComponents() {
+    private void initComponents(Application app) {
         setLayout(new BorderLayout());
         setOpaque(false);
 
@@ -193,7 +210,10 @@ final class CPUView extends JPanel {
         snapshotButton.setOpaque(false);
         snapshotButton.setEnabled(false);
         toolBar.addItem(snapshotButton);
-        
+
+        toolBar.addSeparator();
+        fillInToolbar(app, toolBar);
+
         toolBar.addFiller();
 
         threaddumpButton = new JButton(NbBundle.getMessage(CPUView.class, "LBL_Thread_dump")) { // NOI18N
@@ -242,6 +262,96 @@ final class CPUView extends JPanel {
         
     }
 
+    private void fillInToolbar(final Application app, final TransparentToolBar toolBar) throws MissingResourceException {
+        List<? extends Action> actions = Utilities.actionsForPath("VisualVM/CPUView");
+        final InstanceContent ic = new InstanceContent();
+        ic.add(app);
+        AbstractLookup lookup = new AbstractLookup(ic);
+        class L implements TableModelListener, Runnable, ListSelectionListener {
+            ClientUtils.SourceCodeSelection sss;
+            ApplicationMethod am;
+
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                JTable t = findJTable(CPUView.this);
+                if (t == null) {
+                    return;
+                }
+                int row = t.getSelectedRow();
+                if (sss != null) {
+                    ic.remove(sss);
+                }
+                if (am != null) {
+                    ic.remove(am);
+                }
+                if (row == -1) {
+                    return;
+                }
+                String classAndMethod = t.getModel().getValueAt(row, 0).toString();
+                int lastDot = classAndMethod.lastIndexOf('.');
+                String clazzName = classAndMethod.substring(0, lastDot);
+                int param = classAndMethod.lastIndexOf('(');
+                if (param == -1) {
+                    param = classAndMethod.length();
+                }
+                String methodName = classAndMethod.substring(lastDot + 1, param);
+                String signature = classAndMethod.substring(param);
+
+                ic.add(sss = new ClientUtils.SourceCodeSelection(clazzName, methodName, signature));
+                ic.add(am = new ApplicationMethod(app, clazzName, methodName, signature));
+            }
+
+            @Override
+            public void run() {
+                if (EventQueue.isDispatchThread()) {
+                    JTable t = findJTable(CPUView.this);
+                    if (t != null) {
+                        t.getSelectionModel().addListSelectionListener(this);
+                    } else {
+                        RequestProcessor.getDefault().schedule(this, 100, TimeUnit.MILLISECONDS);
+                    }
+                    tableChanged(null);
+                } else {
+                    EventQueue.invokeLater(this);
+                }
+            }
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                tableChanged(null);
+            }
+        }
+        final L listener = new L();
+        listener.run();
+
+        for (Action a : actions) {
+            if (a instanceof ContextAwareAction) {
+                a = ((ContextAwareAction) a).createContextAwareInstance(lookup);
+            }
+            JButton b = new JButton();
+            Actions.connect(b, a);
+//            b.setText((String) a.getValue(Action.NAME));
+//            b.addActionListener(a);
+//            b.setOpaque(false);
+            toolBar.addItem(b);
+        }
+    }
+
+    private static JTable findJTable(Component c) {
+        if (c instanceof JTable) {
+            return (JTable) c;
+        }
+        if (c instanceof JComponent) {
+            Component[] arr = ((JComponent) c).getComponents();
+            for (Component component : arr) {
+                JTable t = findJTable(component);
+                if (t != null) {
+                    return t;
+                }
+            }
+        }
+        return null;
+    }
     
 //    private JLabel refreshRateLabel;
 //    private JLabel refreshUnitsLabel;
