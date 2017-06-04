@@ -251,7 +251,7 @@ function JavaClassProto() {
     }
 
     this.instances = function() {
-        return jclass(this).instances.iterator;
+        return wrapIterator(jclass(this).instances.iterator(), true)
     }
 
     this.toString = function() { 
@@ -1135,6 +1135,21 @@ function root(jobject) {
         return root;
     } catch (e) {
         return null;
+    }
+}
+
+/**
+ * If given jobject has a path to GC root, return distance
+ * to nearest GC root.
+ *
+ * @param jobject object whose distance to the nearest GC root is returned
+ */
+function rootDistance(jobject) {
+    try {
+        jobject = unwrapJavaObject(jobject);
+        return snapshot.distanceToGCRoot(jobject);
+    } catch (e) {
+        return 0;
     }
 }
 
