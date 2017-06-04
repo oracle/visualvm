@@ -164,6 +164,19 @@ public class Snapshot {
         return null;
     }
 
+    public int distanceToGCRoot(Instance object) {
+        Instance gcInstance = object;
+        int distance = 0;
+        do {
+            gcInstance = gcInstance.getNearestGCRootPointer();
+            if (gcInstance == null) {
+                return 0;
+            }
+            distance++;
+        } while (!gcInstance.isGCRoot());
+        return distance;
+    }
+
     /**
      * Return an Iterator of all of the classes in this snapshot.
      **/
@@ -191,6 +204,10 @@ public class Snapshot {
     }
 
     public Iterator getInstances(final JavaClass clazz, final boolean includeSubclasses) {
+        // special case for all subclasses of java.lang.Object
+        if (includeSubclasses && clazz.getSuperClass() == null) {
+            return delegate.getAllInstancesIterator();
+        }
         return new TreeIterator<Instance, JavaClass>(clazz) {
 
             @Override
