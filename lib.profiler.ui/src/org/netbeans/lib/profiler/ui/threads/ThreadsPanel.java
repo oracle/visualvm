@@ -78,6 +78,9 @@ import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
+import org.netbeans.lib.profiler.ui.components.FlatToolBar;
+import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
@@ -173,6 +176,8 @@ public class ThreadsPanel extends DataView {
     
     
     private void initUI(Action saveView) {
+        setOpaque(true);
+        setBackground(new HTMLTextArea().getBackground());
         
         final AbstractTableModel threadsTableModel = new AbstractTableModel() {
             public String getColumnName(int columnIndex) {

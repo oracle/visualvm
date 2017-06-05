@@ -616,7 +616,6 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     private void enableDisablePopup(PrestimeCPUCCTNode node) {
         boolean regularNode = node.getMethodId() != 0 && !node.isFiltered();
         if (popupShowSource != null) popupShowSource.setEnabled(regularNode && isShowSourceAvailable());
-        popupAddToRoots.setEnabled(regularNode && isAddToRootsAvailable());
     }
 
     public void requestFocus() {
@@ -643,7 +642,6 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
     protected JPopupMenu createPopupMenu() {
         JPopupMenu popup = new JPopupMenu();
         if (GoToSource.isAvailable()) popupShowSource = new JMenuItem();
-        popupAddToRoots = new JMenuItem();
 
         Font boldfont = popup.getFont().deriveFont(Font.BOLD);
 
@@ -655,9 +653,6 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
         }
 
 
-        popupAddToRoots.setText(ADD_ROOT_METHOD_POPUP_ITEM);
-        popup.add(popupAddToRoots);
-
         ActionListener menuListener = new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 menuActionPerformed(evt);
@@ -665,7 +660,6 @@ public class ReverseCallGraphPanel extends SnapshotCPUResultsPanel implements Sc
         };
 
         if (popupShowSource != null) popupShowSource.addActionListener(menuListener);
-        popupAddToRoots.addActionListener(menuListener);
 
         return popup;
     }

@@ -80,7 +80,6 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     protected CPUResUserActionsHandler actionsHandler;
-    protected JMenuItem popupAddToRoots;
     protected JMenuItem popupFind;
     protected JMenuItem popupShowReverse;
     protected JMenuItem popupShowSource;
@@ -148,7 +147,6 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
         currentView = view;
 
         if (popupShowSource != null) popupShowSource.setEnabled(isShowSourceAvailable());
-        popupAddToRoots.setEnabled(isAddToRootsAvailable());
 
         actionsHandler.viewChanged(view); // notify the actions handler about this
     }
@@ -177,7 +175,6 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
     protected JPopupMenu createPopupMenu() {
         JPopupMenu popup = new JPopupMenu();
         if (GoToSource.isAvailable()) popupShowSource = new JMenuItem();
-        popupAddToRoots = new JMenuItem();
         popupFind = new JMenuItem();
 
         Font boldfont = popup.getFont().deriveFont(Font.BOLD);
@@ -222,13 +219,7 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
 
         popup.add(popupFind);
 
-        popup.addSeparator();
-
-        popupAddToRoots.setText(ROOT_METHODS_ITEM_NAME);
-        popup.add(popupAddToRoots);
-
         if (popupShowSource != null) popupShowSource.addActionListener(menuListener);
-        popupAddToRoots.addActionListener(menuListener);
         popupFind.addActionListener(menuListener);
 
         return popup;
@@ -337,21 +328,6 @@ public abstract class CPUResultsPanel extends ResultsPanel implements CommonCons
 
                 showSubtreeCallGraph(selectedNode, currentView, getSortingColumn(), getSortingOrder());
             }
-        } else if (src == popupAddToRoots) {
-            if (popupPath != null) {
-                PrestimeCPUCCTNode selectedNode = (PrestimeCPUCCTNode) popupPath.getLastPathComponent();
-
-                if (selectedNode.getMethodId() == 0) {
-                    if (selectedNode.getParent() instanceof PrestimeCPUCCTNode) {
-                        methodId = ((PrestimeCPUCCTNode) selectedNode.getParent()).getMethodId();
-                    }
-                } else {
-                    methodId = selectedNode.getMethodId();
-                }
-            } // else methodId is already set
-
-            String[] methodClassNameAndSig = getMethodClassNameAndSig(methodId, currentView);
-            actionsHandler.addMethodToRoots(methodClassNameAndSig[0], methodClassNameAndSig[1], methodClassNameAndSig[2]);
         } else if (src == popupFind) {
             actionsHandler.find(this, getSelectedMethodName());
         }

@@ -68,6 +68,7 @@ import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.JTableHeader;
 import org.netbeans.lib.profiler.ui.UIUtils;
+import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 
 /**
  *
@@ -84,7 +85,8 @@ public class ProfilerTableContainer extends JPanel {
     public ProfilerTableContainer(final ProfilerTable table, boolean decorated,
                                   ColumnChangeAdapter adapter) {
         super(new BorderLayout());
-        setOpaque(false);
+        setOpaque(true);
+        setBackground(new HTMLTextArea().getBackground());
         
         this.table = table;
         
