@@ -171,6 +171,8 @@ public class ObjectNode extends InstanceNode {
                         DynamicObject dynObj = new DynamicObject(getInstance());
                         fieldValues.addAll(dynObj.getFieldValues());
                         fieldValues.addAll(dynObj.getStaticFieldValues());
+                        TruffleFrame truffleFrame = new TruffleFrame(getInstance());
+                        fieldValues.addAll(truffleFrame.getFieldValues());
                         fieldValues.addAll(getInstance().getFieldValues());
                         fieldValues.addAll(getInstance().getStaticFieldValues());
                         if (fieldValues.size() == 0) {
