@@ -61,7 +61,7 @@ public class TruffleFrame {
     private static final String ARG_PREFIX = "arg";         // NOI18N
 
     private List<FieldValue> values;
-    boolean isTruffleFrame;
+    private boolean isTruffleFrame;
 
     public TruffleFrame(Instance truffleFrame) {
         values = Collections.EMPTY_LIST;
@@ -73,17 +73,21 @@ public class TruffleFrame {
 
             if (locals != null && arguments != null && slots != null) {
                 String[] localNames = createLocalNames(slots, locals.size());
-                values = new ArrayList(arguments.size() + locals.size());
-                createArguments(truffleFrame, arguments, values);
-                createLocals(truffleFrame, locals, localNames, values);
+                List<FieldValue> vals = new ArrayList(arguments.size() + locals.size());
+                createArguments(truffleFrame, arguments, vals);
+                createLocals(truffleFrame, locals, localNames, vals);
+                values = Collections.unmodifiableList(vals);
+                isTruffleFrame = true;
             }
-            isTruffleFrame = true;
         }
-
     }
 
     public List<FieldValue> getFieldValues() {
         return values;
+    }
+
+    public boolean isTruffleFrame() {
+        return isTruffleFrame;
     }
 
     private boolean isTruffleFrameSubClass(Instance truffleFrame) {
@@ -142,7 +146,7 @@ public class TruffleFrame {
 
         for (int i = 0; i < size; i++) {
             Instance frameSlot = slots.get(i);
-            Integer index = (Integer) frameSlot.getValueOfField("index"); // NOI18n
+            Integer index = (Integer) frameSlot.getValueOfField("index"); // NOI18N
             Instance nameInst = (Instance) frameSlot.getValueOfField("identifier"); // NOI18N
             String name = DetailsUtils.getInstanceString(nameInst, null);
 
@@ -221,7 +225,7 @@ public class TruffleFrame {
 
         @Override
         public String getName() {
-            return "object";
+            return "object";    // NOI18N
         }
     }
 }
