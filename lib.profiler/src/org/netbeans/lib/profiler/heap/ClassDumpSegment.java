@@ -82,6 +82,7 @@ class ClassDumpSegment extends TagBounds {
     final int stackTraceSerialNumberOffset;
     final int superClassIDOffset;
     ClassDump java_lang_Class;
+    boolean newSize;
     Map /*<JavaClass,List<Field>>*/ fieldsCache;
     private List /*<JavaClass>*/ classes;
     private Map /*<Byte,JavaClass>*/ primitiveArrayMap;
@@ -257,6 +258,7 @@ class ClassDumpSegment extends TagBounds {
     }
 
     void extractSpecialClasses() {
+        ClassDump java_lang_Object = null;
         primitiveArrayMap = new HashMap();
 
         Iterator classIt = classes.iterator();
@@ -284,6 +286,8 @@ class ClassDumpSegment extends TagBounds {
                 typeObj = Integer.valueOf(HprofHeap.LONG);
             } else if (vmName.equals("java/lang/Class")) { // NOI18N
                 java_lang_Class = jcls;
+            } else if (vmName.equals("java/lang/Object")) { // NOI18N
+                java_lang_Object = jcls;
             } else if (vmName.equals("boolean[]")) { // NOI18N
                 typeObj = Integer.valueOf(HprofHeap.BOOLEAN);
             } else if (vmName.equals("char[]")) { // NOI18N
@@ -302,11 +306,16 @@ class ClassDumpSegment extends TagBounds {
                 typeObj = Integer.valueOf(HprofHeap.LONG);
             } else if (vmName.equals("java.lang.Class")) { // NOI18N
                 java_lang_Class = jcls;
+            } else if (vmName.equals("java.lang.Object")) { // NOI18N
+                java_lang_Object = jcls;
             }
 
             if (typeObj != null) {
                 primitiveArrayMap.put(typeObj, jcls);
             }
+        }
+        if (java_lang_Object != null) {
+            newSize = java_lang_Object.getRawInstanceSize() > 0;
         }
     }
 
