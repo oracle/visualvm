@@ -48,6 +48,8 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
+import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
+import org.netbeans.lib.profiler.heap.PrimitiveType;
 import org.netbeans.lib.profiler.heap.Type;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 
@@ -58,7 +60,21 @@ import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 public class TruffleFrame {
 
     private static final String TRUFFLE_FRAME_FQN = "com.oracle.truffle.api.impl.DefaultVirtualFrame";  // NOI18N
+    private static final String COMPILER_FRAME_NOBOX_FQN = "org.graalvm.compiler.truffle.FrameWithoutBoxing"; // NOI18N
+    private static final String ENT_COMPILER_FRAME_NOBOX_FQN = "com.oracle.graal.truffle.FrameWithoutBoxing"; // NOI18N
+    private static final String COMPILER_FRAME_BOX_FQN = "org.graalvm.compiler.truffle.FrameWithBoxing"; // NOI18N
+    private static final String ENT_COMPILER_FRAME_BOX_FQN = "com.oracle.graal.truffle.FrameWithBoxing"; // NOI18N
     private static final String ARG_PREFIX = "arg";         // NOI18N
+    private static final String LOCAL_UNDEFINED = "undefined"; // NOI18N
+
+    private static final byte OBJECT_TAG = 0;
+    private static final byte ILLEGAL_TAG = 1;
+    private static final byte LONG_TAG = 2;
+    private static final byte INT_TAG = 3;
+    private static final byte DOUBLE_TAG = 4;
+    private static final byte FLOAT_TAG = 5;
+    private static final byte BOOLEAN_TAG = 6;
+    private static final byte BYTE_TAG = 7;
 
     private List<FieldValue> values;
     private boolean isTruffleFrame;
@@ -67,15 +83,17 @@ public class TruffleFrame {
         values = Collections.EMPTY_LIST;
         if (isTruffleFrameSubClass(truffleFrame)) {
             List<Instance> locals = getObjectArray(truffleFrame, "locals");         // NOI18N
+            List<String> primitiveLocals = getPrimitiveArray(truffleFrame, "primitiveLocals");  // NOI18N       // NOI18N
             List<Instance> arguments = getObjectArray(truffleFrame, "arguments");   // NOI18N
             Instance slotArr = getValueofFields(truffleFrame, "descriptor", "slots");   // NOI18N
             List<Instance> slots = getObjectArray(slotArr, "elementData");  // NOI18N
+            Instance defaultValue = getValueofFields(truffleFrame, "descriptor", "defaultValue"); // NOI18N
 
             if (locals != null && arguments != null && slots != null) {
-                String[] localNames = createLocalNames(slots, locals.size());
+                Instance[] frameSlots = createFrameSlots(slots, locals.size());
                 List<FieldValue> vals = new ArrayList(arguments.size() + locals.size());
                 createArguments(truffleFrame, arguments, vals);
-                createLocals(truffleFrame, locals, localNames, vals);
+                createLocals(truffleFrame, locals, primitiveLocals, frameSlots, defaultValue, vals);
                 values = Collections.unmodifiableList(vals);
                 isTruffleFrame = true;
             }
@@ -91,7 +109,11 @@ public class TruffleFrame {
     }
 
     private boolean isTruffleFrameSubClass(Instance truffleFrame) {
-        return isSubClassOf(truffleFrame, TRUFFLE_FRAME_FQN);
+        return isSubClassOf(truffleFrame, TRUFFLE_FRAME_FQN)
+                || isSubClassOf(truffleFrame, COMPILER_FRAME_NOBOX_FQN)
+                || isSubClassOf(truffleFrame, ENT_COMPILER_FRAME_NOBOX_FQN)
+                || isSubClassOf(truffleFrame, COMPILER_FRAME_BOX_FQN)
+                || isSubClassOf(truffleFrame, ENT_COMPILER_FRAME_BOX_FQN);
     }
 
     private boolean isSubClassOf(Instance i, String superClassName) {
@@ -129,42 +151,126 @@ public class TruffleFrame {
         return null;
     }
 
+    private List<String> getPrimitiveArray(Instance instance, String field) {
+        Object localsInst = instance.getValueOfField(field);
+
+        if (localsInst instanceof PrimitiveArrayInstance) {
+            return ((PrimitiveArrayInstance) localsInst).getValues();
+        }
+        return null;
+    }
+
     private void createArguments(Instance truffleFrame, List<Instance> arguments, List<FieldValue> values) {
         for (int i = 0; i < arguments.size(); i++) {
-            values.add(new TruffleField(truffleFrame, arguments.get(i), ARG_PREFIX + i));
+            values.add(new TruffleObjectField(truffleFrame, arguments.get(i), ARG_PREFIX + i));
         }
     }
 
-    private void createLocals(Instance truffleFrame, List<Instance> locals, String[] names, List<FieldValue> values) {
+    private void createLocals(Instance truffleFrame, List<Instance> locals, List<String> primitiveLocals, Instance[] frameSlots,
+            Instance defaultValue, List<FieldValue> values) {
         for (int i = 0; i < locals.size(); i++) {
-            values.add(new TruffleField(truffleFrame, locals.get(i), names[i]));
+            Instance frameSlot = frameSlots[i];
+            Instance nameInst = (Instance) frameSlot.getValueOfField("identifier"); // NOI18N
+            String name = getDetails(nameInst);
+            Type type = getVauleType(frameSlot);
+
+            if (ObjType.OBJECT.equals(type)) {
+                values.add(new TruffleObjectField(truffleFrame, locals.get(i), name));
+            } else { // primitive type
+                if (primitiveLocals != null) {
+                    String value = convertValue(primitiveLocals.get(i), type);
+                    values.add(new TruffleField(truffleFrame, value, name, type));
+                } else {
+                    Instance val = locals.get(i);
+                    if (val.equals(defaultValue)) {
+                        values.add(new TruffleField(truffleFrame, LOCAL_UNDEFINED, name, type));
+                    } else {
+                        String value = getDetails(val);
+                        values.add(new TruffleField(truffleFrame, value, name, type));
+                    }
+                }
+            }
         }
     }
 
-    private String[] createLocalNames(List<Instance> slots, int size) {
-        String[] names = new String[size];
+    private Instance[] createFrameSlots(List<Instance> slots, int size) {
+        Instance[] names = new Instance[size];
 
         for (int i = 0; i < size; i++) {
             Instance frameSlot = slots.get(i);
             Integer index = (Integer) frameSlot.getValueOfField("index"); // NOI18N
-            Instance nameInst = (Instance) frameSlot.getValueOfField("identifier"); // NOI18N
-            String name = DetailsUtils.getInstanceString(nameInst, null);
 
-            names[index.intValue()] = name;
+            names[index.intValue()] = frameSlot;
         }
         return names;
     }
 
-    private class TruffleField implements ObjectFieldValue {
+    private Type getVauleType(Instance frameSlot) {
+        Instance kind = (Instance) frameSlot.getValueOfField("kind");
+        byte tag = ((Byte) kind.getValueOfField("tag")).byteValue();
+
+        switch (tag) {
+            case OBJECT_TAG:
+                return ObjType.OBJECT;
+            case ILLEGAL_TAG:
+                return ObjType.OBJECT;
+            case LONG_TAG:
+                return PType.LONG;
+            case INT_TAG:
+                return PType.INT;
+            case DOUBLE_TAG:
+                return PType.DOUBLE;
+            case FLOAT_TAG:
+                return PType.FLOAT;
+            case BOOLEAN_TAG:
+                return PType.BOOLEAN;
+            case BYTE_TAG:
+                return PType.BYTE;
+            default:
+                throw new IllegalArgumentException("Unknown type:" + tag);
+        }
+    }
+
+    private String convertValue(String val, Type type) {
+        if (!PType.LONG.equals(type)) {
+            long originalLong = Long.parseLong(val);
+
+            if (PType.INT.equals(type)) {
+                return String.valueOf((int) originalLong);
+            }
+            if (PType.DOUBLE.equals(type)) {
+                return String.valueOf(Double.longBitsToDouble(originalLong));
+            }
+            if (PType.FLOAT.equals(type)) {
+                return String.valueOf(Float.intBitsToFloat((int) originalLong));
+            }
+            if (PType.BOOLEAN.equals(type)) {
+                return String.valueOf((int) originalLong != 0);
+            }
+            if (PType.BYTE.equals(type)) {
+                return String.valueOf((byte) originalLong);
+            }
+        }
+        return val;
+    }
+
+    private String getDetails(Instance i) {
+        if (i.getJavaClass().getName().startsWith("java.lang.")) {  // NOI18N
+            return DetailsUtils.getInstanceString(i, null);
+        }
+        return "N/A";   // NOI18N
+    }
+
+    private class TruffleField implements FieldValue {
 
         private final Instance definingInstance;
-        private final Instance value;
         private final Field field;
+        private final String value;
 
-        private TruffleField(Instance defI, Instance val, String name) {
+        private TruffleField(Instance defI, String val, String name, Type type) {
             definingInstance = defI;
             value = val;
-            field = new FrameField(defI.getJavaClass(), name);
+            field = new FrameField(defI.getJavaClass(), name, type);
         }
 
         @Override
@@ -173,18 +279,28 @@ public class TruffleFrame {
         }
 
         @Override
-        public String getValue() {
-            return String.valueOf(value.getInstanceId());
-        }
-
-        @Override
         public Instance getDefiningInstance() {
             return definingInstance;
         }
 
         @Override
-        public Instance getInstance() {
+        public String getValue() {
             return value;
+        }
+    }
+
+    private class TruffleObjectField extends TruffleField implements ObjectFieldValue {
+
+        private final Instance instanceValue;
+
+        private TruffleObjectField(Instance defI, Instance val, String name) {
+            super(defI, val == null ? null : String.valueOf(val.getInstanceId()), name, ObjType.OBJECT);
+            instanceValue = val;
+        }
+
+        @Override
+        public Instance getInstance() {
+            return instanceValue;
         }
     }
 
@@ -192,10 +308,12 @@ public class TruffleFrame {
 
         private final JavaClass definingClass;
         private final String name;
+        private final Type type;
 
-        private FrameField(JavaClass cls, String n) {
+        private FrameField(JavaClass cls, String n, Type t) {
             definingClass = cls;
             name = n;
+            type = t;
         }
 
         @Override
@@ -215,7 +333,7 @@ public class TruffleFrame {
 
         @Override
         public Type getType() {
-            return ObjType.OBJECT;
+            return type;
         }
     }
 
@@ -225,7 +343,30 @@ public class TruffleFrame {
 
         @Override
         public String getName() {
-            return "object";    // NOI18N
+            return "Object";    // NOI18N
+        }
+    }
+
+    private static class PType implements PrimitiveType {
+
+        static final PrimitiveType BOOLEAN = new PType("boolean"); //NOI18N
+        static final PrimitiveType CHAR = new PType("char"); //NOI18N
+        static final PrimitiveType FLOAT = new PType("float"); //NOI18N
+        static final PrimitiveType DOUBLE = new PType("double"); //NOI18N
+        static final PrimitiveType BYTE = new PType("byte"); //NOI18N
+        static final PrimitiveType SHORT = new PType("short"); //NOI18N
+        static final PrimitiveType INT = new PType("int"); //NOI18N
+        static final PrimitiveType LONG = new PType("long"); //NOI18N
+
+        private String name;
+
+        PType(String n) {
+            name = n;
+        }
+
+        @Override
+        public String getName() {
+            return name;
         }
     }
 }
