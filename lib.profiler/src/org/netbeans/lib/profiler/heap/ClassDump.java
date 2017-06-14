@@ -136,8 +136,11 @@ class ClassDump extends HprofObject implements JavaClass {
             return -1;
         }
 
-        return classDumpSegment.getMinimumInstanceSize()
-               + getHprofBuffer().getInt(fileOffset + classDumpSegment.instanceSizeOffset);
+        int size = getRawInstanceSize();
+        if (!classDumpSegment.newSize) {
+            size += classDumpSegment.getMinimumInstanceSize();
+        }
+        return size;
     }
 
     public long getRetainedSizeByClass() {
@@ -358,6 +361,10 @@ class ClassDump extends HprofObject implements JavaClass {
         }
 
         return (int) (cpOffset - (fileOffset + classDumpSegment.constantPoolSizeOffset));
+    }
+
+    int getRawInstanceSize() {
+        return getHprofBuffer().getInt(fileOffset + classDumpSegment.instanceSizeOffset);
     }
 
     HprofHeap getHprof() {
