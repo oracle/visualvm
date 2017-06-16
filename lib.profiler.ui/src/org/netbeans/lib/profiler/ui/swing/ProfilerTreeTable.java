@@ -599,7 +599,6 @@ public class ProfilerTreeTable extends ProfilerTable {
     
     protected TableRowSorter createRowSorter() {
         ProfilerRowSorter s = new ProfilerTreeTableSorter(getModel()) {
-//            private boolean firstSort = true;
             public void allRowsChanged() {
                 // Must invoke later, JTree.getRowCount() not ready yet
                 SwingUtilities.invokeLater(new Runnable() {
@@ -609,20 +608,16 @@ public class ProfilerTreeTable extends ProfilerTable {
             protected void setSortKeysImpl(List newKeys) {
                 // TODO: Improve to not call createComparator(newKeys) here and from super
                 willBeSorted(Collections.unmodifiableList(newKeys));
-//                if (firstSort) {
-                    super.setSortKeysImpl(newKeys);
-//                    System.err.println(">>> SORTING...");
-//                    firstSort = false;
-//                }
+                super.setSortKeysImpl(newKeys);
             }
         };
         s.setDefaultSortOrder(SortOrder.DESCENDING);
         s.setDefaultSortOrder(0, SortOrder.ASCENDING);
-        s.setSortColumn(0);
+//        s.setSortColumn(0);
         return s;
     }
     
-    protected void willBeSorted(List<RowSorter.SortKey> sortKeys) {}
+    protected void willBeSorted(List<? extends RowSorter.SortKey> sortKeys) {}
     
     private static class ProfilerTreeTableSorter extends ProfilerRowSorter {
         

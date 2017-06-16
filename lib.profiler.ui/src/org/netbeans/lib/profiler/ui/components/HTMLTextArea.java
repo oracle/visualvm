@@ -68,6 +68,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.EditorKit;
 import javax.swing.text.Element;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.html.HTML;
@@ -573,7 +574,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public HTMLTextArea() {
-        setEditorKit(new HTMLEditorKit());
+//        setEditorKit(createEditorKit());
         setEditable(false);
         setOpaque(true);
         setAutoscrolls(true);
@@ -605,6 +606,10 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
+    
+    protected EditorKit createDefaultEditorKit() {
+        return new HTMLEditorKit();
+    }
     
     public void setOpaque(boolean o) {
         super.setOpaque(o);
