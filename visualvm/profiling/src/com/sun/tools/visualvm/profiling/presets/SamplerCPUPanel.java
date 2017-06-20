@@ -52,8 +52,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
-import org.netbeans.lib.profiler.common.filters.FilterUtils;
-import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.lib.profiler.filters.GenericFilter;
+import org.netbeans.lib.profiler.filters.JavaTypeFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
@@ -94,12 +94,11 @@ public abstract class SamplerCPUPanel extends JPanel {
         settings.setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
         
         String instrFilterString = getFilterValue();
-        SimpleFilter instrFilter = (instrFilterString.length() == 0 ||
-                "*".equals(instrFilterString)) ? SimpleFilter.NO_FILTER : // NOI18N
-            new SimpleFilter(instrFilterString, inclFilterRadioButton.isSelected() ?
-            SimpleFilter.SIMPLE_FILTER_INCLUSIVE : SimpleFilter.SIMPLE_FILTER_EXCLUSIVE,
-            instrFilterString);
-        settings.setSelectedInstrumentationFilter(instrFilter);
+        GenericFilter instrFilter = (instrFilterString.length() == 0 ||
+                "*".equals(instrFilterString)) ? new GenericFilter() : // NOI18N
+            new JavaTypeFilter(instrFilterString, inclFilterRadioButton.isSelected() ?
+            GenericFilter.TYPE_INCLUSIVE : GenericFilter.TYPE_EXCLUSIVE);
+        settings.setInstrumentationFilter(instrFilter);
         
         return settings;
     }
@@ -152,10 +151,11 @@ public abstract class SamplerCPUPanel extends JPanel {
     }
 
     public boolean isFilterValueValid() {
-        String[] filterParts = FilterUtils.getSeparateFilters(getFilterValue());
-
-        for (int i = 0; i < filterParts.length; i++)
-            if (!FilterUtils.isValidProfilerFilter(filterParts[i])) return false;
+// TODO
+//        String[] filterParts = FilterUtils.getSeparateFilters(getFilterValue());
+//
+//        for (int i = 0; i < filterParts.length; i++)
+//            if (!FilterUtils.isValidProfilerFilter(filterParts[i])) return false;
 
         return true;
     }

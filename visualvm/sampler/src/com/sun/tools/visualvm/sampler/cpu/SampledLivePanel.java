@@ -26,7 +26,7 @@ package com.sun.tools.visualvm.sampler.cpu;
 
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileProvider;
 import org.netbeans.lib.profiler.results.cpu.MethodInfoMapper;

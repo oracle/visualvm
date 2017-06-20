@@ -40,8 +40,7 @@ import java.awt.Component;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import org.netbeans.lib.profiler.common.CommonUtils;
-import org.netbeans.modules.profiler.MemoryDiffPanel;
-import org.netbeans.modules.profiler.SnapshotsDiffWindow;
+import org.netbeans.modules.profiler.SnapshotResultsWindow;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
@@ -52,7 +51,7 @@ import org.openide.util.NbBundle;
 final class SnapshotDiffView extends DataSourceView {
     private static final Logger LOGGER = Logger.getLogger(SnapshotDiffView.class.getName());
     
-    private SnapshotsDiffWindow sdw = null;
+    private SnapshotResultsWindow sdw = null;
 
     public SnapshotDiffView(SnapshotDiffContainer snapshotDiff) {
         super(snapshotDiff, NbBundle.getMessage(SnapshotDiffView.class, "LBL_Snapshots_Comparison"), // NOI18N
@@ -90,19 +89,19 @@ final class SnapshotDiffView extends DataSourceView {
     
     protected DataViewComponent createComponent() {
         SnapshotDiffContainer snapshotDiff = (SnapshotDiffContainer)getDataSource();
-        sdw = SnapshotsDiffWindow.get(snapshotDiff.getDiff(),
-                                      snapshotDiff.getSnapshot1().getLoadedSnapshot(),
-                                      snapshotDiff.getSnapshot2().getLoadedSnapshot());
+//        sdw = SnapshotsDiffWindow.get(snapshotDiff.getDiff(),
+//                                      snapshotDiff.getSnapshot1().getLoadedSnapshot(),
+//                                      snapshotDiff.getSnapshot2().getLoadedSnapshot());
         
         // Workaround to hide the links to original snapshots which cannot be
         // displayed in VisualVM (opening the snapshots doesn't fit VisualVM
         // workflow, APIs are not ready yet).
-        try {
-            MemoryDiffPanel mdp = (MemoryDiffPanel)sdw.getComponent(0);
-            JToolBar tb = (JToolBar)mdp.getComponent(1);
-            HTMLLabel htl = (HTMLLabel)tb.getComponent(6);
-            htl.setVisible(false);
-        } catch (Exception e) {} // Original UI probably changed
+//        try {
+//            MemoryDiffPanel mdp = (MemoryDiffPanel)sdw.getComponent(0);
+//            JToolBar tb = (JToolBar)mdp.getComponent(1);
+//            HTMLLabel htl = (HTMLLabel)tb.getComponent(6);
+//            htl.setVisible(false);
+//        } catch (Exception e) {} // Original UI probably changed
         
         return new DataViewComponent( new MasterViewSupport().getMasterView(),
                                       new DataViewComponent.MasterViewConfiguration(true));

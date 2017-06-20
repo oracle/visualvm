@@ -314,9 +314,9 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             ThreadsPanel threadsPanel = new ThreadsPanel(threadsManager, null);
             threadsPanel.threadsMonitoringEnabled();
 
-            JComponent toolbar = (JComponent)threadsPanel.getToolbar();
+//            JComponent toolbar = (JComponent)threadsPanel.getToolbar();
 
-            add(toolbar, BorderLayout.NORTH);
+//            add(toolbar, BorderLayout.NORTH);
             add(threadsPanel, BorderLayout.CENTER);
         }
     }

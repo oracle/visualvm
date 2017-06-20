@@ -44,7 +44,8 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import org.netbeans.modules.profiler.heapwalk.HeapWalker;
+import org.netbeans.modules.profiler.heapwalker.v2.HeapWalker;
+import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerWindow;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -136,7 +137,7 @@ class HeapDumpView extends DataSourceView {
                 final HeapWalker hw = new HeapWalker(file);
                 SwingUtilities.invokeLater(new Runnable() { public void run() {
                     contentsPanel.remove(progressLabel);
-                    JComponent hwView = hw.getTopComponent();
+                    JComponent hwView = new HeapWalkerWindow(hw);
                     try {
                         JComponent fragmentWalker = (JComponent)hwView.getComponent(0);
                         fragmentWalker.setOpaque(false);

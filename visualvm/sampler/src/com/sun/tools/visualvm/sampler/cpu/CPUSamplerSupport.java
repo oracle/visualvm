@@ -43,8 +43,8 @@ import java.util.TimerTask;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
-import org.netbeans.lib.profiler.common.filters.SimpleFilter;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
+import org.netbeans.lib.profiler.filters.GenericFilter;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot.NoDataAvailableException;
 import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
@@ -150,10 +150,8 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
     }
 
     public boolean startSampling(ProfilingSettings settings, int samplingRate, int refreshRate) {
-        InstrumentationFilter filter = new InstrumentationFilter();
-        SimpleFilter sf = (SimpleFilter)settings.getSelectedInstrumentationFilter();
-        filter.setFilterStrings(sf.getFilterValue());
-        filter.setFilterType(convertFilterType(sf.getFilterType()));
+        GenericFilter sf = settings.getInstrumentationFilter();
+        InstrumentationFilter filter = new InstrumentationFilter(sf);
         builder = snapshotDumper.getNewBuilder(filter);
                 
         refresher.setRefreshRate(refreshRate);
@@ -243,20 +241,6 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
                 }
             });
     }
-
-    private int convertFilterType(int simpleFilterrType) {
-        if (simpleFilterrType == SimpleFilter.SIMPLE_FILTER_NONE) {
-            return InstrumentationFilter.INSTR_FILTER_NONE;
-        }
-        if (simpleFilterrType == SimpleFilter.SIMPLE_FILTER_EXCLUSIVE) {
-            return InstrumentationFilter.INSTR_FILTER_EXCLUSIVE;
-        }
-        if (simpleFilterrType == SimpleFilter.SIMPLE_FILTER_INCLUSIVE) {
-            return InstrumentationFilter.INSTR_FILTER_INCLUSIVE;
-        }
-        throw new IllegalArgumentException("type "+simpleFilterrType); // NOI18N
-    }
-
 
     private class SamplerTask extends TimerTask {
 

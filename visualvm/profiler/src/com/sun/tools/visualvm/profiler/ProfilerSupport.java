@@ -46,7 +46,6 @@ import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.SessionSettings;
 import org.netbeans.lib.profiler.global.Platform;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.ProfilerControlPanel2;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -202,10 +201,7 @@ public final class ProfilerSupport {
         if (!CalibrationSupport.checkCalibration(java, architecture, null, null)) return;
         
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                // prevent deadlock, similar to issue #570
-                ProfilerControlPanel2.getDefault();
-                
+            public void run() {                
                 // Perform the actual attach
                 RequestProcessor.getDefault().post(new Runnable() {
                     public void run() {

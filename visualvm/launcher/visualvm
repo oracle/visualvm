@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2007, 2017, Oracle and/or its affiliates. All rights reserved.
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 #
 # This code is free software; you can redistribute it and/or modify it
@@ -167,18 +167,6 @@ ${visualvm_default_options}
 EOF
         heap_size
 	visualvm_default_options="-J-Xmx${max_heap_size}m ${visualvm_default_options}"
-fi
-
-if grep -v -- "-J-XX:MaxPermSize" >/dev/null <<EOF ; then
-${visualvm_default_options}
-EOF
-	visualvm_default_options="-L-XX:MaxPermSize=96m ${visualvm_default_options}"
-fi
-
-if grep -v -- "-J-XX:PermSize" >/dev/null <<EOF ; then
-${visualvm_default_options}
-EOF
-	visualvm_default_options="-L-XX:PermSize=32m ${visualvm_default_options}"
 fi
 
 launchNbexec() {

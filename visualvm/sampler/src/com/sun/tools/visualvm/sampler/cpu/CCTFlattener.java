@@ -27,7 +27,7 @@ package com.sun.tools.visualvm.sampler.cpu;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
-import org.netbeans.lib.profiler.global.InstrumentationFilter;
+import org.netbeans.lib.profiler.filters.InstrumentationFilter;
 import org.netbeans.lib.profiler.results.RuntimeCCTNodeProcessor;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.results.cpu.MethodInfoMapper;
@@ -155,7 +155,7 @@ final class CCTFlattener extends RuntimeCCTNodeProcessor.PluginAdapter {
 
         if (!filteredOut) {
             String jvmClassName = methodInfoMapper.getInstrMethodClass(nodeMethodId).replace('.', '/'); // NOI18N
-            filteredOut = !instrFilter.passesFilter(jvmClassName);
+            filteredOut = !instrFilter.passes(jvmClassName);
         }
 
         final int parentMethodId = currentParent != null ? currentParent.getMethodId() : -1;

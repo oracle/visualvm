@@ -65,9 +65,7 @@ import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
-import org.netbeans.modules.profiler.LiveResultsWindow;
 import org.netbeans.modules.profiler.NetBeansProfiler;
-import org.netbeans.modules.profiler.ProfilerControlPanel2;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.util.ImageUtilities;
@@ -192,8 +190,6 @@ final class ApplicationProfilerView extends DataSourceView {
             
             timer = new Timer(1000, this);
             timer.setInitialDelay(1000);
-            // prevent deadlock, issue #570
-            ProfilerControlPanel2.getDefault();
             NetBeansProfiler.getDefaultNB().addProfilingStateListener(this);
             
             // TODO: should listen for PROPERTY_AVAILABLE instead of DataSource removal
@@ -239,7 +235,8 @@ final class ApplicationProfilerView extends DataSourceView {
         
         
         private static JComponent getLiveResultsView() {
-            JComponent view = LiveResultsWindow.getDefault();
+            // TODO
+            JComponent view = null; //LiveResultsWindow.getDefault();
             Component[] components = view.getComponents();
             boolean buttonFound = false;
             

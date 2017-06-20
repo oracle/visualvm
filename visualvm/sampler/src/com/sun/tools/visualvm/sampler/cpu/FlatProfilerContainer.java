@@ -24,6 +24,7 @@
  */
 package com.sun.tools.visualvm.sampler.cpu;
 
+import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.cpu.FlatProfileContainer;
 import org.netbeans.lib.profiler.results.cpu.MethodInfoMapper;
 import org.netbeans.lib.profiler.utils.formatting.MethodNameFormatter;
@@ -91,5 +92,10 @@ final class FlatProfilerContainer extends FlatProfileContainer {
 
     public double getWholeGraphNetTime1() {
         return wholeGraphNetTime1;
+    }
+
+    @Override
+    public ClientUtils.SourceCodeSelection getSourceCodeSelectionAtRow(int i) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

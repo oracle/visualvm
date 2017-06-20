@@ -48,8 +48,8 @@ import javax.swing.event.DocumentListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
 import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
-import org.netbeans.lib.profiler.common.filters.FilterUtils;
-import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.lib.profiler.filters.GenericFilter;
+import org.netbeans.lib.profiler.filters.JavaTypeFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
@@ -88,10 +88,10 @@ public abstract class ProfilerCPUPanel extends JPanel {
         settings.setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
         
         String instrFilterString = getFilterValue();
-        SimpleFilter instrFilter = (instrFilterString.isEmpty() || "*".equals(instrFilterString)) ? SimpleFilter.NO_FILTER : // NOI18N
-            new SimpleFilter(instrFilterString, inclFilterRadioButton.isSelected() ?
-            SimpleFilter.SIMPLE_FILTER_INCLUSIVE : SimpleFilter.SIMPLE_FILTER_EXCLUSIVE, instrFilterString);
-        settings.setSelectedInstrumentationFilter(instrFilter);
+        GenericFilter instrFilter = (instrFilterString.isEmpty() || "*".equals(instrFilterString)) ? new GenericFilter() : // NOI18N
+            new JavaTypeFilter(instrFilterString, inclFilterRadioButton.isSelected() ?
+            GenericFilter.TYPE_INCLUSIVE : GenericFilter.TYPE_EXCLUSIVE);
+        settings.setInstrumentationFilter(instrFilter);
         
         String[] rootValues = getRootValue().split(","); // NOI18N
         ClientUtils.SourceCodeSelection[] roots = (rootValues.length == 1 && rootValues[0].isEmpty()) ?
@@ -146,15 +146,16 @@ public abstract class ProfilerCPUPanel extends JPanel {
     }
     
     public boolean isRootValueValid() {
-        String[] rootParts = FilterUtils.getSeparateFilters(getRootValue());
-
-        for (int i = 0; i < rootParts.length; i++)
-            if (!FilterUtils.isValidProfilerFilter(rootParts[i]))
-                if (rootParts[i].endsWith("**")) { // NOI18N
-                    if (!FilterUtils.isValidProfilerFilter(rootParts[i].substring(0, rootParts[i].length() - 1))) return false;
-                } else {
-                    return false;
-                }
+// TODO 
+//        String[] rootParts = FilterUtils.getSeparateFilters(getRootValue());
+//
+//        for (int i = 0; i < rootParts.length; i++)
+//            if (!FilterUtils.isValidProfilerFilter(rootParts[i]))
+//                if (rootParts[i].endsWith("**")) { // NOI18N
+//                    if (!FilterUtils.isValidProfilerFilter(rootParts[i].substring(0, rootParts[i].length() - 1))) return false;
+//                } else {
+//                    return false;
+//                }
 
         return true;
     }
@@ -189,10 +190,11 @@ public abstract class ProfilerCPUPanel extends JPanel {
     }
     
     public boolean isFilterValueValid() {
-        String[] filterParts = FilterUtils.getSeparateFilters(getFilterValue());
+// TODO 
+//        String[] filterParts = FilterUtils.getSeparateFilters(getFilterValue());
 
-        for (int i = 0; i < filterParts.length; i++)
-            if (!FilterUtils.isValidProfilerFilter(filterParts[i])) return false;
+//        for (int i = 0; i < filterParts.length; i++)
+//            if (!FilterUtils.isValidProfilerFilter(filterParts[i])) return false;
 
         return true;
     }
