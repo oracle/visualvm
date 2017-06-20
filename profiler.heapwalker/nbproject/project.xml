@@ -187,6 +187,8 @@ Contributor(s):
                 <package>org.netbeans.modules.profiler.heapwalk</package>
                 <package>org.netbeans.modules.profiler.heapwalk.details.spi</package>
                 <package>org.netbeans.modules.profiler.heapwalk.ui.icons</package>
+                <package>org.netbeans.modules.profiler.heapwalker.v2</package>
+                <package>org.netbeans.modules.profiler.heapwalker.v2.ui</package>
             </friend-packages>
         </data>
     </configuration>
