@@ -78,22 +78,25 @@ public final class ThreadInfoProvider {
             LOGGER.log(Level.INFO, "JvmMXBeansFactory.getJvmMXBeans(jmxModel) returns null for " + application); // NOI18N
             return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
         }
-        threadBean = mxbeans.getThreadMXBean();
-        if (threadBean == null) {
-            LOGGER.log(Level.INFO, "mxbeans.getThreadMXBean() returns null for " + application); // NOI18N
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
-        }
-        useGetThreadInfo = JvmFactory.getJVMFor(application).is15();
-        try {
-            dumpAllThreads();
-        } catch (SecurityException e) {
-            LOGGER.log(Level.INFO, "threadBean.getThreadInfo(ids, maxDepth) throws SecurityException for " + application, e); // NOI18N
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
-        } catch (Throwable t) {
-            LOGGER.log(Level.INFO, "threadBean.getThreadInfo(ids, maxDepth) throws Throwable for " + application, t); // NOI18N
-            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
-        }
-        return null;
+        //TODO
+        // temporary disabled until profiling is rewritten to NB 90
+        return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
+//        threadBean = mxbeans.getThreadMXBean();
+//        if (threadBean == null) {
+//            LOGGER.log(Level.INFO, "mxbeans.getThreadMXBean() returns null for " + application); // NOI18N
+//            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
+//        }
+//        useGetThreadInfo = JvmFactory.getJVMFor(application).is15();
+//        try {
+//            dumpAllThreads();
+//        } catch (SecurityException e) {
+//            LOGGER.log(Level.INFO, "threadBean.getThreadInfo(ids, maxDepth) throws SecurityException for " + application, e); // NOI18N
+//            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
+//        } catch (Throwable t) {
+//            LOGGER.log(Level.INFO, "threadBean.getThreadInfo(ids, maxDepth) throws Throwable for " + application, t); // NOI18N
+//            return NbBundle.getMessage(ThreadInfoProvider.class, "MSG_unavailable_threads"); // NOI18N
+//        }
+//        return null;
     }
 
     ThreadInfo[] dumpAllThreads() {

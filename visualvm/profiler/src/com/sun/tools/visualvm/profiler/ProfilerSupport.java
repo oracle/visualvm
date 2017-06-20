@@ -306,20 +306,24 @@ public final class ProfilerSupport {
         // User explicitly requests to profile any VM
         if (FORCE_PROFILING_SUPPORTED) return true;
         
+        //TODO
+        // temporary disabled until profiling is rewritten to NB 90
+        return false;
+
         // Profiled application needs to be running JDK 6.0 or 7.0 or 8.0 or 9.0
-        if (!jvm.is16() && !jvm.is17() && !jvm.is18() && !jvm.is19()) return false;
+//        if (!jvm.is16() && !jvm.is17() && !jvm.is18() && !jvm.is19()) return false;
         
-        String vmName = jvm.getVmName();
-        String vmVendor = jvm.getVmVendor();
+//        String vmName = jvm.getVmName();
+//        String vmVendor = jvm.getVmVendor();
         
         // VM has to be a HotSpot VM or OpenJDK by Sun Microsystems Inc. or 
         // Oracle Co. or Apple Inc. or Hewlett-Packard Co. or 
         // Azul Systems, Inc. or SAP AG
-        return vmName != null && (vmName.startsWith(HOTSPOT_VM_NAME_PREFIX) || vmName.startsWith(OPENJDK_VM_NAME_PREFIX)
-                                  || vmName.startsWith(SAPJDK_VM_NAME_PREFIX)) && 
-               vmVendor != null && (vmVendor.startsWith(ORACLE_VM_VENDOR_PREFIX) || vmVendor.startsWith(SUN_VM_VENDOR_PREFIX) 
-                                 || vmVendor.startsWith(APPLE_VM_VENDOR_PREFIX) || vmVendor.startsWith(HP_VM_VENDOR_PREFIX)
-                                 || vmVendor.startsWith(AZUL_VM_VENDOR_PREFIX) || vmVendor.startsWith(SAP_VM_VENDOR_PREFIX));
+//        return vmName != null && (vmName.startsWith(HOTSPOT_VM_NAME_PREFIX) || vmName.startsWith(OPENJDK_VM_NAME_PREFIX)
+//                                  || vmName.startsWith(SAPJDK_VM_NAME_PREFIX)) &&
+//               vmVendor != null && (vmVendor.startsWith(ORACLE_VM_VENDOR_PREFIX) || vmVendor.startsWith(SUN_VM_VENDOR_PREFIX)
+//                                 || vmVendor.startsWith(APPLE_VM_VENDOR_PREFIX) || vmVendor.startsWith(HP_VM_VENDOR_PREFIX)
+//                                 || vmVendor.startsWith(AZUL_VM_VENDOR_PREFIX) || vmVendor.startsWith(SAP_VM_VENDOR_PREFIX));
     }
     
     static boolean classSharingBreaksProfiling(Application application) {
