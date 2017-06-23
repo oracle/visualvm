@@ -92,7 +92,7 @@ int VisualVMLauncher::start(int argc, char *argv[]) {
     parseConfigFile((userDir + "\\etc\\" + getAppName() + ".conf").c_str());
     userDir = oldUserDir;
 
-    adjustHeapAndPermGenSize();
+    adjustHeapSize();
     addExtraClusters();
     string nbexecPath;
     SetDllDirectory(baseDir.c_str());
@@ -508,9 +508,9 @@ bool VisualVMLauncher::areWeOn32bits() {
             (strstr(NBEXEC_FILE_PATH, "64") == NULL));
 }
 
-// Search if -Xmx and -XX:MaxPermSize are specified in existing arguments
+// Search if -Xmx is specified in existing arguments
 // If it isn't compute default values based on 32/64-bits and available RAM
-void VisualVMLauncher::adjustHeapAndPermGenSize() {
+void VisualVMLauncher::adjustHeapSize() {
     if (nbOptions.find("-J-Xmx") == string::npos) {
         int maxheap;
         if (areWeOn32bits())
@@ -518,9 +518,10 @@ void VisualVMLauncher::adjustHeapAndPermGenSize() {
         else
             maxheap = 1024;
         // find how much memory we have and add -Xmx as 1/5 of the memory
-        MEMORYSTATUS ms = {0};
-        GlobalMemoryStatus(&ms);
-        int memory = (int)((ms.dwTotalPhys / 1024 / 1024) / 5);
+        MEMORYSTATUSEX ms = {0};
+        ms.dwLength = sizeof (ms);
+        GlobalMemoryStatusEx(&ms);
+        int memory = (int)((ms.ullTotalPhys / 1024 / 1024) / 5);
         if (memory < 96) {
             memory = 96;
         }
@@ -530,27 +531,6 @@ void VisualVMLauncher::adjustHeapAndPermGenSize() {
         char tmp[32];
         snprintf(tmp, 32, " -J-Xmx%dm", memory);
         logMsg("Memory settings: -J-Xmx%dm", memory);
-        nbOptions += tmp;
-    }
-    // -XX:MaxPermSize and -XX:PermSize are passed to nbexec as
-    // launcher options, to apply them only for JDK 7. JDK 8 and
-    // newer do not support these arguments.
-    if (nbOptions.find("-J-XX:MaxPermSize") == string::npos) {
-        int memory;
-        if (areWeOn32bits())
-            memory = 96;
-        else
-            memory = 96;
-        char tmp[32];
-        logMsg("Memory settings: -L-XX:MaxPermSize=%dm", memory);
-        snprintf(tmp, 32, " -L-XX:MaxPermSize=%dm", memory);
-        nbOptions += tmp;
-    }
-    if (nbOptions.find("-J-XX:PermSize") == string::npos) {
-        int memory = 32;
-        char tmp[32];
-        logMsg("Memory settings: -L-XX:PermSize=%dm", memory);
-        snprintf(tmp, 32, " -L-XX:PermSize=%dm", memory);
         nbOptions += tmp;
     }
 }

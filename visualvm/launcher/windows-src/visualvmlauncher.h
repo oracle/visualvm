@@ -67,7 +67,7 @@ protected:
     virtual bool initBaseNames();
     virtual void addSpecificOptions(CmdArgs &args);
     virtual bool areWeOn32bits();
-    virtual void adjustHeapAndPermGenSize();
+    virtual void adjustHeapSize();
     virtual bool findUserDir(const char *str);
     virtual bool findCacheDir(const char *str);
     virtual const char * getAppName();
