@@ -121,7 +121,7 @@ class HprofHeap implements Heap {
     private static final boolean DEBUG = false;
 
     private static final String SNAPSHOT_ID = "NBPHD";
-    private static final int SNAPSHOT_VERSION  = 1;
+    private static final int SNAPSHOT_VERSION  = 2;
     
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
@@ -328,6 +328,10 @@ class HprofHeap implements Heap {
         out.writeInt(idMapSize);
         out.writeInt(segment);        
         idToOffsetMap.writeToStream(out);
+        out.writeBoolean(domTree != null);
+        if (domTree != null) {
+            domTree.writeToStream(out);
+        }
     }
 
     HprofHeap(DataInputStream dis, CacheDirectory cacheDir) throws IOException {
@@ -355,6 +359,9 @@ class HprofHeap implements Heap {
         idMapSize = dis.readInt();
         segment = dis.readInt();
         idToOffsetMap = new LongMap(dis, cacheDirectory);
+        if (dis.readBoolean()) {
+            domTree = new DominatorTree(this, dis);
+        }
         gcRoots = new HprofGCRoots(this);
         getClassDumpSegment().extractSpecialClasses();            
     }
