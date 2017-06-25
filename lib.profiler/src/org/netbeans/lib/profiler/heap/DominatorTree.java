@@ -43,6 +43,8 @@
 
 package org.netbeans.lib.profiler.heap;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -368,6 +370,16 @@ class DominatorTree {
         Instance ii = heap.getInstanceByID(instanceid.longValue());
         return ii.getJavaClass().getName()+"#"+ii.getInstanceNumber();
         
+    }
+
+    //---- Serialization support
+    void writeToStream(DataOutputStream out) throws IOException {
+        map.writeToStream(out);
+    }
+
+    DominatorTree(HprofHeap h, DataInputStream dis) throws IOException {
+        heap = h;
+        map = new LongHashMap(dis);
     }
     
     private static final class NearestGCRootCache extends LinkedHashMap {
