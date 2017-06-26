@@ -31,7 +31,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Tomas Hurka
  */
-@ServiceProvider(service=ProfilerToolbar.Provider.class)
+//@ServiceProvider(service=ProfilerToolbar.Provider.class)
 public class ToolbarProvider extends ProfilerToolbar.Provider {
 
     @Override
