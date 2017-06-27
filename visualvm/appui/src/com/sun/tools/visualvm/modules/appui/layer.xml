@@ -171,6 +171,7 @@
         <file name="Clipboard_hidden"/>
         <file name="Edit_hidden"/>
         <file name="Profile_hidden"/>
+        <file name="Standard.xml" url="Standard.xml"/>
         <file name="UndoRedo_hidden"/>
         <file name="QuickSearch_hidden"/>        
     </folder>
