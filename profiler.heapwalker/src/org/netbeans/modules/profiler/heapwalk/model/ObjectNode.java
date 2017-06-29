@@ -171,7 +171,7 @@ public class ObjectNode extends InstanceNode {
                     if (hasInstance()) {
                         ArrayList fieldValues = new ArrayList();
                         Instance instance = getInstance();
-                        if (DynamicObject.isDynObjSubClass(instance)) {
+                        if (DynamicObject.isDynamicObject(instance)) {
                             DynamicObject dynObj = new DynamicObject(instance);
                             fieldValues.addAll(dynObj.getFieldValues());
                             fieldValues.addAll(dynObj.getStaticFieldValues());
