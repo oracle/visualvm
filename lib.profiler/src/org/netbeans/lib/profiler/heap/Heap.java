@@ -164,4 +164,7 @@ public interface Heap {
      * this {@link Heap}
      */
     Properties getSystemProperties();
+
+    boolean isRetainedSizeComputed();
+    boolean isRetainedSizeByClassComputed();
 }
