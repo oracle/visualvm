@@ -82,8 +82,8 @@ import org.openide.util.NbBundle;
     "ArrayValueView_Truncated=... <truncated>",                                     // NOI18N
     "ArrayValueView_Value=Value:",                                                  // NOI18N
     "ArrayValueView_Items=Array items:",                                            // NOI18N
-    "ArrayValueView_All=Show all",                                                  // NOI18N
-    "ArrayValueView_Save=Save to file",                                             // NOI18N
+    "ArrayValueView_All=Show All",                                                  // NOI18N
+    "ArrayValueView_Save=Save to File",                                             // NOI18N
     "ArrayValueView_OutOfMemory=Out of memory - value too long."                    // NOI18N
 })
 final class ArrayValueView extends DetailsProvider.View implements Scrollable, BasicExportAction.ExportProvider {
@@ -168,6 +168,7 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
                 view.setLineWrap(true);
                 view.setWrapStyleWord(true);
                 view.setText(preview);
+                try { view.setCaretPosition(0); } catch (IllegalArgumentException e) {}
                 
                 JScrollPane viewScroll = new JScrollPane(view,
                         JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -230,6 +231,7 @@ final class ArrayValueView extends DetailsProvider.View implements Scrollable, B
                     public void run() {
                         try {
                             view.setText(preview);
+                            try { view.setCaretPosition(0); } catch (IllegalArgumentException e) {}
                             view.setEnabled(true);
                         } catch (OutOfMemoryError e) {
                             ProfilerDialogs.displayError(Bundle.ArrayValueView_OutOfMemory());
