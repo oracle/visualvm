@@ -297,6 +297,14 @@ class HprofHeap implements Heap {
         return null;
     }
 
+    public boolean isRetainedSizeComputed() {
+        return retainedSizeComputed;
+    }
+
+    public boolean isRetainedSizeByClassComputed() {
+        return retainedSizeByClassComputed;
+    }
+
     //---- Serialization support
     void writeToFile() {
         if (!cacheDirectory.isTemporary()) {
