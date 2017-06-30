@@ -41,11 +41,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.profiler.v2.ui;
+package org.netbeans.lib.profiler.ui.swing;
 
 import java.awt.Component;
 import java.awt.EventQueue;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -53,17 +52,12 @@ import java.awt.event.MouseEvent;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
 import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.MenuElement;
 import javax.swing.MenuSelectionManager;
-import javax.swing.UIManager;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.swing.ProfilerPopupMenu;
 
 /**
  * A JPopupMenu implementation optionally allowing to interact with JMenuItems
