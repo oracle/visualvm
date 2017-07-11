@@ -165,6 +165,13 @@ public class NormalBoldGrayRenderer extends MultiRenderer {
         }
     }
     
+    public Icon getIcon() {
+        Icon icon = normalRenderer.getIcon();
+        if (icon == null) icon = boldRenderer.getIcon();
+        if (icon == null) icon = grayRenderer.getIcon();
+        return icon;
+    }
+    
     // Invoke after values are set!
     protected void setIconTextGap(int gap) {
         String text = normalRenderer.getText();
@@ -184,10 +191,5 @@ public class NormalBoldGrayRenderer extends MultiRenderer {
 //            grayRenderer.setIcon(null);
         }
     }
-    
-    
-    public String toString() {
-        return normalRenderer.toString() + boldRenderer.toString() + grayRenderer.toString();
-    }
-    
+        
 }
