@@ -467,8 +467,13 @@ public class ProfilerTable extends JTable {
     }
     
     protected void restoreSelection() {
-        if (!(selection instanceof Object[])) selection = selectValue(selection, mainColumn, false);
-        else selection = selectValues((Object[])selection, mainColumn, false);
+        try {
+            if (!(selection instanceof Object[])) selection = selectValue(selection, mainColumn, false);
+            else selection = selectValues((Object[])selection, mainColumn, false);
+        } catch (Exception e) {
+            System.err.println(">>> Exception in ProfilerTable.restoreSelection: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     public void selectRow(int row, boolean scrollToVisible) {
