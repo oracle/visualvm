@@ -1159,18 +1159,26 @@ public class ProfilerTreeTable extends ProfilerTable {
 //                System.err.println(">>> Restoring expanded " + tp);
                 tree.expandPath(getSimilarPath(tp, tree.getModel()));
             }
+        } catch (Exception e) {
+            System.err.println(">>> Exception in ProfilerTreeTable.restoreExpandedNodes: " + e.getMessage());
+            e.printStackTrace();
         } finally {
             tree.putClientProperty(UIUtils.PROP_EXPANSION_TRANSACTION, null);
         }
     }
     
     static void restoreSelectedNodes(JTree tree, UIState uiState) {
-        TreePath[] sel = uiState.getSelectedPaths();
-        
-        if (sel != null)
-            for (int i = 0; i < sel.length; i++)
-                sel[i] = getSimilarPath(sel[i], tree.getModel());
-        tree.setSelectionPaths(sel);
+        try {
+            TreePath[] sel = uiState.getSelectedPaths();
+
+            if (sel != null)
+                for (int i = 0; i < sel.length; i++)
+                    sel[i] = getSimilarPath(sel[i], tree.getModel());
+            tree.setSelectionPaths(sel);
+        } catch (Exception e) {
+            System.err.println(">>> Exception in ProfilerTreeTable.restoreSelectedNodes: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     
