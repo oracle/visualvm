@@ -44,10 +44,12 @@ package org.netbeans.modules.profiler.heapwalk.details.spi;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.heapwalk.model.BrowserUtils;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -57,7 +59,7 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "BrowserUtils_Loading=Loading content..."                                   // NOI18N
+    "BrowserUtils_Loading=<loading content...>"                                   // NOI18N
 })
 public abstract class DetailsProvider {
     
@@ -104,11 +106,22 @@ public abstract class DetailsProvider {
         private Instance instance;
         private Heap heap;
         
-        // [Event Dispatch Thread] Constructor for default initial UI ("Loading content...")
+        // [Event Dispatch Thread] Constructor for default initial UI ("<loading content...>")
         protected View(Instance instance, Heap heap) {
-            this(instance, heap, new JLabel(Bundle.BrowserUtils_Loading(), JLabel.CENTER) {
-                public void addNotify() { setEnabled(false); }
-            });
+            this(instance, heap, initialView());
+        }
+        
+        private static JComponent initialView() {
+            JLabel loading = new JLabel(Bundle.BrowserUtils_Loading(), JLabel.CENTER);
+            loading.setEnabled(false);
+            
+            JPanel loadingContainer = new JPanel(new BorderLayout());
+            loadingContainer.setOpaque(true);
+            loadingContainer.setBackground(UIUtils.getProfilerResultsBackground());
+            loadingContainer.setEnabled(false);
+            loadingContainer.add(loading, BorderLayout.CENTER);
+            
+            return loadingContainer;
         }
         
         // [Event Dispatch Thread] Constructor for custom initial UI
