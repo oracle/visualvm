@@ -479,6 +479,10 @@ public class ProfilerTable extends JTable {
     public void selectRow(int row, boolean scrollToVisible) {
         internal = true;
         try { setRowSelectionInterval(row, row); saveSelection(); }
+        catch (Exception e) {
+            System.err.println(">>> Exception in ProfilerTable.selectRow: " + e.getMessage());
+            e.printStackTrace();
+        }
         finally { internal = false; }
         if (scrollToVisible) scrollRectToVisible(getCellRect(row, getSelectedColumn(), true));
     }
@@ -486,6 +490,10 @@ public class ProfilerTable extends JTable {
     public void selectColumn(int column, boolean scrollToVisible) {
         internal = true;
         try { setColumnSelectionInterval(column, column); }
+        catch (Exception e) {
+            System.err.println(">>> Exception in ProfilerTable.selectColumn: " + e.getMessage());
+            e.printStackTrace();
+        }
         finally { internal = false; }
         if (scrollToVisible) scrollRectToVisible(getCellRect(getSelectedRow(), column, true));
     }
