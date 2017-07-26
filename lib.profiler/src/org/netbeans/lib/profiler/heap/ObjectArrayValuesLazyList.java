@@ -43,33 +43,35 @@
 
 package org.netbeans.lib.profiler.heap;
 
-import java.util.List;
+import java.util.AbstractList;
 
 
 /**
- * represents instance of array of objects
- * @author Tomas Hurka
+ *
+ * @author Jiri Sedlacek
  */
-public interface ObjectArrayInstance extends Instance {
+class ObjectArrayValuesLazyList extends AbstractList {
+    //~ Instance fields ----------------------------------------------------------------------------------------------------------
+
+    private final ClassDump dumpClass;
+    private final int length;
+    private final long offset;
+
+    //~ Constructors -------------------------------------------------------------------------------------------------------------
+
+    ObjectArrayValuesLazyList(ClassDump dump, int len, long off) {
+        dumpClass = dump;
+        length = len;
+        offset = off;
+    }
+
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
-    /**
-     * return number of elements in the array (arr.length).
-     * <br>
-     * Speed: fast
-     * @return number of elements in the array
-     */
-    int getLength();
+    public Object get(int index) {
+        return new HprofArrayValue(dumpClass, offset, index);
+    }
 
-    /**
-     * returns list of elements. The elements are instances of {@link Instance}.
-     * The list is ordered as the original array.
-     * <br>
-     * Speed: fast
-     * @return list {@link Instance} of elements.
-     */
-    List /*<Instance>*/ getValues();
-    
-    List /*<ArrayItemValue>*/ getItems();
-    
+    public int size() {
+        return length;
+    }
 }
