@@ -77,7 +77,7 @@ Contributor(s):
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.138</specification-version>
+                        <specification-version>1.139</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
