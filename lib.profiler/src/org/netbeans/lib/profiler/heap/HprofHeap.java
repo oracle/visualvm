@@ -130,15 +130,20 @@ class HprofHeap implements Heap {
     private NearestGCRoot nearestGCRoot;
     final HprofGCRoots gcRoots;
     private ComputedSummary computedSummary;
+    private final Object computedSummaryLock = new Object();
     private DominatorTree domTree;
     private TagBounds allInstanceDumpBounds;
     private TagBounds heapDumpSegment;
     private TagBounds[] heapTagBounds;
     private TagBounds[] tagBounds = new TagBounds[0xff];
     private boolean instancesCountComputed;
+    private final Object instancesCountLock = new Object();
     private boolean referencesComputed;
+    private final Object referencesLock = new Object();
     private boolean retainedSizeComputed;
+    private final Object retainedSizeLock = new Object();
     private boolean retainedSizeByClassComputed;
+    private final Object retainedSizeByClassLock = new Object();
     private int idMapSize;
     private int segment;
 
@@ -275,8 +280,10 @@ class HprofHeap implements Heap {
             return new Summary(dumpBuffer, summaryBound.startOffset);
         }
 
-        if (computedSummary == null) {
-            computedSummary = new ComputedSummary(this);
+        synchronized (computedSummaryLock) {
+            if (computedSummary == null) {
+                computedSummary = new ComputedSummary(this);
+            }
         }
 
         return computedSummary;
@@ -483,7 +490,8 @@ class HprofHeap implements Heap {
         }
     }
 
-    synchronized void computeInstances() {
+    void computeInstances() {
+        synchronized (instancesCountLock) {
         if (instancesCountComputed) {
             return;
         }
@@ -532,6 +540,7 @@ class HprofHeap implements Heap {
         }
         instancesCountComputed = true;
         writeToFile();
+        }
         HeapProgress.progressFinish();
     }
 
@@ -600,7 +609,8 @@ class HprofHeap implements Heap {
         return refs;
     }
 
-    synchronized void computeReferences() {
+    void computeReferences() {
+        synchronized (referencesLock) {
         if (referencesComputed) {
             return;
         }
@@ -685,10 +695,12 @@ class HprofHeap implements Heap {
         idToOffsetMap.flush();
         referencesComputed = true;
         writeToFile();
+        }
         HeapProgress.progressFinish();        
     }
     
-    synchronized void computeRetainedSize() {
+    void computeRetainedSize() {
+        synchronized (retainedSizeLock) {
         if (retainedSizeComputed) {
             return;
         }
@@ -747,9 +759,11 @@ class HprofHeap implements Heap {
         }
         retainedSizeComputed = true;
         writeToFile();
+        }
     }
 
-    synchronized void computeRetainedSizeByClass() {
+    void computeRetainedSizeByClass() {
+        synchronized (retainedSizeByClassLock) {
         if (retainedSizeByClassComputed) {
             return;
         }
@@ -783,9 +797,10 @@ class HprofHeap implements Heap {
         domTree = null;
         retainedSizeByClassComputed = true;
         writeToFile();
+        }
     }
 
-    synchronized Instance getNearestGCRootPointer(Instance instance) {
+    Instance getNearestGCRootPointer(Instance instance) {
         return nearestGCRoot.getNearestGCRootPointer(instance);
     }
     

@@ -118,4 +118,12 @@ public abstract class CCTNode implements TreeNode {
         return getChild(index);
     }
     //---
+    
+    
+    public static interface FixedPosition {}
+    
+    public static interface AlwaysFirst extends FixedPosition {}
+    
+    public static interface AlwaysLast extends FixedPosition {}
+    
 }

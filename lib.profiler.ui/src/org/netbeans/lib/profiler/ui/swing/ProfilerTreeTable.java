@@ -696,7 +696,13 @@ public class ProfilerTreeTable extends ProfilerTable {
                 public int compare(Object o1, Object o2) {
                     int result;
                     
-                    if (comp == null) {
+                    if (o1 instanceof CCTNode.FixedPosition) {
+                        result = o1 instanceof CCTNode.AlwaysFirst ? -1 : 1;
+                        result = ascending ? result : -result;
+                    } else if (o2 instanceof CCTNode.FixedPosition) {
+                        result = o2 instanceof CCTNode.AlwaysFirst ? 1 : -1;
+                        result = ascending ? result : -result;
+                    } else if (comp == null) {
                         result = o1.toString().compareTo(o2.toString());
                     } else {
                         Object v1 = model.getValueAt((TreeNode)o1, sortColumn);
