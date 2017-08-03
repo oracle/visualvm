@@ -42,6 +42,8 @@
 package org.netbeans.modules.profiler.oql.engine.api.impl;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -58,6 +60,7 @@ import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.OQLQuery;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.ObjectVisitor;
 import org.netbeans.modules.profiler.oql.engine.api.OQLException;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -72,10 +75,14 @@ public class OQLEngineImpl {
     private static boolean oqlSupported;
 
     static {
-        try {
+        try {            
+            // first try Truffle JavaScript
+            Object engine = getTruffleJS();
             // Do we have JavaScript engine?
-            ScriptEngineManager manager = new ScriptEngineManager();
-            Object engine = manager.getEngineByName("JavaScript"); // NOI18N
+            if (engine == null) {
+                ScriptEngineManager manager = new ScriptEngineManager();
+                engine = manager.getEngineByName("JavaScript"); // NOI18N
+            }
 
             oqlSupported = engine != null;
         } catch (Throwable ex) {
@@ -84,6 +91,36 @@ public class OQLEngineImpl {
         }
     }
 
+    private static ScriptEngine getTruffleJS() {
+        try {
+            Class truffleLocatorClass = Class.forName("com.oracle.truffle.api.impl.TruffleLocator");    // NOI18N
+            Method loadersMethod = truffleLocatorClass.getDeclaredMethod("loaders");  // NOI18N
+            loadersMethod.setAccessible(true);
+            Set<ClassLoader> loaders = (Set) loadersMethod.invoke(null);
+            
+            for (ClassLoader loader : loaders) {
+                ScriptEngineManager manager = new ScriptEngineManager(loader);
+                ScriptEngine graalJS = manager.getEngineByName("Graal.js");    // NOI18N
+                if (graalJS != null) {
+                    System.out.println("Engine: "+graalJS);
+                    return graalJS;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            return null;
+        } catch (NoSuchMethodException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (SecurityException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (IllegalAccessException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (IllegalArgumentException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (InvocationTargetException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        return null;
+    } 
     // check OQL is supported or not before creating OQLEngine 
     public static boolean isOQLSupported() {
         return oqlSupported;
@@ -397,8 +434,11 @@ public class OQLEngineImpl {
     private void init(Snapshot snapshot) throws RuntimeException {
         this.snapshot = snapshot;
         try {
-            ScriptEngineManager manager = new ScriptEngineManager();
-            engine = manager.getEngineByName("JavaScript"); // NOI18N
+            engine = getTruffleJS();
+            if (engine == null) {
+                ScriptEngineManager manager = new ScriptEngineManager();
+                engine = manager.getEngineByName("JavaScript"); // NOI18N
+            }
             InputStream strm = getInitStream();
             CompiledScript cs = ((Compilable)engine).compile(new InputStreamReader(strm));
             cs.eval();
