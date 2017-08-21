@@ -73,8 +73,9 @@ class HeapHistogramImpl extends HeapHistogram {
         time = new Date();
         Scanner sc = new Scanner(histogramText);
         sc.useRadix(10);
-        sc.nextLine();
-        sc.nextLine();
+        while(!sc.hasNext("-+")) {
+            sc.nextLine();
+        }
         sc.skip("-+");
         sc.nextLine();
 
@@ -149,6 +150,7 @@ class HeapHistogramImpl extends HeapHistogram {
             instances = sc.nextLong();
             bytes = sc.nextLong();
             jvmName = sc.next();
+            sc.nextLine();  // skip module name on JDK 9
             name = convertJVMName(jvmName);
         }
 
