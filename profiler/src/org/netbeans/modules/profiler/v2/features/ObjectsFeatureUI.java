@@ -203,6 +203,8 @@ abstract class ObjectsFeatureUI extends FeatureUI {
         
         memoryView.putClientProperty("HelpCtx.Key", "ProfileObjects.HelpCtx"); // NOI18N
         
+        updater = new LiveMemoryViewUpdater(memoryView, getProfilerClient());
+        
         
         // --- Toolbar ---------------------------------------------------------
         
