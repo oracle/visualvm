@@ -26,9 +26,14 @@ package com.sun.tools.visualvm.profiler;
 
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import java.awt.BorderLayout;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import org.netbeans.modules.profiler.ResultsListener;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -58,4 +63,40 @@ final class ProfilingResultsSupport extends JPanel {
         setLayout(new BorderLayout());
         setOpaque(false);
     }
+    
+    
+    static abstract class ResultsView extends JPanel {
+        
+        abstract void refreshResults();
+        
+        abstract void resetResults();
+        
+    }
+    
+    
+    @ServiceProvider(service=ResultsListener.class)
+    public static class ResultsResetter implements ResultsListener {
+        
+        private final List<ResultsView> views = new ArrayList();
+        
+        
+        public static ResultsResetter registerView(ResultsView view) {
+            ResultsResetter handler = Lookup.getDefault().lookup(ResultsResetter.class);
+            handler.views.add(view);
+            return handler;
+        }
+        
+        public void unregisterView(ResultsView view) {
+            views.remove(view);
+        }
+        
+        
+        public void resultsAvailable() {}
+        
+        public void resultsReset() {
+            for (ResultsView updater : views) updater.resetResults();
+        }
+
+    }
+    
 }

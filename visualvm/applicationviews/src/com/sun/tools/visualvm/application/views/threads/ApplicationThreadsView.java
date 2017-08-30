@@ -49,13 +49,19 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
+import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -297,7 +303,29 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
 
     // --- Timeline ------------------------------------------------------------
 
+    @NbBundle.Messages({
+        "ThreadsFeatureUI_show=Show:",
+        "ThreadsFeatureUI_filterAll=All Threads",
+        "ThreadsFeatureUI_filterLive=Live Threads",
+        "ThreadsFeatureUI_filterFinished=Finished Threads",
+        "ThreadsFeatureUI_filterSelected=Selected Threads",
+        "ThreadsFeatureUI_timeline=Timeline:",
+        "ThreadsFeatureUI_threadsFilter=Threads filter",
+        "# HTML formatted:",
+        "ThreadsFeatureUI_noThreadsMsg=<html><b>No threads are currently selected.</b><br><br>Use the Selected column or invoke Select thread action to select threads.</html>"
+    })
     private static class TimelineViewSupport extends JPanel {
+        private ProfilerToolbar toolbar;
+        private ThreadsPanel threadsPanel;
+        
+        private JLabel shLabel;
+        private ActionPopupButton shFilter;
+
+        private JLabel tlLabel;
+        private JComponent tlZoomInButton;
+        private JComponent tlZoomOutButton;
+        private JComponent tlFitWidthButton;
+        
 
         TimelineViewSupport(VisualVMThreadsDataManager threadsManager) {
             initComponents(threadsManager);
@@ -311,13 +339,96 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
             setLayout(new BorderLayout());
             setOpaque(false);
 
-            ThreadsPanel threadsPanel = new ThreadsPanel(threadsManager, null);
+            threadsPanel = new ThreadsPanel(threadsManager, null) {
+                protected void filterSelected(ThreadsPanel.Filter filter) {
+                    super.filterSelected(filter);
+                    shFilter.selectAction(filter.ordinal());
+                }
+            };
             threadsPanel.threadsMonitoringEnabled();
+            
+            // -----------------------------------------------------------------
+            // --- copy-pasted timeline toolbar from org.netbeans.modules.profiler.v2.features.ThreadsFeatureUI
+            
+            shLabel = new GrayLabel(Bundle.ThreadsFeatureUI_show());
 
-//            JComponent toolbar = (JComponent)threadsPanel.getToolbar();
+            Action aAll = new AbstractAction() {
+                { putValue(NAME, Bundle.ThreadsFeatureUI_filterAll()); }
+                public void actionPerformed(ActionEvent e) { setFilter(ThreadsPanel.Filter.ALL); }
 
-//            add(toolbar, BorderLayout.NORTH);
+            };
+            Action aLive = new AbstractAction() {
+                { putValue(NAME, Bundle.ThreadsFeatureUI_filterLive()); }
+                public void actionPerformed(ActionEvent e) { setFilter(ThreadsPanel.Filter.LIVE); }
+
+            };
+            Action aFinished = new AbstractAction() {
+                { putValue(NAME, Bundle.ThreadsFeatureUI_filterFinished()); }
+                public void actionPerformed(ActionEvent e) { setFilter(ThreadsPanel.Filter.FINISHED); }
+
+            };
+            Action aSelected = new AbstractAction() {
+                { putValue(NAME, Bundle.ThreadsFeatureUI_filterSelected()); }
+                public void actionPerformed(ActionEvent e) { setSelectedFilter(); }
+
+            };
+            shFilter = new ActionPopupButton(aAll, aLive, aFinished, aSelected);
+            shFilter.setToolTipText(Bundle.ThreadsFeatureUI_threadsFilter());
+
+            tlLabel = new GrayLabel(Bundle.ThreadsFeatureUI_timeline());
+
+
+            tlZoomInButton = (JComponent)threadsPanel.getZoomIn();
+            tlZoomInButton.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+            tlZoomInButton.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
+            tlZoomOutButton = (JComponent)threadsPanel.getZoomOut();
+            tlZoomOutButton.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+            tlZoomOutButton.putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
+            tlFitWidthButton = (JComponent)threadsPanel.getFitWidth();
+            tlFitWidthButton.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+            tlFitWidthButton.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
+
+            toolbar = ProfilerToolbar.create(true);
+
+//            toolbar.addSpace(2);
+//            toolbar.addSeparator();
+            toolbar.addSpace(5);
+
+            toolbar.add(shLabel);
+            toolbar.addSpace(2);
+            toolbar.add(shFilter);
+
+            toolbar.addSpace(2);
+            toolbar.addSeparator();
+            toolbar.addSpace(5);
+
+            toolbar.add(tlLabel);
+            toolbar.addSpace(2);
+            toolbar.add(tlZoomInButton);
+            toolbar.add(tlZoomOutButton);
+            toolbar.add(tlFitWidthButton);
+            
+            add(toolbar.getComponent(), BorderLayout.NORTH);
+
+            setFilter(ThreadsPanel.Filter.LIVE);
+            
+            // -----------------------------------------------------------------
+
             add(threadsPanel, BorderLayout.CENTER);
+        }
+        
+        private void setSelectedFilter() {
+            if (threadsPanel.hasSelectedThreads()) {
+                setFilter(ThreadsPanel.Filter.SELECTED);
+            } else {
+                threadsPanel.showSelectedColumn();
+                shFilter.selectAction(threadsPanel.getFilter().ordinal());
+                ProfilerDialogs.displayWarning(Bundle.ThreadsFeatureUI_noThreadsMsg());
+            }
+        }
+
+        private void setFilter(ThreadsPanel.Filter filter) {
+            threadsPanel.setFilter(filter);
         }
     }
 }

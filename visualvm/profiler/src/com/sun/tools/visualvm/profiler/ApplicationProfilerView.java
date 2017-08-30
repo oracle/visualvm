@@ -36,7 +36,6 @@ import com.sun.tools.visualvm.profiling.presets.ProfilerPresets;
 import com.sun.tools.visualvm.uisupport.HTMLLabel;
 import com.sun.tools.visualvm.uisupport.HTMLTextArea;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -49,15 +48,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.text.MessageFormat;
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.netbeans.lib.profiler.TargetAppRunner;
@@ -67,6 +63,7 @@ import org.netbeans.lib.profiler.common.event.ProfilingStateEvent;
 import org.netbeans.lib.profiler.common.event.ProfilingStateListener;
 import org.netbeans.modules.profiler.NetBeansProfiler;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.utilities.ProfilerUtils;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -174,6 +171,9 @@ final class ApplicationProfilerView extends DataSourceView {
         private boolean applicationTerminated = false;
         
         private boolean classSharingBreaksProfiling;
+        
+        
+        private ProfilingResultsSupport.ResultsView results;
     
         
         public MasterViewSupport(final Application application, ProfilingResultsSupport profilingResultsView,
@@ -230,37 +230,42 @@ final class ApplicationProfilerView extends DataSourceView {
         }
         
         public void actionPerformed(ActionEvent e) {
+            if (results != null) results.refreshResults();
             updateRunningText();
         }
         
         
-        private static JComponent getLiveResultsView() {
-            // TODO
-            JComponent view = null; //LiveResultsWindow.getDefault();
-            Component[] components = view.getComponents();
-            boolean buttonFound = false;
-            
-            if (components.length > 0 && components[0] instanceof JPanel) {
-                components = ((JPanel)components[0]).getComponents();
-                if (components.length > 0 && components[0] instanceof JPanel) {
-                    JPanel toolbarPanel = (JPanel)components[0];
-                    components = toolbarPanel.getComponents();
-                    if (components.length > 0 && components[0] instanceof JToolBar) {
-                        JToolBar toolbar = (JToolBar)components[0];
-                        components = toolbar.getComponents();
-                    }
-                    if (components.length > 5 && components[5] instanceof AbstractButton) {
-                        AbstractButton takeSnapshot = (AbstractButton)components[5];
-                        takeSnapshot.setText(NbBundle.getMessage(
-                                ApplicationProfilerView.class, "LBL_Snapshot")); // NOI18N
-                        buttonFound = true;
-                    }
-                }
-            }
-            assert buttonFound : "Take Snapshot button was not found in the toolbar";  // NOI18N
-
-            view.setPreferredSize(new Dimension(1, 1));
-            return view;
+//        private static JComponent getLiveResultsView() {
+//            // TODO
+//            JComponent view = null; //LiveResultsWindow.getDefault();
+//            Component[] components = view.getComponents();
+//            boolean buttonFound = false;
+//            
+//            if (components.length > 0 && components[0] instanceof JPanel) {
+//                components = ((JPanel)components[0]).getComponents();
+//                if (components.length > 0 && components[0] instanceof JPanel) {
+//                    JPanel toolbarPanel = (JPanel)components[0];
+//                    components = toolbarPanel.getComponents();
+//                    if (components.length > 0 && components[0] instanceof JToolBar) {
+//                        JToolBar toolbar = (JToolBar)components[0];
+//                        components = toolbar.getComponents();
+//                    }
+//                    if (components.length > 5 && components[5] instanceof AbstractButton) {
+//                        AbstractButton takeSnapshot = (AbstractButton)components[5];
+//                        takeSnapshot.setText(NbBundle.getMessage(
+//                                ApplicationProfilerView.class, "LBL_Snapshot")); // NOI18N
+//                        buttonFound = true;
+//                    }
+//                }
+//            }
+//            assert buttonFound : "Take Snapshot button was not found in the toolbar";  // NOI18N
+//
+//            view.setPreferredSize(new Dimension(1, 1));
+//            return view;
+//        }
+        
+        private ProfilingResultsSupport.ResultsView getResultsView(boolean cpu) {
+            return cpu ? new CPULivePanel() : new MemoryLivePanel();
         }
         
         private void handleCPUProfiling() {
@@ -414,11 +419,13 @@ final class ApplicationProfilerView extends DataSourceView {
                       enableControlButtons();
                       updateControlButtons();
                       disableSettings();
-                      profilingResultsView.setProfilingResultsDisplay(getLiveResultsView());
+                      results = getResultsView(cpuButton.isSelected());
+                      profilingResultsView.setProfilingResultsDisplay(results);
                     } else {
                       statusValueLabel.setText(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_profiling_of") + ProfilerSupport.getInstance().getProfiledApplicationName() + NbBundle.getMessage(ApplicationProfilerView.class, "MSG_in_progress"));  // NOI18N
                       disableControlButtons();
-                      profilingResultsView.setProfilingResultsDisplay(null);
+                      results = null;
+                      profilingResultsView.setProfilingResultsDisplay(results);
                     }
 
                     profilingResultsView.revalidate();
@@ -526,6 +533,8 @@ final class ApplicationProfilerView extends DataSourceView {
           attachSettings.setDirect(false);
           attachSettings.setDynamic16(true);
           attachSettings.setPid(application.getPid());
+          
+          ProfilerIDESettings.getInstance().setOOMDetectionMode(ProfilerIDESettings.OOME_DETECTION_NONE);
         }
         
         
