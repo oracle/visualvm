@@ -153,12 +153,14 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
         GenericFilter sf = settings.getInstrumentationFilter();
         InstrumentationFilter filter = new InstrumentationFilter(sf);
         builder = snapshotDumper.getNewBuilder(filter);
-                
+        
         refresher.setRefreshRate(refreshRate);
 
+        final StackTraceSnapshotBuilder _builder = builder;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                cpuView.setResultsPanel(new SampledLivePanel(builder));
+                cpuView.setBuilder(_builder);
+//                cpuView.setResultsPanel(new SampledLivePanel2(builder));
             }
         });
 

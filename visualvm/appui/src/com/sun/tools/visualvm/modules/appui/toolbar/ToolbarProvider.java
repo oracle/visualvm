@@ -24,6 +24,7 @@
  */
 package com.sun.tools.visualvm.modules.appui.toolbar;
 
+import javax.swing.JComponent;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -31,12 +32,26 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Tomas Hurka
  */
-//@ServiceProvider(service=ProfilerToolbar.Provider.class)
+@ServiceProvider(service=ProfilerToolbar.Provider.class)
 public class ToolbarProvider extends ProfilerToolbar.Provider {
 
     @Override
     public ProfilerToolbar create(boolean showSeparator) {
-        return new VisualVMToolbar(showSeparator);
+        return new VisualVMImpl(showSeparator);
+    }
+    
+    
+    private static class VisualVMImpl extends ProfilerToolbar.Impl {
+        
+        private VisualVMImpl(boolean showSeparator) {
+            super(showSeparator);
+            
+            JComponent comp = component;
+            if (showSeparator) comp = (JComponent)comp.getComponent(0);
+            
+            comp.setOpaque(false);
+        }
+        
     }
     
 }

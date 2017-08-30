@@ -1,48 +1,43 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *  Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
- * This code is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ *  This code is free software; you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License version 2 only, as
+ *  published by the Free Software Foundation.  Oracle designates this
+ *  particular file as subject to the "Classpath" exception as provided
+ *  by Oracle in the LICENSE file that accompanied this code.
  * 
- * This code is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * version 2 for more details (a copy is included in the LICENSE file that
- * accompanied this code).
+ *  This code is distributed in the hope that it will be useful, but WITHOUT
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ *  version 2 for more details (a copy is included in the LICENSE file that
+ *  accompanied this code).
  * 
- * You should have received a copy of the GNU General Public License version
- * 2 along with this work; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ *  You should have received a copy of the GNU General Public License version
+ *  2 along with this work; if not, write to the Free Software Foundation,
+ *  Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  * 
- * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
- * or visit www.oracle.com if you need additional information or have any
- * questions.
+ *  Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ *  or visit www.oracle.com if you need additional information or have any
+ *  questions.
  */
+package com.sun.tools.visualvm.profiler;
 
-package com.sun.tools.visualvm.sampler.cpu;
-
-import com.sun.tools.visualvm.sampler.AbstractSamplerSupport;
 import java.awt.BorderLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.awt.event.ItemEvent;
-import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
-import org.netbeans.lib.profiler.results.cpu.StackTraceSnapshotBuilder;
+import org.netbeans.lib.profiler.common.Profiler;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.LiveCPUView;
+import org.netbeans.lib.profiler.ui.cpu.LiveCPUViewUpdater;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.MultiButtonGroup;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
@@ -77,72 +72,87 @@ import org.openide.util.NbBundle;
     "MethodsFeatureUI_showAbsolute=Show absolute values",
     "MethodsFeatureUI_showDeltas=Show delta values"
 })
-final class CPUView extends JPanel {
-
-    private final AbstractSamplerSupport.Refresher refresher;
-    private boolean forceRefresh = false;
+class CPULivePanel extends ProfilingResultsSupport.ResultsView {
     
-    private final CPUSamplerSupport.SnapshotDumper snapshotDumper;
-    private final CPUSamplerSupport.ThreadDumper threadDumper;
-    
-    private StackTraceSnapshotBuilder builder;
-
     private ProfilerToolbar toolbar;
     private LiveCPUView cpuView;
-
-
-    CPUView(AbstractSamplerSupport.Refresher refresher, CPUSamplerSupport.SnapshotDumper
-            snapshotDumper, CPUSamplerSupport.ThreadDumper threadDumper) {
-        this.refresher = refresher;
-        this.snapshotDumper = snapshotDumper;
-        this.threadDumper = threadDumper;
-        
-        initComponents();
-
-        addHierarchyListener(new HierarchyListener() {
-            public void hierarchyChanged(HierarchyEvent e) {
-                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                    if (isShowing()) CPUView.this.refresher.refresh();
-                }
-            }
-        });
-    }
-
+    private LiveCPUViewUpdater updater;
+    private ProfilingResultsSupport.ResultsResetter resetter;
     
-    void setBuilder(StackTraceSnapshotBuilder builder) {
-        this.builder = builder;
-    }
-
-    void initSession() {
-        pdSnapshotButton.setEnabled(false);
-    }
-
-    void refresh() {
-        if (!isShowing() || (lrPauseButton.isSelected() && !forceRefresh)) return;
-        forceRefresh = false;
+    
+    CPULivePanel() {
+        setLayout(new BorderLayout());
+        setOpaque(false);
         
-        try {
-            // TODO: perform out of the EDT!
-            CPUResultsSnapshot snapshot = builder.createSnapshot(System.currentTimeMillis());
-            cpuView.setData(snapshot, true);
-        } catch (CPUResultsSnapshot.NoDataAvailableException ex) {
-            Exceptions.printStackTrace(ex);
+        add(getToolbar().getComponent(), BorderLayout.NORTH);
+        add(getResultsUI(), BorderLayout.CENTER);
+    }
+    
+    
+    
+    // --- API implementation --------------------------------------------------
+    
+    ProfilerToolbar getToolbar() {
+        if (toolbar == null) initUI();
+        return toolbar;
+    }
+
+    JPanel getResultsUI() {
+        if (cpuView == null) initUI();
+        return cpuView;
+    }
+    
+    boolean hasResultsUI() {
+        return cpuView != null;
+    }
+    
+    void sessionStateChanged(int sessionState) {
+        refreshToolbar(sessionState);
+    }
+    
+    
+    void resetPause() {
+        if (lrPauseButton != null) lrPauseButton.setSelected(false);
+    }
+    
+    void setForceRefresh() {
+        if (updater != null) updater.setForceRefresh(true);
+    }
+    
+    void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
+        if (updater != null) updater.update();
+    }
+    
+    void resetResults() {
+        if (lrDeltasButton != null) {
+            lrDeltasButton.setSelected(false);
+            lrDeltasButton.setToolTipText(Bundle.MethodsFeatureUI_showDeltas());
         }
-
-        pdSnapshotButton.setEnabled(snapshotDumper != null);
+        if (cpuView != null) {
+            cpuView.resetData();
+            cpuView.setDiffView(false);
+        }
     }
-
-    void terminate() {
-        lrPauseButton.setEnabled(false);
-        lrRefreshButton.setEnabled(false);
-        threaddumpButton.setEnabled(false);
+    
+    
+    void cleanup() {
+        if (updater != null) updater.cleanup();
+        
+        if (resetter != null) {
+            resetter.unregisterView(this);
+            resetter = null;
+        }
     }
-
+    
+    // -------------------------------------------------------------------------
+    
+    
     
     private JLabel lrLabel;
     private JToggleButton lrPauseButton;
     private JButton lrRefreshButton;
     private JToggleButton lrDeltasButton;
+//    private ActionPopupButton lrView;
     
     private JLabel pdLabel;
     private JButton pdSnapshotButton;
@@ -151,22 +161,30 @@ final class CPUView extends JPanel {
     private boolean popupPause;
     private JToggleButton[] toggles;
     
-    private AbstractButton threaddumpButton;
-
-    private void initComponents() {
-        setLayout(new BorderLayout());
-        setOpaque(false);
+    
+    private void initUI() {
         
+        assert SwingUtilities.isEventDispatchThread();
+        
+        // --- Results ---------------------------------------------------------
         
         cpuView = new LiveCPUView(null) {
+//            protected ProfilerClient getProfilerClient() {
+//                return MethodsFeatureUI.this.getProfilerClient();
+//            }
+//            protected boolean isSampling() {
+//                return MethodsFeatureUI.this.getProfilerClient().getCurrentInstrType() == ProfilerClient.INSTR_NONE_SAMPLING;
+//            }
+//            protected void requestResults() throws ClientUtils.TargetAppOrVMTerminated {
+//                MethodsFeatureUI.this.getProfilerClient().forceObtainedResultsDump(true);
+//            }
+//            protected CPUResultsSnapshot getResults() throws ClientUtils.TargetAppOrVMTerminated, CPUResultsSnapshot.NoDataAvailableException {
+//                ProfilerClient client = MethodsFeatureUI.this.getProfilerClient();
+//                return client.getStatus().getInstrMethodClasses() == null ?
+//                       null : client.getCPUProfilingResultsSnapshot(false);
+//            }
             protected boolean showSourceSupported() {
                 return GoToSource.isAvailable();
-            }
-            protected boolean profileMethodSupported() {
-                return false;
-            }
-            protected boolean profileClassSupported() {
-                return false;
             }
             protected void showSource(ClientUtils.SourceCodeSelection value) {
 //                Lookup.Provider project = getProject();
@@ -205,28 +223,43 @@ final class CPUView extends JPanel {
             }
         };
         
+        cpuView.putClientProperty("HelpCtx.Key", "ProfileMethods.HelpCtx"); // NOI18N
+        
+        updater = new LiveCPUViewUpdater(cpuView, Profiler.getDefault().getTargetAppRunner().getProfilerClient());
+        resetter = ProfilingResultsSupport.ResultsResetter.registerView(this);
+        
+        
         // --- Toolbar ---------------------------------------------------------
         
         lrLabel = new GrayLabel(Bundle.MethodsFeatureUI_liveResults());
             
         lrPauseButton = new JToggleButton(Icons.getIcon(GeneralIcons.PAUSE)) {
             protected void fireItemStateChanged(ItemEvent event) {
-                boolean selected = lrPauseButton.isSelected();
-                lrRefreshButton.setEnabled(selected);
-                if (!selected) refresher.refresh();
+                boolean paused = isSelected();
+                updater.setPaused(paused);
+                if (!paused) try {
+                    updater.setForceRefresh(true);
+                    updater.update();
+                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+//////                refreshToolbar(getSessionState());
             }
         };
         lrPauseButton.setToolTipText(Bundle.MethodsFeatureUI_pauseResults());
-//        lrPauseButton.setEnabled(false);
+        lrPauseButton.setEnabled(false);
 
         lrRefreshButton = new JButton(Icons.getIcon(GeneralIcons.UPDATE_NOW)) {
             protected void fireActionPerformed(ActionEvent e) {
-                forceRefresh = true;
-                refresher.refresh();
+                try {
+                    updater.setForceRefresh(true);
+                    updater.update();
+                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                    Exceptions.printStackTrace(ex);
+                }
             }
         };
         lrRefreshButton.setToolTipText(Bundle.MethodsFeatureUI_updateResults());
-        lrRefreshButton.setEnabled(false);
         
         Icon icon = Icons.getIcon(ProfilerIcons.DELTA_RESULTS);
         lrDeltasButton = new JToggleButton(icon) {
@@ -245,7 +278,12 @@ final class CPUView extends JPanel {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 cpuView.setView(isSelected(), toggles[1].isSelected(), toggles[2].isSelected());
-                refresh();
+                try {
+                    updater.setForceRefresh(true);
+                    updater.update();
+                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                    Exceptions.printStackTrace(ex);
+                }
             }
         };
         forwardCalls.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
@@ -253,13 +291,19 @@ final class CPUView extends JPanel {
         forwardCalls.setToolTipText(Bundle.MethodsFeatureUI_viewForward());
         group.add(forwardCalls);
         toggles[0] = forwardCalls;
+//        toolbar.add(forwardCalls);
         forwardCalls.setSelected(true);
         
         JToggleButton hotSpots = new JToggleButton(Icons.getIcon(ProfilerIcons.TAB_HOTSPOTS)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 cpuView.setView(toggles[0].isSelected(), isSelected(), toggles[2].isSelected());
-                refresh();
+                try {
+                    updater.setForceRefresh(true);
+                    updater.update();
+                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                    Exceptions.printStackTrace(ex);
+                }
             }
         };
         hotSpots.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
@@ -267,13 +311,19 @@ final class CPUView extends JPanel {
         hotSpots.setToolTipText(Bundle.MethodsFeatureUI_viewHotSpots());
         group.add(hotSpots);
         toggles[1] = hotSpots;
+//        toolbar.add(hotSpots);
         hotSpots.setSelected(false);
         
         JToggleButton reverseCalls = new JToggleButton(Icons.getIcon(ProfilerIcons.NODE_REVERSE)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 cpuView.setView(toggles[0].isSelected(), toggles[1].isSelected(), isSelected());
-                refresh();
+                try {
+                    updater.setForceRefresh(true);
+                    updater.update();
+                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                    Exceptions.printStackTrace(ex);
+                }
             }
         };
         reverseCalls.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
@@ -281,15 +331,30 @@ final class CPUView extends JPanel {
         reverseCalls.setToolTipText(Bundle.MethodsFeatureUI_viewReverse());
         group.add(reverseCalls);
         toggles[2] = reverseCalls;
+//        toolbar.add(reverseCalls);
         reverseCalls.setSelected(false);
+        
+//        Action aCallTree = new AbstractAction() {
+//            { putValue(NAME, Bundle.MethodsFeatureUI_viewCallTree()); }
+//            public void actionPerformed(ActionEvent e) { setView(View.CALL_TREE); }
+//            
+//        };
+//        Action aHotSpots = new AbstractAction() {
+//            { putValue(NAME, Bundle.MethodsFeatureUI_viewHotSpots()); }
+//            public void actionPerformed(ActionEvent e) { setView(View.HOT_SPOTS); }
+//            
+//        };
+//        Action aCombined = new AbstractAction() {
+//            { putValue(NAME, Bundle.MethodsFeatureUI_viewCombined()); }
+//            public void actionPerformed(ActionEvent e) { setView(View.COMBINED); }
+//            
+//        };
+//        lrView = new ActionPopupButton(aCallTree, aHotSpots, aCombined);
+//        lrView.setToolTipText(Bundle.MethodsFeatureUI_resultsMode());
 
         pdLabel = new GrayLabel(Bundle.MethodsFeatureUI_profilingData());
 
-        pdSnapshotButton = new JButton(TakeSnapshotAction.getInstance()) {
-            protected void fireActionPerformed(ActionEvent event) {
-                snapshotDumper.takeSnapshot((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
-            }
-        };
+        pdSnapshotButton = new JButton(TakeSnapshotAction.getInstance());
         pdSnapshotButton.setHideActionText(true);
 //        pdSnapshotButton.setText(Bundle.MethodsFeatureUI_snapshot());
 
@@ -333,25 +398,34 @@ final class CPUView extends JPanel {
         toolbar.addSpace(3);
         toolbar.add(pdResetResultsButton);
         
-        toolbar.addFiller();
         
-        threaddumpButton = new JButton(NbBundle.getMessage(CPUView.class, "LBL_Thread_dump")) { // NOI18N
-            protected void fireActionPerformed(ActionEvent event) {
-                threadDumper.takeThreadDump((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
-            }
-        };
-        threaddumpButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Thread_dump")); // NOI18N
-        threaddumpButton.setOpaque(false);
-        threaddumpButton.setEnabled(threadDumper != null);
-        toolbar.add(threaddumpButton);
+        // --- Sync UI ---------------------------------------------------------
         
-        
+//        setView(View.HOT_SPOTS);
         cpuView.setView(true, false, false);
-        
-        
-        add(toolbar.getComponent(), BorderLayout.NORTH);
-        add(cpuView, BorderLayout.CENTER);
+//////        sessionStateChanged(getSessionState());
         
     }
-
+    
+    private void refreshToolbar(final int state) {
+        if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+//                boolean running = isRunning(state);
+                boolean running = state == Profiler.PROFILING_RUNNING;
+                lrPauseButton.setEnabled(running);
+                lrRefreshButton.setEnabled(!popupPause && running && lrPauseButton.isSelected());
+                lrDeltasButton.setEnabled(running);
+            }
+        });
+    }
+    
+    
+    void refreshResults() {
+        try {
+            refreshData();
+        } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
+    
 }
