@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.sampler.cpu;
 
 import com.sun.tools.visualvm.sampler.AbstractSamplerSupport;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
@@ -290,8 +291,8 @@ final class CPUView extends JPanel {
                 snapshotDumper.takeSnapshot((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
             }
         };
-        pdSnapshotButton.setHideActionText(true);
-//        pdSnapshotButton.setText(Bundle.MethodsFeatureUI_snapshot());
+//        pdSnapshotButton.setHideActionText(true);
+        pdSnapshotButton.setText(Bundle.MethodsFeatureUI_snapshot());
 
         pdResetResultsButton = new JButton(ResetResultsAction.getInstance());
         pdResetResultsButton.setHideActionText(true);
@@ -338,6 +339,11 @@ final class CPUView extends JPanel {
         threaddumpButton = new JButton(NbBundle.getMessage(CPUView.class, "LBL_Thread_dump")) { // NOI18N
             protected void fireActionPerformed(ActionEvent event) {
                 threadDumper.takeThreadDump((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
+            }
+            public Dimension getPreferredSize() {
+                Dimension dim = super.getPreferredSize();
+                dim.width += 5;
+                return dim;
             }
         };
         threaddumpButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Thread_dump")); // NOI18N
