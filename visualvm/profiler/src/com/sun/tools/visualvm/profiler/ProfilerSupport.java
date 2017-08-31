@@ -446,11 +446,17 @@ public final class ProfilerSupport {
     
     
     private ProfilerSupport() {
-        profilerViewProvider = new ApplicationProfilerViewProvider();
-        profilerViewProvider.initialize();
+        isInitialized = NetBeansProfiler.isInitialized();
+        
+        if (isInitialized) {
+            profilerViewProvider = new ApplicationProfilerViewProvider();
+            profilerViewProvider.initialize();
 
-        ProfilerIDESettings.getInstance().setAutoOpenSnapshot(false);
-        ProfilerIDESettings.getInstance().setAutoSaveSnapshot(true);
+            ProfilerIDESettings.getInstance().setAutoOpenSnapshot(false);
+            ProfilerIDESettings.getInstance().setAutoSaveSnapshot(true);
+        } else {
+            profilerViewProvider = null;
+        }
     }
 
 }
