@@ -355,8 +355,8 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
         pdLabel = new GrayLabel(Bundle.MethodsFeatureUI_profilingData());
 
         pdSnapshotButton = new JButton(TakeSnapshotAction.getInstance());
-        pdSnapshotButton.setHideActionText(true);
-//        pdSnapshotButton.setText(Bundle.MethodsFeatureUI_snapshot());
+//        pdSnapshotButton.setHideActionText(true);
+        pdSnapshotButton.setText(Bundle.MethodsFeatureUI_snapshot());
 
         pdResetResultsButton = new JButton(ResetResultsAction.getInstance());
         pdResetResultsButton.setHideActionText(true);
