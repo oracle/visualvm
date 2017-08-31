@@ -32,9 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.modules.profiler.LoadedSnapshot;
@@ -42,7 +40,6 @@ import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.SnapshotResultsWindow;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.windows.TopComponent;
 
@@ -102,15 +99,15 @@ final class ProfilerSnapshotNPS extends ProfilerSnapshot {
     JComponent getUIComponent() {
         if (srw == null) {
             srw = SnapshotResultsWindow.get(loadedSnapshot, CommonConstants.SORTING_COLUMN_DEFAULT, false);
-            try {
-                JComponent cpuResPanel = (JComponent) srw.getComponent(0);
-                cpuResPanel.setOpaque(false);
-                JTabbedPane tabbedPane = (JTabbedPane) cpuResPanel.getComponent(0);
-                JComponent infoPanel = (JComponent) tabbedPane.getComponentAt(tabbedPane.getTabCount() - 1);
-                infoPanel.setBorder(BorderFactory.createEmptyBorder());
-            } catch (Exception e) {
-                Exceptions.printStackTrace(e);
-            }
+//            try {
+//                JComponent cpuResPanel = (JComponent) srw.getComponent(0);
+//                cpuResPanel.setOpaque(false);
+//                JTabbedPane tabbedPane = (JTabbedPane) cpuResPanel.getComponent(0);
+//                JComponent infoPanel = (JComponent) tabbedPane.getComponentAt(tabbedPane.getTabCount() - 1);
+//                infoPanel.setBorder(BorderFactory.createEmptyBorder());
+//            } catch (Exception e) {
+//                Exceptions.printStackTrace(e);
+//            }
             srw.setPreferredSize(new Dimension(1, 1));
         }
         return srw;
