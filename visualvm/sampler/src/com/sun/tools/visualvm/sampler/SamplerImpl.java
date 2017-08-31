@@ -542,7 +542,7 @@ final class SamplerImpl {
                         }
                     };
                     
-                cpuSampler = new CPUSamplerSupport(ti, tcpu, snapshotDumper, threadDumper) {
+                cpuSampler = new CPUSamplerSupport(application, ti, tcpu, snapshotDumper, threadDumper) {
                     protected Timer getTimer() { return SamplerImpl.this.getTimer(); }
                 };
                 SwingUtilities.invokeLater(new Runnable() {
