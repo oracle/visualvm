@@ -247,18 +247,25 @@ class HprofHeap implements Heap {
     
     private class InstancesIterator implements Iterator {
         private long[] offset;
+        private Instance nextInstance;
         
         private InstancesIterator() {
             offset = new long[] { allInstanceDumpBounds.startOffset };
         }
 
         public boolean hasNext() {
-            return offset[0] < allInstanceDumpBounds.endOffset;
+            while (offset[0] < allInstanceDumpBounds.endOffset && nextInstance == null) {
+                nextInstance = getInstanceByOffset(offset);
+            }
+            return nextInstance != null;
         }
 
         public Object next() {
             if (hasNext()) {
-                return getInstanceByOffset(offset);
+                Instance ni = nextInstance;
+
+                nextInstance = null;
+                return ni;
             }
             throw new NoSuchElementException();
         }
