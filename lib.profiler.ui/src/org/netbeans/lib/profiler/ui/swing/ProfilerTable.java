@@ -190,7 +190,7 @@ public class ProfilerTable extends JTable {
         getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "DEFAULT_ACTION"); // NOI18N
         getActionMap().put("DEFAULT_ACTION", new AbstractAction() { // NOI18N
-                    public void actionPerformed(ActionEvent e) { performDefaultAction(); }
+                    public void actionPerformed(ActionEvent e) { performDefaultAction(e); }
                 });
         
         addFocusListener(new FocusListener() {
@@ -989,7 +989,7 @@ public class ProfilerTable extends JTable {
         this.defaultAction = action;
     }
     
-    public void performDefaultAction() {
+    public void performDefaultAction(ActionEvent e) {
         if (defaultAction != null) defaultAction.actionPerformed(null);
     }
     
@@ -1037,6 +1037,7 @@ public class ProfilerTable extends JTable {
             TableColumn column = columns.get(col);
             if (column.getWidth() > 0) {
                 String columnName = column.getHeaderValue().toString();
+                if (columnName.toLowerCase().startsWith("<html>")) columnName = columnName.replaceAll("<[^>]*>", ""); // NOI118N
                 copyItem.add(new JMenuItem(MessageFormat.format(genericItemName, columnName)) {
                     protected void fireActionPerformed(ActionEvent e) {
                         StringSelection s = new StringSelection(getStringValue(row, _col));
@@ -1128,7 +1129,8 @@ public class ProfilerTable extends JTable {
         }
         
         // Only perform default action if not already processed (expand tree)
-        if (!e.isConsumed() && clickEvent && e.getClickCount() == 2) performDefaultAction();
+        if (!e.isConsumed() && clickEvent && e.getClickCount() == 2)
+            performDefaultAction(new ActionEvent(e.getSource(), e.getID(), "default action", e.getWhen(), e.getModifiers())); // NOI18N
         
         if (generatedClick != null) processMouseEvent(generatedClick);
     }
