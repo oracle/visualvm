@@ -498,8 +498,10 @@ class HprofHeap implements Heap {
     }
 
     void computeInstances() {
+        HeapProgress.progressStart();
         synchronized (instancesCountLock) {
         if (instancesCountComputed) {
+            HeapProgress.progressFinish();
             return;
         }
 
@@ -617,8 +619,10 @@ class HprofHeap implements Heap {
     }
 
     void computeReferences() {
+        HeapProgress.progressStart();
         synchronized (referencesLock) {
         if (referencesComputed) {
+            HeapProgress.progressFinish();
             return;
         }
 
@@ -1230,6 +1234,7 @@ class HprofHeap implements Heap {
             return;
         }
 
+        HeapProgress.progressStart();
         heapTagBounds = new TagBounds[0x100];
 
         long[] offset = new long[] { heapDumpSegment.startOffset + 1 + 4 + 4 };
