@@ -54,8 +54,15 @@ import javax.swing.SwingUtilities;
 public final class HeapProgress {
     
     public static final int PROGRESS_MAX = 1000;
+    private static final Integer ZERO = Integer.valueOf(0);
     private static ThreadLocal progressThreadLocal = new ThreadLocal();
-    
+    private static ThreadLocal progressLevelThreadLocal = new ThreadLocal() {
+        @Override
+        protected Object initialValue() {
+            return ZERO;
+        }
+    };
+
     private HeapProgress() {
         
     }
@@ -66,6 +73,7 @@ public final class HeapProgress {
         if (model == null) {
             model = new DefaultBoundedRangeModel(0,0,0,PROGRESS_MAX);
             progressThreadLocal.set(model);
+            assert progressLevelThreadLocal.get() == ZERO;
         }
         return model;
     }
@@ -89,10 +97,25 @@ public final class HeapProgress {
         }
     }
     
+    private static int levelAdd(int diff) {
+        Integer level = (Integer) progressLevelThreadLocal.get();
+
+        level = Integer.valueOf(level.intValue()+diff);
+        progressLevelThreadLocal.set(level);
+        return level.intValue();
+    }
+
+    static void progressStart() {
+        levelAdd(1);
+    }
+
     static void progressFinish() {
         BoundedRangeModel model = (BoundedRangeModel) progressThreadLocal.get();
-        if (model != null) {
-            setValue(model, PROGRESS_MAX);
+        int level = levelAdd(-1);
+
+        assert level >= 0;
+        if (model != null && level == 0) {
+//            setValue(model, PROGRESS_MAX);
             progressThreadLocal.remove();
         }
     }

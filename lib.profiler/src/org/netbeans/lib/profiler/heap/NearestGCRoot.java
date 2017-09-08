@@ -111,7 +111,9 @@ class NearestGCRoot {
     }
 
     private synchronized void computeGCRoots() {
+        HeapProgress.progressStart();
         if (gcRootsComputed) {
+            HeapProgress.progressFinish();
             return;
         }
         if (!initHotSpotReference()) {
