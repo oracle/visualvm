@@ -59,6 +59,7 @@ import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
 import org.netbeans.modules.profiler.oql.engine.api.ReferenceChain;
 
 import static org.netbeans.lib.profiler.utils.VMUtils.*;
+import org.openide.util.Enumerations;
 
 /**
  *
@@ -175,6 +176,10 @@ public class Snapshot {
             distance++;
         } while (!gcInstance.isGCRoot());
         return distance;
+    }
+
+    public Enumeration concat(Enumeration en1, Enumeration en2) {
+        return Enumerations.concat(en1, en2);
     }
 
     /**
