@@ -1425,7 +1425,7 @@ function concat(array1, array2) {
         return array1.concat(array2);
     } else if (array1 instanceof java.util.Enumeration &&
         array2 instanceof java.util.Enumeration) {
-        return new Packages.com.sun.tools.hat.internal.util.CompositeEnumeration(array1, array2);
+        return this.snapshot.concat(array1, array2);
     } else {
         return undefined;
     }
