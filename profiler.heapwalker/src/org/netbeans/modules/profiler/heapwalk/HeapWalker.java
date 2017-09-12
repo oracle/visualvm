@@ -59,7 +59,7 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.ProfilerStorage;
-import org.netbeans.modules.profiler.heapwalker.v2.prototype.HeapWalkerTopComponent;
+import org.netbeans.modules.profiler.heapwalk.ui.HeapWalkerUI;
 import org.openide.util.Lookup;
 
 
@@ -137,8 +137,7 @@ public class HeapWalker {
 
     public TopComponent getTopComponent() {
         if (heapWalkerUI == null) {
-//            heapWalkerUI = new HeapWalkerUI(this);
-            heapWalkerUI = new HeapWalkerTopComponent(this);
+            heapWalkerUI = new HeapWalkerUI(this);
         }
 
         return heapWalkerUI;

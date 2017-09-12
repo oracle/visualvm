@@ -44,7 +44,6 @@
 package org.netbeans.modules.profiler.heapwalk.model;
 
 
-import org.netbeans.modules.profiler.heapwalker.v2.truffle.TruffleFrame;
 import org.openide.util.NbBundle;
 import java.util.ArrayList;
 import javax.swing.Icon;
@@ -52,7 +51,6 @@ import javax.swing.ImageIcon;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.GCRoot;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.modules.profiler.heapwalker.v2.truffle.DynamicObject;
 
 
 /**
@@ -170,17 +168,10 @@ public class ObjectNode extends InstanceNode {
                 if (getMode() == HeapWalkerNode.MODE_FIELDS) {
                     if (hasInstance()) {
                         ArrayList fieldValues = new ArrayList();
-                        Instance instance = getInstance();
-                        if (DynamicObject.isDynamicObject(instance)) {
-                            DynamicObject dynObj = new DynamicObject(instance);
-                            fieldValues.addAll(dynObj.getFieldValues());
-                            fieldValues.addAll(dynObj.getStaticFieldValues());
-                        }
-                        TruffleFrame truffleFrame = new TruffleFrame(instance);
-                        fieldValues.addAll(truffleFrame.getFieldValues());
-                        fieldValues.addAll(instance.getFieldValues());
-                        fieldValues.addAll(instance.getStaticFieldValues());
-                        if (fieldValues.isEmpty()) {
+                        fieldValues.addAll(getInstance().getFieldValues());
+                        fieldValues.addAll(getInstance().getStaticFieldValues());
+
+                        if (fieldValues.size() == 0) {
                             // Instance has no fields
                             children = new HeapWalkerNode[1];
                             children[0] = HeapWalkerNodeFactory.createNoFieldsNode(ObjectNode.this);
@@ -192,8 +183,6 @@ public class ObjectNode extends InstanceNode {
                                 children[i] = HeapWalkerNodeFactory.createFieldNode((FieldValue) fieldValues.get(i),
                                                                                     ObjectNode.this);
                             }
-                            
-//                            children[0].
                         }
                     } else {
                         children = new HeapWalkerNode[0];
