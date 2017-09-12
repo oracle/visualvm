@@ -42,6 +42,7 @@
  */
 package org.netbeans.modules.profiler.heapwalk.details.basic;
 
+import org.netbeans.modules.profiler.heapwalk.details.api.StringDecoder;
 import java.util.List;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;

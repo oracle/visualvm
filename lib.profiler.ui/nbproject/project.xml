@@ -109,6 +109,7 @@ made subject to such option by the copyright holder.
                 <friend>com.sun.tools.visualvm.modules.appui</friend>
                 <friend>com.sun.tools.visualvm.profiler</friend>
                 <friend>com.sun.tools.visualvm.sampler</friend>
+                <friend>com.sun.tools.visualvm.truffle.heapwalker</friend>
                 <friend>com.sun.tools.visualvm.uisupport</friend>
                 <friend>oracle.jdevimpl.profiler.impl</friend>
                 <friend>org.netbeans.modules.profiler</friend>

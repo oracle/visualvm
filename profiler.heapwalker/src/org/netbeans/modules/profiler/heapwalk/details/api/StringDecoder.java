@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2015 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.profiler.heapwalk.details.basic;
+package org.netbeans.modules.profiler.heapwalk.details.api;
 
 import java.util.List;
 import org.netbeans.lib.profiler.heap.Heap;
@@ -49,7 +49,7 @@ import org.netbeans.lib.profiler.heap.JavaClass;
  *
  * @author Tomas Hurka
  */
-public class StringDecoder {
+public final class StringDecoder {
     
     private final byte coder;
     private final List<String> values;
