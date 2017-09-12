@@ -72,17 +72,17 @@ public class AboutDialogPanel extends JPanel {
     }
     
     void updateAppearance() {
-        String message = AboutDialog.getInstance().getMessage();
-        String htmlMessage = AboutDialog.getInstance().getHTMLMessage();
-                
-        licenseArea.setVisible(message != null);
-        if (message != null) {
-            if (htmlMessage != null && DesktopUtils.isBrowseAvailable()) {
-                licenseArea.setText(htmlMessage);
-            } else {
-                licenseArea.setText(message);
-            }
-        }
+//        String message = AboutDialog.getInstance().getMessage();
+//        String htmlMessage = AboutDialog.getInstance().getHTMLMessage();
+//                
+//        licenseArea.setVisible(message != null);
+//        if (message != null) {
+//            if (htmlMessage != null && DesktopUtils.isBrowseAvailable()) {
+//                licenseArea.setText(htmlMessage);
+//            } else {
+//                licenseArea.setText(message);
+//            }
+//        }
     }
     
     
@@ -93,69 +93,69 @@ public class AboutDialogPanel extends JPanel {
         
         SeparatorLine separator = new SeparatorLine();
 
-        licenseArea = new HTMLTextArea() {
-            protected void showURL(URL url) {
-                if (DesktopUtils.isBrowseAvailable()) {
-                    try {
-                        DesktopUtils.browse(url.toURI());
-                    } catch (Exception e) {
-                        LOGGER.throwing(AboutDialogPanel.class.getName(), "initComponents", e); // NOI18N
-                    }
-                }
-            }
-        };
-        licenseArea.setOpaque(true);
-        licenseArea.setForeground(Color.BLACK);
-        licenseArea.setBorder(BorderFactory.createEmptyBorder(10, 22, 10, 22));
-        licenseArea.setCaret(new NullCaret());
-        licenseArea.setShowPopup(false);
-        licenseArea.setFocusable(false);
-
-        splashImageContainer.setLayout(new BorderLayout());
-
-        if (UIManager.getLookAndFeel().getID().equals("Nimbus")) { // NOI18N
-            // Nimbus LaF doesn't respect setOpaque(false), this is a workaround.
-            licenseArea.setBackground(new Color(0, 0, 0, 0));
-            JPanel transparentPanel = new JPanel(new BorderLayout()) {
-                public void paint(Graphics g) {
-                    g.setColor(getBackground());
-                    g.fillRect(0, 0, getWidth(), getHeight());
-                    paintChildren(g);
-                }
-            };
-            transparentPanel.setOpaque(true);
-            transparentPanel.setBackground(new Color(255, 255, 255, 100));
-            transparentPanel.add(licenseArea, BorderLayout.CENTER);
-            splashImageContainer.add(transparentPanel, BorderLayout.SOUTH);
-        } else {
-            licenseArea.setBackground(new Color(255, 255, 255, 100));
-            splashImageContainer.add(licenseArea, BorderLayout.SOUTH);
-        }
+//        licenseArea = new HTMLTextArea() {
+//            protected void showURL(URL url) {
+//                if (DesktopUtils.isBrowseAvailable()) {
+//                    try {
+//                        DesktopUtils.browse(url.toURI());
+//                    } catch (Exception e) {
+//                        LOGGER.throwing(AboutDialogPanel.class.getName(), "initComponents", e); // NOI18N
+//                    }
+//                }
+//            }
+//        };
+//        licenseArea.setOpaque(true);
+//        licenseArea.setForeground(Color.BLACK);
+//        licenseArea.setBorder(BorderFactory.createEmptyBorder(10, 22, 10, 22));
+//        licenseArea.setCaret(new NullCaret());
+//        licenseArea.setShowPopup(false);
+//        licenseArea.setFocusable(false);
+//
+//        splashImageContainer.setLayout(new BorderLayout());
+//
+//        if (UIManager.getLookAndFeel().getID().equals("Nimbus")) { // NOI18N
+//            // Nimbus LaF doesn't respect setOpaque(false), this is a workaround.
+//            licenseArea.setBackground(new Color(0, 0, 0, 0));
+//            JPanel transparentPanel = new JPanel(new BorderLayout()) {
+//                public void paint(Graphics g) {
+//                    g.setColor(getBackground());
+//                    g.fillRect(0, 0, getWidth(), getHeight());
+//                    paintChildren(g);
+//                }
+//            };
+//            transparentPanel.setOpaque(true);
+//            transparentPanel.setBackground(new Color(255, 255, 255, 100));
+//            transparentPanel.add(licenseArea, BorderLayout.CENTER);
+//            splashImageContainer.add(transparentPanel, BorderLayout.SOUTH);
+//        } else {
+//            licenseArea.setBackground(new Color(255, 255, 255, 100));
+//            splashImageContainer.add(licenseArea, BorderLayout.SOUTH);
+//        }
 
         setLayout(new BorderLayout());
         add(splashImageContainer, BorderLayout.CENTER);
         add(separator, BorderLayout.SOUTH);
     }
     
-    private HTMLTextArea licenseArea;
+//    private HTMLTextArea licenseArea;
 
-    private static final class NullCaret implements Caret {
-        public void install(javax.swing.text.JTextComponent c) {}
-        public void deinstall(javax.swing.text.JTextComponent c) {}
-        public void paint(Graphics g) {}
-        public void addChangeListener(ChangeListener l) {}
-        public void removeChangeListener(ChangeListener l) {}
-        public boolean isVisible() { return false; }
-        public void setVisible(boolean v) {}
-        public boolean isSelectionVisible() { return false; }
-        public void setSelectionVisible(boolean v) {}
-        public void setMagicCaretPosition(Point p) {}
-        public Point getMagicCaretPosition() { return new Point(0, 0); }
-        public void setBlinkRate(int rate) {}
-        public int getBlinkRate() { return 0; }
-        public int getDot() { return 0; }
-        public int getMark() { return 0; }
-        public void setDot(int dot) {}
-        public void moveDot(int dot) {}
-    }
+//    private static final class NullCaret implements Caret {
+//        public void install(javax.swing.text.JTextComponent c) {}
+//        public void deinstall(javax.swing.text.JTextComponent c) {}
+//        public void paint(Graphics g) {}
+//        public void addChangeListener(ChangeListener l) {}
+//        public void removeChangeListener(ChangeListener l) {}
+//        public boolean isVisible() { return false; }
+//        public void setVisible(boolean v) {}
+//        public boolean isSelectionVisible() { return false; }
+//        public void setSelectionVisible(boolean v) {}
+//        public void setMagicCaretPosition(Point p) {}
+//        public Point getMagicCaretPosition() { return new Point(0, 0); }
+//        public void setBlinkRate(int rate) {}
+//        public int getBlinkRate() { return 0; }
+//        public int getDot() { return 0; }
+//        public int getMark() { return 0; }
+//        public void setDot(int dot) {}
+//        public void moveDot(int dot) {}
+//    }
 }
