@@ -574,7 +574,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public HTMLTextArea() {
-//        setEditorKit(createEditorKit());
+        setContentType("text/html"); // NOI18N
         setEditable(false);
         setOpaque(true);
         setAutoscrolls(true);
@@ -607,7 +607,8 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
     
-    protected EditorKit createDefaultEditorKit() {
+    public EditorKit getEditorKitForContentType(String type) {
+        // Always assumes "text/html" as this is a HTML displayer
         return new HTMLEditorKit();
     }
     
