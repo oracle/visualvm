@@ -42,13 +42,15 @@ public abstract class AbstractObjectsProvider {
         for (Instance instance : searchInstances) {
             if (dominators.contains(instance)) {
                 Instance dom = instance;
+                long retainedSize = instance.getRetainedSize();
 
                 while (!instance.isGCRoot()) {
                     instance = instance.getNearestGCRootPointer();
-                    if (dominators.contains(instance)) {
+                    if (dominators.contains(instance) && instance.getRetainedSize()>=retainedSize) {
                         dominators.remove(dom);
                         removed.add(dom);
                         dom = instance;
+                        retainedSize = instance.getRetainedSize();
                     }
                     if (removed.contains(instance)) {
                         dominators.remove(dom);
