@@ -89,14 +89,16 @@ public class HeapFactory {
     public static Heap createHeap(File heapDump, int segment)
                            throws FileNotFoundException, IOException {
         CacheDirectory cacheDir = CacheDirectory.getHeapDumpCacheDirectory(heapDump);
-        File savedDump = cacheDir.getHeapDumpAuxFile();
+        if (!cacheDir.isTemporary()) {
+            File savedDump = cacheDir.getHeapDumpAuxFile();
 
-        if (savedDump.exists() && savedDump.isFile() && savedDump.canRead()) {
-            try {
-                return loadHeap(cacheDir);
-            } catch (IOException ex) {
-                System.err.println("Loading heap dump "+heapDump+" from cache failed.");
-                ex.printStackTrace(System.err);
+            if (savedDump.exists() && savedDump.isFile() && savedDump.canRead()) {
+                try {
+                    return loadHeap(cacheDir);
+                } catch (IOException ex) {
+                    System.err.println("Loading heap dump "+heapDump+" from cache failed.");
+                    ex.printStackTrace(System.err);
+                }
             }
         }
         return new HprofHeap(heapDump, segment, cacheDir);
