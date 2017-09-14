@@ -54,28 +54,20 @@ import javax.swing.SwingUtilities;
 public final class HeapProgress {
     
     public static final int PROGRESS_MAX = 1000;
-    private static final Integer ZERO = Integer.valueOf(0);
     private static ThreadLocal progressThreadLocal = new ThreadLocal();
-    private static ThreadLocal progressLevelThreadLocal = new ThreadLocal() {
-        @Override
-        protected Object initialValue() {
-            return ZERO;
-        }
-    };
 
     private HeapProgress() {
         
     }
     
     public static BoundedRangeModel getProgress() {
-        BoundedRangeModel model = (BoundedRangeModel) progressThreadLocal.get();
+        ModelInfo info = (ModelInfo) progressThreadLocal.get();
         
-        if (model == null) {
-            model = new DefaultBoundedRangeModel(0,0,0,PROGRESS_MAX);
-            progressThreadLocal.set(model);
-            assert progressLevelThreadLocal.get() == ZERO;
+        if (info == null) {
+            info = new ModelInfo();
+            progressThreadLocal.set(info);
         }
-        return model;
+        return info.model;
     }
     
     static void progress(long counter, long startOffset, long value, long endOffset) {
@@ -90,33 +82,39 @@ public final class HeapProgress {
     }
     
     private static void progress(final long value, final long endOffset, final long startOffset) {
-        BoundedRangeModel model = (BoundedRangeModel) progressThreadLocal.get();
-        if (model != null) {
+        ModelInfo info = (ModelInfo) progressThreadLocal.get();
+        if (info != null) {
+            if (info.level>info.divider) {
+                info.divider = info.level;
+            }
             long val = PROGRESS_MAX*(value - startOffset)/(endOffset - startOffset);
-            setValue(model, (int)val);
+            int modelVal = (int) (info.offset + val/info.divider);
+            setValue(info.model, modelVal);
         }
     }
     
-    private static int levelAdd(int diff) {
-        Integer level = (Integer) progressLevelThreadLocal.get();
-
-        level = Integer.valueOf(level.intValue()+diff);
-        progressLevelThreadLocal.set(level);
-        return level.intValue();
+    private static int levelAdd(ModelInfo info, int diff) {        
+        info.level+=diff;
+        return info.level;
     }
 
     static void progressStart() {
-        levelAdd(1);
+        ModelInfo info = (ModelInfo) progressThreadLocal.get();
+        if (info != null) {
+            levelAdd(info, 1);
+        }
     }
 
     static void progressFinish() {
-        BoundedRangeModel model = (BoundedRangeModel) progressThreadLocal.get();
-        int level = levelAdd(-1);
+        ModelInfo info = (ModelInfo) progressThreadLocal.get();
+        if (info != null) {
+            int level = levelAdd(info, -1);
 
-        assert level >= 0;
-        if (model != null && level == 0) {
-//            setValue(model, PROGRESS_MAX);
-            progressThreadLocal.remove();
+            assert level >= 0;
+            if (level == 0) {
+                progressThreadLocal.remove();
+            }
+            info.offset = info.model.getValue();
         }
     }
     
@@ -128,5 +126,16 @@ public final class HeapProgress {
                 public void run() { model.setValue(val); }
             });
         }
+    }
+    
+    private static class ModelInfo {
+        private BoundedRangeModel model;
+        private int level;
+        private int divider;
+        private int offset;
+
+        private ModelInfo() {
+            model = new DefaultBoundedRangeModel(0,0,0,PROGRESS_MAX);
+        } 
     }
 }
