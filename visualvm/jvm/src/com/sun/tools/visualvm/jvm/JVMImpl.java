@@ -387,7 +387,6 @@ public class JVMImpl extends Jvm implements JvmstatListener {
             if (attach.takeHeapDump(dumpFile.getAbsolutePath())) {
                 return dumpFile;
             }
-            return null;
         }
         if (getJmxModel().takeHeapDump(dumpFile.getAbsolutePath())) {
             return dumpFile;
