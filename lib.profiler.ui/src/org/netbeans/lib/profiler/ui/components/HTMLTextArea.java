@@ -49,7 +49,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.InputEvent;
@@ -60,7 +59,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javax.swing.*;
@@ -235,7 +234,7 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
 
         private static synchronized Map getEntities() {
             if (entities == null) {
-                entities = new Hashtable();
+                entities = new HashMap();
                 //Quotation mark
                 entities.put("quot", "\""); //NOI18N
                                             //Ampersand
@@ -555,15 +554,8 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
-    private ActionListener popupListener;
-    private JMenuItem itemCopy;
-    private JMenuItem itemCut;
-    private JMenuItem itemDelete;
-    private JMenuItem itemPaste;
-    private JMenuItem itemSelectAll;
+    private URL activeLink;
 
-    // --- Popup menu support ----------------------------------------------------
-    private JPopupMenu popupMenu;
     private boolean showPopup = true;
 
     // --- Lazy setting text ---------------------------------------------------
@@ -715,12 +707,19 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
         }
 
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            showURL(e.getURL());
+            activeLink = e.getURL();
+            showURL(activeLink, e.getInputEvent());
         } else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
+            activeLink = e.getURL();
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         } else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
+            activeLink = null;
             setCursor(Cursor.getDefaultCursor());
         }
+    }
+    
+    public URL getActiveLink() {
+        return activeLink;
     }
     
     protected void processMouseEvent(MouseEvent e) {
@@ -741,10 +740,10 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
     
     private void showPopupMenu(MouseEvent e) {
         if (isEnabled() && isFocusable() && showPopup) {
-            JPopupMenu popup = getPopupMenu();
+            JPopupMenu popup = new JPopupMenu();
+            populatePopup(popup);
 
-            if (popup != null) {
-                updatePopupMenu();
+            if (popup.getComponentCount() > 0) {
 
                 if (!hasFocus()) requestFocus(); // required for Select All functionality
                 
@@ -774,39 +773,64 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
         }
     }
 
-    protected JPopupMenu getPopupMenu() {
-        if (popupMenu == null) {
-            popupMenu = createPopupMenu();
-        }
-
-        return popupMenu;
-    }
-
-    protected JPopupMenu createPopupMenu() {
-        JPopupMenu popup = new JPopupMenu();
-
-        popupListener = createPopupListener();
-
-        itemCut = new JMenuItem(CUT_STRING);
-        itemCopy = new JMenuItem(COPY_STRING);
-        itemPaste = new JMenuItem(PASTE_STRING);
-        itemDelete = new JMenuItem(DELETE_STRING);
-        itemSelectAll = new JMenuItem(SELECT_ALL_STRING);
-
-        itemCut.addActionListener(popupListener);
-        itemCopy.addActionListener(popupListener);
-        itemPaste.addActionListener(popupListener);
-        itemDelete.addActionListener(popupListener);
-        itemSelectAll.addActionListener(popupListener);
-
-        popup.add(itemCut);
-        popup.add(itemCopy);
-        popup.add(itemPaste);
-        popup.add(itemDelete);
+    protected void populatePopup(JPopupMenu popup) {
+        popup.add(createCutMenuItem());
+        popup.add(createCopyMenuItem());
+        popup.add(createPasteMenuItem());
+        popup.add(createDeleteMenuItem());
         popup.addSeparator();
-        popup.add(itemSelectAll);
-
-        return popup;
+        popup.add(createSelectAllMenuItem());
+    }
+    
+    protected JMenuItem createCutMenuItem() {
+        return new JMenuItem(CUT_STRING) {
+            { setEnabled(isEditable() && getSelectedText() != null); }
+            protected void fireActionPerformed(ActionEvent e) { cut(); }
+        };
+    }
+    
+    protected JMenuItem createCopyMenuItem() {
+        return new JMenuItem(COPY_STRING) {
+            { setEnabled(getSelectedText() != null); }
+            protected void fireActionPerformed(ActionEvent e) { copy(); }
+        };
+    }
+    
+    protected JMenuItem createPasteMenuItem() {
+        return new JMenuItem(PASTE_STRING) {
+            {
+                if (isEditable()) {
+                    try {
+                        Transferable clipboardContent = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(this);
+                        setEnabled(clipboardContent != null && clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor));
+                    } catch (Exception e) {
+                        setEnabled(false);
+                    }
+                } else {
+                    setEnabled(false);
+                }
+            }
+            protected void fireActionPerformed(ActionEvent e) { paste(); }
+        };
+    }
+    
+    protected JMenuItem createDeleteMenuItem() {
+        return new JMenuItem(DELETE_STRING) {
+            {
+                if (isEditable()) {
+                    setEnabled(getSelectedText() != null);
+                } else {
+                    setVisible(false);
+                }
+            }
+            protected void fireActionPerformed(ActionEvent e) { deleteSelection(); }
+        };
+    }
+    
+    protected JMenuItem createSelectAllMenuItem() {
+        return new JMenuItem(SELECT_ALL_STRING) {
+            protected void fireActionPerformed(ActionEvent e) { selectAll(); }
+        };
     }
     
     public void paste() {
@@ -815,54 +839,13 @@ public class HTMLTextArea extends JEditorPane implements HyperlinkListener {
                                     .getTransferData(DataFlavor.stringFlavor).toString());
         } catch (Exception ex) {}
     }
+    
+    protected void showURL(URL url, InputEvent e) {
+        showURL(url);
+    }
 
     protected void showURL(URL url) {
         // override to react to URL clicks
     }
-
-    protected void updatePopupMenu() {
-        // Cut
-        itemCut.setEnabled(isEditable() && (getSelectedText() != null));
-
-        // Copy
-        itemCopy.setEnabled(getSelectedText() != null);
-
-        // Paste
-        try {
-            Transferable clipboardContent = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(this);
-            itemPaste.setEnabled(isEditable() && (clipboardContent != null)
-                                 && clipboardContent.isDataFlavorSupported(DataFlavor.stringFlavor));
-        } catch (Exception e) {
-            itemPaste.setEnabled(false);
-        }
-
-        // Delete
-        if (isEditable()) {
-            itemDelete.setVisible(true);
-            itemDelete.setEnabled(getSelectedText() != null);
-        } else {
-            itemDelete.setVisible(false);
-        }
-
-        // Select All
-        // always visible and enabled...
-    }
-
-    private ActionListener createPopupListener() {
-        return new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (e.getSource() == itemCut) {
-                        cut();
-                    } else if (e.getSource() == itemCopy) {
-                        copy();
-                    } else if (e.getSource() == itemPaste) {
-                        paste();
-                    } else if (e.getSource() == itemDelete) {
-                        deleteSelection();
-                    } else if (e.getSource() == itemSelectAll) {
-                        selectAll();
-                    }
-                }
-            };
-    }
+    
 }

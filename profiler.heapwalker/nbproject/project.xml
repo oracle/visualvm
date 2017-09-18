@@ -77,7 +77,7 @@ Contributor(s):
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.141</specification-version>
+                        <specification-version>1.142</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -194,6 +194,7 @@ Contributor(s):
                 <package>org.netbeans.modules.profiler.heapwalker.v2.model</package>
                 <package>org.netbeans.modules.profiler.heapwalker.v2.swing</package>
                 <package>org.netbeans.modules.profiler.heapwalker.v2.ui</package>
+                <package>org.netbeans.modules.profiler.heapwalker.v2.utils</package>
             </friend-packages>
         </data>
     </configuration>
