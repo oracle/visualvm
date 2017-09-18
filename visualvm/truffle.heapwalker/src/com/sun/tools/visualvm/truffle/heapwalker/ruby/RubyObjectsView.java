@@ -91,7 +91,7 @@ class RubyObjectsView extends HeapWalkerFeature {
     
     
     public RubyObjectsView(HeapContext context, HeapWalkerActions actions) {
-        super("Objects", "Objects", RubySupport.createBadgedIcon(LanguageIcons.CLASS), 200);
+        super("ruby_objects", "Objects", "Objects", RubySupport.createBadgedIcon(LanguageIcons.CLASS), 200);
         
         this.context = context;
         Heap heap = context.getFragment().getHeap();

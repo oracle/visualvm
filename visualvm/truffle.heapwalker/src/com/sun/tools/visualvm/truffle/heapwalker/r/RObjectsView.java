@@ -91,7 +91,7 @@ class RObjectsView extends HeapWalkerFeature {
     
     
     public RObjectsView(HeapContext context, HeapWalkerActions actions) {
-        super("Objects", "Objects", RSupport.createBadgedIcon(LanguageIcons.CLASS), 200);
+        super("r_objects", "Objects", "Objects", RSupport.createBadgedIcon(LanguageIcons.CLASS), 200);
         
         this.context = context;
         Heap heap = context.getFragment().getHeap();

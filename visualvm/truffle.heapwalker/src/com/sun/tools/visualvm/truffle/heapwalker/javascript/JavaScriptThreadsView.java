@@ -74,7 +74,7 @@ public class JavaScriptThreadsView extends HeapWalkerFeature {
     
     
     public JavaScriptThreadsView(HeapContext context, HeapWalkerActions actions) {
-        super("Thread", "Thread", JavaScriptSupport.createBadgedIcon(ProfilerIcons.WINDOW_THREADS), 300);
+        super("javascript_threads_objects", "Thread", "Thread", JavaScriptSupport.createBadgedIcon(ProfilerIcons.WINDOW_THREADS), 300);
         
         this.context = context;
         Heap heap = context.getFragment().getHeap();

@@ -60,7 +60,7 @@ public abstract class TruffleLanguageSummaryView extends HeapWalkerFeature {
     
     
     public TruffleLanguageSummaryView(Icon icon, HeapContext context) {
-        super("Summary", "Summary", icon, 100);
+        super("truffle_summary", "Summary", "Summary", icon, 100);
         this.context = context;
     }
     

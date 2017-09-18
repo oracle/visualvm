@@ -91,7 +91,7 @@ class JavaScriptObjectsView extends HeapWalkerFeature {
     
     
     public JavaScriptObjectsView(HeapContext context, HeapWalkerActions actions) {
-        super("Objects", "Objects", JavaScriptSupport.createBadgedIcon(LanguageIcons.CLASS), 200);
+        super("javascript_objects", "Objects", "Objects", JavaScriptSupport.createBadgedIcon(LanguageIcons.CLASS), 200);
         
         this.context = context;
         Heap heap = context.getFragment().getHeap();
