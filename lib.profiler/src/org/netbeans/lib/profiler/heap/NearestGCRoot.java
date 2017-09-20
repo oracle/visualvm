@@ -139,8 +139,9 @@ class NearestGCRoot {
 
         deleteBuffers();
         heap.idToOffsetMap.flush();
-        HeapProgress.progressFinish();
         gcRootsComputed = true;
+        heap.writeToFile();
+        HeapProgress.progressFinish();
     }
 
     private boolean initHotSpotReference() {
