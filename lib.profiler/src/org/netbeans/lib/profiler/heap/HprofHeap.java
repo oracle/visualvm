@@ -498,13 +498,12 @@ class HprofHeap implements Heap {
     }
 
     void computeInstances() {
-        HeapProgress.progressStart();
         synchronized (instancesCountLock) {
         if (instancesCountComputed) {
-            HeapProgress.progressFinish();
             return;
         }
 
+        HeapProgress.progressStart();
         ClassDumpSegment classDumpBounds = getClassDumpSegment();
         int idSize = dumpBuffer.getIDSize();
         long[] offset = new long[] { allInstanceDumpBounds.startOffset };
@@ -619,13 +618,12 @@ class HprofHeap implements Heap {
     }
 
     void computeReferences() {
-        HeapProgress.progressStart();
         synchronized (referencesLock) {
         if (referencesComputed) {
-            HeapProgress.progressFinish();
             return;
         }
 
+        HeapProgress.progressStart();
         ClassDumpSegment classDumpBounds = getClassDumpSegment();
         int idSize = dumpBuffer.getIDSize();
         long[] offset = new long[] { allInstanceDumpBounds.startOffset };
