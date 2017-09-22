@@ -111,11 +111,10 @@ class NearestGCRoot {
     }
 
     private synchronized void computeGCRoots() {
-        HeapProgress.progressStart();
         if (gcRootsComputed) {
-            HeapProgress.progressFinish();
             return;
         }
+        HeapProgress.progressStart();
         if (!initHotSpotReference()) {
             if (!initSVMReference()) {
                 throw new IllegalArgumentException("reference field not found"); // NOI18N
