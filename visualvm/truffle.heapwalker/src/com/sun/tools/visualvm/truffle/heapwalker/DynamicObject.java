@@ -56,6 +56,7 @@ public class DynamicObject {
     private static final String LOCATION_FQN = "com.oracle.truffle.api.object.Location";
     private static final String ENTERPRISE_PACKAGE = "com.oracle.truffle.object.enterprise";
     private static final String PROPERTY_MAP_FQN = "com.oracle.truffle.object.ConsListPropertyMap";
+    private static final String TRIE_PROPERTY_MAP_FQN = "com.oracle.truffle.object.TriePropertyMap";
     private static final String PROPERTY_FQN = "com.oracle.truffle.object.PropertyImpl";
     private static final String OBJECT_TYPE_FQN = "com.oracle.truffle.api.object.ObjectType";
 
@@ -218,6 +219,9 @@ public class DynamicObject {
             if (mapClass.equals(PROPERTY_MAP_FQN)) {
                 return getConsListValues(propertyMap);
             }
+            if (mapClass.equals(TRIE_PROPERTY_MAP_FQN)) {
+                return getTrieValues(propertyMap);
+            }
         }
         return null;
     }
@@ -253,6 +257,39 @@ public class DynamicObject {
             }
         }
         return mapValues;
+    }
+
+    private static List<Instance> getTrieValues(Instance propertyMap) {
+        List<Instance> mapValues = new ArrayList();
+        Object root = propertyMap.getValueOfField("root");  // NOI18N
+
+        getNodeValues(root, mapValues);
+        return mapValues;
+    }
+
+    private static void getNodeValues(Object nodeObject, List<Instance>nodeValues) {
+        if (nodeObject instanceof Instance) {
+            Instance node = (Instance) nodeObject;
+            JavaClass nodeClass = node.getJavaClass();
+            Object entries = node.getValueOfField("entries");  // NOI18N
+
+            if (entries instanceof ObjectArrayInstance) {
+                ObjectArrayInstance table = (ObjectArrayInstance) entries;
+
+                for (Object el : table.getValues()) {
+                    Instance entry = (Instance) el;
+
+                    if (entry.getJavaClass().equals(nodeClass)) {
+                        getNodeValues(entry, nodeValues);
+                    } else {
+                        Object value = entry.getValueOfField("value");  // NOI18N
+                        if (value instanceof Instance) {
+                            nodeValues.add((Instance) value);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private static String getShortInstanceId(Instance instance) {
