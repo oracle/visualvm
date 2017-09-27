@@ -446,7 +446,7 @@ public class OQLEngineImpl {
             engine.put("heap", heap); // NOI18N
             engine.put("cancelled", cancelled); // NOI18N
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, "Error initializing snapshot", ex); // NOI18N
+            LOGGER.log(Level.INFO, "Error initializing snapshot", ex); // NOI18N
             throw new RuntimeException(ex);
         }
     }
