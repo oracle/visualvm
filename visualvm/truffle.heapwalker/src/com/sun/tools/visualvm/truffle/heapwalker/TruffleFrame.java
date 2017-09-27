@@ -93,7 +93,7 @@ public class TruffleFrame {
         return isTruffleFrame;
     }
 
-    private boolean isTruffleFrameSubClass(Instance truffleFrame) {
+    private static boolean isTruffleFrameSubClass(Instance truffleFrame) {
         return isSubClassOf(truffleFrame, TRUFFLE_FRAME_FQN)
                 || isSubClassOf(truffleFrame, COMPILER_FRAME_NOBOX_FQN)
                 || isSubClassOf(truffleFrame, ENT_COMPILER_FRAME_NOBOX_FQN)
@@ -101,7 +101,7 @@ public class TruffleFrame {
                 || isSubClassOf(truffleFrame, ENT_COMPILER_FRAME_BOX_FQN);
     }
 
-    private boolean isSubClassOf(Instance i, String superClassName) {
+    private static boolean isSubClassOf(Instance i, String superClassName) {
         if (i != null) {
             JavaClass superCls = i.getJavaClass();
 
@@ -112,6 +112,10 @@ public class TruffleFrame {
             }
         }
         return false;
+    }
+    
+    public static boolean isTruffleFrame(Instance truffleFrame) {
+        return isTruffleFrameSubClass(truffleFrame);
     }
 
     private static Instance getValueofFields(Instance instance, String... fields) {
