@@ -355,13 +355,17 @@ public class TruffleStackTraces {
             if (callTarget != null && localFrame != null) {
                 return new Frame(heap, callTarget, localFrame);
             }
+            callTarget = findLocalInstance(callNodeFrame, DEFAULT_CALL_TARGET_FQN, OPTIMIZED_CALL_TARGET_FQN, ENT_OPTIMIZED_CALL_TARGET_FQN);
+            localFrame = findLocalFrame(callTargetFrame);
+            if (callTarget != null && localFrame != null) {
+                return new Frame(heap, callTarget, localFrame);
+            }
             return null;
         }
 
         private synchronized Collection<StackTrace> getStackTraces() {
             if (isHotSpotTruffleRuntime() && truffleStackTraces == null) {
-                Instance callMethods = (Instance) hotSpotRuntime.getValueOfField("callMethods");  // NOI18N
-                FrameVisitor visitor = new FrameVisitor(this, heap, callMethods, 0);
+                FrameVisitor visitor = new FrameVisitor(this, heap, 0);
 
                 truffleStackTraces = new ArrayList();
 
@@ -397,16 +401,15 @@ public class TruffleStackTraces {
         private final String methodName;
         private final String signature;
 
-        private JavaMethod(Heap heap, Instance callMethods, String field) {
-            this(heap, (Instance) callMethods.getValueOfField(field));
+        private JavaMethod(Heap heap, JavaClass frameClass, String field) {
+            this(heap, (Instance) frameClass.getValueOfStaticField(field));
         }
 
         private JavaMethod(Heap heap, Instance method) {
-            Instance holder = (Instance) method.getValueOfField("holder");  // NOI18N
-            Instance javaClass = (Instance) holder.getValueOfField("javaClass");   // NOI18N
+            Instance javaClass = (Instance) method.getValueOfField("clazz");   // NOI18N
             className = heap.getJavaClassByID(javaClass.getInstanceId()).getName();
-            methodName = DetailsUtils.getInstanceFieldString(method, "nameCache", heap);
-            signature = DetailsUtils.getInstanceFieldString(method, "signature", heap);
+            methodName = DetailsUtils.getInstanceFieldString(method, "name", heap); // NOI18N
+            signature = DetailsUtils.getInstanceFieldString(method, "signature", heap); // NOI18N
         }
 
         private boolean isMethod(StackTraceElement frame) {
@@ -416,20 +419,21 @@ public class TruffleStackTraces {
 
     private static final class FrameVisitor {
 
+        private static final String GRAAL_FRAME_INSTANCE_FQN = "org.graalvm.compiler.truffle.GraalFrameInstance"; // NOI18N
+
         private final HotSpotTruffleRuntime visitor;
         private final JavaMethod callOSRMethod;
-        private JavaMethod callTargetMethod;
-        private JavaMethod callNodeMethod;
+        private final JavaMethod callTargetMethod;
+        private final JavaMethod callNodeMethod;
         private int skipFrames;
         private List<JavaFrameGCRoot> callNodeFrame;
 
-        FrameVisitor(HotSpotTruffleRuntime visitor, Heap heap, Instance callMethods, int skip) {
+        FrameVisitor(HotSpotTruffleRuntime visitor, Heap heap, int skip) {
             this.visitor = visitor;
-            callOSRMethod = new JavaMethod(heap, callMethods, "callOSRMethod");  // NOI18N
-//            callTargetMethod = new JavaMethod(heap, callMethods, "callTargetMethod");  // NOI18N
-//            callNodeMethod = new JavaMethod(heap, callMethods, "callNodeMethod");  // NOI18N
-            callTargetMethod = new JavaMethod(heap, callMethods, "callNodeMethod");  // NOI18N
-            callNodeMethod = new JavaMethod(heap, callMethods, "callTargetMethod");  // NOI18N
+            JavaClass frameClass = heap.getJavaClassByName(GRAAL_FRAME_INSTANCE_FQN);
+            callOSRMethod = new JavaMethod(heap, frameClass, "CALL_OSR_METHOD");  // NOI18N
+            callTargetMethod = new JavaMethod(heap, frameClass, "CALL_TARGET_METHOD");  // NOI18N
+            callNodeMethod = new JavaMethod(heap, frameClass, "CALL_NODE_METHOD");  // NOI18N
             skipFrames = skip;
         }
 
