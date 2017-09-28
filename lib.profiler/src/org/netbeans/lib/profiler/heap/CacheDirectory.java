@@ -55,14 +55,10 @@ class CacheDirectory {
     private File cacheDirectory;
     
     static CacheDirectory getHeapDumpCacheDirectory(File heapDump) {
-        if (isLinux()) {
-            return new CacheDirectory(null);
-        } else {
-            String dumpName = heapDump.getName();
-            File parent = heapDump.getParentFile();
-            File dir = new File(parent, dumpName+DIR_EXT);
-            return new CacheDirectory(dir);
-        }
+        String dumpName = heapDump.getName();
+        File parent = heapDump.getParentFile();
+        File dir = new File(parent, dumpName+DIR_EXT);
+        return new CacheDirectory(dir);
     }
     
     CacheDirectory(File cacheDir) {
