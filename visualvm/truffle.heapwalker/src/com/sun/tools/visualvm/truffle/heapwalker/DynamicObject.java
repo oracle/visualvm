@@ -694,9 +694,15 @@ public class DynamicObject {
                     Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
                     if (index.intValue() == 0) { // test for type Object[]
                         ObjectFieldValue val = (ObjectFieldValue) getDynamicObjectField(dynamicObject, index+1);
-                        Instance type = (Instance) loc.getValueOfField("type"); // NOI18N
-                        if (val.getInstance() != null && val.getInstance().getJavaClass().getJavaClassId() == type.getInstanceId()) {
-                            return val;
+                        Instance value = val.getInstance();
+                        if (value != null) {
+                            // test for the same class as type or subclasses
+                            long typeClassId = ((Instance) loc.getValueOfField("type")).getInstanceId();  // NOI18N
+                            for (JavaClass valueClass = value.getJavaClass(); valueClass != null; valueClass = valueClass.getSuperClass()) {
+                                if (valueClass.getJavaClassId() == typeClassId) {
+                                    return val;
+                                }
+                            }
                         }
                         return getDynamicObjectField(dynamicObject, index);
 
