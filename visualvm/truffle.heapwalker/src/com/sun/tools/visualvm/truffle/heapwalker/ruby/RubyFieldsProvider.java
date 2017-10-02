@@ -97,6 +97,8 @@ public class RubyFieldsProvider extends HeapWalkerNode.Provider {
                         String name = instance.getJavaClass().getName();
                         if (name.startsWith("java.lang.")) {
                             nodes.add(new InstanceReferenceNode.Field((ObjectFieldValue)field, false));
+                        } else if (name.startsWith("org.truffleruby.core.rope.")) {
+                            nodes.add(new InstanceReferenceNode.Field((ObjectFieldValue)field, false));
                         }
                     }
                 }
