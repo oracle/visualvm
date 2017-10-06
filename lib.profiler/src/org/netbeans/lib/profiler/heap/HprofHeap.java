@@ -597,14 +597,12 @@ class HprofHeap implements Heap {
                 }
             } else if (tag == OBJECT_ARRAY_DUMP) {
                 int elements = dumpBuffer.getInt(start + 1 + idSize + 4);
-                int i;
+                long classId = dumpBuffer.getID(start + 1 + idSize + 4 + 4);
+                ClassDump classDump = classDumpBounds.getClassDumpByID(classId);
                 long position = start + 1 + idSize + 4 + 4 + idSize;
 
-                for (i = 0; i < elements; i++, position += idSize) {
+                for (int i = 0; i < elements; i++, position += idSize) {
                     if (dumpBuffer.getID(position) == instanceId) {
-                        long classId = dumpBuffer.getID(start + 1 + idSize + 4 + 4);
-                        ClassDump classDump = classDumpBounds.getClassDumpByID(classId);
-
                         refs.add(new HprofArrayValue(classDump, start, i));
                     }
                 }
