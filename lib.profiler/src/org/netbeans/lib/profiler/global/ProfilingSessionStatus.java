@@ -86,6 +86,9 @@ public class ProfilingSessionStatus {
     // Target machine OS, as returned by System.getProperty("os.name")
     public String targetMachineOSName;
 
+    // true if target JDK class file verifier accepts our constructor instrumentation
+    public boolean canInstrumentConstructor;
+
     // Important timer-related characteristics of instrumentation that we inject into the TA.
     // Each array has 5 elements:
     // o value when absolute timer is used;

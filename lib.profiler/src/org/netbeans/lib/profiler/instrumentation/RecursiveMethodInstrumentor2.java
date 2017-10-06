@@ -370,6 +370,7 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
      */
     private boolean checkAndScanMethod(DynamicClassInfo clazz, String methodName, String methodSignature, boolean virtualCall,
                                        boolean lookupInSuperIfNotFoundInThis, boolean checkSubclasses) {
+        boolean constructorNotInstrumented = false;
         String className = clazz.getName();
         int idx = clazz.getMethodIndex(methodName, methodSignature);
 
@@ -388,6 +389,9 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
                         || (!clazz.isMethodRoot(idx) && !clazz.isMethodMarker(idx) && !instrFilter.passes(className))
                         || (className == OBJECT_SLASHED_CLASS_NAME)) {  // Actually, just the Object.<init> method?
                     clazz.setMethodUnscannable(idx);
+                } else if (methodName == "<init>" && !status.canInstrumentConstructor && clazz.getMajorVersion()>50) {
+                    clazz.setMethodUnscannable(idx);
+                    constructorNotInstrumented = true;
                 } else {
                     bytecode = clazz.getMethodBytecode(idx);
 
@@ -418,6 +422,8 @@ public class RecursiveMethodInstrumentor2 extends RecursiveMethodInstrumentor {
                 markClassAndMethodForInstrumentation(clazz, idx);
                 clazz.setMethodScanned(idx);
                 //if (!lookupInSuperIfNotFoundInThis && !checkSubclasses) System.out.println("Gonna scan potentially reachable " + className + "." + methodName + methodSignature);
+                scanBytecode(clazz, bytecode);
+            } else if (constructorNotInstrumented) {
                 scanBytecode(clazz, bytecode);
             }
         }
