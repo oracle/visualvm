@@ -49,11 +49,9 @@ package org.netbeans.lib.profiler.heap;
  */
 class SyntheticClassObjectValue extends HprofInstanceObjectValue {
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-    Field syntheticField;
 
-    SyntheticClassObjectValue(InstanceDump i, Field f, long offset) {
-        super(i, null, offset);
-        syntheticField = f;
+    SyntheticClassObjectValue(InstanceDump i, HprofField f, long fieldOffset) {
+        super(i, f, fieldOffset);
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -62,15 +60,11 @@ class SyntheticClassObjectValue extends HprofInstanceObjectValue {
         return new Long(getInstanceId());
     }
 
-    public Field getField() {
-        return syntheticField;
-    }
-
     public Instance getInstance() {
-        return new ClassDumpInstance(instance.dumpClass);
+        return new ClassDumpInstance(field.classDump);
     }
 
     long getInstanceId() {
-        return instance.dumpClass.getJavaClassId();
+        return field.classDump.getJavaClassId();
     }
 }
