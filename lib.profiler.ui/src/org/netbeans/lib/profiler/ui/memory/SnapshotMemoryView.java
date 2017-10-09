@@ -256,6 +256,11 @@ public abstract class SnapshotMemoryView extends JPanel {
     }
     
     
+    protected boolean profileMethodSupported() { return true; }
+    
+    protected boolean profileClassSupported() { return true; }
+    
+    
     protected abstract boolean showSourceSupported();
     
     protected abstract void showSource(ClientUtils.SourceCodeSelection value);
@@ -297,19 +302,29 @@ public abstract class SnapshotMemoryView extends JPanel {
             popup.addSeparator();
         }
         
-        if (userValue == null || !Wildcards.ALLWILDCARD.equals(userValue.getMethodName())) {
-            popup.add(new JMenuItem(MemoryView.ACTION_PROFILE_METHOD) {
-                { setEnabled(userValue != null && isSelectable(userValue, true)); }
-                protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
-            });
+        if (profileMethodSupported()) {
+            if (userValue == null || !Wildcards.ALLWILDCARD.equals(userValue.getMethodName())) {
+                popup.add(new JMenuItem(MemoryView.ACTION_PROFILE_METHOD) {
+                    { setEnabled(userValue != null && isSelectable(userValue, true)); }
+                    protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
+                });
+            }
         }
         
-        popup.add(new JMenuItem(MemoryView.ACTION_PROFILE_CLASS) {
+        if (profileClassSupported()) popup.add(new JMenuItem(MemoryView.ACTION_PROFILE_CLASS) {
             { setEnabled(userValue != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW && isSelectable(userValue, false)); }
             protected void fireActionPerformed(ActionEvent e) { profileClass(userValue); }
         });
         
-        popup.addSeparator();
+        if (profileMethodSupported() || profileClassSupported()) popup.addSeparator();
+        
+        JMenuItem[] customItems = invoker.createCustomMenuItems(this, value, userValue);
+        if (customItems != null) {
+            for (JMenuItem customItem : customItems) popup.add(customItem);
+            popup.addSeparator();
+        }
+        
+        customizeNodePopup(invoker, popup, value, userValue);
         
         if (snapshot.containsStacks()) {
             final ProfilerTreeTable ttable = (ProfilerTreeTable)dataView.getResultsComponent();
@@ -341,12 +356,13 @@ public abstract class SnapshotMemoryView extends JPanel {
                     ttable.collapseAll();
                 }
             });
+            
+            popup.addSeparator();
         }
         
-        popup.addSeparator();
         popup.add(invoker.createCopyMenuItem());
-        
         popup.addSeparator();
+        
         popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateFilter(); }
         });
@@ -354,6 +370,8 @@ public abstract class SnapshotMemoryView extends JPanel {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
         });
     }
+    
+    protected void customizeNodePopup(DataView invoker, JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {}
     
     private void setAggregation(int aggregation) {
         this.aggregation = aggregation;

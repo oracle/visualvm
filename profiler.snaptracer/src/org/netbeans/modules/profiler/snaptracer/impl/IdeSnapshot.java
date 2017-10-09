@@ -67,14 +67,14 @@ import org.openide.util.Lookup;
  */
 public final class IdeSnapshot {
 
-    private SampledCPUSnapshot cpuSnapshot;
+    private final SampledCPUSnapshot cpuSnapshot;
     private LogReader xmlLogs;
     private LogRecord lastRecord;
     private Map<Integer, LogRecord> recordsMap;
     private Map<Integer, LogRecordInfo> infosMap;
     private final FileObject npssFileObject;
 
-    IdeSnapshot(FileObject npssFO, FileObject uigestureFO) throws IOException {
+    public IdeSnapshot(FileObject npssFO, FileObject uigestureFO) throws IOException {
         cpuSnapshot = new SampledCPUSnapshot(npssFO);
         npssFileObject = npssFO;
         if (uigestureFO != null) {

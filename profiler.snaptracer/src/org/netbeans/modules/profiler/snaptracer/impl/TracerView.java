@@ -74,6 +74,7 @@ import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.SampledCPUSnapshot;
 import org.netbeans.modules.profiler.actions.CompareSnapshotsAction;
 import org.netbeans.modules.profiler.api.GoToSource;
+import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
@@ -85,7 +86,7 @@ import org.openide.util.lookup.Lookups;
  * @author Jiri Sedlacek
  * @author Tomas Hurka
  */
-final class TracerView {
+public final class TracerView {
     
     private final TracerModel model;
     private final TracerController controller;
@@ -93,12 +94,12 @@ final class TracerView {
     private TimelineView timelineView;
     private SnapshotView snapshotView;
     
-    TracerView(TracerModel model, TracerController controller) {
+    public TracerView(TracerModel model, TracerController controller) {
         this.model = model;
         this.controller = controller;
     }
 
-    protected JComponent createComponent() {
+    public JComponent createComponent() {
         
         final JPanel component = new JPanel(new BorderLayout());
 
@@ -347,8 +348,16 @@ final class TracerView {
             super.setSnapshot(snapshot, true);
         }
         
-        protected boolean profileMethodSupported() {
+        protected boolean profileMethodEnabled() {
             return false;
+        }
+        
+        protected boolean profileMethodSupported() {
+            return ProfilerFeature.Registry.hasProviders();
+        }
+    
+        protected boolean profileClassSupported() {
+            return ProfilerFeature.Registry.hasProviders();
         }
 
         protected boolean showSourceSupported() {
@@ -378,8 +387,8 @@ final class TracerView {
         
         protected void customizeNodePopup(DataView invoker, JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {
             if (value instanceof PrestimeCPUCCTNode) {
-                popup.addSeparator();
                 popup.add(new FindMethodAction((PrestimeCPUCCTNode)value));
+                popup.addSeparator();
             }
         }
         

@@ -76,7 +76,7 @@ import org.openide.util.RequestProcessor;
         + "not supported in Tracer,<br>all negative values will be"
         + " displayed as 0.</html>"
     })
-final class TracerController  {
+public final class TracerController  {
 
     private static final Logger LOGGER = Logger.getLogger(TracerController.class.getName());
 
@@ -101,7 +101,7 @@ final class TracerController  {
 
     // --- Constructor ---------------------------------------------------------
 
-    TracerController(TracerModel model) {
+    public TracerController(TracerModel model) {
         this.model = model;
 
         changeSupport = new PropertyChangeSupport(this);

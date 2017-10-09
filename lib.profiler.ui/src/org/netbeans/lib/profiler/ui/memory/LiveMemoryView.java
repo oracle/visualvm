@@ -352,8 +352,17 @@ public abstract class LiveMemoryView extends JPanel {
                 { setEnabled(userValue != null); }
                 protected void fireActionPerformed(ActionEvent e) { selectForProfiling(userValue); }
             });
+        }
+        
+        if (profileClassSupported()) popup.addSeparator();
+        
+        JMenuItem[] customItems = invoker.createCustomMenuItems(this, value, userValue);
+        if (customItems != null) {
+            for (JMenuItem customItem : customItems) popup.add(customItem);
             popup.addSeparator();
         }
+        
+        customizeNodePopup(invoker, popup, value, userValue);
         
         if (snapshot.containsStacks()) {
             final ProfilerTreeTable ttable = (ProfilerTreeTable)dataView.getResultsComponent();
@@ -385,12 +394,13 @@ public abstract class LiveMemoryView extends JPanel {
                     ttable.collapseAll();
                 }
             });
+            
+            popup.addSeparator();
         }
         
-        popup.addSeparator();
         popup.add(invoker.createCopyMenuItem());
-        
         popup.addSeparator();
+        
         popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateFilter(); }
         });
@@ -398,6 +408,8 @@ public abstract class LiveMemoryView extends JPanel {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
         });
     }
+    
+    protected void customizeNodePopup(DataView invoker, JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {}
     
     
     private void initUI() {

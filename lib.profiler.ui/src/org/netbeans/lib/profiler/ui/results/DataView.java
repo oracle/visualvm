@@ -50,6 +50,10 @@ import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
@@ -63,6 +67,7 @@ import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
+import org.openide.util.Lookup;
 
 /**
  *
@@ -85,6 +90,19 @@ public abstract class DataView extends JPanel {
     
     public final JMenuItem createCopyMenuItem() {
         return getResultsComponent().createCopyMenuItem();
+    }
+    
+    public final JMenuItem[] createCustomMenuItems(JComponent invoker, Object value, ClientUtils.SourceCodeSelection userValue) {
+        Collection<? extends PopupCustomizer> customizers = Lookup.getDefault().lookupAll(PopupCustomizer.class);
+        if (customizers.isEmpty()) return null;
+        
+        List<JMenuItem> menuItems = new ArrayList(customizers.size());
+        for (PopupCustomizer customizer : customizers) {
+            JMenuItem[] items = customizer.getMenuItems(invoker, this, value, userValue);
+            if (items != null) Collections.addAll(menuItems, items);
+        }
+        
+        return menuItems.isEmpty() ? null : menuItems.toArray(new JMenuItem[0]);
     }
     
     public void notifyOnFocus(final Runnable handler) {
@@ -287,6 +305,13 @@ public abstract class DataView extends JPanel {
                 search.setBounds(0, 0, size.width, size.height - bottomOffset);
             }
         }
+        
+    }
+    
+    
+    public static abstract class PopupCustomizer {
+        
+        public abstract JMenuItem[] getMenuItems(JComponent invoker, DataView source, Object value, ClientUtils.SourceCodeSelection userValue);
         
     }
     

@@ -98,6 +98,7 @@ import org.openide.windows.WindowManager;
 @NbBundle.Messages({
     "ProfilerSessions_actionNotSupported=Action not supported by the current profiling session.",
     "ProfilerSessions_loadingFeatures=Loading profiler modes...",
+    "ProfilerSessions_noFeature=<no compatible mode available>",
     "ProfilerSessions_selectProject=&Select the project to profile:",
     "ProfilerSessions_selectFeature=Select Profiler Mode",
     "ProfilerSessions_selectHandlingFeature=S&elect profiler mode to handle the action:",
@@ -424,7 +425,7 @@ final class ProfilerSessions {
         private void refreshFeatures(final Lookup context, final Lookup.Provider project) {
             contents.removeAll();
             
-            JLabel l = new JLabel(Bundle.ProfilerSessions_loadingFeatures(), JLabel.CENTER);
+            final JLabel l = new JLabel(Bundle.ProfilerSessions_loadingFeatures(), JLabel.CENTER);
             GridBagConstraints c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = 0;
@@ -445,40 +446,44 @@ final class ProfilerSessions {
                     Lookup projectContext = project == null ? Lookup.EMPTY :
                                             Lookups.fixed(project);
                     selectedSession = ProfilerSession.forContext(projectContext);
-                    final ProfilerFeatures features = selectedSession.getFeatures();
+                    final ProfilerFeatures features = selectedSession == null ? null :
+                                                      selectedSession.getFeatures();
                     
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             
-                            contents.removeAll();
-                            selectModeLabel.setLabelFor(null);
-                            
-                            int y = 0;
-                            GridBagConstraints c;
-                            
-                            ButtonGroup rbg = new ButtonGroup();
-                            for (final ProfilerFeature f : features.getAvailable()) {
-                                if (f.supportsConfiguration(context)) {
-                                    JRadioButton rb = new JExtendedRadioButton(f.getName(), f.getIcon()) {
-                                        protected void fireItemStateChanged(ItemEvent e) {
-                                            if (e.getStateChange() == ItemEvent.SELECTED)
-                                                selectedFeature = f;
-                                        }
-                                    };
-                                    rbg.add(rb);
-                                    if (rbg.getSelection() == null) rb.setSelected(true);
-                                    c = new GridBagConstraints();
-                                    c.gridx = 0;
-                                    c.gridy = y++;
-                                    c.anchor = GridBagConstraints.WEST;
-                                    c.insets = new Insets(0, 20, 0, 10);
-                                    contents.add(rb, c);
-                                    if (selectModeLabel.getLabelFor() == null) selectModeLabel.setLabelFor(rb);
+                            if (features == null || features.getAvailable().isEmpty()) {
+                                l.setText(Bundle.ProfilerSessions_noFeature());
+                            } else {                            
+                                contents.removeAll();
+                                selectModeLabel.setLabelFor(null);
+
+                                int y = 0;
+                                GridBagConstraints c;
+
+                                ButtonGroup rbg = new ButtonGroup();
+                                for (final ProfilerFeature f : features.getAvailable()) {
+                                    if (f.supportsConfiguration(context)) {
+                                        JRadioButton rb = new JExtendedRadioButton(f.getName(), f.getIcon()) {
+                                            protected void fireItemStateChanged(ItemEvent e) {
+                                                if (e.getStateChange() == ItemEvent.SELECTED)
+                                                    selectedFeature = f;
+                                            }
+                                        };
+                                        rbg.add(rb);
+                                        if (rbg.getSelection() == null) rb.setSelected(true);
+                                        c = new GridBagConstraints();
+                                        c.gridx = 0;
+                                        c.gridy = y++;
+                                        c.anchor = GridBagConstraints.WEST;
+                                        c.insets = new Insets(0, 20, 0, 10);
+                                        contents.add(rb, c);
+                                        if (selectModeLabel.getLabelFor() == null) selectModeLabel.setLabelFor(rb);
+                                    }
                                 }
+
+                                repaintContents();
                             }
-                            
-                            repaintContents();
-                            
                         }
                     });
                     
