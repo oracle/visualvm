@@ -76,11 +76,9 @@ public class RObjectsProvider extends AbstractObjectsProvider {
             
             while (instancesI.hasNext()) {
                 RObject robject = new RObject(instancesI.next());
-                
                 String type = robject.getType();
-                type = type.substring(type.lastIndexOf('.') + 1);
-
                 RObjectsContainer typeNode = types.get(type);
+
                 if (typeNode == null) {
                     typeNode = new RObjectsContainer(type, 100);
                     nodes.add(typeNode);

@@ -24,6 +24,7 @@
  */
 package com.sun.tools.visualvm.truffle.heapwalker.details;
 
+import java.util.List;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
@@ -31,6 +32,9 @@ import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
 import org.openide.util.lookup.ServiceProvider;
+import com.sun.tools.visualvm.truffle.heapwalker.DynamicObject;
+import org.netbeans.lib.profiler.heap.FieldValue;
+import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 
 /**
  *
@@ -40,11 +44,17 @@ import org.openide.util.lookup.ServiceProvider;
 public class RDetailsProvider extends DetailsProvider.Basic {
 
     private static final String RVECTOR_MASK = "com.oracle.truffle.r.runtime.data.RVector+";   // NOI18N
+    private static final String RLOGICAL_VECTOR_FQN = "com.oracle.truffle.r.runtime.data.RLogicalVector";   // NOI18N
+    private static final String RCOMPLEX_VECTOR_FQN = "com.oracle.truffle.r.runtime.data.RComplexVector";   // NOI18N
     private static final String RSYMBOL_MASK = "com.oracle.truffle.r.runtime.data.RSymbol"; //NOI18N
     private static final String RFUNCTION_MASK = "com.oracle.truffle.r.runtime.data.RFunction"; //NOI18N
+    private static final String RCOMPLEX_MASK = "com.oracle.truffle.r.runtime.data.RComplex";   // NOI18N
+    private static final String RS4OBJECT_MASK = "com.oracle.truffle.r.runtime.data.RS4Object"; // NOI18N
+    private static final String RNULL_MASK = "com.oracle.truffle.r.runtime.data.RNull"; // NOI18N
 
     public RDetailsProvider() {
-        super(RVECTOR_MASK, RSYMBOL_MASK, RFUNCTION_MASK);
+        super(RVECTOR_MASK, RSYMBOL_MASK, RFUNCTION_MASK, RCOMPLEX_MASK, RS4OBJECT_MASK,
+             RNULL_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -59,19 +69,37 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                     size = data.getLength();
                     if (size == 1) {
                         Instance string = (Instance) data.getValues().get(0);
-                        return DetailsSupport.getDetailsString(string, heap);
+                        return "["+DetailsSupport.getDetailsString(string, heap)+"]";
                     }
                 } else if (rawData instanceof PrimitiveArrayInstance) {
                     PrimitiveArrayInstance data = (PrimitiveArrayInstance) rawData;
                     size = data.getLength();
                     if (size == 1) {
-                        return (String) data.getValues().get(0);
+                        String valString = (String) data.getValues().get(0);
+                        if (RLOGICAL_VECTOR_FQN.equals(instance.getJavaClass().getName())) {
+                            int val = Integer.valueOf(valString);
+
+                            if (val == 0) {
+                                valString = "FALSE";
+                            } else if (val == 1) {
+                                valString = "TRUE";
+                            }
+                        }
+                        return "["+valString+"]";
+                    }
+                    if (RCOMPLEX_VECTOR_FQN.equals(instance.getJavaClass().getName())) {
+                        size /= 2;
+                        if (size == 1) {
+                            List vals = data.getValues();
+                            return "["+vals.get(0)+"+"+vals.get(1)+"i]";
+                        }
                     }
                 } else {
                     return null;
                 }
                 Boolean complete = (Boolean) instance.getValueOfField("complete");
                 Integer refCount = (Integer) instance.getValueOfField("refCount");
+                String rClassName = getRClassName(instance, heap);
                 String refString;
 
                 switch (refCount.intValue()) {
@@ -87,6 +115,11 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                     default:
                         refString = ", shared";
                 }
+                if (rClassName == null) {
+                    rClassName = "";
+                } else {
+                    rClassName = rClassName+" ";
+                }
                 return "Size: " + size + (complete ? "" : ", has NAs") +  refString;
             }
         }
@@ -100,6 +133,33 @@ public class RDetailsProvider extends DetailsProvider.Basic {
             Instance target = (Instance) instance.getValueOfField("target");   // NOI18N
             String value = target == null ? null : DetailsSupport.getDetailsString(target, heap);
             return value == null || value.isEmpty() ? null : value;
+        }
+        if (RCOMPLEX_MASK.equals(className)) {
+            Double realPart = (Double) instance.getValueOfField("realPart");    // NOI18N
+            Double imaginaryPart = (Double) instance.getValueOfField("imaginaryPart"); // NOI18N
+
+            if (realPart != null && imaginaryPart != null) {
+                return realPart+"+"+imaginaryPart+"i";
+            }
+        }
+        if (RS4OBJECT_MASK.equals(className)) {
+            return getRClassName(instance, heap);
+        }
+        if (RNULL_MASK.equals(className)) {
+            return "NULL";
+        }
+        return null;
+    }
+
+    private String getRClassName(Instance instance, Heap heap) {
+        Instance attributesInst = (Instance) instance.getValueOfField("attributes");   // NOI18N
+        if (attributesInst != null) {
+            DynamicObject  attributes = new DynamicObject(attributesInst);
+            FieldValue classAttr = attributes.getFieldValue("class");
+            if (classAttr instanceof ObjectFieldValue) {
+                Instance classAttrName = ((ObjectFieldValue)classAttr).getInstance();
+                return "Class: " + DetailsSupport.getDetailsString(classAttrName, heap);
+            }
         }
         return null;
     }

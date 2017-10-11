@@ -62,6 +62,7 @@ public class TruffleFrame {
     private static final byte BYTE_TAG = 7;
 
     private List<FieldValue> values;
+    private List<FieldValue> localValues;
     private boolean isTruffleFrame;
 
     public TruffleFrame(Instance truffleFrame) {
@@ -77,9 +78,12 @@ public class TruffleFrame {
             if (locals != null && arguments != null && slots != null) {
                 Instance[] frameSlots = createFrameSlots(slots, locals.size());
                 List<FieldValue> vals = new ArrayList(arguments.size() + locals.size());
+                List<FieldValue> locs = new ArrayList(locals.size());
                 createArguments(truffleFrame, arguments, vals);
-                createLocals(truffleFrame, locals, primitiveLocals, frameSlots, defaultValue, vals);
+                createLocals(truffleFrame, locals, primitiveLocals, frameSlots, defaultValue, locs);
+                vals.addAll(locs);
                 values = Collections.unmodifiableList(vals);
+                localValues = Collections.unmodifiableList(locs);
                 isTruffleFrame = true;
             }
         }
@@ -88,6 +92,11 @@ public class TruffleFrame {
     public List<FieldValue> getFieldValues() {
         return values;
     }
+
+    public List<FieldValue> getLocalFieldValues() {
+        return localValues;
+    }
+
 
     public boolean isTruffleFrame() {
         return isTruffleFrame;
