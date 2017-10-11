@@ -24,13 +24,14 @@
  */
 package com.sun.tools.visualvm.profiler;
 
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.profiling.actions.ProfilerResultsAction;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -70,27 +71,19 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
     private ProfilingResultsSupport.ResultsResetter resetter;
     
     
-    MemoryLivePanel() {
+    MemoryLivePanel(Application application) {
         setLayout(new BorderLayout());
         setOpaque(false);
         
-        add(getToolbar().getComponent(), BorderLayout.NORTH);
-        add(getResultsUI(), BorderLayout.CENTER);
+        initUI(application);
+        
+        add(toolbar.getComponent(), BorderLayout.NORTH);
+        add(memoryView, BorderLayout.CENTER);
     }
     
     
     
     // --- API implementation --------------------------------------------------
-    
-    ProfilerToolbar getToolbar() {
-        if (toolbar == null) initUI();
-        return toolbar;
-    }
-
-    JPanel getResultsUI() {
-        if (memoryView == null) initUI();
-        return memoryView;
-    }
     
     boolean hasResultsUI() {
         return memoryView != null;
@@ -152,7 +145,7 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
     private boolean popupPause;
     
     
-    private void initUI() {
+    private void initUI(Application application) {
         
         assert SwingUtilities.isEventDispatchThread();
         
@@ -164,6 +157,9 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
 //            }
             protected boolean showSourceSupported() {
                 return GoToSource.isAvailable();
+            }
+            protected boolean profileClassSupported() {
+                return false;
             }
             protected void showSource(ClientUtils.SourceCodeSelection value) {
                 Lookup.Provider project = null;
@@ -188,8 +184,8 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
                 }
             }
         };
-        
         memoryView.putClientProperty("HelpCtx.Key", "ProfileObjects.HelpCtx"); // NOI18N
+        memoryView.putClientProperty(ProfilerResultsAction.PROP_APPLICATION, application);
         
         updater = new LiveMemoryViewUpdater(memoryView, Profiler.getDefault().getTargetAppRunner().getProfilerClient());        
         resetter = ProfilingResultsSupport.ResultsResetter.registerView(this);
@@ -292,7 +288,7 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
         try {
             refreshData();
         } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-            Exceptions.printStackTrace(ex);
+            cleanup();
         }
     }
     

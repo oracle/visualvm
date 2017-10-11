@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.sampler.cpu;
 
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
@@ -58,6 +59,8 @@ import org.openide.util.NbBundle;
  * @author Tomas Hurka
  */
 public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
+    
+    private final Application application;
 
     private final ThreadInfoProvider threadInfoProvider;
     private final SnapshotDumper snapshotDumper;
@@ -83,7 +86,9 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
     private ThreadsCPUView threadCPUView;
     private ThreadsCPU threadsCPU;
 
-    public CPUSamplerSupport(ThreadInfoProvider tip, ThreadsCPU tcpu, SnapshotDumper snapshotDumper, ThreadDumper threadDumper) {
+    public CPUSamplerSupport(Application application, ThreadInfoProvider tip, ThreadsCPU tcpu, SnapshotDumper snapshotDumper, ThreadDumper threadDumper) {
+        this.application = application;
+        
         threadInfoProvider = tip;
         threadsCPU = tcpu;
         this.snapshotDumper = snapshotDumper;
@@ -131,7 +136,7 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
 
     public DataViewComponent.DetailsView[] getDetailsView() {
         if (detailsViews == null) {
-            cpuView = new CPUView(refresher, snapshotDumper, threadDumper);
+            cpuView = new CPUView(refresher, snapshotDumper, threadDumper, application);
             detailsViews = new DataViewComponent.DetailsView[threadsCPU != null ? 2:1];
             detailsViews[0] = new DataViewComponent.DetailsView(NbBundle.getMessage(
                 CPUSamplerSupport.class, "LBL_Cpu_samples"), null, 10, cpuView, null); // NOI18N

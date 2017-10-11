@@ -27,11 +27,13 @@ package com.sun.tools.visualvm.profiling.snapshot;
 import com.sun.tools.visualvm.core.datasource.DataSource;
 import java.awt.Image;
 import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.io.IOException;
 import javax.swing.JComponent;
 import org.netbeans.modules.profiler.LoadedSnapshot;
+import org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot;
+import org.netbeans.modules.profiler.snaptracer.impl.TracerController;
+import org.netbeans.modules.profiler.snaptracer.impl.TracerModel;
+import org.netbeans.modules.profiler.snaptracer.impl.TracerView;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
@@ -39,39 +41,23 @@ import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 
 /**
- * This is prototype to handle npss files. It uses reflection till the proper API is
- * available in snaptracer module.
+ * This is prototype to handle npss files.
  *
  * @author Tomas Hurka
+ * @author Jiri Sedlacek
  */
 @NbBundle.Messages("MSG_SnapshotLoadFailedMsg=Error while loading snapshot: {0}")
 class ProfilerSnapshotNPSS extends ProfilerSnapshot {
 
-    private Object loadedSnapshot;
+    private IdeSnapshot loadedSnapshot;
 
     ProfilerSnapshotNPSS(File file, DataSource master) {
         super(file, master);
         try {
             FileObject primary = FileUtil.toFileObject(file);
             FileObject uigestureFO = primary.getParent().getFileObject(primary.getName(), "log"); // NOI18N
-            Class ideSnapshotClass = Class.forName("org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot");  // NOI18N
-            Constructor c = ideSnapshotClass.getDeclaredConstructor(FileObject.class, FileObject.class);
-            c.setAccessible(true);
-            loadedSnapshot =  c.newInstance(primary, uigestureFO);
-
-        } catch (ClassNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (InstantiationException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (IllegalAccessException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (IllegalArgumentException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (InvocationTargetException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (NoSuchMethodException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (SecurityException ex) {
+            loadedSnapshot = new IdeSnapshot(primary, uigestureFO);
+        } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
     }
@@ -94,44 +80,10 @@ class ProfilerSnapshotNPSS extends ProfilerSnapshot {
 
     @Override
     JComponent getUIComponent() {
-        try {
-            // TracerModel model = new TracerModel(loadedSnapshot);
-            Class tracerModelClass = Class.forName("org.netbeans.modules.profiler.snaptracer.impl.TracerModel");  // NOI18N
-            Class ideSnapshotClass = Class.forName("org.netbeans.modules.profiler.snaptracer.impl.IdeSnapshot");  // NOI18N
-            Constructor c = tracerModelClass.getDeclaredConstructor(ideSnapshotClass);
-            c.setAccessible(true);
-            Object tracerModel = c.newInstance(loadedSnapshot);
-            //TracerController controller = new TracerController(model);
-            Class tracerControllerClass = Class.forName("org.netbeans.modules.profiler.snaptracer.impl.TracerController");  // NOI18N
-            Constructor cc = tracerControllerClass.getDeclaredConstructor(tracerModelClass);
-            cc.setAccessible(true);
-            Object tracerController = cc.newInstance(tracerModel);
-            //TracerView tracer = new TracerView(model, controller);
-            Class tracerViewClass = Class.forName("org.netbeans.modules.profiler.snaptracer.impl.TracerView");  // NOI18N
-            Constructor tvc = tracerViewClass.getDeclaredConstructor(tracerModelClass, tracerControllerClass);
-            tvc.setAccessible(true);
-            Object tracerView = tvc.newInstance(tracerModel, tracerController);
-            // tracer.createComponent();
-            Method tvm = tracerViewClass.getDeclaredMethod("createComponent");  // NOI18N
-            tvm.setAccessible(true);
-            JComponent tracerViewComponent = (JComponent) tvm.invoke(tracerView);
-            return tracerViewComponent;
-        } catch (InstantiationException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (IllegalAccessException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (IllegalArgumentException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (InvocationTargetException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (NoSuchMethodException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (SecurityException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (ClassNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        return null;
+        TracerModel model = new TracerModel(loadedSnapshot);
+        TracerController controller = new TracerController(model);
+        TracerView view = new TracerView(model, controller);
+        return view.createComponent();
     }
 
     @Override

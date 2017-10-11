@@ -24,13 +24,14 @@
  */
 package com.sun.tools.visualvm.profiler;
 
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.profiling.actions.ProfilerResultsAction;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.client.ClientUtils;
@@ -80,27 +81,19 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
     private ProfilingResultsSupport.ResultsResetter resetter;
     
     
-    CPULivePanel() {
+    CPULivePanel(Application application) {
         setLayout(new BorderLayout());
         setOpaque(false);
         
-        add(getToolbar().getComponent(), BorderLayout.NORTH);
-        add(getResultsUI(), BorderLayout.CENTER);
+        initUI(application);
+        
+        add(toolbar.getComponent(), BorderLayout.NORTH);
+        add(cpuView, BorderLayout.CENTER);
     }
     
     
     
     // --- API implementation --------------------------------------------------
-    
-    ProfilerToolbar getToolbar() {
-        if (toolbar == null) initUI();
-        return toolbar;
-    }
-
-    JPanel getResultsUI() {
-        if (cpuView == null) initUI();
-        return cpuView;
-    }
     
     boolean hasResultsUI() {
         return cpuView != null;
@@ -162,7 +155,7 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
     private JToggleButton[] toggles;
     
     
-    private void initUI() {
+    private void initUI(Application application) {
         
         assert SwingUtilities.isEventDispatchThread();
         
@@ -185,6 +178,12 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
 //            }
             protected boolean showSourceSupported() {
                 return GoToSource.isAvailable();
+            }
+            protected boolean profileMethodSupported() {
+                return false;
+            }
+            protected boolean profileClassSupported() {
+                return false;
             }
             protected void showSource(ClientUtils.SourceCodeSelection value) {
 //                Lookup.Provider project = getProject();
@@ -222,8 +221,8 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
                 toggles[2].setSelected(true);
             }
         };
-        
         cpuView.putClientProperty("HelpCtx.Key", "ProfileMethods.HelpCtx"); // NOI18N
+        cpuView.putClientProperty(ProfilerResultsAction.PROP_APPLICATION, application);
         
         updater = new LiveCPUViewUpdater(cpuView, Profiler.getDefault().getTargetAppRunner().getProfilerClient());
         resetter = ProfilingResultsSupport.ResultsResetter.registerView(this);
@@ -424,7 +423,7 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
         try {
             refreshData();
         } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-            Exceptions.printStackTrace(ex);
+            cleanup();
         }
     }
     
