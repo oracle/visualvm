@@ -69,7 +69,7 @@ public abstract class TruffleFieldsPlugin extends HeapViewPlugin {
                     fields.addAll(((DynamicObject)selected).getStaticFieldValues());
                 }
                 
-                HeapWalkerNode[] nodes = getNodes(fields, root, heap, viewID, dataTypes, sortOrders);
+                HeapWalkerNode[] nodes = getNodes(fields, root, heap, viewID, viewFilter, dataTypes, sortOrders);
                 return nodes == null ? HeapWalkerNode.NO_NODES : nodes;
             }
         };
@@ -80,7 +80,7 @@ public abstract class TruffleFieldsPlugin extends HeapViewPlugin {
     }
     
     
-    protected abstract HeapWalkerNode[] getNodes(List<FieldValue> fields, HeapWalkerNode parent, Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders);
+    protected abstract HeapWalkerNode[] getNodes(List<FieldValue> fields, HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders);
     
     
     protected void nodeSelected(HeapWalkerNode node, boolean adjusting) {

@@ -74,7 +74,7 @@ class RItemsPlugin extends HeapViewPlugin {
                     }
                 }
 
-                HeapWalkerNode[] nodes = getNodes(fields, root, heap, viewID, dataTypes, sortOrders);
+                HeapWalkerNode[] nodes = getNodes(fields, root, heap, viewID, viewFilter, dataTypes, sortOrders);
                 return nodes == null ? HeapWalkerNode.NO_NODES : nodes;
             }
         };
@@ -84,8 +84,8 @@ class RItemsPlugin extends HeapViewPlugin {
         return objectsView.getComponent();
     }
 
-    protected HeapWalkerNode[] getNodes(List<FieldValue> fields, HeapWalkerNode parent, Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders) {
-        return RItemsProvider.getNodes(fields, parent, heap, viewID, dataTypes, sortOrders);
+    protected HeapWalkerNode[] getNodes(List<FieldValue> fields, HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
+        return RItemsProvider.getNodes(fields, parent, heap, viewID, viewFilter, dataTypes, sortOrders);
     }
 
     protected void nodeSelected(HeapWalkerNode node, boolean adjusting) {

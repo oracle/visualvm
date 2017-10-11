@@ -30,15 +30,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.swing.SortOrder;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.heapwalker.v2.HeapContext;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
-import org.netbeans.modules.profiler.heapwalker.v2.model.SortedNodesBuffer;
+import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
 import org.netbeans.modules.profiler.heapwalker.v2.model.TextNode;
+import org.netbeans.modules.profiler.heapwalker.v2.ui.UIThresholds;
+import org.netbeans.modules.profiler.heapwalker.v2.utils.NodesComputer;
 
 /**
  *
@@ -46,44 +47,54 @@ import org.netbeans.modules.profiler.heapwalker.v2.model.TextNode;
  */
 public class RObjectsProvider extends AbstractObjectsProvider {
     
-    private static RObjectsContainer PLACEHOLDER = new RObjectsContainer("", 0);
-    
-    static HeapWalkerNode[] getAllObjects(HeapWalkerNode parent, HeapContext context, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+    static HeapWalkerNode[] getAllObjects(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
 
-        RHeapFragment fragment = (RHeapFragment)context.getFragment();
-        Iterator<Instance> instancesI = fragment.getRObjectsIterator();
+        final RHeapFragment fragment = (RHeapFragment)context.getFragment();
+        final Heap heap = fragment.getHeap();
         
         if (aggregation == 0) {
-            DataType dataType = dataTypes == null || dataTypes.isEmpty() ? null : dataTypes.get(0);
-            SortOrder sortOrder = sortOrders == null || sortOrders.isEmpty() ? null : sortOrders.get(0);
-            SortedNodesBuffer objects = new SortedNodesBuffer(100, dataType, sortOrder, fragment.getHeap(), parent) {
-                protected String getMoreItemsString(String formattedNodesLeft) {
-                    return "<another " + formattedNodesLeft + " objects left>";
+            NodesComputer<Instance> computer = new NodesComputer<Instance>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
+                protected boolean sorts(DataType dataType) {
+                    return !DataType.COUNT.equals(dataType);
+                }
+                protected HeapWalkerNode createNode(Instance instance) {
+                    RObject robject = new RObject(instance);
+                    return new RObjectNode(robject);
+                }
+                protected Iterator<Instance> objectsIterator(int index) {
+                    Iterator<Instance> instances = fragment.getRObjectsIterator();
+                    for (int i = 0; i < index; i++) instances.next();
+                    return instances;
+                }
+                protected String getMoreNodesString(String moreNodesCount)  {
+                    return "<another " + moreNodesCount + " objects left>";
+                }
+                protected String getSamplesContainerString(String objectsCount)  {
+                    return "<sample " + objectsCount + " objects>";
+                }
+                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                    return "<objects " + firstNodeIdx + "-" + lastNodeIdx + ">";
                 }
             };
-            
-            while (instancesI.hasNext()) {
-                RObject robject = new RObject(instancesI.next());
-                objects.add(new RObjectNode(robject));
-            }
-            
-            return objects.getNodes();
+
+            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
         } else {
-            Heap heap = fragment.getHeap();
-            
             List<HeapWalkerNode> nodes = new ArrayList();
             Map<String, RObjectsContainer> types = new HashMap();
             
-            while (instancesI.hasNext()) {
-                RObject robject = new RObject(instancesI.next());
+            Iterator<Instance> instances = fragment.getRObjectsIterator();
+            
+            while (instances.hasNext()) {
+                RObject robject = new RObject(instances.next());
                 String type = robject.getType();
                 RObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
-                    typeNode = new RObjectsContainer(type, 100);
+                    typeNode = new RObjectsContainer(type);
                     nodes.add(typeNode);
                     types.put(type, typeNode);
                 }
+                
                 typeNode.add(robject, heap);
             }
             
@@ -92,81 +103,140 @@ public class RObjectsProvider extends AbstractObjectsProvider {
     }
     
     
-    public static HeapWalkerNode[] getDominators(HeapWalkerNode parent, Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+    public static HeapWalkerNode[] getDominators(HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
         if (!DataType.RETAINED_SIZE.valuesAvailable(heap))
             return new HeapWalkerNode[] { new TextNode("<Retained sizes not computed yet>") };
-        
-        List<HeapWalkerNode> nodes = new ArrayList();
         
         int maxSearchInstances = 10000;
         
         List<Instance> searchInstances = heap.getBiggestObjectsByRetainedSize(maxSearchInstances);
         Iterator<Instance> searchInstancesIt = searchInstances.iterator();
-        Set<Instance> dominators;
-        
-        while (searchInstancesIt.hasNext()) {
-            if (!RObject.isRObject(searchInstancesIt.next())) {
+        while (searchInstancesIt.hasNext())
+            if (!RObject.isRObject(searchInstancesIt.next()))
                 searchInstancesIt.remove();
-            }
-        }
-        dominators = getDominatorRoots(searchInstances);
         
-        Map<String, RObjectsContainer> types = new HashMap();
-
-        for (Instance dominator : dominators) {
-            RObject dobject = new RObject(dominator);
-            String type = dobject.getType();
-            type = type.substring(type.lastIndexOf('.') + 1);
-
-            RObjectsContainer typeNode = types.get(type);
-            if (typeNode == null) {
-                if (aggregation == 0) {
-                    typeNode = PLACEHOLDER;
-                } else {
-                    typeNode = new RObjectsContainer(type, Integer.MAX_VALUE);
-                    nodes.add(typeNode);
-                }
-                types.put(type, typeNode);
-            }
-            if (typeNode != null) {
-                if (aggregation == 0) {
-                    nodes.add(new RObjectNode(dobject));
-                } else {
-                    typeNode.add(dobject, heap);
-                }
-            }
-        }
-        
-        if (nodes.isEmpty()) nodes.add(new TextNode("<No dominators found>"));
-        return nodes.toArray(HeapWalkerNode.NO_NODES);
-    }
-    
-    public static HeapWalkerNode[] getGCRoots(HeapWalkerNode parent, HeapContext context, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
-        RHeapFragment fragment = (RHeapFragment)context.getFragment();
-        Iterator<Instance> instancesI = fragment.getRObjectsIterator();
+        final List<Instance> dominators = new ArrayList(getDominatorRoots(searchInstances));
         
         if (aggregation == 0) {
-            DataType dataType = dataTypes == null || dataTypes.isEmpty() ? null : dataTypes.get(0);
-            SortOrder sortOrder = sortOrders == null || sortOrders.isEmpty() ? null : sortOrders.get(0);
-            SortedNodesBuffer objects = new SortedNodesBuffer(100, dataType, sortOrder, fragment.getHeap(), parent) {
-                protected String getMoreItemsString(String formattedNodesLeft) {
-                    return "<another " + formattedNodesLeft + " objects left>";
+            NodesComputer<Instance> computer = new NodesComputer<Instance>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
+                protected boolean sorts(DataType dataType) {
+                    return !DataType.COUNT.equals(dataType);
+                }
+                protected HeapWalkerNode createNode(Instance instance) {
+                    RObject robject = new RObject(instance);
+                    return new RObjectNode(robject);
+                }
+                protected Iterator<Instance> objectsIterator(int index) {
+                    return dominators.listIterator(index);
+                }
+                protected String getMoreNodesString(String moreNodesCount)  {
+                    return "<another " + moreNodesCount + " dominators left>";
+                }
+                protected String getSamplesContainerString(String objectsCount)  {
+                    return "<sample " + objectsCount + " dominators>";
+                }
+                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                    return "<dominators " + firstNodeIdx + "-" + lastNodeIdx + ">";
                 }
             };
             
-            while (instancesI.hasNext()) {
-                Instance instance = instancesI.next();
-                if (instance.isGCRoot()) {
-                    RObject robject = new RObject(instance);
-                    objects.add(new RObjectNode(robject));
+            HeapWalkerNode[] nodes = computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
+            return nodes.length > 0 ? nodes : new HeapWalkerNode[] { new TextNode("<No dominators found>") };
+        } else {
+            List<HeapWalkerNode> nodes = new ArrayList();
+            Map<String, RObjectsContainer> types = new HashMap();
+            
+            for (Instance dominator : dominators) {
+                RObject robject = new RObject(dominator);
+                String type = robject.getType();
+                RObjectsContainer typeNode = types.get(type);
+
+                if (typeNode == null) {
+                    typeNode = new RObjectsContainer(type);
+                    nodes.add(typeNode);
+                    types.put(type, typeNode);
                 }
+                
+                typeNode.add(robject, heap);
             }
             
-            HeapWalkerNode[] nodes = objects.getNodes();
+            if (nodes.isEmpty()) nodes.add(new TextNode("<No dominators found>"));
+            return nodes.toArray(HeapWalkerNode.NO_NODES);
+        }
+        
+        
+//        dominators = getDominatorRoots(searchInstances);
+//        
+//        Map<String, RObjectsContainer> types = new HashMap();
+//
+//        
+//        List<HeapWalkerNode> nodes = new ArrayList();
+//        for (Instance dominator : dominators) {
+//            RObject dobject = new RObject(dominator);
+//            String type = dobject.getType();
+//            type = type.substring(type.lastIndexOf('.') + 1);
+//
+//            RObjectsContainer typeNode = types.get(type);
+//            if (typeNode == null) {
+//                if (aggregation == 0) {
+//                    typeNode = PLACEHOLDER;
+//                } else {
+//                    typeNode = new RObjectsContainer(type, Integer.MAX_VALUE);
+//                    nodes.add(typeNode);
+//                }
+//                types.put(type, typeNode);
+//            }
+//            if (typeNode != null) {
+//                if (aggregation == 0) {
+//                    nodes.add(new RObjectNode(dobject));
+//                } else {
+//                    typeNode.add(dobject, heap);
+//                }
+//            }
+//        }
+//        
+//        if (nodes.isEmpty()) nodes.add(new TextNode("<No dominators found>"));
+//        return nodes.toArray(HeapWalkerNode.NO_NODES);
+    }
+    
+    public static HeapWalkerNode[] getGCRoots(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+        RHeapFragment fragment = (RHeapFragment)context.getFragment();
+        final Heap heap = fragment.getHeap();
+        
+        Iterator<Instance> instancesI = fragment.getRObjectsIterator();
+        
+        if (aggregation == 0) {
+            final List<Instance> gcRoots = new ArrayList();
+            while (instancesI.hasNext()) {
+                Instance instance = instancesI.next();
+                if (instance.isGCRoot()) gcRoots.add(instance);
+            }
+            
+            NodesComputer<Instance> computer = new NodesComputer<Instance>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
+                protected boolean sorts(DataType dataType) {
+                    return !DataType.COUNT.equals(dataType);
+                }
+                protected HeapWalkerNode createNode(Instance instance) {
+                    RObject robject = new RObject(instance);
+                    return new RObjectNode(robject);
+                }
+                protected Iterator<Instance> objectsIterator(int index) {
+                    return gcRoots.listIterator(index);
+                }
+                protected String getMoreNodesString(String moreNodesCount)  {
+                    return "<another " + moreNodesCount + " GC roots left>";
+                }
+                protected String getSamplesContainerString(String objectsCount)  {
+                    return "<sample " + objectsCount + " GC roots>";
+                }
+                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                    return "<GC roots " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                }
+            };
+
+            HeapWalkerNode[] nodes = computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
             return nodes.length > 0 ? nodes : new HeapWalkerNode[] { new TextNode("<No GC roots found>") };
         } else {
-            Heap heap = fragment.getHeap();
-            
             List<HeapWalkerNode> nodes = new ArrayList();
             Map<String, RObjectsContainer> types = new HashMap();
             
@@ -181,7 +251,7 @@ public class RObjectsProvider extends AbstractObjectsProvider {
 
                 RObjectsContainer typeNode = types.get(type);
                 if (typeNode == null) {
-                    typeNode = new RObjectsContainer(type, 100);
+                    typeNode = new RObjectsContainer(type);
                     nodes.add(typeNode);
                     types.put(type, typeNode);
                 }

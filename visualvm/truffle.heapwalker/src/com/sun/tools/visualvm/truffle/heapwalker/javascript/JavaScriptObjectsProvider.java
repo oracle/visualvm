@@ -37,13 +37,14 @@ import javax.swing.SortOrder;
 import org.netbeans.lib.profiler.heap.GCRoot;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalker.v2.HeapContext;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
-import org.netbeans.modules.profiler.heapwalker.v2.model.SortedNodesBuffer;
 import org.netbeans.modules.profiler.heapwalker.v2.model.TextNode;
 import com.sun.tools.visualvm.truffle.heapwalker.TruffleLanguageHeapFragment;
+import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
+import org.netbeans.modules.profiler.heapwalker.v2.ui.UIThresholds;
+import org.netbeans.modules.profiler.heapwalker.v2.utils.NodesComputer;
 
 /**
  *
@@ -54,62 +55,90 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
     static final String JS_LANG_ID = "com.oracle.truffle.js.runtime.builtins.JSClass";
     private static DynamicObjectsContainer PLACEHOLDER = new DynamicObjectsContainer("", 0);
 
-    public static HeapWalkerNode[] getAllObjects(HeapWalkerNode parent, HeapContext context, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+    public static HeapWalkerNode[] getAllObjects(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
 //        long start = System.currentTimeMillis();
 
-        TruffleLanguageHeapFragment fragment = (TruffleLanguageHeapFragment) context.getFragment();
-        Heap heap = fragment.getHeap();
-        List<HeapWalkerNode> nodes = new ArrayList();
-        Map<String, DynamicObjectsContainer> types = new HashMap();
-
-        Map<Instance, String> shapes = new HashMap();
-        DataType dataType = dataTypes == null || dataTypes.isEmpty() ? null : dataTypes.get(0);
-        SortOrder sortOrder = sortOrders == null || sortOrders.isEmpty() ? null : sortOrders.get(0);
-        SortedNodesBuffer objects = new SortedNodesBuffer(100, dataType, sortOrder, heap, parent) {
-            protected String getMoreItemsString(String formattedNodesLeft) {
-                return "<another " + formattedNodesLeft + " objects left>";
-            }
-        };
-        Iterator<DynamicObject> instancesI = fragment.getDynamicObjectsIterator();
-        while (instancesI.hasNext()) {
-            DynamicObject dobject = instancesI.next();
-            Instance shape = dobject.getShape();
-            String type = shapes.get(shape);
-            if (type == null) {
-                type = DetailsSupport.getDetailsString(shape, heap);
-                shapes.put(shape, type);
-            }
-
-            DynamicObjectsContainer typeNode = types.get(type);
-            if (typeNode == null) {
-                String langid = dobject.getLanguageId().getName();
-                if (JS_LANG_ID.equals(langid)) {
-                    if (aggregation == 0) {
-                        typeNode = PLACEHOLDER;
-                    } else {
-                        typeNode = new JavaScriptNodes.JavaScriptDynamicObjectsContainer(type, 100);
-                        nodes.add(typeNode);
-                    }
-                    types.put(type, typeNode);
-                }
-            }
-            if (typeNode != null) {
-                if (aggregation == 0) {
-                     objects.add(new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, heap));
-                } else {
-                    typeNode.add(dobject, heap);
-                }
-            }
-        }
+        final TruffleLanguageHeapFragment fragment = (TruffleLanguageHeapFragment)context.getFragment();
+        final Heap heap = fragment.getHeap();
         
-//        System.err.println(">>> ALL JS objects X computed in " + (System.currentTimeMillis() - start));
+//        if (aggregation == 0) {
+            NodesComputer<DynamicObject> computer = new NodesComputer<DynamicObject>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
+                protected boolean sorts(DataType dataType) {
+                    return !DataType.COUNT.equals(dataType);
+                }
+                protected HeapWalkerNode createNode(DynamicObject dobject) {
+                    return new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, heap);
+                }
+                protected Iterator<DynamicObject> objectsIterator(int index) {
+                    Iterator<DynamicObject> dobjects = fragment.getDynamicObjectsIterator(JS_LANG_ID);
+                    for (int i = 0; i < index; i++) dobjects.next();
+                    return dobjects;
+                }
+                protected String getMoreNodesString(String moreNodesCount)  {
+                    return "<another " + moreNodesCount + " objects left>";
+                }
+                protected String getSamplesContainerString(String objectsCount)  {
+                    return "<sample " + objectsCount + " objects>";
+                }
+                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                    return "<objects " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                }
+            };
+
+            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
+//        }
         
-        if (aggregation == 0) return objects.getNodes();
-        else return nodes.toArray(HeapWalkerNode.NO_NODES);
+//        List<HeapWalkerNode> nodes = new ArrayList();
+//        Map<String, DynamicObjectsContainer> types = new HashMap();
+//
+//        Map<Instance, String> shapes = new HashMap();
+//        DataType dataType = dataTypes == null || dataTypes.isEmpty() ? null : dataTypes.get(0);
+//        SortOrder sortOrder = sortOrders == null || sortOrders.isEmpty() ? null : sortOrders.get(0);
+//        SortedNodesBuffer objects = new SortedNodesBuffer(100, dataType, sortOrder, heap, parent) {
+//            protected String getMoreItemsString(String formattedNodesLeft) {
+//                return "<another " + formattedNodesLeft + " objects left>";
+//            }
+//        };
+//        Iterator<DynamicObject> instancesI = fragment.getDynamicObjectsIterator();
+//        while (instancesI.hasNext()) {
+//            DynamicObject dobject = instancesI.next();
+//            Instance shape = dobject.getShape();
+//            String type = shapes.get(shape);
+//            if (type == null) {
+//                type = DetailsSupport.getDetailsString(shape, heap);
+//                shapes.put(shape, type);
+//            }
+//
+//            DynamicObjectsContainer typeNode = types.get(type);
+//            if (typeNode == null) {
+//                String langid = dobject.getLanguageId().getName();
+//                if (JS_LANG_ID.equals(langid)) {
+//                    if (aggregation == 0) {
+//                        typeNode = PLACEHOLDER;
+//                    } else {
+//                        typeNode = new JavaScriptNodes.JavaScriptDynamicObjectsContainer(type, 100);
+//                        nodes.add(typeNode);
+//                    }
+//                    types.put(type, typeNode);
+//                }
+//            }
+//            if (typeNode != null) {
+//                if (aggregation == 0) {
+//                     objects.add(new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, heap));
+//                } else {
+//                    typeNode.add(dobject, heap);
+//                }
+//            }
+//        }
+//        
+////        System.err.println(">>> ALL JS objects X computed in " + (System.currentTimeMillis() - start));
+//        
+//        if (aggregation == 0) return objects.getNodes();
+//        else return nodes.toArray(HeapWalkerNode.NO_NODES);
     }
     
     
-    public static HeapWalkerNode[] getDominators(HeapWalkerNode parent, Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+    public static HeapWalkerNode[] getDominators(HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
         if (!DataType.RETAINED_SIZE.valuesAvailable(heap))
             return new HeapWalkerNode[] { new TextNode("<Retained sizes not computed yet>") };
         
@@ -159,7 +188,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
         return nodes.toArray(HeapWalkerNode.NO_NODES);
     }
     
-    public static HeapWalkerNode[] getGCRoots(HeapWalkerNode parent, Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+    public static HeapWalkerNode[] getGCRoots(HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
         List<HeapWalkerNode> nodes = new ArrayList();
         
         Iterator<Instance> gcroots = heap.getGCRoots().iterator();

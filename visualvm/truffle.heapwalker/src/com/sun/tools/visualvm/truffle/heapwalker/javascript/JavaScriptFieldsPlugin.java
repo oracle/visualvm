@@ -32,6 +32,7 @@ import org.netbeans.modules.profiler.heapwalker.v2.HeapContext;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import com.sun.tools.visualvm.truffle.heapwalker.TruffleFieldsPlugin;
+import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapViewPlugin;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerActions;
 import org.openide.util.lookup.ServiceProvider;
@@ -47,8 +48,8 @@ class JavaScriptFieldsPlugin extends TruffleFieldsPlugin {
     }
     
     
-    protected HeapWalkerNode[] getNodes(List<FieldValue> fields, HeapWalkerNode parent, Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders) {
-        return JavaScriptFieldsProvider.getNodes(fields, parent, heap, viewID, dataTypes, sortOrders);
+    protected HeapWalkerNode[] getNodes(List<FieldValue> fields, HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
+        return JavaScriptFieldsProvider.getNodes(fields, parent, heap, viewID, viewFilter, dataTypes, sortOrders);
     }
     
     

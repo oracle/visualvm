@@ -31,6 +31,7 @@ import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.heapwalker.v2.model.ContainerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerRenderer;
+import org.netbeans.modules.profiler.heapwalker.v2.ui.UIThresholds;
 
 /**
  *
@@ -39,7 +40,7 @@ import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerRenderer;
 public class RObjectsContainer extends ContainerNode<RObject> {
     
     public RObjectsContainer(String name) {
-        this(name, 100);
+        this(name, UIThresholds.MAX_CLASS_INSTANCES);
     }
     
     public RObjectsContainer(String name, int maxItems) {
@@ -65,8 +66,16 @@ public class RObjectsContainer extends ContainerNode<RObject> {
         return new RObjectNode(dobject, name);
     }
     
-    protected String getMoreItemsString(String formattedNodesLeft) {
-        return "<another " + formattedNodesLeft + " objects left>";
+    protected String getMoreNodesString(String moreNodesCount)  {
+        return "<another " + moreNodesCount + " objects left>";
+    }
+    
+    protected String getSamplesContainerString(String objectsCount)  {
+        return "<sample " + objectsCount + " objects>";
+    }
+    
+    protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+        return "<objects " + firstNodeIdx + "-" + lastNodeIdx + ">";
     }
     
     

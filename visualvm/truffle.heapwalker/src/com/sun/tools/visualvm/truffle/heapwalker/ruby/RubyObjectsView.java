@@ -102,23 +102,23 @@ class RubyObjectsView extends HeapWalkerFeature {
                     case ALL_OBJECTS:
                         switch (getAggregation()) {
                             case TYPES:
-                                return RubyObjectsProvider.getAllObjects(root, RubyObjectsView.this.context, viewID, dataTypes, sortOrders, 1);
+                                return RubyObjectsProvider.getAllObjects(root, RubyObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 1);
                             default:
-                                return RubyObjectsProvider.getAllObjects(root, RubyObjectsView.this.context, viewID, dataTypes, sortOrders, 0);
+                                return RubyObjectsProvider.getAllObjects(root, RubyObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 0);
                         }
                     case DOMINATORS:
                         switch (getAggregation()) {
                             case TYPES:
-                                return RubyObjectsProvider.getDominators(root, heap, viewID, dataTypes, sortOrders, 1);
+                                return RubyObjectsProvider.getDominators(root, heap, viewID, viewFilter, dataTypes, sortOrders, 1);
                             default:
-                                return RubyObjectsProvider.getDominators(root, heap, viewID, dataTypes, sortOrders, 0);
+                                return RubyObjectsProvider.getDominators(root, heap, viewID, viewFilter, dataTypes, sortOrders, 0);
                         }
                     case GC_ROOTS:
                         switch (getAggregation()) {
                             case TYPES:
-                                return RubyObjectsProvider.getGCRoots(root, heap, viewID, dataTypes, sortOrders, 1);
+                                return RubyObjectsProvider.getGCRoots(root, heap, viewID, viewFilter, dataTypes, sortOrders, 1);
                             default:
-                                return RubyObjectsProvider.getGCRoots(root, heap, viewID, dataTypes, sortOrders, 0);
+                                return RubyObjectsProvider.getGCRoots(root, heap, viewID, viewFilter, dataTypes, sortOrders, 0);
                         }
                    default:
                         return HeapWalkerNode.NO_NODES;

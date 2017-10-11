@@ -26,6 +26,7 @@ package com.sun.tools.visualvm.truffle.heapwalker.r;
 
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObject;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.swing.SortOrder;
 import org.netbeans.lib.profiler.heap.FieldValue;
@@ -38,7 +39,8 @@ import org.netbeans.modules.profiler.heapwalker.v2.java.PrimitiveNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
-import org.netbeans.modules.profiler.heapwalker.v2.model.SortedNodesBuffer;
+import org.netbeans.modules.profiler.heapwalker.v2.ui.UIThresholds;
+import org.netbeans.modules.profiler.heapwalker.v2.utils.NodesComputer;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -63,75 +65,98 @@ public class RAttributesProvider extends HeapWalkerNode.Provider {
     public boolean supportsNode(HeapWalkerNode parent, Heap heap, String viewID) {
         if (parent instanceof RObjectNode) {
             RObject robject = HeapWalkerNode.getValue(parent, RObject.DATA_TYPE, heap);
-            if (robject != null) {
-                return robject.getAttributes() != null;
-            }
+            if (robject != null && robject.getAttributes() != null) return true;
         }
         return false;
     }
 
     public HeapWalkerNode[] getNodes(HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
-        return getNodes(getFields(parent, heap), parent, heap, viewID, dataTypes, sortOrders);
+        return getNodes(getFields(parent, heap), parent, heap, viewID, viewFilter, dataTypes, sortOrders);
     }
 
-    static HeapWalkerNode[] getNodes(List<FieldValue> fields, HeapWalkerNode parent, Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders) {
-        if (fields == null) {
-            return null;
-        }
+    static HeapWalkerNode[] getNodes(List<FieldValue> fields, HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
+        if (fields == null) return null;
 
-        DataType dataType = dataTypes == null || dataTypes.isEmpty() ? null : dataTypes.get(0);
-        SortOrder sortOrder = sortOrders == null || sortOrders.isEmpty() ? null : sortOrders.get(0);
-        SortedNodesBuffer nodes = new SortedNodesBuffer(1000, dataType, sortOrder, heap, parent) {
-            protected String getMoreItemsString(String formattedNodesLeft) {
-                return "<another " + formattedNodesLeft + " items left>";
+        NodesComputer<Integer> computer = new NodesComputer<Integer>(fields.size(), UIThresholds.MAX_INSTANCE_FIELDS) {
+            protected boolean sorts(DataType dataType) {
+                return !DataType.COUNT.equals(dataType);
+            }
+            protected HeapWalkerNode createNode(Integer index) {
+                return RAttributesProvider.createNode(fields.get(index), heap);
+            }
+            protected Iterator<Integer> objectsIterator(int index) {
+                return integerIterator(index, fields.size());
+            }
+            protected String getMoreNodesString(String moreNodesCount)  {
+                return "<another " + moreNodesCount + " attributes left>";
+            }
+            protected String getSamplesContainerString(String objectsCount)  {
+                return "<sample " + objectsCount + " attributes>";
+            }
+            protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                return "<attributes " + firstNodeIdx + "-" + lastNodeIdx + ">";
             }
         };
 
-        for (FieldValue field : fields) {
-            if (field instanceof ObjectFieldValue) {
-                Instance instance = ((ObjectFieldValue) field).getInstance();
-                if (RObject.isRObject(instance)) {
-                    nodes.add(new RObjectFieldNode(new RObject(instance), field));
-                } else {
-                    // TODO: include the actual values (strings, arrays etc.)
-                    if (instance == null) {
-                        nodes.add(new InstanceReferenceNode.Field((ObjectFieldValue) field, false));
-                    } else if (instance instanceof PrimitiveArrayInstance) {
-                        nodes.add(new InstanceReferenceNode.Field((ObjectFieldValue) field, false));
-                    } else {
-                        String name = instance.getJavaClass().getName();
-                        if (name.startsWith("java.lang.")) {
-                            nodes.add(new InstanceReferenceNode.Field((ObjectFieldValue) field, false));
-//                        } else if (name.startsWith("com.oracle.truffle.js.runtime.objects.")) {
-//                            nodes.add(new FieldNode.ObjectValue((ObjectFieldValue)field));
-                        }
-                    }
-                }
-            } else {
-                nodes.add(new PrimitiveNode.Field(field));
-            }
-        }
-        return nodes.getNodes();
+        return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
     }
 
-    protected List<FieldValue> getFields(HeapWalkerNode parent, Heap heap) {
+    
+    private List<FieldValue> getFields(HeapWalkerNode parent, Heap heap) {
         RObject robject = parent == null ? null : HeapWalkerNode.getValue(parent, RObject.DATA_TYPE, heap);
-        if (robject == null) {
-            return null;
-        }
+        if (robject == null) return null;
+        
         DynamicObject attributes = robject.getAttributes();
-        if (attributes == null) {
-            return null;
-        }
+        if (attributes == null) return null;
+        
+        List<FieldValue> fields = new ArrayList();
+        
+        if (includeInstanceFields) fields.addAll(attributes.getFieldValues());
+        if (includeStaticFields) fields.addAll(attributes.getStaticFieldValues());
+        
+        Iterator<FieldValue> fieldsIt = fields.iterator();
+        while (fieldsIt.hasNext())
+            if (!displayField(fieldsIt.next()))
+                fieldsIt.remove();
 
-        if (includeStaticFields == includeInstanceFields) {
-            List<FieldValue> fields = new ArrayList(attributes.getFieldValues());
-            fields.addAll(attributes.getStaticFieldValues());
-            return fields;
-        } else if (includeInstanceFields) {
-            return attributes.getFieldValues();
+        return fields;
+    }
+    
+    private boolean displayField(FieldValue field) {
+        // display primitive fields
+        if (!(field instanceof ObjectFieldValue)) return true;
+        
+        Instance instance = ((ObjectFieldValue)field).getInstance();
+        
+        // display null fields
+        if (instance == null) return true;
+        
+        // display DynamicObject fields
+        if (RObject.isRObject(instance)) return true;
+        
+        // display primitive arrays
+        if (instance instanceof PrimitiveArrayInstance) return true;
+        
+        String className = instance.getJavaClass().getName();
+        
+        // display java.lang.** fields
+        if (className.startsWith("java.lang."))
+            return true;
+        
+        return false;
+    }
+    
+    private static HeapWalkerNode createNode(FieldValue field, Heap heap) {
+        if (field instanceof ObjectFieldValue) {
+            Instance instance = ((ObjectFieldValue)field).getInstance();
+            if (RObject.isRObject(instance)) {
+                return new RObjectFieldNode(new RObject(instance), field);
+            } else {
+                return new InstanceReferenceNode.Field((ObjectFieldValue)field, false);
+            }
         } else {
-            return attributes.getStaticFieldValues();
+            return new PrimitiveNode.Field(field);
         }
     }
+    
 }

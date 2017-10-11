@@ -79,7 +79,7 @@ class TruffleFieldsPlugin extends HeapViewPlugin {
                     fields.addAll(tframe.getFieldValues());
                 }
                 
-                HeapWalkerNode[] nodes = TruffleFieldsProvider.getNodes(fields, root, heap, viewID, dataTypes, sortOrders);
+                HeapWalkerNode[] nodes = TruffleFieldsProvider.getNodes(fields, root, heap, viewID, viewFilter, dataTypes, sortOrders);
                 return nodes == null ? HeapWalkerNode.NO_NODES : nodes;
             }
         };

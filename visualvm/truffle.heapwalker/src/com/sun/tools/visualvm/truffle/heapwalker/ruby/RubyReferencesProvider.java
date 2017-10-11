@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.truffle.heapwalker.ruby;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectFieldNode;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectNode;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObject;
+import java.util.Iterator;
 import java.util.List;
 import javax.swing.SortOrder;
 import org.netbeans.lib.profiler.heap.FieldValue;
@@ -34,7 +35,8 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
-import org.netbeans.modules.profiler.heapwalker.v2.model.SortedNodesBuffer;
+import org.netbeans.modules.profiler.heapwalker.v2.ui.UIThresholds;
+import org.netbeans.modules.profiler.heapwalker.v2.utils.NodesComputer;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -64,23 +66,33 @@ public class RubyReferencesProvider extends HeapWalkerNode.Provider {
     static HeapWalkerNode[] getNodes(List<FieldValue> references, HeapWalkerNode parent, Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders) {
         if (references == null) return null;
         
-        DataType dataType = dataTypes == null || dataTypes.isEmpty() ? null : dataTypes.get(0);
-        SortOrder sortOrder = sortOrders == null || sortOrders.isEmpty() ? null : sortOrders.get(0);
-        SortedNodesBuffer nodes = new SortedNodesBuffer(100, dataType, sortOrder, heap, parent) {
-            protected String getMoreItemsString(String formattedNodesLeft) {
-                return "<another " + formattedNodesLeft + " references left>";
+        NodesComputer<Integer> computer = new NodesComputer<Integer>(references.size(), UIThresholds.MAX_INSTANCE_REFERENCES) {
+            protected boolean sorts(DataType dataType) {
+                return !DataType.COUNT.equals(dataType);
+            }
+            protected HeapWalkerNode createNode(Integer index) {
+                FieldValue reference = references.get(index);
+                DynamicObject dobject = new DynamicObject(reference.getDefiningInstance());
+                return new RubyNodes.RubyDynamicObjectReferenceNode(dobject, reference, heap);
+            }
+            protected Iterator<Integer> objectsIterator(int index) {
+                return integerIterator(index, references.size());
+            }
+            protected String getMoreNodesString(String moreNodesCount)  {
+                return "<another " + moreNodesCount + " references left>";
+            }
+            protected String getSamplesContainerString(String objectsCount)  {
+                return "<sample " + objectsCount + " references>";
+            }
+            protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                return "<references " + firstNodeIdx + "-" + lastNodeIdx + ">";
             }
         };
-        
-        for (FieldValue reference : references) {
-            DynamicObject rdobject = new DynamicObject(reference.getDefiningInstance());
-            nodes.add(new RubyNodes.RubyDynamicObjectReferenceNode(rdobject, reference, heap));
-        }
 
-        return nodes.getNodes();
+        return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
     }
     
-    protected List<FieldValue> getReferences(HeapWalkerNode parent, Heap heap) {
+    private List<FieldValue> getReferences(HeapWalkerNode parent, Heap heap) {
         DynamicObject dobject = parent == null ? null : HeapWalkerNode.getValue(parent, DynamicObject.DATA_TYPE, heap);
         if (dobject == null) return null;
 

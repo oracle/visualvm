@@ -28,6 +28,7 @@ import com.sun.tools.visualvm.truffle.heapwalker.DynamicObject;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectFieldNode;
 import com.sun.tools.visualvm.truffle.heapwalker.TruffleFrame;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.swing.SortOrder;
 import org.netbeans.lib.profiler.heap.FieldValue;
@@ -40,9 +41,8 @@ import org.netbeans.modules.profiler.heapwalker.v2.java.PrimitiveNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
-import org.netbeans.modules.profiler.heapwalker.v2.model.MoreNodesNode;
-import org.netbeans.modules.profiler.heapwalker.v2.model.SortedNodesBuffer;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.UIThresholds;
+import org.netbeans.modules.profiler.heapwalker.v2.utils.NodesComputer;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -53,75 +53,48 @@ abstract class TruffleFieldsProvider extends HeapWalkerNode.Provider {
     
     public HeapWalkerNode[] getNodes(HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
         List<FieldValue> fields = getFields(parent, heap);
-        return getNodes(fields, parent, heap, viewID, dataTypes, sortOrders);
+        return getNodes(fields, parent, heap, viewID, viewFilter, dataTypes, sortOrders);
     }
     
-    static HeapWalkerNode[] getNodes(final List<FieldValue> fields, final HeapWalkerNode parent, final Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders) {
+    static HeapWalkerNode[] getNodes(final List<FieldValue> fields, final HeapWalkerNode parent, final Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
         if (fields == null) return null;
         
-        int maxFields = UIThresholds.MAX_INSTANCE_FIELDS;
-        final int fieldsCount = fields.size();
-        
-        if (fieldsCount <= maxFields) {
-            // All fields unsorted
-            HeapWalkerNode[] nodes = new HeapWalkerNode[fields.size()];
-            for (int i = 0; i < nodes.length; i++) {
-                FieldValue field = fields.get(i);
-                if (field instanceof ObjectFieldValue) {
-                     ObjectFieldValue objectField = (ObjectFieldValue)field;
-                    Instance fieldInstance = objectField.getInstance();
-                    if (DynamicObject.isDynamicObject(fieldInstance)){
-                        nodes[i] = new DynamicObjectFieldNode(new DynamicObject(fieldInstance), field, heap);
-                    } else {
-                        nodes[i] = new InstanceReferenceNode.Field(objectField, false);
-                    }
-                    
-                    nodes[i] = new InstanceReferenceNode.Field((ObjectFieldValue)field, false);
-                } else {
-                    nodes[i] = new PrimitiveNode.Field(field);
-                }
+        NodesComputer<Integer> computer = new NodesComputer<Integer>(fields.size(), UIThresholds.MAX_INSTANCE_FIELDS) {
+            protected boolean sorts(DataType dataType) {
+                return !DataType.COUNT.equals(dataType);
             }
-            return nodes;
-        } else {
-            // First N fields according to the provided sorting
-            final DataType dataType = dataTypes == null || dataTypes.isEmpty() ? null : dataTypes.get(0);
-            final SortOrder sortOrder = sortOrders == null || sortOrders.isEmpty() ? null : sortOrders.get(0);
-            
-            MoreNodesNode.RemainingNodesSupport moreNodes = new MoreNodesNode.RemainingNodesSupport() {
-                protected int getRemainingNodesOffset() {
-                    return maxFields;
-                }
-                protected HeapWalkerNode[] computeAllNodes() {
-                    return getFields(fields, fieldsCount, dataType, sortOrder, heap, parent, null);
-                }
-            };
-            
-            return getFields(fields, maxFields, dataType, sortOrder, heap, parent, moreNodes);
-        }
-    }
-    
-    
-    private static HeapWalkerNode[] getFields(List<FieldValue> fields, int maxReferences, DataType dataType, SortOrder sortOrder, Heap heap, HeapWalkerNode parent, MoreNodesNode.RemainingNodesSupport moreNodes) {
-        SortedNodesBuffer result = new SortedNodesBuffer(maxReferences, dataType, sortOrder, heap, parent, moreNodes) {
-            protected String getMoreItemsString(String formattedNodesLeft) {
-                return "<another " + formattedNodesLeft + " fields left>";
+            protected HeapWalkerNode createNode(Integer index) {
+                return TruffleFieldsProvider.createNode(fields.get(index), heap);
+            }
+            protected Iterator<Integer> objectsIterator(int index) {
+                return integerIterator(index, fields.size());
+            }
+            protected String getMoreNodesString(String moreNodesCount)  {
+                return "<another " + moreNodesCount + " truffle fields left>";
+            }
+            protected String getSamplesContainerString(String objectsCount)  {
+                return "<sample " + objectsCount + " truffle fields>";
+            }
+            protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                return "<truffle fields " + firstNodeIdx + "-" + lastNodeIdx + ">";
             }
         };
-        for (FieldValue field : fields) {
-            if (field instanceof ObjectFieldValue) {
-                ObjectFieldValue objectField = (ObjectFieldValue)field;
-                Instance fieldInstance = objectField.getInstance();
-                if (DynamicObject.isDynamicObject(fieldInstance)){
-                    result.add(new DynamicObjectFieldNode(new DynamicObject(fieldInstance), field, heap));
-                } else {
-                    result.add(new InstanceReferenceNode.Field(objectField, false));
-                }
-            } else {
-                result.add(new PrimitiveNode.Field(field));
-            }
-        }
 
-        return result.getNodes();
+        return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
+    }
+    
+    private static HeapWalkerNode createNode(FieldValue field, Heap heap) {
+        if (field instanceof ObjectFieldValue) {
+            ObjectFieldValue objectField = (ObjectFieldValue)field;
+            Instance fieldInstance = objectField.getInstance();
+            if (DynamicObject.isDynamicObject(fieldInstance)){
+                return new DynamicObjectFieldNode(new DynamicObject(fieldInstance), field, heap);
+            } else {
+                return new InstanceReferenceNode.Field(objectField, false);
+            }
+        } else {
+            return new PrimitiveNode.Field(field);
+        }
     }
     
     
