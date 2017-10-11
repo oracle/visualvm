@@ -71,7 +71,7 @@ import org.openide.util.Exceptions;
  *
  * @author Jiri Sedlacek
  */
-final class TracerModel {
+public final class TracerModel {
 
     private static final Logger LOGGER = Logger.getLogger(TracerController.class.getName());
 
@@ -87,7 +87,7 @@ final class TracerModel {
 
     // --- Constructor ---------------------------------------------------------
 
-    TracerModel(IdeSnapshot snapshot) {
+    public TracerModel(IdeSnapshot snapshot) {
         this.snapshot = snapshot;
         timelineSupport = new TimelineSupport(new TimelineSupport.DescriptorResolver() {
             public TracerProbeDescriptor getDescriptor(TracerProbe p) {

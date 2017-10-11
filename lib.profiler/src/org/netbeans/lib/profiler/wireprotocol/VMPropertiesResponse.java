@@ -67,6 +67,7 @@ public class VMPropertiesResponse extends Response {
     private String jvmArguments;
     private String targetMachineOSName;
     private String workingDir;
+    private boolean canInstrumentConstructor;
     private int agentId;
     private int agentVersion;
     private long maxHeapSize;
@@ -77,7 +78,8 @@ public class VMPropertiesResponse extends Response {
 
     public VMPropertiesResponse(String jdkVerString, String javaClassPath, String javaExtDirs, String bootClassPath,
                                 String workingDir, String jvmArguments, String javaCommand, String targetMachineOSName,
-                                long maxHeapSize, long startupTimeMillis, long startupTimeInCounts, int agentId) {
+                                boolean canInstrumentConstructor, long maxHeapSize, long startupTimeMillis,
+                                long startupTimeInCounts, int agentId) {
         super(true, VM_PROPERTIES);
         this.jdkVersionString = jdkVerString;
         this.javaClassPath = javaClassPath;
@@ -87,6 +89,7 @@ public class VMPropertiesResponse extends Response {
         this.jvmArguments = (jvmArguments != null) ? jvmArguments : ""; // NOI18N
         this.javaCommand = (javaCommand != null) ? javaCommand : ""; // NOI18N
         this.targetMachineOSName = targetMachineOSName;
+        this.canInstrumentConstructor = canInstrumentConstructor;
         this.maxHeapSize = maxHeapSize;
         this.startupTimeMillis = startupTimeMillis;
         this.startupTimeInCounts = startupTimeInCounts & 0xFFFFFFFFFFFFFFL; // we use only 7 bytes for hi res timer
@@ -133,6 +136,10 @@ public class VMPropertiesResponse extends Response {
         return javaExtDirs;
     }
 
+    public boolean canInstrumentConstructor() {
+        return canInstrumentConstructor;
+    }
+
     public long getMaxHeapSize() {
         return maxHeapSize;
     }
@@ -164,6 +171,7 @@ public class VMPropertiesResponse extends Response {
                + "\n  jvmArguments: " + jvmArguments // NOI18N
                + "\n  javaCommand: " + javaCommand // NOI18N
                + "\n  targetMachineOSName: " + targetMachineOSName // NOI18N
+               + "\n  canInstrumentConstructor: " + canInstrumentConstructor // NOI18N
                + "\n  maxHeapSize: " + maxHeapSize // NOI18N
                + "\n  startupTimeMillis: " + startupTimeMillis // NOI18N
                + "\n  startupTimeInCounts: " + startupTimeInCounts // NOI18N
@@ -182,6 +190,7 @@ public class VMPropertiesResponse extends Response {
         jvmArguments = in.readUTF();
         javaCommand = in.readUTF();
         targetMachineOSName = in.readUTF();
+        canInstrumentConstructor = in.readBoolean();
         maxHeapSize = in.readLong();
         startupTimeMillis = in.readLong();
         startupTimeInCounts = in.readLong();
@@ -198,6 +207,7 @@ public class VMPropertiesResponse extends Response {
         out.writeUTF(jvmArguments);
         out.writeUTF(javaCommand);
         out.writeUTF(targetMachineOSName);
+        out.writeBoolean(canInstrumentConstructor);
         out.writeLong(maxHeapSize);
         out.writeLong(startupTimeMillis);
         out.writeLong(startupTimeInCounts);

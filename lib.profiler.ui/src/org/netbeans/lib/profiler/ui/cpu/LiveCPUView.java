@@ -405,7 +405,15 @@ public abstract class LiveCPUView extends JPanel {
             protected void fireActionPerformed(ActionEvent e) { profileClass(userValue); }
         });
         
-        if (showSourceSupported() || profileMethodSupported() || profileClassSupported()) popup.addSeparator();
+        if (profileMethodSupported() || profileClassSupported()) popup.addSeparator();
+        
+        JMenuItem[] customItems = invoker.createCustomMenuItems(this, value, userValue);
+        if (customItems != null) {
+            for (JMenuItem customItem : customItems) popup.add(customItem);
+            popup.addSeparator();
+        }
+        
+        customizeNodePopup(invoker, popup, value, userValue);
         
         if (invoker == forwardCallsView) {
             final ProfilerTreeTable ttable = (ProfilerTreeTable)forwardCallsView.getResultsComponent();
@@ -635,6 +643,8 @@ public abstract class LiveCPUView extends JPanel {
             }
         };
     }
+    
+    protected void customizeNodePopup(DataView invoker, JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {}
     
     
     private synchronized ExecutorService getExecutor() {

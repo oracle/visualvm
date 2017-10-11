@@ -1606,6 +1606,7 @@ public class ProfilerServer extends Thread implements CommonConstants {
                                                                      System.getProperty("user.dir"), // NOI18N
                                                                      status.jvmArguments, status.javaCommand,
                                                                      System.getProperty("os.name"), // NOI18N
+                                                                     InstrumentConstructorTest.test(),
                                                                      Runtime.getRuntime().maxMemory(),
                                                                      System.currentTimeMillis(), Timers.getCurrentTimeInCounts(),
                                                                      getAgentId()

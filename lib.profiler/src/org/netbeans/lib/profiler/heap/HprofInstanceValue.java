@@ -52,20 +52,20 @@ class HprofInstanceValue extends HprofObject implements FieldValue {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
 
     HprofField field;
-    InstanceDump instance;
+    long instanceOffset;
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
-    HprofInstanceValue(InstanceDump i, HprofField f, long offset) {
-        super(offset);
-        instance = i;
+    HprofInstanceValue(InstanceDump i, HprofField f, long fieldOffset) {
+        super(fieldOffset);
+        instanceOffset = i.fileOffset;
         field = f;
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public Instance getDefiningInstance() {
-        return instance;
+        return field.classDump.getHprof().getInstanceByOffset(new long[] {instanceOffset});
     }
 
     public Field getField() {
@@ -78,7 +78,7 @@ class HprofInstanceValue extends HprofObject implements FieldValue {
 
     Object getTypeValue() {
         byte type = field.getValueType();
-        HprofByteBuffer dumpBuffer = instance.dumpClass.getHprofBuffer();
+        HprofByteBuffer dumpBuffer = field.classDump.getHprofBuffer();
 
         return getTypeValue(dumpBuffer, fileOffset, type);
     }

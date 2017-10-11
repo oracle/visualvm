@@ -153,7 +153,11 @@ public abstract class SnapshotCPUView extends JPanel {
     }
     
     
+    protected boolean profileMethodEnabled() { return true; }
+    
     protected boolean profileMethodSupported() { return true; }
+    
+    protected boolean profileClassSupported() { return true; }
     
     
     protected abstract boolean showSourceSupported();
@@ -469,19 +473,26 @@ public abstract class SnapshotCPUView extends JPanel {
             popup.addSeparator();
         }
         
-        popup.add(new JMenuItem(CPUView.ACTION_PROFILE_METHOD) {
-            { setEnabled(profileMethodSupported() && userValue != null && aggregation == CPUResultsSnapshot.METHOD_LEVEL_VIEW && CPUTableView.isSelectable(userValue)); }
+        if (profileMethodSupported()) popup.add(new JMenuItem(CPUView.ACTION_PROFILE_METHOD) {
+            { setEnabled(profileMethodEnabled() && userValue != null && aggregation == CPUResultsSnapshot.METHOD_LEVEL_VIEW && CPUTableView.isSelectable(userValue)); }
             protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
         });
         
-        popup.add(new JMenuItem(CPUView.ACTION_PROFILE_CLASS) {
+        if (profileClassSupported()) popup.add(new JMenuItem(CPUView.ACTION_PROFILE_CLASS) {
             { setEnabled(userValue != null && aggregation != CPUResultsSnapshot.PACKAGE_LEVEL_VIEW); }
             protected void fireActionPerformed(ActionEvent e) { profileClass(userValue); }
         });
         
+        if (profileMethodSupported() || profileClassSupported()) popup.addSeparator();
+        
+        JMenuItem[] customItems = invoker.createCustomMenuItems(this, value, userValue);
+        if (customItems != null) {
+            for (JMenuItem customItem : customItems) popup.add(customItem);
+            popup.addSeparator();
+        }
+        
         customizeNodePopup(invoker, popup, value, userValue);
         
-        popup.addSeparator();
         if (invoker == forwardCallsView) {
             final ProfilerTreeTable ttable = (ProfilerTreeTable)forwardCallsView.getResultsComponent();
             int column = ttable.convertColumnIndexToView(ttable.getMainColumn());

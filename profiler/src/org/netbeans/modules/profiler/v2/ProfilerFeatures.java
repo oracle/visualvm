@@ -105,7 +105,7 @@ final class ProfilerFeatures {
         listeners = new HashSet();
         
         // Populates SessionStorage, can be accessed in EDT from now
-        for (ProfilerFeature.Provider provider : Lookup.getDefault().lookupAll(ProfilerFeature.Provider.class)) {
+        for (ProfilerFeature.Provider provider : ProfilerFeature.Registry.getProviders()) {
             ProfilerFeature feature = provider.getFeature(session);
             if (feature != null) features.add(feature);
 //            features.add(provider.getFeature(session));

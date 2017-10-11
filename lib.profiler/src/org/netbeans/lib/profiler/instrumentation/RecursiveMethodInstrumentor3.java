@@ -334,6 +334,8 @@ public class RecursiveMethodInstrumentor3 extends RecursiveMethodInstrumentor {
                     || (className == OBJECT_SLASHED_CLASS_NAME) // Actually, just the Object.<init> method?
             ) {
                 clazz.setMethodUnscannable(idx);
+            } else if (clazz.getMethodName(idx) == "<init>" && !status.canInstrumentConstructor && clazz.getMajorVersion()>50) {
+                clazz.setMethodUnscannable(idx);
             } else {
                 byte[] bytecode = clazz.getMethodBytecode(idx);
 

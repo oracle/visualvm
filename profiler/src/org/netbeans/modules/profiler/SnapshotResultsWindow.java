@@ -77,6 +77,7 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.v2.ProfilerFeature;
 import org.netbeans.modules.profiler.v2.ProfilerSession;
 import org.netbeans.spi.actions.AbstractSavable;
 import org.openide.DialogDescriptor;
@@ -530,6 +531,12 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
                 protected boolean showSourceSupported() {
                     return GoToSource.isAvailable();
                 }
+                protected boolean profileMethodSupported() {
+                    return ProfilerFeature.Registry.hasProviders();
+                }
+                protected boolean profileClassSupported() {
+                    return ProfilerFeature.Registry.hasProviders();
+                }
                 protected void showSource(ClientUtils.SourceCodeSelection value) {
                     Lookup.Provider project = snapshot.getProject();
                     String className = value.getClassName();
@@ -585,6 +592,12 @@ public final class SnapshotResultsWindow extends ProfilerTopComponent {
             final SnapshotMemoryView _memorySnapshot = new SnapshotMemoryView(s, filter, aSave, aCompare, aInfo, exporter) {
                 protected boolean showSourceSupported() {
                     return GoToSource.isAvailable();
+                }
+                protected boolean profileMethodSupported() {
+                    return ProfilerFeature.Registry.hasProviders();
+                }
+                protected boolean profileClassSupported() {
+                    return ProfilerFeature.Registry.hasProviders();
                 }
                 protected void showSource(ClientUtils.SourceCodeSelection value) {
                     Lookup.Provider project = snapshot.getProject();

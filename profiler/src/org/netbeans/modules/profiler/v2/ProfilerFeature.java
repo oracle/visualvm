@@ -43,6 +43,7 @@
 
 package org.netbeans.modules.profiler.v2;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.Icon;
@@ -264,11 +265,33 @@ public abstract class ProfilerFeature {
         
     }
     
+    
     // --- Provider ------------------------------------------------------------
     
     public static abstract class Provider {
         
         public abstract ProfilerFeature getFeature(ProfilerSession session);
+        
+    }
+    
+    
+    // --- Registry ------------------------------------------------------------
+    
+    public static final class Registry {
+        
+        private static boolean HAS_PROVIDERS;
+        
+        private Registry() {}
+        
+        public static boolean hasProviders() {
+            return HAS_PROVIDERS;
+        }
+        
+        static Collection<? extends Provider> getProviders() {
+            Collection<? extends Provider> providers = Lookup.getDefault().lookupAll(Provider.class);
+            HAS_PROVIDERS = !providers.isEmpty();
+            return providers;
+        }
         
     }
     
