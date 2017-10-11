@@ -25,23 +25,19 @@
 package com.sun.tools.visualvm.truffle.heapwalker.ruby;
 
 import com.sun.tools.visualvm.truffle.heapwalker.AbstractObjectsProvider;
-import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectsContainer;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.swing.SortOrder;
-import org.netbeans.lib.profiler.heap.GCRoot;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.heapwalker.v2.HeapContext;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.TextNode;
-import com.sun.tools.visualvm.truffle.heapwalker.TruffleLanguageHeapFragment;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.UIThresholds;
 import org.netbeans.modules.profiler.heapwalker.v2.utils.NodesComputer;
@@ -52,16 +48,14 @@ import org.netbeans.modules.profiler.heapwalker.v2.utils.NodesComputer;
  */
 public class RubyObjectsProvider extends AbstractObjectsProvider {
     
-    static final String RUBY_LANG_ID = "org.truffleruby.language.RubyObjectType";   // NOI18N
-    private static DynamicObjectsContainer PLACEHOLDER = new DynamicObjectsContainer("", 0);
+    static final String RUBY_LANG_ID = "org.truffleruby.language.RubyObjectType"; // NOI18N
+    
 
     public static HeapWalkerNode[] getAllObjects(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
-//        long start = System.currentTimeMillis();
-
-        final TruffleLanguageHeapFragment fragment = (TruffleLanguageHeapFragment) context.getFragment();
+        final RubyHeapFragment fragment = (RubyHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
         
-//        if (aggregation == 0) {
+        if (aggregation == 0) {
             NodesComputer<DynamicObject> computer = new NodesComputer<DynamicObject>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
                 protected boolean sorts(DataType dataType) {
                     return !DataType.COUNT.equals(dataType);
@@ -70,7 +64,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                     return new RubyNodes.RubyDynamicObjectNode(dobject, heap);
                 }
                 protected Iterator<DynamicObject> objectsIterator(int index) {
-                    Iterator<DynamicObject> dobjects = fragment.getDynamicObjectsIterator(RUBY_LANG_ID);
+                    Iterator<DynamicObject> dobjects = fragment.getRubyObjectsIterator();
                     for (int i = 0; i < index; i++) dobjects.next();
                     return dobjects;
                 }
@@ -86,148 +80,162 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
             };
 
             return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
-//        }
-        
-        
-        
-//        List<HeapWalkerNode> nodes = new ArrayList();
-//        Map<String, DynamicObjectsContainer> types = new HashMap();
-//
-//        Map<Instance, String> shapes = new HashMap();
-//        DataType dataType = dataTypes == null || dataTypes.isEmpty() ? null : dataTypes.get(0);
-//        SortOrder sortOrder = sortOrders == null || sortOrders.isEmpty() ? null : sortOrders.get(0);
-//        SortedNodesBuffer objects = new SortedNodesBuffer(100, dataType, sortOrder, heap, parent) {
-//            protected String getMoreItemsString(String formattedNodesLeft) {
-//                return "<another " + formattedNodesLeft + " objects left>";
-//            }
-//        };
-//        Iterator<DynamicObject> instancesI = fragment.getDynamicObjectsIterator();
-//        while (instancesI.hasNext()) {
-//            DynamicObject dobject = instancesI.next();
-//            Instance shape = dobject.getShape();
-//            String type = shapes.get(shape);
-//            if (type == null) {
-//                type = DetailsSupport.getDetailsString(shape, heap);
-//                shapes.put(shape, type);
-//            }
-//
-//            DynamicObjectsContainer typeNode = types.get(type);
-//            if (typeNode == null) {
-//                String langid = dobject.getLanguageId().getName();
-//                if (RUBY_LANG_ID.equals(langid)) {
-//                    if (aggregation == 0) {
-//                        typeNode = PLACEHOLDER;
-//                    } else {
-//                        typeNode = new RubyNodes.RubyDynamicObjectsContainer(type, 100);
-//                        nodes.add(typeNode);
-//                    }
-//                    types.put(type, typeNode);
-//                }
-//            }
-//            if (typeNode != null) {
-//                if (aggregation == 0) {
-//                     objects.add(new RubyNodes.RubyDynamicObjectNode(dobject, heap));
-//                } else {
-//                    typeNode.add(dobject, heap);
-//                }
-//            }
-//        }
-//        
-////        System.err.println(">>> ALL JS objects X computed in " + (System.currentTimeMillis() - start));
-//        
-//        if (aggregation == 0) return objects.getNodes();
-//        else return nodes.toArray(HeapWalkerNode.NO_NODES);
+        } else {
+            List<HeapWalkerNode> nodes = new ArrayList();
+            Map<String, RubyNodes.RubyDynamicObjectsContainer> types = new HashMap();
+            
+            Iterator<DynamicObject> dobjects = fragment.getRubyObjectsIterator();
+            
+            while (dobjects.hasNext()) {
+                DynamicObject dobject = dobjects.next();
+                String type = dobject.getType(heap);
+                RubyNodes.RubyDynamicObjectsContainer typeNode = types.get(type);
+
+                if (typeNode == null) {
+                    typeNode = new RubyNodes.RubyDynamicObjectsContainer(type);
+                    nodes.add(typeNode);
+                    types.put(type, typeNode);
+                }
+                
+                typeNode.add(dobject, heap);
+            }
+            
+            return nodes.toArray(HeapWalkerNode.NO_NODES);
+        }
     }
     
-    
-    public static HeapWalkerNode[] getDominators(HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+    public static HeapWalkerNode[] getDominators(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+        final Heap heap = context.getFragment().getHeap();
+        
         if (!DataType.RETAINED_SIZE.valuesAvailable(heap))
             return new HeapWalkerNode[] { new TextNode("<Retained sizes not computed yet>") };
-        
-        List<HeapWalkerNode> nodes = new ArrayList();
         
         int maxSearchInstances = 10000;
         
         List<Instance> searchInstances = heap.getBiggestObjectsByRetainedSize(maxSearchInstances);
         Iterator<Instance> searchInstancesIt = searchInstances.iterator();
-        Set<Instance> dominators;
-        
         while (searchInstancesIt.hasNext()) {
-            if (!DynamicObject.isDynamicObject(searchInstancesIt.next())) {
+            Instance instance = searchInstancesIt.next();
+            if (!DynamicObject.isDynamicObject(instance) || !isRubyObject(new DynamicObject(instance)))
                 searchInstancesIt.remove();
-            }
         }
-        dominators = getDominatorRoots(searchInstances);
         
-        Map<String, DynamicObjectsContainer> types = new HashMap();
+        final List<Instance> dominators = new ArrayList(getDominatorRoots(searchInstances));
+        
+        if (aggregation == 0) {
+            NodesComputer<Instance> computer = new NodesComputer<Instance>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
+                protected boolean sorts(DataType dataType) {
+                    return !DataType.COUNT.equals(dataType);
+                }
+                protected HeapWalkerNode createNode(Instance instance) {
+                    DynamicObject dobject = new DynamicObject(instance);
+                    return new RubyNodes.RubyDynamicObjectNode(dobject, heap);
+                }
+                protected Iterator<Instance> objectsIterator(int index) {
+                    return dominators.listIterator(index);
+                }
+                protected String getMoreNodesString(String moreNodesCount)  {
+                    return "<another " + moreNodesCount + " dominators left>";
+                }
+                protected String getSamplesContainerString(String objectsCount)  {
+                    return "<sample " + objectsCount + " dominators>";
+                }
+                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                    return "<dominators " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                }
+            };
+            
+            HeapWalkerNode[] nodes = computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
+            return nodes.length > 0 ? nodes : new HeapWalkerNode[] { new TextNode("<No dominators found>") };
+        } else {
+            List<HeapWalkerNode> nodes = new ArrayList();
+            Map<String, RubyNodes.RubyDynamicObjectsContainer> types = new HashMap();
+            
+            for (Instance dominator : dominators) {
+                DynamicObject dobject = new DynamicObject(dominator);
+                String type = dobject.getType(heap);
+                RubyNodes.RubyDynamicObjectsContainer typeNode = types.get(type);
 
-        for (Instance dominator : dominators) {
-            DynamicObject dobject = new DynamicObject(dominator);
-            String type = dobject.getType(heap);
-
-            DynamicObjectsContainer typeNode = types.get(type);
-            if (typeNode == null) {
-                String langid = dobject.getLanguageId().getName();
-                if (RUBY_LANG_ID.equals(langid)) {
-                    if (aggregation == 0) {
-                        typeNode = PLACEHOLDER;
-                    } else {
-                        typeNode = new RubyNodes.RubyDynamicObjectsContainer(type, Integer.MAX_VALUE);
-                        nodes.add(typeNode);
-                    }
+                if (typeNode == null) {
+                    typeNode = new RubyNodes.RubyDynamicObjectsContainer(type);
+                    nodes.add(typeNode);
                     types.put(type, typeNode);
                 }
+                
+                typeNode.add(dobject, heap);
             }
-            if (typeNode != null) {
-                if (aggregation == 0) {
-                    nodes.add(new RubyNodes.RubyDynamicObjectNode(dobject, heap));
-                } else {
-                    typeNode.add(dobject, heap);
-                }
-            }
+            
+            if (nodes.isEmpty()) nodes.add(new TextNode("<No dominators found>"));
+            return nodes.toArray(HeapWalkerNode.NO_NODES);
         }
-        
-        if (nodes.isEmpty()) nodes.add(new TextNode("<No dominators found>"));
-        return nodes.toArray(HeapWalkerNode.NO_NODES);
     }
     
-    public static HeapWalkerNode[] getGCRoots(HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
-        List<HeapWalkerNode> nodes = new ArrayList();
+    public static HeapWalkerNode[] getGCRoots(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+        RubyHeapFragment fragment = (RubyHeapFragment)context.getFragment();
+        final Heap heap = fragment.getHeap();
         
-        Iterator<Instance> gcroots = heap.getGCRoots().iterator();
+        Iterator<DynamicObject> dobjects = fragment.getRubyObjectsIterator();
         
-        Map<String, DynamicObjectsContainer> types = new HashMap();
+        if (aggregation == 0) {
+            final List<Instance> gcRoots = new ArrayList();
+            while (dobjects.hasNext()) {
+                DynamicObject dobject = dobjects.next();
+                Instance instance = dobject.getInstance();
+                if (instance.isGCRoot()) gcRoots.add(instance);
+            }
+            
+            NodesComputer<Instance> computer = new NodesComputer<Instance>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
+                protected boolean sorts(DataType dataType) {
+                    return !DataType.COUNT.equals(dataType);
+                }
+                protected HeapWalkerNode createNode(Instance instance) {
+                    DynamicObject dobject = new DynamicObject(instance);
+                    return new RubyNodes.RubyDynamicObjectNode(dobject, heap);
+                }
+                protected Iterator<Instance> objectsIterator(int index) {
+                    return gcRoots.listIterator(index);
+                }
+                protected String getMoreNodesString(String moreNodesCount)  {
+                    return "<another " + moreNodesCount + " GC roots left>";
+                }
+                protected String getSamplesContainerString(String objectsCount)  {
+                    return "<sample " + objectsCount + " GC roots>";
+                }
+                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                    return "<GC roots " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                }
+            };
 
-        while (gcroots.hasNext()) {
-            Instance gcroot = ((GCRoot)gcroots.next()).getInstance();
-            if (!DynamicObject.isDynamicObject(gcroot)) continue;
+            HeapWalkerNode[] nodes = computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
+            return nodes.length > 0 ? nodes : new HeapWalkerNode[] { new TextNode("<No GC roots found>") };
+        } else {
+            List<HeapWalkerNode> nodes = new ArrayList();
+            Map<String, RubyNodes.RubyDynamicObjectsContainer> types = new HashMap();
+            
+            while (dobjects.hasNext()) {
+                DynamicObject dobject = dobjects.next();
+                Instance instance = dobject.getInstance();
+                if (!instance.isGCRoot()) continue;
+                
+                String type = dobject.getType(heap);
+                type = type.substring(type.lastIndexOf('.') + 1);
 
-            DynamicObject dobject = new DynamicObject(gcroot);
-            String type = dobject.getType(heap);
-
-            DynamicObjectsContainer typeNode = types.get(type);
-            if (typeNode == null) {
-                String langid = dobject.getLanguageId().getName();
-                if (RUBY_LANG_ID.equals(langid)) {
-                    if (aggregation == 0) {
-                        typeNode = PLACEHOLDER;
-                    } else {
-                        typeNode = new RubyNodes.RubyDynamicObjectsContainer(type, Integer.MAX_VALUE);
-                        nodes.add(typeNode);
-                    }
+                RubyNodes.RubyDynamicObjectsContainer typeNode = types.get(type);
+                if (typeNode == null) {
+                    typeNode = new RubyNodes.RubyDynamicObjectsContainer(type);
+                    nodes.add(typeNode);
                     types.put(type, typeNode);
                 }
+                typeNode.add(dobject, heap);
             }
-            if (typeNode != null) {
-                if (aggregation == 0) {
-                    nodes.add(new RubyNodes.RubyDynamicObjectNode(dobject, heap));                
-                } else {
-                    typeNode.add(dobject, heap);
-                }
-            }
+            
+            if (nodes.isEmpty()) nodes.add(new TextNode("<No GC roots found>"));
+            return nodes.toArray(HeapWalkerNode.NO_NODES);
         }
-        
-        if (nodes.isEmpty()) nodes.add(new TextNode("<No GC roots found>"));
-        return nodes.toArray(HeapWalkerNode.NO_NODES);
     }
+    
+    private static boolean isRubyObject(DynamicObject dobject) {
+        return RUBY_LANG_ID.equals(dobject.getLanguageId().getName());
+    }
+    
 }

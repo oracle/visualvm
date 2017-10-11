@@ -48,7 +48,6 @@ import org.netbeans.modules.profiler.heapwalker.v2.utils.NodesComputer;
 public class RObjectsProvider extends AbstractObjectsProvider {
     
     static HeapWalkerNode[] getAllObjects(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
-
         final RHeapFragment fragment = (RHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
         
@@ -102,8 +101,9 @@ public class RObjectsProvider extends AbstractObjectsProvider {
         }
     }
     
-    
-    public static HeapWalkerNode[] getDominators(HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+    public static HeapWalkerNode[] getDominators(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+        Heap heap = context.getFragment().getHeap();
+        
         if (!DataType.RETAINED_SIZE.valuesAvailable(heap))
             return new HeapWalkerNode[] { new TextNode("<Retained sizes not computed yet>") };
         
@@ -163,40 +163,6 @@ public class RObjectsProvider extends AbstractObjectsProvider {
             if (nodes.isEmpty()) nodes.add(new TextNode("<No dominators found>"));
             return nodes.toArray(HeapWalkerNode.NO_NODES);
         }
-        
-        
-//        dominators = getDominatorRoots(searchInstances);
-//        
-//        Map<String, RObjectsContainer> types = new HashMap();
-//
-//        
-//        List<HeapWalkerNode> nodes = new ArrayList();
-//        for (Instance dominator : dominators) {
-//            RObject dobject = new RObject(dominator);
-//            String type = dobject.getType();
-//            type = type.substring(type.lastIndexOf('.') + 1);
-//
-//            RObjectsContainer typeNode = types.get(type);
-//            if (typeNode == null) {
-//                if (aggregation == 0) {
-//                    typeNode = PLACEHOLDER;
-//                } else {
-//                    typeNode = new RObjectsContainer(type, Integer.MAX_VALUE);
-//                    nodes.add(typeNode);
-//                }
-//                types.put(type, typeNode);
-//            }
-//            if (typeNode != null) {
-//                if (aggregation == 0) {
-//                    nodes.add(new RObjectNode(dobject));
-//                } else {
-//                    typeNode.add(dobject, heap);
-//                }
-//            }
-//        }
-//        
-//        if (nodes.isEmpty()) nodes.add(new TextNode("<No dominators found>"));
-//        return nodes.toArray(HeapWalkerNode.NO_NODES);
     }
     
     public static HeapWalkerNode[] getGCRoots(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
@@ -262,4 +228,5 @@ public class RObjectsProvider extends AbstractObjectsProvider {
             return nodes.toArray(HeapWalkerNode.NO_NODES);
         }
     }
+    
 }

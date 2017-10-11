@@ -109,16 +109,16 @@ class JavaScriptObjectsView extends HeapWalkerFeature {
                     case DOMINATORS:
                         switch (getAggregation()) {
                             case TYPES:
-                                return JavaScriptObjectsProvider.getDominators(root, heap, viewID, viewFilter, dataTypes, sortOrders, 1);
+                                return JavaScriptObjectsProvider.getDominators(root, JavaScriptObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 1);
                             default:
-                                return JavaScriptObjectsProvider.getDominators(root, heap, viewID, viewFilter, dataTypes, sortOrders, 0);
+                                return JavaScriptObjectsProvider.getDominators(root, JavaScriptObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 0);
                         }
                     case GC_ROOTS:
                         switch (getAggregation()) {
                             case TYPES:
-                                return JavaScriptObjectsProvider.getGCRoots(root, heap, viewID, viewFilter, dataTypes, sortOrders, 1);
+                                return JavaScriptObjectsProvider.getGCRoots(root, JavaScriptObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 1);
                             default:
-                                return JavaScriptObjectsProvider.getGCRoots(root, heap, viewID, viewFilter, dataTypes, sortOrders, 0);
+                                return JavaScriptObjectsProvider.getGCRoots(root, JavaScriptObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 0);
                         }
                     default:
                         return HeapWalkerNode.NO_NODES;

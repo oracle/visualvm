@@ -25,17 +25,16 @@
 package com.sun.tools.visualvm.truffle.heapwalker;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalker.v2.HeapFragment;
+import org.netbeans.modules.profiler.heapwalker.v2.utils.HeapUtils;
 
 /**
  *
@@ -48,15 +47,15 @@ public abstract class TruffleLanguageHeapFragment extends HeapFragment {
     }
 
     public Iterator<Instance> getInstancesIterator(String javaClassFqn) {
-        return new InstancesIterator(getSubclasses(heap, javaClassFqn));
+        return new InstancesIterator(HeapUtils.getSubclasses(heap, javaClassFqn));
     }
 
     public Iterator<DynamicObject> getDynamicObjectsIterator() {
-        return new DynamicObjectsIterator(getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
+        return new DynamicObjectsIterator(HeapUtils.getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
     }
 
     public Iterator<DynamicObject> getDynamicObjectsIterator(String languageID) {
-        Iterator<DynamicObject> dynIt = new DynamicObjectsIterator(getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
+        Iterator<DynamicObject> dynIt = new DynamicObjectsIterator(HeapUtils.getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
 
         return new LanguageFilterIterator(dynIt, languageID);
     }
@@ -144,21 +143,6 @@ public abstract class TruffleLanguageHeapFragment extends HeapFragment {
         public DynamicObject next() {
             return new DynamicObject(instancesIter.next());
         }
-    }
-
-    private static Collection<JavaClass> getSubclasses(Heap heap, String baseClass) {
-        List<JavaClass> subclasses = new ArrayList();
-
-        String escapedClassName = "\\Q" + baseClass + "\\E";
-        Collection<JavaClass> jClasses = heap.getJavaClassesByRegExp(escapedClassName);
-
-        for (JavaClass jClass : jClasses) {
-            Collection subclassesCol = jClass.getSubClasses();
-            subclasses.add(jClass); // instanceof approach rather than subclassof
-            subclasses.addAll(subclassesCol);
-        }
-
-        return subclasses;
     }
 
 }

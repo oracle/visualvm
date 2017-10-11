@@ -24,6 +24,7 @@
  */
 package com.sun.tools.visualvm.truffle.heapwalker.ruby;
 
+import com.sun.tools.visualvm.truffle.heapwalker.DynamicObject;
 import java.io.File;
 import java.io.IOException;
 import org.netbeans.lib.profiler.heap.Heap;
@@ -33,6 +34,7 @@ import org.netbeans.modules.profiler.heapwalker.v2.HeapContext;
 import org.netbeans.modules.profiler.heapwalker.v2.HeapFragment;
 import com.sun.tools.visualvm.truffle.heapwalker.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.truffle.heapwalker.TruffleLanguageSupport;
+import java.util.Iterator;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -56,6 +58,11 @@ class RubyHeapFragment extends TruffleLanguageHeapFragment {
     
     static RubyHeapFragment heap(Heap heap) {
         return (RubyHeapFragment)heap;
+    }
+    
+    
+    Iterator<DynamicObject> getRubyObjectsIterator() {
+        return getDynamicObjectsIterator(RubyObjectsProvider.RUBY_LANG_ID);
     }
     
     

@@ -109,9 +109,9 @@ class RObjectsView extends HeapWalkerFeature {
                     case DOMINATORS:
                         switch (getAggregation()) {
                             case TYPES:
-                                return RObjectsProvider.getDominators(root, heap, viewID, viewFilter, dataTypes, sortOrders, 1);
+                                return RObjectsProvider.getDominators(root, RObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 1);
                             default:
-                                return RObjectsProvider.getDominators(root, heap, viewID, viewFilter, dataTypes, sortOrders, 0);
+                                return RObjectsProvider.getDominators(root, RObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 0);
                         }
                     case GC_ROOTS:
                         switch (getAggregation()) {
