@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
@@ -54,8 +55,50 @@ public abstract class TruffleLanguageHeapFragment extends HeapFragment {
         return new DynamicObjectsIterator(getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
     }
 
+    public Iterator<DynamicObject> getDynamicObjectsIterator(String languageID) {
+        Iterator<DynamicObject> dynIt = new DynamicObjectsIterator(getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
+
+        return new LanguageFilterIterator(dynIt, languageID);
+    }
+
     private static String createFragmentDescription(Instance langInfo, Heap heap) {
         return DetailsSupport.getDetailsString(langInfo, heap);
+    }
+
+    private static class LanguageFilterIterator implements Iterator<DynamicObject> {
+        private final String languageID;
+        private final Iterator<DynamicObject> dynamicObjIterator;
+        private DynamicObject next;
+
+        private LanguageFilterIterator(Iterator<DynamicObject> dynIt, String langID) {
+            dynamicObjIterator = dynIt;
+            languageID = langID;
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (next != null) {
+                return true;
+            }
+            while (dynamicObjIterator.hasNext()) {
+                DynamicObject dynObj = dynamicObjIterator.next();
+                if (languageID.equals(dynObj.getLanguageId().getName())) {
+                    next = dynObj;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public DynamicObject next() {
+            if (hasNext()) {
+                DynamicObject dynObj = next;
+                next = null;
+                return dynObj;
+            }
+            throw new NoSuchElementException();
+        }
     }
 
     private class InstancesIterator implements Iterator<Instance> {
