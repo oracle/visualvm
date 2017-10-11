@@ -25,6 +25,8 @@
 
 package com.sun.tools.visualvm.sampler.cpu;
 
+import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.profiling.actions.ProfilerResultsAction;
 import com.sun.tools.visualvm.sampler.AbstractSamplerSupport;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -93,12 +95,12 @@ final class CPUView extends JPanel {
 
 
     CPUView(AbstractSamplerSupport.Refresher refresher, CPUSamplerSupport.SnapshotDumper
-            snapshotDumper, CPUSamplerSupport.ThreadDumper threadDumper) {
+            snapshotDumper, CPUSamplerSupport.ThreadDumper threadDumper, Application application) {
         this.refresher = refresher;
         this.snapshotDumper = snapshotDumper;
         this.threadDumper = threadDumper;
         
-        initComponents();
+        initComponents(application);
 
         addHierarchyListener(new HierarchyListener() {
             public void hierarchyChanged(HierarchyEvent e) {
@@ -154,7 +156,7 @@ final class CPUView extends JPanel {
     
     private AbstractButton threaddumpButton;
 
-    private void initComponents() {
+    private void initComponents(Application application) {
         setLayout(new BorderLayout());
         setOpaque(false);
         
@@ -205,6 +207,7 @@ final class CPUView extends JPanel {
                 toggles[2].setSelected(true);
             }
         };
+        cpuView.putClientProperty(ProfilerResultsAction.PROP_APPLICATION, application);
         
         // --- Toolbar ---------------------------------------------------------
         
