@@ -69,6 +69,15 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.netbeans.lib.profiler.ui</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.143</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.netbeans.modules.options.api</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -83,7 +92,7 @@
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>3</release-version>
-                        <specification-version>3.28</specification-version>
+                        <specification-version>3.29</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -97,9 +106,11 @@
                 </dependency>
                 <dependency>
                     <code-name-base>org.netbeans.modules.profiler.snaptracer</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.8.1</specification-version>
+                        <specification-version>1.25</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -179,6 +190,8 @@
                 <friend>com.sun.tools.visualvm.profiler</friend>
                 <friend>com.sun.tools.visualvm.profiler.startup</friend>
                 <friend>com.sun.tools.visualvm.sampler</friend>
+                <friend>org.graalvm.visualizer.dumpmethod</friend>
+                <package>com.sun.tools.visualvm.profiling.actions</package>
                 <package>com.sun.tools.visualvm.profiling.presets</package>
                 <package>com.sun.tools.visualvm.profiling.snapshot</package>
             </friend-packages>

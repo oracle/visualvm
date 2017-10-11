@@ -24,7 +24,10 @@
  */
 package com.sun.tools.visualvm.profiling.snapshot;
 
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.core.datasource.DataSource;
+import com.sun.tools.visualvm.profiling.actions.ProfilerResultsAction;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.io.File;
@@ -99,16 +102,13 @@ final class ProfilerSnapshotNPS extends ProfilerSnapshot {
     JComponent getUIComponent() {
         if (srw == null) {
             srw = SnapshotResultsWindow.get(loadedSnapshot, CommonConstants.SORTING_COLUMN_DEFAULT, false);
-//            try {
-//                JComponent cpuResPanel = (JComponent) srw.getComponent(0);
-//                cpuResPanel.setOpaque(false);
-//                JTabbedPane tabbedPane = (JTabbedPane) cpuResPanel.getComponent(0);
-//                JComponent infoPanel = (JComponent) tabbedPane.getComponentAt(tabbedPane.getTabCount() - 1);
-//                infoPanel.setBorder(BorderFactory.createEmptyBorder());
-//            } catch (Exception e) {
-//                Exceptions.printStackTrace(e);
-//            }
             srw.setPreferredSize(new Dimension(1, 1));
+            
+            DataSource master = getMaster();
+            if (master instanceof Application && srw.getComponentCount() > 0) {
+                Component c = srw.getComponent(0);
+                if (c instanceof JComponent) ((JComponent)c).putClientProperty(ProfilerResultsAction.PROP_APPLICATION, master);
+            }
         }
         return srw;
     }

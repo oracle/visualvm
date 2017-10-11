@@ -265,7 +265,7 @@ final class ApplicationProfilerView extends DataSourceView {
 //        }
         
         private ProfilingResultsSupport.ResultsView getResultsView(boolean cpu) {
-            return cpu ? new CPULivePanel() : new MemoryLivePanel();
+            return cpu ? new CPULivePanel(application) : new MemoryLivePanel(application);
         }
         
         private void handleCPUProfiling() {
