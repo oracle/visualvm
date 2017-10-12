@@ -391,6 +391,20 @@ public class RObject {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
 
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof RPairList) {
+                RPairList rlist = (RPairList) obj;
+                return pairListInstance.equals(rlist.pairListInstance);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return pairListInstance.hashCode();
+        }
+
         private String getName(Instance tag) {
             if (tag != null) {
                 if (tag.getJavaClass().getName().equals(RNULL_FQN)) {
