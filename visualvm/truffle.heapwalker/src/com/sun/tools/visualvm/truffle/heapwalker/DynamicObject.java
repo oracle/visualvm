@@ -328,12 +328,12 @@ public class DynamicObject {
         return dynClass != null;
     }
 
-    private boolean isLocationObjSubClass(Instance dynObj) {
+    private static boolean isLocationObjSubClass(Instance dynObj) {
         return isSubClassOf(dynObj, LOCATION_FQN);
     }
 
 
-    private class Property implements Field {
+    private static class Property implements Field {
 
         Instance property;
         Instance location;
