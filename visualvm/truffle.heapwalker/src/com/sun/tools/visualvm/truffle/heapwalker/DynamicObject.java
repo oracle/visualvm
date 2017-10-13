@@ -409,20 +409,10 @@ public class DynamicObject {
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
                 return getInstanceFieldValue(dynamicObject, "primitive" + (index + 1)); // NOI18N
             }
-            return new FieldValue() {
-                @Override
-                public Field getField() {
-                    return Property.this;
-                }
-
+            return new DynObjFieldValue(dynamicObject, this) {
                 @Override
                 public String getValue() {
                     return "Not implemented for " + className; // NOI18N
-                }
-
-                @Override
-                public Instance getDefiningInstance() {
-                    return dynamicObject;
                 }
             };
         }
@@ -492,87 +482,61 @@ public class DynamicObject {
             // throw new IllegalArgumentException(locationClassName);
         }
 
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof Property) {
+                Property p = (Property) obj;
+
+                return property.equals(p.property);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return property.hashCode();
+        }
+
         private FieldValue createFieldValue(final Instance i, final FieldValue fieldValue) {
             if (fieldValue instanceof ObjectFieldValue) {
-                return new ObjectFieldValue() {
+                return new DynObjObjectFieldValue(i, this) {
                     @Override
                     public Instance getInstance() {
                         return ((ObjectFieldValue) fieldValue).getInstance();
                     }
-
-                    @Override
-                    public Field getField() {
-                        return Property.this;
-                    }
-
                     @Override
                     public String getValue() {
                         return fieldValue.getValue();
                     }
-
-                    @Override
-                    public Instance getDefiningInstance() {
-                        return i;
-                    }
                 };
             }
-            return new FieldValue() {
-                @Override
-                public Field getField() {
-                    return Property.this;
-                }
-
+            return new DynObjFieldValue(i, this) {
                 @Override
                 public String getValue() {
                     return fieldValue.getValue();
-                }
-
-                @Override
-                public Instance getDefiningInstance() {
-                    return i;
                 }
             };
         }
 
         private FieldValue getFieldValue(final Instance dynamicObject, final String value) {
-            return new FieldValue() {
-                @Override
-                public Field getField() {
-                    return Property.this;
-                }
-
+            return new DynObjFieldValue(dynamicObject, this) {
                 @Override
                 public String getValue() {
                     return value;
-                }
-
-                @Override
-                public Instance getDefiningInstance() {
-                    return dynamicObject;
                 }
             };
         }
 
         private ObjectFieldValue getObjectFieldValue(final Instance dynamicObject, final Instance value) {
-            return new ObjectFieldValue() {
+            return new DynObjObjectFieldValue(dynamicObject, this) {
                 @Override
                 public Instance getInstance() {
                     return value;
                 }
 
                 @Override
-                public Field getField() {
-                    return Property.this;
-                }
-
-                @Override
                 public String getValue() {
                     return String.valueOf(value.getInstanceId());
-                }
-
-                @Override
-                public Instance getDefiningInstance() {
-                    return dynamicObject;
                 }
             };
         }
@@ -798,6 +762,48 @@ public class DynamicObject {
         @Override
         public String getName() {
             return name;
+        }
+    }
+
+    private abstract static class DynObjFieldValue implements FieldValue {
+        Instance definingInstance;
+        Property field;
+
+        private DynObjFieldValue(Instance i, Property p) {
+            definingInstance = i;
+            field = p;
+        }
+
+        @Override
+        public Field getField() {
+            return field;
+        }
+
+        @Override
+        public Instance getDefiningInstance() {
+            return definingInstance;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof DynObjFieldValue) {
+                DynObjFieldValue dfv = (DynObjFieldValue) obj;
+
+                return definingInstance.equals(dfv.definingInstance)
+                    && field.equals(dfv.field);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * definingInstance.hashCode() + field.hashCode();
+        }
+    }
+
+    private abstract static class DynObjObjectFieldValue extends DynObjFieldValue implements ObjectFieldValue {
+        private DynObjObjectFieldValue(Instance i, Property p) {
+            super(i,p);
         }
     }
 }

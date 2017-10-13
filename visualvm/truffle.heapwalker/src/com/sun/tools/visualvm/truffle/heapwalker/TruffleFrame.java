@@ -285,6 +285,21 @@ public class TruffleFrame {
         public String getValue() {
             return value;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof TruffleField) {
+                TruffleField tfv = (TruffleField) obj;
+                return definingInstance.equals(tfv.definingInstance)
+                    && field.equals(tfv.field);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * definingInstance.hashCode() + field.hashCode();
+        }
     }
 
     private class TruffleObjectField extends TruffleField implements ObjectFieldValue {
@@ -332,6 +347,22 @@ public class TruffleFrame {
         @Override
         public Type getType() {
             return type;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof FrameField) {
+                FrameField ff = (FrameField) obj;
+
+                return definingClass.equals(ff.definingClass)
+                    && name.equals(ff.name);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * definingClass.hashCode() + name.hashCode();
         }
     }
 

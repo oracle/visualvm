@@ -517,6 +517,22 @@ public class RObject {
         public Instance getDefiningInstance() {
             return instance;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof RFieldValue) {
+                RFieldValue rfv = (RFieldValue) obj;
+
+                return instance.equals(rfv.getDefiningInstance())
+                     && index == rfv.index;
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * instance.hashCode() + index;
+        }
     }
 
     private class RLogicalFieldValue extends RFieldValue {
@@ -588,6 +604,22 @@ public class RObject {
         @Override
         public Instance getDefiningInstance() {
             return instance;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof RFieldValue) {
+                RFieldValue rfv = (RFieldValue) obj;
+
+                return instance.equals(rfv.getDefiningInstance())
+                     && index == rfv.index;
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * instance.hashCode() + index;
         }
     }
     
