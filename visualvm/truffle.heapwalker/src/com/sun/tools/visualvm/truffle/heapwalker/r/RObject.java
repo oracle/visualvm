@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.netbeans.lib.profiler.heap.ArrayItemValue;
 import org.netbeans.lib.profiler.heap.Field;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Instance;
@@ -40,6 +41,7 @@ import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.lib.profiler.heap.Type;
+import org.netbeans.lib.profiler.heap.Value;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
@@ -272,6 +274,62 @@ public class RObject {
             frame = new TruffleFrame(frameInstance);
         }
         return frame;
+    }
+
+    List<FieldValue> getReferences() {
+        List<Value> refs = instance.getReferences();
+        List<FieldValue> robjRefs = new ArrayList();
+
+        for (Value ref : refs) {
+            Instance defInstance = ref.getDefiningInstance();
+            if (ref instanceof ArrayItemValue) {
+                if (defInstance instanceof ObjectArrayInstance) {
+                    List<Value> arrRefs = defInstance.getReferences();
+
+                    for (Value arrRef : arrRefs) {
+                        Instance rInstance = arrRef.getDefiningInstance();
+
+                        if (RObject.isRObject(rInstance)) {
+                            RObject robject = new RObject(rInstance);
+                            int index = ((ArrayItemValue)ref).getIndex();
+
+                            robjRefs.add(robject.getFieldValues().get(index));
+                        }
+                        addAttribute(defInstance, robjRefs);
+                    }
+                }
+            }
+            if (defInstance != null && defInstance.getJavaClass().getName().equals(RPAIR_LIST_FQN)) {
+                RObject robject = new RObject(defInstance);
+
+                robjRefs.add(robject.getFieldValues().get(0));
+            }
+            addAttribute(defInstance, robjRefs);
+        }
+        return robjRefs;
+    }
+
+    private void addAttribute(Instance instance, List<FieldValue> robjRefs) {
+        if (DynamicObject.isDynamicObject(instance)) {
+            List<Value> refs = instance.getReferences();
+
+            for (Value ref : refs) {
+                Instance defInstance = ref.getDefiningInstance();
+
+                if (RObject.isRObject(defInstance)) {
+                    RObject robject = new RObject(defInstance);
+                    DynamicObject attrs = robject.getAttributes();
+
+                    if (attrs != null) {
+                        for (FieldValue fv : attrs.getFieldValues()) {
+                            if (fv.getDefiningInstance().equals(instance)) {
+                                robjRefs.add(fv);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private class RPairList implements ObjectArrayInstance {
