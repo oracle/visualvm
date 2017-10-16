@@ -60,6 +60,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
 import javax.swing.BorderFactory;
@@ -1302,6 +1303,12 @@ public class ProfilerTreeTable extends ProfilerTable {
             if (internal) return;
             
             TreePath selected = e.getPath();
+            
+            // NOTE: workaround to not break scrollRectToVisible() when there's
+            //       an expanded node above the selection.
+            //       Can be detected by e.getPath() != tree.getSelectionPath().
+            if (!Objects.equals(selected, tree.getSelectionPath())) return;
+            
             int row = selected == null ? -1 : tree.getRowForPath(selected);
             try {
                 internal = true;
