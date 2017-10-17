@@ -61,7 +61,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                     return !DataType.COUNT.equals(dataType);
                 }
                 protected HeapWalkerNode createNode(DynamicObject dobject) {
-                    return new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, heap);
+                    return new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, dobject.getType(heap));
                 }
                 protected Iterator<DynamicObject> objectsIterator(int index) {
                     Iterator<DynamicObject> dobjects = fragment.getJavaScriptObjectsIterator();
@@ -129,7 +129,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                 }
                 protected HeapWalkerNode createNode(Instance instance) {
                     DynamicObject dobject = new DynamicObject(instance);
-                    return new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, heap);
+                    return new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, dobject.getType(heap));
                 }
                 protected Iterator<Instance> objectsIterator(int index) {
                     return dominators.listIterator(index);
@@ -190,7 +190,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                 }
                 protected HeapWalkerNode createNode(Instance instance) {
                     DynamicObject dobject = new DynamicObject(instance);
-                    return new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, heap);
+                    return new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, dobject.getType(heap));
                 }
                 protected Iterator<Instance> objectsIterator(int index) {
                     return gcRoots.listIterator(index);

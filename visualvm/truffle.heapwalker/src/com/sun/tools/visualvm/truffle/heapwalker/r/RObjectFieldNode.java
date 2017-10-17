@@ -73,6 +73,11 @@ public class RObjectFieldNode extends RObjectNode {
     }
     
     
+    public RObjectNode createCopy() {
+        return new RObjectNode(getRObject(), getType());
+    }
+    
+    
     public static class Renderer extends MultiRenderer implements HeapWalkerRenderer {
         
         private final NormalBoldGrayRenderer fieldRenderer;

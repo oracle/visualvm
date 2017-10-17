@@ -79,6 +79,21 @@ public class RObjectsContainer extends ContainerNode<RObject> {
     }
     
     
+    public RObjectsContainer createCopy() {
+        RObjectsContainer copy = new RObjectsContainer(name, maxNodes);
+        setupCopy(copy);
+        return copy;
+    }
+    
+    protected void setupCopy(RObjectsContainer copy) {
+        super.setupCopy(copy);
+        copy.items.addAll(items); // TODO: should be shared (add protected constructor to access this.items)
+        copy.count = count;
+        copy.ownSize = ownSize;
+        copy.retainedSize = retainedSize;
+    }
+    
+    
     public static class Renderer extends LabelRenderer implements HeapWalkerRenderer {
         
         public Renderer() {

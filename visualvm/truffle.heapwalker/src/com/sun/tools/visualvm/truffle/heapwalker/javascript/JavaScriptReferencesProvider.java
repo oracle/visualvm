@@ -73,7 +73,7 @@ public class JavaScriptReferencesProvider extends HeapWalkerNode.Provider {
             protected HeapWalkerNode createNode(Integer index) {
                 FieldValue reference = references.get(index);
                 DynamicObject dobject = new DynamicObject(reference.getDefiningInstance());
-                return new JavaScriptNodes.JavaScriptDynamicObjectReferenceNode(dobject, reference, heap);
+                return new JavaScriptNodes.JavaScriptDynamicObjectReferenceNode(dobject, dobject.getType(heap), reference);
             }
             protected Iterator<Integer> objectsIterator(int index) {
                 return integerIterator(index, references.size());

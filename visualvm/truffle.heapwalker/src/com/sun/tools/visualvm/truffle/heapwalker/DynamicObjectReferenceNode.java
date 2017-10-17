@@ -39,7 +39,6 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NormalBoldGrayRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerRenderer;
 
 /**
@@ -51,16 +50,14 @@ public class DynamicObjectReferenceNode extends DynamicObjectNode {
     private final FieldValue field;
     
     private String fieldName;
-    private final Heap heap;
     
-    public DynamicObjectReferenceNode(DynamicObject dobject, FieldValue value, Heap heap) {
-        super(dobject, heap);
+    public DynamicObjectReferenceNode(DynamicObject dobject, String type, FieldValue value) {
+        super(dobject, type);
         this.field = value;
-        this.heap = heap;
     }
     
     
-    String getFieldName() {
+    public String getFieldName() {
         if (fieldName == null) fieldName = (field.getField().isStatic() ? "static " : "") + field.getField().getName();
         return fieldName;
     }
@@ -69,7 +66,7 @@ public class DynamicObjectReferenceNode extends DynamicObjectNode {
 //        return fieldName;
 //    }
     
-    FieldValue getField() {
+    public FieldValue getField() {
         return field;
     }
     
@@ -82,7 +79,7 @@ public class DynamicObjectReferenceNode extends DynamicObjectNode {
             ObjectFieldValue ovalue = (ObjectFieldValue)value;
             Instance toSearch = ovalue.getInstance();
             
-            System.err.println(">>> Computing referrer for " + DetailsSupport.getDetailsString(toSearch, heap));
+//            System.err.println(">>> Computing referrer for " + DetailsSupport.getDetailsString(toSearch, heap));
 //            System.err.println(">>>     VALUES " + DetailsSupport.getDetailsString(ovalue.getInstance(), heap) + " | " + DetailsSupport.getDetailsString(ovalue.getDefiningInstance(), heap));
             
             List<FieldValue> fields = new ArrayList(dobject.getFieldValues());
@@ -92,7 +89,7 @@ public class DynamicObjectReferenceNode extends DynamicObjectNode {
             for (FieldValue field : fields) {
                 if (!(field instanceof ObjectFieldValue)) continue;
                 
-                System.err.println(">>> ANALYZING FIELD " + field.getField().getName() + " value " + DetailsSupport.getDetailsString(((ObjectFieldValue)field).getInstance(), heap));
+//                System.err.println(">>> ANALYZING FIELD " + field.getField().getName() + " value " + DetailsSupport.getDetailsString(((ObjectFieldValue)field).getInstance(), heap));
                 if (toSearch.equals(((ObjectFieldValue)field).getInstance()))
                     return field.getField().getName();
             }
@@ -110,6 +107,11 @@ public class DynamicObjectReferenceNode extends DynamicObjectNode {
 
     public int hashCode() {
         return field.hashCode();
+    }
+    
+    
+    public DynamicObjectNode createCopy() {
+        return null;
     }
     
     

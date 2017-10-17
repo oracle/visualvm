@@ -88,8 +88,12 @@ class JavaScriptThreadsObjects {
 
                         Instance instance = ((ObjectFieldValue)fv).getInstance();
                         if (instance == null) continue;
-                        if (!DynamicObject.isDynamicObject(instance)) localObjects.add(new LocalObjectNode(instance));
-                        else localObjects.add(new JavaScriptNodes.JavaScriptLocalDynamicObjectNode(new DynamicObject(instance), heap));
+                        if (!DynamicObject.isDynamicObject(instance)) {
+                            localObjects.add(new LocalObjectNode(instance));
+                        } else {
+                            DynamicObject dobject = new DynamicObject(instance);
+                            localObjects.add(new JavaScriptNodes.JavaScriptLocalDynamicObjectNode(dobject, dobject.getType(heap)));
+                        }
 
                     }
     //                List<FieldValue> fields = f.getFieldValues();

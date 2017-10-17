@@ -147,7 +147,8 @@ public class RubyFieldsProvider extends HeapWalkerNode.Provider {
         if (field instanceof ObjectFieldValue) {
             Instance instance = ((ObjectFieldValue)field).getInstance();
             if (DynamicObject.isDynamicObject(instance)) {
-                return new RubyNodes.RubyDynamicObjectFieldNode(new DynamicObject(instance), field, heap);
+                DynamicObject dobject = new DynamicObject(instance);
+                return new RubyNodes.RubyDynamicObjectFieldNode(dobject, dobject.getType(heap), field);
             } else {
                 return new InstanceReferenceNode.Field((ObjectFieldValue)field, false);
             }

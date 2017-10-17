@@ -93,6 +93,17 @@ class RObjectNode extends InstanceNode {
     }
     
     
+    public RObjectNode createCopy() {
+        RObjectNode copy = new RObjectNode(robject, type);
+        setupCopy(copy);
+        return copy;
+    }
+    
+    protected void setupCopy(RObjectNode copy) {
+        super.setupCopy(copy);
+    }
+    
+    
     public static class Renderer extends NormalBoldGrayRenderer implements HeapWalkerRenderer {
         
         private static final Icon ICON = RSupport.createBadgedIcon(LanguageIcons.INSTANCE);

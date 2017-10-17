@@ -49,7 +49,7 @@ import org.netbeans.modules.profiler.heapwalker.v2.model.TextNode;
  */
 class RubyThreadsObjects {
     
-    private static final String JS_THREAD_NAME_PREFIX = "Ruby Thread";
+    private static final String RUBY_THREAD_NAME_PREFIX = "Ruby Thread";
     
     
     static HeapWalkerNode[] getThreads(RootNode rootNode, Heap heap) {
@@ -64,7 +64,7 @@ class RubyThreadsObjects {
             for (TruffleStackTraces.StackTrace st : threads) {
                 Instance threadInstance = st.getThread();
                 String threadName = DetailsSupport.getDetailsString(threadInstance, heap);
-                if (threadName == null || !threadName.startsWith(JS_THREAD_NAME_PREFIX)) continue;
+                if (threadName == null || !threadName.startsWith(RUBY_THREAD_NAME_PREFIX)) continue;
                 
                 final List<HeapWalkerNode> stackFrameNodes = new ArrayList();
                 ThreadNode threadNode = new ThreadNode(threadName, threadInstance) {
@@ -88,8 +88,12 @@ class RubyThreadsObjects {
 
                         Instance instance = ((ObjectFieldValue)fv).getInstance();
                         if (instance == null) continue;
-                        if (!DynamicObject.isDynamicObject(instance)) localObjects.add(new LocalObjectNode(instance));
-                        else localObjects.add(new RubyNodes.RubyLocalDynamicObjectNode(new DynamicObject(instance), heap));
+                        if (!DynamicObject.isDynamicObject(instance)) {
+                            localObjects.add(new LocalObjectNode(instance));
+                        } else {
+                            DynamicObject dobject = new DynamicObject(instance);
+                            localObjects.add(new RubyNodes.RubyLocalDynamicObjectNode(dobject, dobject.getType(heap)));
+                        }
 
                     }
     //                List<FieldValue> fields = f.getFieldValues();

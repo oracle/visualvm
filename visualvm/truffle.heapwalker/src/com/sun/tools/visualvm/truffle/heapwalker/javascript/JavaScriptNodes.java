@@ -91,12 +91,8 @@ class JavaScriptNodes {
     }
     
     
-    static class JavaScriptDynamicObjectNode extends DynamicObjectNode {
+    static class JavaScriptDynamicObjectNode extends DynamicObjectNode implements JavaScriptNode {
         
-        JavaScriptDynamicObjectNode(DynamicObject dobject, Heap heap) {
-            super(dobject, heap);
-        }
-
         JavaScriptDynamicObjectNode(DynamicObject dobject, String type) {
             super(dobject, type);
         }
@@ -107,9 +103,20 @@ class JavaScriptNodes {
             return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
         }
         
+        
+        public JavaScriptDynamicObjectNode createCopy() {
+            JavaScriptDynamicObjectNode copy = new JavaScriptDynamicObjectNode(getDynamicObject(), getType());
+            setupCopy(copy);
+            return copy;
+        }
+
+        protected void setupCopy(JavaScriptDynamicObjectNode copy) {
+            super.setupCopy(copy);
+        }
+        
     }
     
-    static class JavaScriptDynamicObjectsContainer extends DynamicObjectsContainer {
+    static class JavaScriptDynamicObjectsContainer extends DynamicObjectsContainer implements JavaScriptNode {
         
         JavaScriptDynamicObjectsContainer(String name) {
             super(name);
@@ -122,39 +129,60 @@ class JavaScriptNodes {
         protected JavaScriptDynamicObjectNode createNode(DynamicObject dobject) {
             return new JavaScriptDynamicObjectNode(dobject, name);
         }
+        
+        
+        public JavaScriptDynamicObjectsContainer createCopy() {
+            JavaScriptDynamicObjectsContainer copy = new JavaScriptDynamicObjectsContainer(name, maxNodes);
+            setupCopy(copy);
+            return copy;
+        }
+
+        protected void setupCopy(JavaScriptDynamicObjectsContainer copy) {
+            super.setupCopy(copy);
+        }
 
     }
     
-    static class JavaScriptDynamicObjectFieldNode extends DynamicObjectFieldNode {
+    static class JavaScriptDynamicObjectFieldNode extends DynamicObjectFieldNode implements JavaScriptNode {
         
-        JavaScriptDynamicObjectFieldNode(DynamicObject dobject, FieldValue field, Heap heap) {
-            super(dobject, field, heap);
+        JavaScriptDynamicObjectFieldNode(DynamicObject dobject, String type, FieldValue field) {
+            super(dobject, type, field);
         }
         
         protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
             String logicalValue = JavaScriptNodes.getLogicalValue(dobject, type, heap);
             return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
+        }
+        
+        
+        public JavaScriptDynamicObjectNode createCopy() {
+            return new JavaScriptDynamicObjectNode(getDynamicObject(), getType());
         }
         
     }
     
-    static class JavaScriptDynamicObjectReferenceNode extends DynamicObjectReferenceNode {
+    static class JavaScriptDynamicObjectReferenceNode extends DynamicObjectReferenceNode implements JavaScriptNode {
         
-        JavaScriptDynamicObjectReferenceNode(DynamicObject dobject, FieldValue value, Heap heap) {
-            super(dobject, value, heap);
+        JavaScriptDynamicObjectReferenceNode(DynamicObject dobject, String type, FieldValue value) {
+            super(dobject, type, value);
         }
         
         protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
             String logicalValue = JavaScriptNodes.getLogicalValue(dobject, type, heap);
             return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
+        }
+        
+        
+        public JavaScriptDynamicObjectNode createCopy() {
+            return new JavaScriptDynamicObjectNode(getDynamicObject(), getType()); 
         }
         
     }
     
-    static class JavaScriptLocalDynamicObjectNode extends LocalDynamicObjectNode {
+    static class JavaScriptLocalDynamicObjectNode extends LocalDynamicObjectNode implements JavaScriptNode {
         
-        JavaScriptLocalDynamicObjectNode(DynamicObject dobject, Heap heap) {
-            super(dobject, heap);
+        JavaScriptLocalDynamicObjectNode(DynamicObject dobject, String type) {
+            super(dobject, type);
         }
         
         protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
@@ -162,6 +190,14 @@ class JavaScriptNodes {
             return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
         }
         
+        
+        public JavaScriptDynamicObjectNode createCopy() {
+            return new JavaScriptDynamicObjectNode(getDynamicObject(), getType()); 
+        }
+        
     }
+    
+    
+    static interface JavaScriptNode {}
     
 }

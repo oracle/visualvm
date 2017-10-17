@@ -37,8 +37,13 @@ import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerRenderer;
  */
 public class LocalDynamicObjectNode extends DynamicObjectNode {
     
-    public LocalDynamicObjectNode(DynamicObject dobject, Heap heap) {
-        super(dobject, heap);
+    public LocalDynamicObjectNode(DynamicObject dobject, String type) {
+        super(dobject, type);
+    }
+    
+    
+    public DynamicObjectNode createCopy() {
+        return null;
     }
     
     

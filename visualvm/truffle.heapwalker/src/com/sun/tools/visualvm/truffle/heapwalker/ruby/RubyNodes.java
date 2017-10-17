@@ -117,12 +117,8 @@ class RubyNodes {
     }
     
     
-    static class RubyDynamicObjectNode extends DynamicObjectNode {
+    static class RubyDynamicObjectNode extends DynamicObjectNode implements RubyNode {
         
-        RubyDynamicObjectNode(DynamicObject dobject, Heap heap) {
-            super(dobject, heap);
-        }
-
         RubyDynamicObjectNode(DynamicObject dobject, String type) {
             super(dobject, type);
         }
@@ -133,9 +129,20 @@ class RubyNodes {
             return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
         }
         
+        
+        public RubyDynamicObjectNode createCopy() {
+            RubyDynamicObjectNode copy = new RubyDynamicObjectNode(getDynamicObject(), getType());
+            setupCopy(copy);
+            return copy;
+        }
+
+        protected void setupCopy(RubyDynamicObjectNode copy) {
+            super.setupCopy(copy);
+        }
+        
     }
     
-    static class RubyDynamicObjectsContainer extends DynamicObjectsContainer {
+    static class RubyDynamicObjectsContainer extends DynamicObjectsContainer implements RubyNode {
         
         RubyDynamicObjectsContainer(String name) {
             super(name);
@@ -145,16 +152,28 @@ class RubyNodes {
             super(name, maxObjects);
         }
         
+        
         protected RubyDynamicObjectNode createNode(DynamicObject dobject) {
             return new RubyDynamicObjectNode(dobject, name);
         }
+        
+        
+        public RubyDynamicObjectsContainer createCopy() {
+            RubyDynamicObjectsContainer copy = new RubyDynamicObjectsContainer(name, maxNodes);
+            setupCopy(copy);
+            return copy;
+        }
 
+        protected void setupCopy(RubyDynamicObjectNode copy) {
+            super.setupCopy(copy);
+        }
+        
     }
     
-    static class RubyDynamicObjectFieldNode extends DynamicObjectFieldNode {
+    static class RubyDynamicObjectFieldNode extends DynamicObjectFieldNode implements RubyNode {
         
-        RubyDynamicObjectFieldNode(DynamicObject dobject, FieldValue field, Heap heap) {
-            super(dobject, field, heap);
+        RubyDynamicObjectFieldNode(DynamicObject dobject, String type, FieldValue field) {
+            super(dobject, type, field);
         }
         
         protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
@@ -162,12 +181,17 @@ class RubyNodes {
             return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
         }
         
+        
+        public RubyDynamicObjectNode createCopy() {
+            return new RubyDynamicObjectNode(getDynamicObject(), getType());
+        }
+        
     }
     
-    static class RubyDynamicObjectReferenceNode extends DynamicObjectReferenceNode {
+    static class RubyDynamicObjectReferenceNode extends DynamicObjectReferenceNode implements RubyNode {
         
-        RubyDynamicObjectReferenceNode(DynamicObject dobject, FieldValue value, Heap heap) {
-            super(dobject, value, heap);
+        RubyDynamicObjectReferenceNode(DynamicObject dobject, String type, FieldValue value) {
+            super(dobject, type, value);
         }
         
         protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
@@ -175,12 +199,17 @@ class RubyNodes {
             return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
         }
         
+        
+        public RubyDynamicObjectNode createCopy() {
+            return new RubyDynamicObjectNode(getDynamicObject(), getType());
+        }
+        
     }
     
-    static class RubyLocalDynamicObjectNode extends LocalDynamicObjectNode {
+    static class RubyLocalDynamicObjectNode extends LocalDynamicObjectNode implements RubyNode {
         
-        RubyLocalDynamicObjectNode(DynamicObject dobject, Heap heap) {
-            super(dobject, heap);
+        RubyLocalDynamicObjectNode(DynamicObject dobject, String type) {
+            super(dobject, type);
         }
         
         protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
@@ -188,6 +217,14 @@ class RubyNodes {
             return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
         }
         
+        
+        public RubyDynamicObjectNode createCopy() {
+            return new RubyDynamicObjectNode(getDynamicObject(), getType());
+        }
+        
     }
+    
+    
+    static interface RubyNode {}
     
 }

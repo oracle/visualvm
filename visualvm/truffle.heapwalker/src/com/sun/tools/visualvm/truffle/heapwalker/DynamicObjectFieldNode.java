@@ -46,18 +46,18 @@ public class DynamicObjectFieldNode extends DynamicObjectNode {
     private String fieldName;
     
     
-    public DynamicObjectFieldNode(DynamicObject dobject, FieldValue field, Heap heap) {
-        super(dobject, heap);
+    public DynamicObjectFieldNode(DynamicObject dobject, String type, FieldValue field) {
+        super(dobject, type);
         this.field = field;
     }
     
     
-    String getFieldName() {
+    public String getFieldName() {
         if (fieldName == null) fieldName = (field.getField().isStatic() ? "static " : "") + field.getField().getName();
         return fieldName;
     }
     
-    FieldValue getField() {
+    public FieldValue getField() {
         return field;
     }
     
@@ -70,6 +70,11 @@ public class DynamicObjectFieldNode extends DynamicObjectNode {
 
     public int hashCode() {
         return field.hashCode();
+    }
+    
+    
+    public DynamicObjectNode createCopy() {
+        return null;
     }
     
     

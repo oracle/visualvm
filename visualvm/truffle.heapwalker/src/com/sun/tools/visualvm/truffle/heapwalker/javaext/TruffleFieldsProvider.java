@@ -87,8 +87,9 @@ abstract class TruffleFieldsProvider extends HeapWalkerNode.Provider {
         if (field instanceof ObjectFieldValue) {
             ObjectFieldValue objectField = (ObjectFieldValue)field;
             Instance fieldInstance = objectField.getInstance();
-            if (DynamicObject.isDynamicObject(fieldInstance)){
-                return new DynamicObjectFieldNode(new DynamicObject(fieldInstance), field, heap);
+            if (DynamicObject.isDynamicObject(fieldInstance)) {
+                DynamicObject dobject = new DynamicObject(fieldInstance);
+                return new DynamicObjectFieldNode(dobject, dobject.getType(heap), field);
             } else {
                 return new InstanceReferenceNode.Field(objectField, false);
             }

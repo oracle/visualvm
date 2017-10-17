@@ -79,6 +79,21 @@ public class DynamicObjectsContainer extends ContainerNode<DynamicObject> {
     }
     
     
+    public DynamicObjectsContainer createCopy() {
+        DynamicObjectsContainer copy = new DynamicObjectsContainer(name, maxNodes);
+        setupCopy(copy);
+        return copy;
+    }
+    
+    protected void setupCopy(DynamicObjectsContainer copy) {
+        super.setupCopy(copy);
+        copy.items.addAll(items); // TODO: should be shared (add protected constructor to access this.items)
+        copy.count = count;
+        copy.ownSize = ownSize;
+        copy.retainedSize = retainedSize;
+    }
+    
+    
     public static class Renderer extends LabelRenderer implements HeapWalkerRenderer {
         
         public Renderer(Icon icon) {

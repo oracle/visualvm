@@ -44,9 +44,9 @@ public class DynamicObjectNode extends InstanceNode {
     private String logicalValue;
     
     
-    public DynamicObjectNode(DynamicObject dobject, Heap heap) {
-        this(dobject, dobject.getType(heap));
-    }
+//    public DynamicObjectNode(DynamicObject dobject, Heap heap) {
+//        this(dobject, dobject.getType(heap));
+//    }
     
     public DynamicObjectNode(DynamicObject dobject, String type) {
         super(dobject.getInstance());
@@ -83,6 +83,19 @@ public class DynamicObjectNode extends InstanceNode {
         if (type == DynamicObject.DATA_TYPE) return getDynamicObject();
         
         return super.getValue(type, heap);
+    }
+    
+    
+    public DynamicObjectNode createCopy() {
+        DynamicObjectNode copy = new DynamicObjectNode(dobject, type);
+        setupCopy(copy);
+        return copy;
+    }
+    
+    protected void setupCopy(DynamicObjectNode copy) {
+        super.setupCopy(copy);
+        copy.nameString = nameString;
+        copy.logicalValue = logicalValue;
     }
     
     
