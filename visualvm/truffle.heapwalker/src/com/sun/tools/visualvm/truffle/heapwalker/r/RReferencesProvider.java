@@ -33,13 +33,11 @@ import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.HeapProgress;
 import org.netbeans.modules.profiler.heapwalker.v2.HeapFragment;
-import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceReferenceNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.UIThresholds;
 import org.netbeans.modules.profiler.heapwalker.v2.utils.NodesComputer;
-import static org.netbeans.modules.profiler.heapwalker.v2.utils.NodesComputer.integerIterator;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -95,7 +93,7 @@ public class RReferencesProvider extends HeapWalkerNode.Provider {
 
             protected HeapWalkerNode createNode(Integer index) {
                 FieldValue reference = references.get(index);
-                return InstanceReferenceNode.incoming(reference);
+                return new RObjectReferenceNode(reference);
             }
 
             protected Iterator<Integer> objectsIterator(int index) {

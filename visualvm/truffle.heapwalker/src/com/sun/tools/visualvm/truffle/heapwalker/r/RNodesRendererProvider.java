@@ -51,6 +51,8 @@ public class RNodesRendererProvider extends HeapWalkerRenderer.Provider {
         
         renderers.put(RObjectFieldNode.class, new RObjectFieldNode.Renderer(heap));
         
+        renderers.put(RObjectReferenceNode.class, new RObjectReferenceNode.Renderer(heap));
+        
         
         // --- reused from Java ------------------------------------------------
         
