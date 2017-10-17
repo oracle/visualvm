@@ -26,14 +26,23 @@
 package com.sun.tools.visualvm.heapdump.impl;
 
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
-import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import com.sun.tools.visualvm.heapdump.HeapDump;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import org.netbeans.api.actions.Openable;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
+import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -41,6 +50,10 @@ import org.openide.util.NbBundle;
  * @author Tomas Hurka
  */
 public class HeapDumpCategory extends SnapshotCategory<HeapDump> {
+    
+    private static final Logger LOGGER =
+            Logger.getLogger(HeapDumpCategory.class.getName());
+    
     private static final String HPROF_HEADER = "JAVA PROFILE 1.0";
     private static final long MIN_HPROF_SIZE = 1024*1024L;
     private static final String NAME = NbBundle.getMessage(HeapDumpCategory.class, "LBL_Heap_Dumps");   // NOI18N
@@ -56,7 +69,39 @@ public class HeapDumpCategory extends SnapshotCategory<HeapDump> {
     }
     
     public void openSnapshot(File file) {
-        DataSourceWindowManager.sharedInstance().openDataSource(new HeapDumpImpl(file, null));
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                ProgressHandle pHandle = null;
+                try {
+                    pHandle = ProgressHandleFactory.createHandle(
+                            NbBundle.getMessage(HeapDumpCategory.class,
+                                                "MSG_Opening_Heap_Dump")); // NOI18N
+                    pHandle.setInitialDelay(0);
+                    pHandle.start();
+                    try {
+                        FileObject fileObject = FileUtil.toFileObject(file);
+                        DataObject dobj = DataObject.find(fileObject);
+                        Openable openCookie = dobj.getLookup().lookup(Openable.class);
+                        openCookie.open();
+                    } catch (Exception e) {
+                        LOGGER.log(Level.INFO, "Error loading profiler snapshot", e); // NOI18N
+                        // TODO: enable once HeapDump module is a friend of Profiler API
+//                        SwingUtilities.invokeLater(new Runnable() {
+//                            public void run() {
+//                                ProfilerDialogs.displayError(
+//                                        NbBundle.getMessage(HeapDumpCategory.class,
+//                                                            "MSG_Opening_Heap_Dump_failed")); // NOI18N
+//                            }   
+//                        });
+                    }
+                } finally {
+                    final ProgressHandle pHandleF = pHandle;
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() { if (pHandleF != null) pHandleF.finish(); }
+                    });
+                }
+            }
+        });
     }
 
     protected boolean isSnapshot(File file) {
