@@ -47,7 +47,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
-@ServiceProvider(service = HeapWalkerNode.Provider.class, position = 210)
+@ServiceProvider(service = HeapWalkerNode.Provider.class, position = 200)
 public class RItemsProvider extends HeapWalkerNode.Provider {
 
     public String getName() {

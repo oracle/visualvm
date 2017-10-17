@@ -48,7 +48,7 @@ import org.openide.util.lookup.ServiceProvider;
 @NbBundle.Messages({
     "RReferencesProvider_References=Computing references..."
 })
-@ServiceProvider(service = HeapWalkerNode.Provider.class, position = 450)
+@ServiceProvider(service = HeapWalkerNode.Provider.class, position = 300)
 public class RReferencesProvider extends HeapWalkerNode.Provider {
 
     public String getName() {

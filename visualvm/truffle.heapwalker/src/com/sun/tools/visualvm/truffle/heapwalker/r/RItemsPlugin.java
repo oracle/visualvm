@@ -99,7 +99,7 @@ class RItemsPlugin extends HeapViewPlugin {
         objectsView.reloadView();
     }
 
-    @ServiceProvider(service = HeapViewPlugin.Provider.class, position = 500)
+    @ServiceProvider(service = HeapViewPlugin.Provider.class, position = 200)
     public static class Provider extends HeapViewPlugin.Provider {
 
         public HeapViewPlugin createPlugin(HeapContext context, HeapWalkerActions actions, String viewID) {

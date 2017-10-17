@@ -47,7 +47,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
-@ServiceProvider(service = HeapWalkerNode.Provider.class, position = 210)
+@ServiceProvider(service = HeapWalkerNode.Provider.class, position = 100)
 public class RAttributesProvider extends HeapWalkerNode.Provider {
 
     // TODO: will be configurable, ideally by instance
