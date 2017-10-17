@@ -63,7 +63,7 @@ public class RAttributesProvider extends HeapWalkerNode.Provider {
     }
 
     public boolean supportsNode(HeapWalkerNode parent, Heap heap, String viewID) {
-        if (parent instanceof RObjectNode) {
+        if (parent instanceof RObjectNode && !(parent instanceof RObjectReferenceNode)) {
             RObject robject = HeapWalkerNode.getValue(parent, RObject.DATA_TYPE, heap);
             if (robject != null && robject.getAttributes() != null) return true;
         }

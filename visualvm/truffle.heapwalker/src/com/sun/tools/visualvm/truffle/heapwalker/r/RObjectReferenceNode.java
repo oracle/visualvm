@@ -122,7 +122,7 @@ public class RObjectReferenceNode extends RObjectNode {
                         setBoldValue(name);
                     }
                     inRenderer.setText(node.isRField() ? "in" : "attribute in");
-                    setIcon(Icons.getIcon(ProfilerIcons.NODE_FORWARD));
+                    setIcon(Icons.getIcon(ProfilerIcons.NODE_REVERSE));
                 }
             };
             

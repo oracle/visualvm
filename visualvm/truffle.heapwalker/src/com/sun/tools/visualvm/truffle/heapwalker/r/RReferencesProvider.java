@@ -24,7 +24,6 @@
  */
 package com.sun.tools.visualvm.truffle.heapwalker.r;
 
-import com.sun.tools.visualvm.truffle.heapwalker.TruffleFrame;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.SortOrder;
@@ -60,21 +59,7 @@ public class RReferencesProvider extends HeapWalkerNode.Provider {
     }
 
     public boolean supportsNode(HeapWalkerNode parent, Heap heap, String viewID) {
-        if (parent instanceof RObjectNode) {
-            RObject robject = HeapWalkerNode.getValue(parent, RObject.DATA_TYPE, heap);
-            if (robject != null) {
-                if (robject.getFieldValues().isEmpty()) {
-                    TruffleFrame frame = robject.getFrame();
-                    if (frame != null) {
-                        return frame.isTruffleFrame();
-                    } else {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
+        return parent instanceof RObjectNode && !(parent instanceof RObjectFieldNode);
     }
 
     public HeapWalkerNode[] getNodes(HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
