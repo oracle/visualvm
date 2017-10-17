@@ -24,15 +24,9 @@
  */
 package com.sun.tools.visualvm.truffle.heapwalker;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.Icon;
-import org.netbeans.lib.profiler.heap.ArrayItemValue;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.lib.profiler.heap.Value;
 import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.MultiRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NormalBoldGrayRenderer;
@@ -61,41 +55,9 @@ public class DynamicObjectReferenceNode extends DynamicObjectNode {
         if (fieldName == null) fieldName = (field.getField().isStatic() ? "static " : "") + field.getField().getName();
         return fieldName;
     }
-//    String getFieldName() {
-//        if (fieldName == null) fieldName = computeFieldName(getDynamicObject(), value);
-//        return fieldName;
-//    }
     
     public FieldValue getField() {
         return field;
-    }
-    
-    
-    // TODO: should use some kind of API?
-    private String computeFieldName(DynamicObject dobject, Value value) {
-        if (value instanceof ArrayItemValue) return "[" + ((ArrayItemValue)value).getIndex() + "]";
-        
-        if (value instanceof ObjectFieldValue) {
-            ObjectFieldValue ovalue = (ObjectFieldValue)value;
-            Instance toSearch = ovalue.getInstance();
-            
-//            System.err.println(">>> Computing referrer for " + DetailsSupport.getDetailsString(toSearch, heap));
-//            System.err.println(">>>     VALUES " + DetailsSupport.getDetailsString(ovalue.getInstance(), heap) + " | " + DetailsSupport.getDetailsString(ovalue.getDefiningInstance(), heap));
-            
-            List<FieldValue> fields = new ArrayList(dobject.getFieldValues());
-            fields.addAll(dobject.getStaticFieldValues());
-            
-//            System.err.println(">>> SEARCHING for referrer of instance " + instance);
-            for (FieldValue field : fields) {
-                if (!(field instanceof ObjectFieldValue)) continue;
-                
-//                System.err.println(">>> ANALYZING FIELD " + field.getField().getName() + " value " + DetailsSupport.getDetailsString(((ObjectFieldValue)field).getInstance(), heap));
-                if (toSearch.equals(((ObjectFieldValue)field).getInstance()))
-                    return field.getField().getName();
-            }
-        }
-        
-        return "<unknown field>";
     }
     
     
