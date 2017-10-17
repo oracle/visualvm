@@ -309,9 +309,9 @@ public class RObject {
         return robjRefs;
     }
 
-    private void addAttribute(Instance instance, List<FieldValue> robjRefs) {
-        if (DynamicObject.isDynamicObject(instance)) {
-            List<Value> refs = instance.getReferences();
+    private void addAttribute(Instance dynObjInstance, List<FieldValue> robjRefs) {
+        if (DynamicObject.isDynamicObject(dynObjInstance)) {
+            List<Value> refs = dynObjInstance.getReferences();
 
             for (Value ref : refs) {
                 Instance defInstance = ref.getDefiningInstance();
@@ -320,10 +320,14 @@ public class RObject {
                     RObject robject = new RObject(defInstance);
                     DynamicObject attrs = robject.getAttributes();
 
-                    if (attrs != null) {
+                    if (attrs != null && attrs.getInstance().equals(dynObjInstance)) {
                         for (FieldValue fv : attrs.getFieldValues()) {
-                            if (fv.getDefiningInstance().equals(instance)) {
-                                robjRefs.add(fv);
+                            if (fv instanceof ObjectFieldValue) {
+                                ObjectFieldValue ofv = (ObjectFieldValue) fv;
+
+                                if (ofv.getInstance().equals(instance)) {
+                                    robjRefs.add(fv);
+                                }
                             }
                         }
                     }
