@@ -24,14 +24,20 @@
  */
 package com.sun.tools.visualvm.truffle.heapwalker.r;
 
-import javax.swing.Icon;
+import java.awt.Image;
+import javax.swing.ImageIcon;
 import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NormalBoldGrayRenderer;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
+import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
+import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerRenderer;
+import org.openide.util.ImageUtilities;
 
 /**
  *
@@ -106,7 +112,8 @@ class RObjectNode extends InstanceNode {
     
     public static class Renderer extends NormalBoldGrayRenderer implements HeapWalkerRenderer {
         
-        private static final Icon ICON = RSupport.createBadgedIcon(LanguageIcons.INSTANCE);
+        private static final ImageIcon ICON = RSupport.createBadgedIcon(LanguageIcons.INSTANCE);
+        private static final Image IMAGE_LOOP = Icons.getImage(HeapWalkerIcons.LOOP);
         
         private final Heap heap;
         
@@ -115,15 +122,26 @@ class RObjectNode extends InstanceNode {
         }
         
         public void setValue(Object value, int row) {
-            RObjectNode node = (RObjectNode)value;
+            HeapWalkerNode loop = HeapWalkerNode.getValue((HeapWalkerNode)value, DataType.LOOP, heap);
+            boolean isLoop = loop != null;
+            RObjectNode node = isLoop ? (RObjectNode)loop : (RObjectNode)value;
             
-            setNormalValue("");
-            setBoldValue(node.getName(heap));
+            String name = node.getName(heap);
+            if (name != null && !"null".equals(name)) {
+                super.setNormalValue(isLoop ? "loop to " : "");
+                super.setBoldValue(name);
+            } else {
+                super.setNormalValue("null");
+                super.setBoldValue(null);
+            }
             
             String logValue = DetailsSupport.getDetailsString(node.getInstance(), heap);
             setGrayValue(logValue == null ? "" : " : " + logValue);
             
-            setIcon(ICON);
+            setIcon(isLoop ? new ImageIcon(ImageUtilities.mergeImages(ICON.getImage(), IMAGE_LOOP, 0, 0)) : ICON);   
+            
+            setIconTextGap(isLoop ? 4 : 1);
+            ((LabelRenderer)valueRenderers()[0]).setMargin(3, isLoop ? 3 : 0, 3, 0);
         }
         
         public String getShortName() {

@@ -25,7 +25,6 @@
 package com.sun.tools.visualvm.truffle.heapwalker.r;
 
 import java.awt.Image;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.openide.util.ImageUtilities;
@@ -36,7 +35,7 @@ import org.openide.util.ImageUtilities;
  */
 class RSupport {
     
-    static Icon createBadgedIcon(String key) {
+    static ImageIcon createBadgedIcon(String key) {
         String path = RSupport.class.getPackage().getName().replace('.', '/') + "/r_badge.png";
         Image image = ImageUtilities.loadImage(path, true);
         return new ImageIcon(ImageUtilities.mergeImages(Icons.getImage(key), image, 0, 0));

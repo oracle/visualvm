@@ -33,6 +33,8 @@ import org.netbeans.lib.profiler.ui.swing.renderer.NormalBoldGrayRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
+import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerRenderer;
 
 /**
@@ -85,7 +87,11 @@ public class RObjectFieldNode extends RObjectNode {
         private final RObjectNode.Renderer robjectRenderer;
         private final ProfilerRenderer[] renderers;
         
+        private final Heap heap;
+        
         public Renderer(Heap heap) {
+            this.heap = heap;
+            
             fieldRenderer = new NormalBoldGrayRenderer() {
                 public void setValue(Object value, int row) {
                     RObjectFieldNode node = (RObjectFieldNode)value;
@@ -115,7 +121,11 @@ public class RObjectFieldNode extends RObjectNode {
         }
         
         public void setValue(Object value, int row) {
-            fieldRenderer.setValue(value, row);
+            HeapWalkerNode node = (HeapWalkerNode)value;
+            HeapWalkerNode loop = HeapWalkerNode.getValue(node, DataType.LOOP, heap);
+            if (loop != null) node = loop;
+        
+            fieldRenderer.setValue(node, row);
             robjectRenderer.setValue(value, row);
         }
         
