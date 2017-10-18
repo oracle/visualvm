@@ -55,6 +55,7 @@ public class DynamicObject {
     static final String DYNAMIC_OBJECT_FQN = "com.oracle.truffle.api.object.DynamicObject";
     private static final String LOCATION_FQN = "com.oracle.truffle.api.object.Location";
     private static final String ENTERPRISE_PACKAGE = "com.oracle.truffle.object.enterprise";
+    private static final String ENTERPRISE_LOCATION_TOP_CLASS = ENTERPRISE_PACKAGE+".EnterpriseLocations";
     private static final String PROPERTY_MAP_FQN = "com.oracle.truffle.object.ConsListPropertyMap";
     private static final String TRIE_PROPERTY_MAP_FQN = "com.oracle.truffle.object.TriePropertyMap";
     private static final String PROPERTY_FQN = "com.oracle.truffle.object.PropertyImpl";
@@ -543,6 +544,9 @@ public class DynamicObject {
 
         private FieldValue getEnterpriseValue(Instance loc, String className, Instance dynamicObject) {
             if (className.length()-ENTERPRISE_PACKAGE.length() < 5) {   // obfuscated enterprise classes
+                return getObfuscatedEnperpriseValue(loc, className, dynamicObject);
+            }
+            if (className.length()-ENTERPRISE_LOCATION_TOP_CLASS.length() < 3) { // obfuscated enterprise inner classes
                 return getObfuscatedEnperpriseValue(loc, className, dynamicObject);
             }
             if (className.endsWith("Decorator")) {  // NOI18N
