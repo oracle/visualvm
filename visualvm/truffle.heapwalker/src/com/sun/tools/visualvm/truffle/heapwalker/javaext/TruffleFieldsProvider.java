@@ -102,7 +102,7 @@ abstract class TruffleFieldsProvider extends HeapWalkerNode.Provider {
     protected abstract List<FieldValue> getFields(HeapWalkerNode parent, Heap heap);
     
     
-    @ServiceProvider(service=HeapWalkerNode.Provider.class, position = 220)
+    @ServiceProvider(service=HeapWalkerNode.Provider.class, position = 1000)
     public static class InstanceFieldsProvider extends TruffleFieldsProvider {
         
         // TODO: will be configurable, ideally by instance
@@ -114,7 +114,7 @@ abstract class TruffleFieldsProvider extends HeapWalkerNode.Provider {
         }
 
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("java_");
+            return viewID.startsWith("java_") && !viewID.endsWith("_truffleext");
         }
 
         public boolean supportsNode(HeapWalkerNode parent, Heap heap, String viewID) {

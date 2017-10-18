@@ -22,22 +22,20 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.truffle.heapwalker.javaext;
+package com.sun.tools.visualvm.truffle.heapwalker.r;
 
-import com.sun.tools.visualvm.truffle.heapwalker.DynamicObject;
-import com.sun.tools.visualvm.truffle.heapwalker.TruffleFrame;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.SortOrder;
-import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalker.v2.HeapContext;
-import org.netbeans.modules.profiler.heapwalker.v2.java.JavaHeapFragment;
+import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceNode;
+import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceNodeRenderer;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
@@ -45,67 +43,54 @@ import org.netbeans.modules.profiler.heapwalker.v2.model.RootNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.TextNode;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapViewPlugin;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerActions;
+import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerRenderer;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.TreeTableView;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.TreeTableViewColumn;
-import org.openide.util.ImageUtilities;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class TruffleFieldsPlugin extends HeapViewPlugin {
+class RJavaViewPlugin extends HeapViewPlugin {
     
     private final Heap heap;
     private Instance selected;
     
     private final TreeTableView objectsView;
     
-
-    public TruffleFieldsPlugin(HeapContext context, HeapWalkerActions actions) {
-        super("Truffle Fields", "Truffle Fields", graalIcon());
+    
+    public RJavaViewPlugin(HeapContext context, HeapWalkerActions actions) {
+        super("Java Object", "Java Object", Icons.getIcon(GeneralIcons.JAVA_PROCESS));
         
         heap = context.getFragment().getHeap();
         
-        objectsView = new TreeTableView("truffle_objects_fields", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
+        objectsView = new TreeTableView("java_objects_truffleext", context, actions, TreeTableViewColumn.instances(heap, false)) {
             protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
-                List<FieldValue> fields = null;
-                
-                if (DynamicObject.isDynamicObject(selected)) {
-                    fields = new ArrayList();
-                    DynamicObject dobj = new DynamicObject(selected);
-                    fields.addAll(dobj.getFieldValues());
-                    fields.addAll(dobj.getStaticFieldValues());
-                } else if (TruffleFrame.isTruffleFrame(selected)) {
-                    fields = new ArrayList();
-                    TruffleFrame tframe = new TruffleFrame(selected);
-                    fields.addAll(tframe.getFieldValues());
-                }
-                
-                HeapWalkerNode[] nodes = TruffleFieldsProvider.getNodes(fields, root, heap, viewID, viewFilter, dataTypes, sortOrders);
-                return nodes == null ? new HeapWalkerNode[] { new TextNode("<no DynamicObject or TruffleFrame selected>") } : nodes;
+                InstanceNode instanceNode = selected == null ? null : new InstanceNodeWrapper(selected);
+                HeapWalkerNode result = instanceNode == null ? new TextNode("<no instance selected>") : instanceNode;
+                return new HeapWalkerNode[] { result };
+            }
+            protected void childrenChanged() {
+                HeapWalkerNode[] children = getRoot().getChildren();
+                for (HeapWalkerNode child : children) expandNode(child);
             }
         };
     }
 
+    
     protected JComponent createComponent() {
         return objectsView.getComponent();
     }
     
     
     protected void nodeSelected(HeapWalkerNode node, boolean adjusting) {
-        Instance instance = node == null ? null : HeapWalkerNode.getValue(node, DataType.INSTANCE, heap);
-        
-        if (Objects.equals(instance, selected)) return;
-        selected = instance;
+        Instance selectedInstance = node == null ? null : HeapWalkerNode.getValue(node, DataType.INSTANCE, heap);
+        if (Objects.equals(selected, selectedInstance)) return;
+
+        selected = selectedInstance;
         
         objectsView.reloadView();
-    }
-    
-    
-    private static Icon graalIcon() {
-        String path = DynamicObject.class.getPackage().getName().replace('.', '/') + "/GraalVM.png";
-        return new ImageIcon(ImageUtilities.loadImage(path, true));
     }
     
     
@@ -113,10 +98,29 @@ class TruffleFieldsPlugin extends HeapViewPlugin {
     public static class Provider extends HeapViewPlugin.Provider {
 
         public HeapViewPlugin createPlugin(HeapContext context, HeapWalkerActions actions, String viewID) {
-            if (JavaHeapFragment.isJavaHeap(context)) return new TruffleFieldsPlugin(context, actions);
+            if (RHeapFragment.isRHeap(context)) return new RJavaViewPlugin(context, actions);
             return null;
         }
         
+    }
+    
+    
+    private static class InstanceNodeWrapper extends InstanceNode {
+        
+        InstanceNodeWrapper(Instance instance) {
+            super(instance);
+        }
+        
+    }
+    
+    
+    @ServiceProvider(service=HeapWalkerRenderer.Provider.class)
+    public static class InstanceNodeWrapperRendererProvider extends HeapWalkerRenderer.Provider {
+
+        public void registerRenderers(Map<Class<? extends HeapWalkerNode>, HeapWalkerRenderer> renderers, HeapContext context) {
+            renderers.put(InstanceNodeWrapper.class, new InstanceNodeRenderer( context.getFragment().getHeap()));
+        }
+
     }
     
 }
