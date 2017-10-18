@@ -25,6 +25,7 @@
 package com.sun.tools.visualvm.truffle.heapwalker.r;
 
 import java.awt.Image;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
@@ -112,8 +113,8 @@ class RObjectNode extends InstanceNode {
     
     public static class Renderer extends NormalBoldGrayRenderer implements HeapWalkerRenderer {
         
-        private static final ImageIcon ICON = RSupport.createBadgedIcon(LanguageIcons.INSTANCE);
-        private static final Image IMAGE_LOOP = Icons.getImage(HeapWalkerIcons.LOOP);
+        private static final Icon ICON = RSupport.createBadgedIcon(LanguageIcons.INSTANCE);
+        private static Icon LOOP_ICON;
         
         private final Heap heap;
         
@@ -138,14 +139,24 @@ class RObjectNode extends InstanceNode {
             String logValue = DetailsSupport.getDetailsString(node.getInstance(), heap);
             setGrayValue(logValue == null ? "" : " : " + logValue);
             
-            setIcon(isLoop ? new ImageIcon(ImageUtilities.mergeImages(ICON.getImage(), IMAGE_LOOP, 0, 0)) : ICON);   
+            setIcon(isLoop ? loopIcon() : ICON);   
             
-            setIconTextGap(isLoop ? 4 : 1);
-            ((LabelRenderer)valueRenderers()[0]).setMargin(3, isLoop ? 3 : 0, 3, 0);
+            setIconTextGap(isLoop ? 4 : 0);
+            ((LabelRenderer)valueRenderers()[0]).setMargin(3, isLoop ? 3 : 2, 3, 0);
         }
         
         public String getShortName() {
             return getBoldValue();
+        }
+        
+        
+        private static Icon loopIcon() {
+            if (LOOP_ICON == null) {
+                Image iconImage = ImageUtilities.icon2Image(ICON);
+                Image loopImage = Icons.getImage(HeapWalkerIcons.LOOP);
+                LOOP_ICON = new ImageIcon(ImageUtilities.mergeImages(iconImage, loopImage, 0, 0));
+            }
+            return LOOP_ICON;
         }
         
     }

@@ -24,12 +24,19 @@
  */
 package com.sun.tools.visualvm.truffle.heapwalker;
 
+import java.awt.Image;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NormalBoldGrayRenderer;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
+import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerRenderer;
+import org.openide.util.ImageUtilities;
 
 /**
  *
@@ -43,10 +50,6 @@ public class DynamicObjectNode extends InstanceNode {
     private String nameString;
     private String logicalValue;
     
-    
-//    public DynamicObjectNode(DynamicObject dobject, Heap heap) {
-//        this(dobject, dobject.getType(heap));
-//    }
     
     public DynamicObjectNode(DynamicObject dobject, String type) {
         super(dobject.getInstance());
@@ -101,33 +104,52 @@ public class DynamicObjectNode extends InstanceNode {
     
     public static class Renderer extends NormalBoldGrayRenderer implements HeapWalkerRenderer {
         
-        private final Icon icon;       
+        private static final Image IMAGE_LOOP = Icons.getImage(HeapWalkerIcons.LOOP);
+        
+        private final Icon icon;
+        private Icon loopIcon;
+        
         private final Heap heap;
         
         public Renderer(Heap heap, Icon icon) {
             this.heap = heap;
             this.icon = icon;
-            
-//            ((LabelRenderer)valueRenderers()[0]).setMargin(3, 3, 3, 0);
         }
         
         public void setValue(Object value, int row) {
-            DynamicObjectNode node = (DynamicObjectNode)value;
+            HeapWalkerNode loop = HeapWalkerNode.getValue((HeapWalkerNode)value, DataType.LOOP, heap);
+            boolean isLoop = loop != null;
+            DynamicObjectNode node = isLoop ? (DynamicObjectNode)loop : (DynamicObjectNode)value;
             
-            setBoldValue(node.getName(heap));
+            String name = node.getName(heap);
+            if (name != null && !"null".equals(name)) {
+                super.setNormalValue(isLoop ? "loop to " : "");
+                super.setBoldValue(name);
+            } else {
+                super.setNormalValue("null");
+                super.setBoldValue(null);
+            }
             
-//            setBoldValue(" " + node.getLogicalValue(heap));
-//            
-//            setGrayValue(" (" + node.getShapeString() + ")");
-
-            setGrayValue(" : " + node.getLogicalValue(heap));
+            String logValue = node.getLogicalValue(heap);
+            setGrayValue(logValue == null ? "" : " : " + logValue);
             
-            setIcon(icon);
-            setIconTextGap(0);
+            setIcon(isLoop ? loopIcon() : icon);   
+            
+            setIconTextGap(isLoop ? 4 : 0);
+            ((LabelRenderer)valueRenderers()[0]).setMargin(3, isLoop ? 3 : 2, 3, 0);
         }
         
         public String getShortName() {
             return getBoldValue();
+        }
+        
+        
+        private Icon loopIcon() {
+            if (loopIcon == null) {
+                Image loopImage = ImageUtilities.icon2Image(icon);
+                loopIcon = new ImageIcon(ImageUtilities.mergeImages(loopImage, IMAGE_LOOP, 0, 0));
+            }
+            return loopIcon;
         }
         
     }
