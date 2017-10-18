@@ -295,7 +295,7 @@ public class RObject {
 
                             robjRefs.add(robject.getFieldValues().get(index));
                         }
-                        addAttribute(defInstance, robjRefs);
+                        addAttribute(rInstance, robjRefs);
                     }
                 }
             }
