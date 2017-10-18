@@ -300,9 +300,9 @@ public class RObject {
                 }
             }
             if (defInstance != null && defInstance.getJavaClass().getName().equals(RPAIR_LIST_FQN)) {
-                RObject robject = new RObject(defInstance);
+                FieldValue rootReference = findRootRPairList(defInstance);
 
-                robjRefs.add(robject.getFieldValues().get(0));
+                robjRefs.add(rootReference);
             }
             addAttribute(defInstance, robjRefs);
         }
@@ -334,6 +334,34 @@ public class RObject {
                 }
             }
         }
+    }
+
+    private FieldValue findRootRPairList(Instance pairList) {
+        int index = 0;
+
+        for (Instance parent = getParentRlist(pairList); parent != null; parent = getParentRlist(parent)) {
+            index++;
+            pairList = parent;
+        }
+        return new RObject(pairList).getFieldValues().get(index);
+    }
+
+    private Instance getParentRlist(Instance pairList) {
+        List<Value> refs = pairList.getReferences();
+
+        if (refs.size() == 1) {
+           Value val = refs.get(0);
+
+           if (val instanceof ObjectFieldValue) {
+               ObjectFieldValue fval = (ObjectFieldValue) val;
+               Instance parent = fval.getDefiningInstance();
+
+               if (parent.getJavaClass().getName().equals(RPAIR_LIST_FQN) && fval.getField().getName().equals("cdr")) {
+                   return parent;
+               }
+           }
+        }
+        return null;
     }
 
     private class RPairList implements ObjectArrayInstance {
