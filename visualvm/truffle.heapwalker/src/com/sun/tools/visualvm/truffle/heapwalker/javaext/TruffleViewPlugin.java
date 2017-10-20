@@ -37,6 +37,7 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.heapwalker.v2.HeapContext;
 import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceNode;
+import org.netbeans.modules.profiler.heapwalker.v2.java.JavaHeapFragment;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
@@ -114,8 +115,9 @@ class TruffleViewPlugin extends HeapViewPlugin {
     public static class Provider extends HeapViewPlugin.Provider {
 
         public HeapViewPlugin createPlugin(HeapContext context, HeapWalkerActions actions, String viewID) {
-            if (viewID.startsWith("java_")) return new TruffleViewPlugin(context, actions);
-            return null;
+            if (!JavaHeapFragment.isJavaHeap(context)) return null;
+            if (!DynamicObject.hasDynamicObject(context.getFragment().getHeap())) return null;
+            return new TruffleViewPlugin(context, actions);
         }
         
     }
