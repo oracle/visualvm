@@ -25,7 +25,6 @@
 package com.sun.tools.visualvm.truffle.heapwalker;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import javax.swing.JComponent;
 import javax.swing.SortOrder;
@@ -34,9 +33,7 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalker.v2.HeapContext;
-import org.netbeans.modules.profiler.heapwalker.v2.HeapFragment;
 import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceNode;
-import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceNodeRenderer;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
@@ -44,7 +41,6 @@ import org.netbeans.modules.profiler.heapwalker.v2.model.RootNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.TextNode;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapViewPlugin;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerActions;
-import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerRenderer;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.TreeTableView;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.TreeTableViewColumn;
 import org.openide.util.lookup.ServiceProvider;
@@ -66,15 +62,20 @@ class JavaViewPlugin extends HeapViewPlugin {
         
         heap = context.getFragment().getHeap();
         
-        objectsView = new TreeTableView("java_objects_truffleext", context, actions, TreeTableViewColumn.instances(heap, false)) {
+        objectsView = new TreeTableView("java_objects_truffleext", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
             protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
-                InstanceNode instanceNode = selected == null ? null : new InstanceNodeWrapper(selected);
+                InstanceNode instanceNode = selected == null ? null : new InstanceNode(selected);
                 HeapWalkerNode result = instanceNode == null ? new TextNode("<no instance selected>") : instanceNode;
                 return new HeapWalkerNode[] { result };
             }
             protected void childrenChanged() {
                 HeapWalkerNode[] children = getRoot().getChildren();
                 for (HeapWalkerNode child : children) expandNode(child);
+                
+                if (children.length > 0) {
+                    children = children[0].getChildren();
+                    if (children.length > 0 && children[0] instanceof TextNode) expandNode(children[0]);
+                }
             }
         };
     }
@@ -99,30 +100,10 @@ class JavaViewPlugin extends HeapViewPlugin {
     public static class Provider extends HeapViewPlugin.Provider {
 
         public HeapViewPlugin createPlugin(HeapContext context, HeapWalkerActions actions, String viewID) {
-            HeapFragment fragment = context.getFragment();
-            if (fragment instanceof TruffleLanguageHeapFragment && !fragment.getID().startsWith("r_")) return new JavaViewPlugin(context, actions);
+            if (viewID.startsWith("javascript_") || viewID.startsWith("ruby_")) return new JavaViewPlugin(context, actions);
             return null;
         }
         
-    }
-    
-    
-    private static class InstanceNodeWrapper extends InstanceNode {
-        
-        InstanceNodeWrapper(Instance instance) {
-            super(instance);
-        }
-        
-    }
-    
-    
-    @ServiceProvider(service=HeapWalkerRenderer.Provider.class)
-    public static class InstanceNodeWrapperRendererProvider extends HeapWalkerRenderer.Provider {
-
-        public void registerRenderers(Map<Class<? extends HeapWalkerNode>, HeapWalkerRenderer> renderers, HeapContext context) {
-            renderers.put(InstanceNodeWrapper.class, new InstanceNodeRenderer( context.getFragment().getHeap()));
-        }
-
     }
     
 }

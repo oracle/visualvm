@@ -44,7 +44,7 @@ import org.openide.util.lookup.ServiceProvider;
 class RubyFieldsPlugin extends TruffleFieldsPlugin {
     
     public RubyFieldsPlugin(HeapContext context, HeapWalkerActions actions) {
-        super("Variables", "Variables", context, actions);
+        super("Variables", "Variables", "ruby_objects_fields", context, actions);
     }
     
     

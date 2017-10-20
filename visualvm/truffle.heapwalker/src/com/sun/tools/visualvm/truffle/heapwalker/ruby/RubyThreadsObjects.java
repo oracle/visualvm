@@ -25,6 +25,7 @@
 package com.sun.tools.visualvm.truffle.heapwalker.ruby;
 
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObject;
+import com.sun.tools.visualvm.truffle.heapwalker.TruffleStackFrameNode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -36,7 +37,6 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalker.v2.java.LocalObjectNode;
-import org.netbeans.modules.profiler.heapwalker.v2.java.StackFrameNode;
 import org.netbeans.modules.profiler.heapwalker.v2.java.ThreadNode;
 import com.sun.tools.visualvm.truffle.heapwalker.TruffleStackTraces;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
@@ -97,7 +97,7 @@ class RubyThreadsObjects {
 
                     }
     //                List<FieldValue> fields = f.getFieldValues();
-                    stackFrameNodes.add(new StackFrameNode(f.getName(), localObjects.toArray(HeapWalkerNode.NO_NODES)));
+                    stackFrameNodes.add(new TruffleStackFrameNode(f.getName(), localObjects.toArray(HeapWalkerNode.NO_NODES)));
     //                sb.append("    at "+f.getName()+"()");
     //                sb.append("<br>");  // NOI18N
     //

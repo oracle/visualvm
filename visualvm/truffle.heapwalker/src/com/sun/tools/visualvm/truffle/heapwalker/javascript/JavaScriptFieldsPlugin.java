@@ -44,7 +44,7 @@ import org.openide.util.lookup.ServiceProvider;
 class JavaScriptFieldsPlugin extends TruffleFieldsPlugin {
     
     public JavaScriptFieldsPlugin(HeapContext context, HeapWalkerActions actions) {
-        super("Properties", "Properties", context, actions);
+        super("Properties", "Properties", "javascript_objects_fields", context, actions);
     }
     
     

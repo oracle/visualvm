@@ -43,7 +43,7 @@ import org.openide.util.lookup.ServiceProvider;
 class RubyReferencesPlugin extends TruffleReferencesPlugin {
     
     public RubyReferencesPlugin(HeapContext context, HeapWalkerActions actions) {
-        super(context, actions);
+        super("ruby_objects_references", context, actions);
     }
     
     

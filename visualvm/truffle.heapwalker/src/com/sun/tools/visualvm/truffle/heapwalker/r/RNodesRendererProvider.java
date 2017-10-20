@@ -27,10 +27,6 @@ package com.sun.tools.visualvm.truffle.heapwalker.r;
 import java.util.Map;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.modules.profiler.heapwalker.v2.HeapContext;
-import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceReferenceNode;
-import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceReferenceNodeRenderer;
-import org.netbeans.modules.profiler.heapwalker.v2.java.PrimitiveNode;
-import org.netbeans.modules.profiler.heapwalker.v2.java.PrimitiveNodeRenderer;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerRenderer;
 import org.openide.util.lookup.ServiceProvider;
@@ -41,6 +37,10 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service=HeapWalkerRenderer.Provider.class)
 public class RNodesRendererProvider extends HeapWalkerRenderer.Provider {
+    
+    public boolean supportsView(HeapContext context, String viewID) {
+        return true;
+    }
 
     public void registerRenderers(Map<Class<? extends HeapWalkerNode>, HeapWalkerRenderer> renderers, HeapContext context) {
         Heap heap = context.getFragment().getHeap();
@@ -52,15 +52,6 @@ public class RNodesRendererProvider extends HeapWalkerRenderer.Provider {
         renderers.put(RObjectFieldNode.class, new RObjectFieldNode.Renderer(heap));
         
         renderers.put(RObjectReferenceNode.class, new RObjectReferenceNode.Renderer(heap));
-        
-        
-        // --- reused from Java ------------------------------------------------
-        
-        // primitive fields & items
-        renderers.put(PrimitiveNode.class, new PrimitiveNodeRenderer());
-        
-        // object fields & items
-        renderers.put(InstanceReferenceNode.class, new InstanceReferenceNodeRenderer(heap)); 
     }
     
 }

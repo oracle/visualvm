@@ -55,6 +55,15 @@ class RHeapFragment extends TruffleLanguageHeapFragment {
         return R_HEAP_ID.equals(context.getFragment().getID()); // NOI18N
     }
     
+    public static HeapContext getRContext(HeapContext context) {
+        if (isRHeap(context)) return context;
+        
+        for (HeapContext otherContext : context.getOtherContexts())
+            if (isRHeap(otherContext)) return otherContext;
+        
+        return null;
+    }
+    
     static RHeapFragment heap(Heap heap) {
         return (RHeapFragment)heap;
     }

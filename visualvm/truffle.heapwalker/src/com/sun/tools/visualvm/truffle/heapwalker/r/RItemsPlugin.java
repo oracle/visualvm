@@ -60,7 +60,7 @@ class RItemsPlugin extends HeapViewPlugin {
 
         heap = context.getFragment().getHeap();
 
-        objectsView = new TreeTableView("r_attributes_fields", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
+        objectsView = new TreeTableView("r_objects_items", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
             protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
                 List<FieldValue> fields = null;
 

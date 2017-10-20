@@ -28,7 +28,6 @@ import java.awt.CardLayout;
 import java.awt.event.ItemEvent;
 import java.net.URL;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
@@ -36,7 +35,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.SortOrder;
-import javax.swing.SwingWorker;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.results.CCTNode;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
@@ -49,12 +47,11 @@ import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
 import org.netbeans.modules.profiler.heapwalker.v2.model.RootNode;
-import org.netbeans.modules.profiler.heapwalker.v2.swing.HTMLTextComponent;
+import org.netbeans.modules.profiler.heapwalker.v2.ui.HTMLView;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerActions;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerFeature;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.PluggableTreeTableView;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.TreeTableViewColumn;
-import org.openide.util.Exceptions;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -63,23 +60,24 @@ import org.openide.util.lookup.ServiceProvider;
  */
 public class JavaScriptThreadsView extends HeapWalkerFeature {
     
-    private final HeapContext context;
+    private static final String FEATURE_ID = "javascript_threads"; // NOI18N
+    private static final String VIEW_OBJECTS_ID = FEATURE_ID + "_objects"; // NOI18N
+    private static final String VIEW_HTML_ID = FEATURE_ID + "_html"; // NOI18N
     
     private JComponent component;
     private ProfilerToolbar toolbar;
     private ProfilerToolbar pluginsToolbar;
     
-    private HTMLTextComponent htmlView;
+    private final HTMLView htmlView;
     private final PluggableTreeTableView objectsView;
     
     
     public JavaScriptThreadsView(HeapContext context, HeapWalkerActions actions) {
-        super("javascript_threads_objects", "Thread", "Thread", JavaScriptSupport.createBadgedIcon(ProfilerIcons.WINDOW_THREADS), 300);
+        super(FEATURE_ID, "Thread", "Thread", JavaScriptSupport.createBadgedIcon(ProfilerIcons.WINDOW_THREADS), 300);
         
-        this.context = context;
         Heap heap = context.getFragment().getHeap();
         
-        objectsView = new PluggableTreeTableView("javascript_threads", context, actions, TreeTableViewColumn.instances(heap, false)) {
+        objectsView = new PluggableTreeTableView(VIEW_OBJECTS_ID, context, actions, TreeTableViewColumn.instances(heap, false)) {
             protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
                 return JavaScriptThreadsObjects.getThreads(root, heap);
             }
@@ -89,6 +87,15 @@ public class JavaScriptThreadsView extends HeapWalkerFeature {
             }
         };
         objectsView.setViewName("Thread");
+        
+        htmlView = new HTMLView(VIEW_HTML_ID, context, actions, "<br>&nbsp;&nbsp;computing thread...") {
+            protected String computeData(HeapContext context, String viewID) {
+                return JavaScriptThreadsHTML.getThreads(context);
+            }
+            protected HeapWalkerNode nodeForURL(URL url, HeapContext context) {
+                return JavaScriptThreadsHTML.getNode(url, context);
+            }
+        };
     }
     
 
@@ -152,31 +159,7 @@ public class JavaScriptThreadsView extends HeapWalkerFeature {
             toolbar.add(pluginsToolbar);
         }
         
-
-        htmlView = new HTMLTextComponent("<br>&nbsp;&nbsp;computing thread...") {
-            protected void showURL(URL url) {
-//                resultsController.showURL(url);
-            }
-            protected void firstDisplayed() {
-                new SwingWorker<String, String>() {
-                    protected String doInBackground() throws Exception {
-                        return JavaScriptThreadsHTML.getThreads(context);
-                    }
-                    protected void done() {
-                        try {
-                            htmlView.setText(get());
-                            if (htmlView.getDocument().getLength() > 0) htmlView.setCaretPosition(0);
-                        } catch (InterruptedException ex) {
-                            Exceptions.printStackTrace(ex);
-                        } catch (ExecutionException ex) {
-                            Exceptions.printStackTrace(ex);
-                        }
-                    }
-                }.execute();
-            }
-        };
-        if (htmlView.getDocument().getLength() > 0) htmlView.setCaretPosition(0);
-        JScrollPane htmlViewScroll = new JScrollPane(htmlView,
+        JScrollPane htmlViewScroll = new JScrollPane(htmlView.getComponent(),
                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         htmlViewScroll.setBorder(BorderFactory.createEmptyBorder());

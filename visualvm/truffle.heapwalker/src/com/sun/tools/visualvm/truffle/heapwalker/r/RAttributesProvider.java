@@ -25,6 +25,7 @@
 package com.sun.tools.visualvm.truffle.heapwalker.r;
 
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObject;
+import com.sun.tools.visualvm.truffle.heapwalker.TerminalJavaNodes;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +35,6 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
-import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceReferenceNode;
 import org.netbeans.modules.profiler.heapwalker.v2.java.PrimitiveNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
@@ -152,7 +152,7 @@ public class RAttributesProvider extends HeapWalkerNode.Provider {
             if (RObject.isRObject(instance)) {
                 return new RObjectFieldNode(new RObject(instance), field);
             } else {
-                return new InstanceReferenceNode.Field((ObjectFieldValue)field, false);
+                return new TerminalJavaNodes.Field((ObjectFieldValue)field, false);
             }
         } else {
             return new PrimitiveNode.Field(field);

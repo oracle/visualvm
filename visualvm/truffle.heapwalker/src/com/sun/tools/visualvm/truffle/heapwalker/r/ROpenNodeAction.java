@@ -39,12 +39,13 @@ import org.openide.util.lookup.ServiceProvider;
 public class ROpenNodeAction extends HeapWalkerNodeAction.Provider {
     
     public boolean supportsView(HeapContext context, String viewID) {
-        return RHeapFragment.isRHeap(context);
+        return viewID.startsWith("r_") && RHeapFragment.getRContext(context) != null;
     }
 
     public HeapWalkerNodeAction[] getActions(HeapWalkerNode node, HeapContext context, HeapWalkerActions actions) {
+        HeapContext rContext = RHeapFragment.getRContext(context);
         HeapWalkerNode copy = node instanceof RObjectNode || node instanceof RObjectsContainer ? node.createCopy() : null;
-        return new HeapWalkerNodeAction[] { new OpenNodeAction(copy, context, actions) };
+        return new HeapWalkerNodeAction[] { new OpenNodeAction(copy, rContext, actions) };
     }
     
     

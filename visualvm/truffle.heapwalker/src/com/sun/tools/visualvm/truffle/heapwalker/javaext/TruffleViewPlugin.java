@@ -25,19 +25,18 @@
 package com.sun.tools.visualvm.truffle.heapwalker.javaext;
 
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObject;
+import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectNode;
 import com.sun.tools.visualvm.truffle.heapwalker.TruffleFrame;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.SortOrder;
-import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.heapwalker.v2.HeapContext;
-import org.netbeans.modules.profiler.heapwalker.v2.java.JavaHeapFragment;
+import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
@@ -54,7 +53,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
-class TruffleFieldsPlugin extends HeapViewPlugin {
+class TruffleViewPlugin extends HeapViewPlugin {
     
     private final Heap heap;
     private Instance selected;
@@ -62,28 +61,30 @@ class TruffleFieldsPlugin extends HeapViewPlugin {
     private final TreeTableView objectsView;
     
 
-    public TruffleFieldsPlugin(HeapContext context, HeapWalkerActions actions) {
-        super("Truffle Fields", "Truffle Fields", graalIcon());
+    public TruffleViewPlugin(HeapContext context, HeapWalkerActions actions) {
+        super("Truffle Object", "Truffle Object", graalIcon());
         
         heap = context.getFragment().getHeap();
         
-        objectsView = new TreeTableView("truffle_objects_fields", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
+        objectsView = new TreeTableView("truffle_objects_javaext", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
             protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
-                List<FieldValue> fields = null;
-                
                 if (DynamicObject.isDynamicObject(selected)) {
-                    fields = new ArrayList();
-                    DynamicObject dobj = new DynamicObject(selected);
-                    fields.addAll(dobj.getFieldValues());
-                    fields.addAll(dobj.getStaticFieldValues());
+                    DynamicObject dobject = new DynamicObject(selected);
+                    return new HeapWalkerNode[] { new DynamicObjectNode(dobject, dobject.getType(heap)) };
                 } else if (TruffleFrame.isTruffleFrame(selected)) {
-                    fields = new ArrayList();
-                    TruffleFrame tframe = new TruffleFrame(selected);
-                    fields.addAll(tframe.getFieldValues());
+                    return new HeapWalkerNode[] { new InstanceNode(selected) };
+                } else {
+                    return new HeapWalkerNode[] { new TextNode("<no DynamicObject or TruffleFrame selected>") };
                 }
+            }
+            protected void childrenChanged() {
+                HeapWalkerNode[] children = getRoot().getChildren();
+                for (HeapWalkerNode child : children) expandNode(child);
                 
-                HeapWalkerNode[] nodes = TruffleFieldsProvider.getNodes(fields, root, heap, viewID, viewFilter, dataTypes, sortOrders);
-                return nodes == null ? new HeapWalkerNode[] { new TextNode("<no DynamicObject or TruffleFrame selected>") } : nodes;
+                if (children.length > 0) {
+                    children = children[0].getChildren();
+                    if (children.length > 0 && children[0] instanceof TextNode) expandNode(children[0]);
+                }
             }
         };
     }
@@ -113,7 +114,7 @@ class TruffleFieldsPlugin extends HeapViewPlugin {
     public static class Provider extends HeapViewPlugin.Provider {
 
         public HeapViewPlugin createPlugin(HeapContext context, HeapWalkerActions actions, String viewID) {
-            if (JavaHeapFragment.isJavaHeap(context)) return new TruffleFieldsPlugin(context, actions);
+            if (viewID.startsWith("java_")) return new TruffleViewPlugin(context, actions);
             return null;
         }
         

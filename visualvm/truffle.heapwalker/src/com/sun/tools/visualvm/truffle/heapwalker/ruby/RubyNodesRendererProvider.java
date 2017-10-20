@@ -35,7 +35,6 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.heapwalker.v2.HeapContext;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
-import com.sun.tools.visualvm.truffle.heapwalker.TruffleNodesRendererProvider;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerRenderer;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -44,7 +43,11 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapWalkerRenderer.Provider.class)
-public class RubyNodesRendererProvider extends TruffleNodesRendererProvider {
+public class RubyNodesRendererProvider extends HeapWalkerRenderer.Provider {
+    
+    public boolean supportsView(HeapContext context, String viewID) {
+        return true;
+    }
 
     public void registerRenderers(Map<Class<? extends HeapWalkerNode>, HeapWalkerRenderer> renderers, HeapContext context) {
         Heap heap = context.getFragment().getHeap();
@@ -60,9 +63,6 @@ public class RubyNodesRendererProvider extends TruffleNodesRendererProvider {
         renderers.put(RubyNodes.RubyDynamicObjectReferenceNode.class, new DynamicObjectReferenceNode.Renderer(heap, instanceIcon));
         
         renderers.put(RubyNodes.RubyLocalDynamicObjectNode.class, new LocalDynamicObjectNode.Renderer(heap, instanceIcon));
-        
-        
-        if (RubyHeapFragment.isRubyHeap(context)) super.registerRenderers(renderers, context);
     }
     
 }

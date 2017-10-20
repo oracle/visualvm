@@ -55,12 +55,12 @@ public abstract class TruffleFieldsPlugin extends HeapViewPlugin {
     private final TreeTableView objectsView;
     
 
-    public TruffleFieldsPlugin(String name, String description, HeapContext context, HeapWalkerActions actions) {
+    public TruffleFieldsPlugin(String name, String description, String viewID, HeapContext context, HeapWalkerActions actions) {
         super(name, description, Icons.getIcon(ProfilerIcons.NODE_FORWARD));
         
         heap = context.getFragment().getHeap();
         
-        objectsView = new TreeTableView("truffle_objects_fields", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
+        objectsView = new TreeTableView(viewID, context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
             protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
                 List<FieldValue> fields = null;
                 

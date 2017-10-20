@@ -34,16 +34,47 @@ import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import com.sun.tools.visualvm.truffle.heapwalker.TruffleStackTraces;
+import java.net.URL;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.heapwalker.v2.HeapContext;
+import org.netbeans.modules.profiler.heapwalker.v2.java.ClassNode;
+import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceNode;
+import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
+import org.netbeans.modules.profiler.heapwalker.v2.utils.HeapUtils;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "JavaScriptThreadsHTML_CannotResolveClassMsg=Cannot resolve class",
+    "JavaScriptThreadsHTML_CannotResolveInstanceMsg=Cannot resolve instance"
+})
 class JavaScriptThreadsHTML {
     
-    private static final String CLASS_URL_PREFIX = "file://class/"; // NOI18N
-    private static final String INSTANCE_URL_PREFIX = "file://instance/";   // NOI18N
+    static HeapWalkerNode getNode(URL url, HeapContext context) {
+        String urls = url.toString();
+                
+        if (HeapUtils.isInstance(urls)) {
+            Heap heap = context.getFragment().getHeap();
+            Instance instance = HeapUtils.instanceFromHtml(urls, heap);
+            if (DynamicObject.isDynamicObject(instance)) {
+                DynamicObject dobject = new DynamicObject(instance);
+                return new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, dobject.getType(heap));
+            } else if (instance != null) {
+                return new InstanceNode(instance);
+            } else {
+                ProfilerDialogs.displayError(Bundle.JavaScriptThreadsHTML_CannotResolveInstanceMsg());
+            }
+        } else if (HeapUtils.isClass(urls)) {
+            JavaClass javaClass = HeapUtils.classFromHtml(urls, context.getFragment().getHeap());
+            if (javaClass != null) return new ClassNode(javaClass);
+            else ProfilerDialogs.displayError(Bundle.JavaScriptThreadsHTML_CannotResolveClassMsg());
+        }
+
+        return null;
+    }
     
     static String getThreads(HeapContext context) {
 //        long start = System.currentTimeMillis();
@@ -101,40 +132,53 @@ class JavaScriptThreadsHTML {
     }
     
     private static String printInstance(Instance in, Heap h, JavaClass jc) {
-        String className;
-        JavaClass jcls;
-        
-        if (in == null) {
-            return "null";
-        }
-        jcls = in.getJavaClass();
-        if (jcls == null) {
-            return "unknown instance #"+in.getInstanceId(); // NOI18N
-        }
-        if (jcls.equals(jc)) {
-            JavaClass javaClass = h.getJavaClassByID(in.getInstanceId());
-            
-            if (javaClass != null) {
-                className = javaClass.getName();
-                return "<a href='"+ CLASS_URL_PREFIX + className + "/" + javaClass.getJavaClassId() + "'>class " + className + "</a>"; // NOI18N
-            }
-        }
-        
-        className = jcls.getName();
-        String instanceString;
         if (DynamicObject.isDynamicObject(in)) {
             DynamicObject dobj = new DynamicObject(in);
+            String instanceString = HeapUtils.instanceToHtml(in, false, h, jc);
             String type = dobj.getType(h);
-            instanceString = "<a href='"+ INSTANCE_URL_PREFIX + className + "/" + in.getInstanceNumber() + "/" + in.getInstanceId() + "' name='" + in.getInstanceId() + "'>" + type + "#" + in.getInstanceNumber() + "</a>";
+            instanceString = instanceString.replace(">" + in.getJavaClass().getName() + "#", ">" + type + "#");
             String logValue = JavaScriptNodes.getLogicalValue(dobj, type, h);
             if (logValue != null) instanceString += " <span style=\"color: #666666\">: " + logValue + "</span>";
+            return instanceString;
         } else {
-            instanceString = "<a href='"+ INSTANCE_URL_PREFIX + className + "/" + in.getInstanceNumber() + "/" + in.getInstanceId() + "' name='" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
-            String logValue = DetailsSupport.getDetailsString(in, h);
-            if (logValue != null) instanceString += " <span style=\"color: #666666\">(" + logValue + ")</span>";
+            return HeapUtils.instanceToHtml(in, true, h, jc);
         }
         
-        return instanceString;
+        
+//        String className;
+//        JavaClass jcls;
+//        
+//        if (in == null) {
+//            return "null";
+//        }
+//        jcls = in.getJavaClass();
+//        if (jcls == null) {
+//            return "unknown instance #"+in.getInstanceId(); // NOI18N
+//        }
+//        if (jcls.equals(jc)) {
+//            JavaClass javaClass = h.getJavaClassByID(in.getInstanceId());
+//            
+//            if (javaClass != null) {
+//                className = javaClass.getName();
+//                return "<a href='"+ CLASS_URL_PREFIX + className + "/" + javaClass.getJavaClassId() + "'>class " + className + "</a>"; // NOI18N
+//            }
+//        }
+//        
+//        className = jcls.getName();
+//        String instanceString;
+//        if (DynamicObject.isDynamicObject(in)) {
+//            DynamicObject dobj = new DynamicObject(in);
+//            String type = dobj.getType(h);
+//            instanceString = "<a href='"+ INSTANCE_URL_PREFIX + className + "/" + in.getInstanceNumber() + "/" + in.getInstanceId() + "' name='" + in.getInstanceId() + "'>" + type + "#" + in.getInstanceNumber() + "</a>";
+//            String logValue = JavaScriptNodes.getLogicalValue(dobj, type, h);
+//            if (logValue != null) instanceString += " <span style=\"color: #666666\">: " + logValue + "</span>";
+//        } else {
+//            instanceString = "<a href='"+ INSTANCE_URL_PREFIX + className + "/" + in.getInstanceNumber() + "/" + in.getInstanceId() + "' name='" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
+//            String logValue = DetailsSupport.getDetailsString(in, h);
+//            if (logValue != null) instanceString += " <span style=\"color: #666666\">(" + logValue + ")</span>";
+//        }
+//        
+//        return instanceString;
     }
     
 }

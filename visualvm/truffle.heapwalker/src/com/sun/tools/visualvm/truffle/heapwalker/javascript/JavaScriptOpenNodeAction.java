@@ -39,12 +39,13 @@ import org.openide.util.lookup.ServiceProvider;
 public class JavaScriptOpenNodeAction extends HeapWalkerNodeAction.Provider {
     
     public boolean supportsView(HeapContext context, String viewID) {
-        return JavaScriptHeapFragment.isJavaScriptHeap(context);
+        return viewID.startsWith("javascript_") && JavaScriptHeapFragment.getJavaScriptContext(context) != null;
     }
 
     public HeapWalkerNodeAction[] getActions(HeapWalkerNode node, HeapContext context, HeapWalkerActions actions) {
+        HeapContext javaScriptContext = JavaScriptHeapFragment.getJavaScriptContext(context);
         HeapWalkerNode copy = node instanceof JavaScriptNodes.JavaScriptNode ? node.createCopy() : null;
-        return new HeapWalkerNodeAction[] { new OpenNodeAction(copy, context, actions) };
+        return new HeapWalkerNodeAction[] { new OpenNodeAction(copy, javaScriptContext, actions) };
     }
     
     

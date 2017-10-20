@@ -26,6 +26,8 @@ package com.sun.tools.visualvm.truffle.heapwalker.javaext;
 
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObject;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectFieldNode;
+import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectReferenceNode;
+import com.sun.tools.visualvm.truffle.heapwalker.TerminalJavaNodes;
 import com.sun.tools.visualvm.truffle.heapwalker.TruffleFrame;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,7 +38,6 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceNode;
-import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceReferenceNode;
 import org.netbeans.modules.profiler.heapwalker.v2.java.PrimitiveNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
@@ -91,7 +92,7 @@ abstract class TruffleFieldsProvider extends HeapWalkerNode.Provider {
                 DynamicObject dobject = new DynamicObject(fieldInstance);
                 return new DynamicObjectFieldNode(dobject, dobject.getType(heap), field);
             } else {
-                return new InstanceReferenceNode.Field(objectField, false);
+                return new TerminalJavaNodes.Field(objectField, false);
             }
         } else {
             return new PrimitiveNode.Field(field);
@@ -102,7 +103,7 @@ abstract class TruffleFieldsProvider extends HeapWalkerNode.Provider {
     protected abstract List<FieldValue> getFields(HeapWalkerNode parent, Heap heap);
     
     
-    @ServiceProvider(service=HeapWalkerNode.Provider.class, position = 1000)
+    @ServiceProvider(service=HeapWalkerNode.Provider.class, position = 100)
     public static class InstanceFieldsProvider extends TruffleFieldsProvider {
         
         // TODO: will be configurable, ideally by instance
@@ -114,12 +115,15 @@ abstract class TruffleFieldsProvider extends HeapWalkerNode.Provider {
         }
 
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("java_") && !viewID.endsWith("_truffleext");
+            return viewID.equals("truffle_objects_javaext");
         }
 
         public boolean supportsNode(HeapWalkerNode parent, Heap heap, String viewID) {
-            if (parent instanceof InstanceNode && !InstanceNode.Mode.INCOMING_REFERENCE.equals(((InstanceNode)parent).getMode())) {
-                Instance instance = ((InstanceNode)parent).getInstance();
+            if (parent instanceof InstanceNode && !(parent instanceof DynamicObjectReferenceNode)) {
+                InstanceNode node = (InstanceNode)parent;
+                if (InstanceNode.Mode.INCOMING_REFERENCE.equals(node.getMode())) return false;
+                
+                Instance instance = node.getInstance();
                 return DynamicObject.isDynamicObject(instance) ||
                        TruffleFrame.isTruffleFrame(instance);
             } else {

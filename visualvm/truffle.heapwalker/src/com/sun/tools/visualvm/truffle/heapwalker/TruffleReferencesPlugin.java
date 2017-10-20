@@ -54,12 +54,12 @@ public abstract class TruffleReferencesPlugin extends HeapViewPlugin {
     private final TreeTableView objectsView;
     
 
-    public TruffleReferencesPlugin(HeapContext context, HeapWalkerActions actions) {
+    public TruffleReferencesPlugin(String viewID, HeapContext context, HeapWalkerActions actions) {
         super("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE));
         
         heap = context.getFragment().getHeap();
         
-        objectsView = new TreeTableView("truffle_objects_references", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
+        objectsView = new TreeTableView(viewID, context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
             protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
                 List<FieldValue> references = selected != null ? selected.getReferences() : null;                
                 HeapWalkerNode[] nodes = getNodes(references, root, heap, viewID, dataTypes, sortOrders);

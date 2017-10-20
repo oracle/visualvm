@@ -43,7 +43,7 @@ import org.openide.util.lookup.ServiceProvider;
 class JavaScriptReferencesPlugin extends TruffleReferencesPlugin {
     
     public JavaScriptReferencesPlugin(HeapContext context, HeapWalkerActions actions) {
-        super(context, actions);
+        super("javascript_objects_references", context, actions);
     }
     
     

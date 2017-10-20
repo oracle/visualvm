@@ -25,164 +25,42 @@
 package com.sun.tools.visualvm.truffle.heapwalker;
 
 import java.util.Map;
+import javax.swing.Icon;
 import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.MultiRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.NormalBoldGrayRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.heapwalker.v2.HeapContext;
-import org.netbeans.modules.profiler.heapwalker.v2.java.LocalObjectNode;
-import org.netbeans.modules.profiler.heapwalker.v2.java.LocalObjectNodeRenderer;
-import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceReferenceNode;
-import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceReferenceNodeRenderer;
-import org.netbeans.modules.profiler.heapwalker.v2.java.PrimitiveNode;
-import org.netbeans.modules.profiler.heapwalker.v2.java.PrimitiveNodeRenderer;
-import org.netbeans.modules.profiler.heapwalker.v2.java.StackFrameNode;
-import org.netbeans.modules.profiler.heapwalker.v2.java.ThreadNode;
-import org.netbeans.modules.profiler.heapwalker.v2.java.ThreadNodeRenderer;
-import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerRenderer;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@ServiceProvider(service=HeapWalkerRenderer.Provider.class)
 public class TruffleNodesRendererProvider extends HeapWalkerRenderer.Provider {
+    
+    public boolean supportsView(HeapContext context, String viewID) {
+        return true;
+    }
 
     public void registerRenderers(Map<Class<? extends HeapWalkerNode>, HeapWalkerRenderer> renderers, HeapContext context) {
-
         Heap heap = context.getFragment().getHeap();
+        Icon instanceIcon = Icons.getIcon(LanguageIcons.INSTANCE);
+        Icon packageIcon = Icons.getIcon(LanguageIcons.PACKAGE);
         
-        // --- reused from Java ------------------------------------------------
+        renderers.put(DynamicObjectNode.class, new DynamicObjectNode.Renderer(heap, instanceIcon));
         
-        // primitive fields & items
-        renderers.put(PrimitiveNode.class, new PrimitiveNodeRenderer());
+        renderers.put(DynamicObjectsContainer.class, new DynamicObjectsContainer.Renderer(packageIcon));
         
-        // object fields & items
-        renderers.put(InstanceReferenceNode.class, new InstanceReferenceNodeRenderer(heap)); 
+        renderers.put(DynamicObjectFieldNode.class, new DynamicObjectFieldNode.Renderer(heap, instanceIcon));
         
-        // thread 
-        renderers.put(ThreadNode.class, new RubyThreadNodeRenderer(heap));
+        renderers.put(DynamicObjectReferenceNode.class, new DynamicObjectReferenceNode.Renderer(heap, instanceIcon));
         
-        // local variables
-        renderers.put(LocalObjectNode.class, new LocalObjectNodeRenderer(heap));
+        renderers.put(LocalDynamicObjectNode.class, new LocalDynamicObjectNode.Renderer(heap, instanceIcon));
         
-        // stack frames
-        renderers.put(StackFrameNode.class, new TruffleStackFrameNodeRenderer());
-    }
-    
-    
-    // NOTE: temporary solution, should probably be implemented for each Truffle language separately
-    private static class RubyThreadNodeRenderer extends ThreadNodeRenderer {
-        
-        public RubyThreadNodeRenderer(Heap heap) {
-            super(heap);
-        }
-        
-        public void setValue(Object value, int row) {
-            HeapWalkerNode node = (HeapWalkerNode)value;
-            String name = HeapWalkerNode.getValue(node, DataType.NAME, heap);
-            int resIdx = name.indexOf('@');
-            setText(resIdx == -1 ? name : name.substring(0, resIdx));
-        }
-        
-        public String getShortName() {
-            return getText();
-        }
-        
-    }
-    
-    
-    // NOTE: temporary solution, should probably be implemented for each Truffle language separately
-    private static class TruffleStackFrameNodeRenderer extends MultiRenderer implements HeapWalkerRenderer {
-    
-        private final LabelRenderer atRenderer;
-        private final NormalBoldGrayRenderer frameRenderer;
-        private final ProfilerRenderer[] renderers;
-        
-        private String name1;
-        private String name2;
-        private String detail;
-
-
-        public TruffleStackFrameNodeRenderer() {
-            atRenderer = new LabelRenderer();
-            atRenderer.setText("at");
-            atRenderer.setMargin(3, 3, 3, 0);
-            frameRenderer = new NormalBoldGrayRenderer() {
-                public void setValue(Object value, int row) {
-                    if (value == null) {
-                        setNormalValue("");
-                        setBoldValue("");
-                        setGrayValue("");
-                    } else {
-                        setNormalValue(((Object[])value)[0].toString());
-                        setBoldValue(((Object[])value)[1].toString());
-                        setGrayValue(((Object[])value)[2].toString());
-                    }
-                }
-            };
-            renderers = new ProfilerRenderer[] { atRenderer, frameRenderer };
-        }
-
-
-        protected ProfilerRenderer[] valueRenderers() {
-            return renderers;
-        }
-
-
-        public void setValue(Object value, int row) {
-            String val = value.toString();
-            
-            int idx = val.indexOf('@');
-            if (idx != -1) {
-                // JavaScript Node@hashCode
-                name2 = val.substring(0, idx);
-                detail = " (" + val.substring(idx) + ")";
-            } else {
-                idx = val.indexOf(' ');
-                if (idx != -1) {
-                    // Ruby node with resource
-                    name2 = val.substring(0, idx);
-                    detail = val.substring(idx);
-                    
-                    idx = detail.lastIndexOf('/');
-                    if (idx != -1) {
-                        detail = detail.substring(idx + 1);
-                    }
-                    
-                    if (!detail.startsWith(" (")) detail = " (" + detail + ")";
-                } else {
-                    // JavaScript function
-                    name2 = val;
-                    detail = " ()";
-                }
-            }
-            
-            idx = name2.lastIndexOf('.');
-            if (idx != -1) {
-                // JavaScript function in package
-                name1 = name2.substring(0, idx + 1);
-                name2 = name2.substring(idx + 1);
-            } else {
-                idx = name2.lastIndexOf('#');
-                if (idx > 0) {
-                    // Ruby method in module
-                    name1 = name2.substring(0, idx);
-                    name2 = name2.substring(idx);
-                } else {
-                    name1 = "";
-                }
-            }
-            
-            frameRenderer.setValue(new Object[] { name1, name2, detail }, row);
-        }
-
-        public String getShortName() {
-            return "at " + name2 + " " + detail;
-        }
-
+        renderers.put(TruffleStackFrameNode.class, new TruffleStackFrameNode.Renderer());
     }
     
 }

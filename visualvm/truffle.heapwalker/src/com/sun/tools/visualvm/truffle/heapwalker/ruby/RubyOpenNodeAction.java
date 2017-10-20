@@ -39,12 +39,13 @@ import org.openide.util.lookup.ServiceProvider;
 public class RubyOpenNodeAction extends HeapWalkerNodeAction.Provider {
     
     public boolean supportsView(HeapContext context, String viewID) {
-        return RubyHeapFragment.isRubyHeap(context);
+        return viewID.startsWith("ruby_") && RubyHeapFragment.getRubyContext(context) != null;
     }
 
     public HeapWalkerNodeAction[] getActions(HeapWalkerNode node, HeapContext context, HeapWalkerActions actions) {
+        HeapContext rubyContext = RubyHeapFragment.getRubyContext(context);
         HeapWalkerNode copy = node instanceof RubyNodes.RubyNode ? node.createCopy() : null;
-        return new HeapWalkerNodeAction[] { new OpenNodeAction(copy, context, actions) };
+        return new HeapWalkerNodeAction[] { new OpenNodeAction(copy, rubyContext, actions) };
     }
     
     

@@ -56,6 +56,15 @@ class JavaScriptHeapFragment extends TruffleLanguageHeapFragment {
         return JS_HEAP_ID.equals(context.getFragment().getID()); // NOI18N
     }
     
+    public static HeapContext getJavaScriptContext(HeapContext context) {
+        if (isJavaScriptHeap(context)) return context;
+        
+        for (HeapContext otherContext : context.getOtherContexts())
+            if (isJavaScriptHeap(otherContext)) return otherContext;
+        
+        return null;
+    }
+    
     static JavaScriptHeapFragment heap(Heap heap) {
         return (JavaScriptHeapFragment)heap;
     }

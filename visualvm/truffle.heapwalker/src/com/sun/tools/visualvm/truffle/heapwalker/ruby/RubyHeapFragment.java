@@ -56,6 +56,15 @@ class RubyHeapFragment extends TruffleLanguageHeapFragment {
         return RUBY_HEAP_ID.equals(context.getFragment().getID()); // NOI18N
     }
     
+    public static HeapContext getRubyContext(HeapContext context) {
+        if (isRubyHeap(context)) return context;
+        
+        for (HeapContext otherContext : context.getOtherContexts())
+            if (isRubyHeap(otherContext)) return otherContext;
+        
+        return null;
+    }
+    
     static RubyHeapFragment heap(Heap heap) {
         return (RubyHeapFragment)heap;
     }

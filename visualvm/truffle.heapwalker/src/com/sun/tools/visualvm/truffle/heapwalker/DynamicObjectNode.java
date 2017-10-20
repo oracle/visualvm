@@ -136,7 +136,7 @@ public class DynamicObjectNode extends InstanceNode {
             setIcon(isLoop ? loopIcon() : icon);   
             
             setIconTextGap(isLoop ? 4 : 0);
-            ((LabelRenderer)valueRenderers()[0]).setMargin(3, isLoop ? 3 : 2, 3, 0);
+            ((LabelRenderer)valueRenderers()[0]).setMargin(3, isLoop ? 3 : 0, 3, 0);
         }
         
         public String getShortName() {
