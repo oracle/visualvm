@@ -59,9 +59,9 @@ public class DynamicObjectDetailsProvider extends DetailsProvider.Basic {
             Long undefinedId = getJSUdefined(heap);
             Long nullId = getJSNull(heap);
             if (instance.getInstanceId() == undefinedId.longValue()) {
-                buf.append(" undefined");       // NOI18N
+                buf.append("undefined");       // NOI18N
             } else if (instance.getInstanceId() == nullId.longValue()) {
-                buf.append(" null");       // NOI18N
+                buf.append("null");       // NOI18N
             } else {
                 Instance shape = (Instance) instance.getValueOfField("shape");  // NOI18N
                 Instance objectType = (Instance) shape.getValueOfField("objectType");   // NOI18N
