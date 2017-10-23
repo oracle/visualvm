@@ -1197,16 +1197,17 @@ function toHtml(obj) {
         //print("1");
         if (tmp instanceof Packages.org.netbeans.lib.profiler.heap.JavaClass) {
             //print("2");
+            // must use the same format as defined in org.netbeans.modules.profiler.heapwalker.v2.utils.HeapUtils.classToHtml()
             var id = tmp.javaClassId;
             var name = tmp.name;
-            return "<a href='file://class/" + name + "'>class " + name + "</a>";
+            return "<a href='file://class/" + id + "' name='" + id + "'>class " + name + "</a>";
         }else if (tmp instanceof Packages.org.netbeans.lib.profiler.heap.Instance) {
             //print("3");
+            // must use the same format as defined in org.netbeans.modules.profiler.heapwalker.v2.utils.HeapUtils.instanceToHtml()
             var id = tmp.instanceId;
             var number = tmp.instanceNumber;
             var name = tmp.javaClass.name;
-            return "<a href='file://instance/" + name +"@" + id + "'>" +
-            name + "#" + number + "</a>";
+            return "<a href='file://instance/" + id + "' name='" + id + "'>" + name + "#" + number + "</a>";
         }
         //print("31 "+typeof(tmp));
     }
