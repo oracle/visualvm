@@ -529,7 +529,7 @@ public class OQLEngineTest {
     public void testMap() throws Exception {
         System.out.println("map");
 
-        final String[] output = new String[] {"", "$assertionsDisabled=true\nserialVersionUID=301077366599181570\ntmpdir=null\ncounter=-1\ntmpFileLock=<a href='file://instance/java.lang.Object@1684106928'>java.lang.Object#6</a>\npathSeparator=<a href='file://instance/java.lang.String@1684106888'>java.lang.String#101</a>\npathSeparatorChar=:\nseparator=<a href='file://instance/java.lang.String@1684106848'>java.lang.String#100</a>\nseparatorChar=/\nfs=<a href='file://instance/java.io.UnixFileSystem@1684106408'>java.io.UnixFileSystem#1</a>\n<classLoader>=null\n"};
+        final String[] output = new String[] {"", "$assertionsDisabled=true\nserialVersionUID=301077366599181570\ntmpdir=null\ncounter=-1\ntmpFileLock=<a href='file://instance/1684106928' name='1684106928'>java.lang.Object#6</a>\npathSeparator=<a href='file://instance/1684106888' name='1684106888'>java.lang.String#101</a>\npathSeparatorChar=:\nseparator=<a href='file://instance/1684106848' name='1684106848'>java.lang.String#100</a>\nseparatorChar=/\nfs=<a href='file://instance/1684106408' name='1684106408'>java.io.UnixFileSystem#1</a>\n<classLoader>=null\n"};
 
         instance.executeQuery("select map(heap.findClass(\"java.io.File\").statics, \"index + '=' + toHtml(it)\")", new ObjectVisitor() {
 
@@ -711,7 +711,7 @@ public class OQLEngineTest {
     public void testMapWrapping() throws Exception {
         System.out.println("map wrapping");
 
-        final String[] result = new String[] {"", "<a href='file://class/java.util.HashMap$Entry[]'>class java.util.HashMap$Entry[]</a>"};
+        final String[] result = new String[] {"", "<a href='file://class/1746081976' name='1746081976'>class java.util.HashMap$Entry[]</a>"};
 
         instance.executeQuery("select unique(map(filter(reachables(a), 'it != null'), 'toHtml(it.clazz)')) from instanceof java.util.HashMap a", new ObjectVisitor() {
 
