@@ -38,6 +38,7 @@ import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
 import org.netbeans.modules.profiler.heapwalker.v2.model.RootNode;
+import org.netbeans.modules.profiler.heapwalker.v2.model.TextNode;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapViewPlugin;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerActions;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.TreeTableView;
@@ -62,15 +63,15 @@ public abstract class TruffleFieldsPlugin extends HeapViewPlugin {
         
         objectsView = new TreeTableView(viewID, context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
             protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
-                List<FieldValue> fields = null;
-                
                 if (selected != null) {
-                    fields = new ArrayList(((DynamicObject)selected).getFieldValues());
+                    List<FieldValue> fields = new ArrayList(((DynamicObject)selected).getFieldValues());
                     fields.addAll(((DynamicObject)selected).getStaticFieldValues());
+                
+                    HeapWalkerNode[] nodes = getNodes(fields, root, heap, viewID, viewFilter, dataTypes, sortOrders);
+                    return nodes == null || nodes.length == 0 ? new HeapWalkerNode[] { new TextNode(getNoObjectsString()) } : nodes;
                 }
                 
-                HeapWalkerNode[] nodes = getNodes(fields, root, heap, viewID, viewFilter, dataTypes, sortOrders);
-                return nodes == null ? HeapWalkerNode.NO_NODES : nodes;
+                return new HeapWalkerNode[] { new TextNode("<no object selected>") };
             }
         };
     }
@@ -81,6 +82,8 @@ public abstract class TruffleFieldsPlugin extends HeapViewPlugin {
     
     
     protected abstract HeapWalkerNode[] getNodes(List<FieldValue> fields, HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders);
+    
+    protected abstract String getNoObjectsString();
     
     
     protected void nodeSelected(HeapWalkerNode node, boolean adjusting) {

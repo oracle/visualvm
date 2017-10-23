@@ -52,6 +52,10 @@ class JavaScriptFieldsPlugin extends TruffleFieldsPlugin {
         return JavaScriptFieldsProvider.getNodes(fields, parent, heap, viewID, viewFilter, dataTypes, sortOrders);
     }
     
+    protected String getNoObjectsString() {
+        return "<no properties>";
+    }
+    
     
     @ServiceProvider(service=HeapViewPlugin.Provider.class, position = 200)
     public static class Provider extends HeapViewPlugin.Provider {

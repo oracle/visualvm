@@ -51,6 +51,10 @@ class RubyFieldsPlugin extends TruffleFieldsPlugin {
     protected HeapWalkerNode[] getNodes(List<FieldValue> fields, HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
         return RubyFieldsProvider.getNodes(fields, parent, heap, viewID, viewFilter, dataTypes, sortOrders);
     }
+
+    protected String getNoObjectsString() {
+        return "<no variables>";
+    }
     
     
     @ServiceProvider(service=HeapViewPlugin.Provider.class, position = 200)

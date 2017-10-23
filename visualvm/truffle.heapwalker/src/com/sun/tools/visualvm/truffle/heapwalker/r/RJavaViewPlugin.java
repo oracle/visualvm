@@ -65,7 +65,7 @@ class RJavaViewPlugin extends HeapViewPlugin {
         objectsView = new TreeTableView("java_objects_truffleext", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
             protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
                 InstanceNode instanceNode = selected == null ? null : new InstanceNode(selected);
-                HeapWalkerNode result = instanceNode == null ? new TextNode("<no instance selected>") : instanceNode;
+                HeapWalkerNode result = instanceNode == null ? new TextNode("<no object selected>") : instanceNode;
                 return new HeapWalkerNode[] { result };
             }
             protected void childrenChanged() {

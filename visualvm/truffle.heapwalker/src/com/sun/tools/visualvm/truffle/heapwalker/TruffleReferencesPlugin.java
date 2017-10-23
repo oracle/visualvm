@@ -37,6 +37,7 @@ import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
 import org.netbeans.modules.profiler.heapwalker.v2.model.RootNode;
+import org.netbeans.modules.profiler.heapwalker.v2.model.TextNode;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapViewPlugin;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerActions;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.TreeTableView;
@@ -61,9 +62,13 @@ public abstract class TruffleReferencesPlugin extends HeapViewPlugin {
         
         objectsView = new TreeTableView(viewID, context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
             protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
-                List<FieldValue> references = selected != null ? selected.getReferences() : null;                
-                HeapWalkerNode[] nodes = getNodes(references, root, heap, viewID, dataTypes, sortOrders);
-                return nodes == null ? HeapWalkerNode.NO_NODES : nodes;
+                if (selected != null) {
+                    List<FieldValue> references = selected.getReferences();                
+                    HeapWalkerNode[] nodes = getNodes(references, root, heap, viewID, dataTypes, sortOrders);
+                    return nodes == null || nodes.length == 0 ? new HeapWalkerNode[] { new TextNode("<no references>") } : nodes;
+                }
+                
+                return new HeapWalkerNode[] { new TextNode("<no object selected>") };
             }
         };
     }
