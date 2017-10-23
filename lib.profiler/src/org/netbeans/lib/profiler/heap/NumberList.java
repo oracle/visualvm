@@ -56,6 +56,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
@@ -184,6 +185,10 @@ class NumberList {
         return readNumber(block,0);
     }
     
+    LongIterator getNumbersIterator(long startOffset) throws IOException {
+        return new NumberIterator(startOffset);
+    }
+
     List getNumbers(long startOffset) throws IOException {
         int slot;
         List numbers = new ArrayList();
@@ -371,6 +376,63 @@ class NumberList {
         }
     }    
     
+    private class NumberIterator extends LongIterator {
+        private int slot;
+        private byte[] block;
+        private long nextNumber;
+
+        private NumberIterator(long startOffset) throws IOException {
+            slot = 0;
+            block = getBlock(startOffset);
+            nextNumber();
+        }
+
+        @Override
+        boolean hasNext() {
+            return nextNumber != 0;
+        }
+
+        @Override
+        long next() {
+            if (hasNext()) {
+                long num = nextNumber;
+                try {
+                    nextNumber();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    nextNumber = 0;
+                }
+                return num;
+            }
+            throw new NoSuchElementException();
+        }
+
+        private void nextNumber() throws IOException {
+            if (slot < NUMBERS_IN_BLOCK) {
+                long nextNum = readNumber(block,slot++);
+                if (nextNum == 0) {     // end of the block, move to next one
+                    nextBlock();
+                } else {
+                    nextNumber = nextNum;
+                }
+            } else {
+               nextBlock();
+            }
+        }
+
+        private void nextBlock() throws IOException {
+            long nextBlock = getOffsetToNextBlock(block);
+
+            if (nextBlock == 0) { // end of list
+                nextNumber = 0;
+                return;
+            }
+            block = getBlock(nextBlock);
+            slot = 0;
+            nextNumber();
+        }
+    }
+
     private class BlockLRUCache extends LinkedHashMap {
         
         private static final int MAX_CAPACITY = 10000;

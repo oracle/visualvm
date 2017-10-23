@@ -47,9 +47,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -167,23 +165,23 @@ class LongMap extends AbstractLongMap {
             }
         }
         
-        List getReferences() {
+        LongIterator getReferences() {
             byte flags = getFlags();
             long ref = getReferencesPointer();
             if ((flags & NUMBER_LIST) == 0) {
                 if (ref == 0L) {
-                    return Collections.EMPTY_LIST;
+                    return LongIterator.EMPTY_ITERATOR;
                 } else {
-                    return Collections.singletonList(new Long(ref));
+                    return LongIterator.singleton(ref);
                 }
             } else {
                 try {
-                    return referenceList.getNumbers(ref);
+                    return referenceList.getNumbersIterator(ref);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }
-            return Collections.EMPTY_LIST;
+            return LongIterator.EMPTY_ITERATOR;
         }
         
         long getOffset() {
