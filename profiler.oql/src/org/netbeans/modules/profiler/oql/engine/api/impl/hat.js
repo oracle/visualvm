@@ -40,7 +40,17 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-var hatPkg = Packages.org.netbeans.modules.profiler.oql.engine.api.impl;
+var ReachableExcludes = Java.type("org.netbeans.modules.profiler.oql.engine.api.impl.ReachableExcludes");
+var ReachableObjects = Java.type("org.netbeans.modules.profiler.oql.engine.api.impl.ReachableObjects");
+
+var JavaClass = Java.type("org.netbeans.lib.profiler.heap.JavaClass");
+var Instance = Java.type("org.netbeans.lib.profiler.heap.Instance");
+var ObjectArrayInstance = Java.type("org.netbeans.lib.profiler.heap.ObjectArrayInstance");
+var PrimitiveArrayInstance = Java.type("org.netbeans.lib.profiler.heap.PrimitiveArrayInstance");
+var Field = Java.type("org.netbeans.lib.profiler.heap.Field");
+var FieldValue = Java.type("org.netbeans.lib.profiler.heap.FieldValue");
+var GCRoot = Java.type("org.netbeans.lib.profiler.heap.GCRoot");
+
 var snapshot;
 
 /**
@@ -271,7 +281,7 @@ function wrapJavaValue(thing) {
     //    printStackTrace();
     //    print(thing);
 
-    if (thing instanceof Packages.org.netbeans.lib.profiler.heap.FieldValue) {
+    if (thing instanceof FieldValue) {
         var type = thing.field.type;
 
         // map primitive values to closest JavaScript primitives
@@ -290,9 +300,9 @@ function wrapJavaValue(thing) {
             // wrap Java object as script object
             return wrapJavaObject(thing.instance);
         }
-    } else if (thing instanceof Packages.org.netbeans.lib.profiler.heap.GCRoot) {
+    } else if (thing instanceof GCRoot) {
         return wrapRoot(thing);
-    } else if (thing instanceof Packages.org.netbeans.lib.profiler.heap.Field) {
+    } else if (thing instanceof Field) {
         return wrapField(thing);
     } else {
         return wrapJavaObject(thing);
@@ -301,28 +311,18 @@ function wrapJavaValue(thing) {
 
 // HAT Java model object wrapper. Handles all cases 
 // (instance, object/primitive array and Class objects)	
-function javaObject(jobject) {		
-    //        // FIXME: Do I need this? or can I assume that these would
-    //        // have been resolved already?
-    //        if (jobject instanceof hatPkg.model.JavaObjectRef) {
-    //            jobject = jobject.dereference();
-    //            if (jobject instanceof hatPkg.model.HackJavaValue) {
-    //                print(jobject);
-    //                return null;
-    //            }
-    //        }
-
+function javaObject(jobject) {
     //        print(jobject.getClass());
-    if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.JavaClass) {
+    if (jobject instanceof JavaClass) {
         //            print("wrapping as Class");
         return new JavaClassWrapper(jobject);
-    } else if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.ObjectArrayInstance) {
+    } else if (jobject instanceof ObjectArrayInstance) {
         //            print("wrapping as ObjectArray");
         return new JavaObjectArrayWrapper(jobject);
-    } else if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.PrimitiveArrayInstance) {
+    } else if (jobject instanceof PrimitiveArrayInstance) {
         // print("wrapping as ValueArray");
         return new JavaValueArrayWrapper(jobject);
-    } else if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.Instance) {
+    } else if (jobject instanceof Instance) {
         //            print("wrapping as Instance");
         return new JavaObjectWrapper(jobject);
     } else {
@@ -575,7 +575,7 @@ function unwrapJavaObject(jobject) {
     //    print("Unwrapping object");
     //    print(typeof(jobject));
     
-    if (!(jobject instanceof Packages.org.netbeans.lib.profiler.heap.Instance)) {
+    if (!(jobject instanceof Instance)) {
         if (jobject instanceof Array) {
             //            print("Object is array");
             var arr = new java.util.ArrayList(jobject.length);
@@ -980,9 +980,9 @@ function identical(o1, o2) {
 function objectid(jobject) {
     try {
         jobject = unwrapJavaObject(jobject);
-        if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.Instance) {
+        if (jobject instanceof Instance) {
             return String(jobject.instanceId);
-        } else if (jobject instanceof Packages.org.netbeans.lib.profiler.heap.JavaClass) {
+        } else if (jobject instanceof JavaClass) {
             return String(jobject.javaClassId);
         }
     } catch (e) {
@@ -1073,7 +1073,7 @@ function reachables(jobject, excludes) {
             excludedFields[excludedFields.length] = st.nextToken().trim();
         }
         if (excludedFields.length > 0) { 
-            excludes = new hatPkg.ReachableExcludes() {
+            excludes = new ReachableExcludes() {
                 isExcluded: function (field) {
                     for (var index in excludedFields) {
                         if (field.equals(excludedFields[index])) {
@@ -1087,12 +1087,12 @@ function reachables(jobject, excludes) {
             // nothing to filter...
             excludes = null;
         }
-    } else if (! (excludes instanceof hatPkg.ReachableExcludes)) {
+    } else if (! (excludes instanceof ReachableExcludes)) {
         excludes = null;
     }
 
     jobject = unwrapJavaObject(jobject);
-    var ro = new hatPkg.ReachableObjects(jobject, excludes);  
+    var ro = new ReachableObjects(jobject, excludes);
     return wrapIterator(ro.reachables, true);
 }
 
@@ -1106,9 +1106,9 @@ function reachables(jobject, excludes) {
 function refers(from, to) {
     try {
         var tmp = unwrapJavaObject(from);
-        if (tmp instanceof Packages.org.netbeans.lib.profiler.heap.JavaClass) {
+        if (tmp instanceof JavaClass) {
             from = from.statics;
-        } else if (tmp instanceof Packages.org.netbeans.lib.profiler.heap.PrimitiveArrayInstance) {
+        } else if (tmp instanceof PrimitiveArrayInstance) {
             return false;
         }
         for (var i in from) {
@@ -1195,13 +1195,13 @@ function toHtml(obj) {
     var tmp = unwrapJavaObject(obj);
     if (tmp != undefined) {
         //print("1");
-        if (tmp instanceof Packages.org.netbeans.lib.profiler.heap.JavaClass) {
+        if (tmp instanceof JavaClass) {
             //print("2");
             // must use the same format as defined in org.netbeans.modules.profiler.heapwalker.v2.utils.HeapUtils.classToHtml()
             var id = tmp.javaClassId;
             var name = tmp.name;
             return "<a href='file://class/" + id + "' name='" + id + "'>class " + name + "</a>";
-        }else if (tmp instanceof Packages.org.netbeans.lib.profiler.heap.Instance) {
+        }else if (tmp instanceof Instance) {
             //print("3");
             // must use the same format as defined in org.netbeans.modules.profiler.heapwalker.v2.utils.HeapUtils.instanceToHtml()
             var id = tmp.instanceId;
