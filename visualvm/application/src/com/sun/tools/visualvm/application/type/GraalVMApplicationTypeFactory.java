@@ -36,17 +36,33 @@ import org.openide.util.NbBundle;
 public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFactory {
 
     private static final String MAIN_CLASS = "com.oracle.graalvm.Main"; // NOI18N
+    private static final String LEGACY_MAIN_CLASS = "com.oracle.graalvm.launcher.LegacyLauncher"; // NOI18N
+    private static final String JAVASCRIPT_MAIN_CLASS = "com.oracle.truffle.js.shell.JSLauncher";   // NOI18N
+    private static final String RUBY_MAIN_CLASS = "com.oracle.graalvm.launcher.ruby.RubyLauncher"; // NOI18N
+    private static final String PYTHON_MAIN_CLASS = "com.oracle.graal.python.shell.GraalPythonMain"; // NOI18N
     private static final String JVM_ARG_GRAAL_ID = "-Dgraalvm.home="; // NOI18N
     private static final String ARG_GRAAL_ID = "--"; // NOI18N
     private static final String JVM_ARG_NODEJS_ID = "-Dtruffle.js.DirectByteBuffer=true";  // NOI18N
 
     private static final String JAVASCRIPT_ID = "com.oracle.truffle.js.shell.Shell"; // NOI18N
     private static final String R_ID = "com.oracle.truffle.r.engine.shell.RCommand";    // NOI18N
+    private static final String LEGACY_RSCRIPT_ID = "com.oracle.truffle.r.launcher.RscriptCommand"; // NOI18N
+    private static final String LEGACY_R_ID = "com.oracle.truffle.r.launcher.RCommand"; // NOI18N
     private static final String RUBY_ID = "org.truffleruby.Main"; // NOI18N;
     private static final String NODEJS_ID = "node.js"; // NOI18N;
+    private static final String PYTHON_ID = "GraalPythonMain"; // NOI18N
 
     private boolean isGraalVM(Jvm jvm, String mainClass) {
-        if (MAIN_CLASS.equals(mainClass)) {
+        if (MAIN_CLASS.equals(mainClass) || LEGACY_MAIN_CLASS.equals(mainClass)) {
+            return true;
+        }
+        if (JAVASCRIPT_MAIN_CLASS.equals(mainClass)) {
+            return true;
+        }
+        if (RUBY_MAIN_CLASS.equals(mainClass)) {
+            return true;
+        }
+        if (PYTHON_MAIN_CLASS.equals(mainClass)) {
             return true;
         }
         if (mainClass == null || mainClass.length() == 0) {    // there is no main class - detect native GraalVM launcher
@@ -62,7 +78,25 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
 
     private String getLangID(Jvm jvm) {
         String args = jvm.getMainArgs();
+        String mainClass = jvm.getMainClass();
 
+        if (LEGACY_MAIN_CLASS.equals(mainClass)) {
+            if (args != null) {
+                String[] argArr = args.split(" +");
+                if (argArr.length > 1) {
+                    return argArr[1];
+                }
+            }
+        }
+        if (JAVASCRIPT_MAIN_CLASS.equals(mainClass)) {
+            return JAVASCRIPT_ID;
+        }
+        if (RUBY_MAIN_CLASS.equals(mainClass)) {
+            return RUBY_ID;
+        }
+        if (PYTHON_MAIN_CLASS.equals(mainClass)) {
+            return PYTHON_ID;
+        }
         if (args != null) {
             String[] argArr = args.split(" +");
             if (argArr.length > 2) {
@@ -82,11 +116,16 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
             case JAVASCRIPT_ID:
                 return getMessage("LBL_Graalvm_Javascript");    // NOI18N
             case R_ID:
+            case LEGACY_R_ID:
                 return getMessage("LBL_Graalvm_R");     // NOI18N
+            case LEGACY_RSCRIPT_ID:
+                return getMessage("LBL_Graalvm_Rscript");     // NOI18N
             case RUBY_ID:
                 return getMessage("LBL_Graalvm_Ruby");  // NOI18N
             case NODEJS_ID:
                 return getMessage("LBL_Graalvm_Nodejs");  // NOI18N                
+            case PYTHON_ID:
+                return getMessage("LBL_Graalvm_Python");  // NOI18N
             default:
                 return lang;
         }
