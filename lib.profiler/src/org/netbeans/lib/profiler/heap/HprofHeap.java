@@ -557,14 +557,13 @@ class HprofHeap implements Heap {
         computeReferences();
         
         List refs = new ArrayList();
-        List refIds = idToOffsetMap.get(instanceId).getReferences();
-        Iterator refIdsIt = refIds.iterator();
+        LongIterator refIdsIt = idToOffsetMap.get(instanceId).getReferences();
         int idSize = dumpBuffer.getIDSize();
         ClassDumpSegment classDumpBounds = getClassDumpSegment();
         long[] offset = new long[1];
         
         while (refIdsIt.hasNext()) {
-            long foundInstanceId = ((Long)refIdsIt.next()).longValue();
+            long foundInstanceId = refIdsIt.next();
             offset[0] = idToOffsetMap.get(foundInstanceId).getOffset();
             long start = offset[0];
             int tag = readDumpTag(offset);
