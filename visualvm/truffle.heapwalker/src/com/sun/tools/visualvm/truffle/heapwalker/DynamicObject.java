@@ -661,19 +661,28 @@ public class DynamicObject {
                 if (loc.getValueOfField("type") != null) {   // TypedObjectFieldLocation
                     Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
                     if (index.intValue() == 0) { // test for type Object[]
+                        long typeClassId = ((Instance) loc.getValueOfField("type")).getInstanceId();  // NOI18N
                         ObjectFieldValue val = (ObjectFieldValue) getDynamicObjectField(dynamicObject, index+1);
                         Instance value = val.getInstance();
                         if (value != null) {
                             // test for the same class as type or subclasses
-                            long typeClassId = ((Instance) loc.getValueOfField("type")).getInstanceId();  // NOI18N
                             for (JavaClass valueClass = value.getJavaClass(); valueClass != null; valueClass = valueClass.getSuperClass()) {
                                 if (valueClass.getJavaClassId() == typeClassId) {
                                     return val;
                                 }
                             }
                         }
-                        return getDynamicObjectField(dynamicObject, index);
-
+                        // we should have Object[]
+                        ObjectFieldValue valarr = (ObjectFieldValue) getDynamicObjectField(dynamicObject, index);
+                        Instance valueArr = valarr.getInstance();
+                        if (valueArr != null) {
+                            // test for Object[]
+                            if (valueArr.getJavaClass().getJavaClassId() == typeClassId) {
+                                return valarr;
+                            }
+                        }
+                        // fallback in case "type" is interface
+                        return val;
                     }
                     return getDynamicObjectField(dynamicObject, index+1);
                 }
