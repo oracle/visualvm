@@ -91,14 +91,19 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
             return value;
         }
         if (SUB_ROPE_MASK.equals(className)) {
-           Object offset = instance.getValueOfField("byteOffset");   // NOI18N
-           Object child = instance.getValueOfField("child");   // NOI18N
-           String childString = DetailsUtils.getInstanceString((Instance)child, heap);
-           int byteOffset = ((Integer)offset).intValue();
+            Object offset = instance.getValueOfField("byteOffset");   // NOI18N
+            Object child = instance.getValueOfField("child");   // NOI18N
+            String childString = DetailsUtils.getInstanceString((Instance) child, heap);
+            int byteOffset;
 
-           if (childString.length()>byteOffset) {
-               return childString.substring(byteOffset);
-           }
+            if (offset == null) {
+                offset = instance.getValueOfField("offset");   // NOI18N
+            }
+            byteOffset = ((Integer) offset).intValue();
+
+            if (childString.length() > byteOffset) {
+                return childString.substring(byteOffset);
+            }
         }
         if (ENCODING_MASK.equals(className)) {
             return getByteArrayFieldString(instance, "name", 0, -1, "...");
