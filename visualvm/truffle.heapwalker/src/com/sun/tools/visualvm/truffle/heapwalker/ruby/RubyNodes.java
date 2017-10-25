@@ -113,6 +113,18 @@ class RubyNodes {
                 Integer size = Integer.parseInt(sizeField.getValue());
                 logicalValue = Formatters.numberFormat().format(size) + (size == 1 ? " item" : " items");
             }
+        } else if ("StringType".equals(type)) {
+            FieldValue ropeField = dobject.getFieldValue("rope (hidden)");
+            Instance rope = ropeField instanceof ObjectFieldValue ? ((ObjectFieldValue)ropeField).getInstance() : null;
+            if (rope != null) logicalValue = DetailsUtils.getInstanceString(rope, heap);
+        } else if ("RegexpType".equals(type)) {
+            FieldValue sourceField = dobject.getFieldValue("source (hidden)");
+            Instance source = sourceField instanceof ObjectFieldValue ? ((ObjectFieldValue)sourceField).getInstance() : null;
+            if (source != null) logicalValue = DetailsUtils.getInstanceString(source, heap);
+        } else if ("EncodingType".equals(type)) {
+            FieldValue encodingField = dobject.getFieldValue("encoding (hidden)");
+            Instance encoding = encodingField instanceof ObjectFieldValue ? ((ObjectFieldValue)encodingField).getInstance() : null;
+            if (encoding != null) logicalValue = DetailsUtils.getInstanceString(encoding, heap);
         }
 
         return logicalValue;
