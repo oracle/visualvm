@@ -24,6 +24,7 @@
  */
 package com.sun.tools.visualvm.truffle.heapwalker.ruby;
 
+import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectArrayItemNode;
 import com.sun.tools.visualvm.truffle.heapwalker.LocalDynamicObjectNode;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectReferenceNode;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectFieldNode;
@@ -59,6 +60,8 @@ public class RubyNodesRendererProvider extends HeapWalkerRenderer.Provider {
         renderers.put(RubyNodes.RubyDynamicObjectsContainer.class, new DynamicObjectsContainer.Renderer(packageIcon));
         
         renderers.put(RubyNodes.RubyDynamicObjectFieldNode.class, new DynamicObjectFieldNode.Renderer(heap, instanceIcon));
+        
+        renderers.put(RubyNodes.RubyDynamicObjectArrayItemNode.class, new DynamicObjectArrayItemNode.Renderer(heap, instanceIcon));
         
         renderers.put(RubyNodes.RubyDynamicObjectReferenceNode.class, new DynamicObjectReferenceNode.Renderer(heap, instanceIcon));
         

@@ -24,6 +24,7 @@
  */
 package com.sun.tools.visualvm.truffle.heapwalker.javascript;
 
+import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectArrayItemNode;
 import com.sun.tools.visualvm.truffle.heapwalker.LocalDynamicObjectNode;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectReferenceNode;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectFieldNode;
@@ -59,6 +60,8 @@ public class JavaScriptNodesRendererProvider extends HeapWalkerRenderer.Provider
         renderers.put(JavaScriptNodes.JavaScriptDynamicObjectsContainer.class, new DynamicObjectsContainer.Renderer(packageIcon));
         
         renderers.put(JavaScriptNodes.JavaScriptDynamicObjectFieldNode.class, new DynamicObjectFieldNode.Renderer(heap, instanceIcon));
+        
+        renderers.put(JavaScriptNodes.JavaScriptDynamicObjectArrayItemNode.class, new DynamicObjectArrayItemNode.Renderer(heap, instanceIcon));
         
         renderers.put(JavaScriptNodes.JavaScriptDynamicObjectReferenceNode.class, new DynamicObjectReferenceNode.Renderer(heap, instanceIcon));
         

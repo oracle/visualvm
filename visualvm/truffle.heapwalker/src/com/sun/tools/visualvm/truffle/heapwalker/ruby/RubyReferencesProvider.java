@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.truffle.heapwalker.ruby;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectFieldNode;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectNode;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObject;
+import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectArrayItemNode;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.SortOrder;
@@ -55,7 +56,7 @@ public class RubyReferencesProvider extends HeapWalkerNode.Provider {
     }
     
     public boolean supportsNode(HeapWalkerNode parent, Heap heap, String viewID) {
-        return parent instanceof DynamicObjectNode && !(parent instanceof DynamicObjectFieldNode);
+        return parent instanceof DynamicObjectNode && !(parent instanceof DynamicObjectFieldNode) && !(parent instanceof DynamicObjectArrayItemNode);
 //        return parent instanceof DynamicObjectNode /*&& !(parent instanceof DynamicObjectFieldNode)*/ || parent instanceof ReferenceNode;
     }
     

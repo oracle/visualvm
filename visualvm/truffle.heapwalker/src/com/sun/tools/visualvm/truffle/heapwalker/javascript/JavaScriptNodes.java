@@ -32,11 +32,13 @@ import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObject;
+import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectArrayItemNode;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectFieldNode;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectNode;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectReferenceNode;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectsContainer;
 import com.sun.tools.visualvm.truffle.heapwalker.LocalDynamicObjectNode;
+import org.netbeans.lib.profiler.heap.ArrayItemValue;
 
 /**
  *
@@ -160,6 +162,25 @@ class JavaScriptNodes {
         }
         
     }
+    
+    static class JavaScriptDynamicObjectArrayItemNode extends DynamicObjectArrayItemNode implements JavaScriptNode {
+        
+        JavaScriptDynamicObjectArrayItemNode(DynamicObject dobject, String type, ArrayItemValue item) {
+            super(dobject, type, item);
+        }
+        
+        protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
+            String logicalValue = JavaScriptNodes.getLogicalValue(dobject, type, heap);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
+        }
+        
+        
+        public JavaScriptDynamicObjectNode createCopy() {
+            return new JavaScriptDynamicObjectNode(getDynamicObject(), getType());
+        }
+        
+    }
+        
     
     static class JavaScriptDynamicObjectReferenceNode extends DynamicObjectReferenceNode implements JavaScriptNode {
         

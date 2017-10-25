@@ -32,11 +32,13 @@ import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObject;
+import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectArrayItemNode;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectFieldNode;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectNode;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectReferenceNode;
 import com.sun.tools.visualvm.truffle.heapwalker.DynamicObjectsContainer;
 import com.sun.tools.visualvm.truffle.heapwalker.LocalDynamicObjectNode;
+import org.netbeans.lib.profiler.heap.ArrayItemValue;
 
 /**
  *
@@ -174,6 +176,24 @@ class RubyNodes {
         
         RubyDynamicObjectFieldNode(DynamicObject dobject, String type, FieldValue field) {
             super(dobject, type, field);
+        }
+        
+        protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
+            String logicalValue = RubyNodes.getLogicalValue(dobject, type, heap);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
+        }
+        
+        
+        public RubyDynamicObjectNode createCopy() {
+            return new RubyDynamicObjectNode(getDynamicObject(), getType());
+        }
+        
+    }
+    
+    static class RubyDynamicObjectArrayItemNode extends DynamicObjectArrayItemNode implements RubyNode {
+        
+        RubyDynamicObjectArrayItemNode(DynamicObject dobject, String type, ArrayItemValue item) {
+            super(dobject, type, item);
         }
         
         protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
