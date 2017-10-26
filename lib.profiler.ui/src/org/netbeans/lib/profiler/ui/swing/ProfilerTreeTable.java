@@ -1288,7 +1288,11 @@ public class ProfilerTreeTable extends ProfilerTable {
 
         public void treeNodesRemoved(TreeModelEvent e) { notifyTable(); }
 
-        public void treeStructureChanged(TreeModelEvent e) { notifyTable(); }
+        public void treeStructureChanged(TreeModelEvent e) {
+            tree.setChangingModel(true);
+            try { notifyTable(); }
+            finally { tree.setChangingModel(false); }
+        }
         
         private void notifyTable() {
             if (tree.isChangingModel()) return;
@@ -1510,10 +1514,16 @@ public class ProfilerTreeTable extends ProfilerTable {
         }
         
         public void setSelectionPaths(TreePath[] paths) {
-            if (changingModel && paths != null)
-                for (int i = 0; i < paths.length; i++)
-                    paths[i] = getSimilarPath(paths[i]);
-            super.setSelectionPaths(paths);
+            if (changingModel && paths != null) {
+                List<TreePath> similarPaths = new ArrayList();
+                for (int i = 0; i < paths.length; i++) {
+                    TreePath similarPath = getSimilarPath(paths[i]);
+                    if (similarPath != null) similarPaths.add(similarPath);
+                }
+                super.setSelectionPaths(similarPaths.toArray(new TreePath[0]));
+            } else {
+                super.setSelectionPaths(paths);
+            }
         }
         
         private TreePath getSimilarPath(TreePath oldPath) {
