@@ -37,6 +37,7 @@ import org.netbeans.modules.profiler.heapwalker.v2.java.InstanceNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
+import org.netbeans.modules.profiler.heapwalker.v2.model.Progress;
 import org.netbeans.modules.profiler.heapwalker.v2.model.RootNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.TextNode;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapViewPlugin;
@@ -63,7 +64,7 @@ class JavaViewPlugin extends HeapViewPlugin {
         heap = context.getFragment().getHeap();
         
         objectsView = new TreeTableView("java_objects_truffleext", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
-            protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
+            protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 InstanceNode instanceNode = selected == null ? null : new InstanceNode(selected);
                 HeapWalkerNode result = instanceNode == null ? new TextNode("<no object selected>") : instanceNode;
                 return new HeapWalkerNode[] { result };

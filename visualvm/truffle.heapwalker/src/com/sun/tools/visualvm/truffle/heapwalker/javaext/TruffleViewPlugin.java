@@ -41,6 +41,7 @@ import org.netbeans.modules.profiler.heapwalker.v2.java.JavaHeapFragment;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
+import org.netbeans.modules.profiler.heapwalker.v2.model.Progress;
 import org.netbeans.modules.profiler.heapwalker.v2.model.RootNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.TextNode;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapViewPlugin;
@@ -68,7 +69,7 @@ class TruffleViewPlugin extends HeapViewPlugin {
         heap = context.getFragment().getHeap();
         
         objectsView = new TreeTableView("truffle_objects_javaext", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
-            protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
+            protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 if (DynamicObject.isDynamicObject(selected)) {
                     DynamicObject dobject = new DynamicObject(selected);
                     return new HeapWalkerNode[] { new DynamicObjectNode(dobject, dobject.getType(heap)) };
