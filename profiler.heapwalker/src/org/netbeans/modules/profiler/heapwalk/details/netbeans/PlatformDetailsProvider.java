@@ -55,12 +55,14 @@ import org.openide.util.lookup.ServiceProvider;
 /**
  *
  * @author Tomas Hurka
+ * @author Jiri Sedlacek
  */
 @ServiceProvider(service=DetailsProvider.class)
 public class PlatformDetailsProvider extends DetailsProvider.Basic {
 
     private static final String STANDARD_MODULE = "org.netbeans.Module+"; // NOI18N
     private static final String MODULE_DATA = "org.netbeans.ModuleData+"; // NOI18N
+    private static final String DEPENDENCY = "org.openide.modules.Dependency"; // NOI18N
     private static final String SPECIFICATION_VERSION = "org.openide.modules.SpecificationVersion"; // NOI18N
     private static final String ABSTRACT_NODE = "org.openide.nodes.AbstractNode+"; // NOI18N
     private static final String MULTI_FILE_ENTRY = "org.openide.loaders.MultiDataObject$Entry+"; // NOI18N
@@ -91,7 +93,7 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
     };
     
     public PlatformDetailsProvider() {
-        super(STANDARD_MODULE,MODULE_DATA,SPECIFICATION_VERSION,
+        super(STANDARD_MODULE,MODULE_DATA,DEPENDENCY,SPECIFICATION_VERSION,
               ABSTRACT_NODE,MULTI_FILE_ENTRY,DATA_OBJECT,JAR_FILESYSTEM,
               FILE_OBJ,FOLDER_OBJ, FILE_NAME,FOLDER_NAME,ABSTRACT_FOLDER,
               BFS_BASE,
@@ -119,6 +121,12 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
                 return codeName;
             }
             return DetailsUtils.getInstanceFieldString(instance, "data", heap);     // NOI18N
+        } else if (DEPENDENCY.equals(className)) {
+            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap);     // NOI18N
+            String version = DetailsUtils.getInstanceFieldString(instance, "version", heap);     // NOI18N
+            int type = DetailsUtils.getIntFieldValue(instance, "type", -1); // NOI18N
+            int comparison = DetailsUtils.getIntFieldValue(instance, "comparison", -1); // NOI18N
+            return DependencyResolver.toString(name, version, type, comparison);
         } else if (SPECIFICATION_VERSION.equals(className)) {
             PrimitiveArrayInstance digits = (PrimitiveArrayInstance) instance.getValueOfField("digits"); // NOI18N
             if (digits != null) {
@@ -1607,6 +1615,50 @@ public class PlatformDetailsProvider extends DetailsProvider.Basic {
      * marker interface for compact char sequence implementations
      */
     private interface CompactCharSequence extends CharSequence {
+    }
+    
+    
+    private static class DependencyResolver {
+        
+        private final static int TYPE_MODULE = 1;
+        private final static int TYPE_PACKAGE = 2;
+        private final static int TYPE_JAVA = 3;
+        private final static int TYPE_IDE = 4;
+        private final static int TYPE_REQUIRES = 5;
+        private final static int TYPE_NEEDS = 6;
+        private final static int TYPE_RECOMMENDS = 7;
+        private final static int COMPARE_SPEC = 1;
+        private final static int COMPARE_IMPL = 2;
+        private final static int COMPARE_ANY = 3;
+        
+        static String toString(String name, String version, int type, int comparison) {
+            StringBuilder buf = new StringBuilder(100);
+
+            if (type == TYPE_MODULE) {
+                buf.append("module "); // NOI18N
+            } else if (type == TYPE_PACKAGE) {
+                buf.append("package "); // NOI18N
+            } else if (type == TYPE_REQUIRES) {
+                buf.append("requires "); // NOI18N
+            } else if (type == TYPE_NEEDS) {
+                buf.append("needs "); // NOI18N
+            } else if (type == TYPE_RECOMMENDS) {
+                buf.append("recommends "); // NOI18N
+            }
+
+            buf.append(name);
+
+            if (comparison == COMPARE_IMPL) {
+                buf.append(" = "); // NOI18N
+                buf.append(version);
+            } else if (comparison == COMPARE_SPEC) {
+                buf.append(" > "); // NOI18N
+                buf.append(version);
+            }
+
+            return buf.toString();
+        }
+        
     }
 
     //</editor-fold>
