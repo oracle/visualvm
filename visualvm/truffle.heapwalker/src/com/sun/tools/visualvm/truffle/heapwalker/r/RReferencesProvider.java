@@ -35,8 +35,11 @@ import org.netbeans.modules.profiler.heapwalker.v2.HeapFragment;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
+import org.netbeans.modules.profiler.heapwalker.v2.model.Progress;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.UIThresholds;
 import org.netbeans.modules.profiler.heapwalker.v2.utils.NodesComputer;
+import static org.netbeans.modules.profiler.heapwalker.v2.utils.NodesComputer.integerIterator;
+import org.netbeans.modules.profiler.heapwalker.v2.utils.ProgressIterator;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -62,11 +65,11 @@ public class RReferencesProvider extends HeapWalkerNode.Provider {
         return parent instanceof RObjectNode && !(parent instanceof RObjectFieldNode);
     }
 
-    public HeapWalkerNode[] getNodes(HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
-        return getNodes(getReferences(parent, heap), parent, heap, viewID, dataTypes, sortOrders);
+    public HeapWalkerNode[] getNodes(HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+        return getNodes(getReferences(parent, heap), parent, heap, viewID, dataTypes, sortOrders, progress);
     }
 
-    static HeapWalkerNode[] getNodes(List<FieldValue> references, HeapWalkerNode parent, Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders) {
+    static HeapWalkerNode[] getNodes(List<FieldValue> references, HeapWalkerNode parent, Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
         if (references == null) {
             return null;
         }
@@ -81,8 +84,9 @@ public class RReferencesProvider extends HeapWalkerNode.Provider {
                 return new RObjectReferenceNode(reference);
             }
 
-            protected Iterator<Integer> objectsIterator(int index) {
-                return integerIterator(index, references.size());
+            protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
+                Iterator<Integer> iterator = integerIterator(index, references.size());
+                return new ProgressIterator(iterator, index, false, progress);
             }
 
             protected String getMoreNodesString(String moreNodesCount) {
@@ -98,7 +102,7 @@ public class RReferencesProvider extends HeapWalkerNode.Provider {
             }
         };
 
-        return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
+        return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
     }
 
     private List<FieldValue> getReferences(HeapWalkerNode parent, Heap heap) {

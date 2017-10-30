@@ -44,6 +44,7 @@ import org.netbeans.modules.profiler.heapwalker.v2.HeapContext;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
+import org.netbeans.modules.profiler.heapwalker.v2.model.Progress;
 import org.netbeans.modules.profiler.heapwalker.v2.model.RootNode;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerActions;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerFeature;
@@ -97,28 +98,28 @@ class RObjectsView extends HeapWalkerFeature {
         Heap heap = context.getFragment().getHeap();
         
         objectsView = new PluggableTreeTableView("r_objects", context, actions, TreeTableViewColumn.classes(heap, true)) {
-            protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
+            protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 switch (getPreset()) {
                     case ALL_OBJECTS:
                         switch (getAggregation()) {
                             case TYPES:
-                                return RObjectsProvider.getAllObjects(root, RObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 1);
+                                return RObjectsProvider.getAllObjects(root, RObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
                             default:
-                                return RObjectsProvider.getAllObjects(root, RObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 0);
+                                return RObjectsProvider.getAllObjects(root, RObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
                         }
                     case DOMINATORS:
                         switch (getAggregation()) {
                             case TYPES:
-                                return RObjectsProvider.getDominators(root, RObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 1);
+                                return RObjectsProvider.getDominators(root, RObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
                             default:
-                                return RObjectsProvider.getDominators(root, RObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 0);
+                                return RObjectsProvider.getDominators(root, RObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
                         }
                     case GC_ROOTS:
                         switch (getAggregation()) {
                             case TYPES:
-                                return RObjectsProvider.getGCRoots(root, RObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 1);
+                                return RObjectsProvider.getGCRoots(root, RObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
                             default:
-                                return RObjectsProvider.getGCRoots(root, RObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 0);
+                                return RObjectsProvider.getGCRoots(root, RObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
                         }
                     default:
                         return HeapWalkerNode.NO_NODES;

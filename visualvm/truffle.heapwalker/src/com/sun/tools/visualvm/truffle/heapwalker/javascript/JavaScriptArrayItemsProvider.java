@@ -39,8 +39,10 @@ import org.netbeans.modules.profiler.heapwalker.v2.java.PrimitiveNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
+import org.netbeans.modules.profiler.heapwalker.v2.model.Progress;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.UIThresholds;
 import org.netbeans.modules.profiler.heapwalker.v2.utils.NodesComputer;
+import org.netbeans.modules.profiler.heapwalker.v2.utils.ProgressIterator;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -67,7 +69,7 @@ public class JavaScriptArrayItemsProvider extends HeapWalkerNode.Provider {
         }
     }
     
-    public HeapWalkerNode[] getNodes(final HeapWalkerNode parent, final Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
+    public HeapWalkerNode[] getNodes(final HeapWalkerNode parent, final Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
         final Instance instance = HeapWalkerNode.getValue(parent, DataType.INSTANCE, heap);
         if (instance == null) return null;
         
@@ -83,8 +85,9 @@ public class JavaScriptArrayItemsProvider extends HeapWalkerNode.Provider {
                 protected HeapWalkerNode createNode(Integer index) {
                     return new PrimitiveNode.ArrayItem(index, type, items.get(index), instance);
                 }
-                protected Iterator<Integer> objectsIterator(int index) {
-                    return integerIterator(index, items.size());
+                protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
+                    Iterator<Integer> iterator = integerIterator(index, items.size());
+                    return new ProgressIterator(iterator, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return "<another " + moreNodesCount + " items left>";
@@ -97,7 +100,7 @@ public class JavaScriptArrayItemsProvider extends HeapWalkerNode.Provider {
                 }
             };
         
-            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
+            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
         } else if (instance instanceof ObjectArrayInstance) {
             final List<ArrayItemValue> items = ((ObjectArrayInstance)instance).getItems();
             
@@ -115,8 +118,9 @@ public class JavaScriptArrayItemsProvider extends HeapWalkerNode.Provider {
                         return new TerminalJavaNodes.ArrayItem(item, false);
                     }
                 }
-                protected Iterator<Integer> objectsIterator(int index) {
-                    return integerIterator(index, items.size());
+                protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
+                    Iterator<Integer> iterator = integerIterator(index, items.size());
+                    return new ProgressIterator(iterator, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return "<another " + moreNodesCount + " items left>";
@@ -129,7 +133,7 @@ public class JavaScriptArrayItemsProvider extends HeapWalkerNode.Provider {
                 }
             };
             
-            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
+            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
         }
         
         return null;

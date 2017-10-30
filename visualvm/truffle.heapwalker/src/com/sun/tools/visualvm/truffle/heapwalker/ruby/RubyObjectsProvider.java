@@ -39,8 +39,10 @@ import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.TextNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
+import org.netbeans.modules.profiler.heapwalker.v2.model.Progress;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.UIThresholds;
 import org.netbeans.modules.profiler.heapwalker.v2.utils.NodesComputer;
+import org.netbeans.modules.profiler.heapwalker.v2.utils.ProgressIterator;
 
 /**
  *
@@ -51,7 +53,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
     static final String RUBY_LANG_ID = "org.truffleruby.language.RubyObjectType"; // NOI18N
     
 
-    public static HeapWalkerNode[] getAllObjects(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+    public static HeapWalkerNode[] getAllObjects(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
         final RubyHeapFragment fragment = (RubyHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
         
@@ -63,10 +65,9 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                 protected HeapWalkerNode createNode(DynamicObject dobject) {
                     return new RubyNodes.RubyDynamicObjectNode(dobject, dobject.getType(heap));
                 }
-                protected Iterator<DynamicObject> objectsIterator(int index) {
+                protected ProgressIterator<DynamicObject> objectsIterator(int index, Progress progress) {
                     Iterator<DynamicObject> dobjects = fragment.getRubyObjectsIterator();
-                    for (int i = 0; i < index; i++) dobjects.next();
-                    return dobjects;
+                    return new ProgressIterator(dobjects, index, true, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return "<another " + moreNodesCount + " objects left>";
@@ -79,15 +80,17 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                 }
             };
 
-            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
+            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
         } else {
             List<HeapWalkerNode> nodes = new ArrayList();
             Map<String, RubyNodes.RubyDynamicObjectsContainer> types = new HashMap();
             
             Iterator<DynamicObject> dobjects = fragment.getRubyObjectsIterator();
-            
+            progress.setupUnknownSteps();
+                        
             while (dobjects.hasNext()) {
                 DynamicObject dobject = dobjects.next();
+                progress.step();
                 String type = dobject.getType(heap);
                 RubyNodes.RubyDynamicObjectsContainer typeNode = types.get(type);
 
@@ -100,11 +103,13 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                 typeNode.add(dobject, heap);
             }
             
+            progress.finish();
+            
             return nodes.toArray(HeapWalkerNode.NO_NODES);
         }
     }
     
-    public static HeapWalkerNode[] getDominators(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+    public static HeapWalkerNode[] getDominators(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
         final Heap heap = context.getFragment().getHeap();
         
         if (!DataType.RETAINED_SIZE.valuesAvailable(heap))
@@ -114,11 +119,16 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
         
         List<Instance> searchInstances = heap.getBiggestObjectsByRetainedSize(maxSearchInstances);
         Iterator<Instance> searchInstancesIt = searchInstances.iterator();
+        progress.setupKnownSteps(searchInstances.size());
+        
         while (searchInstancesIt.hasNext()) {
             Instance instance = searchInstancesIt.next();
+            progress.step();
             if (!DynamicObject.isDynamicObject(instance) || !isRubyObject(new DynamicObject(instance)))
                 searchInstancesIt.remove();
         }
+        
+        progress.finish();
         
         final List<Instance> dominators = new ArrayList(getDominatorRoots(searchInstances));
         
@@ -131,8 +141,9 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                     DynamicObject dobject = new DynamicObject(instance);
                     return new RubyNodes.RubyDynamicObjectNode(dobject, dobject.getType(heap));
                 }
-                protected Iterator<Instance> objectsIterator(int index) {
-                    return dominators.listIterator(index);
+                protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
+                    Iterator<Instance> dominatorsIt = dominators.listIterator(index);
+                    return new ProgressIterator(dominatorsIt, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return "<another " + moreNodesCount + " dominators left>";
@@ -145,14 +156,17 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                 }
             };
             
-            HeapWalkerNode[] nodes = computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
+            HeapWalkerNode[] nodes = computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
             return nodes.length > 0 ? nodes : new HeapWalkerNode[] { new TextNode("<No dominators found>") };
         } else {
             List<HeapWalkerNode> nodes = new ArrayList();
             Map<String, RubyNodes.RubyDynamicObjectsContainer> types = new HashMap();
             
+            progress.setupKnownSteps(dominators.size());
+            
             for (Instance dominator : dominators) {
                 DynamicObject dobject = new DynamicObject(dominator);
+                progress.step();
                 String type = dobject.getType(heap);
                 RubyNodes.RubyDynamicObjectsContainer typeNode = types.get(type);
 
@@ -165,24 +179,31 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                 typeNode.add(dobject, heap);
             }
             
+            progress.finish();
+            
             if (nodes.isEmpty()) nodes.add(new TextNode("<No dominators found>"));
             return nodes.toArray(HeapWalkerNode.NO_NODES);
         }
     }
     
-    public static HeapWalkerNode[] getGCRoots(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+    public static HeapWalkerNode[] getGCRoots(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
         RubyHeapFragment fragment = (RubyHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
         
         Iterator<DynamicObject> dobjects = fragment.getRubyObjectsIterator();
         
         if (aggregation == 0) {
+            progress.setupUnknownSteps();
+            
             final List<Instance> gcRoots = new ArrayList();
             while (dobjects.hasNext()) {
                 DynamicObject dobject = dobjects.next();
+                progress.step();
                 Instance instance = dobject.getInstance();
                 if (instance.isGCRoot()) gcRoots.add(instance);
             }
+            
+            progress.finish();
             
             NodesComputer<Instance> computer = new NodesComputer<Instance>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
                 protected boolean sorts(DataType dataType) {
@@ -192,8 +213,9 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                     DynamicObject dobject = new DynamicObject(instance);
                     return new RubyNodes.RubyDynamicObjectNode(dobject, dobject.getType(heap));
                 }
-                protected Iterator<Instance> objectsIterator(int index) {
-                    return gcRoots.listIterator(index);
+                protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
+                    Iterator<Instance> gcRootsIt = gcRoots.listIterator(index);
+                    return new ProgressIterator(gcRootsIt, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return "<another " + moreNodesCount + " GC roots left>";
@@ -206,14 +228,17 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                 }
             };
 
-            HeapWalkerNode[] nodes = computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
+            HeapWalkerNode[] nodes = computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
             return nodes.length > 0 ? nodes : new HeapWalkerNode[] { new TextNode("<No GC roots found>") };
         } else {
             List<HeapWalkerNode> nodes = new ArrayList();
             Map<String, RubyNodes.RubyDynamicObjectsContainer> types = new HashMap();
             
+            progress.setupUnknownSteps();
+            
             while (dobjects.hasNext()) {
                 DynamicObject dobject = dobjects.next();
+                progress.step();
                 Instance instance = dobject.getInstance();
                 if (!instance.isGCRoot()) continue;
                 
@@ -228,6 +253,8 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                 }
                 typeNode.add(dobject, heap);
             }
+            
+            progress.finish();
             
             if (nodes.isEmpty()) nodes.add(new TextNode("<No GC roots found>"));
             return nodes.toArray(HeapWalkerNode.NO_NODES);

@@ -36,6 +36,7 @@ import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
+import org.netbeans.modules.profiler.heapwalker.v2.model.Progress;
 import org.netbeans.modules.profiler.heapwalker.v2.model.RootNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.TextNode;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapViewPlugin;
@@ -62,10 +63,10 @@ class RReferencesPlugin extends HeapViewPlugin {
         heap = context.getFragment().getHeap();
         
         objectsView = new TreeTableView("r_objects_references", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
-            protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
+            protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 if (selected != null) {
                     List<FieldValue> references = selected.getReferences();                
-                    HeapWalkerNode[] nodes = getNodes(references, root, heap, viewID, dataTypes, sortOrders);
+                    HeapWalkerNode[] nodes = getNodes(references, root, heap, viewID, dataTypes, sortOrders, progress);
                     return nodes == null || nodes.length == 0 ? new HeapWalkerNode[] { new TextNode("<no references>") } : nodes;
                 }
                 
@@ -79,8 +80,8 @@ class RReferencesPlugin extends HeapViewPlugin {
     }
     
     
-    protected HeapWalkerNode[] getNodes(List<FieldValue> fields, HeapWalkerNode parent, Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders) {
-        return RReferencesProvider.getNodes(fields, parent, heap, viewID, dataTypes, sortOrders);
+    protected HeapWalkerNode[] getNodes(List<FieldValue> fields, HeapWalkerNode parent, Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+        return RReferencesProvider.getNodes(fields, parent, heap, viewID, dataTypes, sortOrders, progress);
     }
     
     

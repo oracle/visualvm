@@ -42,8 +42,10 @@ import org.netbeans.modules.profiler.heapwalker.v2.java.PrimitiveNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
+import org.netbeans.modules.profiler.heapwalker.v2.model.Progress;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.UIThresholds;
 import org.netbeans.modules.profiler.heapwalker.v2.utils.NodesComputer;
+import org.netbeans.modules.profiler.heapwalker.v2.utils.ProgressIterator;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -52,12 +54,12 @@ import org.openide.util.lookup.ServiceProvider;
  */
 abstract class TruffleFieldsProvider extends HeapWalkerNode.Provider {
     
-    public HeapWalkerNode[] getNodes(HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
+    public HeapWalkerNode[] getNodes(HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
         List<FieldValue> fields = getFields(parent, heap);
-        return getNodes(fields, parent, heap, viewID, viewFilter, dataTypes, sortOrders);
+        return getNodes(fields, parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
     }
     
-    static HeapWalkerNode[] getNodes(final List<FieldValue> fields, final HeapWalkerNode parent, final Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
+    static HeapWalkerNode[] getNodes(final List<FieldValue> fields, final HeapWalkerNode parent, final Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
         if (fields == null) return null;
         
         NodesComputer<Integer> computer = new NodesComputer<Integer>(fields.size(), UIThresholds.MAX_INSTANCE_FIELDS) {
@@ -67,8 +69,9 @@ abstract class TruffleFieldsProvider extends HeapWalkerNode.Provider {
             protected HeapWalkerNode createNode(Integer index) {
                 return TruffleFieldsProvider.createNode(fields.get(index), heap);
             }
-            protected Iterator<Integer> objectsIterator(int index) {
-                return integerIterator(index, fields.size());
+            protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
+                Iterator<Integer> iterator = integerIterator(index, fields.size());
+                return new ProgressIterator(iterator, index, false, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
                 return "<another " + moreNodesCount + " truffle fields left>";
@@ -81,7 +84,7 @@ abstract class TruffleFieldsProvider extends HeapWalkerNode.Provider {
             }
         };
 
-        return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
+        return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
     }
     
     private static HeapWalkerNode createNode(FieldValue field, Heap heap) {

@@ -39,8 +39,10 @@ import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.TextNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
+import org.netbeans.modules.profiler.heapwalker.v2.model.Progress;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.UIThresholds;
 import org.netbeans.modules.profiler.heapwalker.v2.utils.NodesComputer;
+import org.netbeans.modules.profiler.heapwalker.v2.utils.ProgressIterator;
 
 /**
  *
@@ -51,7 +53,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
     static final String JS_LANG_ID = "com.oracle.truffle.js.runtime.builtins.JSClass";
     
 
-    public static HeapWalkerNode[] getAllObjects(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+    public static HeapWalkerNode[] getAllObjects(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
         final JavaScriptHeapFragment fragment = (JavaScriptHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
         
@@ -63,10 +65,9 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                 protected HeapWalkerNode createNode(DynamicObject dobject) {
                     return new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, dobject.getType(heap));
                 }
-                protected Iterator<DynamicObject> objectsIterator(int index) {
+                protected ProgressIterator<DynamicObject> objectsIterator(int index, Progress progress) {
                     Iterator<DynamicObject> dobjects = fragment.getJavaScriptObjectsIterator();
-                    for (int i = 0; i < index; i++) dobjects.next();
-                    return dobjects;
+                    return new ProgressIterator(dobjects, index, true, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return "<another " + moreNodesCount + " objects left>";
@@ -79,15 +80,17 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                 }
             };
 
-            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
+            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
         } else {
             List<HeapWalkerNode> nodes = new ArrayList();
             Map<String, JavaScriptNodes.JavaScriptDynamicObjectsContainer> types = new HashMap();
             
             Iterator<DynamicObject> dobjects = fragment.getJavaScriptObjectsIterator();
+            progress.setupUnknownSteps();
             
             while (dobjects.hasNext()) {
                 DynamicObject dobject = dobjects.next();
+                progress.step();
                 String type = dobject.getType(heap);
                 JavaScriptNodes.JavaScriptDynamicObjectsContainer typeNode = types.get(type);
 
@@ -100,11 +103,13 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                 typeNode.add(dobject, heap);
             }
             
+            progress.finish();
+            
             return nodes.toArray(HeapWalkerNode.NO_NODES);
         }
     }
     
-    public static HeapWalkerNode[] getDominators(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+    public static HeapWalkerNode[] getDominators(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
         final Heap heap = context.getFragment().getHeap();
         
         if (!DataType.RETAINED_SIZE.valuesAvailable(heap))
@@ -114,11 +119,16 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
         
         List<Instance> searchInstances = heap.getBiggestObjectsByRetainedSize(maxSearchInstances);
         Iterator<Instance> searchInstancesIt = searchInstances.iterator();
+        progress.setupKnownSteps(searchInstances.size());
+        
         while (searchInstancesIt.hasNext()) {
             Instance instance = searchInstancesIt.next();
+            progress.step();
             if (!DynamicObject.isDynamicObject(instance) || !isJavaScriptObject(new DynamicObject(instance)))
                 searchInstancesIt.remove();
         }
+        
+        progress.finish();
         
         final List<Instance> dominators = new ArrayList(getDominatorRoots(searchInstances));
         
@@ -131,8 +141,9 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                     DynamicObject dobject = new DynamicObject(instance);
                     return new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, dobject.getType(heap));
                 }
-                protected Iterator<Instance> objectsIterator(int index) {
-                    return dominators.listIterator(index);
+                protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
+                    Iterator<Instance> dominatorsIt = dominators.listIterator(index);
+                    return new ProgressIterator(dominatorsIt, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return "<another " + moreNodesCount + " dominators left>";
@@ -145,14 +156,17 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                 }
             };
             
-            HeapWalkerNode[] nodes = computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
+            HeapWalkerNode[] nodes = computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
             return nodes.length > 0 ? nodes : new HeapWalkerNode[] { new TextNode("<No dominators found>") };
         } else {
             List<HeapWalkerNode> nodes = new ArrayList();
             Map<String, JavaScriptNodes.JavaScriptDynamicObjectsContainer> types = new HashMap();
             
+            progress.setupKnownSteps(dominators.size());
+            
             for (Instance dominator : dominators) {
                 DynamicObject dobject = new DynamicObject(dominator);
+                progress.step();
                 String type = dobject.getType(heap);
                 JavaScriptNodes.JavaScriptDynamicObjectsContainer typeNode = types.get(type);
 
@@ -165,24 +179,31 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                 typeNode.add(dobject, heap);
             }
             
+            progress.finish();
+            
             if (nodes.isEmpty()) nodes.add(new TextNode("<No dominators found>"));
             return nodes.toArray(HeapWalkerNode.NO_NODES);
         }
     }
     
-    public static HeapWalkerNode[] getGCRoots(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, int aggregation) {
+    public static HeapWalkerNode[] getGCRoots(HeapWalkerNode parent, HeapContext context, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
         JavaScriptHeapFragment fragment = (JavaScriptHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
         
         Iterator<DynamicObject> dobjects = fragment.getJavaScriptObjectsIterator();
         
         if (aggregation == 0) {
+            progress.setupUnknownSteps();
+            
             final List<Instance> gcRoots = new ArrayList();
             while (dobjects.hasNext()) {
                 DynamicObject dobject = dobjects.next();
+                progress.step();
                 Instance instance = dobject.getInstance();
                 if (instance.isGCRoot()) gcRoots.add(instance);
             }
+            
+            progress.finish();
             
             NodesComputer<Instance> computer = new NodesComputer<Instance>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
                 protected boolean sorts(DataType dataType) {
@@ -192,8 +213,9 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                     DynamicObject dobject = new DynamicObject(instance);
                     return new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, dobject.getType(heap));
                 }
-                protected Iterator<Instance> objectsIterator(int index) {
-                    return gcRoots.listIterator(index);
+                protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
+                    Iterator<Instance> gcRootsIt = gcRoots.listIterator(index);
+                    return new ProgressIterator(gcRootsIt, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return "<another " + moreNodesCount + " GC roots left>";
@@ -206,14 +228,17 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                 }
             };
 
-            HeapWalkerNode[] nodes = computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders);
+            HeapWalkerNode[] nodes = computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
             return nodes.length > 0 ? nodes : new HeapWalkerNode[] { new TextNode("<No GC roots found>") };
         } else {
             List<HeapWalkerNode> nodes = new ArrayList();
             Map<String, JavaScriptNodes.JavaScriptDynamicObjectsContainer> types = new HashMap();
             
+            progress.setupUnknownSteps();
+            
             while (dobjects.hasNext()) {
                 DynamicObject dobject = dobjects.next();
+                progress.step();
                 Instance instance = dobject.getInstance();
                 if (!instance.isGCRoot()) continue;
                 
@@ -228,6 +253,8 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                 }
                 typeNode.add(dobject, heap);
             }
+            
+            progress.finish();
             
             if (nodes.isEmpty()) nodes.add(new TextNode("<No GC roots found>"));
             return nodes.toArray(HeapWalkerNode.NO_NODES);

@@ -38,6 +38,7 @@ import org.netbeans.modules.profiler.heapwalker.v2.HeapContext;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
+import org.netbeans.modules.profiler.heapwalker.v2.model.Progress;
 import org.netbeans.modules.profiler.heapwalker.v2.model.RootNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.TextNode;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapViewPlugin;
@@ -63,7 +64,7 @@ public class RAttributesPlugin extends HeapViewPlugin {
         heap = context.getFragment().getHeap();
 
         objectsView = new TreeTableView("r_objects_attributes", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
-            protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
+            protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 if (selected != null) {
                     List<FieldValue> fields = null;
                     
@@ -73,7 +74,7 @@ public class RAttributesPlugin extends HeapViewPlugin {
                         fields.addAll(attributes.getStaticFieldValues());
                     }
 
-                    HeapWalkerNode[] nodes = getNodes(fields, root, heap, viewID, viewFilter, dataTypes, sortOrders);
+                    HeapWalkerNode[] nodes = getNodes(fields, root, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
                     return nodes == null || nodes.length == 0 ? new HeapWalkerNode[] { new TextNode("<no attributes>") } : nodes;
                 }
                 
@@ -86,8 +87,8 @@ public class RAttributesPlugin extends HeapViewPlugin {
         return objectsView.getComponent();
     }
 
-    protected HeapWalkerNode[] getNodes(List<FieldValue> fields, HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
-        return RAttributesProvider.getNodes(fields, parent, heap, viewID, viewFilter, dataTypes, sortOrders);
+    protected HeapWalkerNode[] getNodes(List<FieldValue> fields, HeapWalkerNode parent, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+        return RAttributesProvider.getNodes(fields, parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
     }
 
     protected void nodeSelected(HeapWalkerNode node, boolean adjusting) {

@@ -44,6 +44,7 @@ import org.netbeans.modules.profiler.heapwalker.v2.HeapContext;
 import org.netbeans.modules.profiler.heapwalker.v2.model.DataType;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNode;
 import org.netbeans.modules.profiler.heapwalker.v2.model.HeapWalkerNodeFilter;
+import org.netbeans.modules.profiler.heapwalker.v2.model.Progress;
 import org.netbeans.modules.profiler.heapwalker.v2.model.RootNode;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerActions;
 import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerFeature;
@@ -97,28 +98,28 @@ class RubyObjectsView extends HeapWalkerFeature {
         Heap heap = context.getFragment().getHeap();
         
         objectsView = new PluggableTreeTableView("ruby_objects", context, actions, TreeTableViewColumn.classes(heap, true)) {
-            protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
+            protected HeapWalkerNode[] computeData(RootNode root, Heap heap, String viewID, HeapWalkerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 switch (getPreset()) {
                     case ALL_OBJECTS:
                         switch (getAggregation()) {
                             case TYPES:
-                                return RubyObjectsProvider.getAllObjects(root, RubyObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 1);
+                                return RubyObjectsProvider.getAllObjects(root, RubyObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
                             default:
-                                return RubyObjectsProvider.getAllObjects(root, RubyObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 0);
+                                return RubyObjectsProvider.getAllObjects(root, RubyObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
                         }
                     case DOMINATORS:
                         switch (getAggregation()) {
                             case TYPES:
-                                return RubyObjectsProvider.getDominators(root, RubyObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 1);
+                                return RubyObjectsProvider.getDominators(root, RubyObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
                             default:
-                                return RubyObjectsProvider.getDominators(root, RubyObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 0);
+                                return RubyObjectsProvider.getDominators(root, RubyObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
                         }
                     case GC_ROOTS:
                         switch (getAggregation()) {
                             case TYPES:
-                                return RubyObjectsProvider.getGCRoots(root, RubyObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 1);
+                                return RubyObjectsProvider.getGCRoots(root, RubyObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
                             default:
-                                return RubyObjectsProvider.getGCRoots(root, RubyObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, 0);
+                                return RubyObjectsProvider.getGCRoots(root, RubyObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
                         }
                    default:
                         return HeapWalkerNode.NO_NODES;
