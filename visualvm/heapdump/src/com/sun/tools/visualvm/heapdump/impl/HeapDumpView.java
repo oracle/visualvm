@@ -107,8 +107,9 @@ class HeapDumpView extends DataSourceView {
         private JPanel contentsPanel;
         
         public MasterViewSupport(HeapDump heapDump) {
-            initComponents();
-            loadHeap(heapDump.getFile());
+            File file = heapDump.getFile();
+            initComponents(file != null);
+            if (file != null) loadHeap(file);
         }
         
         
@@ -117,10 +118,12 @@ class HeapDumpView extends DataSourceView {
         }
         
         
-        private void initComponents() {
+        private void initComponents(boolean hasDump) {
             setLayout(new BorderLayout());
             
-            progressLabel = new JLabel(NbBundle.getMessage(HeapDumpView.class, "LBL_Loading_Heap_Dump"), SwingConstants.CENTER);    // NOI18N
+            String label = hasDump ? NbBundle.getMessage(HeapDumpView.class, "LBL_Loading_Heap_Dump") :    // NOI18N
+                                     NbBundle.getMessage(HeapDumpView.class, "LBL_Loading_Heap_Dump_failed");    // NOI18N
+            progressLabel = new JLabel(label, SwingConstants.CENTER);
         
             contentsPanel = new JPanel(new BorderLayout());
             contentsPanel.add(progressLabel, BorderLayout.CENTER);

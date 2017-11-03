@@ -66,7 +66,7 @@ public final class ApplicationSnapshot extends Snapshot {
     }
     
     public boolean supportsSaveAs() {
-        return true;
+        return getFile() != null;
     }
 
     public void saveAs() {

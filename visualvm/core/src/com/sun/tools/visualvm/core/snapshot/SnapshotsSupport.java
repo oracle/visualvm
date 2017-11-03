@@ -35,6 +35,7 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -71,33 +72,37 @@ public final class SnapshotsSupport {
      */
     public void saveAs(final Snapshot snapshot, String dialogTitle) {
         final File file = snapshot.getFile();
-        JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle(dialogTitle);
-        chooser.setSelectedFile(new File(snapshot.getFile().getName()));
-        chooser.setAcceptAllFileFilterUsed(false);
-        chooser.setFileFilter(snapshot.getCategory().getFileFilter());
-//        chooser.setFileView(category.getFileView());
-        if (chooser.showSaveDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
-            String categorySuffix = snapshot.getCategory().getSuffix();
-            String filePath = chooser.getSelectedFile().getAbsolutePath();
-            if (!filePath.endsWith(categorySuffix)) filePath += categorySuffix;
-            final File copy = new File(filePath);
-            RequestProcessor.getDefault().post(new Runnable() {
-                public void run() {
-                    ProgressHandle pHandle = null;
-                    try {
-                        pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(SnapshotsSupport.class, "LBL_Saving",DataSourceDescriptorFactory.getDescriptor(snapshot).getName()));  // NOI18N
-                        pHandle.setInitialDelay(0);
-                        pHandle.start();
-                        Utils.copyFile(file, copy);
-                    } finally {
-                        final ProgressHandle pHandleF = pHandle;
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() { if (pHandleF != null) pHandleF.finish(); }
-                        });
+        if (file == null) {
+            ProfilerDialogs.displayError(NbBundle.getMessage(SnapshotsSupport.class, "LBL_CannotSave"));  // NOI18N
+        } else {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setDialogTitle(dialogTitle);
+            chooser.setSelectedFile(new File(snapshot.getFile().getName()));
+            chooser.setAcceptAllFileFilterUsed(false);
+            chooser.setFileFilter(snapshot.getCategory().getFileFilter());
+    //        chooser.setFileView(category.getFileView());
+            if (chooser.showSaveDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
+                String categorySuffix = snapshot.getCategory().getSuffix();
+                String filePath = chooser.getSelectedFile().getAbsolutePath();
+                if (!filePath.endsWith(categorySuffix)) filePath += categorySuffix;
+                final File copy = new File(filePath);
+                RequestProcessor.getDefault().post(new Runnable() {
+                    public void run() {
+                        ProgressHandle pHandle = null;
+                        try {
+                            pHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(SnapshotsSupport.class, "LBL_Saving",DataSourceDescriptorFactory.getDescriptor(snapshot).getName()));  // NOI18N
+                            pHandle.setInitialDelay(0);
+                            pHandle.start();
+                            Utils.copyFile(file, copy);
+                        } finally {
+                            final ProgressHandle pHandleF = pHandle;
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() { if (pHandleF != null) pHandleF.finish(); }
+                            });
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }
     
