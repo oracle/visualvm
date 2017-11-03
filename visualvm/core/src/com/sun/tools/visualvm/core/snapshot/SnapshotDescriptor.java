@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.core.snapshot;
 import com.sun.tools.visualvm.core.datasource.descriptor.DataSourceDescriptor;
 import java.awt.Image;
 import java.io.File;
+import org.openide.util.NbBundle;
 
 /**
  * Abstract implementation of DataSourceDescriptor for snapshots.
@@ -92,13 +93,12 @@ public abstract class SnapshotDescriptor<X extends Snapshot> extends DataSourceD
         if (persistedName != null) return persistedName;
         
         File file = snapshot.getFile();
-        if (file == null) return snapshot.toString();
-        
-        String fileName = file.getName();
+        String fileName = file != null ? file.getName() :
+               NbBundle.getMessage(SnapshotDescriptor.class, "LBL_NoFile");    // NOI18N
         SnapshotCategory category = snapshot.getCategory();
         String name = "[" + category.getPrefix() + "] " + fileName; // NOI18N
         
-        if (category.isSnapshot(file)) {
+        if (file != null && category.isSnapshot(file)) {
             String timeStamp = category.getTimeStamp(fileName);
             if (timeStamp != null) name = "[" + category.getPrefix() + "] " + timeStamp;    // NOI18N
         }
