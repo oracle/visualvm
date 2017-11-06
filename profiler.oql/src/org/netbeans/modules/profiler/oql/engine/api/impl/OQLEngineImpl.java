@@ -379,12 +379,17 @@ public class OQLEngineImpl {
         if (object == null) return null;
         String className = object.getClass().getName();
         boolean isNativeJS = className.contains(".javascript.")     // NOI18N
-                          || className.equals("jdk.nashorn.api.scripting.ScriptObjectMirror"); // NOI18N
+                          || className.equals("jdk.nashorn.api.scripting.ScriptObjectMirror")  // NOI18N
+                          || className.startsWith("com.oracle.truffle.object.") // NOI18N
+                          || className.equals("org.graalvm.polyglot.Value"); // NOI18N
 
         try {
-            Object ret = ((Invocable)engine).invokeFunction("unwrapJavaObject", object); // NOI18N
-            if (isNativeJS && (ret == null || ret.equals(object)) && tryAssociativeArray) {
+            Object ret = ((Invocable)engine).invokeFunction("unwrapJavaObjectRes", object); // NOI18N
+            if (isNativeJS && ret == null && tryAssociativeArray) {
                 ret = ((Invocable)engine).invokeFunction("unwrapMap", object); // NOI18N
+            }
+            if (ret == null) {
+                return object;
             }
             return ret;
         } catch (Exception ex) {

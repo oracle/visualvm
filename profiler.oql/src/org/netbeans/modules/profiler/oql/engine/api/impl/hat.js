@@ -600,7 +600,7 @@ function unwrapJavaObject(jobject) {
             //print("unwrapJavaObject: " + jobject + ", " + e);
             jobject = undefined;
         }
-    } 
+    }
     return jobject;
 }
 
@@ -621,6 +621,15 @@ function unwrapArray(jsobject) {
     }
 
     return array;
+}
+
+function unwrapJavaObjectRes(jobject) {
+    var ret = unwrapJavaObject(jobject);
+
+    if (ret == jobject) {
+        return null;
+    }
+    return ret;
 }
 
 /**
