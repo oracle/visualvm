@@ -67,7 +67,7 @@ public abstract class ProfilerSnapshot extends Snapshot {
     
     @Override
     public boolean supportsSaveAs() {
-        return true;
+        return getFile() != null;
     }
     
     @Override
