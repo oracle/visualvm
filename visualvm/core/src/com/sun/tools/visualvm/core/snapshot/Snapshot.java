@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.core.datasource.Storage;
 import com.sun.tools.visualvm.core.datasupport.Utils;
 import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
+import java.util.Objects;
 
 /**
  * Abstract implementation of Snapshot.
@@ -45,6 +46,8 @@ public abstract class Snapshot extends DataSource {
     
     private File file;
     private final SnapshotCategory category;
+    
+    private String snapshotID;
     
     
     /**
@@ -98,6 +101,7 @@ public abstract class Snapshot extends DataSource {
         if (file == null && newFile == null) return;
         File oldFile = file;
         file = newFile;
+        if (oldFile == null) snapshotID = null;
         getChangeSupport().firePropertyChange(PROPERTY_FILE, oldFile, newFile);
     }
     
@@ -192,6 +196,35 @@ public abstract class Snapshot extends DataSource {
      */
     protected final boolean isInSnapshot() {
         return getOwner() instanceof Snapshot;
+    }
+    
+    
+    /**
+     * Returns ID of the Snapshot. The ID should be based on the snapshot file
+     * if available and will only be computed for the first non-null file.
+     *
+     * @return ID of the Snapshot
+     *
+     * @since VisualVM 1.4
+     */
+    protected String computeSnapshotID() {
+        File f = getFile();
+        return f == null ? super.hashCode() + "-no_file" : f.getPath(); // NOI18N
+    }
+    
+    private String getSnapshotID() {
+        if (snapshotID == null) snapshotID = computeSnapshotID();
+        return snapshotID;
+    }
+    
+    
+    public boolean equals(Object o) {
+        if (!(o instanceof Snapshot)) return false;
+        return Objects.equals(getSnapshotID(), ((Snapshot)o).getSnapshotID());
+    }
+    
+    public int hashCode() {
+        return Objects.hashCode(getSnapshotID());
     }
 
 }
