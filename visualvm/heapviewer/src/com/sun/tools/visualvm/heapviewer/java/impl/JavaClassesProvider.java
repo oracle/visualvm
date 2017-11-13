@@ -1,0 +1,394 @@
+/*
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.  Oracle designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Oracle in the LICENSE file that accompanied this code.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
+ */
+
+package com.sun.tools.visualvm.heapviewer.java.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.swing.SortOrder;
+import org.netbeans.lib.profiler.heap.GCRoot;
+import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.heap.JavaClass;
+import com.sun.tools.visualvm.heapviewer.java.ClassesContainer;
+import com.sun.tools.visualvm.heapviewer.java.ClassNode;
+import com.sun.tools.visualvm.heapviewer.model.DataType;
+import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.java.InstanceNode;
+import com.sun.tools.visualvm.heapviewer.java.InstancesContainer;
+import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
+import com.sun.tools.visualvm.heapviewer.model.Progress;
+import com.sun.tools.visualvm.heapviewer.model.TextNode;
+import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
+import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
+import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+
+/**
+ *
+ * @author Jiri Sedlacek
+ */
+public class JavaClassesProvider {
+    
+    private static final class Classes_Messages {
+        private static String getMoreNodesString(String moreNodesCount)  {
+            return "<another " + moreNodesCount + " classes left>";
+        }
+        private static String getSamplesContainerString(String objectsCount)  {
+            return "<sample " + objectsCount + " classes>";
+        }
+        private static String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+            return "<classes " + firstNodeIdx + "-" + lastNodeIdx + ">";
+        }
+        private static String getNoClassesString(HeapViewerNodeFilter viewFilter) {
+            return viewFilter == null ? "<no classes>" : "<no classes matching the filter>";
+        }
+        private static String getNoPackagesString(HeapViewerNodeFilter viewFilter) {
+            return viewFilter == null ? "<no packages>" : "<no packages matching the filter>";
+        }
+    }
+    
+    public static HeapViewerNode[] getHeapClasses(HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+        NodesComputer<JavaClass> computer = new NodesComputer<JavaClass>(heap.getAllClasses().size(), UIThresholds.MAX_TOPLEVEL_CLASSES) {
+            protected boolean sorts(DataType dataType) {
+                return true;
+            }
+            protected HeapViewerNode createNode(JavaClass javaClass) {
+                return new ClassNode(javaClass);
+            }
+            protected ProgressIterator<JavaClass> objectsIterator(int index, Progress progress) {
+                Iterator<JavaClass> iterator = heap.getAllClasses().listIterator(index);
+                return new ProgressIterator(iterator, index, false, progress);
+            }
+            protected String getMoreNodesString(String moreNodesCount)  {
+                return Classes_Messages.getMoreNodesString(moreNodesCount);
+            }
+            protected String getSamplesContainerString(String objectsCount)  {
+                return Classes_Messages.getSamplesContainerString(objectsCount);
+            }
+            protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                return Classes_Messages.getNodesContainerString(firstNodeIdx, lastNodeIdx);
+            }
+        };
+//        System.err.println(">>> COMPUTED " + java.util.Arrays.toString(computer.computeNodes(parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress)));
+        HeapViewerNode[] nodes = computer.computeNodes(parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
+        return nodes.length == 0 ? new HeapViewerNode[] { new TextNode(Classes_Messages.getNoClassesString(viewFilter)) } : nodes;
+    }
+    
+    
+    public static HeapViewerNode[] getHeapPackages(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+        List<HeapViewerNode> nodes = new ArrayList();
+        Map<String, ClassesContainer.Objects> packages = new HashMap();
+        
+        List<JavaClass> classes = heap.getAllClasses();
+        for (JavaClass cls : classes) {
+            String className = cls.getName();
+            int nameIdx = className.lastIndexOf('.');
+            if (nameIdx == -1) {
+                ClassNode clsn = new ClassNode(cls);
+                if (viewFilter == null || viewFilter.passes(clsn, heap)) nodes.add(clsn);
+            } else {
+                if (viewFilter != null && !viewFilter.passes(new ClassNode(cls), heap)) continue;
+                
+                String pkgName = className.substring(0, nameIdx);
+                ClassesContainer.Objects node = packages.get(pkgName);
+                if (node == null) {
+                    node = new ClassesContainer.Objects(pkgName);
+                    nodes.add(node);
+                    packages.put(pkgName, node);
+                }
+                node.add(cls, heap);
+            }
+        }
+        
+        return nodes.isEmpty() ? new HeapViewerNode[] { new TextNode(Classes_Messages.getNoPackagesString(viewFilter)) } :
+                                 nodes.toArray(HeapViewerNode.NO_NODES);
+    }
+    
+    
+    private static final class GCRoots_Messages {
+        private static String getMoreNodesString(String moreNodesCount)  {
+            return "<another " + moreNodesCount + " GC roots left>";
+        }
+        private static String getSamplesContainerString(String objectsCount)  {
+            return "<sample " + objectsCount + " GC roots>";
+        }
+        private static String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+            return "<GC roots " + firstNodeIdx + "-" + lastNodeIdx + ">";
+        }
+        private static String getNoItemsString(HeapViewerNodeFilter viewFilter) {
+            return viewFilter == null ? "<no GC roots>" : "<no GC roots matching the filter>";
+        }
+    }
+    
+    public static HeapViewerNode[] getHeapGCRoots(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
+        final List<GCRoot> gcroots = new ArrayList(heap.getGCRoots());
+        
+        if (aggregation == 0) {
+            NodesComputer<GCRoot> computer = new NodesComputer<GCRoot>(gcroots.size(), UIThresholds.MAX_TOPLEVEL_INSTANCES) {
+                protected boolean sorts(DataType dataType) {
+                    return !DataType.COUNT.equals(dataType);
+                }
+                protected HeapViewerNode createNode(GCRoot gcRoot) {
+                    return new InstanceNode(gcRoot.getInstance());
+                }
+                protected ProgressIterator<GCRoot> objectsIterator(int index, Progress progress) {
+                    Iterator<GCRoot> iterator = gcroots.listIterator(index);
+                    return new ProgressIterator(iterator, index, false, progress);
+                }
+                protected String getMoreNodesString(String moreNodesCount)  {
+                    return GCRoots_Messages.getMoreNodesString(moreNodesCount);
+                }
+                protected String getSamplesContainerString(String objectsCount)  {
+                    return GCRoots_Messages.getSamplesContainerString(objectsCount);
+                }
+                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                    return GCRoots_Messages.getNodesContainerString(firstNodeIdx, lastNodeIdx);
+                }
+            };
+            HeapViewerNode[] nodes = computer.computeNodes(parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
+            return nodes.length == 0 ? new HeapViewerNode[] { new TextNode(GCRoots_Messages.getNoItemsString(viewFilter)) } : nodes;
+        } else {
+            if (viewFilter != null) {
+                Iterator<GCRoot> gcrootsI = gcroots.iterator();
+                while (gcrootsI.hasNext())
+                    if (!viewFilter.passes(new InstanceNode(gcrootsI.next().getInstance()), heap))
+                        gcrootsI.remove();
+            }
+            
+            if (aggregation == 3) {
+                List<GCTypeNode> tnodes = new ArrayList();
+                Map<String, GCTypeNode> types = new HashMap();
+                for (GCRoot gcroot : gcroots) {
+                    String tname = gcroot.getKind();
+                    GCTypeNode tnode = types.get(tname);
+                    if (tnode == null) {
+                        tnode = new GCTypeNode(tname);
+                        tnodes.add(tnode);
+                        types.put(tname, tnode);
+                    }
+                    tnode.add(gcroot.getInstance(), heap);
+                }
+                return tnodes.isEmpty() ? new HeapViewerNode[] { new TextNode(GCRoots_Messages.getNoItemsString(viewFilter)) } :
+                                          tnodes.toArray(HeapViewerNode.NO_NODES);
+            } else {
+                List<InstancesContainer.Objects> cnodes = new ArrayList();
+                Map<String, InstancesContainer.Objects> classes = new HashMap();
+                for (GCRoot gcroot : gcroots) {
+                    Instance instance = gcroot.getInstance();
+                    JavaClass javaClass = instance.getJavaClass();
+                    String className = javaClass.getName();
+                    InstancesContainer.Objects cnode = classes.get(className);
+                    if (cnode == null) {
+                        cnode = new InstancesContainer.Objects(className, javaClass) {
+                            protected String getMoreNodesString(String moreNodesCount)  {
+                                return GCRoots_Messages.getMoreNodesString(moreNodesCount);
+                            }
+                            protected String getSamplesContainerString(String objectsCount)  {
+                                return GCRoots_Messages.getSamplesContainerString(objectsCount);
+                            }
+                            protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                                return GCRoots_Messages.getNodesContainerString(firstNodeIdx, lastNodeIdx);
+                            }
+                        };
+                        classes.put(className, cnode);
+                        cnodes.add(cnode);
+                    }
+                    cnode.add(instance, heap);
+                }
+
+                if (aggregation == 1) {
+                    return cnodes.isEmpty() ? new HeapViewerNode[] { new TextNode(GCRoots_Messages.getNoItemsString(viewFilter)) } :
+                                              cnodes.toArray(HeapViewerNode.NO_NODES);
+                }
+
+                List<HeapViewerNode> pnodes = new ArrayList();
+                Map<String, ClassesContainer.ContainerNodes> packages = new HashMap();
+                for (InstancesContainer.Objects cnode : cnodes) {
+                    String className = cnode.getName();
+                    int nameIdx = className.lastIndexOf('.');
+                    if (nameIdx == -1) {
+                        pnodes.add(cnode);
+                    } else {
+                        String pkgName = className.substring(0, nameIdx);
+                        ClassesContainer.ContainerNodes node = packages.get(pkgName);
+                        if (node == null) {
+                            node = new ClassesContainer.ContainerNodes(pkgName);
+                            pnodes.add(node);
+                            packages.put(pkgName, node);
+                        }
+                        node.add(cnode, heap);
+                    }
+                }
+
+                return pnodes.isEmpty() ? new HeapViewerNode[] { new TextNode(GCRoots_Messages.getNoItemsString(viewFilter)) } :
+                                          pnodes.toArray(HeapViewerNode.NO_NODES);
+            }
+        }
+    }
+    
+    
+    private static final class Dominators_Messages {
+        private static String getMoreNodesString(String moreNodesCount)  {
+            return "<another " + moreNodesCount + " dominators left>";
+        }
+        private static String getSamplesContainerString(String objectsCount)  {
+            return "<sample " + objectsCount + " dominators>";
+        }
+        private static String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+            return "<dominators " + firstNodeIdx + "-" + lastNodeIdx + ">";
+        }
+        private static String getNoItemsString(HeapViewerNodeFilter viewFilter) {
+            return viewFilter == null ? "<no dominators>" : "<no dominators matching the filter>";
+        }
+    }
+    
+    public static HeapViewerNode[] getHeapDominators(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
+        if (!DataType.RETAINED_SIZE.valuesAvailable(heap))
+            return new HeapViewerNode[] { new TextNode("<Retained sizes not computed yet>") };
+        
+        int maxSearchInstances = 1000;
+        
+        List<Instance> searchInstances = heap.getBiggestObjectsByRetainedSize(maxSearchInstances);
+        List<Instance> dominators = new ArrayList(getDominatorRoots(searchInstances));
+        
+        if (aggregation == 0) {
+            NodesComputer<Instance> computer = new NodesComputer<Instance>(dominators.size(), UIThresholds.MAX_TOPLEVEL_INSTANCES) {
+                protected boolean sorts(DataType dataType) {
+                    return !DataType.COUNT.equals(dataType);
+                }
+                protected HeapViewerNode createNode(Instance instance) {
+                    return new InstanceNode(instance);
+                }
+                protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
+                    Iterator<Instance> iterator = dominators.listIterator(index);
+                    return new ProgressIterator(iterator, index, false, progress);
+                }
+                protected String getMoreNodesString(String moreNodesCount)  {
+                    return Dominators_Messages.getMoreNodesString(moreNodesCount);
+                }
+                protected String getSamplesContainerString(String objectsCount)  {
+                    return Dominators_Messages.getSamplesContainerString(objectsCount);
+                }
+                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                    return Dominators_Messages.getNodesContainerString(firstNodeIdx, lastNodeIdx);
+                }
+            };
+            HeapViewerNode[] nodes = computer.computeNodes(parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
+            return nodes.length == 0 ? new HeapViewerNode[] { new TextNode(Dominators_Messages.getNoItemsString(viewFilter)) } : nodes;
+        } else {
+            if (viewFilter != null) {
+                Iterator<Instance> dominatorsI = dominators.iterator();
+                while (dominatorsI.hasNext())
+                    if (!viewFilter.passes(new InstanceNode(dominatorsI.next()), heap))
+                        dominatorsI.remove();
+            }
+            
+            List<InstancesContainer.Objects> cnodes = new ArrayList();
+            Map<String, InstancesContainer.Objects> classes = new HashMap();
+            for (Instance instance : dominators) {
+                JavaClass javaClass = instance.getJavaClass();
+                String className = javaClass.getName();
+                InstancesContainer.Objects cnode = classes.get(className);
+                if (cnode == null) {
+                    cnode = new InstancesContainer.Objects(className, javaClass) {
+                        protected String getMoreNodesString(String moreNodesCount)  {
+                            return Dominators_Messages.getMoreNodesString(moreNodesCount);
+                        }
+                        protected String getSamplesContainerString(String objectsCount)  {
+                            return Dominators_Messages.getSamplesContainerString(objectsCount);
+                        }
+                        protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                            return Dominators_Messages.getNodesContainerString(firstNodeIdx, lastNodeIdx);
+                        }
+                    };
+                    classes.put(className, cnode);
+                    cnodes.add(cnode);
+                }
+                cnode.add(instance, heap);
+            }
+            
+            if (aggregation == 1) {
+                return cnodes.isEmpty() ? new HeapViewerNode[] { new TextNode(Dominators_Messages.getNoItemsString(viewFilter)) } :
+                                          cnodes.toArray(HeapViewerNode.NO_NODES);
+            }
+            
+            List<HeapViewerNode> pnodes = new ArrayList();
+            Map<String, ClassesContainer.ContainerNodes> packages = new HashMap();
+            for (InstancesContainer.Objects cnode : cnodes) {
+                String className = cnode.getName();
+                int nameIdx = className.lastIndexOf('.');
+                if (nameIdx == -1) {
+                    pnodes.add(cnode);
+                } else {
+                    String pkgName = className.substring(0, nameIdx);
+                    ClassesContainer.ContainerNodes node = packages.get(pkgName);
+                    if (node == null) {
+                        node = new ClassesContainer.ContainerNodes(pkgName);
+                        pnodes.add(node);
+                        packages.put(pkgName, node);
+                    }
+                    node.add(cnode, heap);
+                }
+            }
+            
+            return pnodes.isEmpty() ? new HeapViewerNode[] { new TextNode(Dominators_Messages.getNoItemsString(viewFilter)) } :
+                                          pnodes.toArray(HeapViewerNode.NO_NODES);
+        }
+    }
+
+    private static Set<Instance> getDominatorRoots(List<Instance> searchInstances) {
+        Set<Instance> dominators = new HashSet(searchInstances);
+        Set<Instance> removed = new HashSet();
+
+        for (Instance instance : searchInstances) {
+            if (dominators.contains(instance)) {
+                Instance dom = instance;
+                long retainedSize = instance.getRetainedSize();
+
+                while (!instance.isGCRoot()) {
+                    instance = instance.getNearestGCRootPointer();
+                    if (dominators.contains(instance) && instance.getRetainedSize()>=retainedSize) {
+                        dominators.remove(dom);
+                        removed.add(dom);
+                        dom = instance;
+                        retainedSize = instance.getRetainedSize();
+                    }
+                    if (removed.contains(instance)) {
+                        dominators.remove(dom);
+                        removed.add(dom);
+                        break;
+                    }
+                }
+            }
+        }
+        return dominators;
+    }
+    
+}
