@@ -182,19 +182,14 @@ Contributor(s):
             </module-dependencies>
             <friend-packages>
                 <friend>com.sun.tools.visualvm.heapdump</friend>
-                <friend>com.sun.tools.visualvm.truffle.heapwalker</friend>
+                <friend>com.sun.tools.visualvm.heapviewer</friend>
+                <friend>com.sun.tools.visualvm.heapviewer.truffle</friend>
                 <friend>oracle.jdevimpl.profiler.impl</friend>
                 <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
                 <package>org.netbeans.modules.profiler.heapwalk</package>
                 <package>org.netbeans.modules.profiler.heapwalk.details.api</package>
                 <package>org.netbeans.modules.profiler.heapwalk.details.spi</package>
                 <package>org.netbeans.modules.profiler.heapwalk.ui.icons</package>
-                <package>org.netbeans.modules.profiler.heapwalker.v2</package>
-                <package>org.netbeans.modules.profiler.heapwalker.v2.java</package>
-                <package>org.netbeans.modules.profiler.heapwalker.v2.model</package>
-                <package>org.netbeans.modules.profiler.heapwalker.v2.swing</package>
-                <package>org.netbeans.modules.profiler.heapwalker.v2.ui</package>
-                <package>org.netbeans.modules.profiler.heapwalker.v2.utils</package>
             </friend-packages>
         </data>
     </configuration>

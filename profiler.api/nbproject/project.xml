@@ -131,11 +131,12 @@ made subject to such option by the copyright holder.
                 <friend>com.sun.tools.visualvm.charts</friend>
                 <friend>com.sun.tools.visualvm.core</friend>
                 <friend>com.sun.tools.visualvm.heapdump</friend>
+                <friend>com.sun.tools.visualvm.heapviewer</friend>
+                <friend>com.sun.tools.visualvm.heapviewer.truffle</friend>
                 <friend>com.sun.tools.visualvm.modules.appui</friend>
                 <friend>com.sun.tools.visualvm.profiler</friend>
                 <friend>com.sun.tools.visualvm.profiling</friend>
                 <friend>com.sun.tools.visualvm.sampler</friend>
-                <friend>com.sun.tools.visualvm.truffle.heapwalker</friend>
                 <friend>oracle.jdevimpl.profiler.actions</friend>
                 <friend>oracle.jdevimpl.profiler.impl</friend>
                 <friend>org.netbeans.lib.profiler.ui</friend>

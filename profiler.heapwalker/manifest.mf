@@ -2,5 +2,5 @@ Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: false
 OpenIDE-Module: org.netbeans.modules.profiler.heapwalker
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/profiler/heapwalker/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.112
+OpenIDE-Module-Specification-Version: 1.113
 
