@@ -33,19 +33,16 @@ import com.sun.tools.visualvm.heapdump.HeapDump;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
+import com.sun.tools.visualvm.heapviewer.HeapViewer;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Logger;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import org.netbeans.modules.profiler.heapwalker.v2.HeapWalker;
-import org.netbeans.modules.profiler.heapwalker.v2.ui.HeapWalkerWindow;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -137,21 +134,10 @@ class HeapDumpView extends DataSourceView {
           RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
               try {
-                final HeapWalker hw = new HeapWalker(file);
+                final HeapViewer heapViewer = new HeapViewer(file);
                 SwingUtilities.invokeLater(new Runnable() { public void run() {
                     contentsPanel.remove(progressLabel);
-                    JComponent hwView = new HeapWalkerWindow(hw);
-                    try {
-                        JComponent fragmentWalker = (JComponent)hwView.getComponent(0);
-                        fragmentWalker.setOpaque(false);
-                        JToolBar toolBar = (JToolBar)fragmentWalker.getComponent(0);
-                        JComponent controllerPanel = (JComponent)fragmentWalker.getComponent(1);
-                        toolBar.setOpaque(false);
-                        ((JComponent)toolBar.getComponent(0)).setOpaque(false);
-                        ((JComponent)toolBar.getComponent(1)).setOpaque(false);
-                        controllerPanel.setOpaque(false);
-                    } catch (Exception e) {}
-                    contentsPanel.add(hwView, BorderLayout.CENTER);
+                    contentsPanel.add(heapViewer.getComponent(), BorderLayout.CENTER);
                     contentsPanel.revalidate();
                     contentsPanel.repaint();
                 } });

@@ -26,19 +26,16 @@
 package com.sun.tools.visualvm.profiling.snapshot;
 
 import com.sun.tools.visualvm.core.snapshot.SnapshotCategory;
+import com.sun.tools.visualvm.core.ui.DataSourceWindowManager;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
-import org.netbeans.api.actions.Openable;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.profiler.ResultsManager;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
-import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -83,10 +80,8 @@ final class ProfilerSnapshotCategory extends SnapshotCategory<ProfilerSnapshot> 
                     pHandle.setInitialDelay(0);
                     pHandle.start();
                     try {
-                        FileObject fileObject = FileUtil.toFileObject(file);
-                        DataObject dobj = DataObject.find(fileObject);
-                        Openable openCookie = dobj.getLookup().lookup(Openable.class);
-                        openCookie.open();
+                        ProfilerSnapshot snapshot = ProfilerSnapshot.createSnapshot(file, null);
+                        DataSourceWindowManager.sharedInstance().openDataSource(snapshot);
                     } catch (Exception e) {
                         LOGGER.log(Level.INFO, "Error loading profiler snapshot", e); // NOI18N
                         SwingUtilities.invokeLater(new Runnable() {
