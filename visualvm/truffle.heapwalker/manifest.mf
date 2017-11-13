@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-AutoUpdate-Show-In-Client: true
-OpenIDE-Module: com.sun.tools.visualvm.truffle.heapwalker
-OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/truffle/heapwalker/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
-
