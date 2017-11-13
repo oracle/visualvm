@@ -191,7 +191,13 @@ class ApplicationSnapshotProvider {
 
                     File storageDirectory = persistent ? ApplicationSnapshotsSupport.getStorageDirectory() :
                                                          Storage.getTemporaryStorageDirectory();
-                    File snapshotDirectory = Utils.extractArchive(archive, storageDirectory);
+                    
+                    File snapshotDirectory = new File(storageDirectory, archive.getName());
+                    
+                    // Only extract the archive if not already extracted (subsequent opening of the same snapshot)
+                    if (!snapshotDirectory.isDirectory() || !snapshotDirectory.canRead())
+                        snapshotDirectory = Utils.extractArchive(archive, storageDirectory);
+                    
                     if (snapshotDirectory != null) {
                         Storage storage = new Storage(snapshotDirectory, PROPERTIES_FILENAME);
                         ApplicationSnapshot snapshot = new ApplicationSnapshot(snapshotDirectory, storage);
