@@ -171,8 +171,8 @@ abstract class SortedObjectsBuffer<T> {
         @Override
         public int compare(Wrapper<T> o1, Wrapper<T> o2) {
             if (o1 == o2) return 0;
-            if (o1 == null) return ascending ? -1 : 1;
-            if (o2 == null) return ascending ? 1 : -1;
+            if (o1 == null) return  1;
+            if (o2 == null) return -1;
             int comp = SortedObjectsBuffer.this.compare(o1.value, o2.value);
             if (comp == 0) {
                 if (o1.serialId > o2.serialId) return 1;
