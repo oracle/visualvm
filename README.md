@@ -4,7 +4,7 @@ VisualVM is a visual tool integrating commandline JDK tools and lightweight prof
 
 ## Get the tools
 
-Use Apache Ant and Oracle JDK 7 to build VisualVM from this repository.
+Use Apache Ant 1.9.9 or above and Oracle JDK 8 to build VisualVM from this repository.
 
 ## Get the sources
 
@@ -14,7 +14,7 @@ First download or clone this repository into directory `visualvm`. There are two
 
 ## Get the dependencies
   
-Then download the [NetBeans 8.0.2 platform and profiler binaries](https://github.com/oracle/visualvm/raw/master/visualvm/nb802_visualvm_02102016.zip) and extract them into directory `visualvm/visualvm` (should create `visualvm/visualvm/netbeans`).
+Then extract the [NetBeans 9.0 Dev platform and profiler binaries](visualvm/nb90_visualvm_15112017.zip) into directory `visualvm/visualvm` (should create `visualvm/visualvm/netbeans`).
 
 ## Build and run VisualVM tool
 

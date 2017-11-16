@@ -40,7 +40,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -67,7 +66,7 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "HeapViewerComponent_LoadingProgress=Loading heap dump..."
+    "HeapViewerComponent_LoadingProgress=Opening heap dump..."
 })
 public final class HeapViewerComponent extends JPanel {
     
@@ -79,15 +78,11 @@ public final class HeapViewerComponent extends JPanel {
     
     public HeapViewerComponent(HeapViewer heapViewer) {
         super(new BorderLayout());
+        setOpaque(false);
         
         this.heapViewer = heapViewer;
         
-        toolbar = ProfilerToolbar.create(true);
-        add(toolbar.getComponent(), BorderLayout.NORTH);
-        
-        JLabel loading = new JLabel(Bundle.HeapViewerComponent_LoadingProgress());
-        loading.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-        toolbar.add(loading);
+        add(new JLabel(Bundle.HeapViewerComponent_LoadingProgress(), JLabel.CENTER), BorderLayout.CENTER);
         
         new RequestProcessor("HPROF initializer for " + getName()).post(new Runnable() { // NOI18N
             public void run() { initImpl(); }
@@ -135,7 +130,7 @@ public final class HeapViewerComponent extends JPanel {
             }
             features[i] = featuresS.toArray(new HeapViewerFeature[0]);
         }
-
+        
         SwingUtilities.invokeLater(new Runnable() {
             public void run() { initComponents(); }
         });
@@ -159,8 +154,10 @@ public final class HeapViewerComponent extends JPanel {
     private MainView mainView;
     
     private void initComponents() {
-        // Remove the loading progress
-        toolbar.remove(0);
+        removeAll();
+        
+        toolbar = ProfilerToolbar.create(true);
+        add(toolbar.getComponent(), BorderLayout.NORTH);
         
         // Reserve space for views toolbars
         viewToolbar = ProfilerToolbar.create(false);
