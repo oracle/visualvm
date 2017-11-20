@@ -59,7 +59,6 @@ public final class ApplicationTypeFactory extends ModelFactory<ApplicationType,A
             appTypeFactory.registerProvider(new MavenApplicationTypeFactory());
             appTypeFactory.registerProvider(new IntellijApplicationTypeFactory());
             appTypeFactory.registerProvider(new EclipseApplicationTypeFactory());
-            appTypeFactory.registerProvider(new GraalVMApplicationTypeFactory());
         }
         return appTypeFactory;
     }

@@ -22,14 +22,14 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.application.type;
+package com.sun.tools.visualvm.graalvm.application.type;
 
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.application.Application;
+import com.sun.tools.visualvm.application.type.ApplicationType;
 import java.awt.Image;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import static com.sun.tools.visualvm.application.type.NetBeansApplicationTypeFactory.PRODUCT_VERSION_PROPERTY;
 import java.util.Properties;
 
 /**
@@ -41,17 +41,10 @@ public class GraalVMApplicationType extends ApplicationType {
 
     private Application application;
     private String name;
-    private String fullVersionString;
 
     GraalVMApplicationType(Application app, Jvm jvm, String n) {
         application = app;
         name = n;
-        if (jvm.isGetSystemPropertiesSupported()) {
-            Properties p = jvm.getSystemProperties();
-            if (p != null) {
-                fullVersionString = p.getProperty(PRODUCT_VERSION_PROPERTY);
-            }
-        }
     }
 
     /**
@@ -72,9 +65,6 @@ public class GraalVMApplicationType extends ApplicationType {
      * {@inheritDoc}
      */
     public String getDescription() {
-        if (fullVersionString != null) {
-            return fullVersionString;
-        }
         return getMessage("DESCR_GraalVMBasedApplicationType"); // NOI18N
     }
 
@@ -82,7 +72,7 @@ public class GraalVMApplicationType extends ApplicationType {
      * {@inheritDoc}
      */
     public Image getIcon() {
-        String iconPath = "com/sun/tools/visualvm/application/type/resources/GraalVM.png";   // NOI18N
+        String iconPath = "com/sun/tools/visualvm/graalvm/application/type/GraalVM.png";   // NOI18N
         return ImageUtilities.loadImage(iconPath, true);
     }
 
