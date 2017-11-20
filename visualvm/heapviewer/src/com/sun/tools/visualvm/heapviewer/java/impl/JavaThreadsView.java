@@ -25,16 +25,15 @@
 
 package com.sun.tools.visualvm.heapviewer.java.impl;
 
+import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.net.URL;
 import java.util.List;
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.SortOrder;
 import org.netbeans.lib.profiler.heap.GCRoot;
@@ -184,17 +183,9 @@ public class JavaThreadsView extends HeapViewerFeature {
             toolbar.add(pluginsToolbar);
         }
 
-        JScrollPane htmlViewScroll = new JScrollPane(htmlView.getComponent(),
-                                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        htmlViewScroll.setBorder(BorderFactory.createEmptyBorder());
-        htmlViewScroll.setViewportBorder(BorderFactory.createEmptyBorder());
-        htmlViewScroll.getVerticalScrollBar().setUnitIncrement(10);
-        htmlViewScroll.getHorizontalScrollBar().setUnitIncrement(10);
-
         component = new JPanel(new CardLayout());
         component.add(objectsView.getComponent());
-        component.add(htmlViewScroll);
+        component.add(new ScrollableContainer(htmlView.getComponent()));
     }
     
     

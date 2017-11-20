@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.heapviewer.oql;
 
+import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -56,7 +57,6 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.SortOrder;
@@ -97,6 +97,7 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.PluggableTreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
 import com.sun.tools.visualvm.heapviewer.utils.HeapUtils;
+import javax.swing.JScrollPane;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.ObjectVisitor;
 import org.netbeans.modules.profiler.oql.engine.api.OQLException;
@@ -682,6 +683,7 @@ public class OQLConsoleView extends HeapViewerFeature {
             editorScroll.getHorizontalScrollBar().setUnitIncrement(10);
             
             add(editorScroll, BorderLayout.CENTER);
+//            add(new ScrollableContainer(editorContainer), BorderLayout.CENTER);
         }
         
     }
@@ -691,15 +693,7 @@ public class OQLConsoleView extends HeapViewerFeature {
         ResultsView(JComponent results) {
             super(new BorderLayout());
             
-            JScrollPane resultsAreaScroll = new JScrollPane(results,
-                                    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            resultsAreaScroll.setBorder(BorderFactory.createEmptyBorder());
-            resultsAreaScroll.setViewportBorder(BorderFactory.createEmptyBorder());
-            resultsAreaScroll.getVerticalScrollBar().setUnitIncrement(10);
-            resultsAreaScroll.getHorizontalScrollBar().setUnitIncrement(10);
-            
-            add(resultsAreaScroll, BorderLayout.CENTER);
+            add(new ScrollableContainer(results), BorderLayout.CENTER);
         }
         
     }

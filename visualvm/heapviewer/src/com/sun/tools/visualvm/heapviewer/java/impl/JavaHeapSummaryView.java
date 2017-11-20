@@ -25,16 +25,15 @@
 
 package com.sun.tools.visualvm.heapviewer.java.impl;
 
+import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import java.text.NumberFormat;
 import java.util.Collection;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JScrollPane;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.HeapSummary;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -111,14 +110,9 @@ public class JavaHeapSummaryView extends HeapViewerFeature {
         HTMLTextArea text = new HTMLTextArea();
         text.setText(createSummary());
         text.setCaretPosition(0);
+        text.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         
-        JScrollPane textScroll = new JScrollPane(text);
-        textScroll.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, UIUtils.getProfilerResultsBackground()));
-        textScroll.setViewportBorder(BorderFactory.createEmptyBorder());
-        textScroll.getHorizontalScrollBar().setUnitIncrement(16);
-        textScroll.getVerticalScrollBar().setUnitIncrement(16);
-        
-        component = textScroll;
+        component = new ScrollableContainer(text);
     }
     
     
