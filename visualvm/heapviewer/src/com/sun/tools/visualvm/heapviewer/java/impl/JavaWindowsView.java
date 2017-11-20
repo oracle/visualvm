@@ -52,6 +52,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Iterator;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -71,6 +72,7 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
+import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
@@ -233,8 +235,8 @@ class JavaWindowsView extends HeapViewerFeature {
                 final Heap heap = context.getFragment().getHeap();
 
                 final Collection<Instance> windows = new ArrayList();
-                windows.addAll(getFrames(heap));
-                windows.addAll(getDialogs(heap));
+                windows.addAll(getVisibleFrames(heap));
+                windows.addAll(getVisibleDialogs(heap));
 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -510,22 +512,30 @@ class JavaWindowsView extends HeapViewerFeature {
     }
     
     
-    private static Collection<Instance> getFrames(Heap heap) {
+    private static Collection<Instance> getVisibleFrames(Heap heap) {
         Collection<JavaClass> framesC = HeapUtils.getSubclasses(heap, "java.awt.Frame"); // NOI18N
         
         Collection<Instance> framesI = new ArrayList();
         for (JavaClass frameC : framesC) framesI.addAll(frameC.getInstances());
         
-        return framesI;
+        return onlyVisible(framesI);
     }
     
-    private static Collection<Instance> getDialogs(Heap heap) {
+    private static Collection<Instance> getVisibleDialogs(Heap heap) {
         Collection<JavaClass> dialogsC = HeapUtils.getSubclasses(heap, "java.awt.Dialog"); // NOI18N
         
         Collection<Instance> dialogsI = new ArrayList();
         for (JavaClass dialogC : dialogsC) dialogsI.addAll(dialogC.getInstances());
         
-        return dialogsI;
+        return onlyVisible(dialogsI);
+    }
+    
+    private static Collection<Instance> onlyVisible(Collection<Instance> instances) {
+        Iterator<Instance> framesIt = instances.iterator();
+        while (framesIt.hasNext())
+            if (!DetailsUtils.getBooleanFieldValue(framesIt.next(), "visible", false)) // NOI18N
+                framesIt.remove();
+        return instances;
     }
     
     
@@ -536,8 +546,8 @@ class JavaWindowsView extends HeapViewerFeature {
             if (!JavaHeapFragment.isJavaHeap(context)) return null;
             
             Heap heap = context.getFragment().getHeap();
-            int estWindowsCount = getFrames(heap).size();
-            if (estWindowsCount <= 1) estWindowsCount += getDialogs(heap).size();
+            int estWindowsCount = getVisibleFrames(heap).size();
+            if (estWindowsCount <= 1) estWindowsCount += getVisibleDialogs(heap).size();
             
             return estWindowsCount == 0 ? null : new JavaWindowsView(context, actions, estWindowsCount);
         }
