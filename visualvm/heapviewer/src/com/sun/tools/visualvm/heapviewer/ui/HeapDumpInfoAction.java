@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.heapviewer.ui;
 
+import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import java.awt.Dimension;
 import org.openide.util.NbBundle;
 import java.awt.event.ActionEvent;
@@ -42,20 +43,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JScrollPane;
 import javax.swing.SwingWorker;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.HeapSummary;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import com.sun.tools.visualvm.heapviewer.HeapViewer;
+import javax.swing.BorderFactory;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.Exceptions;
@@ -122,18 +121,11 @@ class HeapDumpInfoAction extends AbstractAction {
     
     private static JComponent infoComponent(final HeapViewer heapViewer) {
         HTMLTextArea text = new HTMLTextArea();
+        text.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         createInfo(text, heapViewer);
-//        SwingUtilities.invokeLater(new Runnable() {
-//            public void run() { createInfo(text, heapViewer); }
-//        });
         
-        JScrollPane textScroll = new JScrollPane(text);
-        textScroll.setBorder(BorderFactory.createEmptyBorder());
-        textScroll.setViewportBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, UIUtils.getProfilerResultsBackground()));
-        textScroll.getHorizontalScrollBar().setUnitIncrement(16);
-        textScroll.getVerticalScrollBar().setUnitIncrement(16);
+        ScrollableContainer textScroll = new ScrollableContainer(text);
         textScroll.setPreferredSize(new Dimension(750, 400));
-        
         return textScroll;
     }
     
