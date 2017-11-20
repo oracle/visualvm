@@ -531,8 +531,8 @@ public abstract class ProfilerTabbedView {
                 
                 content = view;
                 
-                setOpaque(true);
-                setBackground(Color.YELLOW);
+                setOpaque(false);
+//                setBackground(Color.YELLOW);
                 add(view, BorderLayout.CENTER);
                 if (!closable) putClientProperty(TabbedPaneFactory.NO_CLOSE_BUTTON, Boolean.TRUE);
                 view.putClientProperty("TabbedPaneViewport", this); // NOI18N
