@@ -57,6 +57,7 @@ import org.netbeans.lib.profiler.ui.swing.PopupButton;
 import org.netbeans.lib.profiler.ui.swing.ProfilerPopupMenu;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.HeapViewer;
+import java.awt.Dimension;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -87,6 +88,10 @@ public final class HeapViewerComponent extends JPanel {
         new RequestProcessor("HPROF initializer for " + getName()).post(new Runnable() { // NOI18N
             public void run() { initImpl(); }
         });
+    }
+    
+    public Dimension getMinimumSize() {
+        return new Dimension(0, 0);
     }
     
     private void initImpl() {
