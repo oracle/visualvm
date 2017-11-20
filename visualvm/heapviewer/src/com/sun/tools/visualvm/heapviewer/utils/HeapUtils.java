@@ -40,7 +40,7 @@ public final class HeapUtils {
     
    // --- Heap utils ----------------------------------------------------------
     
-    public static Collection getSubclasses(Heap heap, String baseClass) {
+    public static Collection<JavaClass> getSubclasses(Heap heap, String baseClass) {
         HashSet subclasses = new HashSet();
 
         String escapedClassName = "\\Q" + baseClass + "\\E";
