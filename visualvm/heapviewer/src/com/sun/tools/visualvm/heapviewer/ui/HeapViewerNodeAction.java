@@ -73,7 +73,7 @@ public abstract class HeapViewerNodeAction extends AbstractAction {
     }
     
     
-    static final class Actions {
+    public static final class Actions {
         
         private final List<HeapViewerNodeAction> actions;
         
@@ -81,7 +81,7 @@ public abstract class HeapViewerNodeAction extends AbstractAction {
             this.actions = actions;
         }
         
-        static Actions forNode(HeapViewerNode node, Collection<HeapViewerNodeAction.Provider> actionProviders,
+        public static Actions forNode(HeapViewerNode node, Collection<HeapViewerNodeAction.Provider> actionProviders,
                                HeapContext context, HeapViewerActions actions, HeapViewerNodeAction... additionalActions) {
             List<HeapViewerNodeAction> actionsList = new ArrayList();
             for (HeapViewerNodeAction.Provider provider : actionProviders) {
@@ -98,7 +98,7 @@ public abstract class HeapViewerNodeAction extends AbstractAction {
         }
         
         
-        void performDefaultAction(ActionEvent e) {
+        public void performDefaultAction(ActionEvent e) {
             for (HeapViewerNodeAction action : actions) {
                 if (action.isDefault()) {
                     if (action.isEnabled()) action.actionPerformed(e);
@@ -107,7 +107,7 @@ public abstract class HeapViewerNodeAction extends AbstractAction {
             }
         }
         
-        void performMiddleButtonAction(ActionEvent e) {
+        public void performMiddleButtonAction(ActionEvent e) {
             for (HeapViewerNodeAction action : actions) {
                 if (action.isMiddleButtonDefault(e)) {
                     if (action.isEnabled()) {
@@ -118,7 +118,7 @@ public abstract class HeapViewerNodeAction extends AbstractAction {
             }
         }
         
-        void populatePopup(JPopupMenu popup) {
+        public void populatePopup(JPopupMenu popup) {
             int lastPosition = -1;
             for (HeapViewerNodeAction action : actions) {
                 int position = action.getPosition() / 100;
