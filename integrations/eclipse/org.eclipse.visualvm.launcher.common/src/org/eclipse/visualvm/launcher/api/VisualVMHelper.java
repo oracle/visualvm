@@ -114,7 +114,7 @@ public final class VisualVMHelper {
 		try {
 			String line;
 			while ((line = br.readLine()) != null) {
-				if (line.startsWith("java version")) {
+				if (line.startsWith("java version") || line.startsWith("openjdk version")) {
 					int start = line.indexOf("\"");
 					int end = line.lastIndexOf("\"");
 					if (start > -1 && end > -1) {
