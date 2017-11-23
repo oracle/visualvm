@@ -77,11 +77,16 @@ public class PythonHeapFragment extends TruffleLanguageHeapFragment {
     @ServiceProvider(service=HeapFragment.Provider.class, position = 400)
     public static class Provider extends HeapFragment.Provider {
 
-        private static final String PYTHON_LANG_ID = "python";  // NOI18N
+        private static final String PYTHON_LANG_ID_OLD = "python";  // NOI18N
+        private static final String PYTHON_LANG_ID = "Python";  // NOI18N
 
         public HeapFragment getFragment(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) throws IOException {
             Instance langInfo = TruffleLanguageSupport.getLanguageInfo(heap, PYTHON_LANG_ID);
             JavaClass PythonMainClass = heap.getJavaClassByName(PythonObject.PYTHON_OBJECT_FQN);
+
+            if (langInfo == null) {
+                langInfo = TruffleLanguageSupport.getLanguageInfo(heap, PYTHON_LANG_ID_OLD);
+            }
 
             return langInfo != null && PythonMainClass != null ? new PythonHeapFragment(langInfo, heap) : null;
         }
