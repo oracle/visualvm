@@ -47,7 +47,7 @@ import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
- * @author thurka
+ * @author Tomas Hurka
  */
 @ServiceProvider(service = HeapViewerNode.Provider.class, position = 300)
 public class PythonItemsProvider extends HeapViewerNode.Provider {
@@ -64,7 +64,7 @@ public class PythonItemsProvider extends HeapViewerNode.Provider {
         if (parent instanceof PythonObjectNode && !(parent instanceof PythonObjectReferenceNode)) {
             PythonObject pyobject = HeapViewerNode.getValue(parent, PythonObject.DATA_TYPE, heap);
             if (pyobject != null) {
-                if (pyobject.getFieldValues().isEmpty()) {
+                if (getRawFields(pyobject).isEmpty()) {
                     return false;
                 }
                 return true;
@@ -110,7 +110,7 @@ public class PythonItemsProvider extends HeapViewerNode.Provider {
         PythonObject pyobject = parent == null ? null : HeapViewerNode.getValue(parent, PythonObject.DATA_TYPE, heap);
         if (pyobject == null) return null;
 
-        List<FieldValue> fields = new ArrayList(pyobject.getFieldValues());
+        List<FieldValue> fields = new ArrayList(getRawFields(pyobject));
 
         Iterator<FieldValue> fieldsIt = fields.iterator();
         while (fieldsIt.hasNext())
@@ -118,6 +118,10 @@ public class PythonItemsProvider extends HeapViewerNode.Provider {
                 fieldsIt.remove();
 
         return fields;
+    }
+
+    List<FieldValue> getRawFields(PythonObject pyobject) {
+        return pyobject.getItems();
     }
 
     private boolean displayField(FieldValue field) {

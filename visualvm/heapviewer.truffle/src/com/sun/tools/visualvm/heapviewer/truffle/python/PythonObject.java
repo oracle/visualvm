@@ -74,10 +74,14 @@ public class PythonObject {
         return isSubClassOf(rObj, PYTHON_OBJECT_FQN);
     }
 
-    List<FieldValue> getFieldValues() {
+    List<FieldValue> getItems() {
         if (store != null || array != null) {
             return getListFields();
         }
+        return Collections.EMPTY_LIST;
+    }
+
+    List<FieldValue> getAttributes() {
         if (map != null) {
             return getMapFields();
         }
@@ -332,5 +336,4 @@ public class PythonObject {
             return getLength();
         }
     }
-
 }
