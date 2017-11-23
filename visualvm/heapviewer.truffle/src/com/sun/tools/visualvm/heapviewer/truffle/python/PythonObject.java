@@ -125,7 +125,10 @@ public class PythonObject {
         if (store != null) {
             Integer len = (Integer) store.getValueOfField("length");
 
-            return len.intValue();
+            if (len != null) {
+                return len.intValue();
+            }
+            return 0;
         }
         if (array != null) {
             return array.getLength();
