@@ -43,10 +43,12 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     private static final String PLIST_MASK = "com.oracle.graal.python.runtime.sequence.PList";   // NOI18N
     private static final String OBJ_STORAGE_MASK = "com.oracle.graal.python.runtime.sequence.storage.ObjectSequenceStorage";   // NOI18N
     private static final String PTUPLE_MASK = "com.oracle.graal.python.runtime.sequence.PTuple"; // NOI18N
+    private static final String PMODULE_MASK = "com.oracle.graal.python.runtime.standardtype.PythonModule"; // NOI18N
+    private static final String PBYTES_MASK = "com.oracle.graal.python.runtime.sequence.PBytes"; // NOI18N
 
     public PythonDetailsProvider() {
         super(PCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,OBJ_STORAGE_MASK,
-              PTUPLE_MASK);
+              PTUPLE_MASK,PMODULE_MASK, PBYTES_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -67,6 +69,12 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
         }
         if (PTUPLE_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "array", heap);
+        }
+        if (PMODULE_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "name", heap);
+        }
+        if (PBYTES_MASK.equals(className)) {
+            return DetailsUtils.getPrimitiveArrayFieldString(instance, "bytes", 0, -1, ",", "...");
         }
         return null;
     }
