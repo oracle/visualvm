@@ -41,14 +41,15 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     private static final String PFUNCTION_MASK = "com.oracle.graal.python.runtime.function.PFunction";   // NOI18N
     private static final String PNONE_MASK = "com.oracle.graal.python.runtime.datatype.PNone";   // NOI18N
     private static final String PLIST_MASK = "com.oracle.graal.python.runtime.sequence.PList";   // NOI18N
-    private static final String OBJ_STORAGE_MASK = "com.oracle.graal.python.runtime.sequence.storage.ObjectSequenceStorage";   // NOI18N
+    private static final String BASIC_STORAGE_MASK = "com.oracle.graal.python.runtime.sequence.storage.BasicSequenceStorage+";   // NOI18N
+    private static final String EMPTY_STORAGE_MASK = "com.oracle.graal.python.runtime.sequence.storage.EmptySequenceStorage"; // NOI18N
     private static final String PTUPLE_MASK = "com.oracle.graal.python.runtime.sequence.PTuple"; // NOI18N
     private static final String PMODULE_MASK = "com.oracle.graal.python.runtime.standardtype.PythonModule"; // NOI18N
     private static final String PBYTES_MASK = "com.oracle.graal.python.runtime.sequence.PBytes"; // NOI18N
 
     public PythonDetailsProvider() {
-        super(PCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,OBJ_STORAGE_MASK,
-              PTUPLE_MASK,PMODULE_MASK, PBYTES_MASK);
+        super(PCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,BASIC_STORAGE_MASK,
+              PTUPLE_MASK,PMODULE_MASK, PBYTES_MASK,EMPTY_STORAGE_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -62,16 +63,19 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
             return "None";
         }
         if (PLIST_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "store", heap);
+            return DetailsUtils.getInstanceFieldString(instance, "store", heap);    // NOI18N
         }
-        if (OBJ_STORAGE_MASK.equals(className)) {
+        if (BASIC_STORAGE_MASK.equals(className)) {
             return DetailsUtils.getIntFieldValue(instance, "length", 0)+ " items";
         }
+        if (EMPTY_STORAGE_MASK.equals(className)) {
+            return "0 items";
+        }
         if (PTUPLE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "array", heap);
+            return DetailsUtils.getInstanceFieldString(instance, "array", heap);    // NOI18N
         }
         if (PMODULE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name", heap);
+            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
         }
         if (PBYTES_MASK.equals(className)) {
             return DetailsUtils.getPrimitiveArrayFieldString(instance, "bytes", 0, -1, ",", "...");

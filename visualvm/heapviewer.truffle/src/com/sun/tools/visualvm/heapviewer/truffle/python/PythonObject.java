@@ -36,6 +36,7 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
+import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.lib.profiler.heap.Type;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 
@@ -56,6 +57,8 @@ public class PythonObject {
     private final Instance map;
     private final Instance set;
     private final Instance pythonClass;
+    private String listType;
+    private boolean isPrimitiveList;
 
     public PythonObject(Instance instance) {
         this.instance = instance;
@@ -107,16 +110,23 @@ public class PythonObject {
     }
 
     private List getValues() {
-        ObjectArrayInstance vals = null;
+        Instance vals = null;
 
         if (store != null) {
-            vals = (ObjectArrayInstance)store.getValueOfField("values");
+            vals = (Instance)store.getValueOfField("values");
         }
         if (array != null) {
             vals = array;
         }
         if (vals != null) {
-            return vals.getValues();
+            listType = vals.getJavaClass().getName().replace("[]", "");
+            if (vals instanceof ObjectArrayInstance) {
+                return ((ObjectArrayInstance)vals).getValues();
+            }
+            if (vals instanceof PrimitiveArrayInstance) {
+                isPrimitiveList = true;
+                return ((PrimitiveArrayInstance)vals).getValues();
+            }
         }
         return Collections.emptyList();
     }
@@ -216,7 +226,6 @@ public class PythonObject {
         private PythonMapEntryField(Instance k) {
             super(0);
             key = k;
-
         }
 
         @Override
@@ -225,11 +234,11 @@ public class PythonObject {
         }
     }
 
-    private class PythonObjectFieldValue implements ObjectFieldValue {
-        int index;
-        Instance value;
+    private class PythonFieldValue implements FieldValue {
+        private int index;
+        Object value;
 
-        private PythonObjectFieldValue(int i, Instance val) {
+        private PythonFieldValue(int i, Object val) {
             index = i;
             value = val;
         }
@@ -241,7 +250,7 @@ public class PythonObject {
 
         @Override
         public String getValue() {
-            return String.valueOf(getInstance().getInstanceId());
+            return (String)value;
         }
 
         @Override
@@ -249,9 +258,22 @@ public class PythonObject {
             return instance;
         }
 
+    }
+
+    private class PythonObjectFieldValue extends PythonFieldValue implements ObjectFieldValue {
+
+        private PythonObjectFieldValue(int i, Instance val) {
+            super(i,val);
+        }
+
+        @Override
+        public String getValue() {
+            return String.valueOf(getInstance().getInstanceId());
+        }
+
         @Override
         public Instance getInstance() {
-            return value;
+            return (Instance)value;
         }
     }
 
@@ -283,7 +305,7 @@ public class PythonObject {
             return new Type() {
                 @Override
                 public String getName() {
-                    return "Object";
+                    return listType;
                 }
             };
         }
@@ -299,6 +321,9 @@ public class PythonObject {
 
         @Override
         public FieldValue get(int index) {
+            if (isPrimitiveList) {
+                return new PythonFieldValue(index, values.get(index));
+            }
             return new PythonObjectFieldValue(index, (Instance) values.get(index));
         }
 
