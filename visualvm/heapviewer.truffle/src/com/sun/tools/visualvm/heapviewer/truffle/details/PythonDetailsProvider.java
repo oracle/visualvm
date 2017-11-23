@@ -46,10 +46,13 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     private static final String PTUPLE_MASK = "com.oracle.graal.python.runtime.sequence.PTuple"; // NOI18N
     private static final String PMODULE_MASK = "com.oracle.graal.python.runtime.standardtype.PythonModule"; // NOI18N
     private static final String PBYTES_MASK = "com.oracle.graal.python.runtime.sequence.PBytes"; // NOI18N
+    private static final String PCOMPLEX_MASK = "com.oracle.graal.python.runtime.datatype.PComplex"; // NOI18N
+    private static final String PEXCEPTION_MASK = "com.oracle.graal.python.runtime.exception.PythonExceptionObject"; // NOI18N
 
     public PythonDetailsProvider() {
         super(PCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,BASIC_STORAGE_MASK,
-              PTUPLE_MASK,PMODULE_MASK, PBYTES_MASK,EMPTY_STORAGE_MASK);
+              PTUPLE_MASK,PMODULE_MASK,PBYTES_MASK,EMPTY_STORAGE_MASK,
+              PEXCEPTION_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -66,7 +69,7 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
             return DetailsUtils.getInstanceFieldString(instance, "store", heap);    // NOI18N
         }
         if (BASIC_STORAGE_MASK.equals(className)) {
-            return DetailsUtils.getIntFieldValue(instance, "length", 0)+ " items";
+            return DetailsUtils.getIntFieldValue(instance, "length", 0) + " items";
         }
         if (EMPTY_STORAGE_MASK.equals(className)) {
             return "0 items";
@@ -80,6 +83,37 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
         if (PBYTES_MASK.equals(className)) {
             return DetailsUtils.getPrimitiveArrayFieldString(instance, "bytes", 0, -1, ",", "...");
         }
+        if (PCOMPLEX_MASK.equals(className)) {
+            Double realObj = (Double) instance.getValueOfField("real");    // NOI18N
+            Double imagObj = (Double) instance.getValueOfField("imag");    // NOI18N
+
+            if (realObj != null && imagObj != null) {
+                complexToString(realObj.doubleValue(), imagObj.doubleValue());
+            }
+        }
+        if (PEXCEPTION_MASK.equals(className)) {
+             return DetailsUtils.getInstanceFieldString(instance, "message", heap); // NOI18N
+        }
         return null;
+    }
+
+    private static String complexToString(double real, double imag) {
+        if (real == 0.) {
+            return toString(imag) + "j";
+        } else {
+            if (imag >= 0) {
+                return String.format("(%s+%sj)", toString(real), toString(imag));
+            } else {
+                return String.format("(%s-%sj)", toString(real), toString(-imag));
+            }
+        }
+    }
+
+    private static String toString(double value) {
+        if (value == Math.floor(value) && value <= Long.MAX_VALUE && value >= Long.MIN_VALUE) {
+            return Long.toString((long) value);
+        } else {
+            return Double.toString(value);
+        }
     }
 }
