@@ -83,18 +83,23 @@ final class ProfilerSnapshotNPS extends ProfilerSnapshot {
     protected Image resolveIcon() {
         try {
             int snapshotType = getLoadedSnapshot().getType();
-            if (snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_CPU) {
-                return ImageUtilities.mergeImages(CPU_ICON, NODE_BADGE, 0, 0);
-            } else if (snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS
-                    || snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS
-                    || snapshotType == LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_SAMPLED) {
-                return ImageUtilities.mergeImages(MEMORY_ICON, NODE_BADGE, 0, 0);
-            } else {
-                return null;
+            switch (snapshotType) {
+                case LoadedSnapshot.SNAPSHOT_TYPE_CPU:
+                    return ImageUtilities.mergeImages(CPU_ICON, NODE_BADGE, 0, 0);
+                case LoadedSnapshot.SNAPSHOT_TYPE_CPU_JDBC:
+                    return ImageUtilities.mergeImages(JDBC_ICON, NODE_BADGE, 0, 0);
+                case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_LIVENESS:
+                case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_ALLOCATIONS:
+                case LoadedSnapshot.SNAPSHOT_TYPE_MEMORY_SAMPLED:
+                    return ImageUtilities.mergeImages(MEMORY_ICON, NODE_BADGE, 0, 0);
+                default:
+                    // Fallback icon, cannot return null - throws NPE in DataSourceView
+                    return ImageUtilities.mergeImages(SNAPSHOT_ICON, NODE_BADGE, 0, 0);
             }
         } catch (Exception e) {
             LOGGER.log(Level.FINE, "Failed to determine profiler snapshot type", e);  // NOI18N
-            return null;
+            // Fallback icon, cannot return null - throws NPE in DataSourceView
+            return ImageUtilities.mergeImages(SNAPSHOT_ICON, NODE_BADGE, 0, 0);
         }
     }
 
