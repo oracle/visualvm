@@ -46,6 +46,7 @@
                 <friend>com.sun.tools.visualvm.charts</friend>
                 <friend>com.sun.tools.visualvm.core</friend>
                 <friend>com.sun.tools.visualvm.coredump</friend>
+                <friend>com.sun.tools.visualvm.heapviewer</friend>
                 <friend>com.sun.tools.visualvm.host.views</friend>
                 <friend>com.sun.tools.visualvm.jvmstat</friend>
                 <friend>com.sun.tools.visualvm.modules.appui</friend>

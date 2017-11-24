@@ -30,15 +30,9 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Insets;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -53,23 +47,15 @@ import javax.swing.ButtonGroup;
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.border.Border;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
-import javax.swing.text.Caret;
-import javax.swing.text.Element;
-import javax.swing.text.JTextComponent;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
@@ -91,13 +77,19 @@ import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
 import com.sun.tools.visualvm.heapviewer.model.TextNode;
+import com.sun.tools.visualvm.heapviewer.options.HeapViewerOptionsCategory;
 import com.sun.tools.visualvm.heapviewer.ui.HTMLView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.PluggableTreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
 import com.sun.tools.visualvm.heapviewer.utils.HeapUtils;
-import javax.swing.JScrollPane;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JPopupMenu;
+import javax.swing.JToolBar;
+import org.netbeans.api.options.OptionsDisplayer;
+import org.netbeans.modules.profiler.heapwalk.OQLSupport;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine;
 import org.netbeans.modules.profiler.oql.engine.api.OQLEngine.ObjectVisitor;
 import org.netbeans.modules.profiler.oql.engine.api.OQLException;
@@ -122,16 +114,21 @@ public class OQLConsoleView extends HeapViewerFeature {
     private ProfilerToolbar toolbar;
     private ProfilerToolbar pluginsToolbar;
     private ProfilerToolbar resultsToolbar;
+    private ProfilerToolbar progressToolbar;
     
     private JComponent component;
     
-    private JButton runButton;
-    private JButton cancelButton;
+    private Action runAction;
+    private Action cancelAction;
+    private Action loadAction;
+    private Action saveAction;
+    private Action editAction;
+    
     private JLabel progressLabel;
     private JProgressBar progressBar;
     
     private OQLEngine engine;
-    private OQLEditor editor;
+    private OQLEditorComponent editor;
     
     private JPanel resultsContainer;
     private final HTMLView htmlView;
@@ -146,6 +143,8 @@ public class OQLConsoleView extends HeapViewerFeature {
     
     // TODO: synchronize!
     private Set<HeapViewerNode> nodeResults;
+    
+    private OQLSupport.Query currentQuery;
     
     
     public OQLConsoleView(HeapContext context, HeapViewerActions actions) {
@@ -171,14 +170,14 @@ public class OQLConsoleView extends HeapViewerFeature {
 
             objectsView = new PluggableTreeTableView("java_objects_oql", context, actions, ownColumns) {
                 protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-                    if (nodeResults == null) return new HeapViewerNode[] { new TextNode("<no query executed yet>") };
+                    if (nodeResults == null) return new HeapViewerNode[] { new TextNode("<no script executed yet>") };
                     else if (nodeResults.isEmpty()) return new HeapViewerNode[] { new TextNode("<no results>") };
                     else return nodeResults.toArray(HeapViewerNode.NO_NODES);
                 }
             };
             objectsView.setViewName("Results");
 
-            htmlView = new HTMLView("java_objects_oql", context, actions, "<p>&nbsp;&nbsp;&lt;no query executed yet&gt</p>") {
+            htmlView = new HTMLView("java_objects_oql", context, actions, "<p>&nbsp;&nbsp;&lt;no script executed yet&gt</p>") {
                 protected HeapViewerNode nodeForURL(URL url, HeapContext context) {
                     return OQLConsoleView.getNode(url, context);
                 }
@@ -210,8 +209,17 @@ public class OQLConsoleView extends HeapViewerFeature {
 
             toolbar.add(new GrayLabel("OQL Query:"));
             toolbar.addSpace(2);
+            
+            runAction = new AbstractAction("Run", Icons.getIcon(GeneralIcons.START)) {
+                {
+                    putValue(Action.SHORT_DESCRIPTION, "Execute OQL script");
+                }
+                public void actionPerformed(ActionEvent e) {
+                    executeQuery();
+                }
+            };
 
-            runButton = new JButton("Run", Icons.getIcon(GeneralIcons.START)) {
+            JButton runButton = new JButton(runAction) {
                 public Dimension getPreferredSize() {
                     Dimension d = super.getPreferredSize();
                     d.width += 6;
@@ -223,26 +231,101 @@ public class OQLConsoleView extends HeapViewerFeature {
                 public Dimension getMaximumSize() {
                     return getPreferredSize();
                 }
-                protected void fireActionPerformed(ActionEvent e) {
-                    super.fireActionPerformed(e);
-                    executeQuery();
-                }
             };
-
-            cancelButton = new JButton(Icons.getIcon(GeneralIcons.STOP)) {
-                protected void fireActionPerformed(ActionEvent e) {
+            
+            cancelAction = new AbstractAction("Cancel", Icons.getIcon(GeneralIcons.STOP)) {
+                {
+                    putValue(Action.SHORT_DESCRIPTION, "Cancel OQL script execution");
+                }
+                public void actionPerformed(ActionEvent e) {
                     cancelQuery();
                 }
             };
-            cancelButton.setEnabled(false);
 
+            JButton cancelButton = new JButton(cancelAction);
+            cancelButton.setHideActionText(true);
+            
+            loadAction = new AbstractAction("Load Script", OQLQueries.ICON_LOAD) {
+                {
+                    putValue(Action.SHORT_DESCRIPTION, "Load OQL script");
+                }
+                public void actionPerformed(ActionEvent e) {
+                    if (e.getSource() instanceof JComponent) {
+                        JPopupMenu p = new JPopupMenu();
+                        OQLQueries.instance().populateLoadQuery(p, currentQuery, new OQLQueries.Handler() {
+                            protected void querySelected(OQLSupport.Query query) {
+                                currentQuery = query;
+                                if (editor != null) editor.setScript(currentQuery.getScript());
+                            }
+                        });
+                        
+                        JComponent c = (JComponent)e.getSource();
+                        if (p.getComponentCount() > 0) {
+                            if (c.getClientProperty("POPUP_LEFT") != null) p.show(c, c.getWidth() + 1, 0);
+                            else p.show(c, 0, c.getHeight() + 1);
+                        }
+                        
+                    }
+                }
+            };
+            
+            JButton loadButton = new JButton(loadAction);
+            loadButton.setHideActionText(true);
+            
+            saveAction = new AbstractAction("Save Script", OQLQueries.ICON_SAVE) {
+                {
+                    putValue(Action.SHORT_DESCRIPTION, "Save OQL script");
+                }
+                public void actionPerformed(ActionEvent e) {
+                    if (e.getSource() instanceof JComponent) {
+                        JPopupMenu p = new JPopupMenu();
+                        OQLQueries.instance().populateSaveQuery(p, currentQuery, editor.getScript(), new OQLQueries.Handler() {
+                            protected void querySelected(OQLSupport.Query query) {
+                                currentQuery = query;
+                            }
+                        });
+                        
+                        JComponent c = (JComponent)e.getSource();
+                        if (p.getComponentCount() > 0) {
+                            if (c.getClientProperty("POPUP_LEFT") != null) p.show(c, c.getWidth() + 1, 0);
+                            else p.show(c, 0, c.getHeight() + 1);
+                        }
+                        
+                    }
+                }
+            };
+            
+            JButton saveButton = new JButton(saveAction);
+            saveButton.setHideActionText(true);
+            
+            editAction = new AbstractAction("Edit Scripts", Icons.getIcon(HeapWalkerIcons.RULES)) {
+                {
+                    putValue(Action.SHORT_DESCRIPTION, "Edit Saved OQL scripts");
+                }
+                public void actionPerformed(ActionEvent e) {
+                    OptionsDisplayer.getDefault().open(HeapViewerOptionsCategory.OPTIONS_HANDLE);
+                }
+            };
+            
+            JButton editButton = new JButton(editAction);
+            editButton.setHideActionText(true);
+            
+            
+            progressToolbar = ProfilerToolbar.create(false);
+            progressToolbar.getComponent().setVisible(false);
+            
+            progressToolbar.addSpace(2);
+            progressToolbar.addSeparator();
+            progressToolbar.addSpace(5);
+            
             progressLabel = new GrayLabel("Executing...");
-            progressLabel.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 5));
-            progressLabel.setVisible(false);
+            progressToolbar.add(progressLabel);
+            
+            progressToolbar.addSpace(8);
 
             progressBar = new JProgressBar(JProgressBar.HORIZONTAL) {
                 public Dimension getPreferredSize() {
-                    Dimension dim = super.getPreferredSize();
+                    Dimension dim = super.getMinimumSize();
                     dim.width = 120;
                     return dim;
                 }
@@ -253,15 +336,17 @@ public class OQLConsoleView extends HeapViewerFeature {
                     return getPreferredSize();
                 }
             };
-            progressBar.setVisible(false);
+            progressToolbar.add(progressBar);
 
             toolbar.add(runButton);
     //        toolbar.addSpace(2);
             toolbar.add(cancelButton);
-    //        toolbar.addSpace(6);
-            toolbar.add(progressLabel);
-    //        toolbar.addSpace(5);
-            toolbar.add(progressBar);
+            
+            toolbar.addSpace(5);
+            
+            toolbar.add(loadButton);
+            toolbar.add(saveButton);
+            toolbar.add(editButton);
 
             resultsToolbar = ProfilerToolbar.create(false);
 
@@ -312,8 +397,15 @@ public class OQLConsoleView extends HeapViewerFeature {
             }
 
             toolbar.add(resultsToolbar);
+            
+            toolbar.add(progressToolbar);
 
-            editor = new OQLEditor(engine);
+            editor = new OQLEditorComponent(engine) {
+                protected void validityChanged(boolean valid) {
+                    queryValid = valid;
+                    updateUIState();
+                }
+            };
 
             resultsContainer = new JPanel(new CardLayout());
             resultsContainer.add(objectsView.getComponent());
@@ -328,8 +420,6 @@ public class OQLConsoleView extends HeapViewerFeature {
 
             component = new JPanel(new BorderLayout());
             component.add(masterSplit, BorderLayout.CENTER);
-
-            editor.setScript("select x from java.io.File x");
 
             updateUIState();
         } else {
@@ -373,9 +463,8 @@ public class OQLConsoleView extends HeapViewerFeature {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 updateUIState();
-                toolbar.remove(resultsToolbar);
-                progressLabel.setVisible(true);
-                progressBar.setVisible(true);
+                resultsToolbar.getComponent().setVisible(false);
+                progressToolbar.getComponent().setVisible(true);
                 progressBar.setModel(model);
             }
         });
@@ -385,10 +474,9 @@ public class OQLConsoleView extends HeapViewerFeature {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 updateUIState();
-                progressLabel.setVisible(false);
-                progressBar.setVisible(false);
                 progressBar.setModel(null);
-                toolbar.add(resultsToolbar);
+                progressToolbar.getComponent().setVisible(false);
+                resultsToolbar.getComponent().setVisible(true);
                 objectsView.reloadView();
                 
                 if (result != null) {
@@ -406,23 +494,22 @@ public class OQLConsoleView extends HeapViewerFeature {
     
     
     private void updateUIState() {
+        int scriptLength = editor.getScript().trim().length();
+        
+        saveAction.setEnabled(scriptLength > 0);
+        
         if (analysisRunning.get()) {
-            runButton.setEnabled(false);
-            cancelButton.setEnabled(true);
+            runAction.setEnabled(false);
+            cancelAction.setEnabled(true);
+            loadAction.setEnabled(false);
             editor.setEditable(false);
-            editor.setEnabled(false);
         } else {
-            runButton.setEnabled(editor.getScript().length() > 0 && queryValid);
-            cancelButton.setEnabled(false);
-//            saveButton.setEnabled(editor.getScript().length() > 0 && queryValid);
+            runAction.setEnabled(scriptLength > 0 && queryValid);
+            cancelAction.setEnabled(false);
+            loadAction.setEnabled(true);
             editor.setEditable(true);
-            editor.setEnabled(true);
         }
     }
-    
-//    private void setResult(String result) {
-//        htmlView.setText(result);
-//    }
     
     
     private void executeQueryImpl(final String oqlQuery) {
@@ -613,133 +700,47 @@ public class OQLConsoleView extends HeapViewerFeature {
     
     private class EditorView extends JPanel {
         
-        EditorView(OQLEditor editor) {
+        EditorView(OQLEditorComponent editor) {
             super(new BorderLayout());
             
-            editor.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-            editor.setBackground(UIUtils.getProfilerResultsBackground());
-            editor.addPropertyChangeListener(OQLEditor.VALIDITY_PROPERTY, new PropertyChangeListener() {
-                public void propertyChange(PropertyChangeEvent evt) {
-                    queryValid = (Boolean)evt.getNewValue();
-                    updateUIState();
-                }
-            });
-            
-            final JEditorPane ref = editor.getEditor();
-            
-            JTextField tf = new JTextField(" 1234 ");
-            tf.setBorder(BorderFactory.createEmptyBorder());
-            tf.setMargin(new Insets(0, 0, 0, 0));
-            tf.setFont(editor.getFont());
-            final int w = tf.getPreferredSize().width;
-            
-            final JEditorPane rows = new JEditorPane() {
-                public Dimension getPreferredSize() {
-                    Dimension dim = ref.getPreferredSize();
-                    dim.width = w;
-                    return dim;
-                }
-                public void setBackground(Color c) {
-                    super.setBackground(new Color(245, 245, 245));
-                }
-            };
-            
-            rows.setFont(editor.getFont());
-            rows.setEditorKit(ref.getEditorKit());
-            
-            rows.setCaret(new FollowingCaret(ref));
-            StringBuilder sb = new StringBuilder();
-            for (int i = 1; i < 1000; i++) {
-                if (i < 10) sb.append(" ");
-                if (i < 100) sb.append("  ");
-//                if (i < 1000) sb.append(" ");
-                sb.append(Integer.toString(i) + " \n");
-            }
-            rows.setText(sb.toString());
-            rows.setEditable(false);
-            rows.setEnabled(false);
-            
-            Insets margin = ref.getMargin();
-            if (margin == null) margin = new Insets(0, 0, 0, 0);
-            rows.setMargin(new Insets(margin.top, 0, margin.bottom, 0));
-            
-            Border border = ref.getBorder();
-            if (border != null) {
-                margin = border.getBorderInsets(ref);
-                if (margin == null) margin = new Insets(0, 0, 0, 0);
-                rows.setBorder(BorderFactory.createEmptyBorder(margin.top, -1, margin.bottom, 0));
-            }
-            
-            JPanel editorContainer = new JPanel(new BorderLayout());
-            editorContainer.add(rows, BorderLayout.WEST);
-            editorContainer.add(editor, BorderLayout.CENTER);
-
-            JScrollPane editorScroll = new JScrollPane(editorContainer,
-                                    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            editorScroll.setBorder(BorderFactory.createEmptyBorder());
-            editorScroll.setViewportBorder(BorderFactory.createEmptyBorder());
-            editorScroll.getVerticalScrollBar().setUnitIncrement(10);
-            editorScroll.getHorizontalScrollBar().setUnitIncrement(10);
-            
-            add(editorScroll, BorderLayout.CENTER);
+            editor.clearScrollBorders();
+            add(editor, BorderLayout.CENTER);
 //            add(new ScrollableContainer(editorContainer), BorderLayout.CENTER);
+
+            JToolBar controls = new JToolBar(JToolBar.VERTICAL);
+            controls.setFloatable(false);
+            controls.setBorderPainted(false);
+            controls.add(runAction);
+            controls.add(cancelAction);
+            controls.addSeparator();
+            controls.add(loadAction).putClientProperty("POPUP_LEFT", Boolean.TRUE);
+            controls.add(saveAction).putClientProperty("POPUP_LEFT", Boolean.TRUE);
+            controls.add(editAction).putClientProperty("POPUP_LEFT", Boolean.TRUE);
+            
+            JPanel controlsContainer = new JPanel(new BorderLayout());
+            controlsContainer.setOpaque(false);
+            controlsContainer.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createMatteBorder(0, 0, 0, 1, UIManager.getColor("Separator.foreground")), // NOI18N
+                    BorderFactory.createEmptyBorder(1, 1, 1, 1)));
+            controlsContainer.add(controls, BorderLayout.CENTER);
+            add(controlsContainer, BorderLayout.WEST);
+            
+            // size to always show Run and Stop buttons
+            int h = controls.getComponent(0).getPreferredSize().height;
+            h += controls.getComponent(1).getPreferredSize().height + 2;
+            setMinimumSize(new Dimension(0, h));
         }
         
     }
+    
     
     private class ResultsView extends JPanel {
         
         ResultsView(JComponent results) {
             super(new BorderLayout());
-            
             add(new ScrollableContainer(results), BorderLayout.CENTER);
         }
         
-    }
-    
-    
-    private static class FollowingCaret implements Caret {
-                
-        private final List<ChangeListener> listeners = new ArrayList();
-        private int dot;
-
-        FollowingCaret(final JTextComponent tc) {
-            tc.getCaret().addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent e) {
-                    setDot(followedPosition(tc));
-                }
-            });
-            setDot(followedPosition(tc));
-        }
-
-        private static int followedPosition(JTextComponent tc) {
-            Element root = tc.getDocument().getDefaultRootElement();
-            return root.getElementIndex(tc.getCaretPosition()) * 6;
-        }
-
-        public void install(JTextComponent c) {}
-        public void deinstall(JTextComponent c) {}
-        public void paint(Graphics g) {}
-        public void addChangeListener(ChangeListener l) { listeners.add(l); }
-        public void removeChangeListener(ChangeListener l) { listeners.remove(l); }
-        public boolean isVisible() { return false; }
-        public void setVisible(boolean v) {}
-        public boolean isSelectionVisible() { return false; }
-        public void setSelectionVisible(boolean v) {}
-        public void setMagicCaretPosition(Point p) {}
-        public Point getMagicCaretPosition() { return new Point(0, 0); }
-        public void setBlinkRate(int rate) {}
-        public int getBlinkRate() { return 1; }
-        public int getDot() { return dot; }
-        public int getMark() { return dot; }
-        public void setDot(int dot) {
-            this.dot = dot;
-            ChangeEvent e = new ChangeEvent(this);
-            for (ChangeListener l : listeners) l.stateChanged(e);
-        }
-        public void moveDot(int dot) {}
-
     }
     
 }
