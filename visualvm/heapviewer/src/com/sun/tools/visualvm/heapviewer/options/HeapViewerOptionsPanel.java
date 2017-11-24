@@ -185,7 +185,7 @@ final class HeapViewerOptionsPanel extends JPanel {
 
         setLayout(new GridBagLayout());
 
-        SectionSeparator presetsSection = UISupport.createSectionSeparator("Custom OQL Scripts"); // NOI18N
+        SectionSeparator presetsSection = UISupport.createSectionSeparator("Custom OQL Scripts");
         c = new GridBagConstraints();
         c.gridy = 0;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -215,10 +215,10 @@ final class HeapViewerOptionsPanel extends JPanel {
         });
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         final Dimension oneDim = new Dimension(1, 1);
-        final JLabel loadingScriptsLabel = new JLabel("<loading scripts>", JLabel.CENTER); // NOI18N
+        final JLabel loadingScriptsLabel = new JLabel("<loading scripts>", JLabel.CENTER);
         loadingScriptsLabel.setEnabled(false);
         loadingScriptsLabel.setSize(loadingScriptsLabel.getPreferredSize());
-        final JLabel noScriptsLabel = new JLabel("<no saved scripts>", JLabel.CENTER); // NOI18N
+        final JLabel noScriptsLabel = new JLabel("<no saved scripts>", JLabel.CENTER);
         noScriptsLabel.setEnabled(false);
         noScriptsLabel.setSize(noScriptsLabel.getPreferredSize());
         JScrollPane listScroll = new JScrollPane(list) {
@@ -253,7 +253,7 @@ final class HeapViewerOptionsPanel extends JPanel {
         int mar = nimbusLaF ? 0 : 8;
         margin.left = mar;
         margin.right = mar;
-        removeButton.setToolTipText("Delete selected script"); // NOI18N
+        removeButton.setToolTipText("Delete selected script");
         removeButton.setMargin(margin);
         upButton = new JButton() {
             protected void fireActionPerformed(ActionEvent e) {
@@ -271,7 +271,7 @@ final class HeapViewerOptionsPanel extends JPanel {
         };
         downButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
                 "com/sun/tools/visualvm/profiler/resources/down.png", true)));   // NOI18N
-        downButton.setToolTipText("Move selected script down"); // NOI18N
+        downButton.setToolTipText("Move selected script down");
         downButton.setMargin(margin);
 
         JPanel controlsPanel = new JPanel(new GridLayout(1, 4, 5, 0)) {
@@ -306,7 +306,7 @@ final class HeapViewerOptionsPanel extends JPanel {
         add(presetsPanel, c);
         
         JLabel nameLabel = new JLabel();
-        Mnemonics.setLocalizedText(nameLabel, "&Name:"); // NOI18N
+        Mnemonics.setLocalizedText(nameLabel, "&Name:");
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
@@ -338,7 +338,7 @@ final class HeapViewerOptionsPanel extends JPanel {
         presetsPanel.add(nameField, c);
         
         JLabel descrLabel = new JLabel();
-        Mnemonics.setLocalizedText(descrLabel, "&Description (optional):"); // NOI18N
+        Mnemonics.setLocalizedText(descrLabel, "&Description (optional):");
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 1;
@@ -378,7 +378,7 @@ final class HeapViewerOptionsPanel extends JPanel {
         presetsPanel.add(descrScroll, c);
         
         JLabel previewLabel = new JLabel();
-        Mnemonics.setLocalizedText(previewLabel, "&Preview:"); // NOI18N
+        Mnemonics.setLocalizedText(previewLabel, "&Preview:");
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 3;
