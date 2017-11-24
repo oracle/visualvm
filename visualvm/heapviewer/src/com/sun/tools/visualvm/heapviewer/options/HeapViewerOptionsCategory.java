@@ -36,6 +36,7 @@ import org.netbeans.modules.profiler.heapwalk.OQLSupport;
 import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -47,7 +48,7 @@ import org.openide.util.RequestProcessor;
         categoryName = "#HeapViewerOptionsCategory_Name", 
         iconBase = "com/sun/tools/visualvm/heapviewer/options/heapViewer32.png",
         position = 1525)
-@org.openide.util.NbBundle.Messages({
+@NbBundle.Messages({
         "HeapViewerOptionsCategory_Name=Heap Viewer"
 }) 
 public final class HeapViewerOptionsCategory extends OptionsPanelController {
