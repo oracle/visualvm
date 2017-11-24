@@ -47,6 +47,8 @@ public abstract class ProfilerSnapshot extends Snapshot {
 
     static final Image CPU_ICON = Icons.getImage(ProfilerIcons.CPU);
     static final Image MEMORY_ICON = Icons.getImage(ProfilerIcons.MEMORY);
+    static final Image JDBC_ICON = Icons.getImage(ProfilerIcons.SQL_QUERY);
+    static final Image SNAPSHOT_ICON = Icons.getImage(ProfilerIcons.SNAPSHOT_DO);
     static final Image NODE_BADGE = ImageUtilities.loadImage(
             "com/sun/tools/visualvm/core/ui/resources/snapshotBadge.png", true);    // NOI18N
    
