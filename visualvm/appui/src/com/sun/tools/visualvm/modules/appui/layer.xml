@@ -57,6 +57,7 @@
             <file name="org-netbeans-core-actions-JumpNextAction.instance_hidden"/>
             <file name="org-netbeans-core-actions-JumpPrevAction.instance_hidden"/>
             <file name="org-netbeans-core-windows-model-NewMode.instance_hidden"/>
+            <file name="org-netbeans-modules-masterfs-ui-suspend-PauseAction.instance_hidden"/>
             <file name="org-openide-actions-EditAction.instance_hidden"/>
             <file name="org-openide-actions-InstantiateAction.instance_hidden"/>
             <file name="org-openide-actions-MoveDownAction.instance_hidden"/>
@@ -80,6 +81,7 @@
         </folder>
         <folder name="Window">
             <file name="org-netbeans-core-actions-GlobalPropertiesAction.instance_hidden"/>
+            <file name="org-netbeans-core-io-ui-IOWindowAction.instance_hidden"/>
             <file name="org-netbeans-core-windows-actions-GlobalPropertiesAction.instance_hidden"/>
         </folder>
     </folder>
@@ -173,6 +175,10 @@
         <file name="File_hidden"/>
         <file name="Clipboard_hidden"/>
         <file name="Edit_hidden"/>
+        <folder name="Memory">
+            <file name="org-netbeans-modules-masterfs-ui-suspend-PauseAction.shadow_hidden"/>
+            <file name="org-netbeans-modules-profiler-actions-SelfSamplerAction.shadow_hidden"/>
+        </folder>
         <file name="Profile_hidden"/>
         <file name="Standard.xml" url="Standard.xml"/>
         <file name="UndoRedo_hidden"/>
