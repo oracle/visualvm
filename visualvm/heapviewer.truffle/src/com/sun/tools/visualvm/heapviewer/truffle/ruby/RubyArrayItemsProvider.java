@@ -114,7 +114,8 @@ public class RubyArrayItemsProvider extends HeapViewerNode.Provider {
                     Instance instance = item.getInstance();
                     if (DynamicObject.isDynamicObject(instance)) {
                         DynamicObject dobject = new DynamicObject(instance);
-                        return new RubyNodes.RubyDynamicObjectArrayItemNode(dobject, dobject.getType(heap), item);
+                        String type = RubyObjectsProvider.getDisplayType(dobject.getType(heap));
+                        return new RubyNodes.RubyDynamicObjectArrayItemNode(dobject, type, item);
                     } else {
                         return new TerminalJavaNodes.ArrayItem(item, false);
                     }

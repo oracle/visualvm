@@ -54,7 +54,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
     
     
     static String getDisplayType(String type) {
-        return type.endsWith("Type") ? type.substring(0, type.length() - 4) : type;
+        return type.endsWith("Type") ? type.substring(0, type.length() - 4) : type; // NOI18N
     }
     
 

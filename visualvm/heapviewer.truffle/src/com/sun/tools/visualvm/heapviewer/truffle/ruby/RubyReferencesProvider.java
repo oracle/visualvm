@@ -77,7 +77,8 @@ public class RubyReferencesProvider extends HeapViewerNode.Provider {
             protected HeapViewerNode createNode(Integer index) {
                 FieldValue reference = references.get(index);
                 DynamicObject dobject = new DynamicObject(reference.getDefiningInstance());
-                return new RubyNodes.RubyDynamicObjectReferenceNode(dobject, dobject.getType(heap), reference);
+                String type = RubyObjectsProvider.getDisplayType(dobject.getType(heap));
+                return new RubyNodes.RubyDynamicObjectReferenceNode(dobject, type, reference);
             }
             protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
                 Iterator<Integer> iterator = integerIterator(index, references.size());
