@@ -75,7 +75,8 @@ import org.openide.windows.TopComponent;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "ComponentDetailsProvider_NewWindow=Analyze in new window"
+    "ComponentDetailsProvider_NewWindow=Analyze in new window",
+    "ComponentDetailsProvider_InvisibleComponentPrefix=[invisible]"
 })
 @ServiceProvider(service=DetailsProvider.class)
 public final class ComponentDetailsProvider extends DetailsProvider.Basic {
@@ -101,38 +102,49 @@ public final class ComponentDetailsProvider extends DetailsProvider.Basic {
     }
     
     public String getDetailsString(String className, Instance instance, Heap heap) {
+        String string = null;
+        
         if (JLABEL_MASK.equals(className) ||                                        // JLabel+
             ABSTRACTBUTTON_MASK.equals(className)) {                                // AbstractButton+
-            return DetailsUtils.getInstanceFieldString(
+            string = DetailsUtils.getInstanceFieldString(
                     instance, "text", heap);                                        // NOI18N
         } else if (JTOOLTIP_MASK.equals(className)) {                               // JToolTip+
-            return DetailsUtils.getInstanceFieldString(
+            string = DetailsUtils.getInstanceFieldString(
                     instance, "tipText", heap);                                     // NOI18N
         } else if (JFILECHOOSER_MASK.equals(className)) {                           // JFileChooser+
-            return DetailsUtils.getInstanceFieldString(
+            string = DetailsUtils.getInstanceFieldString(
                     instance, "dialogTitle", heap);                                 // NOI18N
         } else if (JINTERNALFRAME_MASK.equals(className) ||                         // JInternalFrame+
                    FRAME_MASK.equals(className) ||                                  // Frame+
                    DIALOG_MASK.equals(className)) {                                 // Dialog+
-            return DetailsUtils.getInstanceFieldString(
+            string = DetailsUtils.getInstanceFieldString(
                     instance, "title", heap);                                       // NOI18N
         } else if (TABLECOLUMN_MASK.equals(className)) {                            // TableColumn+
-            return DetailsUtils.getInstanceFieldString(
+            string = DetailsUtils.getInstanceFieldString(
                     instance, "headerValue", heap);                                 // NOI18N
         } else if (JPROGRESSBAR_MASK.equals(className)) {                           // JProgressBar+
             boolean b = DetailsUtils.getBooleanFieldValue(
                     instance, "paintString", false);                                // NOI18N
-            if (b) return DetailsUtils.getInstanceFieldString(
+            if (b) string = DetailsUtils.getInstanceFieldString(
                     instance, "progressString", heap);                              // NOI18N
         }
         
-        // Value for a generic Component
-        String string = getStringField(instance, "displayName", heap);
-        if (string == null) string = getStringField(instance, "label", heap);
-        if (string == null) string = getStringField(instance, "name", heap);
-        // TODO: check tooltip
+        if (string == null) {
+            // Value for a generic Component
+            string = getStringField(instance, "displayName", heap);
+            if (string == null) string = getStringField(instance, "label", heap);
+            if (string == null) string = getStringField(instance, "name", heap);
+            // TODO: check tooltip
+
+            if (string != null && string.trim().isEmpty()) string = null;
+        }
         
-        if (string != null && string.trim().isEmpty()) string = null;
+        if (string != null) {
+            // Mark invisible components
+            boolean b = DetailsUtils.getBooleanFieldValue(
+                    instance, "visible", false);                                    // NOI18N
+            if (!b) string = Bundle.ComponentDetailsProvider_InvisibleComponentPrefix() + " " + string; // NOI18N
+        }
         
         return string;
     }
