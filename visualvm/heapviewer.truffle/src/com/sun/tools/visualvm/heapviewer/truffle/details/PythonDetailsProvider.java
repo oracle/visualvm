@@ -52,7 +52,7 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     public PythonDetailsProvider() {
         super(PCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,BASIC_STORAGE_MASK,
               PTUPLE_MASK,PMODULE_MASK,PBYTES_MASK,EMPTY_STORAGE_MASK,
-              PEXCEPTION_MASK);
+              PCOMPLEX_MASK, PEXCEPTION_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -88,7 +88,7 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
             Double imagObj = (Double) instance.getValueOfField("imag");    // NOI18N
 
             if (realObj != null && imagObj != null) {
-                complexToString(realObj.doubleValue(), imagObj.doubleValue());
+                return complexToString(realObj.doubleValue(), imagObj.doubleValue());
             }
         }
         if (PEXCEPTION_MASK.equals(className)) {
