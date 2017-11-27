@@ -30,6 +30,7 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.netbeans.lib.profiler.heap.ArrayItemValue;
 import org.netbeans.lib.profiler.heap.Field;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Instance;
@@ -38,6 +39,7 @@ import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.lib.profiler.heap.Type;
+import org.netbeans.lib.profiler.heap.Value;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 
 /**
@@ -50,6 +52,9 @@ public class PythonObject {
 
     static final String PYTHON_OBJECT_FQN = "com.oracle.graal.python.runtime.object.PythonObject"; // NOI18N
     static final String PYTHON_LIST_FQN = "com.oracle.graal.python.runtime.sequence.PList"; // NOI18N
+    static final String TREEMAP_ENTRY_FQN = "java.util.TreeMap$Entry";  // NOI18N
+    static final String TREEMAP_FQN = "java.util.TreeMap";  // NOI18N
+
     private final Instance instance;
     private final Instance storage;
     private final Instance store;
@@ -113,6 +118,124 @@ public class PythonObject {
         return size;
     }
 
+    List<FieldValue> getReferences() {
+        List<Value> refs = instance.getReferences();
+        List<FieldValue> robjRefs = new ArrayList();
+
+        for (Value ref : refs) {
+            Instance defInstance = ref.getDefiningInstance();
+            if (ref instanceof ArrayItemValue) {
+                if (defInstance instanceof ObjectArrayInstance) {
+                    List<Value> arrRefs = defInstance.getReferences();
+
+                    for (Value arrRef : arrRefs) {
+                        Instance pInstance = arrRef.getDefiningInstance();
+
+                        if (PythonObject.isPythonObject(pInstance)) {
+                            addItem(pInstance, ref, robjRefs);
+                        } else {
+                            Instance store = getReference(pInstance, PYTHON_OBJECT_FQN, "store");
+                            if (PythonObject.isPythonObject(store)) {
+                                addItem(store, ref, robjRefs);
+                            }
+                        }
+                        addAttribute(pInstance, robjRefs);
+                    }
+                }
+            }
+            if (defInstance != null && defInstance.getJavaClass().getName().equals(TREEMAP_ENTRY_FQN)) {
+                FieldValue rootReference = findRootPMap(defInstance);
+
+                robjRefs.add(rootReference);
+            }
+            addAttribute(defInstance, robjRefs);
+        }
+        return robjRefs;
+    }
+
+    private void addItem(Instance pInstance, Value ref, List<FieldValue> robjRefs) {
+        PythonObject pobject = new PythonObject(pInstance);
+        int index = ((ArrayItemValue)ref).getIndex();
+        List<FieldValue> items = pobject.getItems();
+
+        if (index < items.size()) {
+            FieldValue fv = items.get(index);
+            if (fv instanceof ObjectFieldValue) {
+                ObjectFieldValue ofv = (ObjectFieldValue) fv;
+                if (instance.equals(ofv.getInstance())) {
+                    robjRefs.add(fv);
+                }
+            }
+        }
+    }
+
+    private FieldValue findRootPMap(Instance mapEntry) {
+        for (Instance parent = getParentTreeEntry(mapEntry); parent != null; parent = getParentTreeEntry(parent)) {
+            mapEntry = parent;
+        }
+        // top TreeMap$Entry
+        Instance treeMap = getReference(mapEntry, TREEMAP_FQN, "root");
+        Instance pythonObject = getReference(treeMap, PYTHON_OBJECT_FQN, "map");
+
+        if (isPythonObject(pythonObject)) {
+            for (FieldValue fv : new PythonObject(pythonObject).getAttributes()) {
+                if (fv instanceof ObjectFieldValue) {
+                    ObjectFieldValue ofv = (ObjectFieldValue) fv;
+                    if (instance.equals(ofv.getInstance())) {
+                        return fv;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private Instance getParentTreeEntry(Instance treeEntry) {
+        return (Instance) treeEntry.getValueOfField("parent");
+    }
+
+    private Instance getReference(Instance instance, String definingClass, String fieldName) {
+        if (instance == null) return null;
+        List<Value> refs = instance.getReferences();
+        for (Value ref : refs) {
+            if (ref instanceof ObjectFieldValue) {
+               ObjectFieldValue fval = (ObjectFieldValue) ref;
+               Instance parent = fval.getDefiningInstance();
+
+               if (fval.getField().getName().equals(fieldName) && isSubClassOf(parent, definingClass)) {
+                   return parent;
+               }
+            }
+        }
+        return null;
+    }
+
+    private void addAttribute(Instance dynObjInstance, List<FieldValue> robjRefs) {
+        if (DynamicObject.isDynamicObject(dynObjInstance)) {
+            List<Value> refs = dynObjInstance.getReferences();
+
+            for (Value ref : refs) {
+                Instance defInstance = ref.getDefiningInstance();
+
+                if (PythonObject.isPythonObject(defInstance)) {
+                    PythonObject pobject = new PythonObject(defInstance);
+
+                    if (pobject.storage.equals(dynObjInstance)) {
+                        for (FieldValue fv : pobject.getAttributes()) {
+                            if (fv instanceof ObjectFieldValue) {
+                                ObjectFieldValue ofv = (ObjectFieldValue) fv;
+
+                                if (ofv.getInstance().equals(instance)) {
+                                    robjRefs.add(fv);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private List getValues() {
         Instance vals = null;
 
@@ -152,7 +275,7 @@ public class PythonObject {
 
     private static boolean isSubClassOf(Instance i, String superClassName) {
         if (i != null) {
-            JavaClass superCls = i.getJavaClass().getSuperClass();
+            JavaClass superCls = i.getJavaClass();
 
             for (; superCls != null; superCls = superCls.getSuperClass()) {
                 if (superCls.getName().equals(superClassName)) {
@@ -171,7 +294,7 @@ public class PythonObject {
         List fields = new ArrayList();
         Instance rootEntry = (Instance) map.getValueOfField("root");
 
-        getEntries(rootEntry, fields);
+        getEntries(false, rootEntry, fields);
         return fields;
     }
 
@@ -180,15 +303,15 @@ public class PythonObject {
         Instance m = (Instance) set.getValueOfField("m");
         Instance rootEntry = (Instance) m.getValueOfField("root");
 
-        getEntries(rootEntry, fields);
+        getEntries(true, rootEntry, fields);
         return fields;
     }
 
-    private void getEntries(Instance entry, List fields) {
+    private void getEntries(boolean isSet, Instance entry, List fields) {
         if (entry != null) {
-            getEntries((Instance) entry.getValueOfField("left"), fields);
-            fields.add(new PythonMapEntryFieldValue(entry));
-            getEntries((Instance) entry.getValueOfField("right"), fields);
+            getEntries(isSet, (Instance) entry.getValueOfField("left"), fields);
+            fields.add(new PythonMapEntryFieldValue(isSet, entry));
+            getEntries(isSet, (Instance) entry.getValueOfField("right"), fields);
         }
     }
 
@@ -196,19 +319,29 @@ public class PythonObject {
     private class PythonMapEntryFieldValue implements ObjectFieldValue {
 
         Instance entry;
+        boolean isSet;
 
-        private PythonMapEntryFieldValue(Instance e) {
+        private PythonMapEntryFieldValue(boolean set, Instance e) {
             entry = e;
+            isSet = set;
         }
 
         @Override
         public Instance getInstance() {
+            if (isSet) {
+                return (Instance) entry.getValueOfField("key");  // NOI18N
+            }
             return (Instance) entry.getValueOfField("value");  // NOI18N
         }
 
         @Override
         public Field getField() {
-            return new PythonMapEntryField((Instance)entry.getValueOfField("key"));
+            if (isSet) {
+                return new PythonMapEntryField("item");
+            }
+            Instance key = (Instance)entry.getValueOfField("key");
+            String name = DetailsUtils.getInstanceString(key, null);
+            return new PythonMapEntryField(name);
         }
 
         @Override
@@ -225,16 +358,16 @@ public class PythonObject {
 
     private class PythonMapEntryField extends PythonField {
 
-        Instance key;
+        String name;
 
-        private PythonMapEntryField(Instance k) {
+        private PythonMapEntryField(String n) {
             super(0);
-            key = k;
+            name = n;
         }
 
         @Override
         public String getName() {
-            return DetailsUtils.getInstanceString(key, null);
+            return name;
         }
     }
 
