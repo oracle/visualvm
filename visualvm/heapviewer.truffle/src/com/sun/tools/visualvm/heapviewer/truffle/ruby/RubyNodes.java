@@ -50,7 +50,7 @@ class RubyNodes {
     static String getLogicalValue(DynamicObject dobject, String type, Heap heap) {
         String logicalValue = null;
 
-        if ("ProcType".equals(type)) {
+        if ("Proc".equals(type)) {
             FieldValue infoField = dobject.getFieldValue("sharedMethodInfo (hidden)");
             Instance info = infoField instanceof ObjectFieldValue ? ((ObjectFieldValue)infoField).getInstance() : null;
             if (info != null) {
@@ -61,7 +61,7 @@ class RubyNodes {
                 else if (name != null) logicalValue = name;
                 else if (notes != null) logicalValue = notes;
             }
-        } else if ("MethodType".equals(type) || "UnboundMethodType".equals(type)) {
+        } else if ("Method".equals(type) || "UnboundMethod".equals(type)) {
             FieldValue methodField = dobject.getFieldValue("method (hidden)");
             Instance method = methodField instanceof ObjectFieldValue ? ((ObjectFieldValue)methodField).getInstance() : null;
             
@@ -76,12 +76,12 @@ class RubyNodes {
                 else if (name != null) logicalValue = name;
                 else if (notes != null) logicalValue = notes;
             }
-        } else if ("SymbolType".equals(type)) {
+        } else if ("Symbol".equals(type)) {
             FieldValue symbolField = dobject.getFieldValue("string (hidden)");
             Instance symbol = symbolField instanceof ObjectFieldValue ? ((ObjectFieldValue)symbolField).getInstance() : null;
             
             if (symbol != null) logicalValue = DetailsUtils.getInstanceString(symbol, heap);
-        } else if ("ClassType".equals(type) || "ModuleType".equals(type)) {
+        } else if ("Class".equals(type) || "ModuleType".equals(type)) {
             FieldValue fieldsField = dobject.getFieldValue("fields (hidden)");
             Instance fields = fieldsField instanceof ObjectFieldValue ? ((ObjectFieldValue)fieldsField).getInstance() : null;
             
@@ -89,7 +89,7 @@ class RubyNodes {
             Instance name = nameField instanceof Instance ? (Instance)nameField : null;
             
             if (name != null) logicalValue = DetailsUtils.getInstanceString(name, heap);
-        } else if ("BasicObjectType".equals(type)) {
+        } else if ("BasicObject".equals(type)) {
             String head = "fields [";
             String sep = ", ";
             
@@ -107,21 +107,21 @@ class RubyNodes {
             sb.append("]");
             
             logicalValue = sb.toString();
-        } else if ("ArrayType".equals(type)) {
+        } else if ("Array".equals(type)) {
             FieldValue sizeField = dobject.getFieldValue("size (hidden)");
             if (sizeField != null) {
                 Integer size = Integer.parseInt(sizeField.getValue());
                 logicalValue = Formatters.numberFormat().format(size) + (size == 1 ? " item" : " items");
             }
-        } else if ("StringType".equals(type)) {
+        } else if ("String".equals(type)) {
             FieldValue ropeField = dobject.getFieldValue("rope (hidden)");
             Instance rope = ropeField instanceof ObjectFieldValue ? ((ObjectFieldValue)ropeField).getInstance() : null;
             if (rope != null) logicalValue = DetailsUtils.getInstanceString(rope, heap);
-        } else if ("RegexpType".equals(type)) {
+        } else if ("Regexp".equals(type)) {
             FieldValue sourceField = dobject.getFieldValue("source (hidden)");
             Instance source = sourceField instanceof ObjectFieldValue ? ((ObjectFieldValue)sourceField).getInstance() : null;
             if (source != null) logicalValue = DetailsUtils.getInstanceString(source, heap);
-        } else if ("EncodingType".equals(type)) {
+        } else if ("Encoding".equals(type)) {
             FieldValue encodingField = dobject.getFieldValue("encoding (hidden)");
             Instance encoding = encodingField instanceof ObjectFieldValue ? ((ObjectFieldValue)encodingField).getInstance() : null;
             if (encoding != null) logicalValue = DetailsUtils.getInstanceString(encoding, heap);
