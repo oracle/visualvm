@@ -474,9 +474,9 @@ public class OQLConsoleView extends HeapViewerFeature {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 updateUIState();
-                progressBar.setModel(null);
                 progressToolbar.getComponent().setVisible(false);
                 resultsToolbar.getComponent().setVisible(true);
+                progressBar.setModel(new DefaultBoundedRangeModel(0, 0, 0, 0));
                 objectsView.reloadView();
                 
                 if (result != null) {
