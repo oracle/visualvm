@@ -25,10 +25,15 @@
 
 package com.sun.tools.visualvm.uisupport;
 
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.UIManager;
+import org.netbeans.lib.profiler.ui.UIUtils;
 
 
 /**
@@ -38,6 +43,18 @@ import javax.swing.UIManager;
  * @author Jiri Sedlacek
  */
 public class JExtendedSpinner extends JSpinner {
+    //~ Constructors -------------------------------------------------------------------------------------------------------------
+
+    private static int defaultSpinnerHeight = -1;
+    
+    public static int getDefaultSpinnerHeight() {
+        if (defaultSpinnerHeight == -1) {
+            defaultSpinnerHeight = new JTextField().getPreferredSize().height;
+        }
+
+        return defaultSpinnerHeight;
+    }
+    
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
     public JExtendedSpinner() {
@@ -50,6 +67,7 @@ public class JExtendedSpinner extends JSpinner {
                     }
                 }
             });
+        configureWheelListener();
     }
 
     public JExtendedSpinner(SpinnerModel model) {
@@ -62,6 +80,7 @@ public class JExtendedSpinner extends JSpinner {
                     }
                 }
             });
+        configureWheelListener();
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
@@ -86,4 +105,35 @@ public class JExtendedSpinner extends JSpinner {
              .setAccessibleDescription(getAccessibleContext().getAccessibleDescription());
         }
     }
+    
+    
+    public Dimension getPreferredSize() {
+        if (UIUtils.isWindowsClassicLookAndFeel()) {
+            return new Dimension(super.getPreferredSize().width, getDefaultSpinnerHeight());
+        } else {
+            return super.getPreferredSize();
+        }
+    }
+
+    public Dimension getMinimumSize() {
+        if (UIUtils.isWindowsClassicLookAndFeel()) {
+            return getPreferredSize();
+        } else {
+            return super.getMinimumSize();
+        }
+    }
+    
+    
+    private void configureWheelListener() {
+        addMouseWheelListener(new MouseWheelListener() {
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if (e.getScrollType() != MouseWheelEvent.WHEEL_UNIT_SCROLL) return;
+                Object newValue = (e.getWheelRotation() < 0 ?
+                                   JExtendedSpinner.this.getNextValue() :
+                                   JExtendedSpinner.this.getPreviousValue());
+                if (newValue != null) JExtendedSpinner.this.setValue(newValue);
+            }
+        });
+    }
+    
 }
