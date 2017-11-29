@@ -46,12 +46,9 @@ package org.netbeans.lib.profiler.ui.jdbc;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.JMenu;
@@ -61,32 +58,22 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
 import org.netbeans.lib.profiler.results.jdbc.JdbcResultsDiff;
 import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.PresoObjAllocCCTNode;
 import org.netbeans.lib.profiler.ui.UIUtils;
-import static org.netbeans.lib.profiler.ui.jdbc.JDBCTreeTableView.isSQL;
-import org.netbeans.lib.profiler.ui.memory.LiveMemoryView;
 import org.netbeans.lib.profiler.ui.results.DataView;
 import org.netbeans.lib.profiler.ui.swing.FilterUtils;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTreeTable;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.utils.Wildcards;
-import org.openide.util.Lookup;
 
 /**
  *
  * @author Jiri Sedlacek
  */
 public abstract class LiveJDBCView extends JPanel {
-
-    private static final int MIN_UPDATE_DIFF = 900;
-    private static final int MAX_UPDATE_DIFF = 1400;
-    
-    private ResultsMonitor rm;
     
     private JdbcResultsSnapshot snapshot;
     private JdbcResultsSnapshot refSnapshot;
@@ -95,31 +82,9 @@ public abstract class LiveJDBCView extends JPanel {
     private JDBCTreeTableView jdbcCallsView;
     
     private long lastupdate;
-    private volatile boolean paused;
-    private volatile boolean forceRefresh;
     private volatile boolean refreshIsRunning;
     
     private ExecutorService executor;
-    
-    
-    private final class ResultsMonitor implements JdbcCCTProvider.Listener {
-        
-        @Override
-        public void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
-            if (!empty) {
-                try {
-                    LiveJDBCView.this.refreshData(appRootNode);
-                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    Logger.getLogger(LiveMemoryView.class.getName()).log(Level.FINE, null, ex);
-                }
-            }
-        }
-
-        @Override
-        public void cctReset() {
-            LiveJDBCView.this.resetData();
-        }
-    }
     
     
     public LiveJDBCView(Set<ClientUtils.SourceCodeSelection> selection) {
@@ -132,68 +97,51 @@ public abstract class LiveJDBCView extends JPanel {
         jdbcCallsView.setVisible(forwardCalls);
     }
     
-    public void setPaused(boolean paused) {
-        this.paused = paused;
+    public boolean isRefreshRunning() {
+        return refreshIsRunning;
     }
-
-    public void setForceRefresh(boolean forceRefresh) {
-        this.forceRefresh = forceRefresh;
+    
+    public long getLastUpdate() {
+        return lastupdate;
     }
-
-    private void refreshData(RuntimeCCTNode appRootNode) throws ClientUtils.TargetAppOrVMTerminated {
-        if ((lastupdate + MIN_UPDATE_DIFF > System.currentTimeMillis() || paused) && !forceRefresh) return;
+    
+    public void setData(final JdbcResultsSnapshot snapshotData) {
         if (refreshIsRunning) return;
         refreshIsRunning = true;
-        try {
-            ProfilerClient client = getProfilerClient();
-            final JdbcResultsSnapshot snapshotData =
-                    client.getStatus().getInstrMethodClasses() == null ?
-                    null : client.getJdbcProfilingResultsSnapshot(false);
-            UIUtils.runInEventDispatchThread(new Runnable() {
-                public void run() {
-                    snapshot = snapshotData;
-                    setData();
-                    lastupdate = System.currentTimeMillis();
-                    forceRefresh = false;
-                }
-            });
-        } catch (Throwable t) {
-            refreshIsRunning = false;
-            if (t instanceof ClientUtils.TargetAppOrVMTerminated) {
-                throw ((ClientUtils.TargetAppOrVMTerminated)t);
-            } else {
-                Logger.getLogger(LiveJDBCView.class.getName()).log(Level.SEVERE, null, t);
+        
+        UIUtils.runInEventDispatchThread(new Runnable() {
+            public void run() {
+                snapshot = snapshotData;
+                
+                setData();
             }
-        }
+        });
     }
     
     private void setData() {
-        UIUtils.runInEventDispatchThread(new Runnable() {
-            public void run() {
-                if (snapshot == null) {
-                    resetData();
-                    refreshIsRunning = false;
-                } else {
-                    getExecutor().submit(new Runnable() {
-                        public void run() {
-                            final JdbcResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
-                                                                 refSnapshot.createDiff(snapshot);
+        if (snapshot == null) {
+            resetData();
+            refreshIsRunning = false;
+        } else {
+            getExecutor().submit(new Runnable() {
+                public void run() {
+                    final JdbcResultsSnapshot _snapshot = refSnapshot == null ? snapshot :
+                                                         refSnapshot.createDiff(snapshot);
 
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    try {
-                                        boolean diff = _snapshot instanceof JdbcResultsDiff;
-                                        jdbcCallsView.setData(_snapshot, null, -1, null, false, false, diff);
-                                    } finally {
-                                        refreshIsRunning = false;
-                                    }
-                                }
-                            });
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            try {
+                                boolean diff = _snapshot instanceof JdbcResultsDiff;
+                                jdbcCallsView.setData(_snapshot, null, -1, null, false, false, diff);
+                            } finally {
+                                refreshIsRunning = false;
+                                lastupdate = System.currentTimeMillis();
+                            }
                         }
                     });
                 }
-            }
-        });
+            });
+        }
     }
     
     public boolean setDiffView(final boolean diff) {
@@ -205,12 +153,6 @@ public abstract class LiveJDBCView extends JPanel {
             }
         });
         return true;
-    }
-    
-    public void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
-        if ((lastupdate + MAX_UPDATE_DIFF < System.currentTimeMillis() && !paused) || forceRefresh) {
-            getProfilerClient().forceObtainedResultsDump(true);
-        }        
     }
     
     public void resetData() {
@@ -237,33 +179,12 @@ public abstract class LiveJDBCView extends JPanel {
     }
     
     
-    public void profilingSessionStarted() {
-        if (rm == null) {
-            rm = new ResultsMonitor();
-            Collection<? extends JdbcCCTProvider> jdbcCCTProviders = Lookup.getDefault().lookupAll(JdbcCCTProvider.class);
-            assert !jdbcCCTProviders.isEmpty();
-            for (JdbcCCTProvider provider : jdbcCCTProviders) {
-                provider.addListener(rm);
-            }
-        }    
-    }
-    
-    public void profilingSessionFinished() {
-        if (rm != null) {
-            Collection<? extends JdbcCCTProvider> jdbcCCTProviders = Lookup.getDefault().lookupAll(JdbcCCTProvider.class);
-            assert !jdbcCCTProviders.isEmpty();
-            for (JdbcCCTProvider provider : jdbcCCTProviders) {
-                provider.removeListener(rm);
-            }
-            rm = null;
-        }
-    }
-    
-    
     protected abstract ProfilerClient getProfilerClient();
     
     
     protected boolean profileMethodSupported() { return true; }
+    
+    protected boolean profileClassSupported() { return true; }
     
     
     protected abstract boolean showSourceSupported();
@@ -376,17 +297,25 @@ public abstract class LiveJDBCView extends JPanel {
             popup.addSeparator();
         }
         
-        popup.add(new JMenuItem(JDBCView.ACTION_PROFILE_METHOD) {
+        if (profileMethodSupported()) popup.add(new JMenuItem(JDBCView.ACTION_PROFILE_METHOD) {
             { setEnabled(userValue != null && JDBCTreeTableView.isSelectable(node)); }
             protected void fireActionPerformed(ActionEvent e) { profileMethod(userValue); }
         });
         
-        popup.add(new JMenuItem(JDBCView.ACTION_PROFILE_CLASS) {
+        if (profileClassSupported()) popup.add(new JMenuItem(JDBCView.ACTION_PROFILE_CLASS) {
             { setEnabled(userValue != null); }
             protected void fireActionPerformed(ActionEvent e) { profileClass(userValue); }
         });
         
-        popup.addSeparator();
+        if (profileMethodSupported() || profileClassSupported()) popup.addSeparator();
+        
+        JMenuItem[] customItems = invoker.createCustomMenuItems(this, value, userValue);
+        if (customItems != null) {
+            for (JMenuItem customItem : customItems) popup.add(customItem);
+            popup.addSeparator();
+        }
+        
+        customizeNodePopup(invoker, popup, value, userValue);
         
         final ProfilerTreeTable ttable = (ProfilerTreeTable)jdbcCallsView.getResultsComponent();
         JMenu expand = new JMenu(JDBCView.EXPAND_MENU);
@@ -429,6 +358,9 @@ public abstract class LiveJDBCView extends JPanel {
             protected void fireActionPerformed(ActionEvent e) { invoker.activateSearch(); }
         });
     }
+    
+    protected void customizeNodePopup(DataView invoker, JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue) {}
+    
     
     private synchronized ExecutorService getExecutor() {
         if (executor == null) executor = Executors.newSingleThreadExecutor();

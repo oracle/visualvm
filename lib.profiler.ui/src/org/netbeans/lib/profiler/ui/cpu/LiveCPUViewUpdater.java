@@ -51,7 +51,6 @@ import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
 import org.netbeans.lib.profiler.results.cpu.CPUCCTProvider;
 import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
-import org.netbeans.lib.profiler.ui.memory.LiveMemoryView;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -142,7 +141,7 @@ public class LiveCPUViewUpdater {
                     updater.updateData();
                 } catch (ClientUtils.TargetAppOrVMTerminated ex) {
                 } catch (CPUResultsSnapshot.NoDataAvailableException ex) {
-                    Logger.getLogger(LiveMemoryView.class.getName()).log(Level.FINE, null, ex);
+                    Logger.getLogger(LiveCPUView.class.getName()).log(Level.FINE, null, ex);
                 }
             }
         }

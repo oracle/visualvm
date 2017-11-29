@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2017 Oracle and/or its affiliates. All rights reserved.
  *
  * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.
@@ -40,27 +40,26 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.lib.profiler.ui.memory;
+package org.netbeans.lib.profiler.ui.jdbc;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.filters.GenericFilter;
-import org.netbeans.lib.profiler.global.CommonConstants;
 import org.netbeans.lib.profiler.results.RuntimeCCTNode;
-import org.netbeans.lib.profiler.results.memory.MemoryCCTProvider;
-import org.netbeans.lib.profiler.results.memory.MemoryResultsSnapshot;
+import org.netbeans.lib.profiler.results.jdbc.JdbcCCTProvider;
+import org.netbeans.lib.profiler.results.jdbc.JdbcResultsSnapshot;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
- * @author Jiri Sedlacek
+ * @author Jiri
  */
-public class LiveMemoryViewUpdater {
+public class LiveJDBCViewUpdater {
     
     private static final int MIN_UPDATE_DIFF = 900;
     private static final int MAX_UPDATE_DIFF = 1400;
@@ -68,19 +67,19 @@ public class LiveMemoryViewUpdater {
     
     private CCTHandler handler;
     
-    private final LiveMemoryView memoryView;
+    private final LiveJDBCView jdbcView;
     private final ProfilerClient client;
     
     private volatile boolean paused;
     private volatile boolean forceRefresh;
     
     
-    public LiveMemoryViewUpdater(LiveMemoryView memoryView, ProfilerClient client) {
-        this.memoryView = memoryView;
+    
+    public LiveJDBCViewUpdater(LiveJDBCView jdbcView, ProfilerClient client) {
+        this.jdbcView = jdbcView;
         this.client = client;
-        
-        handler = CCTHandler.registerUpdater(this);
     }
+    
     
     
     public void setPaused(boolean paused) {
@@ -92,80 +91,77 @@ public class LiveMemoryViewUpdater {
     }
     
     public void update() throws ClientUtils.TargetAppOrVMTerminated {
-        if (forceRefresh || (!paused && memoryView.getLastUpdate() + MAX_UPDATE_DIFF < System.currentTimeMillis()))
-            switch (client.getCurrentInstrType()) {
-                case CommonConstants.INSTR_NONE_MEMORY_SAMPLING:
-                    updateData();
-                    break;
-                case CommonConstants.INSTR_OBJECT_LIVENESS:
-                case CommonConstants.INSTR_OBJECT_ALLOCATIONS:
-                    if (memoryView.getLastUpdate() + MAX_UPDATE_DIFF < System.currentTimeMillis()) {
-                        client.forceObtainedResultsDump(true);
-                    }
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid profiling instr. type: " + client.getCurrentInstrType()); // NOI18N
-            }
+        if (handler == null) handler = CCTHandler.registerUpdater(this);
+        
+        if (forceRefresh || (!paused && jdbcView.getLastUpdate() + MAX_UPDATE_DIFF < System.currentTimeMillis()))
+            client.forceObtainedResultsDump(true);
     }
     
     public void cleanup() {
-        handler.unregisterUpdater(this);
+        if (handler != null) handler.unregisterUpdater(this);
         handler = null;
     }
     
     
     private void updateData() throws ClientUtils.TargetAppOrVMTerminated {
-        if (!forceRefresh && (paused || memoryView.getLastUpdate() + MIN_UPDATE_DIFF > System.currentTimeMillis())) return;
+        if (!forceRefresh && (paused || jdbcView.getLastUpdate() + MIN_UPDATE_DIFF > System.currentTimeMillis())) return;
         
-        MemoryResultsSnapshot snapshot = client.getMemoryProfilingResultsSnapshot(false);
-
-        // class names in VM format
-        MemoryView.userFormClassNames(snapshot);
-
-        // class names in VM format
-        GenericFilter filter = client.getSettings().getInstrumentationFilter();
-        
-        memoryView.setData(snapshot, filter);
+        JdbcResultsSnapshot data = client.getStatus().getInstrMethodClasses() == null ?
+                            null : client.getJdbcProfilingResultsSnapshot(false);
+        jdbcView.setData(data);
         
         forceRefresh = false;
     }
     
     private void resetData() {
-        memoryView.resetData();
+        jdbcView.resetData();
     }
     
     
-    @ServiceProvider(service=MemoryCCTProvider.Listener.class)
-    public static final class CCTHandler implements MemoryCCTProvider.Listener {
-
-        private final List<LiveMemoryViewUpdater> updaters = new ArrayList();
+    @ServiceProvider(service=JdbcCCTProvider.Listener.class)
+    public static class CCTHandler implements JdbcCCTProvider.Listener {
+        
+        private final List<LiveJDBCViewUpdater> updaters = new ArrayList();
         
         
-        public static CCTHandler registerUpdater(LiveMemoryViewUpdater updater) {
+        public static CCTHandler registerUpdater(LiveJDBCViewUpdater updater) {
             CCTHandler handler = Lookup.getDefault().lookup(CCTHandler.class);
+            
+            if (handler.updaters.isEmpty()) {
+                Collection<? extends JdbcCCTProvider> jdbcCCTProviders = Lookup.getDefault().lookupAll(JdbcCCTProvider.class);
+                assert !jdbcCCTProviders.isEmpty();
+                for (JdbcCCTProvider provider : jdbcCCTProviders) provider.addListener(handler);
+            }
+            
             handler.updaters.add(updater);
             return handler;
         }
         
-        public void unregisterUpdater(LiveMemoryViewUpdater updater) {
+        public void unregisterUpdater(LiveJDBCViewUpdater updater) {
             updaters.remove(updater);
+            
+            if (updaters.isEmpty()) {
+                Collection<? extends JdbcCCTProvider> jdbcCCTProviders = Lookup.getDefault().lookupAll(JdbcCCTProvider.class);
+                assert !jdbcCCTProviders.isEmpty();
+                for (JdbcCCTProvider provider : jdbcCCTProviders) provider.removeListener(this);
+            }
         }
         
-        
-        public void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
-            if (!empty) {
-                for (LiveMemoryViewUpdater updater : updaters) try {
+
+        public final void cctEstablished(RuntimeCCTNode appRootNode, boolean empty) {
+           if (!empty) {
+                for (LiveJDBCViewUpdater updater : updaters) try {
                     updater.updateData();
                 } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-//                } catch (CPUResultsSnapshot.NoDataAvailableException ex) {
-                    Logger.getLogger(LiveMemoryView.class.getName()).log(Level.FINE, null, ex);
+                    Logger.getLogger(LiveJDBCView.class.getName()).log(Level.FINE, null, ex);
                 }
             }
         }
 
-        public void cctReset() {
-            for (LiveMemoryViewUpdater updater : updaters) updater.resetData();
+        public final void cctReset() {
+            for (LiveJDBCViewUpdater updater : updaters) updater.resetData();
         }
+
     }
     
 }

@@ -334,6 +334,10 @@ abstract class AllocTreeTableView extends MemoryView {
     
     protected abstract void populatePopup(JPopupMenu popup, Object value, ClientUtils.SourceCodeSelection userValue);
     
+    protected void popupShowing() {};
+    
+    protected void popupHidden()  {};
+    
     
     private HideableBarRenderer[] renderers;
     
@@ -348,6 +352,12 @@ abstract class AllocTreeTableView extends MemoryView {
             }
             protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
                 AllocTreeTableView.this.populatePopup(popup, value, (ClientUtils.SourceCodeSelection)userValue);
+            }
+            protected void popupShowing() {
+                AllocTreeTableView.this.popupShowing();
+            }
+            protected void popupHidden() {
+                AllocTreeTableView.this.popupHidden();
             }
         };
         
