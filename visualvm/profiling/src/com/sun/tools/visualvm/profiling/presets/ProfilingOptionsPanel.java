@@ -77,6 +77,7 @@ final class ProfilingOptionsPanel extends JPanel {
     private final SamplerMemorySettings samplerMemorySettings;
     private final ProfilerCPUSettings profilerCpuSettings;
     private final ProfilerMemorySettings profilerMemorySettings;
+    private final ProfilerJDBCSettings profilerJdbcSettings;
 
     private PresetsModel listModel;
     private final ListDataListener listModelListener;
@@ -94,7 +95,10 @@ final class ProfilingOptionsPanel extends JPanel {
                 ProfilerPreset preset = (ProfilerPreset)list.getSelectedValue();
                 if (preset == null) return;
                 preset.setValid(samplerCpuSettings.valid() &&
-                                profilerCpuSettings.valid());
+                                profilerCpuSettings.valid() &&
+                                samplerMemorySettings.valid() &&
+                                profilerMemorySettings.valid() &&
+                                profilerJdbcSettings.valid());
                 ProfilingOptionsPanel.this.controller.changed();
             }
         };
@@ -102,7 +106,8 @@ final class ProfilingOptionsPanel extends JPanel {
         samplerCpuSettings = new SamplerCPUSettings(validator);
         samplerMemorySettings = new SamplerMemorySettings();
         profilerCpuSettings = new ProfilerCPUSettings(validator);
-        profilerMemorySettings = new ProfilerMemorySettings();
+        profilerMemorySettings = new ProfilerMemorySettings(validator);
+        profilerJdbcSettings = new ProfilerJDBCSettings();
 
         listModelListener = new ListDataListener() {
             public void intervalAdded(ListDataEvent e) {
@@ -192,6 +197,7 @@ final class ProfilingOptionsPanel extends JPanel {
         samplerMemorySettings.setPreset(preset);
         profilerCpuSettings.setPreset(preset);
         profilerMemorySettings.setPreset(preset);
+        profilerJdbcSettings.setPreset(preset);
 
         presetsPanel.setEnabled(presetIndex != -1);
     }
@@ -440,6 +446,10 @@ final class ProfilingOptionsPanel extends JPanel {
                 "LBL_Profiler_memory"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
                 "com/sun/tools/visualvm/profiling/resources/profiler.png", true)), // NOI18N
                 profilerMemorySettings);
+        settingsPanel.addTab(NbBundle.getMessage(ProfilingOptionsPanel.class,
+                "LBL_Profiler_jdbc"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
+                "com/sun/tools/visualvm/profiling/resources/profiler.png", true)), // NOI18N
+                profilerJdbcSettings);
 
         presetsPanel = new JPanel(new BorderLayout()) {
             public void setEnabled(boolean enabled) {

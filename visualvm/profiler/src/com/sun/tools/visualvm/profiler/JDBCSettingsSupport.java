@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -28,7 +28,7 @@ package com.sun.tools.visualvm.profiler;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import com.sun.tools.visualvm.profiling.presets.PresetSelector;
-import com.sun.tools.visualvm.profiling.presets.ProfilerMemoryPanel;
+import com.sun.tools.visualvm.profiling.presets.ProfilerJDBCPanel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import javax.swing.BorderFactory;
@@ -41,16 +41,15 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-public abstract class MemorySettingsSupport {
+public abstract class JDBCSettingsSupport {
     
     private JPanel container;
-    private ProfilerMemoryPanel panel;
+    private ProfilerJDBCPanel panel;
     private PresetSelector selector;
     
     
     DataViewComponent.DetailsView getDetailsView() {
-        return new DataViewComponent.DetailsView(NbBundle.getMessage(
-                MemorySettingsSupport.class, "LBL_Memory_settings"), null, 20, // NOI18N
+        return new DataViewComponent.DetailsView(NbBundle.getMessage(JDBCSettingsSupport.class, "LBL_JDBC_settings"), null, 30, // NOI18N
                 new ScrollableContainer(getComponent()), null);
     }
     
@@ -66,7 +65,7 @@ public abstract class MemorySettingsSupport {
         // NOTE: might save custom configuration here
     }
     
-    void copySettings(MemorySettingsSupport settings) {
+    void copySettings(JDBCSettingsSupport settings) {
         getComponent(); // initialize selector
         selector.synchronizeWith(settings.selector);
     }
@@ -83,7 +82,7 @@ public abstract class MemorySettingsSupport {
     }
     
     private JPanel createPanel() {
-        panel = new ProfilerMemoryPanel() {
+        panel = new ProfilerJDBCPanel() {
             public void settingsChanged() {
                 panel.saveToPreset(selector.customize(presetValid()));
             }

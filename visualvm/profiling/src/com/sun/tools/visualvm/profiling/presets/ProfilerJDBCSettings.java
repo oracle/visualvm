@@ -33,14 +33,14 @@ import javax.swing.JPanel;
  *
  * @author Jiri Sedlacek
  */
-final class ProfilerMemorySettings extends JPanel {
+final class ProfilerJDBCSettings extends JPanel {
     
     private ProfilerPreset preset;
-    private final ProfilerMemoryPanel panel;
+    private final ProfilerJDBCPanel panel;
     
     
-    ProfilerMemorySettings(Runnable validator) {
-        this.panel = new ProfilerMemoryPanel(validator, true) {
+    ProfilerJDBCSettings() {
+        this.panel = new ProfilerJDBCPanel(true) {
             public void settingsChanged() { panel.saveToPreset(preset); }
         };
         setLayout(new BorderLayout());

@@ -162,20 +162,6 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
         // --- Results ---------------------------------------------------------
         
         cpuView = new LiveCPUView(null) {
-//            protected ProfilerClient getProfilerClient() {
-//                return MethodsFeatureUI.this.getProfilerClient();
-//            }
-//            protected boolean isSampling() {
-//                return MethodsFeatureUI.this.getProfilerClient().getCurrentInstrType() == ProfilerClient.INSTR_NONE_SAMPLING;
-//            }
-//            protected void requestResults() throws ClientUtils.TargetAppOrVMTerminated {
-//                MethodsFeatureUI.this.getProfilerClient().forceObtainedResultsDump(true);
-//            }
-//            protected CPUResultsSnapshot getResults() throws ClientUtils.TargetAppOrVMTerminated, CPUResultsSnapshot.NoDataAvailableException {
-//                ProfilerClient client = MethodsFeatureUI.this.getProfilerClient();
-//                return client.getStatus().getInstrMethodClasses() == null ?
-//                       null : client.getCPUProfilingResultsSnapshot(false);
-//            }
             protected boolean showSourceSupported() {
                 return GoToSource.isAvailable();
             }
@@ -236,29 +222,30 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
             protected void fireItemStateChanged(ItemEvent event) {
                 boolean paused = isSelected();
                 updater.setPaused(paused);
+                lrRefreshButton.setEnabled(paused);
                 if (!paused) try {
                     updater.setForceRefresh(true);
                     updater.update();
                 } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    Exceptions.printStackTrace(ex);
+                    cleanup();
                 }
 //////                refreshToolbar(getSessionState());
             }
         };
         lrPauseButton.setToolTipText(Bundle.MethodsFeatureUI_pauseResults());
-        lrPauseButton.setEnabled(false);
-
+        
         lrRefreshButton = new JButton(Icons.getIcon(GeneralIcons.UPDATE_NOW)) {
             protected void fireActionPerformed(ActionEvent e) {
                 try {
                     updater.setForceRefresh(true);
                     updater.update();
                 } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    Exceptions.printStackTrace(ex);
+                    cleanup();
                 }
             }
         };
         lrRefreshButton.setToolTipText(Bundle.MethodsFeatureUI_updateResults());
+        lrRefreshButton.setEnabled(false);
         
         Icon icon = Icons.getIcon(ProfilerIcons.DELTA_RESULTS);
         lrDeltasButton = new JToggleButton(icon) {
@@ -281,7 +268,7 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
                     updater.setForceRefresh(true);
                     updater.update();
                 } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    Exceptions.printStackTrace(ex);
+                    cleanup();
                 }
             }
         };
@@ -301,7 +288,7 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
                     updater.setForceRefresh(true);
                     updater.update();
                 } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    Exceptions.printStackTrace(ex);
+                    cleanup();
                 }
             }
         };
@@ -321,7 +308,7 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
                     updater.setForceRefresh(true);
                     updater.update();
                 } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    Exceptions.printStackTrace(ex);
+                    cleanup();
                 }
             }
         };
@@ -420,11 +407,18 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
     
     
     void refreshResults() {
-        try {
-            refreshData();
-        } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-            cleanup();
-        }
+        RESULTS_PROCESSOR.post(new Runnable() {
+            public void run() {
+                try {
+                    refreshData();
+                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                    cleanup();
+                } catch (Throwable t) {
+                    Exceptions.printStackTrace(t);
+                    cleanup();
+                }
+            }
+        });
     }
     
 }

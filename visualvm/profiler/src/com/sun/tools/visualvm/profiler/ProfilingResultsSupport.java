@@ -37,6 +37,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -74,6 +75,8 @@ final class ProfilingResultsSupport extends JPanel {
         abstract void refreshResults();
         
         abstract void resetResults();
+        
+        protected static final RequestProcessor RESULTS_PROCESSOR = new RequestProcessor("Results View Processor"); // NOI18N
         
     }
     

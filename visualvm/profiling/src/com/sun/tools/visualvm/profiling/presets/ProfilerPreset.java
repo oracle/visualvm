@@ -48,6 +48,8 @@ public final class ProfilerPreset {
     private static final String PROP_MEMORY_MODE_P = "prof_preset_memoryMode_p"; // NOI18N
     private static final String PROP_ALLOC_P = "prof_preset_alloc_p"; // NOI18N
     private static final String PROP_STACKS_P = "prof_preset_stacks_p"; // NOI18N
+    private static final String PROP_MEMORY_FILTER_P = "prof_memory_filter_p"; // NOI18N
+    private static final String PROP_JDBC_FILTER_P = "prof_jdbc_filter_p"; // NOI18N
 
     private boolean valid;
     private String name;
@@ -64,6 +66,8 @@ public final class ProfilerPreset {
     private boolean memoryModeP;
     private int allocP;
     private boolean stacksP;
+    private String memoryFilterP;
+    private String jdbcFilterP;
 
 
     public ProfilerPreset(String name, String selector) {
@@ -81,7 +85,9 @@ public final class ProfilerPreset {
         this.filterP = ""; // NOI18N
         this.memoryModeP = true;
         this.allocP = 10;
-        this.stacksP = false;
+        this.stacksP = true;
+        this.memoryFilterP = ""; // NOI18N
+        this.jdbcFilterP = ""; // NOI18N
     }
 
     ProfilerPreset(ProfilerPreset preset) {
@@ -100,6 +106,8 @@ public final class ProfilerPreset {
         this.memoryModeP = preset.memoryModeP;
         this.allocP = preset.allocP;
         this.stacksP = preset.stacksP;
+        this.memoryFilterP = preset.memoryFilterP;
+        this.jdbcFilterP = preset.jdbcFilterP;
     }
 
     ProfilerPreset(Preferences prefs, String prefix) {
@@ -117,7 +125,9 @@ public final class ProfilerPreset {
         filterP = prefs.get(prefix + PROP_FILTER_P, ""); // NOI18N
         memoryModeP = prefs.getBoolean(prefix + PROP_MEMORY_MODE_P, true);
         allocP = prefs.getInt(prefix + PROP_ALLOC_P, 10);
-        stacksP = prefs.getBoolean(prefix + PROP_STACKS_P, false);
+        stacksP = prefs.getBoolean(prefix + PROP_STACKS_P, true);
+        memoryFilterP = prefs.get(prefix + PROP_MEMORY_FILTER_P, ""); // NOI18N
+        jdbcFilterP = prefs.get(prefix + PROP_JDBC_FILTER_P, ""); // NOI18N
     }
     
 
@@ -136,6 +146,8 @@ public final class ProfilerPreset {
         prefs.putBoolean(prefix + PROP_MEMORY_MODE_P, memoryModeP);
         prefs.putInt(prefix + PROP_ALLOC_P, allocP);
         prefs.putBoolean(prefix + PROP_STACKS_P, stacksP);
+        prefs.put(prefix + PROP_MEMORY_FILTER_P, memoryFilterP);
+        prefs.put(prefix + PROP_JDBC_FILTER_P, jdbcFilterP);
     }
 
 
@@ -258,6 +270,22 @@ public final class ProfilerPreset {
 
     public boolean getStacksP() {
         return stacksP;
+    }
+    
+    public void setMemoryFilterP(String filter) {
+        this.memoryFilterP = filter;
+    }
+
+    public String getMemoryFilterP() {
+        return memoryFilterP;
+    }
+    
+    public void setJDBCFilterP(String filter) {
+        this.jdbcFilterP = filter;
+    }
+
+    public String getJDBCFilterP() {
+        return jdbcFilterP;
     }
 
     public String toString() {

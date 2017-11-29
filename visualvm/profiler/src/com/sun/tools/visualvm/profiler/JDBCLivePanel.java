@@ -27,18 +27,24 @@ package com.sun.tools.visualvm.profiler;
 import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.profiling.actions.ProfilerResultsAction;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import org.netbeans.lib.profiler.ProfilerClient;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.Profiler;
+import org.netbeans.lib.profiler.ui.components.HTMLTextArea;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.memory.LiveMemoryView;
-import org.netbeans.lib.profiler.ui.memory.LiveMemoryViewUpdater;
+import org.netbeans.lib.profiler.ui.jdbc.LiveJDBCView;
+import org.netbeans.lib.profiler.ui.jdbc.LiveJDBCViewUpdater;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
@@ -46,6 +52,8 @@ import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -55,30 +63,25 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "ObjectsFeatureUI_liveResults=Results:",
-    "ObjectsFeatureUI_pauseResults=Pause live results",
-    "ObjectsFeatureUI_updateResults=Update live results",
-    "ObjectsFeatureUI_profilingData=Collected data:",
-    "ObjectsFeatureUI_snapshot=Snapshot",
-    "ObjectsFeatureUI_showAbsolute=Show absolute values",
-    "ObjectsFeatureUI_showDeltas=Show delta values"
+    "JDBCLivePanel_SqlQueryCaption=SQL Query Viewer",
+    "JDBCLivePanel_SqlQueryLabel=SQL Query:"
 })
-class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
+class JDBCLivePanel extends ProfilingResultsSupport.ResultsView {
     
     private ProfilerToolbar toolbar;
-    private LiveMemoryView memoryView;
-    private LiveMemoryViewUpdater updater;
+    private LiveJDBCView jdbcView;
+    private LiveJDBCViewUpdater updater;
     private ProfilingResultsSupport.ResultsResetter resetter;
     
     
-    MemoryLivePanel(Application application) {
+    JDBCLivePanel(Application application) {
         setLayout(new BorderLayout());
         setOpaque(false);
         
         initUI(application);
         
         add(toolbar.getComponent(), BorderLayout.NORTH);
-        add(memoryView, BorderLayout.CENTER);
+        add(jdbcView, BorderLayout.CENTER);
     }
     
     
@@ -86,7 +89,7 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
     // --- API implementation --------------------------------------------------
     
     boolean hasResultsUI() {
-        return memoryView != null;
+        return jdbcView != null;
     }
     
     void sessionStateChanged(int sessionState) {
@@ -109,11 +112,11 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
     void resetResults() {
         if (lrDeltasButton != null) {
             lrDeltasButton.setSelected(false);
-            lrDeltasButton.setToolTipText(Bundle.ObjectsFeatureUI_showDeltas());
+            lrDeltasButton.setToolTipText(Bundle.MethodsFeatureUI_showDeltas());
         }
-        if (memoryView != null) {
-            memoryView.resetData();
-            memoryView.setDiffView(false);
+        if (jdbcView != null) {
+            jdbcView.resetData();
+            jdbcView.setDiffView(false);
         }
     }
     
@@ -131,18 +134,18 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
     
     
     
-    // --- UI ------------------------------------------------------------------
-    
     private JLabel lrLabel;
     private JToggleButton lrPauseButton;
     private JButton lrRefreshButton;
     private JToggleButton lrDeltasButton;
+//    private ActionPopupButton lrView;
     
     private JLabel pdLabel;
     private JButton pdSnapshotButton;
     private JButton pdResetResultsButton;
     
     private boolean popupPause;
+//    private JToggleButton[] toggles;
     
     
     private void initUI(Application application) {
@@ -151,14 +154,18 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
         
         // --- Results ---------------------------------------------------------
         
-        memoryView = new LiveMemoryView(null) {
+        jdbcView = new LiveJDBCView(null) {
             protected boolean showSourceSupported() {
                 return GoToSource.isAvailable();
+            }
+            protected boolean profileMethodSupported() {
+                return false;
             }
             protected boolean profileClassSupported() {
                 return false;
             }
             protected void showSource(ClientUtils.SourceCodeSelection value) {
+//                Lookup.Provider project = getProject();
                 Lookup.Provider project = null;
                 String className = value.getClassName();
                 String methodName = value.getMethodName();
@@ -166,7 +173,7 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
                 GoToSource.openSource(project, className, methodName, methodSig);
             }
             protected void selectForProfiling(ClientUtils.SourceCodeSelection value) {
-//                ObjectsFeatureUI.this.selectForProfiling(value);
+//                MethodsFeatureUI.this.selectForProfiling(value);
             }
             protected void popupShowing() {
                 if (lrPauseButton.isEnabled() && !lrRefreshButton.isEnabled()) {
@@ -180,36 +187,61 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
                     lrPauseButton.setSelected(false);
                 }
             }
+
+            protected ProfilerClient getProfilerClient() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            protected void showSQLQuery(String query, String htmlQuery) {
+                HTMLTextArea area = new HTMLTextArea(htmlQuery);
+                
+                JScrollPane areaScroll = new JScrollPane(area);
+                areaScroll.setPreferredSize(new Dimension(500, 250));
+                JLabel label = new JLabel(Bundle.JDBCLivePanel_SqlQueryLabel(), JLabel.LEADING);
+                label.setBorder(BorderFactory.createEmptyBorder(0, 0, 3, 0));
+                label.setLabelFor(area);
+                JPanel panel = new JPanel(new BorderLayout());
+                panel.add(label, BorderLayout.NORTH);
+                panel.add(areaScroll, BorderLayout.CENTER);
+                panel.setBorder(BorderFactory.createEmptyBorder(12, 10, 0, 10));
+//                HelpCtx help = new HelpCtx("SqlQueryViewer.HelpCtx"); // NOI18N
+                DialogDisplayer.getDefault().notify(new DialogDescriptor(panel,
+                        Bundle.JDBCLivePanel_SqlQueryCaption(), false,
+                        new Object[] { DialogDescriptor.CLOSED_OPTION },
+                        DialogDescriptor.CLOSED_OPTION, DialogDescriptor.BOTTOM_ALIGN, null, null));
+            }
         };
-        memoryView.putClientProperty("HelpCtx.Key", "ProfileObjects.HelpCtx"); // NOI18N
-        memoryView.putClientProperty(ProfilerResultsAction.PROP_APPLICATION, application);
+        jdbcView.putClientProperty("HelpCtx.Key", "ProfileMethods.HelpCtx"); // NOI18N
+        jdbcView.putClientProperty(ProfilerResultsAction.PROP_APPLICATION, application);
         
-        updater = new LiveMemoryViewUpdater(memoryView, Profiler.getDefault().getTargetAppRunner().getProfilerClient());        
+        updater = new LiveJDBCViewUpdater(jdbcView, Profiler.getDefault().getTargetAppRunner().getProfilerClient());
+//        updater = null;
         resetter = ProfilingResultsSupport.ResultsResetter.registerView(this);
+        
         
         // --- Toolbar ---------------------------------------------------------
         
-        lrLabel = new GrayLabel(Bundle.ObjectsFeatureUI_liveResults());
-
+        lrLabel = new GrayLabel(Bundle.MethodsFeatureUI_liveResults());
+            
         lrPauseButton = new JToggleButton(Icons.getIcon(GeneralIcons.PAUSE)) {
             protected void fireItemStateChanged(ItemEvent event) {
                 boolean paused = isSelected();
                 updater.setPaused(paused);
-                lrRefreshButton.setEnabled(paused);
+                boolean selected = lrPauseButton.isSelected();
+                lrRefreshButton.setEnabled(selected);
                 if (!paused) try {
                     updater.setForceRefresh(true);
                     updater.update();
                 } catch (ClientUtils.TargetAppOrVMTerminated ex) {
                     cleanup();
                 }
-//                refreshToolbar(getSessionState());
+//////                refreshToolbar(getSessionState());
             }
         };
-        lrPauseButton.setToolTipText(Bundle.ObjectsFeatureUI_pauseResults());
+        lrPauseButton.setToolTipText(Bundle.MethodsFeatureUI_pauseResults());
 
         lrRefreshButton = new JButton(Icons.getIcon(GeneralIcons.UPDATE_NOW)) {
             protected void fireActionPerformed(ActionEvent e) {
-                updater.setForceRefresh(true);
                 try {
                     updater.setForceRefresh(true);
                     updater.update();
@@ -218,24 +250,24 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
                 }
             }
         };
-        lrRefreshButton.setToolTipText(Bundle.ObjectsFeatureUI_updateResults());
+        lrRefreshButton.setToolTipText(Bundle.MethodsFeatureUI_updateResults());
         lrRefreshButton.setEnabled(false);
         
         Icon icon = Icons.getIcon(ProfilerIcons.DELTA_RESULTS);
         lrDeltasButton = new JToggleButton(icon) {
             protected void fireActionPerformed(ActionEvent e) {
-                if (!memoryView.setDiffView(isSelected())) setSelected(false);
-                setToolTipText(isSelected() ? Bundle.ObjectsFeatureUI_showAbsolute() :
-                                              Bundle.ObjectsFeatureUI_showDeltas());
+                if (!jdbcView.setDiffView(isSelected())) setSelected(false);
+                setToolTipText(isSelected() ? Bundle.MethodsFeatureUI_showAbsolute() :
+                                              Bundle.MethodsFeatureUI_showDeltas());
             }
         };
-        lrDeltasButton.setToolTipText(Bundle.ObjectsFeatureUI_showDeltas());
+        lrDeltasButton.setToolTipText(Bundle.MethodsFeatureUI_showDeltas());
 
-        pdLabel = new GrayLabel(Bundle.ObjectsFeatureUI_profilingData());
+        pdLabel = new GrayLabel(Bundle.MethodsFeatureUI_profilingData());
 
         pdSnapshotButton = new JButton(TakeSnapshotAction.getInstance());
 //        pdSnapshotButton.setHideActionText(true);
-        pdSnapshotButton.setText(Bundle.ObjectsFeatureUI_snapshot());
+        pdSnapshotButton.setText(Bundle.MethodsFeatureUI_snapshot());
 
         pdResetResultsButton = new JButton(ResetResultsAction.getInstance());
         pdResetResultsButton.setHideActionText(true);
@@ -250,6 +282,7 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
         toolbar.addSpace(2);
         toolbar.add(lrPauseButton);
         toolbar.add(lrRefreshButton);
+        
         toolbar.addSpace(5);
         toolbar.add(lrDeltasButton);
 
@@ -266,7 +299,8 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
         
         // --- Sync UI ---------------------------------------------------------
         
-//        sessionStateChanged(getSessionState());
+        jdbcView.setView(true, false, false);
+//////        sessionStateChanged(getSessionState());
         
     }
     

@@ -27,27 +27,33 @@ package com.sun.tools.visualvm.profiling.presets;
 
 import com.sun.tools.visualvm.core.ui.components.Spacer;
 import com.sun.tools.visualvm.uisupport.JExtendedSpinner;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import javax.swing.AbstractButton;
-import javax.swing.ButtonGroup;
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
+import org.netbeans.lib.profiler.filters.JavaTypeFilter;
+import org.netbeans.lib.profiler.ui.swing.GrayLabel;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 
@@ -57,55 +63,80 @@ import org.openide.util.NbBundle;
  */
 public abstract class ProfilerMemoryPanel extends JPanel {
     
-    private JRadioButton allocRadioButton;
-    private JRadioButton livenessRadioButton;
-    private JCheckBox stackTracesCheckBox;
-    private JLabel trackEveryLabel1;
-    private JLabel trackEveryLabel2;
-    private JSpinner trackEverySpinner;
+    private TextAreaComponent filtersArea;
+    private JCheckBox lifecycleCheckbox;
+    private JCheckBox outgoingCheckbox;
+    private JExtendedSpinner outgoingSpinner;
+    private JLabel unlimited;
+    private JLabel noAllocs;
     
+    private final Runnable validator;
+    private boolean rootsValid = true;
     private boolean internalChange;
     
     
     public ProfilerMemoryPanel() {
-        this(false);
+        this(null, false);
     }
     
-    ProfilerMemoryPanel(boolean mnemonics) {
+    ProfilerMemoryPanel(Runnable validator, boolean mnemonics) {
+        this.validator = validator;
         initComponents(mnemonics);
     }
     
     
     public ProfilingSettings getSettings() {
-        ProfilingSettings settings = allocRadioButton.isSelected() ?
-            ProfilingSettingsPresets.createMemoryPreset(ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS) :
-            ProfilingSettingsPresets.createMemoryPreset(ProfilingSettings.PROFILE_MEMORY_LIVENESS);
-        settings.setAllocStackTraceLimit(stackTracesCheckBox.isSelected() ? -1 : 0);
-        settings.setAllocTrackEvery(((Integer) trackEverySpinner.getValue()).intValue());
+        ProfilingSettings settings = ProfilerIDESettings.getInstance().createDefaultProfilingSettings();
+        
+        settings.setProfilingType(lifecycleCheckbox.isSelected() ? ProfilingSettings.PROFILE_MEMORY_LIVENESS :
+                                                                ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS);
+        
+        String filterValue = getFlatValues(getFilterValues());
+        settings.setInstrumentationFilter(new JavaTypeFilter(filterValue, JavaTypeFilter.TYPE_INCLUSIVE));
+        
+        boolean limitAlloc = outgoingCheckbox.isSelected();
+        int limit = (Integer)outgoingSpinner.getValue();
+        settings.setAllocStackTraceLimit(!limitAlloc ? -10 : limit);
         
         return settings;
     }
     
+    private static String getFlatValues(String[] values) {
+        StringBuilder convertedValue = new StringBuilder();
+
+        for (int i = 0; i < values.length; i++) {
+            String filterValue = values[i].trim();
+            if ((i != (values.length - 1)) && !filterValue.endsWith(",")) // NOI18N
+                filterValue = filterValue + ","; // NOI18N
+            convertedValue.append(filterValue);
+        }
+
+        return convertedValue.toString();
+    }
     
-    public boolean settingsValid() { return true; }
+    
+    public boolean settingsValid() { return rootsValid; }
     
     public void loadFromPreset(ProfilerPreset preset) {
         if (preset == null) return;
 
         internalChange = true;
-        allocRadioButton.setSelected(!preset.getMemoryModeP());
-        livenessRadioButton.setSelected(preset.getMemoryModeP());
-        stackTracesCheckBox.setSelected(preset.getStacksP());
-        trackEverySpinner.setValue(preset.getAllocP());
+        filtersArea.getTextArea().setText(preset.getMemoryFilterP().trim());
+        lifecycleCheckbox.setSelected(preset.getMemoryModeP());
+        outgoingCheckbox.setSelected(preset.getStacksP());
+        outgoingSpinner.setValue(preset.getAllocP());
         internalChange = false;
+        
+        updateAllocControls();
     }
     
     public void saveToPreset(ProfilerPreset preset) {
         if (preset == null) return;
         
-        preset.setMemoryModeP(livenessRadioButton.isSelected());
-        preset.setStacksP(stackTracesCheckBox.isSelected());
-        preset.setAllocP((Integer)trackEverySpinner.getValue());
+        preset.setMemoryFilterP(filtersArea.getTextArea().getText().trim());
+        preset.setMemoryModeP(lifecycleCheckbox.isSelected());
+        preset.setStacksP(outgoingCheckbox.isSelected());
+        preset.setAllocP((Integer)outgoingSpinner.getValue());
     }
     
     public abstract void settingsChanged();
@@ -113,6 +144,40 @@ public abstract class ProfilerMemoryPanel extends JPanel {
     private void syncUI() {
         if (internalChange) return;
         settingsChanged();
+    }
+    
+    private void updateAllocControls() {
+        boolean selected = outgoingCheckbox.isSelected();
+        unlimited.setVisible(!selected);
+        outgoingSpinner.setVisible(selected);
+        noAllocs.setVisible(selected && (Integer)outgoingSpinner.getValue() == 0);
+    }
+    
+    
+    private void checkRootValidity() {
+        rootsValid = isRootValueValid();
+        filtersArea.getTextArea().setForeground(rootsValid ?
+            UIManager.getColor("TextArea.foreground") : Color.RED); // NOI18N
+        if (validator != null) validator.run();
+    }
+    
+    public boolean isRootValueValid() {
+// TODO 
+//        String[] rootParts = FilterUtils.getSeparateFilters(getRootValue());
+//
+//        for (int i = 0; i < rootParts.length; i++)
+//            if (!FilterUtils.isValidProfilerFilter(rootParts[i]))
+//                if (rootParts[i].endsWith("**")) { // NOI18N
+//                    if (!FilterUtils.isValidProfilerFilter(rootParts[i].substring(0, rootParts[i].length() - 1))) return false;
+//                } else {
+//                    return false;
+//                }
+
+        return true;
+    }
+    
+    private String[] getFilterValues() {
+        return filtersArea.getTextArea().getText().split("\\n"); // NOI18N
     }
     
     
@@ -125,151 +190,140 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         setOpaque(false);
         setLayout(new GridBagLayout());
         
-        JLabel referenceLabel = new JLabel("X"); // NOI18N
-        
-        ButtonGroup modesRadioGroup = new ButtonGroup();
         GridBagConstraints constraints;
         
-        allocRadioButton = new JRadioButton() {
-            protected void fireActionPerformed(ActionEvent e) { syncUI(); }
-        };
-        setText(allocRadioButton, NbBundle.getMessage(ProfilerMemorySettings.class,
-                "LBL_Profile_Allocations"), mnemonics); // NOI18N
-        allocRadioButton.setToolTipText(NbBundle.getMessage(ProfilerMemorySettings.class, "TOOLTIP_Allocations")); // NOI18N
-        allocRadioButton.setOpaque(false);
-        allocRadioButton.setBorder(referenceLabel.getBorder());
-        modesRadioGroup.add(allocRadioButton);
-        constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = GridBagConstraints.REMAINDER;
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.fill = GridBagConstraints.NONE;
-        constraints.insets = new Insets(10, 10, 10, 10);
-        add(allocRadioButton, constraints);
-        
-        livenessRadioButton = new JRadioButton() {
-            protected void fireActionPerformed(ActionEvent e) { syncUI(); }
-        };
-        setText(livenessRadioButton, NbBundle.getMessage(ProfilerMemorySettings.class,
-                "LBL_Profile_AllocationsGC"), mnemonics); // NOI18N
-        livenessRadioButton.setToolTipText(NbBundle.getMessage(ProfilerMemorySettings.class, "TOOLTIP_Allocations_GC")); // NOI18N
-        livenessRadioButton.setOpaque(false);
-        livenessRadioButton.setBorder(referenceLabel.getBorder());
-        modesRadioGroup.add(livenessRadioButton);
+        JLabel filtersLabel = new JLabel();
+        setText(filtersLabel, NbBundle.getMessage(ProfilerCPUSettings.class,
+                "LBL_Root_Classes"), mnemonics);
+        Dimension d = filtersLabel.getPreferredSize();
+        JRadioButton refRadion = new JRadioButton(NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Root_Classes")); // NOI18N
+        refRadion.setBorder(filtersLabel.getBorder());
+        d.height = Math.max(d.height, refRadion.getPreferredSize().height);
+        filtersLabel.setPreferredSize(d);
+        filtersLabel.setToolTipText(NbBundle.getMessage(ProfilerCPUSettings.class, "TOOLTIP_Root_Classes")); // NOI18N
+        filtersLabel.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 1;
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.anchor = GridBagConstraints.WEST;
         constraints.fill = GridBagConstraints.NONE;
-        constraints.insets = new Insets(0, 10, 10, 10);
-        add(livenessRadioButton, constraints);
+        constraints.insets = new Insets(10, 10, 5, 10);
+        add(filtersLabel, constraints);
         
-        // trackEveryContainer - definition
-        JPanel trackEveryContainer = new JPanel(new GridBagLayout()) {
-            public void setEnabled(boolean enabled) {
-                super.setEnabled(enabled);
-                for (Component c : getComponents())
-                    c.setEnabled(enabled);
-            }
-        };
-
-        // trackEveryLabel1
-        trackEveryLabel1 = new JLabel();
-        setText(trackEveryLabel1, NbBundle.getMessage(ProfilerMemorySettings.class,
-                "LBL_Track_Every1"), mnemonics); // NOI18N
-        trackEveryLabel1.setToolTipText(NbBundle.getMessage(ProfilerMemorySettings.class, "TOOLTIP_Track_Every")); // NOI18N
-        trackEveryLabel1.setOpaque(false);
-        constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        constraints.fill = GridBagConstraints.NONE;
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(0, 0, 0, 5);
-        trackEveryContainer.add(trackEveryLabel1, constraints);
-
-        // trackEverySpinner
-        trackEverySpinner = new JExtendedSpinner(new SpinnerNumberModel(10, 1, Integer.MAX_VALUE, 1)) {
-            public Dimension getPreferredSize() {
-                return new Dimension(55, super.getPreferredSize().height);
-            }
-            public Dimension getMinimumSize() {
-                return getPreferredSize();
-            }
-            protected void processFocusEvent(FocusEvent e) {
-                super.processFocusEvent(e);
-                syncUI();
-            }
-        };
-        trackEverySpinner.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) { syncUI(); }
+        filtersArea = createTextArea(2);
+        filtersLabel.setLabelFor(filtersArea.getTextArea());
+        filtersArea.getTextArea().setToolTipText("<html>Define the classes to be profiled:<br><br><code>&nbsp;org.mypackage.**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package and subpackages<br><code>&nbsp;org.mypackage.*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package<br><code>&nbsp;org.mypackage.MyClass&nbsp;&nbsp;</code>single class<br><br>Special cases:<br><br><code>&nbsp;char[]&nbsp;&nbsp;</code>primitive array<br><code>&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes<br><code>&nbsp;[]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>(on a separate line) include arrays matching the filter<br></html>");
+        filtersArea.getTextArea().getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { checkRootValidity(); syncUI(); }
+            public void removeUpdate(DocumentEvent e) { checkRootValidity(); syncUI(); }
+            public void changedUpdate(DocumentEvent e) { checkRootValidity(); syncUI(); }
         });
-        JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor)trackEverySpinner.getEditor();
-        editor.getTextField().getDocument().addDocumentListener(new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) { try { trackEverySpinner.commitEdit(); } catch (Exception ex) {} }
-            public void removeUpdate(DocumentEvent e) { try { trackEverySpinner.commitEdit(); } catch (Exception ex) {} }
-            public void changedUpdate(DocumentEvent e) { try { trackEverySpinner.commitEdit(); } catch (Exception ex) {} }
-        });
-        trackEverySpinner.setToolTipText(NbBundle.getMessage(ProfilerMemorySettings.class, "TOOLTIP_Track_Every")); // NOI18N
-        trackEveryLabel1.setLabelFor(trackEverySpinner);
-        constraints = new GridBagConstraints();
-        constraints.gridx = 1;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        constraints.fill = GridBagConstraints.NONE;
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(0, 0, 0, 0);
-        trackEveryContainer.add(trackEverySpinner, constraints);
-
-        // trackEveryLabel2
-        trackEveryLabel2 = new JLabel(NbBundle.getMessage(ProfilerMemorySettings.class, "LBL_Track_Every2")); // NOI18N
-        trackEveryLabel2.setToolTipText(NbBundle.getMessage(ProfilerMemorySettings.class, "TOOLTIP_Track_Every")); // NOI18N
-        trackEveryLabel2.setOpaque(false);
-        constraints = new GridBagConstraints();
-        constraints.gridx = 2;
-        constraints.gridy = 0;
-        constraints.weightx = 1;
-        constraints.gridwidth = 1;
-        constraints.fill = GridBagConstraints.NONE;
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(0, 5, 0, 0);
-        trackEveryContainer.add(trackEveryLabel2, constraints);
-
-        // trackEveryContainer - customization
-        trackEveryContainer.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 2;
+        constraints.weightx = 1;
+        constraints.weighty = 0.65;
         constraints.gridwidth = GridBagConstraints.REMAINDER;
-        constraints.fill = GridBagConstraints.NONE;
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(5, 10, 10, 10);
-        add(trackEveryContainer, constraints);
+        constraints.anchor = GridBagConstraints.NORTHWEST;
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.insets = new Insets(0, 10, 10, 10);
+        add(filtersArea, constraints);
         
-        stackTracesCheckBox = new JCheckBox() {
-            protected void fireActionPerformed(ActionEvent e) { syncUI(); }
+        
+        lifecycleCheckbox = new JCheckBox("Track only live objects") {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                syncUI();
+            }
         };
-        setText(stackTracesCheckBox, NbBundle.getMessage(ProfilerMemorySettings.class,
-                "LBL_Record_Stacktraces"), mnemonics); // NOI18N
-        stackTracesCheckBox.setToolTipText(NbBundle.getMessage(ProfilerMemorySettings.class, "TOOLTIP_Stack_Traces")); // NOI18N
-        stackTracesCheckBox.setOpaque(false);
-        stackTracesCheckBox.setBorder(referenceLabel.getBorder());
+        lifecycleCheckbox.setToolTipText("Unselect to profile all created objects (including those already released from the heap)");
+        lifecycleCheckbox.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 3;
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.anchor = GridBagConstraints.WEST;
         constraints.fill = GridBagConstraints.NONE;
-        constraints.insets = new Insets(5, 10, 10, 10);
-        add(stackTracesCheckBox, constraints);
+        constraints.insets = new Insets(5, 10, 0, 5);
+        add(lifecycleCheckbox, constraints);
         
+        outgoingCheckbox = new JCheckBox("Limit allocations depth:") {
+            protected void fireActionPerformed(ActionEvent e) {
+                super.fireActionPerformed(e);
+                updateAllocControls();
+                syncUI();
+            }
+        };
+        outgoingCheckbox.setToolTipText("Unselect to collect full depth allocations call tree");
+        outgoingCheckbox.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 4;
+        constraints.gridwidth = 1;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.insets = new Insets(5, 10, 5, 5);
+        add(outgoingCheckbox, constraints);
+        
+        outgoingSpinner = new JExtendedSpinner(new SpinnerNumberModel(Math.abs(10), 0, 99, 1)) {
+            public Dimension getPreferredSize() { return getMinimumSize(); }
+            public Dimension getMaximumSize() { return getMinimumSize(); }
+            protected void fireStateChanged() { updateAllocControls(); syncUI(); super.fireStateChanged(); }
+        };
+        outgoingSpinner.setToolTipText("Limit depth of allocations call tree (select 0 for no allocation calls)");
+        JComponent editor = outgoingSpinner.getEditor();
+        JTextField field = editor instanceof JSpinner.DefaultEditor ?
+                ((JSpinner.DefaultEditor)editor).getTextField() : null;
+        if (field != null) field.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { change(); }
+            public void removeUpdate(DocumentEvent e) { change(); }
+            public void changedUpdate(DocumentEvent e) { change(); }
+            private void change() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        noAllocs.setVisible(outgoingSpinner.isVisible() &&
+                                            (Integer)outgoingSpinner.getValue() == 0);
+                    }
+                });
+                updateAllocControls();
+                syncUI();
+            }
+        });
+        constraints = new GridBagConstraints();
+        constraints.gridx = 1;
+        constraints.gridy = 4;
+        constraints.gridwidth = 1;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.insets = new Insets(5, 0, 5, 5);
+        add(outgoingSpinner, constraints);
+        
+        unlimited = new GrayLabel("unlimited");
+        constraints = new GridBagConstraints();
+        constraints.gridx = 2;
+        constraints.gridy = 4;
+        constraints.gridwidth = 1;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.insets = new Insets(5, 0, 5, 5);
+        add(unlimited, constraints);
+        
+        noAllocs = new GrayLabel("(no allocation calls)");
+        constraints = new GridBagConstraints();
+        constraints.gridx = 3;
+        constraints.gridy = 4;
+        constraints.gridwidth = 1;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.insets = new Insets(5, 5, 5, 5);
+        add(noAllocs, constraints);
+        
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 5;
         constraints.weightx = 1;
-        constraints.weighty = 1;
+        constraints.weighty = 0.35;
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.fill = GridBagConstraints.BOTH;
@@ -283,9 +337,38 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         else l.setText(text.replace("&", "")); // NOI18N
     }
     
-    private static void setText(AbstractButton b, String text, boolean mnemonics) {
-        if (mnemonics) Mnemonics.setLocalizedText(b, text);
-        else b.setText(text.replace("&", "")); // NOI18N
+//    private static void setText(AbstractButton b, String text, boolean mnemonics) {
+//        if (mnemonics) Mnemonics.setLocalizedText(b, text);
+//        else b.setText(text.replace("&", "")); // NOI18N
+//    }
+    
+    private static TextAreaComponent createTextArea(int rows) {
+        final JTextArea rootsArea = new JTextArea();
+        rootsArea.setFont(new Font("Monospaced", Font.PLAIN, UIManager.getFont("Label.font").getSize())); // NOI18N
+        TextAreaComponent rootsAreaScrollPane = new TextAreaComponent(rootsArea,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) {
+            public Dimension getMinimumSize() {
+                return getPreferredSize();
+            }
+            public void setEnabled(boolean enabled) {
+                super.setEnabled(enabled);
+                rootsArea.setEnabled(enabled);
+            }
+        };
+        rootsAreaScrollPane.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        JTextArea referenceArea = new JTextArea("X"); // NOI18N
+        referenceArea.setFont(rootsArea.getFont());
+        referenceArea.setRows(rows);
+        Insets insets = rootsAreaScrollPane.getInsets();
+        rootsAreaScrollPane.setPreferredSize(new Dimension(1, referenceArea.getPreferredSize().height + 
+                (insets != null ? insets.top + insets.bottom : 0)));
+        return rootsAreaScrollPane;
+    }
+    
+    private static class TextAreaComponent extends JScrollPane {
+        public TextAreaComponent(JTextArea textArea, int vPolicy, int hPolicy) { super(textArea, vPolicy, hPolicy); }
+        public JTextArea getTextArea() { return (JTextArea)getViewport().getView(); }
     }
 
 }
