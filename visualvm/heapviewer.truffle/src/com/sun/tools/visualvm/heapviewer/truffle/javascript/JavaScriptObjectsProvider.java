@@ -85,13 +85,13 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
             List<HeapViewerNode> nodes = new ArrayList();
             Map<String, JavaScriptNodes.JavaScriptDynamicObjectsContainer> types = new HashMap();
             
-            Iterator<DynamicObject> dobjects = fragment.getJavaScriptObjectsIterator();
+            Iterator<Instance> instances = fragment.getJavaScriptInstancesIterator();
             progress.setupUnknownSteps();
             
-            while (dobjects.hasNext()) {
-                DynamicObject dobject = dobjects.next();
+            while (instances.hasNext()) {
+                Instance instance = instances.next();
                 progress.step();
-                String type = dobject.getType(heap);
+                String type = DynamicObject.getType(instance, heap);
                 JavaScriptNodes.JavaScriptDynamicObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
@@ -100,7 +100,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                     types.put(type, typeNode);
                 }
                 
-                typeNode.add(dobject, heap);
+                typeNode.add(instance, heap);
             }
             
             progress.finish();
@@ -165,9 +165,8 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
             progress.setupKnownSteps(dominators.size());
             
             for (Instance dominator : dominators) {
-                DynamicObject dobject = new DynamicObject(dominator);
                 progress.step();
-                String type = dobject.getType(heap);
+                String type = DynamicObject.getType(dominator, heap);
                 JavaScriptNodes.JavaScriptDynamicObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
@@ -176,7 +175,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                     types.put(type, typeNode);
                 }
                 
-                typeNode.add(dobject, heap);
+                typeNode.add(dominator, heap);
             }
             
             progress.finish();
@@ -190,16 +189,15 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
         JavaScriptHeapFragment fragment = (JavaScriptHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
         
-        Iterator<DynamicObject> dobjects = fragment.getJavaScriptObjectsIterator();
+        Iterator<Instance> instances = fragment.getJavaScriptInstancesIterator();
         
         if (aggregation == 0) {
             progress.setupUnknownSteps();
             
             final List<Instance> gcRoots = new ArrayList();
-            while (dobjects.hasNext()) {
-                DynamicObject dobject = dobjects.next();
+            while (instances.hasNext()) {
+                Instance instance = instances.next();
                 progress.step();
-                Instance instance = dobject.getInstance();
                 if (instance.isGCRoot()) gcRoots.add(instance);
             }
             
@@ -236,14 +234,13 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
             
             progress.setupUnknownSteps();
             
-            while (dobjects.hasNext()) {
-                DynamicObject dobject = dobjects.next();
+            while (instances.hasNext()) {
+                Instance instance = instances.next();
                 progress.step();
-                Instance instance = dobject.getInstance();
                 if (!instance.isGCRoot()) continue;
                 
-                String type = dobject.getType(heap);
-                type = type.substring(type.lastIndexOf('.') + 1);
+                String type = DynamicObject.getType(instance, heap);
+//                type = type.substring(type.lastIndexOf('.') + 1);
 
                 JavaScriptNodes.JavaScriptDynamicObjectsContainer typeNode = types.get(type);
                 if (typeNode == null) {
@@ -251,7 +248,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                     nodes.add(typeNode);
                     types.put(type, typeNode);
                 }
-                typeNode.add(dobject, heap);
+                typeNode.add(instance, heap);
             }
             
             progress.finish();

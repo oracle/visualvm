@@ -86,9 +86,9 @@ public class PythonObjectsProvider extends AbstractObjectsProvider {
             progress.setupUnknownSteps();
 
             while (instances.hasNext()) {
-                PythonObject pyobject = new PythonObject(instances.next());
+                Instance instance = instances.next();
                 progress.step();
-                String type = pyobject.getType();
+                String type = PythonObject.getType(instance);
                 PythonObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
@@ -97,7 +97,7 @@ public class PythonObjectsProvider extends AbstractObjectsProvider {
                     types.put(type, typeNode);
                 }
 
-                typeNode.add(pyobject, heap);
+                typeNode.add(instance, heap);
             }
 
             progress.finish();
@@ -162,9 +162,8 @@ public class PythonObjectsProvider extends AbstractObjectsProvider {
             progress.setupKnownSteps(dominators.size());
 
             for (Instance dominator : dominators) {
-                PythonObject pyobject = new PythonObject(dominator);
                 progress.step();
-                String type = pyobject.getType();
+                String type = PythonObject.getType(dominator);
                 PythonObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
@@ -172,8 +171,8 @@ public class PythonObjectsProvider extends AbstractObjectsProvider {
                     nodes.add(typeNode);
                     types.put(type, typeNode);
                 }
-
-                typeNode.add(pyobject, heap);
+                
+                typeNode.add(dominator, heap);
             }
 
             progress.finish();
@@ -236,19 +235,18 @@ public class PythonObjectsProvider extends AbstractObjectsProvider {
                 Instance instance = instancesI.next();
                 progress.step();
                 if (!instance.isGCRoot()) continue;
-
-                PythonObject pyobject = new PythonObject(instance);
-
-                String type = pyobject.getType();
-                type = type.substring(type.lastIndexOf('.') + 1);
-
+                
+                String type = PythonObject.getType(instance);
+//                type = type.substring(type.lastIndexOf('.') + 1);
                 PythonObjectsContainer typeNode = types.get(type);
+
                 if (typeNode == null) {
                     typeNode = new PythonObjectsContainer(type);
                     nodes.add(typeNode);
                     types.put(type, typeNode);
                 }
-                typeNode.add(pyobject, heap);
+
+                typeNode.add(instance, heap);
             }
 
             progress.finish();

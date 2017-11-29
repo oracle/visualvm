@@ -103,6 +103,10 @@ public class PythonObject {
     public String getType() {
         return DetailsUtils.getInstanceString(pythonClass, null);
     }
+    
+    public static String getType(Instance instance) {
+        return DetailsUtils.getInstanceString((Instance) instance.getValueOfField("pythonClass"), null);
+    }
 
     public long getSize() {
         long size = instance.getSize();

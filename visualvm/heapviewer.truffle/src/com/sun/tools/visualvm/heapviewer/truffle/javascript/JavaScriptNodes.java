@@ -128,8 +128,8 @@ class JavaScriptNodes {
             super(name, maxObjects);
         }
         
-        protected JavaScriptDynamicObjectNode createNode(DynamicObject dobject) {
-            return new JavaScriptDynamicObjectNode(dobject, name);
+        protected JavaScriptDynamicObjectNode createNode(Instance instance) {
+            return new JavaScriptDynamicObjectNode(new DynamicObject(instance), name);
         }
         
         

@@ -70,6 +70,10 @@ class RubyHeapFragment extends TruffleLanguageHeapFragment {
     }
     
     
+    Iterator<Instance> getRubyInstancesIterator() {
+        return getLanguageInstancesIterator(RubyObjectsProvider.RUBY_LANG_ID);
+    }
+    
     Iterator<DynamicObject> getRubyObjectsIterator() {
         return getDynamicObjectsIterator(RubyObjectsProvider.RUBY_LANG_ID);
     }

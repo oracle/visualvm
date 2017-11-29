@@ -146,8 +146,33 @@ public class DynamicObject {
         return type;
     }
     
+    public static String getType(Instance instance, Heap heap) {
+        Instance shape = (Instance)instance.getValueOfField("shape"); // NOI18N
+        return DetailsSupport.getDetailsString(shape, heap);
+    }
+    
     public JavaClass getLanguageId() {
         Instance sh = getShape();
+        if (sh != null) {
+            Instance objectType = (Instance) sh.getValueOfField("objectType");
+            if (objectType != null) {
+                JavaClass objTypeCls = objectType.getJavaClass();
+
+                while (objTypeCls != null) {
+                    JavaClass superObjType = objTypeCls.getSuperClass();
+
+                    if (OBJECT_TYPE_FQN.equals(superObjType.getName())) {
+                        return objTypeCls;
+                    }
+                    objTypeCls = superObjType;
+                }
+            }
+        }
+        return null;
+    }
+    
+    public static JavaClass getLanguageId(Instance instance) {
+        Instance sh = (Instance)instance.getValueOfField("shape"); // NOI18N
         if (sh != null) {
             Instance objectType = (Instance) sh.getValueOfField("objectType");
             if (objectType != null) {

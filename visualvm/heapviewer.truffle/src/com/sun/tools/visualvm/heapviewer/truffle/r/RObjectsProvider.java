@@ -86,9 +86,9 @@ public class RObjectsProvider extends AbstractObjectsProvider {
             progress.setupUnknownSteps();
             
             while (instances.hasNext()) {
-                RObject robject = new RObject(instances.next());
+                Instance instance = instances.next();
                 progress.step();
-                String type = robject.getType();
+                String type = RObject.getType(instance);
                 RObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
@@ -97,7 +97,7 @@ public class RObjectsProvider extends AbstractObjectsProvider {
                     types.put(type, typeNode);
                 }
                 
-                typeNode.add(robject, heap);
+                typeNode.add(instance, heap);
             }
             
             progress.finish();
@@ -162,9 +162,8 @@ public class RObjectsProvider extends AbstractObjectsProvider {
             progress.setupKnownSteps(dominators.size());
             
             for (Instance dominator : dominators) {
-                RObject robject = new RObject(dominator);
                 progress.step();
-                String type = robject.getType();
+                String type = RObject.getType(dominator);
                 RObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
@@ -173,7 +172,7 @@ public class RObjectsProvider extends AbstractObjectsProvider {
                     types.put(type, typeNode);
                 }
                 
-                typeNode.add(robject, heap);
+                typeNode.add(dominator, heap);
             }
             
             progress.finish();
@@ -237,18 +236,17 @@ public class RObjectsProvider extends AbstractObjectsProvider {
                 progress.step();
                 if (!instance.isGCRoot()) continue;
                 
-                RObject robject = new RObject(instance);
-                
-                String type = robject.getType();
-                type = type.substring(type.lastIndexOf('.') + 1);
-
+                String type = RObject.getType(instance);
+//                type = type.substring(type.lastIndexOf('.') + 1);
                 RObjectsContainer typeNode = types.get(type);
+
                 if (typeNode == null) {
                     typeNode = new RObjectsContainer(type);
                     nodes.add(typeNode);
                     types.put(type, typeNode);
                 }
-                typeNode.add(robject, heap);
+                
+                typeNode.add(instance, heap);
             }
             
             progress.finish();

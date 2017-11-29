@@ -49,6 +49,12 @@ public abstract class TruffleLanguageHeapFragment extends HeapFragment {
     public Iterator<Instance> getInstancesIterator(String javaClassFqn) {
         return new InstancesIterator(HeapUtils.getSubclasses(heap, javaClassFqn));
     }
+    
+    public Iterator<Instance> getLanguageInstancesIterator(String languageID) {
+        Iterator<Instance> instIt = new InstancesIterator(HeapUtils.getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
+        
+        return new LanguageInstanceFilterIterator(instIt, languageID);
+    }
 
     public Iterator<DynamicObject> getDynamicObjectsIterator() {
         return new DynamicObjectsIterator(HeapUtils.getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
@@ -95,6 +101,43 @@ public abstract class TruffleLanguageHeapFragment extends HeapFragment {
                 DynamicObject dynObj = next;
                 next = null;
                 return dynObj;
+            }
+            throw new NoSuchElementException();
+        }
+    }
+    
+    private static class LanguageInstanceFilterIterator implements Iterator<Instance> {
+        private final String languageID;
+        private final Iterator<Instance> instancesIterator;
+        private Instance next;
+
+        private LanguageInstanceFilterIterator(Iterator<Instance> instIt, String langID) {
+            instancesIterator = instIt;
+            languageID = langID;
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (next != null) {
+                return true;
+            }
+            while (instancesIterator.hasNext()) {
+                Instance inst = instancesIterator.next();
+                JavaClass langId = DynamicObject.getLanguageId(inst);
+                if (langId != null && languageID.equals(langId.getName())) {
+                    next = inst;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public Instance next() {
+            if (hasNext()) {
+                Instance inst = next;
+                next = null;
+                return inst;
             }
             throw new NoSuchElementException();
         }

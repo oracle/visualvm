@@ -167,8 +167,8 @@ class RubyNodes {
         }
         
         
-        protected RubyDynamicObjectNode createNode(DynamicObject dobject) {
-            return new RubyDynamicObjectNode(dobject, name);
+        protected RubyDynamicObjectNode createNode(Instance instance) {
+            return new RubyDynamicObjectNode(new DynamicObject(instance), name);
         }
         
         

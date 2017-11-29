@@ -32,12 +32,13 @@ import com.sun.tools.visualvm.heapviewer.model.ContainerNode;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
+import org.netbeans.lib.profiler.heap.Instance;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class DynamicObjectsContainer extends ContainerNode<DynamicObject> {
+public class DynamicObjectsContainer extends ContainerNode<Instance> {
     
     public DynamicObjectsContainer(String name) {
         this(name, UIThresholds.MAX_CLASS_INSTANCES);
@@ -52,18 +53,18 @@ public class DynamicObjectsContainer extends ContainerNode<DynamicObject> {
         return 1;
     }
 
-    protected long getOwnSize(DynamicObject item, Heap heap) {
-        return item.getInstance().getSize();
+    protected long getOwnSize(Instance instance, Heap heap) {
+        return instance.getSize();
     }
 
-    protected long getRetainedSize(DynamicObject item, Heap heap) {
+    protected long getRetainedSize(Instance instance, Heap heap) {
         return DataType.RETAINED_SIZE.valuesAvailable(heap) ?
-               item.getInstance().getRetainedSize() : DataType.RETAINED_SIZE.getNotAvailableValue();
+               instance.getRetainedSize() : DataType.RETAINED_SIZE.getNotAvailableValue();
     }
     
     
-    protected DynamicObjectNode createNode(DynamicObject dobject) {
-        return new DynamicObjectNode(dobject, name);
+    protected DynamicObjectNode createNode(Instance instance) {
+        return new DynamicObjectNode(new DynamicObject(instance), name);
     }
     
     protected String getMoreNodesString(String moreNodesCount)  {

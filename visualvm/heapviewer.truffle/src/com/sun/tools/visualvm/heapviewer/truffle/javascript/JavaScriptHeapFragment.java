@@ -70,6 +70,10 @@ class JavaScriptHeapFragment extends TruffleLanguageHeapFragment {
     }
     
     
+    Iterator<Instance> getJavaScriptInstancesIterator() {
+        return getLanguageInstancesIterator(JavaScriptObjectsProvider.JS_LANG_ID);
+    }
+    
     Iterator<DynamicObject> getJavaScriptObjectsIterator() {
         return getDynamicObjectsIterator(JavaScriptObjectsProvider.JS_LANG_ID);
     }

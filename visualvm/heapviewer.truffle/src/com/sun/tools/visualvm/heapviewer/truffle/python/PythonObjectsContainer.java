@@ -30,6 +30,7 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import java.awt.Font;
 import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 
@@ -37,7 +38,7 @@ import org.netbeans.modules.profiler.api.icons.LanguageIcons;
  *
  * @author Tomas Hurka
  */
-class PythonObjectsContainer extends ContainerNode<PythonObject> {
+class PythonObjectsContainer extends ContainerNode<Instance> {
 
     public PythonObjectsContainer(String name) {
         this(name, UIThresholds.MAX_CLASS_INSTANCES);
@@ -48,22 +49,22 @@ class PythonObjectsContainer extends ContainerNode<PythonObject> {
     }
 
 
-    protected int getCount(PythonObject item, Heap heap) {
+    protected int getCount(Instance instance, Heap heap) {
         return 1;
     }
 
-    protected long getOwnSize(PythonObject item, Heap heap) {
-        return item.getSize();
+    protected long getOwnSize(Instance instance, Heap heap) {
+        return instance.getSize();
     }
 
-    protected long getRetainedSize(PythonObject item, Heap heap) {
+    protected long getRetainedSize(Instance instance, Heap heap) {
         return DataType.RETAINED_SIZE.valuesAvailable(heap) ?
-               item.getInstance().getRetainedSize() : DataType.RETAINED_SIZE.getNotAvailableValue();
+               instance.getRetainedSize() : DataType.RETAINED_SIZE.getNotAvailableValue();
     }
 
 
-    protected PythonObjectNode createNode(PythonObject dobject) {
-        return new PythonObjectNode(dobject, name);
+    protected PythonObjectNode createNode(Instance instance) {
+        return new PythonObjectNode(new PythonObject(instance), name);
     }
 
     protected String getMoreNodesString(String moreNodesCount)  {

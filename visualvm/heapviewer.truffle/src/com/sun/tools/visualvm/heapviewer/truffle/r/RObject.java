@@ -159,6 +159,21 @@ public class RObject {
         }
         return type;
     }
+    
+    public static String getType(Instance instance) {
+        String cnameS = instance.getJavaClass().getName();
+        String typeS = cnameS.substring(cnameS.lastIndexOf('.') + 1);
+        int dindex = typeS.indexOf('$');
+        if (dindex>0) {
+            typeS = typeS.substring(0, dindex);
+        }
+        String convertedType = typeMap.get(typeS);
+
+        if (convertedType != null) {
+            return convertedType;
+        }
+        return typeS;
+    }
 
     public long getSize() {
         long size = instance.getSize();

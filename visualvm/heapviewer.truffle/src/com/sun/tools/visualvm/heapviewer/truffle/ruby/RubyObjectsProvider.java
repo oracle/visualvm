@@ -90,13 +90,13 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
             List<HeapViewerNode> nodes = new ArrayList();
             Map<String, RubyNodes.RubyDynamicObjectsContainer> types = new HashMap();
             
-            Iterator<DynamicObject> dobjects = fragment.getRubyObjectsIterator();
+            Iterator<Instance> instances = fragment.getRubyInstancesIterator();
             progress.setupUnknownSteps();
                         
-            while (dobjects.hasNext()) {
-                DynamicObject dobject = dobjects.next();
+            while (instances.hasNext()) {
+                Instance instance = instances.next();
                 progress.step();
-                String type = getDisplayType(dobject.getType(heap));
+                String type = getDisplayType(DynamicObject.getType(instance, heap));
                 RubyNodes.RubyDynamicObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
@@ -105,7 +105,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                     types.put(type, typeNode);
                 }
                 
-                typeNode.add(dobject, heap);
+                typeNode.add(instance, heap);
             }
             
             progress.finish();
@@ -170,9 +170,8 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
             progress.setupKnownSteps(dominators.size());
             
             for (Instance dominator : dominators) {
-                DynamicObject dobject = new DynamicObject(dominator);
                 progress.step();
-                String type = getDisplayType(dobject.getType(heap));
+                String type = getDisplayType(DynamicObject.getType(dominator, heap));
                 RubyNodes.RubyDynamicObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
@@ -181,7 +180,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                     types.put(type, typeNode);
                 }
                 
-                typeNode.add(dobject, heap);
+                typeNode.add(dominator, heap);
             }
             
             progress.finish();
@@ -195,16 +194,15 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
         RubyHeapFragment fragment = (RubyHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
         
-        Iterator<DynamicObject> dobjects = fragment.getRubyObjectsIterator();
+        Iterator<Instance> instances = fragment.getRubyInstancesIterator();
         
         if (aggregation == 0) {
             progress.setupUnknownSteps();
             
             final List<Instance> gcRoots = new ArrayList();
-            while (dobjects.hasNext()) {
-                DynamicObject dobject = dobjects.next();
+            while (instances.hasNext()) {
+                Instance instance = instances.next();
                 progress.step();
-                Instance instance = dobject.getInstance();
                 if (instance.isGCRoot()) gcRoots.add(instance);
             }
             
@@ -241,13 +239,12 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
             
             progress.setupUnknownSteps();
             
-            while (dobjects.hasNext()) {
-                DynamicObject dobject = dobjects.next();
+            while (instances.hasNext()) {
+                Instance instance = instances.next();
                 progress.step();
-                Instance instance = dobject.getInstance();
                 if (!instance.isGCRoot()) continue;
                 
-                String type = getDisplayType(dobject.getType(heap));
+                String type = getDisplayType(DynamicObject.getType(instance, heap));
                 RubyNodes.RubyDynamicObjectsContainer typeNode = types.get(type);
                 
                 if (typeNode == null) {
@@ -256,7 +253,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                     types.put(type, typeNode);
                 }
                 
-                typeNode.add(dobject, heap);
+                typeNode.add(instance, heap);
             }
             
             progress.finish();
