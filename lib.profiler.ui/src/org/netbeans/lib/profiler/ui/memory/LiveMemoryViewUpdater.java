@@ -115,6 +115,8 @@ public class LiveMemoryViewUpdater {
     
     
     private void updateData() throws ClientUtils.TargetAppOrVMTerminated {
+        if (!forceRefresh && (paused || memoryView.getLastUpdate() + MIN_UPDATE_DIFF > System.currentTimeMillis())) return;
+        
         MemoryResultsSnapshot snapshot = client.getMemoryProfilingResultsSnapshot(false);
 
         // class names in VM format
@@ -126,15 +128,6 @@ public class LiveMemoryViewUpdater {
         memoryView.setData(snapshot, filter);
         
         forceRefresh = false;
-        
-//        if (!forceRefresh && (paused || memoryView.getLastUpdate() + MIN_UPDATE_DIFF > System.currentTimeMillis())) return;
-//        
-//        boolean sampling = client.getCurrentInstrType() == ProfilerClient.INSTR_NONE_SAMPLING;
-//        MemoryResultsSnapshot data = client.getStatus().getInstrMethodClasses() == null ?
-//                           null : client.getCPUProfilingResultsSnapshot(false);
-//        memoryView.setData(data, sampling);
-//        
-//        forceRefresh = false;
     }
     
     private void resetData() {
