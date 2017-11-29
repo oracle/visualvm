@@ -50,11 +50,12 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
     private static final String INT_ROPE_MASK = "org.truffleruby.core.rope.LazyIntRope"; // NOI18N
     private static final String ROPE_TABLE_KEY_MASK = "org.truffleruby.core.rope.RopeTable$Key"; // NOI18N
     private static final String ENCODING_MASK = "org.jcodings.Encoding+";   // NOI18N
+    private static final String MODULE_FIELDS_MASK = "org.truffleruby.core.module.ModuleFields"; // NOI18N
 
     public RubyDetailsProvider() {
         super(RUBY_OBJECT_TYPE_MASK,ASCII_ROPE_MASK,CONCAT_ROPE_MASK,SUB_ROPE_MASK,
                 ROPE_TABLE_KEY_MASK,INVALID_ROPE_MASK,VALID_ROPE_MASK,
-                INT_ROPE_MASK, ENCODING_MASK);
+                INT_ROPE_MASK, ENCODING_MASK, MODULE_FIELDS_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -128,6 +129,9 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
         }
         if (INT_ROPE_MASK.equals(className)) {
             return Integer.toString(DetailsUtils.getIntFieldValue(instance, "value", 0));
+        }
+        if (MODULE_FIELDS_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "name", heap);
         }
         return null;
     }
