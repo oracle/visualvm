@@ -54,7 +54,6 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -85,28 +84,10 @@ class JDBCLivePanel extends ProfilingResultsSupport.ResultsView {
     }
     
     
+    // -------------------------------------------------------------------------
     
-    // --- API implementation --------------------------------------------------
-    
-    boolean hasResultsUI() {
-        return jdbcView != null;
-    }
-    
-    void sessionStateChanged(int sessionState) {
-        refreshToolbar(sessionState);
-    }
-    
-    
-    void resetPause() {
-        if (lrPauseButton != null) lrPauseButton.setSelected(false);
-    }
-    
-    void setForceRefresh() {
-        if (updater != null) updater.setForceRefresh(true);
-    }
-    
-    void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
-        if (updater != null) updater.update();
+    void refreshResults() {
+        refreshResults(false);
     }
     
     void resetResults() {
@@ -120,19 +101,39 @@ class JDBCLivePanel extends ProfilingResultsSupport.ResultsView {
         }
     }
     
-    
-    void cleanup() {
-        if (updater != null) updater.cleanup();
-        
-        if (resetter != null) {
-            resetter.unregisterView(this);
-            resetter = null;
-        }
+    void sessionStateChanged(int sessionState) {
+        refreshToolbar(sessionState);
     }
+    
     
     // -------------------------------------------------------------------------
     
+    private void refreshResults(final boolean forceRefresh) {
+        RESULTS_PROCESSOR.post(new Runnable() {
+            public void run() {
+                try {
+                    if (updater != null) {
+                        if (forceRefresh) updater.setForceRefresh(true);
+                        updater.update();
+                    }
+//                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                } catch (Throwable t) {
+                    if (updater != null) {
+                        updater.cleanup();
+                        updater = null;
+                    }
+
+                    if (resetter != null) {
+                        resetter.unregisterView(JDBCLivePanel.this);
+                        resetter = null;
+                    }
+                }
+            }
+        });
+    }
     
+    
+    // -------------------------------------------------------------------------
     
     private JLabel lrLabel;
     private JToggleButton lrPauseButton;
@@ -229,25 +230,14 @@ class JDBCLivePanel extends ProfilingResultsSupport.ResultsView {
                 updater.setPaused(paused);
                 boolean selected = lrPauseButton.isSelected();
                 lrRefreshButton.setEnabled(selected);
-                if (!paused) try {
-                    updater.setForceRefresh(true);
-                    updater.update();
-                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    cleanup();
-                }
-//////                refreshToolbar(getSessionState());
+                if (!paused) refreshResults(true);
             }
         };
         lrPauseButton.setToolTipText(Bundle.MethodsFeatureUI_pauseResults());
 
         lrRefreshButton = new JButton(Icons.getIcon(GeneralIcons.UPDATE_NOW)) {
             protected void fireActionPerformed(ActionEvent e) {
-                try {
-                    updater.setForceRefresh(true);
-                    updater.update();
-                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    cleanup();
-                }
+                refreshResults(true);
             }
         };
         lrRefreshButton.setToolTipText(Bundle.MethodsFeatureUI_updateResults());
@@ -296,38 +286,15 @@ class JDBCLivePanel extends ProfilingResultsSupport.ResultsView {
         toolbar.addSpace(3);
         toolbar.add(pdResetResultsButton);
         
-        
-        // --- Sync UI ---------------------------------------------------------
-        
-        jdbcView.setView(true, false, false);
-//////        sessionStateChanged(getSessionState());
-        
     }
     
     private void refreshToolbar(final int state) {
         if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-//                boolean running = isRunning(state);
                 boolean running = state == Profiler.PROFILING_RUNNING;
                 lrPauseButton.setEnabled(running);
                 lrRefreshButton.setEnabled(!popupPause && running && lrPauseButton.isSelected());
                 lrDeltasButton.setEnabled(running);
-            }
-        });
-    }
-    
-    
-    void refreshResults() {
-        RESULTS_PROCESSOR.post(new Runnable() {
-            public void run() {
-                try {
-                    refreshData();
-                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    cleanup();
-                } catch (Throwable t) {
-                    Exceptions.printStackTrace(t);
-                    cleanup();
-                }
             }
         });
     }

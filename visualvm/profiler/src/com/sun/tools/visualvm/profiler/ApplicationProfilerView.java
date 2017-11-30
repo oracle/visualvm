@@ -376,7 +376,7 @@ final class ApplicationProfilerView extends DataSourceView {
         }
 
 
-        public void profilingStateChanged(ProfilingStateEvent e) { refreshStatus(); }
+        public void profilingStateChanged(ProfilingStateEvent e) { refreshStatus(); if (results != null) results.sessionStateChanged(e.getNewState()); }
         public void threadsMonitoringChanged() { refreshStatus(); }
         public void instrumentationChanged(int oldInstrType, int currentInstrType) { refreshStatus(); }
         public void serverStateChanged(int serverState, int serverProgress) {}
