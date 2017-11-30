@@ -31,6 +31,7 @@ import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import com.sun.tools.visualvm.core.ui.components.DataViewComponent.DetailsView;
 import com.sun.tools.visualvm.profiling.presets.PresetSelector;
 import com.sun.tools.visualvm.profiling.presets.ProfilerPresets;
 import com.sun.tools.visualvm.uisupport.HTMLLabel;
@@ -79,6 +80,7 @@ final class ApplicationProfilerView extends DataSourceView {
     private static final String IMAGE_PATH =
             "com/sun/tools/visualvm/profiler/resources/profiler.png"; // NOI18N
     
+    private DataViewComponent dvc;
     private MasterViewSupport masterViewSupport;
     private CPUSettingsSupport cpuSettings;
     private MemorySettingsSupport memorySettings;
@@ -140,20 +142,35 @@ final class ApplicationProfilerView extends DataSourceView {
     protected DataViewComponent createComponent() {
         Application application = (Application)getDataSource();
         ProfilingResultsSupport profilingResultsSupport = new ProfilingResultsSupport();
-        masterViewSupport = new MasterViewSupport(application, profilingResultsSupport, cpuSettings, memorySettings, jdbcSettings, classSharingBreaksProfiling);
         
-        DataViewComponent dvc = new DataViewComponent(
-                masterViewSupport.getMasterView(),
-                new DataViewComponent.MasterViewConfiguration(false));
+        final DetailsView cpuSettingsView = cpuSettings.getDetailsView();
+        final DetailsView memorySettingsView = memorySettings.getDetailsView();
+        final DetailsView jdbcSettingsView = jdbcSettings.getDetailsView();
         
+        masterViewSupport = new MasterViewSupport(application, profilingResultsSupport, cpuSettings, memorySettings, jdbcSettings, classSharingBreaksProfiling) {
+            void showCPUSettings() {
+                if (dvc != null) {
+                    dvc.selectDetailsView(cpuSettingsView);
+                    dvc.showDetailsArea(DataViewComponent.TOP_RIGHT);
+                }
+            }
+            void showMemorySettings() {
+                if (dvc != null) {
+                    dvc.selectDetailsView(memorySettingsView);
+                    dvc.showDetailsArea(DataViewComponent.TOP_RIGHT);
+                }
+            }
+        };
+        
+        dvc = new DataViewComponent(masterViewSupport.getMasterView(), new DataViewComponent.MasterViewConfiguration(false));
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Profiling_results"), false), DataViewComponent.TOP_LEFT);   // NOI18N
         dvc.addDetailsView(profilingResultsSupport.getDetailsView(), DataViewComponent.TOP_LEFT);
         
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Settings"), true), DataViewComponent.TOP_RIGHT);   // NOI18N
-        dvc.addDetailsView(cpuSettings.getDetailsView(), DataViewComponent.TOP_RIGHT);
-        dvc.addDetailsView(memorySettings.getDetailsView(), DataViewComponent.TOP_RIGHT);
-        dvc.addDetailsView(jdbcSettings.getDetailsView(), DataViewComponent.TOP_RIGHT);
-        dvc.hideDetailsArea(DataViewComponent.TOP_RIGHT);
+        dvc.addDetailsView(cpuSettingsView, DataViewComponent.TOP_RIGHT);
+        dvc.addDetailsView(memorySettingsView, DataViewComponent.TOP_RIGHT);
+        dvc.addDetailsView(jdbcSettingsView, DataViewComponent.TOP_RIGHT);
+//        dvc.hideDetailsArea(DataViewComponent.TOP_RIGHT);
         
         return dvc;
     }
@@ -169,7 +186,7 @@ final class ApplicationProfilerView extends DataSourceView {
     
     // --- General data --------------------------------------------------------
     
-    private static class MasterViewSupport extends JPanel implements ProfilingStateListener, DataRemovedListener<Application>, ActionListener, PropertyChangeListener {
+    private static abstract class MasterViewSupport extends JPanel implements ProfilingStateListener, DataRemovedListener<Application>, ActionListener, PropertyChangeListener {
         
         private Application application;
         private ProfilingResultsSupport profilingResultsView;
@@ -213,6 +230,11 @@ final class ApplicationProfilerView extends DataSourceView {
             application.notifyWhenRemoved(this);
             application.addPropertyChangeListener(Stateful.PROPERTY_STATE, WeakListeners.propertyChange(this,application));
         }
+        
+        
+        abstract void showCPUSettings();
+        
+        abstract void showMemorySettings();
         
         
         public DataViewComponent.MasterView getMasterView() {
@@ -271,6 +293,7 @@ final class ApplicationProfilerView extends DataSourceView {
                 internalChange = true;
                 cpuButton.setSelected(false);
                 internalChange = false;
+                showCPUSettings();
                 ProfilerDialogs.displayError(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_Incorrect_CPU_settings")); // NOI18N
             } else {
                 cpuSettingsSupport.saveSettings();
@@ -297,19 +320,27 @@ final class ApplicationProfilerView extends DataSourceView {
             cpuButton.setSelected(false);
             jdbcButton.setSelected(false);
             internalChange = false;
-            memorySettingsSupport.saveSettings();
-            if (NetBeansProfiler.getDefaultNB().getProfilingState() == NetBeansProfiler.PROFILING_RUNNING) {
-              ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
-                public void run() {
-                    NetBeansProfiler.getDefaultNB().modifyCurrentProfiling(memorySettingsSupport.getSettings()); 
-                }
-              });
+            if (!memorySettingsSupport.settingsValid()) {
+                internalChange = true;
+                memoryButton.setSelected(false);
+                internalChange = false;
+                showMemorySettings();
+                ProfilerDialogs.displayError(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_Incorrect_Memory_settings")); // NOI18N
             } else {
-              disableControlButtons();
-              ProfilerSupport.getInstance().setProfiledApplication(application);
-              ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
-                public void run() { startProfiling(application, memorySettingsSupport.getSettings()); }
-              });
+              memorySettingsSupport.saveSettings();
+              if (NetBeansProfiler.getDefaultNB().getProfilingState() == NetBeansProfiler.PROFILING_RUNNING) {
+                ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+                  public void run() {
+                    NetBeansProfiler.getDefaultNB().modifyCurrentProfiling(memorySettingsSupport.getSettings()); 
+                  }
+                });
+              } else {
+                disableControlButtons();
+                ProfilerSupport.getInstance().setProfiledApplication(application);
+                ProfilerUtils.runInProfilerRequestProcessor(new Runnable() {
+                  public void run() { startProfiling(application, memorySettingsSupport.getSettings()); }
+                });
+              }
             }
           }
         }

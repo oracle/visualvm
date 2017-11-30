@@ -89,7 +89,7 @@ public abstract class ProfilerCPUPanel extends JPanel {
                                      CommonConstants.CPU_INSTR_FULL :
                                      CommonConstants.CPU_INSTR_SAMPLED);
         
-        String[] rootsValues = GenericFilter.values(getFlatValues(getRootsValues()));
+        String[] rootsValues = GenericFilter.values(PresetsUtils.normalizeValue(getRootsValue()));
         ClientUtils.SourceCodeSelection[] roots = (rootsValues.length == 1 && rootsValues[0].isEmpty()) ?
             new ClientUtils.SourceCodeSelection[0] :
             new ClientUtils.SourceCodeSelection[rootsValues.length];
@@ -97,32 +97,19 @@ public abstract class ProfilerCPUPanel extends JPanel {
             roots[i] = new ClientUtils.SourceCodeSelection(rootsValues[i], "*", null); // NOI18N
         settings.addRootMethods(roots);
         
-        String filter = filtersArea.getTextArea().getText();
+        String filter = getFilterValue();
         if (filter.isEmpty() || "*".equals(filter) || "**".equals(filter)) { // NOI18N
             settings.setInstrumentationFilter(new JavaTypeFilter());
         } else {
             int filterType = inclFilterRadioButton.isSelected() ?
                              JavaTypeFilter.TYPE_INCLUSIVE : JavaTypeFilter.TYPE_EXCLUSIVE;
-            String filterValue = getFlatValues(getFilterValues());
+            String filterValue = PresetsUtils.normalizeValue(filter);
             settings.setInstrumentationFilter(new JavaTypeFilter(filterValue, filterType));
         }
         
         settings.setStackDepthLimit(Integer.MAX_VALUE);
         
         return settings;
-    }
-    
-    private static String getFlatValues(String[] values) {
-        StringBuilder convertedValue = new StringBuilder();
-
-        for (int i = 0; i < values.length; i++) {
-            String filterValue = values[i].trim();
-            if ((i != (values.length - 1)) && !filterValue.endsWith(",")) // NOI18N
-                filterValue = filterValue + ","; // NOI18N
-            convertedValue.append(filterValue);
-        }
-
-        return convertedValue.toString();
     }
     
     
@@ -138,15 +125,18 @@ public abstract class ProfilerCPUPanel extends JPanel {
         exclFilterRadioButton.setSelected(preset.getFilterModeP());
         filtersArea.getTextArea().setText(preset.getFilterP());
         internalChange = false;
+        
+        checkRootValidity();
+        checkFilterValidity();
     }
     
     public void saveToPreset(ProfilerPreset preset) {
         if (preset == null) return;
         
-        preset.setRootsP(rootsArea.getTextArea().getText());
+        preset.setRootsP(getRootsValue());
 //        preset.setRunnablesP(runnablesCheckBox.isSelected());
         preset.setFilterModeP(exclFilterRadioButton.isSelected());
-        preset.setFilterP(filtersArea.getTextArea().getText());
+        preset.setFilterP(getFilterValue());
     }
     
     public abstract void settingsChanged();
@@ -165,33 +155,12 @@ public abstract class ProfilerCPUPanel extends JPanel {
     }
     
     public boolean isRootValueValid() {
-        // TODO
-        String roots = rootsArea.getTextArea().getText().trim();
-        if (roots.isEmpty() || roots.contains("<") || roots.contains(">")) return false; // NOI18N
-
-        return true;
+        String rootsValue = PresetsUtils.normalizeValue(getRootsValue());
+        return PresetsUtils.isValidJavaValue(rootsValue, false, false);
     }
     
-//    private String getRootValue() {
-//        StringBuilder convertedValue = new StringBuilder();
-//
-//        String[] rootValues = getRootsValues();
-//
-//        for (int i = 0; i < rootValues.length; i++) {
-//            String filterValue = rootValues[i].trim();
-//
-//            if ((i != (rootValues.length - 1)) && !filterValue.endsWith(",")) { // NOI18N
-//                filterValue = filterValue + ","; // NOI18N
-//            }
-//
-//            convertedValue.append(filterValue);
-//        }
-//
-//        return convertedValue.toString();
-//    }
-    
-    private String[] getRootsValues() {
-        return rootsArea.getTextArea().getText().split("\\n"); // NOI18N
+    private String getRootsValue() {
+        return rootsArea.getTextArea().getText().trim();
     }
     
     private void checkFilterValidity() {
@@ -202,35 +171,12 @@ public abstract class ProfilerCPUPanel extends JPanel {
     }
     
     public boolean isFilterValueValid() {
-// TODO 
-//        String[] filterParts = FilterUtils.getSeparateFilters(getFilterValue());
-
-//        for (int i = 0; i < filterParts.length; i++)
-//            if (!FilterUtils.isValidProfilerFilter(filterParts[i])) return false;
-
-        return true;
+        String filterValue = PresetsUtils.normalizeValue(getFilterValue());
+        return PresetsUtils.isValidJavaValue(filterValue, true, false);
     }
-    
-//    private String getFilterValue() {
-//        StringBuilder convertedValue = new StringBuilder();
-//
-//        String[] filterValues = getFilterValues();
-//
-//        for (int i = 0; i < filterValues.length; i++) {
-//            String filterValue = filterValues[i].trim();
-//
-//            if ((i != (filterValues.length - 1)) && !filterValue.endsWith(",")) { // NOI18N
-//                filterValue = filterValue + ", "; // NOI18N
-//            }
-//
-//            convertedValue.append(filterValue);
-//        }
-//
-//        return convertedValue.toString();
-//    }
 
-    private String[] getFilterValues() {
-        return filtersArea.getTextArea().getText().split("\\n"); // NOI18N
+    private String getFilterValue() {
+        return filtersArea.getTextArea().getText().trim();
     }
     
     
