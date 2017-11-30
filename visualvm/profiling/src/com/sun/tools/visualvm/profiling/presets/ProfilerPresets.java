@@ -265,11 +265,11 @@ public final class ProfilerPresets {
 
     private static String getDefaultFiltersP(String defaultRoots) {
         if (defaultRoots.isEmpty())
-            return !Utilities.isMac() ? "sun.*, sunw.*, com.sun.*" : // NOI18N
-                "sun.*, sunw.*, com.sun.*,\ncom.apple.*, apple.awt.*, apple.laf.*"; // NOI18N
+            return !Utilities.isMac() ? "sun.**, sunw.**, com.sun.**" : // NOI18N
+                "sun.**, sunw.**, com.sun.**,\ncom.apple.**, apple.awt.**, apple.laf.**"; // NOI18N
         else
-            return !Utilities.isMac() ? "java.*, javax.*,\nsun.*, sunw.*, com.sun.*" : // NOI18N
-                "java.*, javax.*,\nsun.*, sunw.*, com.sun.*,\ncom.apple.*, apple.awt.*, apple.laf.*"; // NOI18N
+            return !Utilities.isMac() ? "java.**, javax.**,\nsun.**, sunw.**, com.sun.**" : // NOI18N
+                "java.**, javax.**,\nsun.**, sunw.**, com.sun.**,\ncom.apple.**, apple.awt.**, apple.laf.**"; // NOI18N
     }
 
 
