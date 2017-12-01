@@ -52,12 +52,6 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
     
     static final String RUBY_LANG_ID = "org.truffleruby.language.RubyObjectType"; // NOI18N
     
-    
-    static String getDisplayType(String type) {
-        return type.endsWith("Type") ? type.substring(0, type.length() - 4) : type;
-    }
-    
-
     public static HeapViewerNode[] getAllObjects(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
         final RubyHeapFragment fragment = (RubyHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
@@ -68,7 +62,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                     return !DataType.COUNT.equals(dataType);
                 }
                 protected HeapViewerNode createNode(DynamicObject dobject) {
-                    return new RubyNodes.RubyDynamicObjectNode(dobject, getDisplayType(dobject.getType(heap)));
+                    return new RubyNodes.RubyDynamicObjectNode(dobject, dobject.getType(heap));
                 }
                 protected ProgressIterator<DynamicObject> objectsIterator(int index, Progress progress) {
                     Iterator<DynamicObject> dobjects = fragment.getRubyObjectsIterator();
@@ -96,7 +90,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
             while (instances.hasNext()) {
                 Instance instance = instances.next();
                 progress.step();
-                String type = getDisplayType(DynamicObject.getType(instance, heap));
+                String type = DynamicObject.getType(instance, heap);
                 RubyNodes.RubyDynamicObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
@@ -144,7 +138,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                 }
                 protected HeapViewerNode createNode(Instance instance) {
                     DynamicObject dobject = new DynamicObject(instance);
-                    return new RubyNodes.RubyDynamicObjectNode(dobject, getDisplayType(dobject.getType(heap)));
+                    return new RubyNodes.RubyDynamicObjectNode(dobject, dobject.getType(heap));
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
                     Iterator<Instance> dominatorsIt = dominators.listIterator(index);
@@ -171,7 +165,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
             
             for (Instance dominator : dominators) {
                 progress.step();
-                String type = getDisplayType(DynamicObject.getType(dominator, heap));
+                String type = DynamicObject.getType(dominator, heap);
                 RubyNodes.RubyDynamicObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
@@ -214,7 +208,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                 }
                 protected HeapViewerNode createNode(Instance instance) {
                     DynamicObject dobject = new DynamicObject(instance);
-                    return new RubyNodes.RubyDynamicObjectNode(dobject, getDisplayType(dobject.getType(heap)));
+                    return new RubyNodes.RubyDynamicObjectNode(dobject, dobject.getType(heap));
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
                     Iterator<Instance> gcRootsIt = gcRoots.listIterator(index);
@@ -244,7 +238,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                 progress.step();
                 if (!instance.isGCRoot()) continue;
                 
-                String type = getDisplayType(DynamicObject.getType(instance, heap));
+                String type = DynamicObject.getType(instance, heap);
                 RubyNodes.RubyDynamicObjectsContainer typeNode = types.get(type);
                 
                 if (typeNode == null) {

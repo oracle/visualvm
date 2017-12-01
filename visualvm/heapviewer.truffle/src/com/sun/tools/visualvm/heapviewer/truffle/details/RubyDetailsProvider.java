@@ -24,11 +24,13 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.details;
 
+import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.List;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
@@ -51,11 +53,13 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
     private static final String ROPE_TABLE_KEY_MASK = "org.truffleruby.core.rope.RopeTable$Key"; // NOI18N
     private static final String ENCODING_MASK = "org.jcodings.Encoding+";   // NOI18N
     private static final String MODULE_FIELDS_MASK = "org.truffleruby.core.module.ModuleFields"; // NOI18N
+    private static final String BASIC_LAYOUT_MASK= "org.truffleruby.core.basicobject.BasicObjectLayoutImpl$BasicObjectType+"; // NI18N
 
     public RubyDetailsProvider() {
         super(RUBY_OBJECT_TYPE_MASK,ASCII_ROPE_MASK,CONCAT_ROPE_MASK,SUB_ROPE_MASK,
                 ROPE_TABLE_KEY_MASK,INVALID_ROPE_MASK,VALID_ROPE_MASK,
-                INT_ROPE_MASK, ENCODING_MASK, MODULE_FIELDS_MASK);
+                INT_ROPE_MASK, ENCODING_MASK, MODULE_FIELDS_MASK,
+                BASIC_LAYOUT_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -132,6 +136,15 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
         }
         if (MODULE_FIELDS_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "name", heap);
+        }
+        if (BASIC_LAYOUT_MASK.equals(className)) {
+            Instance logicalClassInst = (Instance) instance.getValueOfField("logicalClass");
+            if (DynamicObject.isDynamicObject(logicalClassInst)) {
+                DynamicObject logicalClass = new DynamicObject(logicalClassInst);
+                ObjectFieldValue fields = (ObjectFieldValue) logicalClass.getFieldValue("fields (hidden)");
+
+                return DetailsUtils.getInstanceString(fields.getInstance(), heap);
+            }
         }
         return null;
     }
