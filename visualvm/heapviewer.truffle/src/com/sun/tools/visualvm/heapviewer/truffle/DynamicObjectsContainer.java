@@ -49,7 +49,7 @@ public class DynamicObjectsContainer extends ContainerNode<Instance> {
     }
     
     
-    protected int getCount(DynamicObject item, Heap heap) {
+    protected int getCount(Instance item, Heap heap) {
         return 1;
     }
 
