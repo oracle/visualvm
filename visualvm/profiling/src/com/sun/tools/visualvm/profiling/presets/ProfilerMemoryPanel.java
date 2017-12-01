@@ -116,6 +116,7 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         lifecycleCheckbox.setSelected(preset.getMemoryModeP());
         outgoingCheckbox.setSelected(preset.getStacksP());
         outgoingSpinner.setValue(preset.getAllocP());
+        highlighInvalid();
         internalChange = false;
         
         checkRootValidity();

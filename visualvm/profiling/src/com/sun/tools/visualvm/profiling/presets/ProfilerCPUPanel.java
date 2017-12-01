@@ -128,6 +128,7 @@ public abstract class ProfilerCPUPanel extends JPanel {
         inclFilterRadioButton.setSelected(!preset.getFilterModeP());
         exclFilterRadioButton.setSelected(preset.getFilterModeP());
         filtersArea.getTextArea().setText(preset.getFilterP());
+        highlighInvalid();
         internalChange = false;
         
         checkRootValidity();
