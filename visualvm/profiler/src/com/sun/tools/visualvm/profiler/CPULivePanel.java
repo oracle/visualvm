@@ -47,7 +47,6 @@ import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -56,9 +55,6 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-//    "MethodsFeatureUI_viewHotSpots=Hot spots",
-//    "MethodsFeatureUI_viewCallTree=Call tree",
-//    "MethodsFeatureUI_viewCombined=Combined",
     "MethodsFeatureUI_selectedMethods=Selected methods",
     "MethodsFeatureUI_liveResults=Results:",
     "MethodsFeatureUI_pauseResults=Pause live results",
@@ -92,28 +88,10 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
     }
     
     
+    // -------------------------------------------------------------------------
     
-    // --- API implementation --------------------------------------------------
-    
-    boolean hasResultsUI() {
-        return cpuView != null;
-    }
-    
-    void sessionStateChanged(int sessionState) {
-        refreshToolbar(sessionState);
-    }
-    
-    
-    void resetPause() {
-        if (lrPauseButton != null) lrPauseButton.setSelected(false);
-    }
-    
-    void setForceRefresh() {
-        if (updater != null) updater.setForceRefresh(true);
-    }
-    
-    void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
-        if (updater != null) updater.update();
+    void refreshResults() {
+        refreshResults(false);
     }
     
     void resetResults() {
@@ -127,25 +105,44 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
         }
     }
     
-    
-    void cleanup() {
-        if (updater != null) updater.cleanup();
-        
-        if (resetter != null) {
-            resetter.unregisterView(this);
-            resetter = null;
-        }
+    void sessionStateChanged(int sessionState) {
+        refreshToolbar(sessionState);
     }
+    
     
     // -------------------------------------------------------------------------
     
+    private void refreshResults(final boolean forceRefresh) {
+        RESULTS_PROCESSOR.post(new Runnable() {
+            public void run() {
+                try {
+                    if (updater != null) {
+                        if (forceRefresh) updater.setForceRefresh(true);
+                        updater.update();
+                    }
+//                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                } catch (Throwable t) {
+                    if (updater != null) {
+                        updater.cleanup();
+                        updater = null;
+                    }
+
+                    if (resetter != null) {
+                        resetter.unregisterView(CPULivePanel.this);
+                        resetter = null;
+                    }
+                }
+            }
+        });
+    }
     
+    
+    // -------------------------------------------------------------------------
     
     private JLabel lrLabel;
     private JToggleButton lrPauseButton;
     private JButton lrRefreshButton;
     private JToggleButton lrDeltasButton;
-//    private ActionPopupButton lrView;
     
     private JLabel pdLabel;
     private JButton pdSnapshotButton;
@@ -221,27 +218,16 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
         lrPauseButton = new JToggleButton(Icons.getIcon(GeneralIcons.PAUSE)) {
             protected void fireItemStateChanged(ItemEvent event) {
                 boolean paused = isSelected();
-                updater.setPaused(paused);
+                if (updater != null) updater.setPaused(paused);
                 lrRefreshButton.setEnabled(paused);
-                if (!paused) try {
-                    updater.setForceRefresh(true);
-                    updater.update();
-                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    cleanup();
-                }
-//////                refreshToolbar(getSessionState());
+                if (!paused) refreshResults(true);
             }
         };
         lrPauseButton.setToolTipText(Bundle.MethodsFeatureUI_pauseResults());
         
         lrRefreshButton = new JButton(Icons.getIcon(GeneralIcons.UPDATE_NOW)) {
             protected void fireActionPerformed(ActionEvent e) {
-                try {
-                    updater.setForceRefresh(true);
-                    updater.update();
-                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    cleanup();
-                }
+                refreshResults(true);
             }
         };
         lrRefreshButton.setToolTipText(Bundle.MethodsFeatureUI_updateResults());
@@ -264,12 +250,7 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 cpuView.setView(isSelected(), toggles[1].isSelected(), toggles[2].isSelected());
-                try {
-                    updater.setForceRefresh(true);
-                    updater.update();
-                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    cleanup();
-                }
+                refreshResults(true);
             }
         };
         forwardCalls.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
@@ -277,19 +258,13 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
         forwardCalls.setToolTipText(Bundle.MethodsFeatureUI_viewForward());
         group.add(forwardCalls);
         toggles[0] = forwardCalls;
-//        toolbar.add(forwardCalls);
         forwardCalls.setSelected(true);
         
         JToggleButton hotSpots = new JToggleButton(Icons.getIcon(ProfilerIcons.TAB_HOTSPOTS)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 cpuView.setView(toggles[0].isSelected(), isSelected(), toggles[2].isSelected());
-                try {
-                    updater.setForceRefresh(true);
-                    updater.update();
-                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    cleanup();
-                }
+                refreshResults(true);
             }
         };
         hotSpots.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
@@ -297,19 +272,13 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
         hotSpots.setToolTipText(Bundle.MethodsFeatureUI_viewHotSpots());
         group.add(hotSpots);
         toggles[1] = hotSpots;
-//        toolbar.add(hotSpots);
         hotSpots.setSelected(false);
         
         JToggleButton reverseCalls = new JToggleButton(Icons.getIcon(ProfilerIcons.NODE_REVERSE)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 cpuView.setView(toggles[0].isSelected(), toggles[1].isSelected(), isSelected());
-                try {
-                    updater.setForceRefresh(true);
-                    updater.update();
-                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    cleanup();
-                }
+                refreshResults(true);
             }
         };
         reverseCalls.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
@@ -317,26 +286,7 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
         reverseCalls.setToolTipText(Bundle.MethodsFeatureUI_viewReverse());
         group.add(reverseCalls);
         toggles[2] = reverseCalls;
-//        toolbar.add(reverseCalls);
         reverseCalls.setSelected(false);
-        
-//        Action aCallTree = new AbstractAction() {
-//            { putValue(NAME, Bundle.MethodsFeatureUI_viewCallTree()); }
-//            public void actionPerformed(ActionEvent e) { setView(View.CALL_TREE); }
-//            
-//        };
-//        Action aHotSpots = new AbstractAction() {
-//            { putValue(NAME, Bundle.MethodsFeatureUI_viewHotSpots()); }
-//            public void actionPerformed(ActionEvent e) { setView(View.HOT_SPOTS); }
-//            
-//        };
-//        Action aCombined = new AbstractAction() {
-//            { putValue(NAME, Bundle.MethodsFeatureUI_viewCombined()); }
-//            public void actionPerformed(ActionEvent e) { setView(View.COMBINED); }
-//            
-//        };
-//        lrView = new ActionPopupButton(aCallTree, aHotSpots, aCombined);
-//        lrView.setToolTipText(Bundle.MethodsFeatureUI_resultsMode());
 
         pdLabel = new GrayLabel(Bundle.MethodsFeatureUI_profilingData());
 
@@ -385,38 +335,17 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
         toolbar.add(pdResetResultsButton);
         
         
-        // --- Sync UI ---------------------------------------------------------
-        
-//        setView(View.HOT_SPOTS);
         cpuView.setView(true, false, false);
-//////        sessionStateChanged(getSessionState());
         
     }
     
     private void refreshToolbar(final int state) {
         if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-//                boolean running = isRunning(state);
                 boolean running = state == Profiler.PROFILING_RUNNING;
                 lrPauseButton.setEnabled(running);
                 lrRefreshButton.setEnabled(!popupPause && running && lrPauseButton.isSelected());
                 lrDeltasButton.setEnabled(running);
-            }
-        });
-    }
-    
-    
-    void refreshResults() {
-        RESULTS_PROCESSOR.post(new Runnable() {
-            public void run() {
-                try {
-                    refreshData();
-                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    cleanup();
-                } catch (Throwable t) {
-                    Exceptions.printStackTrace(t);
-                    cleanup();
-                }
             }
         });
     }

@@ -91,7 +91,7 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         settings.setProfilingType(lifecycleCheckbox.isSelected() ? ProfilingSettings.PROFILE_MEMORY_LIVENESS :
                                                                 ProfilingSettings.PROFILE_MEMORY_ALLOCATIONS);
         
-        String filterValue = getFlatValues(getFilterValues());
+        String filterValue = PresetsUtils.normalizeValue(getFilterValue());
         settings.setInstrumentationFilter(new JavaTypeFilter(filterValue, JavaTypeFilter.TYPE_INCLUSIVE));
         
         boolean limitAlloc = outgoingCheckbox.isSelected();
@@ -99,19 +99,6 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         settings.setAllocStackTraceLimit(!limitAlloc ? -10 : limit);
         
         return settings;
-    }
-    
-    private static String getFlatValues(String[] values) {
-        StringBuilder convertedValue = new StringBuilder();
-
-        for (int i = 0; i < values.length; i++) {
-            String filterValue = values[i].trim();
-            if ((i != (values.length - 1)) && !filterValue.endsWith(",")) // NOI18N
-                filterValue = filterValue + ","; // NOI18N
-            convertedValue.append(filterValue);
-        }
-
-        return convertedValue.toString();
     }
     
     
@@ -127,13 +114,15 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         outgoingSpinner.setValue(preset.getAllocP());
         internalChange = false;
         
+        checkRootValidity();
+        
         updateAllocControls();
     }
     
     public void saveToPreset(ProfilerPreset preset) {
         if (preset == null) return;
         
-        preset.setMemoryFilterP(filtersArea.getTextArea().getText().trim());
+        preset.setMemoryFilterP(getFilterValue());
         preset.setMemoryModeP(lifecycleCheckbox.isSelected());
         preset.setStacksP(outgoingCheckbox.isSelected());
         preset.setAllocP((Integer)outgoingSpinner.getValue());
@@ -162,22 +151,12 @@ public abstract class ProfilerMemoryPanel extends JPanel {
     }
     
     public boolean isRootValueValid() {
-// TODO 
-//        String[] rootParts = FilterUtils.getSeparateFilters(getRootValue());
-//
-//        for (int i = 0; i < rootParts.length; i++)
-//            if (!FilterUtils.isValidProfilerFilter(rootParts[i]))
-//                if (rootParts[i].endsWith("**")) { // NOI18N
-//                    if (!FilterUtils.isValidProfilerFilter(rootParts[i].substring(0, rootParts[i].length() - 1))) return false;
-//                } else {
-//                    return false;
-//                }
-
-        return true;
+        String filterValue = PresetsUtils.normalizeValue(getFilterValue());
+        return PresetsUtils.isValidJavaValue(filterValue, false, true);
     }
     
-    private String[] getFilterValues() {
-        return filtersArea.getTextArea().getText().split("\\n"); // NOI18N
+    private String getFilterValue() {
+        return filtersArea.getTextArea().getText().trim();
     }
     
     
@@ -213,7 +192,7 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         
         filtersArea = createTextArea(2);
         filtersLabel.setLabelFor(filtersArea.getTextArea());
-        filtersArea.getTextArea().setToolTipText("<html>Define the classes to be profiled:<br><br><code>&nbsp;org.mypackage.**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package and subpackages<br><code>&nbsp;org.mypackage.*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package<br><code>&nbsp;org.mypackage.MyClass&nbsp;&nbsp;</code>single class<br><br>Special cases:<br><br><code>&nbsp;char[]&nbsp;&nbsp;</code>primitive array<br><code>&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes<br><code>&nbsp;[]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>(on a separate line) include arrays matching the filter<br></html>");
+        filtersArea.getTextArea().setToolTipText("<html>Profile these classes:<br><br><code>&nbsp;org.mypackage.**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package and subpackages<br><code>&nbsp;org.mypackage.*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package<br><code>&nbsp;org.mypackage.MyClass&nbsp;&nbsp;</code>single class<br><br>Special cases:<br><br><code>&nbsp;char[]&nbsp;&nbsp;</code>primitive array<br><code>&nbsp;*&nbsp;or&nbsp;**&nbsp;</code>all classes<br><code>&nbsp;[]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>(on a separate line) include arrays matching the filter<br></html>");
         filtersArea.getTextArea().getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { checkRootValidity(); syncUI(); }
             public void removeUpdate(DocumentEvent e) { checkRootValidity(); syncUI(); }

@@ -42,12 +42,12 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.openide.awt.CloseButtonFactory;
 import org.openide.util.NbBundle;
 
 /**
@@ -452,8 +452,9 @@ class DisplayArea extends JComponent {
             setOpaque(true);
             setBackground(DisplayAreaSupport.BACKGROUND_COLOR_NORMAL);
 
-            ImageIcon closeIcon = new ImageIcon(DisplayArea.class.getResource("/com/sun/tools/visualvm/core/ui/resources/closePanel.png")); // NOI18N
-            closeButton = new DisplayAreaSupport.ImageIconButton(closeIcon);
+//            ImageIcon closeIcon = new ImageIcon(DisplayArea.class.getResource("/com/sun/tools/visualvm/core/ui/resources/closePanel.png")); // NOI18N
+//            closeButton = new DisplayAreaSupport.ImageIconButton(closeIcon);
+            closeButton = CloseButtonFactory.createBigCloseButton();
             closeButton.setToolTipText(NbBundle.getMessage(DisplayArea.class, "ToolTip_Hide")); // NOI18N
             closeButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) { getParent().getParent().setVisible(false); }

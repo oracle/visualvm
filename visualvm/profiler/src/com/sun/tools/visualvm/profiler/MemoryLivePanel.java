@@ -46,7 +46,6 @@ import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -82,28 +81,10 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
     }
     
     
+    // -------------------------------------------------------------------------
     
-    // --- API implementation --------------------------------------------------
-    
-    boolean hasResultsUI() {
-        return memoryView != null;
-    }
-    
-    void sessionStateChanged(int sessionState) {
-        refreshToolbar(sessionState);
-    }
-    
-    
-    void resetPause() {
-        if (lrPauseButton != null) lrPauseButton.setSelected(false);
-    }
-    
-    void setForceRefresh() {
-        if (updater != null) updater.setForceRefresh(true);
-    }
-    
-    void refreshData() throws ClientUtils.TargetAppOrVMTerminated {
-        if (updater != null) updater.update();
+    void refreshResults() {
+        refreshResults(false);
     }
     
     void resetResults() {
@@ -117,21 +98,39 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
         }
     }
     
-    
-    void cleanup() {
-        if (updater != null) updater.cleanup();
-        
-        if (resetter != null) {
-            resetter.unregisterView(this);
-            resetter = null;
-        }
+    void sessionStateChanged(int sessionState) {
+        refreshToolbar(sessionState);
     }
+    
     
     // -------------------------------------------------------------------------
     
+    private void refreshResults(final boolean forceRefresh) {
+        RESULTS_PROCESSOR.post(new Runnable() {
+            public void run() {
+                try {
+                    if (updater != null) {
+                        if (forceRefresh) updater.setForceRefresh(true);
+                        updater.update();
+                    }
+//                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
+                } catch (Throwable t) {
+                    if (updater != null) {
+                        updater.cleanup();
+                        updater = null;
+                    }
+
+                    if (resetter != null) {
+                        resetter.unregisterView(MemoryLivePanel.this);
+                        resetter = null;
+                    }
+                }
+            }
+        });
+    }
     
     
-    // --- UI ------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     
     private JLabel lrLabel;
     private JToggleButton lrPauseButton;
@@ -196,26 +195,14 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
                 boolean paused = isSelected();
                 updater.setPaused(paused);
                 lrRefreshButton.setEnabled(paused);
-                if (!paused) try {
-                    updater.setForceRefresh(true);
-                    updater.update();
-                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    cleanup();
-                }
-//                refreshToolbar(getSessionState());
+                if (!paused) refreshResults(true);
             }
         };
         lrPauseButton.setToolTipText(Bundle.ObjectsFeatureUI_pauseResults());
 
         lrRefreshButton = new JButton(Icons.getIcon(GeneralIcons.UPDATE_NOW)) {
             protected void fireActionPerformed(ActionEvent e) {
-                updater.setForceRefresh(true);
-                try {
-                    updater.setForceRefresh(true);
-                    updater.update();
-                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    cleanup();
-                }
+                refreshResults(true);
             }
         };
         lrRefreshButton.setToolTipText(Bundle.ObjectsFeatureUI_updateResults());
@@ -263,37 +250,15 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
         toolbar.addSpace(3);
         toolbar.add(pdResetResultsButton);
         
-        
-        // --- Sync UI ---------------------------------------------------------
-        
-//        sessionStateChanged(getSessionState());
-        
     }
     
     private void refreshToolbar(final int state) {
         if (toolbar != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-//                boolean running = isRunning(state);
                 boolean running = state == Profiler.PROFILING_RUNNING;
                 lrPauseButton.setEnabled(running);
                 lrRefreshButton.setEnabled(!popupPause && running && lrPauseButton.isSelected());
                 lrDeltasButton.setEnabled(running);
-            }
-        });
-    }
-    
-    
-    void refreshResults() {
-        RESULTS_PROCESSOR.post(new Runnable() {
-            public void run() {
-                try {
-                    refreshData();
-                } catch (ClientUtils.TargetAppOrVMTerminated ex) {
-                    cleanup();
-                } catch (Throwable t) {
-                    Exceptions.printStackTrace(t);
-                    cleanup();
-                }
             }
         });
     }

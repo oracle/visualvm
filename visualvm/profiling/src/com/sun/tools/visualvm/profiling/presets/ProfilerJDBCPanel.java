@@ -33,7 +33,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -93,7 +92,7 @@ public abstract class ProfilerJDBCPanel extends JPanel {
         }
         settings.addRootMethods(roots);
 
-        String filter = filterArea.getTextArea().getText();
+        String filter = PresetsUtils.normalizeValue(getFilterValue());
         settings.setInstrumentationFilter(new TextFilter(filter, TextFilter.TYPE_INCLUSIVE, false));
         
         return settings;
@@ -112,7 +111,7 @@ public abstract class ProfilerJDBCPanel extends JPanel {
     
     public void saveToPreset(ProfilerPreset preset) {
         if (preset == null) return;
-        preset.setJDBCFilterP(filterArea.getTextArea().getText().trim());
+        preset.setJDBCFilterP(getFilterValue());
     }
     
     public abstract void settingsChanged();
@@ -120,6 +119,11 @@ public abstract class ProfilerJDBCPanel extends JPanel {
     private void syncUI() {
         if (internalChange) return;
         settingsChanged();
+    }
+    
+    
+    private String getFilterValue() {
+        return filterArea.getTextArea().getText().trim();
     }
     
     

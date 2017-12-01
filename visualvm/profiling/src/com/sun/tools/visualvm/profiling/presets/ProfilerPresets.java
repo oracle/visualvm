@@ -207,6 +207,7 @@ public final class ProfilerPresets {
         defaultPreset.setFilterS(getDefaultFiltersS());
         defaultPreset.setRootsP(getDefaultRootsP(application));
         defaultPreset.setFilterP(getDefaultFiltersP(defaultPreset.getRootsP()));
+        defaultPreset.setMemoryFilterP(getDefaultMemoryFilterP(application));
         return defaultPreset;
     }
 
@@ -270,6 +271,10 @@ public final class ProfilerPresets {
         else
             return !Utilities.isMac() ? "java.**, javax.**,\nsun.**, sunw.**, com.sun.**" : // NOI18N
                 "java.**, javax.**,\nsun.**, sunw.**, com.sun.**,\ncom.apple.**, apple.awt.**, apple.laf.**"; // NOI18N
+    }
+    
+    private static String getDefaultMemoryFilterP(Application application) {
+        return NbBundle.getMessage(ProfilerPresets.class, "HINT_Define_roots"); // NOI18N
     }
 
 
