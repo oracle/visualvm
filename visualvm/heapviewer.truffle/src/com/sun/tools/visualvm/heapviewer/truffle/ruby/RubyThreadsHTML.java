@@ -61,8 +61,7 @@ class RubyThreadsHTML {
             Instance instance = HeapUtils.instanceFromHtml(urls, heap);
             if (DynamicObject.isDynamicObject(instance)) {
                 DynamicObject dobject = new DynamicObject(instance);
-                String type = RubyObjectsProvider.getDisplayType(dobject.getType(heap));
-                return new RubyNodes.RubyDynamicObjectNode(dobject, type);
+                return new RubyNodes.RubyDynamicObjectNode(dobject, dobject.getType(heap));
             } else if (instance != null) {
                 return new InstanceNode(instance);
             } else {
@@ -136,7 +135,7 @@ class RubyThreadsHTML {
         if (DynamicObject.isDynamicObject(in)) {
             DynamicObject dobj = new DynamicObject(in);
             String instanceString = HeapUtils.instanceToHtml(in, false, h, jc);
-            String type = RubyObjectsProvider.getDisplayType(dobj.getType(h));
+            String type = dobj.getType(h);
             instanceString = instanceString.replace(">" + in.getJavaClass().getName() + "#", ">" + type + "#");
             String logValue = RubyNodes.getLogicalValue(dobj, type, h);
             if (logValue != null) instanceString += " <span style=\"color: #666666\">: " + logValue + "</span>";

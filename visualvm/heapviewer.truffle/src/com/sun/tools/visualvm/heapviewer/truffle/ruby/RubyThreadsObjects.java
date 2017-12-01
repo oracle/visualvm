@@ -92,8 +92,7 @@ class RubyThreadsObjects {
                             localObjects.add(new LocalObjectNode(instance));
                         } else {
                             DynamicObject dobject = new DynamicObject(instance);
-                            String type = RubyObjectsProvider.getDisplayType(dobject.getType(heap));
-                            localObjects.add(new RubyNodes.RubyLocalDynamicObjectNode(dobject, type));
+                            localObjects.add(new RubyNodes.RubyLocalDynamicObjectNode(dobject, dobject.getType(heap)));
                         }
 
                     }

@@ -151,8 +151,7 @@ public class RubyFieldsProvider extends HeapViewerNode.Provider {
             Instance instance = ((ObjectFieldValue)field).getInstance();
             if (DynamicObject.isDynamicObject(instance)) {
                 DynamicObject dobject = new DynamicObject(instance);
-                String type = RubyObjectsProvider.getDisplayType(dobject.getType(heap));
-                return new RubyNodes.RubyDynamicObjectFieldNode(dobject, type, field);
+                return new RubyNodes.RubyDynamicObjectFieldNode(dobject, dobject.getType(heap), field);
             } else {
                 return new TerminalJavaNodes.Field((ObjectFieldValue)field, false);
             }
