@@ -54,7 +54,7 @@ class PythonObjectsContainer extends ContainerNode<Instance> {
     }
 
     protected long getOwnSize(Instance instance, Heap heap) {
-        return instance.getSize();
+        return new PythonObject(instance).getSize();
     }
 
     protected long getRetainedSize(Instance instance, Heap heap) {
