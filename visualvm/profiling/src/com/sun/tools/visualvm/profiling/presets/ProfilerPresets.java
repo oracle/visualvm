@@ -70,6 +70,8 @@ public final class ProfilerPresets {
     private ProfilerPreset presetToCreate;
 
     private final Set<WeakReference<PresetSelector>> selectors;
+    
+    static final String DEFINE_CLASSES = NbBundle.getMessage(ProfilerPresets.class, "HINT_Define_roots"); // NOI18N
 
 
     public static synchronized ProfilerPresets getInstance() {
@@ -253,12 +255,9 @@ public final class ProfilerPresets {
     }
 
     private static String getDefaultRootsP(Application application) {
-        if (application == null) return NbBundle.getMessage(
-                ProfilerPresets.class, "HINT_Define_roots"); // NOI18N
+        if (application == null) return DEFINE_CLASSES;
         String mainClass = getMainClass(application);
-        if ("".equals(mainClass)) { // unknown main class
-            return NbBundle.getMessage(ProfilerPresets.class, "HINT_Define_roots"); // NOI18N
-        }
+        if ("".equals(mainClass)) return DEFINE_CLASSES; // unknown main class
         int dotIndex = mainClass.lastIndexOf("."); // NOI18N
         if (dotIndex == -1) return mainClass;  // default package
         else return mainClass.substring(0, dotIndex + 1) + "**"; // NOI18N
@@ -274,7 +273,7 @@ public final class ProfilerPresets {
     }
     
     private static String getDefaultMemoryFilterP(Application application) {
-        return NbBundle.getMessage(ProfilerPresets.class, "HINT_Define_roots"); // NOI18N
+        return DEFINE_CLASSES; // NOI18N
     }
 
 

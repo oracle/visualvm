@@ -47,11 +47,16 @@ public abstract class CPUSettingsSupport {
     private ProfilerCPUPanel panel;
     private PresetSelector selector;
     
+    private DataViewComponent.DetailsView detailsView;
+    
     
     DataViewComponent.DetailsView getDetailsView() {
-        return new DataViewComponent.DetailsView(NbBundle.getMessage(
-                CPUSettingsSupport.class, "LBL_Cpu_settings"), null, 10, // NOI18N
-                new ScrollableContainer(getComponent()), null);
+        if (detailsView == null) {
+            detailsView = new DataViewComponent.DetailsView(NbBundle.getMessage(
+                          CPUSettingsSupport.class, "LBL_Cpu_settings"), null, 10, // NOI18N
+                          new ScrollableContainer(getComponent()), null);
+        }
+        return detailsView;
     }
     
     public JComponent getComponent() {
@@ -74,6 +79,11 @@ public abstract class CPUSettingsSupport {
     public abstract boolean presetValid();
     
     public boolean settingsValid() { return panel.settingsValid(); }
+    
+    public void highlightInvalidSettings(DataViewComponent dvc) {
+        panel.highlighInvalid();
+        dvc.selectDetailsView(getDetailsView());
+    }
     
     public abstract PresetSelector createSelector(Runnable presetSynchronizer);
     

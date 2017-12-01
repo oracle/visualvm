@@ -115,6 +115,10 @@ public abstract class ProfilerCPUPanel extends JPanel {
     
     public boolean settingsValid() { return rootsValid && filtersValid; }
     
+    public void highlighInvalid() {
+        if (getRootsValue().isEmpty()) rootsArea.getTextArea().setText(ProfilerPresets.DEFINE_CLASSES);
+    }
+    
     public void loadFromPreset(ProfilerPreset preset) {
         if (preset == null) return;
 
