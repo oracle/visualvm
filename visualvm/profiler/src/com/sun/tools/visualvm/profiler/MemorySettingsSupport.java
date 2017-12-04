@@ -47,11 +47,16 @@ public abstract class MemorySettingsSupport {
     private ProfilerMemoryPanel panel;
     private PresetSelector selector;
     
+    private DataViewComponent.DetailsView detailsView;
+    
     
     DataViewComponent.DetailsView getDetailsView() {
-        return new DataViewComponent.DetailsView(NbBundle.getMessage(
-                MemorySettingsSupport.class, "LBL_Memory_settings"), null, 20, // NOI18N
-                new ScrollableContainer(getComponent()), null);
+        if (detailsView == null) {
+            detailsView = new DataViewComponent.DetailsView(NbBundle.getMessage(
+                          MemorySettingsSupport.class, "LBL_Memory_settings"), null, 20, // NOI18N
+                          new ScrollableContainer(getComponent()), null);
+        }
+        return detailsView;
     }
     
     public JComponent getComponent() {
@@ -74,6 +79,11 @@ public abstract class MemorySettingsSupport {
     public abstract boolean presetValid();
     
     public boolean settingsValid() { return panel.settingsValid(); }
+    
+    public void highlightInvalidSettings(DataViewComponent dvc) {
+        panel.highlighInvalid();
+        dvc.selectDetailsView(getDetailsView());
+    }
     
     public abstract PresetSelector createSelector(Runnable presetSynchronizer);
     

@@ -31,7 +31,6 @@ import com.sun.tools.visualvm.core.datasupport.Stateful;
 import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
-import com.sun.tools.visualvm.core.ui.components.DataViewComponent.DetailsView;
 import com.sun.tools.visualvm.profiling.presets.PresetSelector;
 import com.sun.tools.visualvm.profiling.presets.ProfilerPresets;
 import com.sun.tools.visualvm.uisupport.HTMLLabel;
@@ -143,20 +142,16 @@ final class ApplicationProfilerView extends DataSourceView {
         Application application = (Application)getDataSource();
         ProfilingResultsSupport profilingResultsSupport = new ProfilingResultsSupport();
         
-        final DetailsView cpuSettingsView = cpuSettings.getDetailsView();
-        final DetailsView memorySettingsView = memorySettings.getDetailsView();
-        final DetailsView jdbcSettingsView = jdbcSettings.getDetailsView();
-        
         masterViewSupport = new MasterViewSupport(application, profilingResultsSupport, cpuSettings, memorySettings, jdbcSettings, classSharingBreaksProfiling) {
             void showCPUSettings() {
                 if (dvc != null) {
-                    dvc.selectDetailsView(cpuSettingsView);
+                    cpuSettings.highlightInvalidSettings(dvc);
                     dvc.showDetailsArea(DataViewComponent.TOP_RIGHT);
                 }
             }
             void showMemorySettings() {
                 if (dvc != null) {
-                    dvc.selectDetailsView(memorySettingsView);
+                    memorySettings.highlightInvalidSettings(dvc);
                     dvc.showDetailsArea(DataViewComponent.TOP_RIGHT);
                 }
             }
@@ -167,9 +162,9 @@ final class ApplicationProfilerView extends DataSourceView {
         dvc.addDetailsView(profilingResultsSupport.getDetailsView(), DataViewComponent.TOP_LEFT);
         
         dvc.configureDetailsArea(new DataViewComponent.DetailsAreaConfiguration(NbBundle.getMessage(ApplicationProfilerView.class, "LBL_Settings"), true), DataViewComponent.TOP_RIGHT);   // NOI18N
-        dvc.addDetailsView(cpuSettingsView, DataViewComponent.TOP_RIGHT);
-        dvc.addDetailsView(memorySettingsView, DataViewComponent.TOP_RIGHT);
-        dvc.addDetailsView(jdbcSettingsView, DataViewComponent.TOP_RIGHT);
+        dvc.addDetailsView(cpuSettings.getDetailsView(), DataViewComponent.TOP_RIGHT);
+        dvc.addDetailsView(memorySettings.getDetailsView(), DataViewComponent.TOP_RIGHT);
+        dvc.addDetailsView(jdbcSettings.getDetailsView(), DataViewComponent.TOP_RIGHT);
 //        dvc.hideDetailsArea(DataViewComponent.TOP_RIGHT);
         
         return dvc;
