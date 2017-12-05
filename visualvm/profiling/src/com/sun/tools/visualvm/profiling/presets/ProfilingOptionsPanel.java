@@ -538,17 +538,17 @@ final class ProfilingOptionsPanel extends JPanel {
     }
 
     boolean valid() {
-        return nameValid && presetsValid();
+        return nameValid /*&& presetsValid()*/;
     }
     
-    private boolean presetsValid() {
-        Enumeration presets = listModel.elements();
-        while (presets.hasMoreElements()) {
-            ProfilerPreset preset = (ProfilerPreset)presets.nextElement();
-            if (!preset.isValid()) return false;
-        }
-        return true;
-    }
+//    private boolean presetsValid() {
+//        Enumeration presets = listModel.elements();
+//        while (presets.hasMoreElements()) {
+//            ProfilerPreset preset = (ProfilerPreset)presets.nextElement();
+//            if (!preset.isValid()) return false;
+//        }
+//        return true;
+//    }
 
 
     private JPanel presetsPanel;

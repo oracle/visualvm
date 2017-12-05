@@ -36,6 +36,7 @@ import java.awt.Insets;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
@@ -142,6 +143,10 @@ public abstract class ProfilerJDBCPanel extends JPanel {
         setText(filterLabel, NbBundle.getMessage(ProfilerCPUSettings.class,
                 "LBL_Query_Filter"), mnemonics);
         Dimension d = filterLabel.getPreferredSize();
+        JRadioButton refRadion = new JRadioButton(NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Root_Classes")); // NOI18N
+        refRadion.setBorder(filterLabel.getBorder());
+        d.height = Math.max(d.height, refRadion.getPreferredSize().height);
+        filterLabel.setPreferredSize(d);
         filterLabel.setToolTipText(NbBundle.getMessage(ProfilerCPUSettings.class, "TOOLTIP_Query_Filter")); // NOI18N
         filterLabel.setOpaque(false);
         constraints = new GridBagConstraints();
@@ -165,7 +170,7 @@ public abstract class ProfilerJDBCPanel extends JPanel {
         constraints.gridx = 0;
         constraints.gridy = 2;
         constraints.weightx = 1;
-        constraints.weighty = 0.5;
+        constraints.weighty = 0.65;
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.fill = GridBagConstraints.BOTH;
@@ -193,7 +198,7 @@ public abstract class ProfilerJDBCPanel extends JPanel {
         constraints.gridx = 0;
         constraints.gridy = 4;
         constraints.weightx = 1;
-        constraints.weighty = 0.5;
+        constraints.weighty = 0.35;
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.anchor = GridBagConstraints.NORTHWEST;
         constraints.fill = GridBagConstraints.BOTH;

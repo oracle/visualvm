@@ -35,14 +35,17 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.prefs.Preferences;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.options.OptionsDisplayer;
@@ -105,57 +108,103 @@ public final class ProfilerPresets {
     void optionsSubmitted(final ProfilerPreset selected) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                Map<DefaultComboBoxModel, Boolean> models = new HashMap();
                 Iterator<WeakReference<PresetSelector>> selectorsI =
                         selectors.iterator();
+                
                 while (selectorsI.hasNext()) {
                     WeakReference<PresetSelector> selectorR = selectorsI.next();
                     PresetSelector selector = selectorR.get();
-                    if (selector == null) selectorsI.remove();
-                    else if (SwingUtilities.getRoot(selector) == null) selectorsI.remove();
-                    else selector.presetsChanged(selected);
+                    if (selector == null) {
+                        selectorsI.remove();
+                    } else if (SwingUtilities.getRoot(selector) == null) {
+                        selectorsI.remove();
+                    } else {
+                        DefaultComboBoxModel model = selector.getModel();
+                        boolean savingCustom = selector.checkSavingCustom();
+                        if (!Boolean.TRUE.equals(models.get(model)))
+                            models.put(model, savingCustom);
+                    }
+                }
+                
+                for (DefaultComboBoxModel model : models.keySet()) {
+                    ProfilerPreset selectedPreset = (ProfilerPreset)model.getSelectedItem();
+                    ProfilerPreset defaultPreset = (ProfilerPreset)model.getElementAt(0);
+                    ProfilerPreset customPreset = model.getSize() < 2 ? null :
+                                                  (ProfilerPreset)model.getElementAt(1);
+                    if (customPreset != null && !PresetSelector.isCustomPreset(customPreset))
+                        customPreset = null;
+                    
+                    boolean savingCustom = models.get(model);
+                    
+//                    internalChange = true;
+
+                    model.removeAllElements();
+                    model.addElement(defaultPreset);
+                    if (!savingCustom && customPreset != null) model.addElement(customPreset);
+                    for (ProfilerPreset preset : presets) model.addElement(preset);
+                    
+                    ProfilerPreset toSelect = savingCustom && selected != null ? selected :
+                                              selectedPreset;
+                    if (model.getIndexOf(toSelect) >= 0) model.setSelectedItem(toSelect);
+                    else model.setSelectedItem(model.getElementAt(0));
+
+//                    internalChange = false;
                 }
             }
         });
     }
     
-    public PresetSelector createSelector(PresetSelector refSelector,
+    public PresetSelector createSelector(DefaultComboBoxModel selectorsModel,
+                                         List<PresetSelector> allSelectors,
                                          Runnable presetSync) {
-        return createSelector(null, refSelector, presetSync);
+        return createSelector(null, selectorsModel, allSelectors, presetSync);
     }
     
     public PresetSelector createSelector(Application application,
-                                         PresetSelector refSelector,
+                                         DefaultComboBoxModel selectorsModel,
+                                         List<PresetSelector> allSelectors,
                                          Runnable presetSync) {
         
-        String mainClass = null;
         
-        if (application != null) {
-            mainClass = getMainClass(application);
-            if (mainClass == null || mainClass.isEmpty()) mainClass =
-                    ApplicationTypeFactory.getApplicationTypeFor(application).getName();
-            if (mainClass == null || mainClass.isEmpty()) mainClass =
-                    DataSourceDescriptorFactory.getDescriptor(application).getName();
-        }
         
-        ProfilerPreset toSelect = null;
-        if (mainClass != null && !mainClass.isEmpty()) {
-            String mainClassL = mainClass.toLowerCase();
-            for (int i = 0; i < presets.size(); i++) {
-                ProfilerPreset preset = presets.get(i);
-                String selector = preset.getSelector();
-                if (selector != null && !selector.isEmpty()) {
-                    if (mainClass.equals(selector) || mainClassL.contains(selector.toLowerCase())) {
-                        toSelect = preset;
-                        break;
+        if (selectorsModel.getSize() == 0) {
+            for (ProfilerPreset preset : getPresets(application))
+                selectorsModel.addElement(preset);
+            
+            String mainClass = null;
+        
+            if (application != null) {
+                mainClass = getMainClass(application);
+                if (mainClass == null || mainClass.isEmpty()) mainClass =
+                        ApplicationTypeFactory.getApplicationTypeFor(application).getName();
+                if (mainClass == null || mainClass.isEmpty()) mainClass =
+                        DataSourceDescriptorFactory.getDescriptor(application).getName();
+            }
+            
+            ProfilerPreset defaultPreset = (ProfilerPreset)selectorsModel.getElementAt(0);
+            defaultPreset.setSelector(mainClass);
+
+            ProfilerPreset toSelect = defaultPreset;
+            if (mainClass != null && !mainClass.isEmpty()) {
+                String mainClassL = mainClass.toLowerCase();
+                for (int i = 0; i < presets.size(); i++) {
+                    ProfilerPreset preset = presets.get(i);
+                    String selector = preset.getSelector();
+                    if (selector != null && !selector.isEmpty()) {
+                        if (mainClass.equals(selector) || mainClassL.contains(selector.toLowerCase())) {
+                            toSelect = preset;
+                            break;
+                        }
                     }
                 }
             }
+            
+            selectorsModel.setSelectedItem(toSelect);
         }
         
-        ProfilerPreset defPreset = createDefaultPreset(application);
-        ProfilerPreset custPreset = null;
-        PresetSelector selector = new PresetSelector(refSelector, defPreset, custPreset,
-                                                     toSelect, presetSync, mainClass);
+        PresetSelector selector = new PresetSelector(selectorsModel, allSelectors,
+                                                     presetSync);
         selectors.add(new WeakReference(selector));
         return selector;
     }

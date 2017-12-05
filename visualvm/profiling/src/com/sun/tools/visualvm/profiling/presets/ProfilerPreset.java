@@ -90,7 +90,7 @@ public final class ProfilerPreset {
         this.jdbcFilterP = ""; // NOI18N
     }
 
-    ProfilerPreset(ProfilerPreset preset) {
+    public ProfilerPreset(ProfilerPreset preset) {
         this.valid = preset.valid;
         this.name = preset.name;
         this.selector = preset.selector;

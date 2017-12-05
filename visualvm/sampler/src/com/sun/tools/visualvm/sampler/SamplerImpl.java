@@ -74,10 +74,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.management.MemoryMXBean;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -121,7 +124,8 @@ final class SamplerImpl {
     private AbstractSamplerSupport memorySampler;
     private MemorySettingsSupport memorySettings;
     
-    private PresetSelector refSelector;
+    private DefaultComboBoxModel selectorModel;
+    private List<PresetSelector> allSelectors;
 
     private DataViewComponent dvc;
     private String currentName;
@@ -154,9 +158,11 @@ final class SamplerImpl {
     }
     
     private PresetSelector createSelector(Runnable presetSynchronizer) {
+        if (selectorModel == null) selectorModel = new DefaultComboBoxModel();
+        if (allSelectors == null) allSelectors = new ArrayList();
         PresetSelector selector = ProfilerPresets.getInstance().createSelector(
-                                  application, refSelector, presetSynchronizer);
-        if (refSelector == null) refSelector = selector; else refSelector = null;
+                                  application, selectorModel, allSelectors, presetSynchronizer);
+        allSelectors.add(selector);
         return selector;
     }
 

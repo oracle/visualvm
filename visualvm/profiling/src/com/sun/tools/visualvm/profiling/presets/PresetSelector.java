@@ -29,6 +29,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -48,39 +50,27 @@ public final class PresetSelector extends JPanel {
     private JComboBox presetsCombo;
     private JButton presetsButton;
     
-    private PresetSelector refSelector;
+    private final DefaultComboBoxModel selectorsModel;
+    private final List<PresetSelector> allSelectors;
     
-    private final ProfilerPreset defaultPreset;
-    private ProfilerPreset customPreset;
-    
-    private final String selector;
     private boolean savingCustom;
     
     private boolean customSelected;
     private boolean internalChange = false;
     
     
-    PresetSelector(final PresetSelector refSelector, ProfilerPreset defaultPreset,
-                   ProfilerPreset customPreset, final ProfilerPreset toSelect,
-                   Runnable presetSynchronizer, String selector) {
+    PresetSelector(DefaultComboBoxModel selectorsModel, List<PresetSelector> allSelectors,
+                   Runnable presetSynchronizer) {
         
-        this.refSelector = refSelector;
-        if (refSelector != null) this.customPreset = refSelector.customPreset;
-        
-        this.selector = selector;
+        this.selectorsModel = selectorsModel;
+        this.allSelectors = allSelectors;
         
         this.presetSynchronizer = presetSynchronizer;
-        this.defaultPreset = defaultPreset;
-        this.customPreset = customPreset;
         
-        initComponents(refSelector);
+        initComponents();
         
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                if (refSelector != null)
-                    refSelector.refSelector = PresetSelector.this;
-                updatePresets(toSelect);
-            }
+            public void run() { notifySynchronizer(); }
         });
     }
     
@@ -89,39 +79,24 @@ public final class PresetSelector extends JPanel {
         return (ProfilerPreset)presetsCombo.getSelectedItem();
     }
     
-    public void synchronizeWith(final PresetSelector selector) {
-        // Need to invokeLater, to be called after updatePresets() in constructor
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                if (selector.customPreset != null) {
-                    customPreset = new ProfilerPreset(selector.customPreset);
-                    if (refSelector != null) refSelector.customPreset = customPreset;
-                }
-                updatePresets(selector.getSelectedPreset());
-            }
-        });
-    }
-    
     public ProfilerPreset customize(boolean presetValid) {
-        if (customPreset == null) {
-            customPreset = new ProfilerPreset(NbBundle.getMessage(
-                    PresetSelector.class, "LBL_Custom"), null); // NOI18N
-            if (refSelector != null) refSelector.customPreset = customPreset;
-        }
-        customPreset.setValid(presetValid);
+        ProfilerPreset custom = customPreset(true);
+        custom.setValid(presetValid);
         internalChange = true;
-        if (presetsCombo.getItemCount() < 2 ||
-            presetsCombo.getItemAt(1) != customPreset)
-            presetsCombo.insertItemAt(customPreset, 1);
-        presetsCombo.setSelectedIndex(1);
+        for (PresetSelector pSelector : allSelectors) pSelector.presetsCombo.setSelectedIndex(1);
         internalChange = false;
-        return customPreset;
+        return custom;
     }
     
     
-    void presetsChanged(ProfilerPreset selectedPreset) {
-        updatePresets(savingCustom ? selectedPreset : null);
+    DefaultComboBoxModel getModel() {
+        return selectorsModel;
+    }
+    
+    boolean checkSavingCustom() {
+        boolean ret = savingCustom;
         savingCustom = false;
+        return ret;
     }
     
     
@@ -129,24 +104,22 @@ public final class PresetSelector extends JPanel {
         Object selected = presetsCombo.getSelectedItem();
         if (selected == null) return;
         
-        boolean custom = selected == customPreset;
+        boolean custom = selected == customPreset(false);
         if (customSelected != custom) {
             customSelected = custom;
             presetsButton.setText(custom ? NbBundle.getMessage(PresetSelector.class,
                                   "BTN_Save") : NbBundle.getMessage(PresetSelector.class, // NOI18N
                                   "BTN_Edit")); // NOI18N
         }
-        updatePresetsButton(true);
+//        updatePresetsButton(true);
         if (internalChange) return;
         notifySynchronizer();
     }
     
     private void actionRequested() {
         if (customSelected) {
-            ProfilerPreset preset = new ProfilerPreset(customPreset);
-            preset.setSelector(selector);
             savingCustom = true;
-            ProfilerPresets.getInstance().savePreset(preset);
+            ProfilerPresets.getInstance().savePreset(new ProfilerPreset(customPreset(true)));
         } else {
             ProfilerPresets.getInstance().editPresets(getSelectedPreset());
         }
@@ -158,44 +131,48 @@ public final class PresetSelector extends JPanel {
         });
     }
     
-    private void updatePresets(ProfilerPreset toSelect) {
-        if (toSelect == null) toSelect =
-                (ProfilerPreset)presetsCombo.getSelectedItem();
-        internalChange = true;
-        
-        presetsCombo.removeAllItems();
-        presetsCombo.addItem(defaultPreset);
-        if (savingCustom) customPreset = null;
-        if (customPreset != null) presetsCombo.addItem(customPreset);
-        ProfilerPresets.PresetsModel presets =
-                ProfilerPresets.getInstance().getPresets();
-        for (int i = 0; i < presets.size(); i++)
-            presetsCombo.addItem(presets.get(i));
-        
-        if (toSelect != null) presetsCombo.setSelectedItem(toSelect);
-        else presetsCombo.setSelectedIndex(0);
-        
-        internalChange = false;
-        notifySynchronizer();
-    }
-    
     
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         presetsLabel.setEnabled(enabled);
         presetsCombo.setEnabled(enabled);
-        updatePresetsButton(enabled);
+        presetsButton.setEnabled(enabled);
+//        updatePresetsButton(enabled);
     }
     
-    private void updatePresetsButton(boolean enabled) {
-        ProfilerPreset preset = getSelectedPreset();
-        presetsButton.setEnabled(enabled && preset != null && preset.isValid());
-        if (refSelector != null)
-            refSelector.presetsButton.setEnabled(presetsButton.isEnabled());
+//    private void updatePresetsButton(boolean enabled) {
+//        ProfilerPreset preset = getSelectedPreset();
+//        for (PresetSelector pselector : allSelectors)
+//            pselector.presetsButton.setEnabled(enabled && preset != null && preset.isValid());
+//    }
+    
+    
+    private ProfilerPreset customPreset(boolean create) {
+        ProfilerPreset custom = new ProfilerPreset((ProfilerPreset)selectorsModel.getSelectedItem());
+        custom.setName(NbBundle.getMessage(PresetSelector.class, "LBL_Custom")); // NOI18N
+        
+        if (selectorsModel.getSize() > 1) {
+            Object customO = selectorsModel.getElementAt(1);
+            if (custom.equals(customO)) return (ProfilerPreset)customO;
+        }
+        
+        if (!create) return null;
+        
+        custom.setSelector(((ProfilerPreset)selectorsModel.getElementAt(0)).getSelector());
+        
+        internalChange = true;
+        selectorsModel.insertElementAt(custom, 1);
+        internalChange = false;
+        
+        return custom;
+    }
+    
+    public static boolean isCustomPreset(ProfilerPreset preset) {
+        return NbBundle.getMessage(PresetSelector.class, "LBL_Custom").equals(preset.getName()); // NOI18N
     }
     
     
-    private void initComponents(PresetSelector refSelector) {
+    private void initComponents() {
         setOpaque(false);
         setLayout(new BorderLayout(5, 0));
         
@@ -207,8 +184,7 @@ public final class PresetSelector extends JPanel {
         add(presetsLabel, BorderLayout.WEST);
         
         // presetsCombo
-        presetsCombo = refSelector == null ? new JComboBox() :
-                       new JComboBox(refSelector.presetsCombo.getModel());
+        presetsCombo = new JComboBox(selectorsModel);
         presetsCombo.setToolTipText(NbBundle.getMessage(PresetSelector.class,
                                     "TOOLTIP_Defined_presets")); // NOI18N
         presetsCombo.addActionListener(new ActionListener() {

@@ -32,6 +32,7 @@ import com.sun.tools.visualvm.core.ui.DataSourceView;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.profiling.presets.PresetSelector;
+import com.sun.tools.visualvm.profiling.presets.ProfilerPreset;
 import com.sun.tools.visualvm.profiling.presets.ProfilerPresets;
 import com.sun.tools.visualvm.uisupport.HTMLLabel;
 import com.sun.tools.visualvm.uisupport.HTMLTextArea;
@@ -48,7 +49,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -85,7 +89,8 @@ final class ApplicationProfilerView extends DataSourceView {
     private MemorySettingsSupport memorySettings;
     private JDBCSettingsSupport jdbcSettings;
     
-    private PresetSelector refSelector;
+    private DefaultComboBoxModel selectorModel;
+    private List<PresetSelector> allSelectors;
     
     private boolean classSharingBreaksProfiling;
 
@@ -125,33 +130,75 @@ final class ApplicationProfilerView extends DataSourceView {
         };
     }
     
-    void copySettings(CPUSettingsSupport cpuSettingsC, MemorySettingsSupport memorySettingsC) {
-        if (cpuSettingsC != null) cpuSettings.copySettings(cpuSettingsC);
-        if (memorySettingsC != null) memorySettings.copySettings(memorySettingsC);
+    private ProfilerPreset cachedPreset;
+    private ProfilingSettings cachedSettings;
+    
+    void selectPreset(ProfilerPreset preset, final ProfilingSettings settings) {
+        
+        if (masterViewSupport == null) {
+            cachedPreset = preset;
+            cachedSettings = settings;
+        } else {            
+            preset = new ProfilerPreset(preset);
+            
+            int presetIdx = selectorModel.getIndexOf(preset);
+            if (presetIdx == -1) { // custom preset
+                selectorModel.insertElementAt(preset, 1);
+            } else {
+                selectorModel.removeElement(preset);
+                selectorModel.insertElementAt(preset, presetIdx);
+            }
+            selectorModel.setSelectedItem(preset);
+            
+            cpuSettings.updateSettings(preset);
+            memorySettings.updateSettings(preset);
+            jdbcSettings.updateSettings(preset);
+            
+            if (ProfilingSettings.isCPUSettings(settings)) {
+                masterViewSupport.showCPUSettings();
+            } else if (ProfilingSettings.isMemorySettings(settings)) {
+                masterViewSupport.showMemorySettings();
+            } else if (ProfilingSettings.isJDBCSettings(settings)) {
+                masterViewSupport.showJDBCSettings();
+            }
+            
+            cachedPreset = null;
+            cachedSettings = null;
+        }
     }
     
     private PresetSelector createSelector(Runnable presetSynchronizer, Application application) {
+        if (selectorModel == null) selectorModel = new DefaultComboBoxModel();
+        if (allSelectors == null) allSelectors = new ArrayList();
         PresetSelector selector = ProfilerPresets.getInstance().createSelector(
-                                  application, refSelector, presetSynchronizer);
-        if (refSelector == null) refSelector = selector; else refSelector = null;
+                                  application, selectorModel, allSelectors, presetSynchronizer);
+        allSelectors.add(selector);
         return selector;
     }
         
     
     protected DataViewComponent createComponent() {
+        if (dvc != null) return dvc;
+        
         Application application = (Application)getDataSource();
         ProfilingResultsSupport profilingResultsSupport = new ProfilingResultsSupport();
         
         masterViewSupport = new MasterViewSupport(application, profilingResultsSupport, cpuSettings, memorySettings, jdbcSettings, classSharingBreaksProfiling) {
             void showCPUSettings() {
                 if (dvc != null) {
-                    cpuSettings.highlightInvalidSettings(dvc);
+                    cpuSettings.showSettings(dvc);
                     dvc.showDetailsArea(DataViewComponent.TOP_RIGHT);
                 }
             }
             void showMemorySettings() {
                 if (dvc != null) {
-                    memorySettings.highlightInvalidSettings(dvc);
+                    memorySettings.showSettings(dvc);
+                    dvc.showDetailsArea(DataViewComponent.TOP_RIGHT);
+                }
+            }
+            void showJDBCSettings() {
+                if (dvc != null) {
+                    jdbcSettings.showSettings(dvc);
                     dvc.showDetailsArea(DataViewComponent.TOP_RIGHT);
                 }
             }
@@ -166,6 +213,8 @@ final class ApplicationProfilerView extends DataSourceView {
         dvc.addDetailsView(memorySettings.getDetailsView(), DataViewComponent.TOP_RIGHT);
         dvc.addDetailsView(jdbcSettings.getDetailsView(), DataViewComponent.TOP_RIGHT);
 //        dvc.hideDetailsArea(DataViewComponent.TOP_RIGHT);
+
+        if (cachedPreset != null) selectPreset(cachedPreset, cachedSettings);
         
         return dvc;
     }
@@ -230,6 +279,8 @@ final class ApplicationProfilerView extends DataSourceView {
         abstract void showCPUSettings();
         
         abstract void showMemorySettings();
+        
+        abstract void showJDBCSettings();
         
         
         public DataViewComponent.MasterView getMasterView() {
