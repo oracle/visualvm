@@ -92,6 +92,7 @@ import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
@@ -381,6 +382,13 @@ final class SamplerImpl {
 
 
     private void handleCPUProfiling() {
+        if (!cpuSettings.settingsValid()) {
+            cpuButton.setSelected(false);
+            if (dvc != null) cpuSettings.showSettings(dvc);
+            ProfilerDialogs.displayError(NbBundle.getMessage(SamplerImpl.class, "MSG_Incorrect_CPU_settings")); // NOI18N
+            return;
+        }
+        
         State currentState = getState();
         if (currentState.equals(State.CPU) ||
            currentState.equals(State.TERMINATED) ||
@@ -421,6 +429,13 @@ final class SamplerImpl {
     }
 
     private void handleMemoryProfiling() {
+        if (!memorySettings.settingsValid()) {
+            memoryButton.setSelected(false);
+            if (dvc != null) memorySettings.showSettings(dvc);
+            ProfilerDialogs.displayError(NbBundle.getMessage(SamplerImpl.class, "MSG_Incorrect_Memory_settings")); // NOI18N
+            return;
+        }
+        
         State currentState = getState();
         if (currentState.equals(State.MEMORY) ||
            currentState.equals(State.TERMINATED) ||
