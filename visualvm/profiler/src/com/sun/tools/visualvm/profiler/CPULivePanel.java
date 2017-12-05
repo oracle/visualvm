@@ -219,7 +219,7 @@ class CPULivePanel extends ProfilingResultsSupport.ResultsView {
             protected void fireItemStateChanged(ItemEvent event) {
                 boolean paused = isSelected();
                 if (updater != null) updater.setPaused(paused);
-                lrRefreshButton.setEnabled(paused);
+                lrRefreshButton.setEnabled(paused && !popupPause);
                 if (!paused) refreshResults(true);
             }
         };

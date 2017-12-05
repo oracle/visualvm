@@ -215,9 +215,9 @@ final class CPUView extends JPanel {
             
         lrPauseButton = new JToggleButton(Icons.getIcon(GeneralIcons.PAUSE)) {
             protected void fireItemStateChanged(ItemEvent event) {
-                boolean selected = lrPauseButton.isSelected();
-                lrRefreshButton.setEnabled(selected);
-                if (!selected) refresher.refresh();
+                boolean paused = lrPauseButton.isSelected();
+                lrRefreshButton.setEnabled(paused && !popupPause);
+                if (!paused) refresher.refresh();
             }
         };
         lrPauseButton.setToolTipText(Bundle.MethodsFeatureUI_pauseResults());
