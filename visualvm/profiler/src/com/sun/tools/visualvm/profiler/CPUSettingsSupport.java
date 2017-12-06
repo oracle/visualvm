@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import com.sun.tools.visualvm.profiling.presets.PresetSelector;
 import com.sun.tools.visualvm.profiling.presets.ProfilerCPUPanel;
+import com.sun.tools.visualvm.profiling.presets.ProfilerPreset;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import javax.swing.BorderFactory;
@@ -41,7 +42,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jiri Sedlacek
  */
-public abstract class CPUSettingsSupport {
+public abstract class CPUSettingsSupport extends ProfilerSettingsSupport {
     
     private JPanel container;
     private ProfilerCPUPanel panel;
@@ -65,22 +66,21 @@ public abstract class CPUSettingsSupport {
     }
     
     
-    ProfilingSettings getSettings() { return panel.getSettings(); }
+    public ProfilingSettings getSettings() { return panel.getSettings(); }
     
     void saveSettings() {
         // NOTE: might save custom configuration here
     }
     
-    void copySettings(CPUSettingsSupport settings) {
-        getComponent(); // initialize selector
-        selector.synchronizeWith(settings.selector);
+    void updateSettings(ProfilerPreset preset) {
+        panel.loadFromPreset(preset);
     }
     
     public abstract boolean presetValid();
     
     public boolean settingsValid() { return panel.settingsValid(); }
     
-    public void highlightInvalidSettings(DataViewComponent dvc) {
+    public void showSettings(DataViewComponent dvc) {
         panel.highlighInvalid();
         dvc.selectDetailsView(getDetailsView());
     }

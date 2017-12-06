@@ -51,10 +51,9 @@ import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.lib.profiler.common.ProfilingSettings;
-import org.netbeans.lib.profiler.common.ProfilingSettingsPresets;
-import org.netbeans.lib.profiler.filters.GenericFilter;
 import org.netbeans.lib.profiler.filters.JavaTypeFilter;
 import org.netbeans.lib.profiler.global.CommonConstants;
+import org.netbeans.modules.profiler.api.ProfilerIDESettings;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 
@@ -90,15 +89,19 @@ public abstract class SamplerCPUPanel extends JPanel {
     
     
     public ProfilingSettings getSettings() {
-        ProfilingSettings settings = ProfilingSettingsPresets.createCPUPreset();
-        settings.setInstrScheme(CommonConstants.INSTRSCHEME_LAZY);
+        ProfilingSettings settings = ProfilerIDESettings.getInstance().createDefaultProfilingSettings();
+        settings.setProfilingType(ProfilingSettings.PROFILE_CPU_SAMPLING);
+        settings.setCPUProfilingType(CommonConstants.CPU_SAMPLED);
         
-        String instrFilterString = getFilterValue();
-        GenericFilter instrFilter = (instrFilterString.length() == 0 ||
-                "*".equals(instrFilterString)) ? new GenericFilter() : // NOI18N
-            new JavaTypeFilter(instrFilterString, inclFilterRadioButton.isSelected() ?
-            GenericFilter.TYPE_INCLUSIVE : GenericFilter.TYPE_EXCLUSIVE);
-        settings.setInstrumentationFilter(instrFilter);
+        String filter = getFilterValue();
+        if (filter.isEmpty() || "*".equals(filter) || "**".equals(filter)) { // NOI18N
+            settings.setInstrumentationFilter(new JavaTypeFilter());
+        } else {
+            int filterType = inclFilterRadioButton.isSelected() ?
+                             JavaTypeFilter.TYPE_INCLUSIVE : JavaTypeFilter.TYPE_EXCLUSIVE;
+            String filterValue = PresetsUtils.normalizeValue(filter);
+            settings.setInstrumentationFilter(new JavaTypeFilter(filterValue, filterType));
+        }
         
         return settings;
     }
@@ -124,6 +127,8 @@ public abstract class SamplerCPUPanel extends JPanel {
         sampleRateCombo.setSelectedItem(preset.getSamplingRateS());
         refreshRateCombo.setSelectedItem(preset.getRefreshRateS());
         internalChange = false;
+        
+        checkFilterValidity();
     }
     
     public void saveToPreset(ProfilerPreset preset) {
@@ -151,35 +156,12 @@ public abstract class SamplerCPUPanel extends JPanel {
     }
 
     public boolean isFilterValueValid() {
-// TODO
-//        String[] filterParts = FilterUtils.getSeparateFilters(getFilterValue());
-//
-//        for (int i = 0; i < filterParts.length; i++)
-//            if (!FilterUtils.isValidProfilerFilter(filterParts[i])) return false;
-
-        return true;
+        String filterValue = PresetsUtils.normalizeValue(getFilterValue());
+        return PresetsUtils.isValidJavaValue(filterValue, true, false);
     }
 
     private String getFilterValue() {
-        StringBuilder convertedValue = new StringBuilder();
-
-        String[] filterValues = getFilterValues();
-
-        for (int i = 0; i < filterValues.length; i++) {
-            String filterValue = filterValues[i].trim();
-
-            if ((i != (filterValues.length - 1)) && !filterValue.endsWith(",")) { // NOI18N
-                filterValue = filterValue + ", "; // NOI18N
-            }
-
-            convertedValue.append(filterValue);
-        }
-
-        return convertedValue.toString();
-    }
-
-    private String[] getFilterValues() {
-        return filtersArea.getTextArea().getText().split("\\n"); // NOI18N
+        return filtersArea.getTextArea().getText().trim();
     }
     
     
@@ -271,7 +253,7 @@ public abstract class SamplerCPUPanel extends JPanel {
 
         filtersArea = createTextArea(2);
         filtersArea.getTextArea().setToolTipText(NbBundle.getMessage(
-                SamplerCPUPanel.class, "TOOLTIP_Instrumentation_Filter")); // NOI18N
+                SamplerCPUPanel.class, "TOOLTIP_Instrumentation_Filter_S")); // NOI18N
         filtersArea.getTextArea().getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { checkFilterValidity(); syncUI(); }
             public void removeUpdate(DocumentEvent e) { checkFilterValidity(); syncUI(); }

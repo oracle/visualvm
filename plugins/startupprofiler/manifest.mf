@@ -2,5 +2,5 @@ Manifest-Version: 1.0
 OpenIDE-Module: com.sun.tools.visualvm.profiler.startup
 OpenIDE-Module-Localizing-Bundle: com/sun/tools/visualvm/profiler/startup/Bundle.properties
 OpenIDE-Module-Layer: com/sun/tools/visualvm/profiler/startup/resources/layer.xml
-OpenIDE-Module-Specification-Version: 1.0
+OpenIDE-Module-Specification-Version: 1.1
 

@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.sampler.memory;
 
 import com.sun.tools.visualvm.core.ui.components.DataViewComponent;
+import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import com.sun.tools.visualvm.profiling.presets.PresetSelector;
 import com.sun.tools.visualvm.profiling.presets.SamplerMemoryPanel;
 import java.awt.BorderLayout;
@@ -45,11 +46,16 @@ public abstract class MemorySettingsSupport {
     private SamplerMemoryPanel panel;
     private PresetSelector selector;
     
+    private DataViewComponent.DetailsView detailsView;
+    
     
     public DataViewComponent.DetailsView getDetailsView() {
-        return new DataViewComponent.DetailsView(NbBundle.getMessage(
-                MemorySettingsSupport.class, "LBL_Memory_settings"), null, 20, // NOI18N
-                createPanel(), null);
+        if (detailsView == null) {
+            detailsView = new DataViewComponent.DetailsView(NbBundle.getMessage(
+                          MemorySettingsSupport.class, "LBL_Memory_settings"), null, 20, // NOI18N
+                          new ScrollableContainer(createPanel()), null);
+        }
+        return detailsView;
     }
     
     
@@ -66,6 +72,10 @@ public abstract class MemorySettingsSupport {
     public abstract boolean presetValid();
     
     public boolean settingsValid() { return panel.settingsValid(); }
+    
+    public void showSettings(DataViewComponent dvc) {
+        dvc.selectDetailsView(getDetailsView());
+    }
     
     public abstract PresetSelector createSelector(Runnable presetSynchronizer);
     

@@ -46,11 +46,16 @@ public abstract class CPUSettingsSupport {
     private SamplerCPUPanel panel;
     private PresetSelector selector;
     
+    private DataViewComponent.DetailsView detailsView;
+    
     
     public DataViewComponent.DetailsView getDetailsView() {
-        return new DataViewComponent.DetailsView(NbBundle.getMessage(
-                CPUSettingsSupport.class, "LBL_Cpu_settings"), null, 10, // NOI18N
-                new ScrollableContainer(createPanel()), null);
+        if (detailsView == null) {
+            detailsView = new DataViewComponent.DetailsView(NbBundle.getMessage(
+                          CPUSettingsSupport.class, "LBL_Cpu_settings"), null, 10, // NOI18N
+                          new ScrollableContainer(createPanel()), null);
+        }
+        return detailsView;
     }
     
     
@@ -67,6 +72,10 @@ public abstract class CPUSettingsSupport {
     public abstract boolean presetValid();
     
     public boolean settingsValid() { return panel.settingsValid(); }
+    
+    public void showSettings(DataViewComponent dvc) {
+        dvc.selectDetailsView(getDetailsView());
+    }
     
     public abstract PresetSelector createSelector(Runnable presetSynchronizer);
     

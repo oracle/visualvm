@@ -48,13 +48,11 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.LiveCPUView;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.MultiButtonGroup;
-import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -118,6 +116,7 @@ final class CPUView extends JPanel {
 
     void initSession() {
         pdSnapshotButton.setEnabled(false);
+//        pdResetResultsButton.setEnabled(false);
     }
 
     void refresh() {
@@ -129,17 +128,38 @@ final class CPUView extends JPanel {
             CPUResultsSnapshot snapshot = builder.createSnapshot(System.currentTimeMillis());
             cpuView.setData(snapshot, true);
         } catch (CPUResultsSnapshot.NoDataAvailableException ex) {
-            Exceptions.printStackTrace(ex);
+            // no problem, just no data matching the provided filter yet
+//            Exceptions.printStackTrace(ex);
         }
 
         pdSnapshotButton.setEnabled(snapshotDumper != null);
+//        pdResetResultsButton.setEnabled(pdSnapshotButton.isEnabled());
     }
-
-    void terminate() {
+    
+    void starting() {
+        lrPauseButton.setEnabled(true);
+        lrRefreshButton.setEnabled(false);
+        lrDeltasButton.setEnabled(true);
+    }
+    
+    void stopping() {
         lrPauseButton.setEnabled(false);
         lrRefreshButton.setEnabled(false);
+        lrDeltasButton.setEnabled(false);
+    }
+    
+    void terminated() {
+        lrPauseButton.setEnabled(false);
+        lrRefreshButton.setEnabled(false);
+        lrDeltasButton.setEnabled(false);
         threaddumpButton.setEnabled(false);
     }
+
+//    void terminate() {
+//        lrPauseButton.setEnabled(false);
+//        lrRefreshButton.setEnabled(false);
+//        threaddumpButton.setEnabled(false);
+//    }
 
     
     private JLabel lrLabel;
@@ -149,7 +169,7 @@ final class CPUView extends JPanel {
     
     private JLabel pdLabel;
     private JButton pdSnapshotButton;
-    private JButton pdResetResultsButton;
+//    private JButton pdResetResultsButton;
     
     private boolean popupPause;
     private JToggleButton[] toggles;
@@ -215,9 +235,9 @@ final class CPUView extends JPanel {
             
         lrPauseButton = new JToggleButton(Icons.getIcon(GeneralIcons.PAUSE)) {
             protected void fireItemStateChanged(ItemEvent event) {
-                boolean selected = lrPauseButton.isSelected();
-                lrRefreshButton.setEnabled(selected);
-                if (!selected) refresher.refresh();
+                boolean paused = lrPauseButton.isSelected();
+                lrRefreshButton.setEnabled(paused && !popupPause);
+                if (!paused) refresher.refresh();
             }
         };
         lrPauseButton.setToolTipText(Bundle.MethodsFeatureUI_pauseResults());
@@ -297,8 +317,8 @@ final class CPUView extends JPanel {
 //        pdSnapshotButton.setHideActionText(true);
         pdSnapshotButton.setText(Bundle.MethodsFeatureUI_snapshot());
 
-        pdResetResultsButton = new JButton(ResetResultsAction.getInstance());
-        pdResetResultsButton.setHideActionText(true);
+//        pdResetResultsButton = new JButton(ResetResultsAction.getInstance());
+//        pdResetResultsButton.setHideActionText(true);
 
         toolbar = ProfilerToolbar.create(true);
 
@@ -334,8 +354,8 @@ final class CPUView extends JPanel {
         toolbar.add(pdLabel);
         toolbar.addSpace(2);
         toolbar.add(pdSnapshotButton);
-        toolbar.addSpace(3);
-        toolbar.add(pdResetResultsButton);
+//        toolbar.addSpace(3);
+//        toolbar.add(pdResetResultsButton);
         
         toolbar.addFiller();
         

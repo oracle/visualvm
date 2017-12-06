@@ -74,10 +74,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.management.MemoryMXBean;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -89,6 +92,7 @@ import org.netbeans.lib.profiler.results.cpu.CPUResultsSnapshot;
 import org.netbeans.lib.profiler.results.memory.SampledMemoryResultsSnapshot;
 import org.netbeans.modules.profiler.LoadedSnapshot;
 import org.netbeans.modules.profiler.ResultsManager;
+import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.ImageUtilities;
@@ -121,7 +125,8 @@ final class SamplerImpl {
     private AbstractSamplerSupport memorySampler;
     private MemorySettingsSupport memorySettings;
     
-    private PresetSelector refSelector;
+    private DefaultComboBoxModel selectorModel;
+    private List<PresetSelector> allSelectors;
 
     private DataViewComponent dvc;
     private String currentName;
@@ -154,9 +159,11 @@ final class SamplerImpl {
     }
     
     private PresetSelector createSelector(Runnable presetSynchronizer) {
+        if (selectorModel == null) selectorModel = new DefaultComboBoxModel();
+        if (allSelectors == null) allSelectors = new ArrayList();
         PresetSelector selector = ProfilerPresets.getInstance().createSelector(
-                                  application, refSelector, presetSynchronizer);
-        if (refSelector == null) refSelector = selector; else refSelector = null;
+                                  application, selectorModel, allSelectors, presetSynchronizer);
+        allSelectors.add(selector);
         return selector;
     }
 
@@ -375,6 +382,13 @@ final class SamplerImpl {
 
 
     private void handleCPUProfiling() {
+        if (!cpuSettings.settingsValid()) {
+            cpuButton.setSelected(false);
+            if (dvc != null) cpuSettings.showSettings(dvc);
+            ProfilerDialogs.displayError(NbBundle.getMessage(SamplerImpl.class, "MSG_Incorrect_CPU_settings")); // NOI18N
+            return;
+        }
+        
         State currentState = getState();
         if (currentState.equals(State.CPU) ||
            currentState.equals(State.TERMINATED) ||
@@ -415,6 +429,13 @@ final class SamplerImpl {
     }
 
     private void handleMemoryProfiling() {
+        if (!memorySettings.settingsValid()) {
+            memoryButton.setSelected(false);
+            if (dvc != null) memorySettings.showSettings(dvc);
+            ProfilerDialogs.displayError(NbBundle.getMessage(SamplerImpl.class, "MSG_Incorrect_Memory_settings")); // NOI18N
+            return;
+        }
+        
         State currentState = getState();
         if (currentState.equals(State.MEMORY) ||
            currentState.equals(State.TERMINATED) ||

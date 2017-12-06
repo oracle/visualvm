@@ -25,9 +25,9 @@
 
 package com.sun.tools.visualvm.profiler.startup;
 
-import com.sun.tools.visualvm.profiler.CPUSettingsSupport;
-import com.sun.tools.visualvm.profiler.MemorySettingsSupport;
+import com.sun.tools.visualvm.profiler.ProfilerSettingsSupport;
 import com.sun.tools.visualvm.profiler.ProfilerSupport;
+import com.sun.tools.visualvm.profiling.presets.ProfilerPreset;
 import java.awt.Dialog;
 import javax.swing.SwingUtilities;
 import org.openide.util.NbBundle;
@@ -76,18 +76,17 @@ final class StartupProfiler {
     
     
     private void attachToProcess() {
-        final CPUSettingsSupport cpuSettings = configurator.getCPUSettings();
-        final MemorySettingsSupport memorySettings = configurator.getMemorySettings();
-        final boolean isCPUProfiling = configurator.isCPUProfiling();
         final int port = configurator.getPort();
         final String java = configurator.getJavaPlatform();
         final int architecture = configurator.getArchitecture();
         
+        final ProfilerSettingsSupport settings = configurator.getSettings();
+        final ProfilerPreset preset = configurator.getPreset();
+        
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
                 ProfilerSupport.getInstance().profileProcessStartup(java, architecture, port,
-                                                                    cpuSettings, memorySettings,
-                                                                    isCPUProfiling);
+                                                                    settings, preset);
             }
         });
     }

@@ -162,9 +162,10 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
         refresher.setRefreshRate(refreshRate);
 
         final StackTraceSnapshotBuilder _builder = builder;
-        SwingUtilities.invokeLater(new Runnable() {
+        if (cpuView != null) SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 cpuView.setBuilder(_builder);
+                cpuView.starting();
 //                cpuView.setResultsPanel(new SampledLivePanel2(builder));
             }
         });
@@ -186,6 +187,12 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
     }
 
     public synchronized void stopSampling() {
+        if (cpuView != null) SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                cpuView.stopping();
+            }
+        });
+        
         if (samplerTask != null) {
             samplerTask.cancel();
             samplerTask = null;
@@ -197,11 +204,16 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
     }
 
     public synchronized void terminate() {
+        if (cpuView != null) SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                cpuView.terminated();
+            }
+        });
+        
         if (timer != null) {
             timer.cancel();
             timer = null;
         }
-        if (cpuView != null) cpuView.terminate();
         if (threadCPUView != null) threadCPUView.terminate();
         builder = null;  // release data
     }

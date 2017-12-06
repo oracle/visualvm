@@ -228,8 +228,7 @@ class JDBCLivePanel extends ProfilingResultsSupport.ResultsView {
             protected void fireItemStateChanged(ItemEvent event) {
                 boolean paused = isSelected();
                 updater.setPaused(paused);
-                boolean selected = lrPauseButton.isSelected();
-                lrRefreshButton.setEnabled(selected);
+                lrRefreshButton.setEnabled(paused && !popupPause);
                 if (!paused) refreshResults(true);
             }
         };

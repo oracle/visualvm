@@ -27,9 +27,12 @@ package com.sun.tools.visualvm.profiler.startup;
 import com.sun.tools.visualvm.core.ui.DesktopUtils;
 import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
 import com.sun.tools.visualvm.profiler.CPUSettingsSupport;
+import com.sun.tools.visualvm.profiler.JDBCSettingsSupport;
 import com.sun.tools.visualvm.profiler.MemorySettingsSupport;
+import com.sun.tools.visualvm.profiler.ProfilerSettingsSupport;
 import com.sun.tools.visualvm.profiler.ProfilerSupport;
 import com.sun.tools.visualvm.profiling.presets.PresetSelector;
+import com.sun.tools.visualvm.profiling.presets.ProfilerPreset;
 import com.sun.tools.visualvm.profiling.presets.ProfilerPresets;
 import com.sun.tools.visualvm.uisupport.HorizontalLayout;
 import com.sun.tools.visualvm.uisupport.SeparatorLine;
@@ -50,6 +53,8 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
@@ -94,6 +99,7 @@ import org.openide.util.RequestProcessor;
     "LBL_Profile=Profile:",
     "LBL_CPU=CPU",
     "LBL_Memory=Memory",
+    "LBL_JDBC=JDBC",
     "BTN_Clipboard=Copy to clipboard",
     "CAP_Clipboard=Copy to Clipboard",
     "MSG_Clipboard=Profiler parameter copied to clipboard",
@@ -111,14 +117,19 @@ final class StartupConfigurator {
     
     private static final String CPU_ICON_PATH = "com/sun/tools/visualvm/profiler/startup/resources/cpu.png";  // NOI18N
     private static final String MEM_ICON_PATH = "com/sun/tools/visualvm/profiler/startup/resources/memory.png";  // NOI18N
+    private static final String JDBC_ICON_PATH = "com/sun/tools/visualvm/profiler/startup/resources/jdbc.png";  // NOI18N
     private static final String HELP_ICON_PATH = "com/sun/tools/visualvm/profiler/startup/resources/help.png";  // NOI18N
     private static final Icon CPU_ICON = ImageUtilities.loadImageIcon(CPU_ICON_PATH, false);
     private static final Icon MEM_ICON = ImageUtilities.loadImageIcon(MEM_ICON_PATH, false);
+    private static final Icon JDBC_ICON = ImageUtilities.loadImageIcon(JDBC_ICON_PATH, false);
     private static final Icon HELP_ICON = ImageUtilities.loadImageIcon(HELP_ICON_PATH, false);
     
     private CPUSettingsSupport cpuSettings;
     private MemorySettingsSupport memorySettings;
-    private PresetSelector refSelector;
+    private JDBCSettingsSupport jdbcSettings;
+    
+    private DefaultComboBoxModel selectorModel;
+    private List<PresetSelector> allSelectors;
     
     private JComponent ui;
     private boolean accepted;
@@ -131,9 +142,11 @@ final class StartupConfigurator {
     private JPanel panel;
     private Dimension cpuSize;
     private Dimension memorySize;
+    private Dimension jdbcSize;
     
     private JRadioButton cpuSelector;
     private JRadioButton memorySelector;
+    private JRadioButton jdbcSelector;
     private JComboBox java;
     private JComboBox arch;
     private JSpinner port;
@@ -146,7 +159,8 @@ final class StartupConfigurator {
         cpuSettings = new CPUSettingsSupport() {
             public boolean presetValid() {
                 return cpuSettings.settingsValid() &&
-                       memorySettings.settingsValid();
+                       memorySettings.settingsValid() &&
+                       jdbcSettings.settingsValid();
             }
             public PresetSelector createSelector(Runnable presetSynchronizer) {
                 return StartupConfigurator.this.createSelector(presetSynchronizer);
@@ -155,7 +169,18 @@ final class StartupConfigurator {
         memorySettings = new MemorySettingsSupport() {
             public boolean presetValid() {
                 return cpuSettings.settingsValid() &&
-                       memorySettings.settingsValid();
+                       memorySettings.settingsValid() &&
+                       jdbcSettings.settingsValid();
+            }
+            public PresetSelector createSelector(Runnable presetSynchronizer) {
+                return StartupConfigurator.this.createSelector(presetSynchronizer);
+            }
+        };
+        jdbcSettings = new JDBCSettingsSupport() {
+            public boolean presetValid() {
+                return cpuSettings.settingsValid() &&
+                       memorySettings.settingsValid() &&
+                       jdbcSettings.settingsValid();
             }
             public PresetSelector createSelector(Runnable presetSynchronizer) {
                 return StartupConfigurator.this.createSelector(presetSynchronizer);
@@ -165,12 +190,15 @@ final class StartupConfigurator {
         // Warmup, the implementation expects both panels to be created
         cpuSettings.getComponent();
         memorySettings.getComponent();
+        jdbcSettings.getComponent();
     }
     
     private PresetSelector createSelector(Runnable presetSynchronizer) {
+        if (selectorModel == null) selectorModel = new DefaultComboBoxModel();
+        if (allSelectors == null) allSelectors = new ArrayList();
         PresetSelector selector = ProfilerPresets.getInstance().createSelector(
-                                                refSelector, presetSynchronizer);
-        if (refSelector == null) refSelector = selector; else refSelector = null;
+                                  selectorModel, allSelectors, presetSynchronizer);
+        allSelectors.add(selector);
         return selector;
     }
     
@@ -187,16 +215,15 @@ final class StartupConfigurator {
         return accepted;
     }
     
-    CPUSettingsSupport getCPUSettings() {
-        return cpuSettings;
+    ProfilerSettingsSupport getSettings() {
+        if (cpuSelector.isSelected()) return cpuSettings;
+        else if (memorySelector.isSelected()) return memorySettings;
+        else if (jdbcSelector.isSelected()) return jdbcSettings;
+        return null;
     }
     
-    MemorySettingsSupport getMemorySettings() {
-        return memorySettings;
-    }
-    
-    boolean isCPUProfiling() {
-        return cpuSelector.isSelected();
+    ProfilerPreset getPreset() {
+        return (ProfilerPreset)selectorModel.getSelectedItem();
     }
     
     String getJavaPlatform() {
@@ -280,13 +307,17 @@ final class StartupConfigurator {
         JPanel buttonsR = new JPanel(new HorizontalLayout(false));
         submit = new JButton(Bundle.BTN_Profile(), new ImageIcon(StartupProfilerAction.ICON)) {
             protected void fireActionPerformed(ActionEvent e) {
-                boolean isCPU = isCPUProfiling();
-                boolean valid = isCPU ? cpuSettings.settingsValid() :
-                                        memorySettings.settingsValid();
-                if (!valid) {
-                    String msg = isCPU ? Bundle.MSG_InvalidCPUSettings() :
-                                         Bundle.MSG_InvalidMemorySettings();
-                    Dialogs.show(Dialogs.error(Bundle.CAP_InvalidSettings(), msg));
+                String err = null;
+                if (cpuSelector.isSelected()) {
+                    if (!cpuSettings.settingsValid())
+                        err = Bundle.MSG_InvalidCPUSettings();
+                } else if (memorySelector.isSelected()) {
+                    if (!memorySettings.settingsValid())
+                        err = Bundle.MSG_InvalidMemorySettings();
+                }
+                
+                if (err != null) {
+                    Dialogs.show(Dialogs.error(Bundle.CAP_InvalidSettings(), err));
                 } else {
                     accepted = true;
                     Window w = SwingUtilities.getWindowAncestor(this);
@@ -327,6 +358,8 @@ final class StartupConfigurator {
         cpuSize = panel.getPreferredSize();
         memorySize = new Dimension(cpuSize);
         memorySize.height -= cpuSettings.getComponent().getPreferredSize().height - memorySettings.getComponent().getPreferredSize().height;
+        jdbcSize = new Dimension(cpuSize);
+        jdbcSize.height -= cpuSettings.getComponent().getPreferredSize().height - jdbcSettings.getComponent().getPreferredSize().height;
         panel.setPreferredSize(cpuSize);
         
         separator2.setVisible(false);
@@ -484,6 +517,11 @@ final class StartupConfigurator {
         ((JComponent)memory.getComponent(1)).setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
         memory.setVisible(false);
         
+        final JComponent jdbc = jdbcSettings.getComponent();
+        ((JComponent)jdbc.getComponent(0)).setBorder(BorderFactory.createEmptyBorder(-3, -10, 0, -10));
+        ((JComponent)jdbc.getComponent(1)).setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
+        jdbc.setVisible(false);
+        
         final JPanel profile = new JPanel(new VerticalLayout(false)); 
         profile.setBorder(BorderFactory.createEmptyBorder(5, 13, 15, 5));
         profile.setOpaque(false);
@@ -500,6 +538,7 @@ final class StartupConfigurator {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     cpu.setVisible(true);
                     memory.setVisible(false);
+                    jdbc.setVisible(false);
                     if (panel != null) {
                         panel.setPreferredSize(cpuSize);
                         SwingUtilities.getWindowAncestor(profile).pack();
@@ -515,6 +554,7 @@ final class StartupConfigurator {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     cpu.setVisible(false);
                     memory.setVisible(true);
+                    jdbc.setVisible(false);
                     if (panel != null) {
                         panel.setPreferredSize(memorySize);
                         SwingUtilities.getWindowAncestor(profile).pack();
@@ -523,10 +563,27 @@ final class StartupConfigurator {
             }
         };
         mode.add(memorySelector);
+        jdbcSelector = new IconRadioButton(Bundle.LBL_JDBC(), JDBC_ICON, false) {
+            { bg.add(this); }
+            protected void fireItemStateChanged(ItemEvent e) {
+                super.fireItemStateChanged(e);
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    cpu.setVisible(false);
+                    memory.setVisible(false);
+                    jdbc.setVisible(true);
+                    if (panel != null) {
+                        panel.setPreferredSize(jdbcSize);
+                        SwingUtilities.getWindowAncestor(profile).pack();
+                    }
+                }
+            }
+        };
+        mode.add(jdbcSelector);
         profile.add(mode);
         
         profile.add(cpu);
         profile.add(memory);
+        profile.add(jdbc);
         
         return profile;
     }
