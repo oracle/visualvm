@@ -141,7 +141,7 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
             detailsViews[0] = new DataViewComponent.DetailsView(NbBundle.getMessage(
                 CPUSamplerSupport.class, "LBL_Cpu_samples"), null, 10, cpuView, null); // NOI18N
             if (threadsCPU != null) {
-                threadCPUView = new ThreadsCPUView(threadCPURefresher);
+                threadCPUView = new ThreadsCPUView(threadCPURefresher, threadDumper);
                 detailsViews[1] = new DataViewComponent.DetailsView(NbBundle.getMessage(
                 CPUSamplerSupport.class, "LBL_ThreadAlloc"), null, 20, threadCPUView, null); // NOI18N
                 
@@ -162,11 +162,13 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
         refresher.setRefreshRate(refreshRate);
 
         final StackTraceSnapshotBuilder _builder = builder;
-        if (cpuView != null) SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                cpuView.setBuilder(_builder);
-                cpuView.starting();
-//                cpuView.setResultsPanel(new SampledLivePanel2(builder));
+                if (cpuView != null) {
+                    cpuView.setBuilder(_builder);
+                    cpuView.starting();
+                }
+                if (threadCPUView != null) threadCPUView.starting();
             }
         });
 
@@ -187,9 +189,10 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
     }
 
     public synchronized void stopSampling() {
-        if (cpuView != null) SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                cpuView.stopping();
+                if (cpuView != null) cpuView.stopping();
+                if (threadCPUView != null) threadCPUView.stopping();
             }
         });
         
@@ -204,9 +207,10 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
     }
 
     public synchronized void terminate() {
-        if (cpuView != null) SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                cpuView.terminated();
+                if (cpuView != null) cpuView.terminated();
+                if (threadCPUView != null) threadCPUView.terminated();
             }
         });
         
@@ -214,7 +218,7 @@ public abstract class CPUSamplerSupport extends AbstractSamplerSupport {
             timer.cancel();
             timer = null;
         }
-        if (threadCPUView != null) threadCPUView.terminate();
+        
         builder = null;  // release data
     }
 
