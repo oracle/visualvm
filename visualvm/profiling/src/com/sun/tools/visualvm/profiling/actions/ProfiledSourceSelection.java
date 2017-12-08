@@ -39,7 +39,7 @@ public final class ProfiledSourceSelection {
     private final String methodSignature;
     
     
-    ProfiledSourceSelection(Application application, String className, String methodName, String methodSignature) {
+    public ProfiledSourceSelection(Application application, String className, String methodName, String methodSignature) {
         this.application = application;
         
         this.className = className;
