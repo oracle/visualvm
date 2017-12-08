@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.sampler.memory;
 
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.HeapHistogram;
 import com.sun.tools.visualvm.application.jvm.Jvm;
 import com.sun.tools.visualvm.core.options.GlobalPreferences;
@@ -54,6 +55,8 @@ import org.openide.util.NbBundle;
  */
 public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     
+    private final Application application;
+    
     private final Jvm jvm;
     private final MemoryMXBean memoryBean;
     private final ThreadsMemory threadsMemory;
@@ -77,7 +80,9 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     
     private DataViewComponent.DetailsView[] detailsViews;
     
-    public MemorySamplerSupport(Jvm jvm, boolean hasPermGen, ThreadsMemory mem, MemoryMXBean memoryBean, SnapshotDumper snapshotDumper, HeapDumper heapDumper) {
+    public MemorySamplerSupport(Application application, Jvm jvm, boolean hasPermGen, ThreadsMemory mem, MemoryMXBean memoryBean, SnapshotDumper snapshotDumper, HeapDumper heapDumper) {
+        this.application = application;
+        
         this.jvm = jvm;
         hasPermGenHisto = hasPermGen;
         threadsMemory = mem;
@@ -94,12 +99,22 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         }
         heapView.initSession();
         if (permgenView != null) permgenView.initSession();
+        if (threadAllocView != null) threadAllocView.initSession();
         return detailsViews.clone();
     }
     
     public boolean startSampling(ProfilingSettings settings, int samplingRate, int refreshRate) {
 //        heapTimer.start();
 //        permgenTimer.start();
+        
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (heapView != null) heapView.starting();
+                if (permgenView != null) permgenView.starting();
+                if (threadAllocView != null) threadAllocView.starting();
+            }
+        });
+
         heapRefresher.setRefreshRate(samplingRate);
         if (permgenRefresher != null)
             permgenRefresher.setRefreshRate(samplingRate);
@@ -113,6 +128,14 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     }
     
     public synchronized void stopSampling() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (heapView != null) heapView.stopping();
+                if (permgenView != null) permgenView.stopping();
+                if (threadAllocView != null) threadAllocView.stopping();
+            }
+        });
+        
         heapTimer.stop();
         if (permgenTimer != null) {
             permgenTimer.stop();
@@ -126,8 +149,13 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
     }
     
     public synchronized void terminate() {
-        if (heapView != null) heapView.terminate();
-        if (permgenView != null) permgenView.terminate();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (heapView != null) heapView.terminated();
+                if (permgenView != null) permgenView.terminated();
+                if (threadAllocView != null) threadAllocView.terminated();
+            }
+        });
     }
     
     
@@ -224,12 +252,12 @@ public abstract class MemorySamplerSupport extends AbstractSamplerSupport {
         if (threadAllocRefresher != null) detailsCount++;
         DataViewComponent.DetailsView[] details = new DataViewComponent.DetailsView[detailsCount];
         
-        heapView = new MemoryView(heapRefresher, MemoryView.MODE_HEAP, memoryBean, snapshotDumper, heapDumper);
+        heapView = new MemoryView(application, heapRefresher, MemoryView.MODE_HEAP, memoryBean, snapshotDumper, heapDumper);
         details[detailIndex++] = new DataViewComponent.DetailsView(
                     NbBundle.getMessage(MemorySamplerSupport.class, "LBL_Heap_histogram"), // NOI18N
                     null, 10, heapView, null);
         if (hasPermGenHisto) {
-            permgenView = new MemoryView(permgenRefresher, MemoryView.MODE_PERMGEN, memoryBean, null, heapDumper);
+            permgenView = new MemoryView(application, permgenRefresher, MemoryView.MODE_PERMGEN, memoryBean, null, heapDumper);
             details[detailIndex++] = new DataViewComponent.DetailsView(
                         NbBundle.getMessage(MemorySamplerSupport.class, "LBL_PermGen_histogram"), // NOI18N
                         null, 20, permgenView, null);

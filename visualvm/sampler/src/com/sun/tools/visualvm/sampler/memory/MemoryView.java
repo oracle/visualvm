@@ -25,62 +25,60 @@
 
 package com.sun.tools.visualvm.sampler.memory;
 
+import com.sun.tools.visualvm.application.Application;
 import com.sun.tools.visualvm.application.jvm.HeapHistogram;
 import com.sun.tools.visualvm.application.jvm.HeapHistogram.ClassInfo;
+import com.sun.tools.visualvm.profiling.actions.ProfiledSourceSelection;
+import com.sun.tools.visualvm.profiling.actions.ProfilerPopupCustomizer;
 import com.sun.tools.visualvm.sampler.AbstractSamplerSupport;
-import com.sun.tools.visualvm.uisupport.HTMLTextArea;
-import com.sun.tools.visualvm.uisupport.SeparatorLine;
-import com.sun.tools.visualvm.uisupport.TransparentToolBar;
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.KeyboardFocusManager;
+import java.awt.LayoutManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.ItemEvent;
 import java.lang.management.MemoryMXBean;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
-import org.netbeans.lib.profiler.global.CommonConstants;
-import org.netbeans.lib.profiler.ui.UIConstants;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.FilterComponent;
-import org.netbeans.lib.profiler.ui.components.JExtendedTable;
-import org.netbeans.lib.profiler.ui.components.table.ClassNameTableCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.CustomBarCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.DiffBarCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.ExtendedTableModel;
-import org.netbeans.lib.profiler.ui.components.table.JExtendedTablePanel;
-import org.netbeans.lib.profiler.ui.components.table.LabelBracketTableCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.LabelTableCellRenderer;
-import org.netbeans.lib.profiler.ui.components.table.SortableTableModel;
+import javax.swing.SortOrder;
+import javax.swing.UIManager;
+import javax.swing.table.AbstractTableModel;
+import org.netbeans.lib.profiler.ui.Formatters;
+import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.swing.FilterUtils;
+import org.netbeans.lib.profiler.ui.swing.GrayLabel;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
+import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
+import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
+import org.netbeans.lib.profiler.utils.Wildcards;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -93,7 +91,6 @@ final class MemoryView extends JPanel {
 
     static final int MODE_HEAP = 1;
     static final int MODE_PERMGEN = 2;
-    static final int MODE_THREADALLOC = 3;
     
     private final int mode;
 
@@ -103,9 +100,15 @@ final class MemoryView extends JPanel {
     private final MemoryMXBean memoryBean;
     private final MemorySamplerSupport.HeapDumper heapDumper;
     private final MemorySamplerSupport.SnapshotDumper snapshotDumper;
+    
+    private List<ClassInfo> classes = new ArrayList();
+    private List<ClassInfo> baseClasses = new ArrayList(); // Needed to correctly setup table renderers
+//    private int totalClasses = -1;
+    private long totalBytes, baseTotalBytes = -1;
+    private long totalInstances, baseTotalInstances = -1;
 
 
-    MemoryView(AbstractSamplerSupport.Refresher refresher, int mode,
+    MemoryView(Application application, AbstractSamplerSupport.Refresher refresher, int mode,
                MemoryMXBean memoryBean, MemorySamplerSupport.SnapshotDumper snapshotDumper,
                MemorySamplerSupport.HeapDumper heapDumper) {
 
@@ -115,8 +118,8 @@ final class MemoryView extends JPanel {
         this.memoryBean = memoryBean;
         this.snapshotDumper = snapshotDumper;
         this.heapDumper = heapDumper;
-        initColumnsData();
-        initComponents();
+        
+        initComponents(application);
 
         addHierarchyListener(new HierarchyListener() {
             public void hierarchyChanged(HierarchyEvent e) {
@@ -129,80 +132,81 @@ final class MemoryView extends JPanel {
 
 
     void initSession() {
-        if (snapshotButton != null) snapshotButton.setEnabled(false);
+        if (pdSnapshotButton != null) pdSnapshotButton.setEnabled(false);
     }
 
     boolean isPaused() {
-        return pauseButton.isSelected() && !forceRefresh;
+        return lrPauseButton.isSelected() && !forceRefresh;
     }
-
+    
     boolean isEmpty() {
-        return resTableModel.getRowCount() == 0;
+        return tableModel.getRowCount() == 0;
     }
-
+    
     void refresh(HeapHistogram histogram) {
         if (histogram == null || isPaused()) return;
         forceRefresh = false;
-
-        if (deltaButton.isSelected()) {
+        
+        boolean diff = lrDeltasButton.isSelected();
+        if (diff) {
             if (baseClasses == null) {
                 baseClasses = new ArrayList(classes);
                 baseTotalBytes = totalBytes;
                 baseTotalInstances = totalInstances;
-
-                columnRenderers[1] = diffBarCellRenderer;
-                columnRenderers[2] = labelTableCellRenderer;
-                columnRenderers[3] = labelTableCellRenderer;
-                updateColumnRenderers();
             }
 
             Collection<ClassInfo> newClasses = getHistogram(histogram);
             classes = computeDeltaClasses(baseClasses, newClasses);
 
-            totalClasses = baseClasses.size() - newClasses.size();
+//            totalClasses = baseClasses.size() - newClasses.size();
             totalBytes = getTotalBytes(histogram) - baseTotalBytes;
             totalInstances = getTotalInstances(histogram) - baseTotalInstances;
 
             long maxAbsDiffBytes = 0;
             for (ClassInfo cInfo : classes)
                 maxAbsDiffBytes = Math.max(maxAbsDiffBytes, Math.abs(cInfo.getBytes()));
-
-            diffBarCellRenderer.setMaximum(maxAbsDiffBytes);
-            diffBarCellRenderer.setMinimum(-maxAbsDiffBytes);
             
         } else {
             if (baseClasses != null) {
                 baseClasses = null;
                 baseTotalBytes = -1;
                 baseTotalInstances = -1;
-
-                columnRenderers[1] = customBarCellRenderer;
-                columnRenderers[2] = labelBracketTableCellRenderer;
-                columnRenderers[3] = labelBracketTableCellRenderer;
-                updateColumnRenderers();
             }
             classes.clear();
             classes.addAll(getHistogram(histogram));
 
-            totalClasses = classes.size();
+//            totalClasses = classes.size();
             totalBytes = getTotalBytes(histogram);
             totalInstances = getTotalInstances(histogram);
-            customBarCellRenderer.setMaximum(totalBytes);
         }
+        
+        renderers[0].setDiffMode(diff);
+        renderers[0].setMaxValue(totalBytes);
+        
+        renderers[1].setDiffMode(diff);
+        renderers[1].setMaxValue(totalInstances);
 
-        updateData(false);
-        refreshUI();
+        tableModel.fireTableDataChanged();
 
-        if (snapshotButton != null) snapshotButton.setEnabled(true);
+        if (pdSnapshotButton != null) pdSnapshotButton.setEnabled(true);
     }
 
-    void terminate() {
-//        refreshRateLabel.setEnabled(false);
-//        refreshCombo.setEnabled(false);
-//        refreshUnitsLabel.setEnabled(false);
-        pauseButton.setEnabled(false);
-        refreshButton.setEnabled(false);
-        deltaButton.setEnabled(false);
+    void starting() {
+        lrPauseButton.setEnabled(true);
+        lrRefreshButton.setEnabled(false);
+        lrDeltasButton.setEnabled(true);
+    }
+    
+    void stopping() {
+        lrPauseButton.setEnabled(false);
+        lrRefreshButton.setEnabled(false);
+        lrDeltasButton.setEnabled(false);
+    }
+    
+    void terminated() {
+        lrPauseButton.setEnabled(false);
+        lrRefreshButton.setEnabled(false);
+        lrDeltasButton.setEnabled(false);
         gcButton.setEnabled(false);
         heapdumpButton.setEnabled(false);
     }
@@ -240,399 +244,179 @@ final class MemoryView extends JPanel {
 
         return new ArrayList(deltaMap.values());
     }
-
-
-    private void updateData(boolean sortOnly) {
-        int selectedRow = resTable.getSelectedRow();
-        String selectedRowContents = null;
-
-        if (selectedRow != -1)
-            selectedRowContents = (String) resTable.getValueAt(selectedRow, 0);
-
-        if (!sortOnly) filterData();
-        sortData();
-
-        resTableModel.fireTableDataChanged();
-
-        if (selectedRowContents != null)
-            resTable.selectRowByContents(selectedRowContents, 0, false);
-    }
-
-
-    private void filterData() {
-        filteredSortedIndexes.clear();
-
-        String[] filterStrings = FilterComponent.getFilterValues(filterString);
-        if (filterType == CommonConstants.FILTER_NONE ||
-            filterStrings == null || filterStrings[0].equals("")) { // NOI18N
-            for (int i = 0; i < classes.size(); i++) filteredSortedIndexes.add(i);
-        } else {
-            for (int i = 0; i < classes.size(); i++)
-                if (passedFilters(classes.get(i).getName(), filterStrings, filterType))
-                    filteredSortedIndexes.add(i);
-        }
-    }
-
-    private static boolean passedFilters(String value, String[] filters, int type) {
-        for (int i = 0; i < filters.length; i++)
-            if (passedFilter(value, filters[i], type)) return true;
-        return false;
-    }
-
-    private static boolean passedFilter(String value, String filter, int type) {
-        // Case sensitive comparison:
-        /*switch (type) {
-           case CommonConstants.FILTER_STARTS_WITH:
-             return value.startsWith(filter);
-           case CommonConstants.FILTER_CONTAINS:
-             return value.indexOf(filter) != -1;
-           case CommonConstants.FILTER_ENDS_WITH:
-             return value.endsWith(filter);
-           case CommonConstants.FILTER_EQUALS:
-             return value.equals(filter);
-           case CommonConstants.FILTER_REGEXP:
-             return value.matches(filter);
-           }*/
-
-        // Case insensitive comparison (except regexp):
-        switch (type) {
-            case CommonConstants.FILTER_STARTS_WITH:
-                return value.regionMatches(true, 0, filter, 0, filter.length()); // case insensitive startsWith, optimized
-            case CommonConstants.FILTER_CONTAINS:
-                return value.toLowerCase().indexOf(filter.toLowerCase()) != -1; // case insensitive indexOf, NOT OPTIMIZED
-            case CommonConstants.FILTER_ENDS_WITH:
-
-                // case insensitive endsWith, optimized
-                return value.regionMatches(true, value.length() - filter.length(), filter, 0, filter.length());
-            case CommonConstants.FILTER_EQUALS:
-                return value.equalsIgnoreCase(filter); // case insensitive equals
-            case CommonConstants.FILTER_REGEXP:
-                return value.matches(filter); // still case sensitive!
-        }
-
-        return false;
-    }
-
-    private void sortData() {
-        Collections.sort(filteredSortedIndexes, new Comparator() {
-
-            public int compare(Object o1, Object o2) {
-                Integer index1 = (Integer)o1;
-                Integer index2 = (Integer)o2;
-                ClassInfo class1 = classes.get(index1);
-                ClassInfo class2 = classes.get(index2);
-
-                switch (sortingColumn) {
-                    case 0:
-                        return sortOrder ? class1.getName().compareTo(class2.getName()) :
-                            class2.getName().compareTo(class1.getName());
-                    case 1:
-                    case 2:
-                        return sortOrder ? ((Long)class1.getBytes()).compareTo(class2.getBytes()) :
-                            ((Long)class2.getBytes()).compareTo(class1.getBytes());
-                    case 3:
-                        return sortOrder ? ((Long)class1.getInstancesCount()).compareTo(class2.getInstancesCount()) :
-                            ((Long)class2.getInstancesCount()).compareTo(class1.getInstancesCount());
-                    default:
-                        return 0;
-                }
-            }
-
-        });
-    }
-
-
-    private JExtendedTable initTable() {
-        resTableModel = new ExtendedTableModel(new SortableTableModel() {
-            public String getColumnName(int col) {
-                return columnNames[col];
-            }
-
-            public int getRowCount() {
-                return filteredSortedIndexes.size();
-            }
-
-            public int getColumnCount() {
-                return columnNames.length;
-            }
-
-            public Class getColumnClass(int col) {
-                return columnTypes[col];
-            }
-
-            public Object getValueAt(int row, int col) {
-                ClassInfo classs = classes.get(filteredSortedIndexes.get(row));
-                boolean deltas = baseClasses != null;
-                long bytes = classs.getBytes();
-                long instances = classs.getInstancesCount();
-                NumberFormat formatter = NumberFormat.getInstance();
-
-                switch (col) {
-                    case 0:
-                        return classs.getName();
-                    case 1:
-                        return bytes;
-                    case 2:
-                        if (deltas) {
-                            return bytes > 0 ? "+" + formatter.format(bytes) : formatter.format(bytes); // NOI18N
-                        } else {
-                            return bytes == 0 ? "0 (0.0%)" : formatter.format(bytes) + " (" + getPercentValue(bytes, totalBytes) + "%)"; // NOI18N
-                        }
-                    case 3:
-                        if (deltas) {
-                            return instances > 0 ? "+" + formatter.format(instances) : formatter.format(instances); // NOI18N
-                        } else {
-                            return instances == 0 ? "0 (0.0%)" : formatter.format(instances) + " (" + getPercentValue(instances, totalInstances) + "%)"; // NOI18N
-                        }
-                    default:
-                        return null;
-                }
-            }
-
-            private String getPercentValue(float value, float basevalue) {
-                int basis = (int) (value / basevalue * 1000f);
-                int percent = basis / 10;
-                int permille = basis % 10;
-
-                return "" + percent + "." + permille; // NOI18N
-            }
-
-            public String getColumnToolTipText(int col) {
-                return columnToolTips[col];
-            }
-
-            public void sortByColumn(int column, boolean order) {
-                sortingColumn = column;
-                sortOrder = order;
-                updateData(true);
-            }
-
-            /**
-             * @param column The table column index
-             * @return Initial sorting for the specified column - if true, ascending, if false descending
-             */
-            public boolean getInitialSorting(int column) {
-                switch (column) {
-                    case 0:
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-        });
-
-        resTable = new JExtendedTable(resTableModel) {
-            public void doLayout() {
-                int columnsWidthsSum = 0;
-                int realFirstColumn = -1;
-
-                int index;
-
-                for (int i = 0; i < resTableModel.getColumnCount(); i++) {
-                    index = resTableModel.getRealColumn(i);
-
-                    if (index == 0) {
-                        realFirstColumn = i;
-                    } else {
-                        columnsWidthsSum += getColumnModel().getColumn(i).getPreferredWidth();
+    
+    
+    private JLabel lrLabel;
+    private JToggleButton lrPauseButton;
+    private JButton lrRefreshButton;
+    private JToggleButton lrDeltasButton;
+    
+    private JLabel pdLabel;
+    private JButton pdSnapshotButton;
+//    private JButton pdResetResultsButton;
+    
+    private AbstractButton gcButton;
+    private AbstractButton heapdumpButton;
+    
+    private boolean popupPause;
+    
+    private JComponent bottomPanel;
+    private JComponent filterPanel;
+    private JComponent searchPanel;
+    
+//    private NumberRenderer threadsCount;
+//    private NumberRenderer threadsTotalBytes;
+    
+    private HistogramTableModel tableModel;
+    private ProfilerTable table;
+    
+    private HideableBarRenderer[] renderers;
+    
+    private void initComponents(final Application application) {
+        tableModel = new HistogramTableModel();
+        
+        table = new ProfilerTable(tableModel, true, true, null) {
+//            public ClientUtils.SourceCodeSelection getUserValueForRow(int row) {
+//                return ThreadsMemoryView.this.getUserValueForRow(row);
+//            }
+            protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
+                String selectedClass = value == null ? null : value.toString();
+                if (snapshotDumper != null && selectedClass != null) {
+                    JMenuItem[] customItems = createCustomMenuItems(application, selectedClass);
+                    if (customItems != null) {
+                        for (JMenuItem customItem : customItems) popup.add(customItem);
+                        popup.addSeparator();
                     }
                 }
-
-                if (realFirstColumn != -1) {
-                    getColumnModel().getColumn(realFirstColumn)
-                        .setPreferredWidth(Math.max(getWidth() - columnsWidthsSum, minNamesColumnWidth));
+                
+                popup.add(createCopyMenuItem());
+                popup.addSeparator();
+                
+                popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
+                    protected void fireActionPerformed(ActionEvent e) { MemoryView.this.activateFilter(); }
+                });
+                popup.add(new JMenuItem(SearchUtils.ACTION_FIND) {
+                    protected void fireActionPerformed(ActionEvent e) { MemoryView.this.activateSearch(); }
+                });
+            }
+            protected void popupShowing() {
+                if (lrPauseButton.isEnabled() && !lrRefreshButton.isEnabled()) {
+                    popupPause = true;
+                    lrPauseButton.setSelected(true);
                 }
-
-                super.doLayout();
             }
-            ;
-        };
-
-        resTableModel.setTable(resTable);
-        resTableModel.setInitialSorting(sortingColumn, sortOrder);
-        resTable.setRowSelectionAllowed(true);
-        resTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        resTable.setGridColor(UIConstants.TABLE_VERTICAL_GRID_COLOR);
-        resTable.setSelectionBackground(UIConstants.TABLE_SELECTION_BACKGROUND_COLOR);
-        resTable.setSelectionForeground(UIConstants.TABLE_SELECTION_FOREGROUND_COLOR);
-        resTable.setShowHorizontalLines(UIConstants.SHOW_TABLE_HORIZONTAL_GRID);
-        resTable.setShowVerticalLines(UIConstants.SHOW_TABLE_VERTICAL_GRID);
-        resTable.setRowMargin(UIConstants.TABLE_ROW_MARGIN);
-        resTable.setRowHeight(UIUtils.getDefaultRowHeight() + 2);
-
-        resTable.getAccessibleContext().setAccessibleName(""); // NOI18N
-        resTable.getAccessibleContext().setAccessibleDescription(""); // NOI18N
-//        resTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-//             .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "DEFAULT_ACTION"); // NOI18N
-//        resTable.getActionMap().put("DEFAULT_ACTION", new AbstractAction() { // NOI18N
-//            public void actionPerformed(ActionEvent e) {
-//                performDefaultAction();
-//            }
-//        });
-
-        // Disable traversing table cells using TAB and Shift+TAB
-        Set keys = new HashSet(resTable.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
-        keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
-        resTable.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
-
-        keys = new HashSet(resTable.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
-        keys.add(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK));
-        resTable.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
-
-        setColumnsData();
-
-        return resTable;
-    }
-
-    protected void initColumnsData() {
-        int maxWidth = getFontMetrics(getFont()).charWidth('W') * 13; // NOI18N // initial width of data columns
-        minNamesColumnWidth = getFontMetrics(getFont()).charWidth('W') * 30; // NOI18N
-
-        ClassNameTableCellRenderer classNameTableCellRenderer = new ClassNameTableCellRenderer();
-        customBarCellRenderer = new CustomBarCellRenderer(0, 100);
-        diffBarCellRenderer = new DiffBarCellRenderer(0, 100);
-        labelTableCellRenderer = new LabelTableCellRenderer(JLabel.TRAILING);
-        labelBracketTableCellRenderer = new LabelBracketTableCellRenderer(JLabel.TRAILING);
-
-        columnNames = new String[] { 
-            NbBundle.getMessage(MemoryView.class, "COL_Class_name"), // NOI18N
-            NbBundle.getMessage(MemoryView.class, "COL_Bytes_rel"), // NOI18N
-            NbBundle.getMessage(MemoryView.class, "COL_Bytes"), // NOI18N
-            NbBundle.getMessage(MemoryView.class, "COL_Instances") }; // NOI18N
-        columnToolTips = new String[] {
-            NbBundle.getMessage(MemoryView.class, "COL_Class_name"), // NOI18N
-            NbBundle.getMessage(MemoryView.class, "COL_Bytes_rel"), // NOI18N
-            NbBundle.getMessage(MemoryView.class, "COL_Bytes"), // NOI18N
-            NbBundle.getMessage(MemoryView.class, "COL_Instances") }; // NOI18N
-        columnTypes = new Class[] { String.class, Number.class, String.class, String.class };
-        columnRenderers = new TableCellRenderer[] {
-            classNameTableCellRenderer, customBarCellRenderer, 
-            labelBracketTableCellRenderer, labelBracketTableCellRenderer };
-        columnWidths = new int[] { maxWidth, maxWidth, maxWidth, maxWidth };
-    }
-
-    private void setColumnsData() {
-        TableColumnModel colModel = resTable.getColumnModel();
-        colModel.getColumn(0).setPreferredWidth(minNamesColumnWidth);
-
-        int index;
-        for (int i = 0; i < colModel.getColumnCount(); i++) {
-            index = resTableModel.getRealColumn(i);
-
-            if (index == 0) {
-                colModel.getColumn(i).setPreferredWidth(minNamesColumnWidth);
-            } else {
-                colModel.getColumn(i).setPreferredWidth(columnWidths[index - 1]);
-            }
-
-            colModel.getColumn(i).setCellRenderer(columnRenderers[index]);
-        }
-    }
-
-    private void updateColumnRenderers() {
-        TableColumnModel colModel = resTable.getColumnModel();
-        for (int i = 0; i < colModel.getColumnCount(); i++)
-            colModel.getColumn(i).setCellRenderer(
-                                columnRenderers[resTableModel.getRealColumn(i)]);
-    }
-
-//    private void performDefaultAction() {
-//        int[] array = resTable.getSelectedRows();
-//
-//        for (int i = 0; i < array.length; i++)
-//            array[i] = filteredDataToDataIndex.get(array[i]).threadIndex;
-//
-//        ThreadsTablePanel.this.detailsCallback.showDetails(array);
-//    }
-
-    private void initComponents() {
-        setLayout(new BorderLayout());
-        setOpaque(false);
-
-        final TransparentToolBar toolBar = new TransparentToolBar();
-
-//        refreshRateLabel = new JLabel("Refresh: ");
-//        refreshRateLabel.setToolTipText("Live results refresh rate [ms]");
-//        toolBar.add(refreshRateLabel);
-//
-//        Integer[] refreshRates = new Integer[] { 100, 200, 500, 1000, 2000, 5000, 10000 };
-//        refreshCombo = new JComboBox(refreshRates) {
-//            public Dimension getMinimumSize() { return getPreferredSize(); }
-//            public Dimension getMaximumSize() { return getPreferredSize(); }
-//        };
-//        refreshCombo.setToolTipText("Live results refresh rate [ms]");
-//        refreshCombo.setEditable(false);
-//        refreshCombo.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                refresher.setRefreshRate((Integer)refreshCombo.getSelectedItem());
-//            }
-//        });
-//        refreshCombo.setSelectedItem(refresher.getRefreshRate());
-//        refreshCombo.setRenderer(new ComboRenderer(refreshCombo));
-//        toolBar.add(refreshCombo);
-//
-//        refreshUnitsLabel = new JLabel(" ms.  ");
-//        refreshUnitsLabel.setToolTipText("Live results refresh rate [ms]");
-//        toolBar.add(refreshUnitsLabel);
-
-        pauseButton = new JToggleButton() {
-            protected void fireActionPerformed(ActionEvent event) {
-                boolean selected = pauseButton.isSelected();
-                refreshButton.setEnabled(selected);
-                if (!selected) refresher.refresh();
+            protected void popupHidden() {
+                if (lrPauseButton.isEnabled() && popupPause) {
+                    popupPause = false;
+                    lrPauseButton.setSelected(false);
+                }
             }
         };
-        pauseButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/sampler/resources/pause.png", true))); // NOI18N
-        pauseButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Pause_results")); // NOI18N
-        pauseButton.setOpaque(false);
-        toolBar.addItem(pauseButton);
+        
+        table.setColumnToolTips(new String[] { "Class name", "Size of live instances", "Number of live instances" });
+        
+        table.providePopupMenu(true);
+        
+        table.setMainColumn(0);
+        table.setFitWidthColumn(0);
+        
+        table.setSortColumn(1);
+        table.setDefaultSortOrder(1, SortOrder.DESCENDING);
+        
+        renderers = new HideableBarRenderer[2];
+        renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(Formatters.bytesFormat()));
+        renderers[1] = new HideableBarRenderer(new NumberPercentRenderer());
+        
+        renderers[0].setMaxValue(123456789);
+        renderers[1].setMaxValue(12345678);
+        
+        table.setColumnRenderer(0, new JavaNameRenderer(Icons.getIcon(LanguageIcons.CLASS)));
+        table.setColumnRenderer(1, renderers[0]);
+        table.setColumnRenderer(2, renderers[1]);
+        
+        table.setDefaultColumnWidth(1, renderers[0].getOptimalWidth());
+        table.setDefaultColumnWidth(2, renderers[1].getMaxNoBarWidth());
+        
+        ProfilerTableContainer tableContainer = new ProfilerTableContainer(table, false, null);
+        
+        
+        // --- Toolbar ---------------------------------------------------------
+        
+        lrLabel = new GrayLabel("Results:");
+            
+        lrPauseButton = new JToggleButton(Icons.getIcon(GeneralIcons.PAUSE)) {
+            protected void fireItemStateChanged(ItemEvent event) {
+                boolean paused = isSelected();
+                lrRefreshButton.setEnabled(paused && !popupPause);
+                if (!paused) refresher.refresh();
+            }
+        };
+        lrPauseButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Pause_results"));
 
-        refreshButton = new JButton() {
-            protected void fireActionPerformed(ActionEvent event) {
+        lrRefreshButton = new JButton(Icons.getIcon(GeneralIcons.UPDATE_NOW)) {
+            protected void fireActionPerformed(ActionEvent e) {
                 forceRefresh = true;
                 refresher.refresh();
             }
         };
-        refreshButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
-                "com/sun/tools/visualvm/sampler/resources/update.png", true))); // NOI18N
-        refreshButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Update_results")); // NOI18N
-        refreshButton.setEnabled(pauseButton.isSelected());
-        refreshButton.setOpaque(false);
-        toolBar.addItem(refreshButton);
-
-        toolBar.addSeparator();
-
-        deltaButton = new JToggleButton(NbBundle.getMessage(MemoryView.class, "LBL_Deltas")) { // NOI18N
-            protected void fireActionPerformed(ActionEvent event) {
-                refresher.refresh();
+        lrRefreshButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Update_results"));
+        lrRefreshButton.setEnabled(false);
+        
+        Icon icon = Icons.getIcon(ProfilerIcons.DELTA_RESULTS);
+        lrDeltasButton = new JToggleButton(icon) {
+            protected void fireActionPerformed(ActionEvent e) {
+                if (!lrPauseButton.isSelected()) {
+                    forceRefresh = true;
+                    refresher.refresh();
+                }
             }
         };
-        deltaButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Deltas")); // NOI18N
-        deltaButton.setOpaque(false);
-        toolBar.addItem(deltaButton);
-
+        lrDeltasButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Deltas"));
+        
         if (snapshotDumper != null) {
-            toolBar.addSeparator();
+            pdLabel = new GrayLabel("Collected data:");
             
-            snapshotButton = new JButton(NbBundle.getMessage(MemoryView.class,
-                    "LBL_Snapshot"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
-                    "com/sun/tools/visualvm/sampler/resources/snapshot.png", true))) { // NOI18N
+            pdSnapshotButton = new JButton(NbBundle.getMessage(MemoryView.class,
+                        "LBL_Snapshot"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
+                        "com/sun/tools/visualvm/sampler/resources/snapshot.png", true))) { // NOI18N
                 protected void fireActionPerformed(ActionEvent event) {
                     snapshotDumper.takeSnapshot((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
                 }
             };
-            snapshotButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Snapshot")); // NOI18N
-            snapshotButton.setOpaque(false);
-            snapshotButton.setEnabled(false);
-            toolBar.addItem(snapshotButton);
+            pdSnapshotButton.setText("Snapshot");
         }
+        
+        ProfilerToolbar toolbar = ProfilerToolbar.create(true);
 
-        toolBar.addFiller();
+//        toolbar.addSpace(2);
+//        toolbar.addSeparator();
+        toolbar.addSpace(5);
 
+        toolbar.add(lrLabel);
+        toolbar.addSpace(2);
+        toolbar.add(lrPauseButton);
+        toolbar.add(lrRefreshButton);
+        
+        toolbar.addSpace(5);
+        toolbar.add(lrDeltasButton);
+        
+        if (pdSnapshotButton != null) {
+        
+            toolbar.addSpace(2);
+            toolbar.addSeparator();
+            toolbar.addSpace(5);
+
+            toolbar.add(pdLabel);
+            toolbar.addSpace(2);
+            toolbar.add(pdSnapshotButton);
+        
+        }
+        
+        toolbar.addFiller();
+        
         gcButton = new JButton(NbBundle.getMessage(MemoryView.class, "LBL_Gc")) { // NOI18N
             protected void fireActionPerformed(ActionEvent event) {
-                RequestProcessor.getDefault().post(new Runnable() {
+                new RequestProcessor("GC Processor").post(new Runnable() { // NOI18N
                     public void run() {
                         try { memoryBean.gc(); } catch (Exception e) {
                             setEnabled(false);
@@ -641,239 +425,234 @@ final class MemoryView extends JPanel {
                     };
                 });
             }
+            public Dimension getPreferredSize() {
+                Dimension dim = super.getPreferredSize();
+                dim.width += 5;
+                return dim;
+            }
         };
         gcButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Gc")); // NOI18N
         gcButton.setOpaque(false);
-        gcButton.setEnabled(memoryBean != null);
-        toolBar.addItem(gcButton);
-
+        gcButton.setEnabled(heapDumper != null);
+        toolbar.add(gcButton);
+        
         heapdumpButton = new JButton(NbBundle.getMessage(MemoryView.class, "LBL_HeapDump")) { // NOI18N
             protected void fireActionPerformed(ActionEvent event) {
-                heapDumper.takeHeapDump((event.getModifiers() &
-                        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
+                heapDumper.takeHeapDump((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
+            }
+            public Dimension getPreferredSize() {
+                Dimension dim = super.getPreferredSize();
+                dim.width += 5;
+                return dim;
             }
         };
         heapdumpButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_HeapDump")); // NOI18N
         heapdumpButton.setOpaque(false);
         heapdumpButton.setEnabled(heapDumper != null);
-        toolBar.addItem(heapdumpButton);
-
-        int maxHeight = pauseButton.getPreferredSize().height;
-        maxHeight = Math.max(maxHeight, refreshButton.getPreferredSize().height);
-        if (snapshotButton != null) maxHeight = Math.max(maxHeight, snapshotButton.getPreferredSize().height);
-        maxHeight = Math.max(maxHeight, deltaButton.getPreferredSize().height);
-        maxHeight = Math.max(maxHeight, gcButton.getPreferredSize().height);
-        maxHeight = Math.max(maxHeight, heapdumpButton.getPreferredSize().height);
-
-        int width = pauseButton.getPreferredSize().width;
-        Dimension size = new Dimension(maxHeight, maxHeight);
-        pauseButton.setMinimumSize(size);
-        pauseButton.setPreferredSize(size);
-        pauseButton.setMaximumSize(size);
-
-        width = refreshButton.getPreferredSize().width;
-        size = new Dimension(maxHeight, maxHeight);
-        refreshButton.setMinimumSize(size);
-        refreshButton.setPreferredSize(size);
-        refreshButton.setMaximumSize(size);
-
-        if (snapshotButton != null) {
-            width = snapshotButton.getPreferredSize().width;
-            size = new Dimension(width + 5, maxHeight);
-            snapshotButton.setMinimumSize(size);
-            snapshotButton.setPreferredSize(size);
-            snapshotButton.setMaximumSize(size);
+        toolbar.add(heapdumpButton);
+        
+        
+        setLayout(new BorderLayout());
+        add(toolbar.getComponent(), BorderLayout.NORTH);
+        add(tableContainer, BorderLayout.CENTER);
+    }
+    
+    private JComponent getBottomPanel() {
+        if (bottomPanel == null) {
+            bottomPanel = new JPanel(new FilterFindLayout());
+            bottomPanel.setOpaque(true);
+            bottomPanel.setBackground(UIManager.getColor("controlShadow")); // NOI18N
+            add(bottomPanel, BorderLayout.SOUTH);
+        }
+        return bottomPanel;
+    }
+    
+    private void activateFilter() {
+        JComponent panel = getBottomPanel();
+        
+        if (filterPanel == null) {
+            filterPanel = FilterUtils.createFilterPanel(table, null);
+            panel.add(filterPanel);
+            Container parent = panel.getParent();
+            parent.invalidate();
+            parent.revalidate();
+            parent.repaint();
+        }
+        
+        panel.setVisible(true);
+        
+        filterPanel.setVisible(true);
+        filterPanel.requestFocusInWindow();
+    }
+    
+    private void activateSearch() {
+        JComponent panel = getBottomPanel();
+        
+        if (searchPanel == null) {
+            searchPanel = SearchUtils.createSearchPanel(table);
+            panel.add(searchPanel);
+            Container parent = panel.getParent();
+            parent.invalidate();
+            parent.revalidate();
+            parent.repaint();
+        }
+        
+        panel.setVisible(true);
+        
+        searchPanel.setVisible(true);
+        searchPanel.requestFocusInWindow();
+    }
+    
+    private JMenuItem[] createCustomMenuItems(Application application, String className) {
+        Collection<? extends ProfilerPopupCustomizer> customizers = Lookup.getDefault().lookupAll(ProfilerPopupCustomizer.class);
+        if (customizers.isEmpty()) return null;
+        
+        ProfiledSourceSelection pss = new ProfiledSourceSelection(application, className, Wildcards.ALLWILDCARD, null);
+        
+        List<JMenuItem> menuItems = new ArrayList(customizers.size());
+        
+        for (ProfilerPopupCustomizer customizer : customizers) {
+            if (customizer.supportsDataView(ProfilerPopupCustomizer.View.MEMORY, ProfilerPopupCustomizer.Mode.LIVE)) {
+                JMenuItem[] items = customizer.getMenuItems(pss, ProfilerPopupCustomizer.View.MEMORY, ProfilerPopupCustomizer.Mode.LIVE);
+                if (items != null) Collections.addAll(menuItems, items);
+            }
+        }
+        
+        return menuItems.isEmpty() ? null : menuItems.toArray(new JMenuItem[0]);
+    }
+    
+    
+    private static final String COL_NAME = NbBundle.getMessage(MemoryView.class, "COL_Class_name"); // NOI18N
+    private static final String COL_BYTES = NbBundle.getMessage(MemoryView.class, "COL_Bytes"); // NOI18N
+    private static final String COL_INSTANCES = NbBundle.getMessage(MemoryView.class, "COL_Instances"); // NOI18N
+    
+    private class HistogramTableModel extends AbstractTableModel {
+        
+        public String getColumnName(int columnIndex) {
+            if (columnIndex == 0) {
+                return COL_NAME;
+            } else if (columnIndex == 1) {
+                return COL_BYTES;
+            } else if (columnIndex == 2) {
+                return COL_INSTANCES;
+            }
+            
+            return null;
         }
 
-        width = deltaButton.getPreferredSize().width;
-        size = new Dimension(width + 5, maxHeight);
-        deltaButton.setMinimumSize(size);
-        deltaButton.setPreferredSize(size);
-        deltaButton.setMaximumSize(size);
-
-        width = gcButton.getPreferredSize().width;
-        size = new Dimension(width + 5, maxHeight);
-        gcButton.setMinimumSize(size);
-        gcButton.setPreferredSize(size);
-        gcButton.setMaximumSize(size);
-
-        width = heapdumpButton.getPreferredSize().width;
-        size = new Dimension(width + 5, maxHeight);
-        heapdumpButton.setMinimumSize(size);
-        heapdumpButton.setPreferredSize(size);
-        heapdumpButton.setMaximumSize(size);
-
-//        controlPanel.add(toolBar, BorderLayout.NORTH);
-//        controlPanel.add(new SeparatorLine(true), BorderLayout.CENTER);
-
-        JPanel resultsPanel = new JPanel(new BorderLayout());
-        resultsPanel.setOpaque(false);
-
-        JPanel areaPanel = new JPanel(new BorderLayout());
-        areaPanel.setOpaque(false);
-        area = new HTMLTextArea();
-        area.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        refreshUI();
-        areaPanel.add(area, BorderLayout.NORTH);
-        areaPanel.add(new SeparatorLine(true), BorderLayout.SOUTH);
-
-        resultsPanel.add(areaPanel, BorderLayout.NORTH);
-
-        add(TransparentToolBar.withSeparator(toolBar), BorderLayout.NORTH);
-
-        resTable = initTable();
-        resTable.addComponentListener(new ComponentAdapter() {
-            public void componentResized(ComponentEvent e) {
-                MemoryView.this.revalidate();
+        public Class<?> getColumnClass(int columnIndex) {
+            if (columnIndex == 0) {
+                return String.class;
+            } else {
+                return Long.class;
             }
-        });
+        }
 
-        resTablePanel = new JExtendedTablePanel(resTable);
-        resTablePanel.clearBorders();
-        resultsPanel.add(resTablePanel, BorderLayout.CENTER);
+        public int getRowCount() {
+            return classes.size();
+        }
 
-        add(resultsPanel, BorderLayout.CENTER);
+        public int getColumnCount() {
+            return 3;
+        }
 
-        initFilterPanel();
-
-//        resTable.addKeyListener(new KeyAdapter() {
-//            public void keyPressed(KeyEvent e) {
-//                if ((e.getKeyCode() == KeyEvent.VK_CONTEXT_MENU)
-//                        || ((e.getKeyCode() == KeyEvent.VK_F10) && (e.getModifiers() == InputEvent.SHIFT_MASK))) {
-//                    int selectedRow = resTable.getSelectedRow();
-//
-//                    if (selectedRow != -1) {
-//                        Rectangle cellRect = resTable.getCellRect(selectedRow, 0, false);
-//                        popupMenu.show(e.getComponent(), ((cellRect.x + resTable.getSize().width) > 50) ? 50 : 5, cellRect.y);
-//                    }
-//                }
-//            }
-//        });
-//
-//        resTable.addMouseListener(new MouseAdapter() {
-//            public void mousePressed(MouseEvent e) {
-//                if ((e.getModifiers() & InputEvent.BUTTON3_MASK) != 0) {
-//                    int line = resTable.rowAtPoint(e.getPoint());
-//
-//                    if ((line != -1) && (!resTable.isRowSelected(line))) {
-//                        if (e.isControlDown()) {
-//                            resTable.addRowSelectionInterval(line, line);
-//                        } else {
-//                            resTable.setRowSelectionInterval(line, line);
-//                        }
-//                    }
-//                }
-//            }
-//
-//            public void mouseClicked(MouseEvent e) {
-//                int clickedLine = resTable.rowAtPoint(e.getPoint());
-//
-//                if (clickedLine != -1) {
-//                    if ((e.getModifiers() & InputEvent.BUTTON3_MASK) != 0) {
-//                        popupMenu.show(e.getComponent(), e.getX(), e.getY());
-//                    } else if ((e.getModifiers() == InputEvent.BUTTON1_MASK) && (e.getClickCount() == 2)) {
-//                        performDefaultAction();
-//                    }
-//                }
-//            }
-//
-//        });
-    }
-
-    private void initFilterPanel() {
-        filterComponent = FilterComponent.create(true, true);
-
-        filterComponent.setFilter(filterString, filterType);
-
-        filterComponent.setHint(NbBundle.getMessage(MemoryView.class, "LBL_Class_filter")); // NOI18N
-
-        filterComponent.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                filterString = filterComponent.getFilterValue();
-                filterType = filterComponent.getFilterType();
-                updateData(false);
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            if (columnIndex == 0) {
+                return classes.get(rowIndex).getName();
+            } else if (columnIndex == 1) {
+                return classes.get(rowIndex).getBytes();
+            } else if (columnIndex == 2) {
+                return classes.get(rowIndex).getInstancesCount();
             }
-        });
 
-        add(filterComponent.getComponent(), BorderLayout.SOUTH);
+            return null;
+        }
+        
     }
-
-    private void refreshUI() {
-        int selStart = area.getSelectionStart();
-        int selEnd   = area.getSelectionEnd();
-        area.setText(getBasicTelemetry());
-        area.select(selStart, selEnd);
-    }
-
-    private String getBasicTelemetry() {
-        boolean deltas = baseClasses != null;
-        String sClasses = totalClasses == -1 ? "" : (deltas && totalClasses > 0 ? "+" : "") + NumberFormat.getInstance().format(totalClasses); // NOI18N
-        String sInstances = totalInstances == -1 ? "" : (deltas && totalInstances > 0 ? "+" : "") + NumberFormat.getInstance().format(totalInstances); // NOI18N
-        String sBytes = totalBytes == -1 ? "" : (deltas && totalBytes > 0 ? "+" : "") + NumberFormat.getInstance().format(totalBytes); // NOI18N
-        String ssClasses = NbBundle.getMessage(MemoryView.class, "LBL_Classes", sClasses); // NOI18N
-        String ssInstances = NbBundle.getMessage(MemoryView.class, "LBL_Instances", sInstances); // NOI18N
-        String ssBytes = NbBundle.getMessage(MemoryView.class, "LBL_Bytes", sBytes); // NOI18N
-        return "<nobr>" + ssClasses + "&nbsp;&nbsp;&nbsp;&nbsp;" + // NOI18N
-               ssInstances + "&nbsp;&nbsp;&nbsp;&nbsp;" + ssBytes + "</nobr>"; // NOI18N
-    }
-
-
-    private HTMLTextArea area;
-//    private JLabel refreshRateLabel;
-//    private JLabel refreshUnitsLabel;
-//    private JComboBox refreshCombo;
-    private AbstractButton snapshotButton;
-    private AbstractButton deltaButton;
-    private AbstractButton pauseButton;
-    private AbstractButton refreshButton;
-    private AbstractButton gcButton;
-    private AbstractButton heapdumpButton;
-    private JExtendedTable resTable;
-    private ExtendedTableModel resTableModel;
-    private JExtendedTablePanel resTablePanel;
-    private FilterComponent filterComponent;
-    private CustomBarCellRenderer customBarCellRenderer;
-    private DiffBarCellRenderer diffBarCellRenderer;
-    private LabelTableCellRenderer labelTableCellRenderer;
-    private LabelBracketTableCellRenderer labelBracketTableCellRenderer;
-
-    private String filterString = ""; // NOI18N
-    private int filterType = CommonConstants.FILTER_CONTAINS;
-
-    private List<ClassInfo> classes = new ArrayList();
-    private List<ClassInfo> baseClasses = new ArrayList(); // Needed to correctly setup table renderers
-    private List<Integer> filteredSortedIndexes = new ArrayList();
-    private int totalClasses = -1;
-    private long totalBytes, baseTotalBytes = -1;
-    private long totalInstances, baseTotalInstances = -1;
-
-    private int sortingColumn = 1;
-    private boolean sortOrder = false; // Defines the sorting order (ascending or descending)
-    private String[] columnNames;
-    private TableCellRenderer[] columnRenderers;
-    private String[] columnToolTips;
-    private Class[] columnTypes;
-    private int[] columnWidths;
-    private int minNamesColumnWidth; // minimal width of classnames columns
-
     
-//    private static class ComboRenderer implements ListCellRenderer {
-//
-//        private ListCellRenderer renderer;
-//
-//        ComboRenderer(JComboBox combo) {
-//            renderer = combo.getRenderer();
-//            if (renderer instanceof JLabel)
-//                ((JLabel)renderer).setHorizontalAlignment(JLabel.TRAILING);
-//        }
-//
-//        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-//            return renderer.getListCellRendererComponent(list, NumberFormat.getInstance().format(value), index, isSelected, cellHasFocus);
-//        }
-//
-//    }
+    
+    private final class FilterFindLayout implements LayoutManager {
+
+        public void addLayoutComponent(String name, Component comp) {}
+        public void removeLayoutComponent(Component comp) {}
+
+        public Dimension preferredLayoutSize(Container parent) {
+            JComponent filter = filterPanel;
+            if (filter != null && !filter.isVisible()) filter = null;
+            
+            JComponent search = searchPanel;
+            if (search != null && !search.isVisible()) search = null;
+            
+            Dimension dim = new Dimension();
+            
+            if (filter != null && search != null) {
+                Dimension dim1 = filter.getPreferredSize();
+                Dimension dim2 = search.getPreferredSize();
+                dim.width = dim1.width + dim2.width + 1;
+                dim.height = Math.max(dim1.height, dim2.height);
+            } else if (filter != null) {
+                dim = filter.getPreferredSize();
+            } else if (search != null) {
+                dim = search.getPreferredSize();
+            }
+            
+            if ((filter != null || search != null) /*&& hasBottomFilterFindMargin()*/)
+                dim.height += 1;
+            
+            return dim;
+        }
+
+        public Dimension minimumLayoutSize(Container parent) {
+            JComponent filter = filterPanel;
+            if (filter != null && !filter.isVisible()) filter = null;
+            
+            JComponent search = searchPanel;
+            if (search != null && !search.isVisible()) search = null;
+            
+            Dimension dim = new Dimension();
+            
+            if (filter != null && search != null) {
+                Dimension dim1 = filter.getMinimumSize();
+                Dimension dim2 = search.getMinimumSize();
+                dim.width = dim1.width + dim2.width + 1;
+                dim.height = Math.max(dim1.height, dim2.height);
+            } else if (filter != null) {
+                dim = filter.getMinimumSize();
+            } else if (search != null) {
+                dim = search.getMinimumSize();
+            }
+            
+            if ((filter != null || search != null) /*&& hasBottomFilterFindMargin()*/)
+                dim.height += 1;
+            
+            return dim;
+        }
+
+        public void layoutContainer(Container parent) {
+            JComponent filter = filterPanel;
+            if (filter != null && !filter.isVisible()) filter = null;
+            
+            JComponent search = searchPanel;
+            if (search != null && !search.isVisible()) search = null;
+            
+            int bottomOffset = /* hasBottomFilterFindMargin() ? 1 :*/ 0;
+            
+            if (filter != null && search != null) {
+                Dimension size = parent.getSize();
+                int w = (size.width - 1) / 2;
+                filter.setBounds(0, 0, w, size.height - bottomOffset);
+                search.setBounds(w + 1, 0, size.width - w - 1, size.height - bottomOffset);
+            } else if (filter != null) {
+                Dimension size = parent.getSize();
+                filter.setBounds(0, 0, size.width, size.height - bottomOffset);
+            } else if (search != null) {
+                Dimension size = parent.getSize();
+                search.setBounds(0, 0, size.width, size.height - bottomOffset);
+            }
+        }
+        
+    }
+    
 
     private static class DeltaClassInfo extends ClassInfo {
 
