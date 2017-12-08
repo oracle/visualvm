@@ -30,6 +30,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.LayoutManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -58,7 +59,7 @@ import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTableContainer;
 import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
+import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.McsTimeRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberRenderer;
@@ -205,6 +206,9 @@ final class ThreadsCPUView extends JPanel {
 //                return ThreadsCPUView.this.getUserValueForRow(row);
 //            }
             protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
+                popup.add(createCopyMenuItem());
+                popup.addSeparator();
+                
                 popup.add(new JMenuItem(FilterUtils.ACTION_FILTER) {
                     protected void fireActionPerformed(ActionEvent e) { ThreadsCPUView.this.activateFilter(); }
                 });
@@ -226,6 +230,8 @@ final class ThreadsCPUView extends JPanel {
             }
         };
         
+        table.setColumnToolTips(new String[] { "Thread name", "Total thread CPU time", "Thread CPU time in last 1 second" });
+        
         table.providePopupMenu(true);
         
         table.setMainColumn(0);
@@ -239,7 +245,11 @@ final class ThreadsCPUView extends JPanel {
         renderers[0] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer()));
         renderers[1] = new HideableBarRenderer(new NumberPercentRenderer(new McsTimeRenderer()));
         
-        table.setColumnRenderer(0, new JavaNameRenderer(Icons.getIcon(ProfilerIcons.THREAD)));
+        LabelRenderer threadRenderer = new LabelRenderer();
+        threadRenderer.setIcon(Icons.getIcon(ProfilerIcons.THREAD));
+        threadRenderer.setFont(threadRenderer.getFont().deriveFont(Font.BOLD));
+        
+        table.setColumnRenderer(0, threadRenderer);
         table.setColumnRenderer(1, renderers[0]);
         table.setColumnRenderer(2, renderers[1]);
         
@@ -305,10 +315,10 @@ final class ThreadsCPUView extends JPanel {
         toolbar.addSeparator();
         toolbar.addSpace(5);
         
-        toolbar.add(new GrayLabel("Threads:"));
+        toolbar.add(new GrayLabel("Statistics:"));
         toolbar.addSpace(5);
         
-        toolbar.add(new JLabel("Count:"));
+        toolbar.add(new JLabel("Threads Count:"));
         final Dimension tcDim = new Dimension(-1, -1);
         final JLabel threadsCountL = new JLabel() {
             public Dimension getPreferredSize() {
