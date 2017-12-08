@@ -339,6 +339,7 @@ final class ApplicationProfilerView extends DataSourceView {
                 internalChange = true;
                 cpuButton.setSelected(false);
                 internalChange = false;
+                updateControlButtons();
                 showCPUSettings();
                 ProfilerDialogs.displayError(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_Incorrect_CPU_settings")); // NOI18N
             } else {
@@ -370,6 +371,7 @@ final class ApplicationProfilerView extends DataSourceView {
                 internalChange = true;
                 memoryButton.setSelected(false);
                 internalChange = false;
+                updateControlButtons();
                 showMemorySettings();
                 ProfilerDialogs.displayError(NbBundle.getMessage(ApplicationProfilerView.class, "MSG_Incorrect_Memory_settings")); // NOI18N
             } else {
