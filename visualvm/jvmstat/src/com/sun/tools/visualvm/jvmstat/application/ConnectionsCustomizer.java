@@ -29,6 +29,7 @@ import com.sun.tools.visualvm.core.options.GlobalPreferences;
 import com.sun.tools.visualvm.core.properties.PropertiesPanel;
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import com.sun.tools.visualvm.core.ui.components.Spacer;
+import com.sun.tools.visualvm.uisupport.JExtendedSpinner;
 import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -387,7 +388,7 @@ class ConnectionsCustomizer extends PropertiesPanel {
             portLabel = new JLabel(NbBundle.getMessage(
                 ConnectionsCustomizer.class, "LBL_Port1")); // NOI18N
             portLabel.setFont(portLabel.getFont().deriveFont(Font.BOLD));
-            final int w = new JSpinner(new SpinnerNumberModel(0, 0, 65535, 0)).
+            final int w = new JExtendedSpinner(new SpinnerNumberModel(0, 0, 65535, 0)).
                     getPreferredSize().width;
             portValueLabel = new JLabel() {
                 public Dimension getPreferredSize() {
@@ -542,14 +543,14 @@ class ConnectionsCustomizer extends PropertiesPanel {
             Mnemonics.setLocalizedText(portLabel, NbBundle.getMessage(
                 ConnectionsCustomizer.class, "LBL_Port2")); // NOI18N
             portLabel.setFont(portLabel.getFont().deriveFont(Font.BOLD));
-            portSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 65535, 1));
+            portSpinner = new JExtendedSpinner(new SpinnerNumberModel(0, 0, 65535, 1));
             portLabel.setLabelFor(portSpinner);
 
             refreshLabel = new JLabel();
             Mnemonics.setLocalizedText(refreshLabel, NbBundle.getMessage(
                 ConnectionsCustomizer.class, "LBL_Refresh2")); // NOI18N
             refreshLabel.setFont(refreshLabel.getFont().deriveFont(Font.BOLD));
-            refreshSpinner = new JSpinner(new SpinnerNumberModel(3.0, 1.0, 9999.0, 1.0));
+            refreshSpinner = new JExtendedSpinner(new SpinnerNumberModel(3.0, 1.0, 9999.0, 1.0));
             refreshLabel.setLabelFor(refreshSpinner);
             refreshUnitsLabel = new JLabel(NbBundle.getMessage(
                 ConnectionsCustomizer.class, "LBL_RefreshUnits")); // NOI18N
