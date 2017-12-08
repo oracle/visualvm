@@ -33,6 +33,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,6 +47,7 @@ public final class Storage {
 
     private static final String VISUALVM_TMP_DIR = System.getProperty("visualvm.tmpdir");  // NOI18N
     private static final String TEMPORARY_STORAGE_DIRNAME = "visualvm.dat";  // NOI18N
+    private static final String TEMPORARY_STORAGE_DIRNAME_EX = "visualvm_{0}.dat";  // NOI18N
     private static final String PERSISTENT_STORAGE_DIRNAME = "repository";  // NOI18N
     
     private static final Logger LOGGER = Logger.getLogger(Storage.class.getName());
@@ -242,10 +244,24 @@ public final class Storage {
     public static String getTemporaryStorageDirectoryString() {
         synchronized(temporaryStorageDirectoryStringLock) {
             if (temporaryStorageDirectoryString == null) {
-                String tmpDir = VISUALVM_TMP_DIR != null ? VISUALVM_TMP_DIR :
-                    System.getProperty("java.io.tmpdir"); // NOI18N
-                temporaryStorageDirectoryString = new File(tmpDir).getAbsolutePath()
-                        + File.separator + TEMPORARY_STORAGE_DIRNAME;
+                if (VISUALVM_TMP_DIR != null) {
+                    temporaryStorageDirectoryString = new File(VISUALVM_TMP_DIR).getAbsolutePath() +
+                                                      File.separator + TEMPORARY_STORAGE_DIRNAME;
+                } else {
+                    String tmpDir = System.getProperty("java.io.tmpdir"); // NOI18N
+                    String storageDir;
+                    
+                    String userDir = System.getProperty("user.home"); // NOI18N
+                    if (userDir != null && !userDir.isEmpty()) {
+                        String userName = new File(userDir).getName();
+                        storageDir = MessageFormat.format(TEMPORARY_STORAGE_DIRNAME_EX, userName);
+                    } else {
+                        storageDir = TEMPORARY_STORAGE_DIRNAME;
+                    }
+                    
+                    temporaryStorageDirectoryString = new File(tmpDir).getAbsolutePath() +
+                                                      File.separator + storageDir;
+                }
             }
             return temporaryStorageDirectoryString;
         }

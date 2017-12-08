@@ -137,7 +137,7 @@ public abstract class Application extends DataSource implements Stateful {
     }
     
     
-    // <system_temp>/visualvm.dat/<application_id>
+    // <system_temp>/visualvm_<username>.dat/<application_id>
     @Override
     protected Storage createStorage() {
         File directory = new File(Storage.getTemporaryStorageDirectoryString() +
