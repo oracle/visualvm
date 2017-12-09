@@ -38,6 +38,9 @@ import org.eclipse.visualvm.launcher.Activator;
 import org.eclipse.visualvm.launcher.preferences.PreferenceConstants;
 
 public final class VisualVMHelper {
+        private static final String JAVA_VERSION_KEY = "java version";
+        private static final String OPENJDK_VERSION_KEY = "openjdk version";
+    
 	private static class SpecVersion {
 		int major, minor;
 		
@@ -114,7 +117,7 @@ public final class VisualVMHelper {
 		try {
 			String line;
 			while ((line = br.readLine()) != null) {
-				if (line.startsWith("java version")) {
+				if (line.startsWith(JAVA_VERSION_KEY) || line.startsWith(OPENJDK_VERSION_KEY)) {
 					int start = line.indexOf("\"");
 					int end = line.lastIndexOf("\"");
 					if (start > -1 && end > -1) {

@@ -191,7 +191,7 @@ class ApplicationMonitorView extends DataSourceView {
 
             gcButton = new JButton(new AbstractAction(NbBundle.getMessage(ApplicationMonitorView.class, "LBL_Perform_GC")) {    // NOI18N
                 public void actionPerformed(ActionEvent e) {
-                    RequestProcessor.getDefault().post(new Runnable() {
+                    new RequestProcessor("GC Processor").post(new Runnable() { // NOI18N
                         public void run() {
                             try {
                                 model.getMemoryMXBean().gc(); 

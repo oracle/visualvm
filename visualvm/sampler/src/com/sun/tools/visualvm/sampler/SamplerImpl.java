@@ -751,7 +751,7 @@ final class SamplerImpl {
                             else hds.takeRemoteHeapDump(application, null, openView);
                         }
                     };
-                memorySampler = new MemorySamplerSupport(jvm, hasPermGenHisto, threadsMemory, memoryBean, snapshotDumper, heapDumper) {
+                memorySampler = new MemorySamplerSupport(application, jvm, hasPermGenHisto, threadsMemory, memoryBean, snapshotDumper, heapDumper) {
                     protected Timer getTimer() { return SamplerImpl.this.getTimer(); }
                 };
                 SwingUtilities.invokeLater(new Runnable() {
