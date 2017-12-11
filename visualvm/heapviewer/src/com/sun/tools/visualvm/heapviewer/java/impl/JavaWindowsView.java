@@ -150,6 +150,8 @@ class JavaWindowsView extends HeapViewerFeature {
         toolbar.add(new JToggleButton("150px") {
             {
                 sizes.add(this);
+                putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+                putClientProperty("JButton.segmentPosition", "first"); // NOI18N
                 setToolTipText("Window preview height: 150px");
             }
             protected void fireItemStateChanged(ItemEvent event) {
@@ -163,6 +165,8 @@ class JavaWindowsView extends HeapViewerFeature {
         toolbar.add(new JToggleButton("300px") {
             {
                 sizes.add(this);
+                putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+                putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
                 setToolTipText("Window preview height: 300px");
             }
             protected void fireItemStateChanged(ItemEvent event) {
@@ -176,6 +180,8 @@ class JavaWindowsView extends HeapViewerFeature {
         toolbar.add(new JToggleButton("600px") {
             {
                 sizes.add(this);
+                putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+                putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
                 setToolTipText("Window preview height: 600px");
             }
             protected void fireItemStateChanged(ItemEvent event) {
@@ -189,6 +195,8 @@ class JavaWindowsView extends HeapViewerFeature {
         toolbar.add(new JToggleButton("50%") {
             {
                 sizes.add(this);
+                putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+                putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
                 setToolTipText("Window preview size: 50%");
             }
             protected void fireItemStateChanged(ItemEvent event) {
@@ -202,6 +210,8 @@ class JavaWindowsView extends HeapViewerFeature {
         toolbar.add(new JToggleButton("100%") {
             {
                 sizes.add(this);
+                putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+                putClientProperty("JButton.segmentPosition", "last"); // NOI18N
                 setToolTipText("Window preview size: 100%");
             }
             protected void fireItemStateChanged(ItemEvent event) {

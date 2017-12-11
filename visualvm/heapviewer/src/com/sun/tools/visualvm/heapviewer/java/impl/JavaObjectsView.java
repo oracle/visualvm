@@ -270,16 +270,30 @@ public class JavaObjectsView extends HeapViewerFeature {
             }
         }
         
-        tbType = new AggregationButton(Aggregation.TYPES);
+        tbType = new AggregationButton(Aggregation.TYPES) {
+            public void setVisible(boolean b) {
+                super.setVisible(b);
+                if (tbPackages != null) tbPackages.putClientProperty("JButton.segmentPosition", // NOI18N
+                                        b ? "middle" : "first"); // NOI18N
+            }
+        };
+        tbType.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        tbType.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
         toolbar.add(tbType);
         
         tbPackages = new AggregationButton(Aggregation.PACKAGES);
+        tbPackages.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        tbPackages.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
         toolbar.add(tbPackages);
         
         tbClasses = new AggregationButton(Aggregation.CLASSES);
+        tbClasses.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        tbClasses.putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
         toolbar.add(tbClasses);
         
         tbInstances = new AggregationButton(Aggregation.INSTANCES);
+        tbInstances.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        tbInstances.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
         toolbar.add(tbInstances);
         
         tbClasses.setSelected(true);

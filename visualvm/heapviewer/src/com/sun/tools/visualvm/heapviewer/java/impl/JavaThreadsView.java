@@ -154,9 +154,12 @@ public class JavaThreadsView extends HeapViewerFeature {
                 }
             }
         };
+        rObjects.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        rObjects.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
         rObjects.setToolTipText("Objects");
         resultsBG.add(rObjects);
         toolbar.add(rObjects);
+        
         rHTML = new JToggleButton(Icons.getIcon(HeapWalkerIcons.PROPERTIES)) {
             protected void fireItemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -165,6 +168,8 @@ public class JavaThreadsView extends HeapViewerFeature {
                 }
             }
         };
+        rHTML.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        rHTML.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
         rHTML.setToolTipText("HTML");
         resultsBG.add(rHTML);
         toolbar.add(rHTML);
