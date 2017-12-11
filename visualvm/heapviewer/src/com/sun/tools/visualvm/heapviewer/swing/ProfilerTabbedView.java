@@ -26,18 +26,23 @@
 package com.sun.tools.visualvm.heapviewer.swing;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.Component;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageProducer;
 import java.awt.image.RGBImageFilter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -47,6 +52,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
@@ -130,6 +136,9 @@ public abstract class ProfilerTabbedView {
     public abstract void highlightView(JComponent view);
     
     
+    public abstract void setFocusMaster(Component focusMaster);
+    
+    
     protected ProfilerTabbedView() {}
     
     
@@ -161,6 +170,8 @@ public abstract class ProfilerTabbedView {
         
         private JTabbedPane tabs;
         
+        private Component focusMaster;
+        
     
         protected Impl(int tabPlacement, int tabLayoutPolicy, boolean minimizeOuterMargin,
                     boolean minimizeInnerMargin, ChangeListener listener) {
@@ -183,8 +194,15 @@ public abstract class ProfilerTabbedView {
                 public void actionPerformed(ActionEvent e) { selectNextView(); }
             });
             
+            setFocusMaster(null);
+            
 //            tabs = createTabs(component, tabPlacement, minimizeOuterMargin);
 //            component.add(tabs, BorderLayout.CENTER);
+        }
+        
+        
+        public void setFocusMaster(Component focusMaster) {
+            this.focusMaster = focusMaster == null ? component : focusMaster;
         }
         
         
@@ -285,7 +303,7 @@ public abstract class ProfilerTabbedView {
                     firstClosable = singleViewport.isClosable();
                     firstView = singleViewport.disposeView();
                     component.remove(tabs);
-                    component.add(firstView);
+                    component.add(firstView, BorderLayout.CENTER);
                     tabs = null;
                 }
             } else if (firstView == view) {
@@ -380,6 +398,7 @@ public abstract class ProfilerTabbedView {
         
         protected final TabbedPaneViewport createViewport(JComponent view, boolean closable) {
             return new TabbedPaneViewport(view, closable) {
+                Component getFocusMaster() { return focusMaster; }
                 int getTabPlacement() { return tabPlacement; }
                 boolean minimizeInnerMargin() { return minimizeInnerMargin; }
             };
@@ -526,16 +545,62 @@ public abstract class ProfilerTabbedView {
             
             private final JComponent content;
             
+            private Reference<Component> lastFocusOwner;
+            
             TabbedPaneViewport(JComponent view, boolean closable) {
                 super(new BorderLayout());
                 
                 content = view;
                 
                 setOpaque(false);
+                setFocusable(false);
 //                setBackground(Color.YELLOW);
                 add(view, BorderLayout.CENTER);
                 if (!closable) putClientProperty(TabbedPaneFactory.NO_CLOSE_BUTTON, Boolean.TRUE);
                 view.putClientProperty("TabbedPaneViewport", this); // NOI18N
+                
+                final PropertyChangeListener focusListener = new PropertyChangeListener() {
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        Component c = evt.getNewValue() instanceof Component ?
+                                (Component)evt.getNewValue() : null;
+                        processFocusedComponent(c);
+                    }
+                    private void processFocusedComponent(Component c) {
+                        Component cc = c;
+                        while (c != null) {
+                            if (c == getFocusMaster()) {
+                                lastFocusOwner = new WeakReference(cc);
+                                return;
+                            }
+                            c = c.getParent();
+                        }
+                    }
+                };
+                
+                addHierarchyListener(new HierarchyListener() {
+                    public void hierarchyChanged(HierarchyEvent e) {
+                        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                            if (isShowing()) {
+                                final Component lastFocus = lastFocusOwner == null ? null : lastFocusOwner.get();
+                                if (lastFocus != null) lastFocus.requestFocusInWindow();
+                                else content.requestFocusInWindow();
+                                
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        if (lastFocus != null) lastFocus.requestFocusInWindow();
+                                        else content.requestFocusInWindow();
+                                    }
+                                });
+                                
+                                KeyboardFocusManager.getCurrentKeyboardFocusManager().
+                                    addPropertyChangeListener("focusOwner", focusListener); // NOI18N
+                            } else {
+                                KeyboardFocusManager.getCurrentKeyboardFocusManager().
+                                    removePropertyChangeListener("focusOwner", focusListener); // NOI18N
+                            }
+                        }
+                    }
+                });
             }
             
             
@@ -568,6 +633,8 @@ public abstract class ProfilerTabbedView {
                 return (TabbedPaneViewport)view.getClientProperty("TabbedPaneViewport"); // NOI18N
             }
             
+            
+            abstract Component getFocusMaster();
             
             abstract int getTabPlacement();
             

@@ -99,11 +99,15 @@ public class PluggableTreeTableView extends TreeTableView {
     }
     
     protected JComponent createComponent() {
-        JComponent comp = super.createComponent();
+        final JComponent comp = super.createComponent();
         
         if (toolbar == null) init();
         
-        JExtendedSplitPane contentSplit = new JExtendedSplitPane(JExtendedSplitPane.VERTICAL_SPLIT, true, comp, pluginsComponent);
+        JExtendedSplitPane contentSplit = new JExtendedSplitPane(JExtendedSplitPane.VERTICAL_SPLIT, true, comp, pluginsComponent) {
+            public boolean requestFocusInWindow() {
+                return comp.requestFocusInWindow();
+            }
+        };
         BasicSplitPaneDivider contentDivider = ((BasicSplitPaneUI)contentSplit.getUI()).getDivider();
         contentDivider.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, SEPARATOR_COLOR));
         contentDivider.setDividerSize(5);
