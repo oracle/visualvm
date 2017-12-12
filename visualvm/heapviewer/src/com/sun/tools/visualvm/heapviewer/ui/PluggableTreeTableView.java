@@ -99,11 +99,15 @@ public class PluggableTreeTableView extends TreeTableView {
     }
     
     protected JComponent createComponent() {
-        JComponent comp = super.createComponent();
+        final JComponent comp = super.createComponent();
         
         if (toolbar == null) init();
         
-        JExtendedSplitPane contentSplit = new JExtendedSplitPane(JExtendedSplitPane.VERTICAL_SPLIT, true, comp, pluginsComponent);
+        JExtendedSplitPane contentSplit = new JExtendedSplitPane(JExtendedSplitPane.VERTICAL_SPLIT, true, comp, pluginsComponent) {
+            public boolean requestFocusInWindow() {
+                return comp.requestFocusInWindow();
+            }
+        };
         BasicSplitPaneDivider contentDivider = ((BasicSplitPaneUI)contentSplit.getUI()).getDivider();
         contentDivider.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, SEPARATOR_COLOR));
         contentDivider.setDividerSize(5);
@@ -120,8 +124,14 @@ public class PluggableTreeTableView extends TreeTableView {
         pluginsComponent = new MultiSplitContainer();
         pluginsComponent.setPreferredSize(new Dimension(300, 300));
         
-        for (HeapViewPlugin plugin : plugins) {
+        int pcount = plugins.size();
+        for (int i = 0; i < pcount; i++) {
+            HeapViewPlugin plugin = plugins.get(i);
             PluginPresenter presenter = new PluginPresenter(plugin);
+            presenter.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+            if (i == 0) presenter.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
+            else if (i == pcount - 1) presenter.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
+            else presenter.putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
             PluginContainer container = new PluginContainer(plugin, presenter);
             toolbar.add(presenter);
             pluginsComponent.add(container);

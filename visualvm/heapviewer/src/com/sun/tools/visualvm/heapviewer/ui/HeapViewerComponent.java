@@ -178,13 +178,10 @@ public final class HeapViewerComponent extends JPanel {
             public void stateChanged(ChangeEvent e) {
                 final JComponent newComponent = views.getSelectedView();
                 viewSelected(getView(newComponent));
-                newComponent.requestFocusInWindow();
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() { newComponent.requestFocusInWindow(); }
-                });
             }
         });
         add(views.getComponent(), BorderLayout.CENTER);
+        views.setFocusMaster(this);
         
         // Create the main view
         mainView = new MainView();
@@ -243,27 +240,6 @@ public final class HeapViewerComponent extends JPanel {
     
     private void updateViewTab(HeapView view) {
         if (views.getViewsCount() > 0) views.updateView(view.getComponent(), view.getName(), view.getIcon(), view.getDescription());
-    }
-    
-    
-    private void updateFocus() {
-//        SwingUtilities.invokeLater(new Runnable() {
-//            public void run() {
-//                Component focused = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-//
-//                // Do not change focus for these special cases:
-//                if (focused != null) {
-//                    if (profilePopupVisible) return; // focus in the Profile popup
-//                    if (ProfilerPopup.isInPopup(focused)) return; // focus in a profiler popup
-//                    if (ProfilerWindow.this.isAncestorOf(focused)) return; // focus inside the ProfilerWindow
-//                }
-//
-//                final Component foc = configure.isVisible() ? configure : start;
-//                SwingUtilities.invokeLater(new Runnable() {
-//                    public void run() { foc.requestFocusInWindow(); }
-//                });
-//            }
-//        });
     }
     
     
@@ -371,12 +347,31 @@ public final class HeapViewerComponent extends JPanel {
         }
         
         
-        private void displayPopupImpl(JComponent invoker) {
+//        private void updateFocus(final JComponent invoker) {
+//            SwingUtilities.invokeLater(new Runnable() {
+//                public void run() {
+//                    Component focused = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+//
+//                    // Do not change focus for these special cases:
+//                    if (focused != null) {
+//    //                    if (profilePopupVisible) return; // focus in the Profile popup
+//                        if (ProfilerPopup.isInPopup(focused)) return; // focus in a profiler popup
+//                        if (HeapViewerComponent.this.isAncestorOf(focused)) return; // focus inside the ProfilerWindow
+//                    }
+//
+//                    SwingUtilities.invokeLater(new Runnable() {
+//                        public void run() { invoker.requestFocusInWindow(); }
+//                    });
+//                }
+//            });
+//        }
+        
+        private void displayPopupImpl(final JComponent invoker) {
             final ProfilerPopupMenu popup = new StayOpenPopupMenu() {
-                public void setVisible(boolean visible) {
-                    super.setVisible(visible);
-                    if (!visible) updateFocus();
-                }
+//                public void setVisible(boolean visible) {
+//                    super.setVisible(visible);
+//                    if (!visible) updateFocus(invoker);
+//                }
             };
             popup.setLayout(new GridBagLayout());
             if (!UIUtils.isAquaLookAndFeel()) {
@@ -507,7 +502,12 @@ public final class HeapViewerComponent extends JPanel {
             };
             toolbar.add(featureChooser);
             
-            component = new JPanel(new BorderLayout());
+            component = new JPanel(new BorderLayout()) {
+                public boolean requestFocusInWindow() {
+                    if (getComponentCount() == 0) return super.requestFocusInWindow();
+                    else return getComponent(0).requestFocusInWindow();
+                }
+            };
             component.setOpaque(false);
             
             selectFeature(selectedContext, selectedFeature);

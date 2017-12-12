@@ -44,6 +44,7 @@ import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
+import javax.swing.SwingUtilities;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -139,6 +140,13 @@ public class NodeObjectsView extends HeapView {
         }
         
         component = new ViewContainer(objectsView.getComponent(), viewNode);
+        
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                objectsView.selectNode(viewNode);
+                objectsView.getComponent().requestFocusInWindow();
+            }
+        });
     }
     
     
@@ -150,7 +158,13 @@ public class NodeObjectsView extends HeapView {
             super(new BorderLayout());
             node = viewNode;
             setOpaque(false);
+            setFocusable(false);
             add(view, BorderLayout.CENTER);
+        }
+        
+        public boolean requestFocusInWindow() {
+            if (getComponentCount() == 0) return super.requestFocusInWindow();
+            else return getComponent(0).requestFocusInWindow();
         }
         
         public boolean equals(Object o) {

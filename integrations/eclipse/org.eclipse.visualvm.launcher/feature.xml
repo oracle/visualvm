@@ -2,7 +2,7 @@
 <feature
       id="VisualVM_Launcher"
       label="VisualVM Launcher Feature"
-      version="1.1.1"
+      version="1.1.2"
       provider-name="Oracle Corporation">
 
    <description>
@@ -16,7 +16,7 @@ as easy as launching them from the IDE.
    </description>
 
    <copyright>
-      Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+      Copyright (c) 2007, 2017, Oracle and/or its affiliates. All rights reserved.
 DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 
 This code is free software; you can redistribute it and/or modify it
@@ -406,7 +406,7 @@ as provided by Sun in the LICENSE file that accompanied this code.&quot;
          id="org.eclipse.visualvm.launcher.common"
          download-size="0"
          install-size="0"
-         version="1.1.1"/>
+         version="1.1.2"/>
 
    <plugin
          id="org.eclipse.visualvm.launcher.java"

@@ -161,7 +161,7 @@ public class TreeTableView {
         
         if (useBreadCrumbs) navigator = new BreadCrumbsNavigator() {
             void nodeClicked(HeapViewerNode node) {
-                TreeTableView.this.selectNode(node);
+                TreeTableView.this.selectExistingNode(node);
             }
             void nodePinned(HeapViewerNode node) {
                 TreeTableView.this.pinNode(node);
@@ -224,6 +224,11 @@ public class TreeTableView {
     }
     
     
+    public void selectNode(HeapViewerNode node) {
+        // TODO: implement correctly for lazy model
+        treeTable.selectPath(HeapViewerNode.fromNode(node, currentRoot), true);
+    }
+    
     public void expandNode(HeapViewerNode node) {
         if (treeTable == null) return;
         treeTable.expandPath(HeapViewerNode.fromNode(node));
@@ -282,7 +287,7 @@ public class TreeTableView {
 //        if (node instanceof RootContainerNode) node = node.getNChildren() == 0 ? null : node.getChild(0);
     }
     
-    void selectNode(HeapViewerNode node) {
+    void selectExistingNode(HeapViewerNode node) {
 //        HeapViewerNode sel = (HeapViewerNode)treeTable.getSelectedValue(0);
         
         if (node == null) {
@@ -447,7 +452,11 @@ public class TreeTableView {
             }
         });
         
-        JComponent comp = new JPanel(new BorderLayout());
+        JComponent comp = new JPanel(new BorderLayout()) {
+            public boolean requestFocusInWindow() {
+                return treeTable.requestFocusInWindow();
+            }
+        };
         comp.add(new ProfilerTableContainer(treeTable, false, null), BorderLayout.CENTER);
         
         JComponent toolsContainer = new JPanel(new GridBagLayout());
