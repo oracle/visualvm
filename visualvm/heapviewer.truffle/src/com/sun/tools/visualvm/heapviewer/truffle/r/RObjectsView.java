@@ -227,9 +227,13 @@ class RObjectsView extends HeapViewerFeature {
         }
         
         tbType = new AggregationButton(Aggregation.TYPES);
+        tbType.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        tbType.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
         toolbar.add(tbType);
         
         tbObject = new AggregationButton(Aggregation.OBJECTS);
+        tbObject.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+        tbObject.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
         toolbar.add(tbObject);
         
         if (objectsView.hasPlugins()) {
