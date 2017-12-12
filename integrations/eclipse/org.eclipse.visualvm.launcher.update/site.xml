@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/VisualVM_Launcher_1.1.1.jar" id="VisualVM_Launcher" version="1.1.1"/>
+   <feature url="features/VisualVM_Launcher_1.1.2.jar" id="VisualVM_Launcher" version="1.1.2"/>
 </site>
