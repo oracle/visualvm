@@ -104,21 +104,27 @@ public class SaModelProvider extends AbstractModelProvider<SaModel, DataSource> 
     }
 
     private File getJdkHome(final JvmJvmstatModel jvmstat) {
-        File jdkHome = new File(jvmstat.getJavaHome());
-        if ("jre".equals(jdkHome.getName())) {  // NOI18N
-           jdkHome = jdkHome.getParentFile(); 
+        String javaHome = jvmstat.getJavaHome();
+        if (javaHome != null) {
+            File jdkHome = new File(javaHome);
+            if ("jre".equals(jdkHome.getName())) {  // NOI18N
+               jdkHome = jdkHome.getParentFile();
+            }
+            return jdkHome;
         }
-        return jdkHome;
+        return null;
     }
     
     static File getSaJar(File jdkHome) {
-        File saJar = new File(jdkHome,SA_JAR);
-        try {
-            if (saJar.exists()) {
-                return saJar.getCanonicalFile();
+        if (jdkHome != null) {
+            File saJar = new File(jdkHome,SA_JAR);
+            try {
+                if (saJar.exists()) {
+                    return saJar.getCanonicalFile();
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.INFO, saJar.getPath(), ex);
             }
-        } catch (IOException ex) {
-            LOGGER.log(Level.INFO, saJar.getPath(), ex);            
         }
         return null;
     }
