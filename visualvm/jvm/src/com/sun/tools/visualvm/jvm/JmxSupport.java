@@ -181,7 +181,7 @@ public class JmxSupport implements DataRemovedListener {
                 for (String arg : args) {
                     buf.append(arg).append(' ');
                 }
-                return buf.toString();
+                return buf.toString().trim();
             }
             return null;
         } catch (Exception e) {
