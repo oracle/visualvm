@@ -198,8 +198,7 @@ public abstract class ProfilerCPUPanel extends JPanel {
         GridBagConstraints constraints;
         
         rootClassesLabel = new JLabel();
-        setText(rootClassesLabel, NbBundle.getMessage(ProfilerCPUSettings.class,
-                "LBL_Root_Classes"), mnemonics);
+        setText(rootClassesLabel, NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Root_Classes"), mnemonics); // NOI18N
         Dimension d = rootClassesLabel.getPreferredSize();
         JRadioButton refRadion = new JRadioButton(NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Root_Classes")); // NOI18N
         refRadion.setBorder(rootClassesLabel.getBorder());

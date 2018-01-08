@@ -96,6 +96,6 @@ final class FlatProfilerContainer extends FlatProfileContainer {
 
     @Override
     public ClientUtils.SourceCodeSelection getSourceCodeSelectionAtRow(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
     }
 }

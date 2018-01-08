@@ -177,8 +177,7 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         GridBagConstraints constraints;
         
         JLabel filtersLabel = new JLabel();
-        setText(filtersLabel, NbBundle.getMessage(ProfilerCPUSettings.class,
-                "LBL_Root_Classes"), mnemonics);
+        setText(filtersLabel, NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Root_Classes"), mnemonics); // NOI18N
         Dimension d = filtersLabel.getPreferredSize();
         JRadioButton refRadion = new JRadioButton(NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Root_Classes")); // NOI18N
         refRadion.setBorder(filtersLabel.getBorder());
@@ -197,7 +196,7 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         
         filtersArea = createTextArea(2);
         filtersLabel.setLabelFor(filtersArea.getTextArea());
-        filtersArea.getTextArea().setToolTipText("<html>Profile these classes:<br><br><code>&nbsp;org.mypackage.**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package and subpackages<br><code>&nbsp;org.mypackage.*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>all classes in package<br><code>&nbsp;org.mypackage.MyClass&nbsp;&nbsp;</code>single class<br><br>Special cases:<br><br><code>&nbsp;char[]&nbsp;&nbsp;</code>primitive array<br><code>&nbsp;*&nbsp;or&nbsp;**&nbsp;</code>all classes<br><code>&nbsp;[]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code>(on a separate line) include arrays matching the filter<br></html>");
+        filtersArea.getTextArea().setToolTipText(NbBundle.getMessage(ProfilerMemoryPanel.class, "ProfilerMemoryPanel_TOOLTIP_Filter")); // NOI18N
         filtersArea.getTextArea().getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { checkRootValidity(); syncUI(); }
             public void removeUpdate(DocumentEvent e) { checkRootValidity(); syncUI(); }
@@ -215,13 +214,13 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         add(filtersArea, constraints);
         
         
-        lifecycleCheckbox = new JCheckBox("Track only live objects") {
+        lifecycleCheckbox = new JCheckBox(NbBundle.getMessage(ProfilerMemoryPanel.class, "ProfilerMemoryPanel_BTN_Track_live")) { // NOI18N
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 syncUI();
             }
         };
-        lifecycleCheckbox.setToolTipText("Unselect to profile all created objects (including those already released from the heap)");
+        lifecycleCheckbox.setToolTipText(NbBundle.getMessage(ProfilerMemoryPanel.class, "ProfilerMemoryPanel_TOOLTIP_Track_live")); // NOI18N
         lifecycleCheckbox.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
@@ -232,14 +231,14 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         constraints.insets = new Insets(5, 10, 0, 5);
         add(lifecycleCheckbox, constraints);
         
-        outgoingCheckbox = new JCheckBox("Limit allocations depth:") {
+        outgoingCheckbox = new JCheckBox(NbBundle.getMessage(ProfilerMemoryPanel.class, "ProfilerMemoryPanel_BTN_Limit_alloc")) { // NOI18N
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 updateAllocControls();
                 syncUI();
             }
         };
-        outgoingCheckbox.setToolTipText("Unselect to collect full depth allocations call tree");
+        outgoingCheckbox.setToolTipText(NbBundle.getMessage(ProfilerMemoryPanel.class, "ProfilerMemoryPanel_TOOLTIP_Limit_alloc")); // NOI18N
         outgoingCheckbox.setOpaque(false);
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
@@ -255,7 +254,7 @@ public abstract class ProfilerMemoryPanel extends JPanel {
             public Dimension getMaximumSize() { return getMinimumSize(); }
             protected void fireStateChanged() { updateAllocControls(); syncUI(); super.fireStateChanged(); }
         };
-        outgoingSpinner.setToolTipText("Limit depth of allocations call tree (select 0 for no allocation calls)");
+        outgoingSpinner.setToolTipText(NbBundle.getMessage(ProfilerMemoryPanel.class, "ProfilerMemoryPanel_TOOLTIP_Limit_alloc2")); // NOI18N
         JComponent editor = outgoingSpinner.getEditor();
         JTextField field = editor instanceof JSpinner.DefaultEditor ?
                 ((JSpinner.DefaultEditor)editor).getTextField() : null;
@@ -283,7 +282,7 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         constraints.insets = new Insets(5, 0, 5, 5);
         add(outgoingSpinner, constraints);
         
-        unlimited = new GrayLabel("unlimited");
+        unlimited = new GrayLabel(NbBundle.getMessage(ProfilerMemoryPanel.class, "ProfilerMemoryPanel_LBL_unlimited")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 2;
         constraints.gridy = 4;
@@ -293,7 +292,7 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         constraints.insets = new Insets(5, 0, 5, 5);
         add(unlimited, constraints);
         
-        noAllocs = new GrayLabel("(no allocation calls)");
+        noAllocs = new GrayLabel(NbBundle.getMessage(ProfilerMemoryPanel.class, "ProfilerMemoryPanel_LBL_No_alloc")); // NOI18N
         constraints = new GridBagConstraints();
         constraints.gridx = 3;
         constraints.gridy = 4;

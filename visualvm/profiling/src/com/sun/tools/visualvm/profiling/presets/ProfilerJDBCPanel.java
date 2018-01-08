@@ -140,8 +140,7 @@ public abstract class ProfilerJDBCPanel extends JPanel {
         GridBagConstraints constraints;
         
         filterLabel = new JLabel();
-        setText(filterLabel, NbBundle.getMessage(ProfilerCPUSettings.class,
-                "LBL_Query_Filter"), mnemonics);
+        setText(filterLabel, NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Query_Filter"), mnemonics); // NOI18N
         Dimension d = filterLabel.getPreferredSize();
         JRadioButton refRadion = new JRadioButton(NbBundle.getMessage(ProfilerCPUSettings.class, "LBL_Root_Classes")); // NOI18N
         refRadion.setBorder(filterLabel.getBorder());

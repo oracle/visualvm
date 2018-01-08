@@ -115,7 +115,7 @@ public abstract class SamplerMemoryPanel extends JPanel {
 
         refreshRateLabel = new JLabel();
         setText(refreshRateLabel, NbBundle.getMessage(SamplerMemoryPanel.class,
-                "LBL_Sampling_refresh"), mnemonics);
+                "LBL_Sampling_refresh"), mnemonics); // NOI18N
         refreshRateLabel.setToolTipText(NbBundle.getMessage(SamplerMemoryPanel.class,
                 "TOOLTIP_Sampling_refresh")); // NOI18N
         constraints = new GridBagConstraints();

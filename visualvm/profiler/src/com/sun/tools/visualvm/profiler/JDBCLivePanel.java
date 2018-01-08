@@ -190,7 +190,7 @@ class JDBCLivePanel extends ProfilingResultsSupport.ResultsView {
             }
 
             protected ProfilerClient getProfilerClient() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                throw new UnsupportedOperationException("Not supported yet."); // NOI18N
             }
 
             protected void showSQLQuery(String query, String htmlQuery) {
