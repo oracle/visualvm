@@ -28,11 +28,15 @@ package com.sun.tools.visualvm.heapviewer.java;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ThreadNode_UnknownThread=unknown thread"
+})
 public class ThreadNode extends InstanceNode {
     
     private final String name;
@@ -52,7 +56,7 @@ public class ThreadNode extends InstanceNode {
     public static class Unknown extends ThreadNode {
         
         public Unknown() {
-            super("unknown thread", null);
+            super(Bundle.ThreadNode_UnknownThread(), null);
         }
         
         public boolean equals(Object o) {

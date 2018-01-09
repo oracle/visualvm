@@ -48,6 +48,8 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
+    "JavaHeapSummaryView_Name=Summary",
+    "JavaHeapSummaryView_Description=Summary",
     "JavaHeapSummaryView_NotAvailableMsg=&lt;not available&gt;",
     "JavaHeapSummaryView_SystemPropertiesString=System Properties:",
     "JavaHeapSummaryView_SummaryString=Basic Info:",
@@ -82,7 +84,8 @@ public class JavaHeapSummaryView extends HeapViewerFeature {
     
     
     public JavaHeapSummaryView(HeapContext context) {
-        super("java_heap_summary", "Summary", "Summary", Icons.getIcon(HeapWalkerIcons.PROPERTIES), 100);
+        super("java_heap_summary", Bundle.JavaHeapSummaryView_Name(), Bundle.JavaHeapSummaryView_Description(),
+               Icons.getIcon(HeapWalkerIcons.PROPERTIES), 100); // NOI18N
         this.context = context;
     }
     
@@ -174,7 +177,7 @@ public class JavaHeapSummaryView extends HeapViewerFeature {
                           Bundle.JavaHeapSummaryView_NotAvailableMsg()
                 );
 
-        String oomeString = "";
+        String oomeString = ""; // NOI18N
 //        if (oome != null) {
 //            Instance thread = oome.getInstance();
 //            String threadName = htmlize(getThreadName(heap, thread));

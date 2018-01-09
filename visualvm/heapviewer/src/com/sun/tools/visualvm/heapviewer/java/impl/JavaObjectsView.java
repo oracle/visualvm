@@ -57,18 +57,34 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.PluggableTreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "JavaObjectsView_Name=Objects",
+    "JavaObjectsView_Description=Objects",
+    "JavaObjectsView_AllObjects=All Objects",
+    "JavaObjectsView_Dominators=Dominators",
+    "JavaObjectsView_GcRoots=GC Roots",
+    "JavaObjectsView_Types=Types",
+    "JavaObjectsView_Packages=Packages",
+    "JavaObjectsView_Classes=Classes",
+    "JavaObjectsView_Instances=Instances",
+    "JavaObjectsView_FilterSubclasses=Filter Subclasses",
+    "JavaObjectsView_Preset=Preset:",
+    "JavaObjectsView_Aggregation=Aggregation:",
+    "JavaObjectsView_Details=Details:"
+})
 public class JavaObjectsView extends HeapViewerFeature {
     
     private static enum Preset {
-        ALL_OBJECTS ("All Objects"),
-        DOMINATORS ("Dominators"),
-        GC_ROOTS ("GC Roots");
+        ALL_OBJECTS (Bundle.JavaObjectsView_AllObjects()),
+        DOMINATORS (Bundle.JavaObjectsView_Dominators()),
+        GC_ROOTS (Bundle.JavaObjectsView_GcRoots());
         
         private final String presetName;
         private Preset(String presetName) { this.presetName = presetName; }
@@ -76,10 +92,10 @@ public class JavaObjectsView extends HeapViewerFeature {
     }
     
     private static enum Aggregation {
-        TYPES ("Types", Icons.getIcon(ProfilerIcons.RUN_GC)),
-        PACKAGES ("Packages", Icons.getIcon(LanguageIcons.PACKAGE)),
-        CLASSES ("Classes", Icons.getIcon(LanguageIcons.CLASS)),
-        INSTANCES ("Instances", Icons.getIcon(LanguageIcons.INSTANCE));
+        TYPES (Bundle.JavaObjectsView_Types(), Icons.getIcon(ProfilerIcons.RUN_GC)),
+        PACKAGES (Bundle.JavaObjectsView_Packages(), Icons.getIcon(LanguageIcons.PACKAGE)),
+        CLASSES (Bundle.JavaObjectsView_Classes(), Icons.getIcon(LanguageIcons.CLASS)),
+        INSTANCES (Bundle.JavaObjectsView_Instances(), Icons.getIcon(LanguageIcons.INSTANCE));
         
         private final String aggregationName;
         private final Icon aggregationIcon;
@@ -103,13 +119,13 @@ public class JavaObjectsView extends HeapViewerFeature {
     
     
     public JavaObjectsView(HeapContext context, HeapViewerActions actions) {
-        super("java_objects", "Objects", "Objects", Icons.getIcon(LanguageIcons.CLASS), 200);
+        super("java_objects", Bundle.JavaObjectsView_Name(), Bundle.JavaObjectsView_Description(), Icons.getIcon(LanguageIcons.CLASS), 200); // NOI18N
         
         this.context = context;
         
         Heap heap = context.getFragment().getHeap();
         
-        objectsView = new PluggableTreeTableView("java_objects", context, actions, TreeTableViewColumn.classes(heap, true)) {
+        objectsView = new PluggableTreeTableView("java_objects", context, actions, TreeTableViewColumn.classes(heap, true)) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 switch (getPreset()) {
                     case ALL_OBJECTS:
@@ -156,7 +172,7 @@ public class JavaObjectsView extends HeapViewerFeature {
                 super.populatePopupLast(node, popup);
                 JavaClass javaClass = HeapViewerNode.getValue(node, DataType.CLASS, heap);
                 final String className = javaClass == null || javaClass.isArray() ? null : javaClass.getName();
-                popup.add(new JMenuItem("Filter Subclasses") {
+                popup.add(new JMenuItem(Bundle.JavaObjectsView_FilterSubclasses()) {
                     {
                         setEnabled(className != null);
                     }
@@ -231,7 +247,7 @@ public class JavaObjectsView extends HeapViewerFeature {
         toolbar.addSeparator();
         toolbar.addSpace(5);
         
-        toolbar.add(new GrayLabel("Preset:"));
+        toolbar.add(new GrayLabel(Bundle.JavaObjectsView_Preset()));
         toolbar.addSpace(2);
         
         class PresetAction extends AbstractAction {
@@ -253,7 +269,7 @@ public class JavaObjectsView extends HeapViewerFeature {
         
         toolbar.addSpace(8);
         
-        toolbar.add(new GrayLabel("Aggregation:"));
+        toolbar.add(new GrayLabel(Bundle.JavaObjectsView_Aggregation()));
         toolbar.addSpace(2);
         
         final ButtonGroup aggregationBG = new ButtonGroup();
@@ -303,7 +319,7 @@ public class JavaObjectsView extends HeapViewerFeature {
         if (objectsView.hasPlugins()) {
             toolbar.addSpace(8);
 
-            toolbar.add(new GrayLabel("Details:"));
+            toolbar.add(new GrayLabel(Bundle.JavaObjectsView_Details()));
             toolbar.addSpace(2);
             
             toolbar.add(objectsView.getToolbar());

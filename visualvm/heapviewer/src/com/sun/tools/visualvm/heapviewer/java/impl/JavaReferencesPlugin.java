@@ -49,12 +49,19 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "JavaReferencesPlugin_Name=References",
+    "JavaReferencesPlugin_Description=References",
+    "JavaReferencesPlugin_NoReferences=<no references>",
+    "JavaReferencesPlugin_NoSelection=<no instance selected>"
+})
 class JavaReferencesPlugin extends HeapViewPlugin {
     
     private final Heap heap;
@@ -66,11 +73,11 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     
 
     public JavaReferencesPlugin(HeapContext context, HeapViewerActions actions) {
-        super("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE));
+        super(Bundle.JavaReferencesPlugin_Name(), Bundle.JavaReferencesPlugin_Description(), Icons.getIcon(ProfilerIcons.NODE_REVERSE));
         
         heap = context.getFragment().getHeap();
         
-        objectsView = new TreeTableView("java_objects_references", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
+        objectsView = new TreeTableView("java_objects_references", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 Instance _selected = null;
                 synchronized (this) { _selected = selected; }
@@ -82,14 +89,14 @@ class JavaReferencesPlugin extends HeapViewPlugin {
                         computingInstances.add(_selected);
                         try {
                             HeapViewerNode[] nodes = JavaReferencesProvider.getNodes(_selected, root, heap, viewID, null, dataTypes, sortOrders, progress);
-                            return nodes == null || nodes.length == 0 ? new HeapViewerNode[] { new TextNode("<no references>") } : nodes;
+                            return nodes == null || nodes.length == 0 ? new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_NoReferences()) } : nodes;
                         } finally {
                             computingInstances.remove(_selected);
                         }
                     }
                 }
                 
-                return new HeapViewerNode[] { new TextNode("<no instance selected>") };
+                return new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_NoSelection()) };
             }
         };
     }

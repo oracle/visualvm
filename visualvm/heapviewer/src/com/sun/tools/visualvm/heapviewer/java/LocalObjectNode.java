@@ -28,18 +28,24 @@ package com.sun.tools.visualvm.heapviewer.java;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "LocalObjectNode_LocalObject=local object",
+    "LocalObjectNode_UnknownLocalObject=unknown local object",
+    "LocalObjectNode_Unknown=<unknown>"
+})
 public class LocalObjectNode extends InstanceNode {
     
     private final String localObjectName;
     
     
     public LocalObjectNode(Instance instance) {
-        this(instance, "local object");
+        this(instance, Bundle.LocalObjectNode_LocalObject());
     }
     
     public LocalObjectNode(Instance instance, String localObjectName) {
@@ -56,11 +62,11 @@ public class LocalObjectNode extends InstanceNode {
     public static class Unknown extends LocalObjectNode {
         
         public Unknown() {
-            super(null, "unknown local object");
+            super(null, Bundle.LocalObjectNode_UnknownLocalObject());
         }
         
         public String getName(Heap heap) {
-            return "<unknown>";
+            return Bundle.LocalObjectNode_Unknown();
         }
         
         public boolean equals(Object o) {

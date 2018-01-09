@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -40,6 +41,9 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerNodeAction.Provider.class)
+@NbBundle.Messages({
+    "JavaGoToSourceAction_GoToSource=Go to Source"
+})
 public class JavaGoToSourceAction extends HeapViewerNodeAction.Provider {
 
     public boolean supportsView(HeapContext context, String viewID) {
@@ -68,7 +72,7 @@ public class JavaGoToSourceAction extends HeapViewerNodeAction.Provider {
         
         
         private GoToSourceAction(JavaClass javaClass) {
-            super("Go to Source", 210);
+            super(Bundle.JavaGoToSourceAction_GoToSource(), 210);
             
             className = javaClass == null ? null : javaClass.getName();
             methodName = null;
@@ -78,20 +82,20 @@ public class JavaGoToSourceAction extends HeapViewerNodeAction.Provider {
         }
         
         private GoToSourceAction(StackFrameNode sfNode) {
-            super("Go to Source", 210);
+            super(Bundle.JavaGoToSourceAction_GoToSource(), 210);
             
             String name = sfNode.getName();
             
-            int fileIdx = name.indexOf("(");
+            int fileIdx = name.indexOf("("); // NOI18N
             String methodName = name.substring(0, fileIdx);
             String fileName = name.substring(fileIdx);
             
-            int classIdx = methodName.lastIndexOf('.');
+            int classIdx = methodName.lastIndexOf('.'); // NOI18N
             className = methodName.substring(0, classIdx);
             this.methodName = methodName.substring(classIdx + 1);
             
-            int lineIdxS = fileName.indexOf(':'); // can be 'Native Method' instead of '<file name>:<line number>'
-            int lineIdxE = fileName.indexOf(')');
+            int lineIdxS = fileName.indexOf(':'); // can be 'Native Method' instead of '<file name>:<line number>'  // NOI18N
+            int lineIdxE = fileName.indexOf(')'); // NOI18N
             line = lineIdxS == -1 ? -1 : Integer.parseInt(fileName.substring(lineIdxS + 1, lineIdxE));
             
             setEnabled(true);

@@ -45,12 +45,18 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "JavaPreviewPlugin_Name=Preview",
+    "JavaPreviewPlugin_Description=Preview",
+    "JavaPreviewPlugin_NoDetails=<no details>"
+})
 class JavaPreviewPlugin extends HeapViewPlugin {
     
     private final Heap heap;
@@ -59,7 +65,7 @@ class JavaPreviewPlugin extends HeapViewPlugin {
     
 
     public JavaPreviewPlugin(HeapContext context) {
-        super("Preview", "Preview", Icons.getIcon(HeapWalkerIcons.PROPERTIES));
+        super(Bundle.JavaPreviewPlugin_Name(), Bundle.JavaPreviewPlugin_Description(), Icons.getIcon(HeapWalkerIcons.PROPERTIES));
         heap = context.getFragment().getHeap();
     }
 
@@ -116,7 +122,7 @@ class JavaPreviewPlugin extends HeapViewPlugin {
             JComponent instanceView = selectedInstance == null ? null :
                        DetailsSupport.getDetailsView(selectedInstance, heap);
             if (instanceView == null) {
-                JLabel noDetails = new JLabel("<no details>", JLabel.CENTER);
+                JLabel noDetails = new JLabel(Bundle.JavaPreviewPlugin_NoDetails(), JLabel.CENTER);
                 noDetails.setEnabled(false);
                 
                 instanceView = new JPanel(new BorderLayout());

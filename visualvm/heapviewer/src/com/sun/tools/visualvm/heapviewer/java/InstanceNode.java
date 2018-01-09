@@ -32,11 +32,15 @@ import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "InstanceNode_GCRootFlag={0} [GC root - {1}]"
+})
 public class InstanceNode extends HeapViewerNode {
     
     public static enum Mode {
@@ -110,15 +114,15 @@ public class InstanceNode extends HeapViewerNode {
     
     
     static String computeName(Instance instance, Heap heap) {
-        String name = instance.getJavaClass().getName() + "#" + instance.getInstanceNumber();
+        String name = instance.getJavaClass().getName() + "#" + instance.getInstanceNumber(); // NOI18N
         GCRoot gcroot = heap == null ? null : heap.getGCRoot(instance);
-        if (gcroot != null) name += " [GC root - " + gcroot.getKind() + "]";
+        if (gcroot != null) name = Bundle.InstanceNode_GCRootFlag(name, gcroot.getKind());
         return name;
     }
     
     static String computeLogicalValue(Instance instance, Heap heap) {
         String detail = DetailsSupport.getDetailsString(instance, heap);
-        return detail == null ? "" : detail;
+        return detail == null ? "" : detail; // NOI18N
     }
     
     

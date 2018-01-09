@@ -45,12 +45,18 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ClassHierarchyPlugin_Name=Hierarchy",
+    "ClassHierarchyPlugin_Description=Hierarchy",
+    "ClassHierarchyPlugin_NoSelection=<no class or instance selected>"
+})
 public class ClassHierarchyPlugin extends HeapViewPlugin {
     
     private final Heap heap;
@@ -60,17 +66,17 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
     
     
     public ClassHierarchyPlugin(HeapContext context, HeapViewerActions actions) {
-        super("Hierarchy", "Hierarchy", Icons.getIcon(HeapWalkerIcons.CLASSES));
+        super(Bundle.ClassHierarchyPlugin_Name(), Bundle.ClassHierarchyPlugin_Description(), Icons.getIcon(HeapWalkerIcons.CLASSES));
         
         heap = context.getFragment().getHeap();
         
-        objectsView = new TreeTableView("java_objects_hierarchy", context, actions, TreeTableViewColumn.classesPlain(heap)) {
+        objectsView = new TreeTableView("java_objects_hierarchy", context, actions, TreeTableViewColumn.classesPlain(heap)) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 if (selected != null) {
                     JavaClass javaClass = selected;
                     
                     if (javaClass.isArray()) {
-                        String className = javaClass.getName().replace("[]", "");
+                        String className = javaClass.getName().replace("[]", ""); // NOI18N
                         JavaClass plainClass = heap.getJavaClassByName(className);
                         if (plainClass != null) javaClass = plainClass;
                     }
@@ -93,7 +99,7 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
                     return new HeapViewerNode[] { firstNode };
                 }
 
-                return new HeapViewerNode[] { new TextNode("<no class or instance selected>") };
+                return new HeapViewerNode[] { new TextNode(Bundle.ClassHierarchyPlugin_NoSelection()) };
             }
             protected void childrenChanged() {
                 HeapViewerNode root = (HeapViewerNode)getRoot();

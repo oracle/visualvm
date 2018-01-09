@@ -32,11 +32,16 @@ import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.heap.Value;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "InstanceReferenceNode_NodeNameField={0} {1}",
+    "InstanceReferenceNode_NodeNameReference={0} in {1}"
+})
 public abstract class InstanceReferenceNode extends InstanceNode {
     
     private final Mode mode;
@@ -89,11 +94,11 @@ public abstract class InstanceReferenceNode extends InstanceNode {
     }
 
     public String getName(Heap heap) {
-        return getInstance() == null ? "null" : super.getName(heap);
+        return getInstance() == null ? "null" : super.getName(heap); // NOI18N
     }
 
     public String getLogicalValue(Heap heap) {
-        return getInstance() == null ? "" : super.getLogicalValue(heap);
+        return getInstance() == null ? "" : super.getLogicalValue(heap); // NOI18N
     }
 
     public long getOwnSize() {
@@ -109,7 +114,9 @@ public abstract class InstanceReferenceNode extends InstanceNode {
     }
     
     public String toString() {
-        return getFieldName() + (Mode.INCOMING_REFERENCE.equals(mode) ? " in " : " ") + getName(null); // TODO: should not be called directly when sorting the tree
+        // TODO: should not be called directly when sorting the tree
+        if (Mode.INCOMING_REFERENCE.equals(mode)) return Bundle.InstanceReferenceNode_NodeNameReference(getFieldName(), getName(null));
+        else return Bundle.InstanceReferenceNode_NodeNameField(getFieldName(), getName(null));
     }
 
     public boolean equals(Object o) {
@@ -136,7 +143,7 @@ public abstract class InstanceReferenceNode extends InstanceNode {
         
         protected String computeFieldName() {
             org.netbeans.lib.profiler.heap.Field field = getValue().getField();
-            return (field.isStatic() ? "static " : "") + field.getName();
+            return (field.isStatic() ? "static " : "") + field.getName(); // NOI18N
         }
         
     }
@@ -152,7 +159,7 @@ public abstract class InstanceReferenceNode extends InstanceNode {
         }
         
         protected String computeFieldName() {
-            return "[" + getValue().getIndex() + "]";
+            return "[" + getValue().getIndex() + "]"; // NOI18N
         }
         
     }

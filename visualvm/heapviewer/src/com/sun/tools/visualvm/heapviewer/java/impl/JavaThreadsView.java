@@ -59,12 +59,23 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.PluggableTreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "JavaThreadsView_Name=Threads",
+    "JavaThreadsView_Description=Threads",
+    "JavaThreadsView_ComputingThreads=<br>&nbsp;&nbsp;computing threads...",
+    "JavaThreadsView_Results=Results:",
+    "JavaThreadsView_TooltipObjects=Objects",
+    "JavaThreadsView_TooltipHTML=HTML",
+    "JavaThreadsView_Details=Details:",
+    "JavaThreadsView_SelectAction=Select in Threads"
+})
 public class JavaThreadsView extends HeapViewerFeature {
     
     private static final String FEATURE_ID = "java_threads"; // NOI18N
@@ -86,7 +97,7 @@ public class JavaThreadsView extends HeapViewerFeature {
     
     
     public JavaThreadsView(HeapContext context, HeapViewerActions actions) {
-        super(FEATURE_ID, "Threads", "Threads", Icons.getIcon(ProfilerIcons.WINDOW_THREADS), 300);
+        super(FEATURE_ID, Bundle.JavaThreadsView_Name(), Bundle.JavaThreadsView_Description(), Icons.getIcon(ProfilerIcons.WINDOW_THREADS), 300);
         
 //        this.context = context;
 //        this.actions = actions;
@@ -102,9 +113,9 @@ public class JavaThreadsView extends HeapViewerFeature {
                 for (CCTNode child : children) expandNode((HeapViewerNode)child);
             }
         };
-        objectsView.setViewName("Threads");
+        objectsView.setViewName(Bundle.JavaThreadsView_Name());
         
-        htmlView = new HTMLView(VIEW_HTML_ID, context, actions, "<br>&nbsp;&nbsp;computing threads...") {
+        htmlView = new HTMLView(VIEW_HTML_ID, context, actions, Bundle.JavaThreadsView_ComputingThreads()) {
             protected String computeData(HeapContext context, String viewID) {
                 return JavaThreadsHTML.getThreads(context);
             }
@@ -141,7 +152,7 @@ public class JavaThreadsView extends HeapViewerFeature {
         toolbar.addSeparator();
         toolbar.addSpace(5);
         
-        toolbar.add(new GrayLabel("Results:"));
+        toolbar.add(new GrayLabel(Bundle.JavaThreadsView_Results()));
         toolbar.addSpace(3);
         
         ButtonGroup resultsBG = new ButtonGroup();
@@ -156,7 +167,7 @@ public class JavaThreadsView extends HeapViewerFeature {
         };
         rObjects.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
         rObjects.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
-        rObjects.setToolTipText("Objects");
+        rObjects.setToolTipText(Bundle.JavaThreadsView_TooltipObjects());
         resultsBG.add(rObjects);
         toolbar.add(rObjects);
         
@@ -170,7 +181,7 @@ public class JavaThreadsView extends HeapViewerFeature {
         };
         rHTML.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
         rHTML.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
-        rHTML.setToolTipText("HTML");
+        rHTML.setToolTipText(Bundle.JavaThreadsView_TooltipHTML());
         resultsBG.add(rHTML);
         toolbar.add(rHTML);
         
@@ -180,7 +191,7 @@ public class JavaThreadsView extends HeapViewerFeature {
 //            detailsToolbar.addSeparator();
             pluginsToolbar.addSpace(8);
 
-            pluginsToolbar.add(new GrayLabel("Details:"));
+            pluginsToolbar.add(new GrayLabel(Bundle.JavaThreadsView_Details()));
             pluginsToolbar.addSpace(2);
             
             pluginsToolbar.add(objectsView.getToolbar());
@@ -213,7 +224,7 @@ public class JavaThreadsView extends HeapViewerFeature {
         private final HeapViewerActions actions;
         
         SelectInstanceAction(long id, HeapViewerActions actions) {
-            super("Select in Threads", 205);
+            super(Bundle.JavaThreadsView_SelectAction(), 205);
             this.id = id;
             this.actions = actions;
         }

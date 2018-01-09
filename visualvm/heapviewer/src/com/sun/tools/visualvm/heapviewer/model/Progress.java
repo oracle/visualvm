@@ -208,9 +208,9 @@ public final class Progress {
         }
         
         public String toString() {
-            if (isFinished()) return "finished";
-            else if (!isKnownSteps()) return "step " + currentStep;
-            else return "step " + currentStep + " of " + totalSteps;
+            if (isFinished()) return "finished"; // NOI18N
+            else if (!isKnownSteps()) return "step " + currentStep; // NOI18N
+            else return "step " + currentStep + " of " + totalSteps; // NOI18N
         }
         
     }

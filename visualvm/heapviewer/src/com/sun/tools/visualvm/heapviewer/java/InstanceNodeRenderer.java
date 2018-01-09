@@ -38,11 +38,15 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import org.openide.util.ImageUtilities;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "InstanceNodeRenderer_LoopTo=loop to {0}"
+})
 public class InstanceNodeRenderer extends JavaNameRenderer implements HeapViewerRenderer {
     
     private static final ImageIcon ICON_INSTANCE = Icons.getImageIcon(LanguageIcons.INSTANCE);
@@ -62,16 +66,16 @@ public class InstanceNodeRenderer extends JavaNameRenderer implements HeapViewer
         InstanceNode node = isLoop ? (InstanceNode)loop : (InstanceNode)value;
         
         String name = node.getName(heap);
-        if (name != null && !"null".equals(name)) {
+        if (name != null && !"null".equals(name)) { // NOI18N
             super.setValue(name, row);
-            if (isLoop) super.setNormalValue("loop to " + super.getNormalValue());
+            if (isLoop) super.setNormalValue(Bundle.InstanceNodeRenderer_LoopTo(super.getNormalValue()));
         } else {
             super.setValue(null, row);
-            super.setNormalValue("null");
+            super.setNormalValue("null"); // NOI18N
         }
         
         String log = node.getLogicalValue(heap);
-        if (log != null && !log.isEmpty()) setGrayValue(" : " + log);
+        if (log != null && !log.isEmpty()) setGrayValue(" : " + log); // NOI18N
         
         JavaClass jclass = HeapViewerNode.getValue(node, DataType.CLASS, heap);
         ImageIcon icon = jclass != null && jclass.isArray() ? ICON_ARRAY : ICON_INSTANCE;

@@ -43,6 +43,7 @@ import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -50,14 +51,20 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerNode.Provider.class, position = 300)
+@NbBundle.Messages({
+    "JavaArrayItemsProvider_Name=items",
+    "JavaArrayItemsProvider_MoreNodes=<another {0} items left>",
+    "JavaArrayItemsProvider_SamplesContainer=<sample {0} items>",
+    "JavaArrayItemsProvider_NodesContainer=<items {0}-{1}>"
+})
 public class JavaArrayItemsProvider extends HeapViewerNode.Provider {
     
     public String getName() {
-        return "items";
+        return Bundle.JavaArrayItemsProvider_Name();
     }
     
     public boolean supportsView(Heap heap, String viewID) {
-        return viewID.startsWith("java_");
+        return viewID.startsWith("java_"); // NOI18N
     }
     
     public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
@@ -74,7 +81,7 @@ public class JavaArrayItemsProvider extends HeapViewerNode.Provider {
         if (instance == null) return null;
         
         if (instance instanceof PrimitiveArrayInstance) {
-            final String type = instance.getJavaClass().getName().replace("[]", "");
+            final String type = instance.getJavaClass().getName().replace("[]", ""); // NOI18N
             final List<String> items = ((PrimitiveArrayInstance)instance).getValues();
             
             NodesComputer<Integer> computer = new NodesComputer<Integer>(items.size(), UIThresholds.MAX_ARRAY_ITEMS) {
@@ -90,13 +97,13 @@ public class JavaArrayItemsProvider extends HeapViewerNode.Provider {
                     return new ProgressIterator(iterator, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
-                    return "<another " + moreNodesCount + " items left>";
+                    return Bundle.JavaArrayItemsProvider_MoreNodes(moreNodesCount);
                 }
                 protected String getSamplesContainerString(String objectsCount)  {
-                    return "<sample " + objectsCount + " items>";
+                    return Bundle.JavaArrayItemsProvider_SamplesContainer(objectsCount);
                 }
                 protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                    return "<items " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                    return Bundle.JavaArrayItemsProvider_NodesContainer(firstNodeIdx, lastNodeIdx);
                 }
             };
         
@@ -116,13 +123,13 @@ public class JavaArrayItemsProvider extends HeapViewerNode.Provider {
                     return new ProgressIterator(iterator, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
-                    return "<another " + moreNodesCount + " items left>";
+                    return Bundle.JavaArrayItemsProvider_MoreNodes(moreNodesCount);
                 }
                 protected String getSamplesContainerString(String objectsCount)  {
-                    return "<sample " + objectsCount + " items>";
+                    return Bundle.JavaArrayItemsProvider_SamplesContainer(objectsCount);
                 }
                 protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                    return "<items " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                    return Bundle.JavaArrayItemsProvider_NodesContainer(firstNodeIdx, lastNodeIdx);
                 }
             };
             

@@ -36,6 +36,7 @@ import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.NodeObjectsView;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -43,10 +44,13 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerNodeAction.Provider.class)
+@NbBundle.Messages({
+    "JavaOpenNodeAction_OpenClassTab=Open Class in New Tab"
+})
 public class JavaOpenNodeAction extends HeapViewerNodeAction.Provider {
     
     public boolean supportsView(HeapContext context, String viewID) {
-        return viewID.startsWith("java_") && JavaHeapFragment.getJavaContext(context) != null;
+        return viewID.startsWith("java_") && JavaHeapFragment.getJavaContext(context) != null; // NOI18N
     }
 
     public HeapViewerNodeAction[] getActions(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
@@ -85,7 +89,7 @@ public class JavaOpenNodeAction extends HeapViewerNodeAction.Provider {
     private static class OpenClassAction extends NodeObjectsView.OpenAction {
         
         private OpenClassAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            super("Open Class in New Tab", 1, node, context, actions);
+            super(Bundle.JavaOpenNodeAction_OpenClassTab(), 1, node, context, actions);
         }
 
         public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {

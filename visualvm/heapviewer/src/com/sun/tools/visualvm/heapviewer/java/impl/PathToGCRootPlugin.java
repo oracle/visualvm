@@ -60,7 +60,12 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "PathToGCRootPlugin_ProgressMsg=Computing nearest GC root..."
+    "PathToGCRootPlugin_Name=GC Root",
+    "PathToGCRootPlugin_Description=GC Root",
+    "PathToGCRootPlugin_ProgressMsg=Computing nearest GC root...",
+    "PathToGCRootPlugin_NoRoot=<no GC root>",
+    "PathToGCRootPlugin_IsRoot=<node is GC root>",
+    "PathToGCRootPlugin_NoSelection=<no instance selected>"
 })
 public class PathToGCRootPlugin extends HeapViewPlugin {
     
@@ -71,20 +76,20 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
     
     
     public PathToGCRootPlugin(HeapContext context, HeapViewerActions actions) {
-        super("GC Root", "GC Root", Icons.getIcon(ProfilerIcons.RUN_GC));
+        super(Bundle.PathToGCRootPlugin_Name(), Bundle.PathToGCRootPlugin_Description(), Icons.getIcon(ProfilerIcons.RUN_GC));
         
         heap = context.getFragment().getHeap();
         
-        objectsView = new TreeTableView("java_objects_gcroots", context, actions, TreeTableViewColumn.instancesPlain(heap)) {
+        objectsView = new TreeTableView("java_objects_gcroots", context, actions, TreeTableViewColumn.instancesPlain(heap)) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 if (selected != null) {
                     Instance instance = selected;
                     Instance nextInstance = getNearestGCRootPointer(instance);
                     
                     if (nextInstance == null) {
-                        return new HeapViewerNode[] { new TextNode("<no GC root>") };
+                        return new HeapViewerNode[] { new TextNode(Bundle.PathToGCRootPlugin_NoRoot()) };
                     } else if (nextInstance == instance) {
-                        return new HeapViewerNode[] { new TextNode("<node is GC root>") };
+                        return new HeapViewerNode[] { new TextNode(Bundle.PathToGCRootPlugin_IsRoot()) };
                     } else {
                         ToRoot node = null;
                         HeapViewerNode firstNode = null;
@@ -115,7 +120,7 @@ public class PathToGCRootPlugin extends HeapViewPlugin {
                     }
                 }
 
-                return new HeapViewerNode[] { new TextNode("<no instance selected>") };
+                return new HeapViewerNode[] { new TextNode(Bundle.PathToGCRootPlugin_NoSelection()) };
             }
             protected void childrenChanged() {
                 HeapViewerNode root = (HeapViewerNode)getRoot();

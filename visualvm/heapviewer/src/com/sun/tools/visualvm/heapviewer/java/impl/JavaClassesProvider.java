@@ -49,6 +49,7 @@ import com.sun.tools.visualvm.heapviewer.model.TextNode;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -56,21 +57,30 @@ import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
  */
 public class JavaClassesProvider {
     
+    @NbBundle.Messages({
+        "Classes_Messages_MoreNodes=<another {0} classes left>",
+        "Classes_Messages_SamplesContainer=<sample {0} classes>",
+        "Classes_Messages_NodesContainer=<classes {0}-{1}>",
+        "Classes_Messages_NoClasses=<no classes>",
+        "Classes_Messages_NoClassesFilter=<no classes matching the filter>",
+        "Classes_Messages_NoPackages=<no packages>",
+        "Classes_Messages_NoPackagesFilter=<no packages matching the filter>"
+    })
     private static final class Classes_Messages {
         private static String getMoreNodesString(String moreNodesCount)  {
-            return "<another " + moreNodesCount + " classes left>";
+            return Bundle.Classes_Messages_MoreNodes(moreNodesCount);
         }
         private static String getSamplesContainerString(String objectsCount)  {
-            return "<sample " + objectsCount + " classes>";
+            return Bundle.Classes_Messages_SamplesContainer(objectsCount);
         }
         private static String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-            return "<classes " + firstNodeIdx + "-" + lastNodeIdx + ">";
+            return Bundle.Classes_Messages_NodesContainer(firstNodeIdx, lastNodeIdx);
         }
         private static String getNoClassesString(HeapViewerNodeFilter viewFilter) {
-            return viewFilter == null ? "<no classes>" : "<no classes matching the filter>";
+            return viewFilter == null ? Bundle.Classes_Messages_NoClasses() : Bundle.Classes_Messages_NoClassesFilter();
         }
         private static String getNoPackagesString(HeapViewerNodeFilter viewFilter) {
-            return viewFilter == null ? "<no packages>" : "<no packages matching the filter>";
+            return viewFilter == null ? Bundle.Classes_Messages_NoPackages() : Bundle.Classes_Messages_NoPackagesFilter();
         }
     }
     
@@ -132,18 +142,25 @@ public class JavaClassesProvider {
     }
     
     
+    @NbBundle.Messages({
+        "GCRoots_Messages_MoreNodes=<another {0} GC roots left>",
+        "GCRoots_Messages_SamplesContainer=<sample {0} GC roots>",
+        "GCRoots_Messages_NodesContainer=<GC roots {0}-{1}>",
+        "GCRoots_Messages_NoGCRoots=<no GC roots>",
+        "GCRoots_Messages_NoGCRootsFilter=<no GC roots matching the filter>"
+    })
     private static final class GCRoots_Messages {
         private static String getMoreNodesString(String moreNodesCount)  {
-            return "<another " + moreNodesCount + " GC roots left>";
+            return Bundle.GCRoots_Messages_MoreNodes(moreNodesCount);
         }
         private static String getSamplesContainerString(String objectsCount)  {
-            return "<sample " + objectsCount + " GC roots>";
+            return Bundle.GCRoots_Messages_SamplesContainer(objectsCount);
         }
         private static String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-            return "<GC roots " + firstNodeIdx + "-" + lastNodeIdx + ">";
+            return Bundle.GCRoots_Messages_NodesContainer(firstNodeIdx, lastNodeIdx);
         }
         private static String getNoItemsString(HeapViewerNodeFilter viewFilter) {
-            return viewFilter == null ? "<no GC roots>" : "<no GC roots matching the filter>";
+            return viewFilter == null ? Bundle.GCRoots_Messages_NoGCRoots() : Bundle.GCRoots_Messages_NoGCRootsFilter();
         }
     }
     
@@ -232,7 +249,7 @@ public class JavaClassesProvider {
                 Map<String, ClassesContainer.ContainerNodes> packages = new HashMap();
                 for (InstancesContainer.Objects cnode : cnodes) {
                     String className = cnode.getName();
-                    int nameIdx = className.lastIndexOf('.');
+                    int nameIdx = className.lastIndexOf('.'); // NOI18N
                     if (nameIdx == -1) {
                         pnodes.add(cnode);
                     } else {
@@ -254,24 +271,32 @@ public class JavaClassesProvider {
     }
     
     
+    @NbBundle.Messages({
+        "Dominators_Messages_MoreNodes=<another {0} dominators left>",
+        "Dominators_Messages_SamplesContainer=<sample {0} dominators>",
+        "Dominators_Messages_NodesContainer=<dominators {0}-{1}>",
+        "Dominators_Messages_NoDominators=<no dominators>",
+        "Dominators_Messages_NoDominatorsFilter=<no dominators matching the filter>",
+        "Dominators_Messages_NoRetainedSizes=<Retained sizes not computed yet>"
+    })
     private static final class Dominators_Messages {
         private static String getMoreNodesString(String moreNodesCount)  {
-            return "<another " + moreNodesCount + " dominators left>";
+            return Bundle.Dominators_Messages_MoreNodes(moreNodesCount);
         }
         private static String getSamplesContainerString(String objectsCount)  {
-            return "<sample " + objectsCount + " dominators>";
+            return Bundle.Dominators_Messages_SamplesContainer(objectsCount);
         }
         private static String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-            return "<dominators " + firstNodeIdx + "-" + lastNodeIdx + ">";
+            return Bundle.Dominators_Messages_NodesContainer(firstNodeIdx, lastNodeIdx);
         }
         private static String getNoItemsString(HeapViewerNodeFilter viewFilter) {
-            return viewFilter == null ? "<no dominators>" : "<no dominators matching the filter>";
+            return viewFilter == null ? Bundle.Dominators_Messages_NoDominators() : Bundle.Dominators_Messages_NoDominatorsFilter();
         }
     }
     
     public static HeapViewerNode[] getHeapDominators(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
         if (!DataType.RETAINED_SIZE.valuesAvailable(heap))
-            return new HeapViewerNode[] { new TextNode("<Retained sizes not computed yet>") };
+            return new HeapViewerNode[] { new TextNode(Bundle.Dominators_Messages_NoRetainedSizes()) };
         
         int maxSearchInstances = 1000;
         
@@ -343,7 +368,7 @@ public class JavaClassesProvider {
             Map<String, ClassesContainer.ContainerNodes> packages = new HashMap();
             for (InstancesContainer.Objects cnode : cnodes) {
                 String className = cnode.getName();
-                int nameIdx = className.lastIndexOf('.');
+                int nameIdx = className.lastIndexOf('.'); // NOI18N
                 if (nameIdx == -1) {
                     pnodes.add(cnode);
                 } else {

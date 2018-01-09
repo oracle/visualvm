@@ -123,7 +123,7 @@ class JavaThreadsHTML {
                     Integer threadStatus = (Integer)threadInstance.getValueOfField("threadStatus"); // NOI18N
                     StackTraceElement stack[] = threadRoot.getStackTrace();
                     Map<Integer,List<JavaFrameGCRoot>> localsMap = javaFrameMap.get(threadRoot);
-                    String style="";
+                    String style=""; // NOI18N
 
                     if (threadRoot.equals(oome)) {
                         style="style=\"color: #FF0000\""; // NOI18N

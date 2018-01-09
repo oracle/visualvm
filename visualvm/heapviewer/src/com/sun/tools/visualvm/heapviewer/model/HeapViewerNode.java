@@ -303,7 +303,7 @@ public abstract class HeapViewerNode extends CCTNode {
         private final Provider provider;
         
         ChildrenContainer(Provider provider) {
-            super("<" + provider.getName() + ">");
+            super("<" + provider.getName() + ">"); // NOI18N
             resetChildren();
             
             this.provider = provider;

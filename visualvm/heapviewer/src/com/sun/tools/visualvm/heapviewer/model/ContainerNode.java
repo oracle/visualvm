@@ -33,11 +33,17 @@ import javax.swing.SortOrder;
 import org.netbeans.lib.profiler.heap.Heap;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ContainerNode_MoreNodes=<another {0} nodes left>",
+    "ContainerNode_SamplesContainer=<sample {0} nodes>",
+    "ContainerNode_NodesContainer=<nodes {0}-{1}>"
+})
 public abstract class ContainerNode<T> extends HeapViewerNode {
     
     protected final int maxNodes;
@@ -104,15 +110,15 @@ public abstract class ContainerNode<T> extends HeapViewerNode {
     }
     
     protected String getMoreNodesString(String moreNodesCount)  {
-        return "<another " + moreNodesCount + " nodes left>";
+        return Bundle.ContainerNode_MoreNodes(moreNodesCount);
     }
     
     protected String getSamplesContainerString(String objectsCount)  {
-        return "<sample " + objectsCount + " nodes>";
+        return Bundle.ContainerNode_SamplesContainer(objectsCount);
     }
     
     protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-        return "<nodes " + firstNodeIdx + "-" + lastNodeIdx + ">";
+        return Bundle.ContainerNode_NodesContainer(firstNodeIdx, lastNodeIdx);
     }
 
     
@@ -271,7 +277,7 @@ public abstract class ContainerNode<T> extends HeapViewerNode {
         }
 
         protected HeapViewerNode createNode(HeapViewerNode item) {
-            throw new UnsupportedOperationException("Not supported");
+            throw new UnsupportedOperationException("Not supported"); // NOI18N
         }
         
     }

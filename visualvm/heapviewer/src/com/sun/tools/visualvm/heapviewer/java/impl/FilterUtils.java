@@ -155,21 +155,21 @@ final class FilterUtils {
     }
     
     public static void filterSubclasses(String className, JComponent filterPanel) {
-        Object filterString = filterPanel.getClientProperty("FILTER_STRING");
+        Object filterString = filterPanel.getClientProperty("FILTER_STRING"); // NOI18N
         if (filterString instanceof JTextComponent) {
             ((JTextComponent)filterString).setText(className);
         } else {
             return;
         }
 
-        Object filterType = filterPanel.getClientProperty("FILTER_TYPE");
+        Object filterType = filterPanel.getClientProperty("FILTER_TYPE"); // NOI18N
         if (filterType instanceof FilterType) {
             ((FilterType)filterType).filterImpl(TextFilter.TYPE_REGEXP, Icons.getIcon(LanguageIcons.CLASS), FILTER_REGEXP);
         } else {
             return;
         }
 
-        Object filterAction = filterPanel.getClientProperty("FILTER_ACTION");
+        Object filterAction = filterPanel.getClientProperty("FILTER_ACTION"); // NOI18N
         if (filterAction instanceof AbstractAction) {
             ((AbstractAction)filterAction).actionPerformed(null);
         } else {
@@ -421,9 +421,9 @@ final class FilterUtils {
             }
         });
         
-        panel.putClientProperty("FILTER_STRING", textC);
-        panel.putClientProperty("FILTER_TYPE", filterType);
-        panel.putClientProperty("FILTER_ACTION", filterAction);
+        panel.putClientProperty("FILTER_STRING", textC); // NOI18N
+        panel.putClientProperty("FILTER_TYPE", filterType); // NOI18N
+        panel.putClientProperty("FILTER_ACTION", filterAction); // NOI18N
         
         return panel;
     }

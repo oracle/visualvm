@@ -41,11 +41,15 @@ import com.sun.tools.visualvm.heapviewer.java.LocalObjectNode;
 import com.sun.tools.visualvm.heapviewer.java.ThreadNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "JavaThreadsObjects_LocalVariable=local variable"
+})
 class JavaThreadsObjects {
     
     static HeapViewerNode[] getThreads(RootNode rootNode, Heap heap) {
@@ -67,9 +71,9 @@ class JavaThreadsObjects {
                     StackTraceElement stack[] = threadRoot.getStackTrace();
                     Map<Integer,List<JavaFrameGCRoot>> localsMap = javaFrameMap.get(threadRoot);
 
-                    String tName = "\"" + threadName + "\"" + (daemon.booleanValue() ? " daemon" : "") + " prio=" + priority;
-                    if (threadId != null) tName += " tid=" + threadId;
-                    if (threadStatus != null) tName += " " + toThreadState(threadStatus.intValue());
+                    String tName = "\"" + threadName + "\"" + (daemon.booleanValue() ? " daemon" : "") + " prio=" + priority; // NOI18N
+                    if (threadId != null) tName += " tid=" + threadId; // NOI18N
+                    if (threadStatus != null) tName += " " + toThreadState(threadStatus.intValue()); // NOI18N
 
                     final List<HeapViewerNode> stackFrameNodes = new ArrayList();
                     ThreadNode threadNode = new ThreadNode(tName, threadInstance) {
@@ -88,7 +92,7 @@ class JavaThreadsObjects {
                                     for (JavaFrameGCRoot localVar : locals) {
                                         Instance localInstance = localVar.getInstance();
                                         if (localInstance != null) {
-                                            localVariableNodes.add(new LocalObjectNode(localInstance, "local variable"));
+                                            localVariableNodes.add(new LocalObjectNode(localInstance, Bundle.JavaThreadsObjects_LocalVariable()));
                                         } else {
                                             localVariableNodes.add(new LocalObjectNode.Unknown());                                              
                                         }

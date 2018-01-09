@@ -29,15 +29,20 @@ import java.io.IOException;
 import org.netbeans.lib.profiler.heap.Heap;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.HeapFragment;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "JavaHeapFragment_Name=Java Heap",
+    "JavaHeapFragment_Description=Java Heap"
+})
 public class JavaHeapFragment extends HeapFragment {
     
     public JavaHeapFragment(Heap heap) throws IOException {
-        super("java_heap", "Java Heap", "Java Heap", heap);
+        super("java_heap", Bundle.JavaHeapFragment_Name(), Bundle.JavaHeapFragment_Description(), heap); // NOI18N
     }
     
     public static boolean isJavaHeap(HeapContext context) {

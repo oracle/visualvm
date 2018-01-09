@@ -75,6 +75,7 @@ import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -82,6 +83,23 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "JavaWindowsView_Name=Windows",
+    "JavaWindowsView_Description=Application Windows",
+    "JavaWindowsView_ComputingWindows=computing windows...",
+    "JavaWindowsView_Preview=Preview:",
+    "JavaWindowsView_150px=150px",
+    "JavaWindowsView_Tooltip150px=Window preview height: 150px",
+    "JavaWindowsView_300px=300px",
+    "JavaWindowsView_Tooltip300px=Window preview height: 300px",
+    "JavaWindowsView_600px=600px",
+    "JavaWindowsView_Tooltip600px=Window preview height: 600px",
+    "JavaWindowsView_50pc=50%",
+    "JavaWindowsView_Tooltip50pc=Window preview size: 50%",
+    "JavaWindowsView_100pc=100%",
+    "JavaWindowsView_Tooltip100pc=Window preview size: 100%",
+    "JavaWindowsView_NoPreview=<no preview>"
+})
 class JavaWindowsView extends HeapViewerFeature {
     
     private static final String FEATURE_ID = "java_windows"; // NOI18N
@@ -101,7 +119,7 @@ class JavaWindowsView extends HeapViewerFeature {
     
     
     JavaWindowsView(HeapContext context, HeapViewerActions actions, int estWindowCount) {
-        super(FEATURE_ID, "Windows", "Application Windows", Icons.getIcon(HeapWalkerIcons.WINDOW), 400);
+        super(FEATURE_ID, Bundle.JavaWindowsView_Name(), Bundle.JavaWindowsView_Description(), Icons.getIcon(HeapWalkerIcons.WINDOW), 400);
         
         this.context = context;
         this.actions = actions;
@@ -131,7 +149,7 @@ class JavaWindowsView extends HeapViewerFeature {
         
         component.setOpaque(false);
         
-        JLabel progress = new JLabel("computing windows...", JLabel.LEADING);
+        JLabel progress = new JLabel(Bundle.JavaWindowsView_ComputingWindows(), JLabel.LEADING);
         progress.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         final int labelHeight = progress.getPreferredSize().height;
         component.add(progress, BorderLayout.NORTH);
@@ -142,17 +160,17 @@ class JavaWindowsView extends HeapViewerFeature {
         toolbar.addSeparator();
         toolbar.addSpace(5);
         
-        toolbar.add(new GrayLabel("Preview:"));
+        toolbar.add(new GrayLabel(Bundle.JavaWindowsView_Preview()));
         toolbar.addSpace(3);
         
         final ButtonGroup sizes = new ButtonGroup();
         
-        toolbar.add(new JToggleButton("150px") {
+        toolbar.add(new JToggleButton(Bundle.JavaWindowsView_150px()) {
             {
                 sizes.add(this);
                 putClientProperty("JButton.buttonType", "segmented"); // NOI18N
                 putClientProperty("JButton.segmentPosition", "first"); // NOI18N
-                setToolTipText("Window preview height: 150px");
+                setToolTipText(Bundle.JavaWindowsView_Tooltip150px());
             }
             protected void fireItemStateChanged(ItemEvent event) {
                 if (isSelected()) {
@@ -162,12 +180,12 @@ class JavaWindowsView extends HeapViewerFeature {
                 }
             }
         });
-        toolbar.add(new JToggleButton("300px") {
+        toolbar.add(new JToggleButton(Bundle.JavaWindowsView_300px()) {
             {
                 sizes.add(this);
                 putClientProperty("JButton.buttonType", "segmented"); // NOI18N
                 putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
-                setToolTipText("Window preview height: 300px");
+                setToolTipText(Bundle.JavaWindowsView_Tooltip300px());
             }
             protected void fireItemStateChanged(ItemEvent event) {
                 if (isSelected()) {
@@ -177,12 +195,12 @@ class JavaWindowsView extends HeapViewerFeature {
                 }
             }
         });
-        toolbar.add(new JToggleButton("600px") {
+        toolbar.add(new JToggleButton(Bundle.JavaWindowsView_600px()) {
             {
                 sizes.add(this);
                 putClientProperty("JButton.buttonType", "segmented"); // NOI18N
                 putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
-                setToolTipText("Window preview height: 600px");
+                setToolTipText(Bundle.JavaWindowsView_Tooltip600px());
             }
             protected void fireItemStateChanged(ItemEvent event) {
                 if (isSelected()) {
@@ -192,12 +210,12 @@ class JavaWindowsView extends HeapViewerFeature {
                 }
             }
         });
-        toolbar.add(new JToggleButton("50%") {
+        toolbar.add(new JToggleButton(Bundle.JavaWindowsView_50pc()) {
             {
                 sizes.add(this);
                 putClientProperty("JButton.buttonType", "segmented"); // NOI18N
                 putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
-                setToolTipText("Window preview size: 50%");
+                setToolTipText(Bundle.JavaWindowsView_Tooltip50pc());
             }
             protected void fireItemStateChanged(ItemEvent event) {
                 if (isSelected()) {
@@ -207,12 +225,12 @@ class JavaWindowsView extends HeapViewerFeature {
                 }
             }
         });
-        toolbar.add(new JToggleButton("100%") {
+        toolbar.add(new JToggleButton(Bundle.JavaWindowsView_100pc()) {
             {
                 sizes.add(this);
                 putClientProperty("JButton.buttonType", "segmented"); // NOI18N
                 putClientProperty("JButton.segmentPosition", "last"); // NOI18N
-                setToolTipText("Window preview size: 100%");
+                setToolTipText(Bundle.JavaWindowsView_Tooltip100pc());
             }
             protected void fireItemStateChanged(ItemEvent event) {
                 if (isSelected()) {
@@ -508,7 +526,7 @@ class JavaWindowsView extends HeapViewerFeature {
                 
                 add(windowComponent, BorderLayout.WEST);
             } else {
-                JLabel noPreview = new JLabel("<no preview>", JLabel.LEADING);
+                JLabel noPreview = new JLabel(Bundle.JavaWindowsView_NoPreview(), JLabel.LEADING);
                 noPreview.setBorder(BorderFactory.createEmptyBorder(5, 20, 5, 20));
                 noPreview.setEnabled(false);
                 
