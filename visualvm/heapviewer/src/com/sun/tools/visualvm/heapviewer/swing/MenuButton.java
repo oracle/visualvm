@@ -48,7 +48,7 @@ import javax.swing.event.ChangeListener;
  */
 public class MenuButton extends JMenuItem implements ChangeListener {
     
-    private static final String CONSUME_EVENT_KEY = "PopupMenu.consumeEventOnClose";
+    private static final String CONSUME_EVENT_KEY = "PopupMenu.consumeEventOnClose"; // NOI18N
     private Object originalConsumeEvent;
     
     private final Color foreground;
@@ -91,7 +91,7 @@ public class MenuButton extends JMenuItem implements ChangeListener {
                     } else {
 //                        setForeground(UIManager.getColor("List.selectionForeground"));
                         setForeground(Color.WHITE);
-                        setBackground(UIManager.getColor("List.selectionBackground"));
+                        setBackground(UIManager.getColor("List.selectionBackground")); // NOI18N
                         setOpaque(true);
                         repaint();
                         selected();

@@ -60,6 +60,7 @@ import org.netbeans.modules.profiler.oql.repository.api.OQLQueryRepository;
 import org.openide.awt.StatusDisplayer;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.WindowManager;
 
@@ -67,6 +68,27 @@ import org.openide.windows.WindowManager;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "OQLQueries_LoadingProgress=Loading Saved OQL scripts...",
+    "OQLQueries_PopupCaptionLoad=<html><b>Load OQL Script</b>: Select Source</html>",
+    "OQLQueries_PopupCustomScripts=Custom Scripts:",
+    "OQLQueries_PopupNoSaved=<no saved scripts>",
+    "OQLQueries_PopupExternalScripts=External Scripts:",
+    "OQLQueries_PopupLoadFromFile=Load From File...",
+    "OQLQueries_PopupPredefinedScripts=Predefined Scripts:",
+    "OQLQueries_PopupLoadingScripts=Loading Saved OQL scripts...",
+    "OQLQueries_PopupCaptionSave=<html><b>Save OQL Script</b>: Select Target</html>",
+    "OQLQueries_PopupSaveNew=Save As New...",
+    "OQLQueries_PopupSaveFile=Save To File...",
+    "OQLQueries_LoadExternalCaption=Load External OQL Script",
+    "OQLQueries_OQLFileFilter=OQL Script Files ({0})",
+    "OQLQueries_InvalidScript=Invalid OQL script file.",
+    "OQLQueries_LoadFailed=Failed to load OQL script.",
+    "OQLQueries_SaveFailed=Failed to save OQL script.",
+    "OQLQueries_SaveExternalCaption=Save External OQL Script",
+    "OQLQueries_CurrentScriptFlag=[current]"
+        
+})
 final class OQLQueries {
     
     static final Icon ICON_LOAD = ImageUtilities.image2Icon(ImageUtilities.loadImage(OQLConsoleView.class.getPackage().getName().replace('.', '/') + "/loadOQL.png", true));
@@ -98,7 +120,7 @@ final class OQLQueries {
     
     public void populateLoadQuery(JPopupMenu popup, OQLSupport.Query currentQuery, final Handler handler) {
         if (customQueries == null || predefinedCategories == null) {
-            JMenuItem progressItem = new JMenuItem("Loading Saved OQL scripts...", Icons.getIcon(HeapWalkerIcons.PROGRESS));
+            JMenuItem progressItem = new JMenuItem(Bundle.OQLQueries_LoadingProgress(), Icons.getIcon(HeapWalkerIcons.PROGRESS));
             progressItem.setEnabled(false);
             popup.add(progressItem);
             
@@ -116,13 +138,13 @@ final class OQLQueries {
         tempQueryText = null;
         tempHandler = null;
 
-        popup.add(new PopupCaption("<html><b>Load OQL Script</b>: Select Source</html>"));
+        popup.add(new PopupCaption(Bundle.OQLQueries_PopupCaptionLoad()));
         
         popup.add(new PopupSpacer(3));
-        popup.add(new PopupSeparator("Custom Scripts:"));
+        popup.add(new PopupSeparator(Bundle.OQLQueries_PopupCustomScripts()));
         
         if (customQueries.isEmpty()) {
-            JMenuItem noItems = new JMenuItem("<no saved scripts>", ICON_EMPTY);
+            JMenuItem noItems = new JMenuItem(Bundle.OQLQueries_PopupNoSaved(), ICON_EMPTY);
             noItems.setEnabled(false);
             popup.add(noItems);
         } else {
@@ -130,8 +152,8 @@ final class OQLQueries {
                 popup.add(new QueryMenuItem(query, currentQuery, ICON_LOAD, null, handler));
         }
         
-        popup.add(new PopupSeparator("External Scripts:"));
-        popup.add(new JMenuItem("Load From File...", ICON_EMPTY) {
+        popup.add(new PopupSeparator(Bundle.OQLQueries_PopupExternalScripts()));
+        popup.add(new JMenuItem(Bundle.OQLQueries_PopupLoadFromFile(), ICON_EMPTY) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 SwingUtilities.invokeLater(new Runnable() {
@@ -147,7 +169,7 @@ final class OQLQueries {
         
         if (!predefinedCategories.isEmpty()) {
             popup.add(new PopupSpacer(3));
-            popup.add(new PopupSeparator("Predefined Scripts:"));
+            popup.add(new PopupSeparator(Bundle.OQLQueries_PopupPredefinedScripts()));
             
             for (OQLQueryCategory category : predefinedCategories) {
                 final JMenu categoryMenu = new JMenu(category.getName()) {
@@ -169,7 +191,7 @@ final class OQLQueries {
     
     public void populateSaveQuery(JPopupMenu popup, final OQLSupport.Query currentQuery, final String queryText, final Handler handler) {
         if (customQueries == null) {
-            JMenuItem progressItem = new JMenuItem("Loading Saved OQL scripts...", Icons.getIcon(HeapWalkerIcons.PROGRESS));
+            JMenuItem progressItem = new JMenuItem(Bundle.OQLQueries_PopupLoadingScripts(), Icons.getIcon(HeapWalkerIcons.PROGRESS));
             progressItem.setEnabled(false);
             popup.add(progressItem);
             
@@ -188,12 +210,12 @@ final class OQLQueries {
         tempQueryText = null;
         tempHandler = null;
         
-        popup.add(new PopupCaption("<html><b>Save OQL Script</b>: Select Target</html>"));
+        popup.add(new PopupCaption(Bundle.OQLQueries_PopupCaptionSave()));
         
         popup.add(new PopupSpacer(3));
-        popup.add(new PopupSeparator("Custom Scripts:"));
+        popup.add(new PopupSeparator(Bundle.OQLQueries_PopupCustomScripts()));
         
-        popup.add(new JMenuItem("Save As New...", ICON_EMPTY) {
+        popup.add(new JMenuItem(Bundle.OQLQueries_PopupSaveNew(), ICON_EMPTY) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 
@@ -203,7 +225,7 @@ final class OQLQueries {
                 String name = query.getName();
                 int nameExt = 0;
                 while (containsQuery(customQueries.list(), query))
-                    query.setName(name + " " + ++nameExt);
+                    query.setName(name + " " + ++nameExt); // NOI18N
                 
                 customQueries.add(query);
                 
@@ -217,8 +239,8 @@ final class OQLQueries {
                 popup.add(new QueryMenuItem(query, currentQuery, ICON_SAVE, null, handler));
         }
         
-        popup.add(new PopupSeparator("External Scripts:"));
-        popup.add(new JMenuItem("Save To File...", ICON_EMPTY) {
+        popup.add(new PopupSeparator(Bundle.OQLQueries_PopupExternalScripts()));
+        popup.add(new JMenuItem(Bundle.OQLQueries_PopupSaveFile(), ICON_EMPTY) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 SwingUtilities.invokeLater(new Runnable() {
@@ -235,7 +257,7 @@ final class OQLQueries {
     
     
     private void loadAllQueries() {
-        new RequestProcessor("OQL Scripts Loader").post(new Runnable() {
+        new RequestProcessor("OQL Scripts Loader").post(new Runnable() { // NOI18N
             public void run() {
                 customQueries = CustomOQLQueries.instance();
                 predefinedCategories = OQLQueryRepository.getInstance().listCategories();
@@ -266,7 +288,7 @@ final class OQLQueries {
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setMultiSelectionEnabled(false);
         chooser.setAcceptAllFileFilterUsed(false);
-        chooser.setDialogTitle("Load External OQL Script");
+        chooser.setDialogTitle(Bundle.OQLQueries_LoadExternalCaption());
         chooser.setFileFilter(new FileFilter() {
             public boolean accept(File f) {
                 if (f.isDirectory()) return true;
@@ -275,7 +297,7 @@ final class OQLQueries {
                 return false;
             }
             public String getDescription() {
-                return "OQL Script Files (*.oql, *.txt)";
+                return Bundle.OQLQueries_OQLFileFilter("*.oql, *.txt"); // NOI18N
             }
         });
 
@@ -287,7 +309,7 @@ final class OQLQueries {
                 public void run() {
                     try {
                         if (!file.isFile() || !file.canRead()) {
-                            ProfilerDialogs.displayError("Invalid OQL script file.");
+                            ProfilerDialogs.displayError(Bundle.OQLQueries_InvalidScript());
                             return;
                         }
                         
@@ -310,7 +332,7 @@ final class OQLQueries {
                             }
                         });
                     } catch (IOException ex) {
-                        ProfilerDialogs.displayError("Failed to load OQL script.");
+                        ProfilerDialogs.displayError(Bundle.OQLQueries_LoadFailed());
                         Exceptions.printStackTrace(ex);
                     }
                 }
@@ -341,7 +363,7 @@ final class OQLQueries {
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setMultiSelectionEnabled(false);
         chooser.setAcceptAllFileFilterUsed(false);
-        chooser.setDialogTitle("Save External OQL Script");
+        chooser.setDialogTitle(Bundle.OQLQueries_SaveExternalCaption());
         chooser.setFileFilter(new FileFilter() {
             public boolean accept(File f) {
                 if (f.isDirectory()) return true;
@@ -350,7 +372,7 @@ final class OQLQueries {
                 return false;
             }
             public String getDescription() {
-                return "OQL Script Files (*.oql, *.txt)";
+                return Bundle.OQLQueries_OQLFileFilter("*.oql, *.txt"); // NOI18N
             }
         });
 
@@ -372,7 +394,7 @@ final class OQLQueries {
                 public void run() {
                     try {
                         if (fileF.isFile() && !fileF.canWrite()) {
-                            ProfilerDialogs.displayError("Invalid OQL script file.");
+                            ProfilerDialogs.displayError(Bundle.OQLQueries_InvalidScript());
                             return;
                         }
 
@@ -392,7 +414,7 @@ final class OQLQueries {
                             }
                         });
                     } catch (IOException ex) {
-                        ProfilerDialogs.displayError("Failed to save OQL script.");
+                        ProfilerDialogs.displayError(Bundle.OQLQueries_SaveFailed());
                         Exceptions.printStackTrace(ex);
                     }
                 }
@@ -545,8 +567,8 @@ final class OQLQueries {
         private static String getName(OQLSupport.Query query, OQLSupport.Query current, JMenu owner) {
             String name = query.getName();
             if (sameQuery(query, current)) {
-                name = "<html><b>" + name + "</b>&nbsp;<span style='color: gray;'>[current]</span></html>";
-                if (owner != null) owner.setText("<html><b>" + owner.getText() + "</b></html>");
+                name = "<html><b>" + name + "</b>&nbsp;<span style='color: gray;'>" + Bundle.OQLQueries_CurrentScriptFlag() + "</span></html>"; // NOI18N
+                if (owner != null) owner.setText("<html><b>" + owner.getText() + "</b></html>"); // NOI18N
             }
             return name;
         }

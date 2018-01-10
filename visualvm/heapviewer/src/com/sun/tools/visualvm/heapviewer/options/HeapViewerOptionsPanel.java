@@ -57,11 +57,25 @@ import javax.swing.event.DocumentListener;
 import org.netbeans.modules.profiler.heapwalk.OQLSupport;
 import org.openide.awt.Mnemonics;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "HeapViewerOptionsPanel_CustomScript=Custom Script",
+    "HeapViewerOptionsPanel_CustomScripts=Custom OQL Scripts",
+    "HeapViewerOptionsPanel_LoadingScripts=<loading scripts>",
+    "HeapViewerOptionsPanel_NoSavedScripts=<no saved scripts>",
+    "HeapViewerOptionsPanel_DeleteScriptTooltip=Delete selected script",
+    "HeapViewerOptionsPanel_MoveScriptUpTooltip=Move selected script up",
+    "HeapViewerOptionsPanel_MoveScriptDownTooltip=Move selected script down",
+    "HeapViewerOptionsPanel_NameLabel=&Name:",
+    "HeapViewerOptionsPanel_DescriptionLabel=&Description (optional):",
+    "HeapViewerOptionsPanel_PreviewLabel=&Preview:",
+    "HeapViewerOptionsPanel_HintLabel=To add custom script, use the Save OQL Script action in Heap Viewer | OQL Console."
+}) 
 final class HeapViewerOptionsPanel extends JPanel {
     
     private boolean loaded;
@@ -137,11 +151,11 @@ final class HeapViewerOptionsPanel extends JPanel {
 
         internalChange = true;
         
-        nameField.setText(query == null ? "" : query.getName());
+        nameField.setText(query == null ? "" : query.getName()); // NOI18N
         try { nameField.setCaretPosition(0); } catch (IllegalArgumentException e) {}
-        descrArea.setText(query == null ? "" : query.getDescription());
+        descrArea.setText(query == null ? "" : query.getDescription()); // NOI18N
         try { descrArea.setCaretPosition(0); } catch (IllegalArgumentException e) {}
-        previewArea.setScript(query == null ? "" : query.getScript());
+        previewArea.setScript(query == null ? "" : query.getScript()); // NOI18N
         internalChange = false;
 
         presetsPanel.setEnabled(index != -1);
@@ -162,11 +176,11 @@ final class HeapViewerOptionsPanel extends JPanel {
     }
     
     private String uniqueName(String name, int index) {
-        if (name.isEmpty()) name = "Custom Script";
+        if (name.isEmpty()) name = Bundle.HeapViewerOptionsPanel_CustomScript();
         String baseName = name;
         
         int nameExt = 0;
-        while (containsQuery(name, index)) name = baseName + " " + ++nameExt;
+        while (containsQuery(name, index)) name = baseName + " " + ++nameExt; // NOI18N
         
         return name;
     }
@@ -185,7 +199,7 @@ final class HeapViewerOptionsPanel extends JPanel {
 
         setLayout(new GridBagLayout());
 
-        SectionSeparator presetsSection = UISupport.createSectionSeparator("Custom OQL Scripts");
+        SectionSeparator presetsSection = UISupport.createSectionSeparator(Bundle.HeapViewerOptionsPanel_CustomScripts());
         c = new GridBagConstraints();
         c.gridy = 0;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -215,10 +229,10 @@ final class HeapViewerOptionsPanel extends JPanel {
         });
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         final Dimension oneDim = new Dimension(1, 1);
-        final JLabel loadingScriptsLabel = new JLabel("<loading scripts>", JLabel.CENTER);
+        final JLabel loadingScriptsLabel = new JLabel(Bundle.HeapViewerOptionsPanel_LoadingScripts(), JLabel.CENTER);
         loadingScriptsLabel.setEnabled(false);
         loadingScriptsLabel.setSize(loadingScriptsLabel.getPreferredSize());
-        final JLabel noScriptsLabel = new JLabel("<no saved scripts>", JLabel.CENTER);
+        final JLabel noScriptsLabel = new JLabel(Bundle.HeapViewerOptionsPanel_NoSavedScripts(), JLabel.CENTER);
         noScriptsLabel.setEnabled(false);
         noScriptsLabel.setSize(noScriptsLabel.getPreferredSize());
         JScrollPane listScroll = new JScrollPane(list) {
@@ -253,7 +267,7 @@ final class HeapViewerOptionsPanel extends JPanel {
         int mar = nimbusLaF ? 0 : 8;
         margin.left = mar;
         margin.right = mar;
-        removeButton.setToolTipText("Delete selected script");
+        removeButton.setToolTipText(Bundle.HeapViewerOptionsPanel_DeleteScriptTooltip());
         removeButton.setMargin(margin);
         upButton = new JButton() {
             protected void fireActionPerformed(ActionEvent e) {
@@ -262,7 +276,7 @@ final class HeapViewerOptionsPanel extends JPanel {
         };
         upButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
                 "com/sun/tools/visualvm/profiler/resources/up.png", true)));   // NOI18N
-        upButton.setToolTipText("Move selected script up"); // NOI18N
+        upButton.setToolTipText(Bundle.HeapViewerOptionsPanel_MoveScriptUpTooltip()); // NOI18N
         upButton.setMargin(margin);
         downButton = new JButton() {
             protected void fireActionPerformed(ActionEvent e) {
@@ -271,7 +285,7 @@ final class HeapViewerOptionsPanel extends JPanel {
         };
         downButton.setIcon(new ImageIcon(ImageUtilities.loadImage(
                 "com/sun/tools/visualvm/profiler/resources/down.png", true)));   // NOI18N
-        downButton.setToolTipText("Move selected script down");
+        downButton.setToolTipText(Bundle.HeapViewerOptionsPanel_MoveScriptDownTooltip());
         downButton.setMargin(margin);
 
         JPanel controlsPanel = new JPanel(new GridLayout(1, 4, 5, 0)) {
@@ -306,7 +320,7 @@ final class HeapViewerOptionsPanel extends JPanel {
         add(presetsPanel, c);
         
         JLabel nameLabel = new JLabel();
-        Mnemonics.setLocalizedText(nameLabel, "&Name:");
+        Mnemonics.setLocalizedText(nameLabel, Bundle.HeapViewerOptionsPanel_NameLabel());
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
@@ -338,7 +352,7 @@ final class HeapViewerOptionsPanel extends JPanel {
         presetsPanel.add(nameField, c);
         
         JLabel descrLabel = new JLabel();
-        Mnemonics.setLocalizedText(descrLabel, "&Description (optional):");
+        Mnemonics.setLocalizedText(descrLabel, Bundle.HeapViewerOptionsPanel_DescriptionLabel());
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 1;
@@ -378,7 +392,7 @@ final class HeapViewerOptionsPanel extends JPanel {
         presetsPanel.add(descrScroll, c);
         
         JLabel previewLabel = new JLabel();
-        Mnemonics.setLocalizedText(previewLabel, "&Preview:");
+        Mnemonics.setLocalizedText(previewLabel, Bundle.HeapViewerOptionsPanel_PreviewLabel());
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 3;
@@ -403,7 +417,7 @@ final class HeapViewerOptionsPanel extends JPanel {
         presetsPanel.add(previewArea, c);
         
         
-        JLabel hint = new JLabel("To add custom script, use the Save OQL Script action in Heap Viewer | OQL Console.");
+        JLabel hint = new JLabel(Bundle.HeapViewerOptionsPanel_HintLabel());
         hint.setEnabled(false);
         c = new GridBagConstraints();
         c.gridx = 0;

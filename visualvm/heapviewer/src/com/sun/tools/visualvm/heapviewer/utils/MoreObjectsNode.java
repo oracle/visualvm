@@ -38,11 +38,16 @@ import com.sun.tools.visualvm.heapviewer.model.MoreNodesNode;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.TextNode;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "MoreObjectsNode_SamplesContainer=<sample {0} objects>",
+    "MoreObjectsNode_NodesContainer=<objects {0}-{1}>"
+})
 abstract class MoreObjectsNode<T> extends MoreNodesNode {
     
     private static final int AGGREGATION = 1000;
@@ -85,11 +90,11 @@ abstract class MoreObjectsNode<T> extends MoreNodesNode {
     
     
     protected String getSamplesContainerString(String objectsCount)  {
-        return "<sample " + objectsCount + " objects>";
+        return Bundle.MoreObjectsNode_SamplesContainer(objectsCount);
     }
     
     protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-        return "<objects " + firstNodeIdx + "-" + lastNodeIdx + ">";
+        return Bundle.MoreObjectsNode_NodesContainer(firstNodeIdx, lastNodeIdx);
     }
     
     
