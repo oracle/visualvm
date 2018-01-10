@@ -50,11 +50,20 @@ import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
 import com.sun.tools.visualvm.heapviewer.swing.LinkButton;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author JiriSedlacek
  */
+@NbBundle.Messages({
+    "BreadCrumbsNavigator_Pin=Pin",
+    "BreadCrumbsNavigator_ResetPin=Reset Pin",
+    "BreadCrumbsNavigator_Class=class",
+    "BreadCrumbsNavigator_SelectNode=Select {0}",
+    "BreadCrumbsNavigator_ResetPinSelectNode=Reset Pin and Select {0}",
+    "BreadCrumbsNavigator_ResetView=Reset View"
+})
 abstract class BreadCrumbsNavigator {
     
     private static final Icon ICON_SEPARATOR = ImageUtilities.image2Icon(ImageUtilities.loadImage(BreadCrumbsNavigator.class.getPackage().getName().replace('.', '/') + "/separator.png", true));
@@ -114,7 +123,7 @@ abstract class BreadCrumbsNavigator {
                     }
                 };
                 pb.setSelected(node.equals(pinnedNode));
-                pb.setToolTipText(pb.isSelected() ? "Reset Pin" : "Pin");
+                pb.setToolTipText(pb.isSelected() ? Bundle.BreadCrumbsNavigator_ResetPin() : Bundle.BreadCrumbsNavigator_Pin());
                 if (pb.isSelected()) visitedPinnedNode = pinnedNode;
                 component.add(pb, 0);
                 component.add(Box.createHorizontalStrut(3), 0);
@@ -128,7 +137,7 @@ abstract class BreadCrumbsNavigator {
                 }
                 protected void middleClicked(MouseEvent e) {
                     HeapViewerNodeAction.Actions nodeActions = getNodeActions(nodeF);
-                    ActionEvent ae = new ActionEvent(e.getSource(), e.getID(), "middle button", e.getWhen(), e.getModifiers());
+                    ActionEvent ae = new ActionEvent(e.getSource(), e.getID(), "middle button", e.getWhen(), e.getModifiers()); // NOI18N
                     nodeActions.performMiddleButtonAction(ae);
                 }
                 protected void populatePopup(JPopupMenu popup) {
@@ -138,7 +147,7 @@ abstract class BreadCrumbsNavigator {
             };
             boolean beforePinnedNode = visitedPinnedNode != null && visitedPinnedNode != node;
             if (beforePinnedNode) lb.setForeground(UIUtils.getDisabledLineColor());
-            lb.setToolTipText(beforePinnedNode ? "Reset Pin and Select " + renderer.toString() : "Select " + renderer.toString());
+            lb.setToolTipText(beforePinnedNode ? Bundle.BreadCrumbsNavigator_ResetPinSelectNode(renderer.toString()) : Bundle.BreadCrumbsNavigator_SelectNode(renderer.toString()));
             lb.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
                     if (SwingUtilities.isMiddleMouseButton(e)) openNode(nodeF);
@@ -157,7 +166,7 @@ abstract class BreadCrumbsNavigator {
                 protected void clicked() { nodeClicked(null); }
             };
             if (visitedPinnedNode != null) lb.setForeground(UIUtils.getDisabledLineColor());
-            lb.setToolTipText("Reset View");
+            lb.setToolTipText(Bundle.BreadCrumbsNavigator_ResetView());
             component.add(lb, 0);
         
             component.add(Box.createHorizontalStrut(4), 0);
@@ -176,7 +185,7 @@ abstract class BreadCrumbsNavigator {
     
     
     private void init() {
-        final int refHeight = new LinkButton("XXX", Icons.getIcon(LanguageIcons.CLASS)).getPreferredSize().height + 3;
+        final int refHeight = new LinkButton("XXX", Icons.getIcon(LanguageIcons.CLASS)).getPreferredSize().height + 3; // NOI18N
         component = new JPanel(null) {
             public Dimension getPreferredSize() {
                 Dimension dim = super.getPreferredSize();
@@ -190,7 +199,7 @@ abstract class BreadCrumbsNavigator {
             }
         };
         component.setLayout(new BoxLayout(component, BoxLayout.LINE_AXIS));
-        component.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("Separator.foreground")));
+        component.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, UIManager.getColor("Separator.foreground"))); // NOI18N
     }
     
     

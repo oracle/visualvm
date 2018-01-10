@@ -33,11 +33,20 @@ import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TreeTableViewColumn_ColName=Name",
+    "TreeTableViewColumn_ColLogicalValue=Logical Value",
+    "TreeTableViewColumn_ColCount=Count",
+    "TreeTableViewColumn_ColSize=Size",
+    "TreeTableViewColumn_ColRetained=Retained",
+    "TreeTableViewColumn_ColObjectId=Object ID"
+})
 public class TreeTableViewColumn extends TableColumn {
     
     private final int position;
@@ -147,7 +156,7 @@ public class TreeTableViewColumn extends TableColumn {
         }
         
         public Name(Heap heap, boolean initiallySorting) {
-            super("Name", 100, DataType.NAME, true, initiallySorting);
+            super(Bundle.TreeTableViewColumn_ColName(), 100, DataType.NAME, true, initiallySorting);
         }
         
     }
@@ -162,17 +171,17 @@ public class TreeTableViewColumn extends TableColumn {
         }
         
         public LogicalValue(Heap heap, boolean initiallyVisible, boolean initiallySorting) {
-            super("Logical Value", 150, DataType.LOGICAL_VALUE, initiallyVisible, initiallySorting);
+            super(Bundle.TreeTableViewColumn_ColLogicalValue(), 150, DataType.LOGICAL_VALUE, initiallyVisible, initiallySorting);
             
             renderer = new LabelRenderer() {
                 public void setValue(Object value, int row) {
-                    if (Objects.equals(value, DataType.OBJECT_ID.getNoValue())) setText("-");
-                    else if (Objects.equals(value, DataType.OBJECT_ID.getUnsupportedValue())) setText("");
-                    else if (Objects.equals(value, DataType.OBJECT_ID.getNotAvailableValue())) setText("n/a");
+                    if (Objects.equals(value, DataType.OBJECT_ID.getNoValue())) setText("-"); // NOI18N
+                    else if (Objects.equals(value, DataType.OBJECT_ID.getUnsupportedValue())) setText(""); // NOI18N
+                    else if (Objects.equals(value, DataType.OBJECT_ID.getNotAvailableValue())) setText("n/a"); // NOI18N
                     else super.setValue(value, row);
                 }
             };
-            renderer.setValue("A typical-length logical value to setup the column width", -1);
+            renderer.setValue("A typical-length logical value to setup the column width", -1); // NOI18N
             preferredWidth = renderer.getPreferredSize().width + 20;
         }
         
@@ -192,7 +201,7 @@ public class TreeTableViewColumn extends TableColumn {
         }
         
         public Count(Heap heap, boolean initiallyVisible, boolean initiallySorting) {
-            super("Count", 200, DataType.COUNT, initiallyVisible, initiallySorting);
+            super(Bundle.TreeTableViewColumn_ColCount(), 200, DataType.COUNT, initiallyVisible, initiallySorting);
             
             renderer = new HideableBarRenderer(HeapViewerNumberRenderer.decimalInstance(DataType.COUNT));
             renderer.setMaxValue(Integer.MAX_VALUE / 1000);
@@ -216,7 +225,7 @@ public class TreeTableViewColumn extends TableColumn {
         }
         
         public OwnSize(Heap heap, boolean initiallyVisible, boolean initiallySorting) {
-            super("Size", 300, DataType.OWN_SIZE, initiallyVisible, initiallySorting);
+            super(Bundle.TreeTableViewColumn_ColSize(), 300, DataType.OWN_SIZE, initiallyVisible, initiallySorting);
             
             renderer = new HideableBarRenderer(HeapViewerNumberRenderer.bytesInstance(DataType.OWN_SIZE));
             renderer.setMaxValue(Integer.MAX_VALUE / 100);
@@ -240,7 +249,7 @@ public class TreeTableViewColumn extends TableColumn {
         }
         
         public RetainedSize(Heap heap, boolean initiallyVisible, boolean initiallySorting) {
-            super("Retained", 400, DataType.RETAINED_SIZE, initiallyVisible, initiallySorting);
+            super(Bundle.TreeTableViewColumn_ColRetained(), 400, DataType.RETAINED_SIZE, initiallyVisible, initiallySorting);
             
             renderer = new HideableBarRenderer(HeapViewerNumberRenderer.bytesInstance(DataType.RETAINED_SIZE));
             renderer.setMaxValue(Integer.MAX_VALUE / 100);
@@ -264,14 +273,14 @@ public class TreeTableViewColumn extends TableColumn {
         }
         
         public ObjectID(Heap heap, boolean initiallyVisible, boolean initiallySorting) {
-            super("Object ID", 500, DataType.OBJECT_ID, initiallyVisible, initiallySorting);
+            super(Bundle.TreeTableViewColumn_ColObjectId(), 500, DataType.OBJECT_ID, initiallyVisible, initiallySorting);
             
             renderer = new LabelRenderer() {
                 public void setValue(Object value, int row) {
                     if (value == null) setText(""); // NOI18N
-                    else if (Objects.equals(value, DataType.OBJECT_ID.getNoValue())) setText("-");
-                    else if (Objects.equals(value, DataType.OBJECT_ID.getUnsupportedValue())) setText("");
-                    else if (Objects.equals(value, DataType.OBJECT_ID.getNotAvailableValue())) setText("n/a");
+                    else if (Objects.equals(value, DataType.OBJECT_ID.getNoValue())) setText("-"); // NOI18N
+                    else if (Objects.equals(value, DataType.OBJECT_ID.getUnsupportedValue())) setText(""); // NOI18N
+                    else if (Objects.equals(value, DataType.OBJECT_ID.getNotAvailableValue())) setText("n/a"); // NOI18N
                     else setText("0x" + Long.toHexString((Long)value)); // NOI18N
                 }
             };

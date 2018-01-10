@@ -70,11 +70,19 @@ import com.sun.tools.visualvm.heapviewer.model.NodesCache;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TreeTableView_FilteredFlag={0} (filtered)",
+    "TreeTableView_Filter=Filter",
+    "TreeTableView_Pin=Pin",
+    "TreeTableView_ResetPin=Reset Pin",
+    "TreeTableView_SortToGet=sort to get"
+})
 public class TreeTableView {
     
     private final String viewID;
@@ -114,7 +122,7 @@ public class TreeTableView {
     public TreeTableView(String viewID, HeapContext context, HeapViewerActions actions, boolean useBreadCrumbs, boolean pluggableColumns, TreeTableViewColumn... columns) {
         assert(!SwingUtilities.isEventDispatchThread());
         
-        if (columns == null || columns.length == 0) throw new IllegalArgumentException("View must have at least one column defined");
+        if (columns == null || columns.length == 0) throw new IllegalArgumentException("View must have at least one column defined"); // NOI18N
         
         this.viewID = viewID;
         this.context = context;
@@ -242,7 +250,7 @@ public class TreeTableView {
         hasSelection = node != null;
         if (navigator != null) {
             String _viewName = viewName;
-            if (_viewName != null && filter != null) _viewName += " (filtered)";
+            if (_viewName != null && filter != null) _viewName = Bundle.TreeTableView_FilteredFlag(_viewName);
             navigator.setNode(node, currentRoot == root ? null : currentRoot, getRoot(), _viewName);
         }
     }
@@ -446,7 +454,7 @@ public class TreeTableView {
                     HeapViewerNodeAction.Actions nodeActions = navigator == null ?
                         HeapViewerNodeAction.Actions.forNode(node, actionProviders, context, actions) :
                         HeapViewerNodeAction.Actions.forNode(node, actionProviders, context, actions, new PinAction(node), new ResetPinAction());
-                    ActionEvent ae = new ActionEvent(e.getSource(), e.getID(), "middle button", e.getWhen(), e.getModifiers());
+                    ActionEvent ae = new ActionEvent(e.getSource(), e.getID(), "middle button", e.getWhen(), e.getModifiers()); // NOI18N
                     nodeActions.performMiddleButtonAction(ae);
                 }
             }
@@ -494,7 +502,7 @@ public class TreeTableView {
     protected void populatePopupLast(HeapViewerNode node, JPopupMenu popup) {
         if (filterComponent.getComponentCount() > 0) {
             popup.addSeparator();
-            popup.add(new JMenuItem("Filter") {
+            popup.add(new JMenuItem(Bundle.TreeTableView_Filter()) {
                 protected void fireActionPerformed(ActionEvent e) { activateFilter(); }
             });
         }
@@ -564,7 +572,7 @@ public class TreeTableView {
         private final HeapViewerNode node;
         
         PinAction(HeapViewerNode node) {
-            super("Pin", 110);
+            super(Bundle.TreeTableView_Pin(), 110);
             this.node = node;
             setEnabled(node != currentRoot && !node.isLeaf());
         }
@@ -584,7 +592,7 @@ public class TreeTableView {
     private class ResetPinAction extends HeapViewerNodeAction {
         
         ResetPinAction() {
-            super("Reset Pin", 111);
+            super(Bundle.TreeTableView_ResetPin(), 111);
             setEnabled(root != currentRoot);
         }
         
@@ -644,7 +652,7 @@ public class TreeTableView {
         public String getColumnName(int column) {
             String columnName = columns.get(column).getHeaderValue().toString();
             return dataTypeListeners[column] == null ? columnName :
-                   "<html><nobr>" + columnName + " <small style='color: gray;'>(sort to get)</small></nobr></html>";
+                   "<html><nobr>" + columnName + " <small style='color: gray;'>(" + Bundle.TreeTableView_SortToGet() + ")</small></nobr></html>";
         }
         
         public Object getValueAt(TreeNode node, int column) {

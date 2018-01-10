@@ -45,12 +45,17 @@ import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
 import javax.swing.SwingUtilities;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "NodeObjectsView_Details=Details:",
+    "NodeObjectsView_NewTab=Open in New Tab"
+})
 public class NodeObjectsView extends HeapView {
     
     private final HeapViewerNode viewNode;
@@ -133,7 +138,7 @@ public class NodeObjectsView extends HeapView {
             toolbar.addSeparator();
             toolbar.addSpace(5);
 
-            toolbar.add(new GrayLabel("Details:"));
+            toolbar.add(new GrayLabel(Bundle.NodeObjectsView_Details()));
             toolbar.addSpace(2);
             
             toolbar.add(objectsView.getToolbar());
@@ -212,7 +217,7 @@ public class NodeObjectsView extends HeapView {
     public static abstract class DefaultOpenAction extends OpenAction {
         
         public DefaultOpenAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            super("Open in New Tab", 0, node, context, actions);
+            super(Bundle.NodeObjectsView_NewTab(), 0, node, context, actions);
         }
         
         public boolean isDefault() {

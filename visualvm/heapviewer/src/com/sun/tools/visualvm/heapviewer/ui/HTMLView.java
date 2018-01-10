@@ -220,8 +220,8 @@ public class HTMLView {
         if (node == null) return;
 
         HeapViewerNodeAction.Actions nodeActions = HeapViewerNodeAction.Actions.forNode(node, actionProviders, context, actions);
-        ActionEvent ae = e == null ? new ActionEvent(htmlComponent, ActionEvent.ACTION_PERFORMED, "link"):
-                                     new ActionEvent(e.getSource(), e.getID(), "link", e.getWhen(), e.getModifiers());
+        ActionEvent ae = e == null ? new ActionEvent(htmlComponent, ActionEvent.ACTION_PERFORMED, "link"): // NO18N
+                                     new ActionEvent(e.getSource(), e.getID(), "link", e.getWhen(), e.getModifiers()); // NO18N
         nodeActions.performDefaultAction(ae);
     }
     
@@ -230,7 +230,7 @@ public class HTMLView {
         if (node == null) return;
 
         HeapViewerNodeAction.Actions nodeActions = HeapViewerNodeAction.Actions.forNode(node, actionProviders, context, actions);
-        ActionEvent ae = new ActionEvent(e.getSource(), e.getID(), "middle button", e.getWhen(), e.getModifiers());
+        ActionEvent ae = new ActionEvent(e.getSource(), e.getID(), "middle button", e.getWhen(), e.getModifiers()); // NO18N
         nodeActions.performMiddleButtonAction(ae);
     }
     

@@ -70,9 +70,9 @@ public class HeapViewerNumberRenderer extends NumberPercentRenderer {
     private static ProfilerRenderer createNumberRenderer(Format customFormat, final DataType dataType) {
         NumberRenderer numberRenderer = new NumberRenderer(customFormat) {
             protected String getValueString(Object value, int row, Format format) {
-                if (Objects.equals(value, dataType.getNoValue())) return "-";
-                if (Objects.equals(value, dataType.getUnsupportedValue())) return "";
-                if (Objects.equals(value, dataType.getNotAvailableValue())) return "n/a";
+                if (Objects.equals(value, dataType.getNoValue())) return "-"; // NOI18N
+                if (Objects.equals(value, dataType.getUnsupportedValue())) return ""; // NOI18N
+                if (Objects.equals(value, dataType.getNotAvailableValue())) return "n/a"; // NOI18N
                 return super.getValueString(value, row, format);
             }
         };
