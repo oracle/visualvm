@@ -250,8 +250,6 @@ public abstract class ProfilerMemoryPanel extends JPanel {
         add(outgoingCheckbox, constraints);
         
         outgoingSpinner = new JExtendedSpinner(new SpinnerNumberModel(Math.abs(10), 0, 99, 1)) {
-            public Dimension getPreferredSize() { return getMinimumSize(); }
-            public Dimension getMaximumSize() { return getMinimumSize(); }
             protected void fireStateChanged() { updateAllocControls(); syncUI(); super.fireStateChanged(); }
         };
         outgoingSpinner.setToolTipText(NbBundle.getMessage(ProfilerMemoryPanel.class, "ProfilerMemoryPanel_TOOLTIP_Limit_alloc2")); // NOI18N
