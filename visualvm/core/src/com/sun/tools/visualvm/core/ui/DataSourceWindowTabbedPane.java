@@ -89,6 +89,9 @@ class DataSourceWindowTabbedPane extends JPanel {
     
     tabpane = TabbedPaneFactory.createCloseButtonTabbedPane();
     tabpane.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);
+    
+    // GH-52 - true would break Tab navigation
+    tabpane.setFocusCycleRoot(false);
       
     // Clear default border for fill up the entire DataSourceWindow
     tabpane.setOpaque(false);
