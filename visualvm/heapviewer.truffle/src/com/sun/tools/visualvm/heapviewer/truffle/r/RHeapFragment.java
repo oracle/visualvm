@@ -70,7 +70,8 @@ class RHeapFragment extends TruffleLanguageHeapFragment {
     
     
     Iterator<Instance> getRObjectsIterator() {
-        return getInstancesIterator(RObject.R_OBJECT_FQN);
+        String[] topClasses = new String[] {RObject.R_OBJECT_FQN, RObject.R_SCALAR_FQN};
+        return getInstancesIterator(topClasses);
     }
     
     

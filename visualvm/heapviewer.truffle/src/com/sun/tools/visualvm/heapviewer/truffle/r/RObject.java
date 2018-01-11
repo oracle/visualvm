@@ -55,18 +55,26 @@ public class RObject {
     public static final DataType<RObject> DATA_TYPE = new DataType<RObject>(RObject.class, null, null);
     
     static final String R_OBJECT_FQN = "com.oracle.truffle.r.runtime.data.RBaseObject"; // NOI18N
+    static final String R_SCALAR_FQN = "com.oracle.truffle.r.runtime.data.RScalarVector";   // NOI18N
     private static final String RLOGICAL_VECTOR_FQN = "com.oracle.truffle.r.runtime.data.RLogicalVector";   // NOI18N
     private static final String RCOMPLEX_VECTOR_FQN = "com.oracle.truffle.r.runtime.data.RComplexVector";   // NOI18N
     private static final String RPAIR_LIST_FQN = "com.oracle.truffle.r.runtime.data.RPairList";   // NOI18N
     private static final String RNULL_FQN = "com.oracle.truffle.r.runtime.data.RNull"; // NOI18N
     private static final String[] typeMaping = new String[] {
         "RRawVector", "raw",
+        "RRaw", "raw",
         "RLogicalVector", "logical",
+        "RLogical", "logical",
         "RIntVector", "integer",
+        "RInteger", "integer",
         "RDoubleVector", "double",
+        "RDouble", "double",
         "RComplexVector", "complex",
+        "RComplex", "complex",
         "RStringVector", "character",
+        "RString", "character",
         "RList", "list",
+        "RScalarList", "list",
         "RExpression", "expression",
         "RFunction", "function",
         "RSymbol", "symbol",
@@ -125,7 +133,7 @@ public class RObject {
     
     
     public static boolean isRObject(Instance rObj) {
-        return isSubClassOf(rObj, R_OBJECT_FQN);
+        return isSubClassOf(rObj, R_OBJECT_FQN) || isSubClassOf(rObj, R_SCALAR_FQN);
     }
     
     private static boolean isSubClassOf(Instance i, String superClassName) {

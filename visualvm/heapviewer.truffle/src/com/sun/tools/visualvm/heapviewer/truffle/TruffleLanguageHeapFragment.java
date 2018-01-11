@@ -35,6 +35,8 @@ import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import com.sun.tools.visualvm.heapviewer.HeapFragment;
 import com.sun.tools.visualvm.heapviewer.utils.HeapUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -50,6 +52,15 @@ public abstract class TruffleLanguageHeapFragment extends HeapFragment {
         return new InstancesIterator(HeapUtils.getSubclasses(heap, javaClassFqn));
     }
     
+    public Iterator<Instance> getInstancesIterator(String[] javaClassFqns) {
+        List classes = new ArrayList();
+
+        for (String fqn : javaClassFqns) {
+            classes.addAll(HeapUtils.getSubclasses(heap, fqn));
+        }
+        return new InstancesIterator(classes);
+    }
+
     public Iterator<Instance> getLanguageInstancesIterator(String languageID) {
         Iterator<Instance> instIt = new InstancesIterator(HeapUtils.getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
         
