@@ -44,16 +44,21 @@ import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 public class RDetailsProvider extends DetailsProvider.Basic {
 
     private static final String RVECTOR_MASK = "com.oracle.truffle.r.runtime.data.RVector+";   // NOI18N
+    private static final String RSCALAR_VECTOR_MASK = "com.oracle.truffle.r.runtime.data.RScalarVector+";     // NOI18N
     private static final String RLOGICAL_VECTOR_FQN = "com.oracle.truffle.r.runtime.data.RLogicalVector";   // NOI18N
+    private static final String RLOGICAL_FQN = "com.oracle.truffle.r.runtime.data.RLogical";   // NOI18N
     private static final String RCOMPLEX_VECTOR_FQN = "com.oracle.truffle.r.runtime.data.RComplexVector";   // NOI18N
     private static final String RSYMBOL_MASK = "com.oracle.truffle.r.runtime.data.RSymbol"; //NOI18N
     private static final String RFUNCTION_MASK = "com.oracle.truffle.r.runtime.data.RFunction"; //NOI18N
-    private static final String RCOMPLEX_MASK = "com.oracle.truffle.r.runtime.data.RComplex";   // NOI18N
     private static final String RS4OBJECT_MASK = "com.oracle.truffle.r.runtime.data.RS4Object"; // NOI18N
     private static final String RNULL_MASK = "com.oracle.truffle.r.runtime.data.RNull"; // NOI18N
 
+    private static final byte LOGICAL_TRUE = 1;
+    private static final byte LOGICAL_FALSE = 0;
+    private static final byte LOGICAL_NA = -1;
+
     public RDetailsProvider() {
-        super(RVECTOR_MASK, RSYMBOL_MASK, RFUNCTION_MASK, RCOMPLEX_MASK, RS4OBJECT_MASK,
+        super(RVECTOR_MASK, RSYMBOL_MASK, RFUNCTION_MASK, RSCALAR_VECTOR_MASK, RS4OBJECT_MASK,
              RNULL_MASK);
     }
 
@@ -68,24 +73,14 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                     ObjectArrayInstance data = (ObjectArrayInstance) rawData;
                     size = data.getLength();
                     if (size == 1) {
-                        Instance string = (Instance) data.getValues().get(0);
-                        return "["+DetailsSupport.getDetailsString(string, heap)+"]";
+                        getValue(data.getValues().get(0), false, heap);
                     }
                 } else if (rawData instanceof PrimitiveArrayInstance) {
                     PrimitiveArrayInstance data = (PrimitiveArrayInstance) rawData;
                     size = data.getLength();
                     if (size == 1) {
-                        String valString = (String) data.getValues().get(0);
-                        if (RLOGICAL_VECTOR_FQN.equals(instance.getJavaClass().getName())) {
-                            int val = Integer.valueOf(valString);
-
-                            if (val == 0) {
-                                valString = "FALSE";
-                            } else if (val == 1) {
-                                valString = "TRUE";
-                            }
-                        }
-                        return "["+valString+"]";
+                        boolean isLogical = RLOGICAL_VECTOR_FQN.equals(instance.getJavaClass().getName());
+                        return getValue(data.getValues().get(0), isLogical, heap);
                     }
                     if (RCOMPLEX_VECTOR_FQN.equals(instance.getJavaClass().getName())) {
                         size /= 2;
@@ -134,12 +129,18 @@ public class RDetailsProvider extends DetailsProvider.Basic {
             String value = target == null ? null : DetailsSupport.getDetailsString(target, heap);
             return value == null || value.isEmpty() ? null : value;
         }
-        if (RCOMPLEX_MASK.equals(className)) {
+        if (RSCALAR_VECTOR_MASK.equals(className)) {
+            Object rawData = instance.getValueOfField("value");
+
+            if (rawData != null) {
+                boolean isLogical = RLOGICAL_FQN.equals(instance.getJavaClass().getName());
+                return getValue(rawData, isLogical, heap);
+            }
             Double realPart = (Double) instance.getValueOfField("realPart");    // NOI18N
             Double imaginaryPart = (Double) instance.getValueOfField("imaginaryPart"); // NOI18N
 
             if (realPart != null && imaginaryPart != null) {
-                return realPart+"+"+imaginaryPart+"i";
+                return "["+realPart+"+"+imaginaryPart+"i]";
             }
         }
         if (RS4OBJECT_MASK.equals(className)) {
@@ -162,5 +163,27 @@ public class RDetailsProvider extends DetailsProvider.Basic {
             }
         }
         return null;
+    }
+
+    private static String getValue(Object value, boolean isLogical, Heap heap) {
+        String valString;
+
+        if (value instanceof Instance) {
+            valString = DetailsSupport.getDetailsString((Instance) value, heap);
+        } else {
+            valString = value.toString();
+        }
+        if (isLogical) {
+            int val = Integer.valueOf(valString);
+
+            if (val == LOGICAL_FALSE) {
+                valString = "FALSE";
+            } else if (val == LOGICAL_TRUE) {
+                valString = "TRUE";
+            } else if (val == LOGICAL_NA) {
+                valString = "NA";
+            }
+        }
+        return "["+valString+"]";
     }
 }
