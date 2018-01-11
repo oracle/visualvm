@@ -42,10 +42,13 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
     private static final String ENT_OPTIMIZED_CALL_TARGET_MASK = "com.oracle.graal.truffle.OptimizedCallTarget"; // NOI18N
     private static final String LANG_INFO_MASK = "com.oracle.truffle.api.nodes.LanguageInfo"; // NOI18N
     private static final String LANG_CACHE_MASK = "com.oracle.truffle.api.vm.LanguageCache"; // NOI18N
+    private static final String POLYGLOT_MASK = "com.oracle.truffle.api.vm.PolyglotLanguage";   // NOI18N
+    private static final String INSTRUMENT_INFO_MASK = "com.oracle.truffle.api.InstrumentInfo"; // NOI18N
 
     public TruffleDetailsProvider() {
         super(DEFAULT_CALL_TARGET_MASK, OPTIMIZED_CALL_TARGET_MASK,
-                ENT_OPTIMIZED_CALL_TARGET_MASK, LANG_INFO_MASK, LANG_CACHE_MASK);
+                ENT_OPTIMIZED_CALL_TARGET_MASK, LANG_INFO_MASK, LANG_CACHE_MASK,
+                POLYGLOT_MASK, INSTRUMENT_INFO_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -81,6 +84,21 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
 
             if (name != null && version != null) {
                 return name + " (version " + version + ")";
+            }
+            return name;
+        }
+        if (POLYGLOT_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "info", heap);
+        }
+        if (INSTRUMENT_INFO_MASK.equals(className)) {
+            String name = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
+            String version = DetailsUtils.getInstanceFieldString(instance, "version", heap); // NOI18N
+
+            if (name != null && !name.isEmpty() && version != null && !version.isEmpty()) {
+                return name + " (version " + version + ")";
+            }
+            if (name == null || name.isEmpty()) {
+                return DetailsUtils.getInstanceFieldString(instance, "id", heap); // NOI18N
             }
             return name;
         }
