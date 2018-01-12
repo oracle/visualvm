@@ -56,6 +56,7 @@ public class RObject {
     
     static final String R_OBJECT_FQN = "com.oracle.truffle.r.runtime.data.RBaseObject"; // NOI18N
     static final String R_SCALAR_FQN = "com.oracle.truffle.r.runtime.data.RScalarVector";   // NOI18N
+    static final String R_WRAPPER_FQN = "com.oracle.truffle.r.runtime.data.RForeignWrapper";  // NOI18N
     private static final String RLOGICAL_VECTOR_FQN = "com.oracle.truffle.r.runtime.data.RLogicalVector";   // NOI18N
     private static final String RCOMPLEX_VECTOR_FQN = "com.oracle.truffle.r.runtime.data.RComplexVector";   // NOI18N
     private static final String RPAIR_LIST_FQN = "com.oracle.truffle.r.runtime.data.RPairList";   // NOI18N
@@ -67,12 +68,15 @@ public class RObject {
         "RLogical", "logical",
         "RIntVector", "integer",
         "RInteger", "integer",
+        "RForeignIntWrapper", "integer",
         "RDoubleVector", "double",
         "RDouble", "double",
+        "RForeignDoubleWrapper", "double",
         "RComplexVector", "complex",
         "RComplex", "complex",
         "RStringVector", "character",
         "RString", "character",
+        "RForeignStringWrapper", "character",
         "RList", "list",
         "RScalarList", "list",
         "RExpression", "expression",
@@ -129,11 +133,15 @@ public class RObject {
         if (data == null && RPAIR_LIST_FQN.equals(className)) {
             data = new RPairList(instance);
         }
+        if (data == null && isSubClassOf(instance, R_WRAPPER_FQN)) {
+            data = getDataFromWrapper(instance);
+        }
     }
     
     
     public static boolean isRObject(Instance rObj) {
-        return isSubClassOf(rObj, R_OBJECT_FQN) || isSubClassOf(rObj, R_SCALAR_FQN);
+        return isSubClassOf(rObj, R_OBJECT_FQN) || isSubClassOf(rObj, R_SCALAR_FQN)
+                || isSubClassOf(rObj, R_WRAPPER_FQN);
     }
     
     private static boolean isSubClassOf(Instance i, String superClassName) {
@@ -383,6 +391,19 @@ public class RObject {
                    return parent;
                }
            }
+        }
+        return null;
+    }
+
+    static Instance getDataFromWrapper(Instance instance) {
+        Instance delegate = (Instance) instance.getValueOfField("delegate");
+
+        if (delegate != null) {
+            Instance proxy = (Instance) delegate.getValueOfField("proxy");
+
+            if (proxy != null) {
+                return (Instance) proxy.getValueOfField("val$values");
+            }
         }
         return null;
     }

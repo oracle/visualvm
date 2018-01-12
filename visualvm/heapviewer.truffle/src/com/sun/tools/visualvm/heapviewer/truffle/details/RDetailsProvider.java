@@ -48,6 +48,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
     private static final String RLOGICAL_VECTOR_FQN = "com.oracle.truffle.r.runtime.data.RLogicalVector";   // NOI18N
     private static final String RLOGICAL_FQN = "com.oracle.truffle.r.runtime.data.RLogical";   // NOI18N
     private static final String RCOMPLEX_VECTOR_FQN = "com.oracle.truffle.r.runtime.data.RComplexVector";   // NOI18N
+    private static final String RWRAPPER_MASK = "com.oracle.truffle.r.runtime.data.RForeignWrapper+";  // NOI18N
     private static final String RSYMBOL_MASK = "com.oracle.truffle.r.runtime.data.RSymbol"; //NOI18N
     private static final String RFUNCTION_MASK = "com.oracle.truffle.r.runtime.data.RFunction"; //NOI18N
     private static final String RS4OBJECT_MASK = "com.oracle.truffle.r.runtime.data.RS4Object"; // NOI18N
@@ -59,7 +60,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
 
     public RDetailsProvider() {
         super(RVECTOR_MASK, RSYMBOL_MASK, RFUNCTION_MASK, RSCALAR_VECTOR_MASK, RS4OBJECT_MASK,
-             RNULL_MASK);
+             RNULL_MASK, RWRAPPER_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -73,7 +74,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                     ObjectArrayInstance data = (ObjectArrayInstance) rawData;
                     size = data.getLength();
                     if (size == 1) {
-                        getValue(data.getValues().get(0), false, heap);
+                        return getValue(data.getValues().get(0), false, heap);
                     }
                 } else if (rawData instanceof PrimitiveArrayInstance) {
                     PrimitiveArrayInstance data = (PrimitiveArrayInstance) rawData;
@@ -148,6 +149,26 @@ public class RDetailsProvider extends DetailsProvider.Basic {
         }
         if (RNULL_MASK.equals(className)) {
             return "NULL";
+        }
+        if (RWRAPPER_MASK.equals(className)) {
+            Instance delegate = (Instance) instance.getValueOfField("delegate");
+
+            if (delegate != null) {
+                Instance proxy = (Instance) delegate.getValueOfField("proxy");
+
+                if (proxy != null) {
+                    Object rawData = proxy.getValueOfField("val$values");
+
+                    if (rawData instanceof ObjectArrayInstance) {
+                        ObjectArrayInstance data = (ObjectArrayInstance) rawData;
+                        int size = data.getLength();
+                        if (size == 1) {
+                            return getValue(data.getValues().get(0), false, heap);
+                        }
+                        return "Size: " + size;
+                    }
+                }
+            }
         }
         return null;
     }

@@ -34,6 +34,9 @@ import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.HeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageSupport;
+import static com.sun.tools.visualvm.heapviewer.truffle.r.RObject.R_OBJECT_FQN;
+import static com.sun.tools.visualvm.heapviewer.truffle.r.RObject.R_SCALAR_FQN;
+import static com.sun.tools.visualvm.heapviewer.truffle.r.RObject.R_WRAPPER_FQN;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -70,7 +73,7 @@ class RHeapFragment extends TruffleLanguageHeapFragment {
     
     
     Iterator<Instance> getRObjectsIterator() {
-        String[] topClasses = new String[] {RObject.R_OBJECT_FQN, RObject.R_SCALAR_FQN};
+        String[] topClasses = new String[] {R_OBJECT_FQN, R_SCALAR_FQN, R_WRAPPER_FQN};
         return getInstancesIterator(topClasses);
     }
     
@@ -82,7 +85,7 @@ class RHeapFragment extends TruffleLanguageHeapFragment {
 
         public HeapFragment getFragment(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) throws IOException {
             Instance langInfo = TruffleLanguageSupport.getLanguageInfo(heap, R_LANG_ID);
-            JavaClass RMainClass = heap.getJavaClassByName(RObject.R_OBJECT_FQN);
+            JavaClass RMainClass = heap.getJavaClassByName(R_OBJECT_FQN);
 
             return langInfo != null && RMainClass != null ? new RHeapFragment(langInfo, heap) : null;
         }
