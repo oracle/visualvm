@@ -96,7 +96,7 @@ public abstract class RootNode extends HeapViewerNode {
     
     
     public String toString() {
-        return "root of " + getViewID();
+        return "root of " + getViewID(); // NOI18N
     }
     
     

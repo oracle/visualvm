@@ -242,7 +242,7 @@ public class OQLEditorComponent extends JPanel {
             public void stateChanged(ChangeEvent e) { updateScroller(verticalScroller); }
         });
         
-        JTextField tf = new JTextField(" 999 ");
+        JTextField tf = new JTextField(" 999 "); // NOI18N
         tf.setBorder(BorderFactory.createEmptyBorder());
         tf.setMargin(new Insets(0, 0, 0, 0));
         tf.setFont(queryEditor.getFont());
@@ -268,10 +268,10 @@ public class OQLEditorComponent extends JPanel {
         rows.setCaret(new FollowingCaret(queryEditor));
         StringBuilder sb = new StringBuilder();
         for (int i = 1; i < 1000; i++) {
-            if (i < 1000) sb.append(" ");
-            if (i < 100) sb.append(" ");
-            if (i < 10) sb.append(" ");
-            sb.append(Integer.toString(i) + " \n");
+            if (i < 1000) sb.append(" "); // NOI18N
+            if (i < 100) sb.append(" "); // NOI18N
+            if (i < 10) sb.append(" "); // NOI18N
+            sb.append(Integer.toString(i) + " \n"); // NOI18N
         }
         rows.setText(sb.toString());
         rows.setEditable(false);

@@ -46,12 +46,18 @@ import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import static com.sun.tools.visualvm.heapviewer.utils.NodesComputer.integerIterator;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "JavaFieldsProvider_MoreNodes=<another {0} fields left>",
+    "JavaFieldsProvider_SamplesContainer=<sample {0} fields>",
+    "JavaFieldsProvider_NodesContainer=<fields {0}-{1}>"
+})
 public abstract class JavaFieldsProvider extends HeapViewerNode.Provider {
     
     public HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
@@ -77,13 +83,13 @@ public abstract class JavaFieldsProvider extends HeapViewerNode.Provider {
                 return new ProgressIterator(iterator, index, false, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
-                return "<another " + moreNodesCount + " fields left>";
+                return Bundle.JavaFieldsProvider_MoreNodes(moreNodesCount);
             }
             protected String getSamplesContainerString(String objectsCount)  {
-                return "<sample " + objectsCount + " fields>";
+                return Bundle.JavaFieldsProvider_SamplesContainer(objectsCount);
             }
             protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                return "<fields " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                return Bundle.JavaFieldsProvider_NodesContainer(firstNodeIdx, lastNodeIdx);
             }
         };
 
@@ -95,6 +101,9 @@ public abstract class JavaFieldsProvider extends HeapViewerNode.Provider {
     
     
     @ServiceProvider(service=HeapViewerNode.Provider.class, position = 200)
+    @NbBundle.Messages({
+        "InstanceFieldsProvider_Name=fields"
+    })
     public static class InstanceFieldsProvider extends JavaFieldsProvider {
         
         // TODO: will be configurable, ideally by instance
@@ -102,11 +111,11 @@ public abstract class JavaFieldsProvider extends HeapViewerNode.Provider {
         private boolean includeInstanceFields = true;
         
         public String getName() {
-            return "fields";
+            return Bundle.InstanceFieldsProvider_Name();
         }
 
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("java_");
+            return viewID.startsWith("java_"); // NOI18N
         }
 
         public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
@@ -137,14 +146,17 @@ public abstract class JavaFieldsProvider extends HeapViewerNode.Provider {
     }
     
 //    @ServiceProvider(service=HeapViewerNode.Provider.class, position = 250)
+    @NbBundle.Messages({
+        "ClassFieldsProvider_Name=static fields"
+    })
     public static class ClassFieldsProvider extends JavaFieldsProvider {
         
         public String getName() {
-            return "static fields";
+            return Bundle.ClassFieldsProvider_Name();
         }
 
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("java_objects");
+            return viewID.startsWith("java_objects"); // NOI18N
         }
 
         public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {

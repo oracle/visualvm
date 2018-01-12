@@ -102,12 +102,35 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
+    "OQLConsoleView_Name=OQL Console",
+    "OQLConsoleView_Description=OQL Console",
     "OQLConsoleView_CannotResolveClassMsg=Cannot resolve class",
-    "OQLConsoleView_CannotResolveInstanceMsg=Cannot resolve instance"
+    "OQLConsoleView_CannotResolveInstanceMsg=Cannot resolve instance",
+    "OQLConsoleView_NothingExecuted=<no script executed yet>",
+    "OQLConsoleView_NoResults=<no results>",
+    "OQLConsoleView_ViewName=Results",
+    "OQLConsoleView_OQLQuery=OQL Query:",
+    "OQLConsoleView_RunAction=Run",
+    "OQLConsoleView_RunActionTooltip=Execute OQL script",
+    "OQLConsoleView_CancelAction=Cancel",
+    "OQLConsoleView_CancelActionTooltip=Cancel OQL script execution",
+    "OQLConsoleView_LoadAction=Load Script",
+    "OQLConsoleView_LoadActionTooltip=Load OQL script",
+    "OQLConsoleView_SaveAction=Save Script",
+    "OQLConsoleView_SaveActionTooltip=Save OQL script",
+    "OQLConsoleView_EditAction=Edit Scripts",
+    "OQLConsoleView_EditActionTooltip=Edit Saved OQL scripts",
+    "OQLConsoleView_ExecutingProgress=Executing...",
+    "OQLConsoleView_Results=Results:",
+    "OQLConsoleView_ObjectsTooltip=Objects",
+    "OQLConsoleView_HTMLTooltip=Results:",
+    "OQLConsoleView_Details=Details:",
+    "OQLConsoleView_EngineNotAvailable=<OQL engine not available>"
+        
 })
 public class OQLConsoleView extends HeapViewerFeature {
     
-    private static final Color SEPARATOR_COLOR = UIManager.getColor("Separator.foreground");
+    private static final Color SEPARATOR_COLOR = UIManager.getColor("Separator.foreground"); // NOI18N
     
     private final HeapContext context;
     
@@ -148,7 +171,7 @@ public class OQLConsoleView extends HeapViewerFeature {
     
     
     public OQLConsoleView(HeapContext context, HeapViewerActions actions) {
-        super("java_objects_oql", "OQL Console", "OQL Console", Icons.getIcon(HeapWalkerIcons.OQL_CONSOLE), 1000);
+        super("java_objects_oql", Bundle.OQLConsoleView_Name(), Bundle.OQLConsoleView_Description(), Icons.getIcon(HeapWalkerIcons.OQL_CONSOLE), 1000); // NOI18N
         
         this.context = context;
         Heap heap = context.getFragment().getHeap();
@@ -168,16 +191,17 @@ public class OQLConsoleView extends HeapViewerFeature {
                 new TreeTableViewColumn.RetainedSize(heap, true, false)
             };
 
-            objectsView = new PluggableTreeTableView("java_objects_oql", context, actions, ownColumns) {
+            objectsView = new PluggableTreeTableView("java_objects_oql", context, actions, ownColumns) { // NOI18N
                 protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-                    if (nodeResults == null) return new HeapViewerNode[] { new TextNode("<no script executed yet>") };
-                    else if (nodeResults.isEmpty()) return new HeapViewerNode[] { new TextNode("<no results>") };
+                    if (nodeResults == null) return new HeapViewerNode[] { new TextNode(Bundle.OQLConsoleView_NothingExecuted()) };
+                    else if (nodeResults.isEmpty()) return new HeapViewerNode[] { new TextNode(Bundle.OQLConsoleView_NoResults()) };
                     else return nodeResults.toArray(HeapViewerNode.NO_NODES);
                 }
             };
-            objectsView.setViewName("Results");
+            objectsView.setViewName(Bundle.OQLConsoleView_ViewName());
 
-            htmlView = new HTMLView("java_objects_oql", context, actions, "<p>&nbsp;&nbsp;&lt;no script executed yet&gt</p>") {
+            String htmlS = Bundle.OQLConsoleView_NothingExecuted().replace("<", "&lt;").replace(">", "&gt;"); // NOI18N
+            htmlView = new HTMLView("java_objects_oql", context, actions, "<p>&nbsp;&nbsp;" + htmlS + "</p>") { // NOI18N
                 protected HeapViewerNode nodeForURL(URL url, HeapContext context) {
                     return OQLConsoleView.getNode(url, context);
                 }
@@ -207,12 +231,12 @@ public class OQLConsoleView extends HeapViewerFeature {
             toolbar.addSeparator();
             toolbar.addSpace(5);
 
-            toolbar.add(new GrayLabel("OQL Query:"));
+            toolbar.add(new GrayLabel(Bundle.OQLConsoleView_OQLQuery()));
             toolbar.addSpace(2);
             
-            runAction = new AbstractAction("Run", Icons.getIcon(GeneralIcons.START)) {
+            runAction = new AbstractAction(Bundle.OQLConsoleView_RunAction(), Icons.getIcon(GeneralIcons.START)) {
                 {
-                    putValue(Action.SHORT_DESCRIPTION, "Execute OQL script");
+                    putValue(Action.SHORT_DESCRIPTION, Bundle.OQLConsoleView_RunActionTooltip());
                 }
                 public void actionPerformed(ActionEvent e) {
                     executeQuery();
@@ -233,9 +257,9 @@ public class OQLConsoleView extends HeapViewerFeature {
                 }
             };
             
-            cancelAction = new AbstractAction("Cancel", Icons.getIcon(GeneralIcons.STOP)) {
+            cancelAction = new AbstractAction(Bundle.OQLConsoleView_CancelAction(), Icons.getIcon(GeneralIcons.STOP)) {
                 {
-                    putValue(Action.SHORT_DESCRIPTION, "Cancel OQL script execution");
+                    putValue(Action.SHORT_DESCRIPTION, Bundle.OQLConsoleView_CancelActionTooltip());
                 }
                 public void actionPerformed(ActionEvent e) {
                     cancelQuery();
@@ -245,9 +269,9 @@ public class OQLConsoleView extends HeapViewerFeature {
             JButton cancelButton = new JButton(cancelAction);
             cancelButton.setHideActionText(true);
             
-            loadAction = new AbstractAction("Load Script", OQLQueries.ICON_LOAD) {
+            loadAction = new AbstractAction(Bundle.OQLConsoleView_LoadAction(), OQLQueries.ICON_LOAD) {
                 {
-                    putValue(Action.SHORT_DESCRIPTION, "Load OQL script");
+                    putValue(Action.SHORT_DESCRIPTION, Bundle.OQLConsoleView_LoadActionTooltip());
                 }
                 public void actionPerformed(ActionEvent e) {
                     if (e.getSource() instanceof JComponent) {
@@ -261,7 +285,7 @@ public class OQLConsoleView extends HeapViewerFeature {
                         
                         JComponent c = (JComponent)e.getSource();
                         if (p.getComponentCount() > 0) {
-                            if (c.getClientProperty("POPUP_LEFT") != null) p.show(c, c.getWidth() + 1, 0);
+                            if (c.getClientProperty("POPUP_LEFT") != null) p.show(c, c.getWidth() + 1, 0); // NOI18N
                             else p.show(c, 0, c.getHeight() + 1);
                         }
                         
@@ -272,9 +296,9 @@ public class OQLConsoleView extends HeapViewerFeature {
             JButton loadButton = new JButton(loadAction);
             loadButton.setHideActionText(true);
             
-            saveAction = new AbstractAction("Save Script", OQLQueries.ICON_SAVE) {
+            saveAction = new AbstractAction(Bundle.OQLConsoleView_SaveAction(), OQLQueries.ICON_SAVE) {
                 {
-                    putValue(Action.SHORT_DESCRIPTION, "Save OQL script");
+                    putValue(Action.SHORT_DESCRIPTION, Bundle.OQLConsoleView_SaveActionTooltip());
                 }
                 public void actionPerformed(ActionEvent e) {
                     if (e.getSource() instanceof JComponent) {
@@ -287,7 +311,7 @@ public class OQLConsoleView extends HeapViewerFeature {
                         
                         JComponent c = (JComponent)e.getSource();
                         if (p.getComponentCount() > 0) {
-                            if (c.getClientProperty("POPUP_LEFT") != null) p.show(c, c.getWidth() + 1, 0);
+                            if (c.getClientProperty("POPUP_LEFT") != null) p.show(c, c.getWidth() + 1, 0); // NOI18N
                             else p.show(c, 0, c.getHeight() + 1);
                         }
                         
@@ -298,9 +322,9 @@ public class OQLConsoleView extends HeapViewerFeature {
             JButton saveButton = new JButton(saveAction);
             saveButton.setHideActionText(true);
             
-            editAction = new AbstractAction("Edit Scripts", Icons.getIcon(HeapWalkerIcons.RULES)) {
+            editAction = new AbstractAction(Bundle.OQLConsoleView_EditAction(), Icons.getIcon(HeapWalkerIcons.RULES)) {
                 {
-                    putValue(Action.SHORT_DESCRIPTION, "Edit Saved OQL scripts");
+                    putValue(Action.SHORT_DESCRIPTION, Bundle.OQLConsoleView_EditActionTooltip());
                 }
                 public void actionPerformed(ActionEvent e) {
                     OptionsDisplayer.getDefault().open(HeapViewerOptionsCategory.OPTIONS_HANDLE);
@@ -318,7 +342,7 @@ public class OQLConsoleView extends HeapViewerFeature {
             progressToolbar.addSeparator();
             progressToolbar.addSpace(5);
             
-            progressLabel = new GrayLabel("Executing...");
+            progressLabel = new GrayLabel(Bundle.OQLConsoleView_ExecutingProgress());
             progressToolbar.add(progressLabel);
             
             progressToolbar.addSpace(8);
@@ -354,7 +378,7 @@ public class OQLConsoleView extends HeapViewerFeature {
             resultsToolbar.addSeparator();
             resultsToolbar.addSpace(5);
 
-            resultsToolbar.add(new GrayLabel("Results:"));
+            resultsToolbar.add(new GrayLabel(Bundle.OQLConsoleView_Results()));
             resultsToolbar.addSpace(3);
 
             ButtonGroup resultsBG = new ButtonGroup();
@@ -369,7 +393,7 @@ public class OQLConsoleView extends HeapViewerFeature {
             };
             rObjects.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
             rObjects.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
-            rObjects.setToolTipText("Objects");
+            rObjects.setToolTipText(Bundle.OQLConsoleView_ObjectsTooltip());
             resultsBG.add(rObjects);
             resultsToolbar.add(rObjects);
             
@@ -383,7 +407,7 @@ public class OQLConsoleView extends HeapViewerFeature {
             };
             rHTML.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
             rHTML.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
-            rHTML.setToolTipText("HTML");
+            rHTML.setToolTipText(Bundle.OQLConsoleView_HTMLTooltip());
             resultsBG.add(rHTML);
             resultsToolbar.add(rHTML);
 
@@ -393,7 +417,7 @@ public class OQLConsoleView extends HeapViewerFeature {
     //            detailsToolbar.addSeparator();
                 pluginsToolbar.addSpace(8);
 
-                pluginsToolbar.add(new GrayLabel("Details:"));
+                pluginsToolbar.add(new GrayLabel(Bundle.OQLConsoleView_Details()));
                 pluginsToolbar.addSpace(2);
 
                 pluginsToolbar.add(objectsView.getToolbar());
@@ -432,7 +456,7 @@ public class OQLConsoleView extends HeapViewerFeature {
             component.setOpaque(true);
             component.setBackground(UIUtils.getProfilerResultsBackground());
             
-            JLabel l = new JLabel("<OQL engine not available>", JLabel.CENTER);
+            JLabel l = new JLabel(Bundle.OQLConsoleView_EngineNotAvailable(), JLabel.CENTER);
             l.setEnabled(false);
             l.setOpaque(false);
             component.add(l, BorderLayout.CENTER);
@@ -522,7 +546,7 @@ public class OQLConsoleView extends HeapViewerFeature {
 
 //        SwingUtilities.invokeLater(new Runnable() {
 //            public void run() {
-                new RequestProcessor("OQL Query Processor").post(new Runnable() { //NOI18N
+                new RequestProcessor("OQL Query Processor").post(new Runnable() { // NOI18N
                     public void run() {
                         final AtomicInteger counter = new AtomicInteger(100);
                         progressModel.setMaximum(100);
@@ -718,9 +742,9 @@ public class OQLConsoleView extends HeapViewerFeature {
             controls.add(runAction);
             controls.add(cancelAction);
             controls.addSeparator();
-            controls.add(loadAction).putClientProperty("POPUP_LEFT", Boolean.TRUE);
-            controls.add(saveAction).putClientProperty("POPUP_LEFT", Boolean.TRUE);
-            controls.add(editAction).putClientProperty("POPUP_LEFT", Boolean.TRUE);
+            controls.add(loadAction).putClientProperty("POPUP_LEFT", Boolean.TRUE); // NOI18N
+            controls.add(saveAction).putClientProperty("POPUP_LEFT", Boolean.TRUE); // NOI18N
+            controls.add(editAction).putClientProperty("POPUP_LEFT", Boolean.TRUE); // NOI18N
             
             JPanel controlsContainer = new JPanel(new BorderLayout());
             controlsContainer.setOpaque(false);

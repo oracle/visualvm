@@ -41,6 +41,7 @@ import com.sun.tools.visualvm.heapviewer.model.TextNode;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -48,10 +49,18 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerNode.Provider.class, position = 100)
+@NbBundle.Messages({
+    "JavaInstancesProvider_Name=instances",
+    "JavaInstancesProvider_MoreNodes=<another {0} instances left>",
+    "JavaInstancesProvider_SamplesContainer=<sample {0} instances>",
+    "JavaInstancesProvider_NodesContainer=<instances {0}-{1}>",
+    "JavaInstancesProvider_NoInstances=<no instances>",
+    "JavaInstancesProvider_NoInstancesFilter=<no instances matching the filter>"
+})
 public class JavaInstancesProvider extends HeapViewerNode.Provider {
 
     public String getName() {
-        return "instances";
+        return Bundle.JavaInstancesProvider_Name();
     }
     
     public boolean supportsView(Heap heap, String viewID) {
@@ -79,13 +88,13 @@ public class JavaInstancesProvider extends HeapViewerNode.Provider {
                 return new ProgressIterator(iterator, index, true, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
-                return "<another " + moreNodesCount + " instances left>";
+                return Bundle.JavaInstancesProvider_MoreNodes(moreNodesCount);
             }
             protected String getSamplesContainerString(String objectsCount)  {
-                return "<sample " + objectsCount + " instances>";
+                return Bundle.JavaInstancesProvider_SamplesContainer(objectsCount);
             }
             protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                return "<instances " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                return Bundle.JavaInstancesProvider_NodesContainer(firstNodeIdx, lastNodeIdx);
             }
         };
         
@@ -114,13 +123,13 @@ public class JavaInstancesProvider extends HeapViewerNode.Provider {
                 return new ProgressIterator(iterator, index, true, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
-                return "<another " + moreNodesCount + " instances left>";
+                return Bundle.JavaInstancesProvider_MoreNodes(moreNodesCount);
             }
             protected String getSamplesContainerString(String objectsCount)  {
-                return "<sample " + objectsCount + " instances>";
+                return Bundle.JavaInstancesProvider_SamplesContainer(objectsCount);
             }
             protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                return "<instances " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                return Bundle.JavaInstancesProvider_NodesContainer(firstNodeIdx, lastNodeIdx);
             }
         };
         
@@ -129,7 +138,8 @@ public class JavaInstancesProvider extends HeapViewerNode.Provider {
     }
     
     private static String getNoInstancesString(HeapViewerNodeFilter viewFilter) {
-        return viewFilter == null ? "<no instances>" : "<no instances matching the filter>";
+        return viewFilter == null ? Bundle.JavaInstancesProvider_NoInstances() :
+                                    Bundle.JavaInstancesProvider_NoInstancesFilter();
     }
     
 }

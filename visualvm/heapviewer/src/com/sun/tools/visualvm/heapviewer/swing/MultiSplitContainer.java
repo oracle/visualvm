@@ -47,7 +47,7 @@ import javax.swing.UIManager;
 public class MultiSplitContainer extends JPanel {
     
     private static final int DIVIDER_SIZE = 6;
-    private static final Color SEPARATOR_COLOR = UIManager.getColor("Separator.foreground");
+    private static final Color SEPARATOR_COLOR = UIManager.getColor("Separator.foreground"); // NOI18N
     
     private final Map<Component, Double> componentsWeights = new HashMap();
     private final List<Integer> dividerOffsets = new ArrayList();

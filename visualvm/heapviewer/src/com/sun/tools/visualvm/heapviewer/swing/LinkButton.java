@@ -67,9 +67,9 @@ public class LinkButton extends JButton {
     
     
     public void setText(String text) {
-        this.text = text.replace("<", "&lt;").replace(">", "&gt;").replace(" ", "&nbsp;");
-        if (!mouseOver && !focused) super.setText("<html>" + this.text + "</html>");
-        else super.setText("<html><a href='#'>" + this.text + "</a></html>");
+        this.text = text.replace("<", "&lt;").replace(">", "&gt;").replace(" ", "&nbsp;"); // NOI18N
+        if (!mouseOver && !focused) super.setText("<html>" + this.text + "</html>"); // NOI18N
+        else super.setText("<html><a href='#'>" + this.text + "</a></html>"); // NOI18N
     }
     
     protected void fireActionPerformed(ActionEvent e) {

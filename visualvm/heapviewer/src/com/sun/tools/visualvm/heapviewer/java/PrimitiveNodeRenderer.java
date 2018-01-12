@@ -50,11 +50,11 @@ public class PrimitiveNodeRenderer extends MultiRenderer implements HeapViewerRe
         nameRenderer = new NormalBoldGrayRenderer() {
             public void setValue(Object value, int row) {
                 String name = ((PrimitiveNode)value).getFieldName();
-                if (name.startsWith("static ")) {
-                    setNormalValue("static ");
-                    setBoldValue(name.substring("static ".length()));
+                if (name.startsWith("static ")) { // NOI18N
+                    setNormalValue("static "); // NOI18N
+                    setBoldValue(name.substring("static ".length())); // NOI18N
                 } else {
-                    setNormalValue("");
+                    setNormalValue(""); // NOI18N
                     setBoldValue(name);
                 }
                 setIcon(Icons.getIcon(ProfilerIcons.NODE_FORWARD));

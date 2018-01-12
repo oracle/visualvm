@@ -37,7 +37,7 @@ import com.sun.tools.visualvm.heapviewer.ui.NodeObjectsView;
 public class JavaObjectView extends NodeObjectsView {
     
     public JavaObjectView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-        super("java_objects", node, context, actions);
+        super("java_objects", node, context, actions); // NOI18N
     }
     
 }

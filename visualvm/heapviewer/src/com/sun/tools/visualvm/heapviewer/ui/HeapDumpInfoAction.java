@@ -89,7 +89,8 @@ import org.openide.util.HelpCtx;
     "HeapDumpInfoAction_JvmItemString=<b>JVM: </b>{0}  ({1}, {2})",
     "HeapDumpInfoAction_ShowSysPropsLinkString=Show System Properties",
     "HeapDumpInfoAction_ThreadsString=Threads at the heap dump:",
-    "HeapDumpInfoAction_ShowThreadsLinkString=Show Threads"
+    "HeapDumpInfoAction_ShowThreadsLinkString=Show Threads",
+    "HeapDumpInfoAction_ComputingInfo=computing heap dump information..."
 })
 class HeapDumpInfoAction extends AbstractAction {
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
@@ -135,8 +136,8 @@ class HeapDumpInfoAction extends AbstractAction {
                 Heap heap = heapViewer.getFragments().get(0).getHeap();
                 Properties sysprops = heap.getSystemProperties();
                 
-                return computeInfo(heapViewer) + "<br><br>" +
-                       computeEnvironment(heap, sysprops) + "<br><br>" +
+                return computeInfo(heapViewer) + "<br><br>" + // NO18N
+                       computeEnvironment(heap, sysprops) + "<br><br>" + // NO18N
                        computeSystemProperties(sysprops);
             }
             protected void done() {
@@ -158,16 +159,16 @@ class HeapDumpInfoAction extends AbstractAction {
         } catch (ExecutionException ex) {
             Exceptions.printStackTrace(ex);
         } catch (TimeoutException ex) {
-            text.setText(SUMMARY_SECTION_PREFIX + LINE_PREFIX + "computing heap dump information...");
+            text.setText(SUMMARY_SECTION_PREFIX + LINE_PREFIX + Bundle.HeapDumpInfoAction_ComputingInfo());
             text.setCaretPosition(0);
         }
     }
     
     private static final String LINE_PREFIX = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"; // NOI18N
-    private static final String SUMMARY_SECTION_PREFIX = "<b><img border='0' align='bottom' src='nbresloc:/" +
+    private static final String SUMMARY_SECTION_PREFIX = "<b><img border='0' align='bottom' src='nbresloc:/" + // NO18N
                                                          Icons.getResource(GeneralIcons.INFO) +
-                                                         "'>&nbsp;&nbsp;" + Bundle.HeapDumpInfoAction_SummaryString() +
-                                                         "</b><br><hr>";
+                                                         "'>&nbsp;&nbsp;" + Bundle.HeapDumpInfoAction_SummaryString() + // NO18N
+                                                         "</b><br><hr>"; // NO18N
     
     private static String computeInfo(HeapViewer heapViewer) {
         File file = heapViewer.getFile();

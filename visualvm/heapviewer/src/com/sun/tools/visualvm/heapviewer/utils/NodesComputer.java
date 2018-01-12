@@ -36,11 +36,17 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "NodesComputer_MoreNodes=<another {0} objects left>",
+    "NodesComputer_SamplesContainer=<sample {0} objects>",
+    "NodesComputer_NodesContainer=<objects {0}-{1}>"
+})
 public abstract class NodesComputer<T> {
     
     private static final int EXTRA_ALLOWED_ITEMS = 10;
@@ -68,15 +74,15 @@ public abstract class NodesComputer<T> {
     
     
     protected String getMoreNodesString(String moreNodesCount)  {
-        return "<another " + moreNodesCount + " objects left>";
+        return Bundle.NodesComputer_MoreNodes(moreNodesCount);
     }
     
     protected String getSamplesContainerString(String objectsCount)  {
-        return "<sample " + objectsCount + " objects>";
+        return Bundle.NodesComputer_SamplesContainer(objectsCount);
     }
     
     protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-        return "<objects " + firstNodeIdx + "-" + lastNodeIdx + ">";
+        return Bundle.NodesComputer_NodesContainer(firstNodeIdx, lastNodeIdx);
     }
     
     

@@ -48,12 +48,19 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "JavaFieldsPlugin_Name=Fields",
+    "JavaFieldsPlugin_Description=Fields",
+    "JavaFieldsPlugin_NoFields=<no fields>",
+    "JavaFieldsPlugin_NoSelection=<no class or instance selected>"
+})
 class JavaFieldsPlugin extends HeapViewPlugin {
     
     private final Heap heap;
@@ -63,11 +70,11 @@ class JavaFieldsPlugin extends HeapViewPlugin {
     
 
     public JavaFieldsPlugin(HeapContext context, HeapViewerActions actions) {
-        super("Fields", "Fields", Icons.getIcon(ProfilerIcons.NODE_FORWARD));
+        super(Bundle.JavaFieldsPlugin_Name(), Bundle.JavaFieldsPlugin_Description(), Icons.getIcon(ProfilerIcons.NODE_FORWARD));
         
         heap = context.getFragment().getHeap();
         
-        objectsView = new TreeTableView("java_objects_fields", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
+        objectsView = new TreeTableView("java_objects_fields", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 if (selected != null) {
                     List<FieldValue> fields = null;
@@ -80,10 +87,10 @@ class JavaFieldsPlugin extends HeapViewPlugin {
                     }
 
                     HeapViewerNode[] nodes = JavaFieldsProvider.getNodes(fields, root, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
-                    return nodes == null || nodes.length == 0 ? new HeapViewerNode[] { new TextNode("<no fields>") } : nodes;
+                    return nodes == null || nodes.length == 0 ? new HeapViewerNode[] { new TextNode(Bundle.JavaFieldsPlugin_NoFields()) } : nodes;
                 }
                 
-                return new HeapViewerNode[] { new TextNode("<no class or instance selected>") };
+                return new HeapViewerNode[] { new TextNode(Bundle.JavaFieldsPlugin_NoSelection()) };
             }
         };
     }

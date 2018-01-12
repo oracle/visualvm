@@ -67,7 +67,9 @@ import org.openide.util.RequestProcessor;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "HeapViewerComponent_LoadingProgress=Opening heap dump..."
+    "HeapViewerComponent_LoadingProgress=Opening heap dump...",
+    "HeapViewerComponent_Scope=Scope:",
+    "HeapViewerComponent_View=View:"
 })
 public final class HeapViewerComponent extends JPanel {
     
@@ -291,7 +293,7 @@ public final class HeapViewerComponent extends JPanel {
 
         public String getDescription() {
             return contexts.length == 1 ? selectedFeature.getName() :
-                   (selectedContext.getFragment().getName() + ": " +
+                   (selectedContext.getFragment().getName() + ": " + // NOI18N
                    selectedFeature.getName());
         }
 
@@ -432,7 +434,7 @@ public final class HeapViewerComponent extends JPanel {
             final ViewsUpdater updater = new ViewsUpdater();
 
             if (scopes) {
-                JLabel scopeL = new JLabel("Scope:", JLabel.LEADING);
+                JLabel scopeL = new JLabel(Bundle.HeapViewerComponent_Scope(), JLabel.LEADING);
                 scopeL.setFont(popup.getFont().deriveFont(Font.BOLD));
                 c = new GridBagConstraints();
                 c.gridx = 0;
@@ -464,7 +466,7 @@ public final class HeapViewerComponent extends JPanel {
                     popup.add(mi, c);
                 }
 
-                JLabel viewL = new JLabel("View:", JLabel.LEADING);
+                JLabel viewL = new JLabel(Bundle.HeapViewerComponent_View(), JLabel.LEADING);
                 viewL.setFont(popup.getFont().deriveFont(Font.BOLD));
                 c = new GridBagConstraints();
                 c.gridx = 0;

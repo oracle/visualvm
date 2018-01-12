@@ -26,11 +26,15 @@
 package com.sun.tools.visualvm.heapviewer.model;
 
 import org.netbeans.lib.profiler.heap.Heap;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "LoopNode_Name={0} (loop to {1})"
+})
 public class LoopNode extends HeapViewerNode {
     
     private final HeapViewerNode loopNode;
@@ -43,7 +47,7 @@ public class LoopNode extends HeapViewerNode {
     }
 
     public String toString() {
-        return loopNode.toString() + "(loop to " + loopOrigin.toString() + ")";
+        return Bundle.LoopNode_Name(loopNode.toString(), loopOrigin.toString());
     }
 
     protected Object getValue(DataType type, Heap heap) {

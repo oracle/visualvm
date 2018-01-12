@@ -31,11 +31,17 @@ import org.netbeans.lib.profiler.heap.JavaClass;
 import com.sun.tools.visualvm.heapviewer.model.ContainerNode;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "InstancesContainer_MoreNodes=<another {0} instances left>",
+    "InstancesContainer_SamplesContainer=<sample {0} instances>",
+    "InstancesContainer_NodesContainer=<instances {0}-{1}>"
+})
 public final class InstancesContainer {
     
     public static class Objects extends ContainerNode<Instance> {
@@ -127,15 +133,15 @@ public final class InstancesContainer {
     
     
     private static String getMoreNodesString(String moreNodesCount)  {
-        return "<another " + moreNodesCount + " instances left>";
+        return Bundle.InstancesContainer_MoreNodes(moreNodesCount);
     }
     
     private static String getSamplesContainerString(String objectsCount)  {
-        return "<sample " + objectsCount + " instances>";
+        return Bundle.InstancesContainer_SamplesContainer(objectsCount);
     }
     
     private static String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-        return "<instances " + firstNodeIdx + "-" + lastNodeIdx + ">";
+        return Bundle.InstancesContainer_NodesContainer(firstNodeIdx, lastNodeIdx);
     }
     
 }

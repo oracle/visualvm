@@ -31,11 +31,17 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "HeapUtils_UnknownClass=unknown class",
+    "HeapUtils_UnknownInstance=unknown instance",
+    "HeapUtils_Class=class"
+}) 
 public final class HeapUtils {
     
    // --- Heap utils ----------------------------------------------------------
@@ -43,7 +49,7 @@ public final class HeapUtils {
     public static Collection<JavaClass> getSubclasses(Heap heap, String baseClass) {
         HashSet subclasses = new HashSet();
 
-        String escapedClassName = "\\Q" + baseClass + "\\E";
+        String escapedClassName = "\\Q" + baseClass + "\\E"; // NOI18N
         Collection<JavaClass> jClasses = heap.getJavaClassesByRegExp(escapedClassName);
 
         for (JavaClass jClass : jClasses) {
@@ -66,7 +72,7 @@ public final class HeapUtils {
     }
     
     private static String classToHtml(JavaClass javaClass, String prefix) {
-        if (javaClass == null) return "unknown class";
+        if (javaClass == null) return Bundle.HeapUtils_UnknownClass();
 
         long id = javaClass.getJavaClassId();
         return "<a href='" + CLASS_URL_PREFIX + id + "' name='" + id + "'>" + (prefix == null ? "" : prefix) + javaClass.getName() + "</a>"; // NOI18N
@@ -88,14 +94,14 @@ public final class HeapUtils {
     }
     
     public static String instanceToHtml(Instance instance, boolean logicalValue, Heap heap, JavaClass javaClassClass) {
-        if (instance == null) return "unknown instance";
+        if (instance == null) return Bundle.HeapUtils_UnknownInstance();
         
         JavaClass jcls = instance.getJavaClass();
-        if (jcls == null) return "unknown instance #" + instance.getInstanceId();
+        if (jcls == null) return Bundle.HeapUtils_UnknownInstance() + " #" + instance.getInstanceId(); // NOI18N
         
         if (jcls.equals(javaClassClass)) {
             JavaClass javaClass = heap.getJavaClassByID(instance.getInstanceId());
-            if (javaClass != null) return classToHtml(javaClass, "class ");
+            if (javaClass != null) return classToHtml(javaClass, Bundle.HeapUtils_Class() + " "); // NOI18N
         }
         
         long id = instance.getInstanceId();

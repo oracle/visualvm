@@ -230,7 +230,10 @@ final class ThreadsCPUView extends JPanel {
             }
         };
         
-        table.setColumnToolTips(new String[] { "Thread name", "Total thread CPU time", "Thread CPU time in last 1 second" });
+        table.setColumnToolTips(new String[] { NbBundle.getMessage(ThreadsCPUView.class, "ThreadsCPUView_TOOLTIP_Col_name"), // NOI18N
+                                               NbBundle.getMessage(ThreadsCPUView.class, "ThreadsCPUView_TOOLTIP_Col_time"), // NOI18N
+                                               NbBundle.getMessage(ThreadsCPUView.class, "ThreadsCPUView_TOOLTIP_Col_timesec") // NOI18N
+                                });
         
         table.providePopupMenu(true);
         
@@ -275,7 +278,7 @@ final class ThreadsCPUView extends JPanel {
                 if (!paused) refresher.refresh();
             }
         };
-        lrPauseButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Pause_results"));
+        lrPauseButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Pause_results")); // NOI18N
 
         lrRefreshButton = new JButton(Icons.getIcon(GeneralIcons.UPDATE_NOW)) {
             protected void fireActionPerformed(ActionEvent e) {
@@ -283,7 +286,7 @@ final class ThreadsCPUView extends JPanel {
                 refresher.refresh();
             }
         };
-        lrRefreshButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Update_results"));
+        lrRefreshButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Update_results")); // NOI18N
         lrRefreshButton.setEnabled(false);
         
         Icon icon = Icons.getIcon(ProfilerIcons.DELTA_RESULTS);
@@ -295,7 +298,7 @@ final class ThreadsCPUView extends JPanel {
                 }
             }
         };
-        lrDeltasButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Deltas"));
+        lrDeltasButton.setToolTipText(NbBundle.getMessage(CPUView.class, "TOOLTIP_Deltas")); // NOI18N
         
         toolbar = ProfilerToolbar.create(true);
 
@@ -315,10 +318,10 @@ final class ThreadsCPUView extends JPanel {
         toolbar.addSeparator();
         toolbar.addSpace(5);
         
-        toolbar.add(new GrayLabel("Statistics:"));
+        toolbar.add(new GrayLabel(NbBundle.getMessage(ThreadsCPUView.class, "ThreadsCPUView_LBL_Statistics"))); // NOI18N
         toolbar.addSpace(5);
         
-        toolbar.add(new JLabel("Threads Count:"));
+        toolbar.add(new JLabel(NbBundle.getMessage(ThreadsCPUView.class, "ThreadsCPUView_LBL_TCount"))); // NOI18N
         final Dimension tcDim = new Dimension(-1, -1);
         final JLabel threadsCountL = new JLabel() {
             public Dimension getPreferredSize() {
@@ -351,7 +354,7 @@ final class ThreadsCPUView extends JPanel {
         
         toolbar.addSpace(5);
         
-        toolbar.add(new JLabel("Total Time (CPU):"));
+        toolbar.add(new JLabel(NbBundle.getMessage(ThreadsCPUView.class, "ThreadsCPUView_LBL_Total_time"))); // NOI18N
         final JLabel threadsTotalTimeL = new JLabel();
         threadsTotalTime = new McsTimeRenderer() {
             public void setText(String text) {

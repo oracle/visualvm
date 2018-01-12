@@ -39,11 +39,15 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.LoopNode;
 import com.sun.tools.visualvm.heapviewer.model.ProgressNode;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TreeTableViewRenderer_Loop=loop to {0}"
+})
 class TreeTableViewRenderer implements ProfilerRenderer {
     
     // Don't make this static, leaks the last rendered value -> model -> UI -> Universe
@@ -134,7 +138,7 @@ class TreeTableViewRenderer implements ProfilerRenderer {
         }
 
         public String getShortName() {
-            return "loop to " + impl.getShortName();
+            return Bundle.TreeTableViewRenderer_Loop(impl.getShortName());
         }
 
     }
@@ -142,8 +146,8 @@ class TreeTableViewRenderer implements ProfilerRenderer {
     private static class ProgressNodeRenderer extends NormalBoldGrayRenderer implements HeapViewerRenderer {
     
         public ProgressNodeRenderer() {
-            setNormalValue("X");
-            setBoldValue("  ");
+            setNormalValue("X"); // NOI18N
+            setBoldValue("  "); // NOI18N
             setIcon(Icons.getIcon(HeapWalkerIcons.PROGRESS));
         }
         

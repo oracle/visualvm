@@ -30,26 +30,32 @@ import org.netbeans.lib.profiler.heap.JavaClass;
 import com.sun.tools.visualvm.heapviewer.model.ContainerNode;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ClassesContainer_MoreNodes=<another {0} classes left>",
+    "ClassesContainer_SamplesContainer=<sample {0} classes>",
+    "ClassesContainer_NodesContainer=<classes {0}-{1}>"
+})
 public final class ClassesContainer {
     
     private ClassesContainer() {}
     
     
     private static String getMoreNodesString(String moreNodesCount)  {
-        return "<another " + moreNodesCount + " classes left>";
+        return Bundle.ClassesContainer_MoreNodes(moreNodesCount);
     }
     
     private static String getSamplesContainerString(String objectsCount)  {
-        return "<sample " + objectsCount + " classes>";
+        return Bundle.ClassesContainer_SamplesContainer(objectsCount);
     }
     
     private static String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-        return "<classes " + firstNodeIdx + "-" + lastNodeIdx + ">";
+        return Bundle.ClassesContainer_NodesContainer(firstNodeIdx, lastNodeIdx);
     }
     
     

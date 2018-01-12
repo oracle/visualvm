@@ -313,7 +313,10 @@ final class MemoryView extends JPanel {
             }
         };
         
-        table.setColumnToolTips(new String[] { "Class name", "Size of live instances", "Number of live instances" });
+        table.setColumnToolTips(new String[] { NbBundle.getMessage(MemoryView.class, "MemoryView_TOOLTIP_Col_name"), // NOI18N
+                                               NbBundle.getMessage(MemoryView.class, "MemoryView_TOOLTIP_Col_size"), // NOI18N
+                                               NbBundle.getMessage(MemoryView.class, "MemoryView_TOOLTIP_Col_count") // NOI18N
+                                });
         
         table.providePopupMenu(true);
         
@@ -342,7 +345,7 @@ final class MemoryView extends JPanel {
         
         // --- Toolbar ---------------------------------------------------------
         
-        lrLabel = new GrayLabel("Results:");
+        lrLabel = new GrayLabel(NbBundle.getMessage(MemoryView.class, "MemoryView_LBL_Results")); // NOI18N
             
         lrPauseButton = new JToggleButton(Icons.getIcon(GeneralIcons.PAUSE)) {
             protected void fireItemStateChanged(ItemEvent event) {
@@ -351,7 +354,7 @@ final class MemoryView extends JPanel {
                 if (!paused) refresher.refresh();
             }
         };
-        lrPauseButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Pause_results"));
+        lrPauseButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Pause_results")); // NOI18N
 
         lrRefreshButton = new JButton(Icons.getIcon(GeneralIcons.UPDATE_NOW)) {
             protected void fireActionPerformed(ActionEvent e) {
@@ -359,7 +362,7 @@ final class MemoryView extends JPanel {
                 refresher.refresh();
             }
         };
-        lrRefreshButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Update_results"));
+        lrRefreshButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Update_results")); // NOI18N
         lrRefreshButton.setEnabled(false);
         
         Icon icon = Icons.getIcon(ProfilerIcons.DELTA_RESULTS);
@@ -371,10 +374,10 @@ final class MemoryView extends JPanel {
                 }
             }
         };
-        lrDeltasButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Deltas"));
+        lrDeltasButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Deltas")); // NOI18N
         
         if (snapshotDumper != null) {
-            pdLabel = new GrayLabel("Collected data:");
+            pdLabel = new GrayLabel(NbBundle.getMessage(MemoryView.class, "MemoryView_LBL_Data")); // NOI18N
             
             pdSnapshotButton = new JButton(NbBundle.getMessage(MemoryView.class,
                         "LBL_Snapshot"), new ImageIcon(ImageUtilities.loadImage( // NOI18N
@@ -383,7 +386,7 @@ final class MemoryView extends JPanel {
                     snapshotDumper.takeSnapshot((event.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0);
                 }
             };
-            pdSnapshotButton.setText("Snapshot");
+            pdSnapshotButton.setText(NbBundle.getMessage(MemoryView.class, "MemoryView_LBL_Snapshot")); // NOI18N
         }
         
         ProfilerToolbar toolbar = ProfilerToolbar.create(true);

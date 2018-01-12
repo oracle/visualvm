@@ -67,7 +67,7 @@ public class LocalObjectNodeRenderer extends MultiRenderer implements HeapViewer
     
     public String getShortName() {
         String name = instanceRenderer.getShortName();
-        int nameIdx = name.lastIndexOf('[');
+        int nameIdx = name.lastIndexOf('['); // NOI18N
         if (nameIdx != -1) name = name.substring(0, nameIdx).trim();
         return /*lvRenderer + " " +*/ name;
     }

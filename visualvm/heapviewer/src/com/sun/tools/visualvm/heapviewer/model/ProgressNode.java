@@ -27,11 +27,20 @@ package com.sun.tools.visualvm.heapviewer.model;
 
 import java.text.NumberFormat;
 import org.netbeans.lib.profiler.ui.Formatters;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ProgressNode_Computing=computing...",
+    "ProgressNode_Processing=processing object {0}",
+    "ProgressNode_DoneProcessing=done processing {0} objects",
+    "ProgressNode_Done0pc=0% done",
+    "ProgressNode_Done100pc=100% done",
+    "ProgressNode_DoneProcessingPc={0} done, processing object {1}"
+})
 public class ProgressNode extends TextNode {
     
     private static NumberFormat PERCENT_FORMAT;
@@ -40,7 +49,7 @@ public class ProgressNode extends TextNode {
     
     
     public ProgressNode() {
-        this("computing...");
+        this(Bundle.ProgressNode_Computing());
     }
     
     public ProgressNode(String text) {
@@ -48,7 +57,7 @@ public class ProgressNode extends TextNode {
     }
     
     public ProgressNode(Progress progress) {
-        this("computing...", progress);
+        this(Bundle.ProgressNode_Computing(), progress);
     }
     
     public ProgressNode(String text, Progress progress) {
@@ -76,8 +85,8 @@ public class ProgressNode extends TextNode {
             if (e.isFinished()) return formatPercent(e.getTotalSteps(), e.getTotalSteps());
             else return formatPercent(e.getCurrentStep(), e.getTotalSteps());
         } else {
-            if (e.isFinished()) return "done processing " + formatNumber(e.getCurrentStep()) + " objects";
-            else return "processing object " + formatNumber(e.getCurrentStep());
+            if (e.isFinished()) return Bundle.ProgressNode_DoneProcessing(formatNumber(e.getCurrentStep()));
+            else return Bundle.ProgressNode_Processing(formatNumber(e.getCurrentStep()));
         }
     }
     
@@ -87,8 +96,8 @@ public class ProgressNode extends TextNode {
     }
     
     protected static String formatPercent(long value, long maxValue) {
-        if (value == maxValue) return "100% done";
-        if (value == 0) return "0% done";
+        if (value == maxValue) return Bundle.ProgressNode_Done100pc();
+        if (value == 0) return Bundle.ProgressNode_Done0pc();
         
         if (PERCENT_FORMAT == null) {
             PERCENT_FORMAT = NumberFormat.getPercentInstance();
@@ -96,7 +105,7 @@ public class ProgressNode extends TextNode {
             PERCENT_FORMAT.setMinimumFractionDigits(0);
         }
         
-        return PERCENT_FORMAT.format(value / (float)maxValue) + " done, processing object " + formatNumber(value);
+        return Bundle.ProgressNode_DoneProcessingPc(PERCENT_FORMAT.format(value / (float)maxValue), formatNumber(value));
     }
     
 }

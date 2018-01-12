@@ -185,11 +185,11 @@ public class DataType<T> {
             
             if (!ProfilerDialogs.displayConfirmationDNSA(Bundle.RetainedSize_ComputeRetainedMsg(), 
                                                          Bundle.RetainedSize_ComputeRetainedCaption(),
-                                                         null, "HeapFragmentWalker.computeRetainedSizes", false))
+                                                         null, "HeapFragmentWalker.computeRetainedSizes", false)) // NOI18N
                 return false;
             
             computing = true;
-            new RequestProcessor("Retained Sizes Computer").post(new Runnable() {
+            new RequestProcessor("Retained Sizes Computer").post(new Runnable() { // NOI18N
                 public void run() {
                     List<JavaClass> classes = heap.getAllClasses();
                     if (classes.size() > 0) {

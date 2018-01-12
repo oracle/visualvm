@@ -52,17 +52,21 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
-    "JavaReferencesProvider_References=Computing references..."
+    "JavaReferencesProvider_Name=references",
+    "JavaReferencesProvider_References=Computing references...",
+    "JavaReferencesProvider_MoreNodes=<another {0} references left>",
+    "JavaReferencesProvider_SamplesContainer=<sample {0} references>",
+    "JavaReferencesProvider_NodesContainer=<references {0}-{1}>"
 })
 @ServiceProvider(service=HeapViewerNode.Provider.class, position = 400)
 public class JavaReferencesProvider extends HeapViewerNode.Provider {
     
     public String getName() {
-        return "references";
+        return Bundle.JavaReferencesProvider_Name();
     }
     
     public boolean supportsView(Heap heap, String viewID) {
-        return viewID.startsWith("java_");
+        return viewID.startsWith("java_"); // NOI18N
     }
     
     public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
@@ -90,13 +94,13 @@ public class JavaReferencesProvider extends HeapViewerNode.Provider {
                 return new ProgressIterator(iterator, index, false, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
-                return "<another " + moreNodesCount + " references left>";
+                return Bundle.JavaReferencesProvider_MoreNodes(moreNodesCount);
             }
             protected String getSamplesContainerString(String objectsCount)  {
-                return "<sample " + objectsCount + " references>";
+                return Bundle.JavaReferencesProvider_SamplesContainer(objectsCount);
             }
             protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                return "<references " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                return Bundle.JavaReferencesProvider_NodesContainer(firstNodeIdx, lastNodeIdx);
             }
         };
         

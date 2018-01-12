@@ -481,7 +481,7 @@ public abstract class ProfilerTabbedView {
             if (idx == -1) { highlights.remove(viewport); return; };
             
             final String originalTitle = tabs.getTitleAt(idx);
-            String highlightTitle = "<html><font color='blue'>" + originalTitle + "</font></html>";
+            String highlightTitle = "<html><font color='blue'>" + originalTitle + "</font></html>"; // NOI18N
             
             final Icon originalIcon = tabs.getIconAt(idx);
             Image image = ImageUtilities.icon2Image(originalIcon);

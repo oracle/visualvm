@@ -33,12 +33,17 @@ import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.ProfilerStorage;
 import org.netbeans.modules.profiler.heapwalk.OQLSupport;
 import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "CustomOQLQueries_SaveFailed=Failed to save OQL scripts.",
+    "CustomOQLQueries_LoadFailed=Failed to load saved OQL scripts."
+}) 
 public final class CustomOQLQueries {
     
     private static final String SAVED_OQL_QUERIES_FILENAME = "oqlqueries"; // NOI18N
@@ -83,13 +88,13 @@ public final class CustomOQLQueries {
     
     
     private void save() {
-        new RequestProcessor("OQL Scripts Saver").post(new Runnable() {
+        new RequestProcessor("OQL Scripts Saver").post(new Runnable() { // NOI18N
             public void run() {
                 try {
                     Properties p = listToProperties(list());
                     ProfilerStorage.saveGlobalProperties(p, SAVED_OQL_QUERIES_FILENAME);
                 } catch (Exception e) {
-                    ProfilerDialogs.displayError("Failed to save OQL scripts.");
+                    ProfilerDialogs.displayError(Bundle.CustomOQLQueries_SaveFailed());
                     Exceptions.printStackTrace(e);
                 }
             }
@@ -140,7 +145,7 @@ public final class CustomOQLQueries {
             ProfilerStorage.loadGlobalProperties(p, SAVED_OQL_QUERIES_FILENAME);
             propertiesToList(customQueries, p);
         } catch (Exception e) {
-            ProfilerDialogs.displayError("Failed to load saved OQL scripts.");
+            ProfilerDialogs.displayError(Bundle.CustomOQLQueries_LoadFailed());
             Exceptions.printStackTrace(e);
         }
     }

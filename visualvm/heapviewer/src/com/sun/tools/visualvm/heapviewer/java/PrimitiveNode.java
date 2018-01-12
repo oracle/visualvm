@@ -100,7 +100,7 @@ public abstract class PrimitiveNode extends HeapViewerNode {
         }
         
         protected String computeFieldName() {
-            return (field.getField().isStatic() ? "static " : "") + field.getField().getName();
+            return (field.getField().isStatic() ? "static " : "") + field.getField().getName(); // NOI18N
         }
     }
     
@@ -139,7 +139,7 @@ public abstract class PrimitiveNode extends HeapViewerNode {
         }
         
         protected String computeFieldName() {
-            return "[" + index + "]";
+            return "[" + index + "]"; // NOI18N
         }
         
     }

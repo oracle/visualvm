@@ -236,7 +236,10 @@ final class ThreadsMemoryView extends JPanel {
             }
         };
         
-        table.setColumnToolTips(new String[] { "Thread name", "Total bytes allocated by thread", "Bytes allocated by thread in last 1 second" });
+        table.setColumnToolTips(new String[] { NbBundle.getMessage(ThreadsMemoryView.class, "ThreadsMemoryView_TOOLTIP_Col_name"), // NOI18N
+                                               NbBundle.getMessage(ThreadsMemoryView.class, "ThreadsMemoryView_TOOLTIP_Col_bytes"), // NOI18N
+                                               NbBundle.getMessage(ThreadsMemoryView.class, "ThreadsMemoryView_TOOLTIP_Col_bytessec") // NOI18N
+                                });
         
         table.providePopupMenu(true);
         
@@ -272,7 +275,7 @@ final class ThreadsMemoryView extends JPanel {
         
         // --- Toolbar ---------------------------------------------------------
         
-        lrLabel = new GrayLabel("Results:");
+        lrLabel = new GrayLabel(NbBundle.getMessage(ThreadsMemoryView.class, "ThreadsMemoryView_LBL_Results")); // NOI18N
             
         lrPauseButton = new JToggleButton(Icons.getIcon(GeneralIcons.PAUSE)) {
             protected void fireItemStateChanged(ItemEvent event) {
@@ -281,7 +284,7 @@ final class ThreadsMemoryView extends JPanel {
                 if (!paused) refresher.refresh();
             }
         };
-        lrPauseButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Pause_results"));
+        lrPauseButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Pause_results")); // NOI18N
 
         lrRefreshButton = new JButton(Icons.getIcon(GeneralIcons.UPDATE_NOW)) {
             protected void fireActionPerformed(ActionEvent e) {
@@ -289,7 +292,7 @@ final class ThreadsMemoryView extends JPanel {
                 refresher.refresh();
             }
         };
-        lrRefreshButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Update_results"));
+        lrRefreshButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Update_results")); // NOI18N
         lrRefreshButton.setEnabled(false);
         
         Icon icon = Icons.getIcon(ProfilerIcons.DELTA_RESULTS);
@@ -301,7 +304,7 @@ final class ThreadsMemoryView extends JPanel {
                 }
             }
         };
-        lrDeltasButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Deltas"));
+        lrDeltasButton.setToolTipText(NbBundle.getMessage(MemoryView.class, "TOOLTIP_Deltas")); // NOI18N
         
         toolbar = ProfilerToolbar.create(true);
 
@@ -321,10 +324,10 @@ final class ThreadsMemoryView extends JPanel {
         toolbar.addSeparator();
         toolbar.addSpace(5);
         
-        toolbar.add(new GrayLabel("Statistics:"));
+        toolbar.add(new GrayLabel(NbBundle.getMessage(ThreadsMemoryView.class, "ThreadsMemoryView_LBL_Statistics"))); // NOI18N
         toolbar.addSpace(5);
         
-        toolbar.add(new JLabel("Threads Count:"));
+        toolbar.add(new JLabel(NbBundle.getMessage(ThreadsMemoryView.class, "ThreadsMemoryView_LBL_TCount"))); // NOI18N
         final Dimension tcDim = new Dimension(-1, -1);
         final JLabel threadsCountL = new JLabel() {
             public Dimension getPreferredSize() {
@@ -357,7 +360,7 @@ final class ThreadsMemoryView extends JPanel {
         
         toolbar.addSpace(5);
         
-        toolbar.add(new JLabel("Total Allocated Bytes:"));
+        toolbar.add(new JLabel(NbBundle.getMessage(ThreadsMemoryView.class, "ThreadsMemoryView_LBL_Total_bytes"))); // NOI18N
         final JLabel threadsTotalBytesL = new JLabel();
         threadsTotalBytes = new NumberRenderer(Formatters.bytesFormat()) {
             public void setText(String text) {

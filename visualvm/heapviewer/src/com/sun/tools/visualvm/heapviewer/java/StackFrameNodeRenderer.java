@@ -30,11 +30,15 @@ import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.MultiRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "StackFrameNodeRenderer_AtMark=at"
+})
 public class StackFrameNodeRenderer extends MultiRenderer implements HeapViewerRenderer {
     
     private final LabelRenderer atRenderer;
@@ -44,7 +48,7 @@ public class StackFrameNodeRenderer extends MultiRenderer implements HeapViewerR
     
     public StackFrameNodeRenderer() {
         atRenderer = new LabelRenderer();
-        atRenderer.setText("at");
+        atRenderer.setText(Bundle.StackFrameNodeRenderer_AtMark());
         atRenderer.setMargin(3, 3, 3, 0);
         methodRenderer = new JavaNameRenderer();
         renderers = new ProfilerRenderer[] { atRenderer, methodRenderer };
@@ -62,16 +66,16 @@ public class StackFrameNodeRenderer extends MultiRenderer implements HeapViewerR
     
     public String getShortName() {
         String name = methodRenderer.toString();
-        int nameIdx = name.indexOf('(');
-        if (nameIdx == -1) return atRenderer + " " + name;
+        int nameIdx = name.indexOf('('); // NOI18N
+        if (nameIdx == -1) return atRenderer + " " + name; // NOI18N
         
         String method = name.substring(0, nameIdx);
-        int dotIdx = method.lastIndexOf('.');
-        if (dotIdx == -1) return atRenderer + " " + name;
+        int dotIdx = method.lastIndexOf('.'); // NOI18N
+        if (dotIdx == -1) return atRenderer + " " + name; // NOI18N
         
         String cls = method.substring(0, dotIdx);
-        dotIdx = cls.lastIndexOf('.');
-        return atRenderer + " " + method.substring(dotIdx + 1) + name.substring(nameIdx);
+        dotIdx = cls.lastIndexOf('.'); // NOI18N
+        return atRenderer + " " + method.substring(dotIdx + 1) + name.substring(nameIdx); // NOI18N
     }
     
 }

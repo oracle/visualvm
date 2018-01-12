@@ -61,8 +61,8 @@ public class ThreadNodeRenderer extends LabelRenderer implements HeapViewerRende
     
     public String getShortName() {
         String name = getText();
-        int nameIdx = name.indexOf('"') + 1;
-        if (nameIdx > 0) name = name.substring(nameIdx, name.indexOf('"', nameIdx));
+        int nameIdx = name.indexOf('"') + 1; // NOI18N
+        if (nameIdx > 0) name = name.substring(nameIdx, name.indexOf('"', nameIdx)); // NOI18N
         return name;
     }
     

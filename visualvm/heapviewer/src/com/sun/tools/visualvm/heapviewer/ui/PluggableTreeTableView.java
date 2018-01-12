@@ -58,7 +58,7 @@ import org.openide.util.Lookup;
  */
 public class PluggableTreeTableView extends TreeTableView {
     
-    private static final Color SEPARATOR_COLOR = UIManager.getColor("Separator.foreground");
+    private static final Color SEPARATOR_COLOR = UIManager.getColor("Separator.foreground"); // NOI18N
     
     private final List<HeapViewPlugin> plugins;
 //    private Collection<? extends HeapViewPlugin.Provider> pluginProviders;

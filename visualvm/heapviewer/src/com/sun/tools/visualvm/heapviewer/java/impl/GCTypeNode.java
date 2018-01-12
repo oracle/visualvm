@@ -32,11 +32,17 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import com.sun.tools.visualvm.heapviewer.java.InstancesContainer;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "ClassesContainer_MoreNodes=<another {0} GC roots left>",
+    "ClassesContainer_SamplesContainer=<sample {0} GC roots>",
+    "ClassesContainer_NodesContainer=<GC roots {0}-{1}>"
+})
 class GCTypeNode extends InstancesContainer.Objects {
     
     GCTypeNode(String name) {
@@ -45,15 +51,15 @@ class GCTypeNode extends InstancesContainer.Objects {
     
     
     protected String getMoreNodesString(String moreNodesCount)  {
-        return "<another " + moreNodesCount + " GC roots left>";
+        return Bundle.ClassesContainer_MoreNodes(moreNodesCount);
     }
     
     protected String getSamplesContainerString(String objectsCount)  {
-        return "<sample " + objectsCount + " GC roots>";
+        return Bundle.ClassesContainer_SamplesContainer(objectsCount);
     }
     
     protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-        return "<GC roots " + firstNodeIdx + "-" + lastNodeIdx + ">";
+        return Bundle.ClassesContainer_NodesContainer(firstNodeIdx, lastNodeIdx);
     }
     
     
