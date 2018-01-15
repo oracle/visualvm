@@ -163,9 +163,9 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                         ObjectArrayInstance data = (ObjectArrayInstance) rawData;
                         int size = data.getLength();
                         if (size == 1) {
-                            return getValue(data.getValues().get(0), false, heap);
+                            return getValue(data.getValues().get(0), false, heap)+", foreign";
                         }
-                        return "Size: " + size;
+                        return "Size: " + size+", foreign";
                     }
                 }
             }
