@@ -33,6 +33,7 @@ import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
 import org.openide.util.lookup.ServiceProvider;
 import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
+import com.sun.tools.visualvm.heapviewer.truffle.r.RObject;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 
@@ -181,6 +182,26 @@ public class RDetailsProvider extends DetailsProvider.Basic {
             if (classAttr instanceof ObjectFieldValue) {
                 Instance classAttrName = ((ObjectFieldValue)classAttr).getInstance();
                 return "Class: " + DetailsSupport.getDetailsString(classAttrName, heap);
+            } else {
+                classAttr = attributes.getFieldValue(".S3Class");
+                if (classAttr instanceof ObjectFieldValue) {
+                    Instance classAttrName = ((ObjectFieldValue)classAttr).getInstance();
+                    if (RObject.isRObject(classAttrName)) {
+                        StringBuilder classes = new StringBuilder("S3Class: [");
+                        RObject vector = new RObject(classAttrName);
+                        List values = vector.getValues();
+
+                        for (int i=0; i<values.size(); i++) {
+                            Instance str = (Instance) values.get(i);
+                            classes.append(DetailsSupport.getDetailsString((Instance) str, heap));
+                            if (i<values.size()-1) {
+                                classes.append(", ");
+                            }
+                        }
+                        return classes.append(']').toString();
+                    }
+                    return "S3Class: " + DetailsSupport.getDetailsString(classAttrName, heap);
+                }
             }
         }
         return null;
