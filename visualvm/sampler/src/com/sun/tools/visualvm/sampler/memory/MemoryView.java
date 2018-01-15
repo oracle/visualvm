@@ -48,9 +48,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -59,6 +63,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import javax.swing.SortOrder;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
 import org.netbeans.lib.profiler.ui.Formatters;
@@ -72,6 +77,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.NumberPercentRenderer;
 import org.netbeans.lib.profiler.utils.Wildcards;
+import org.netbeans.modules.profiler.api.ActionsSupport;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
@@ -341,6 +347,29 @@ final class MemoryView extends JPanel {
         table.setDefaultColumnWidth(2, renderers[1].getMaxNoBarWidth());
         
         ProfilerTableContainer tableContainer = new ProfilerTableContainer(table, false, null);
+        
+        InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        ActionMap actionMap = getActionMap();
+        
+        final String filterKey = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        Action filterAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                MemoryView.this.activateFilter();
+            }
+        };
+        ActionsSupport.registerAction(filterKey, filterAction, actionMap, inputMap);
+        
+        final String findKey = SearchUtils.FIND_ACTION_KEY;
+        Action findAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                MemoryView.this.activateSearch();
+            }
+        };
+        ActionsSupport.registerAction(findKey, findAction, actionMap, inputMap);
+        
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() { SearchUtils.enableSearchActions(table); }
+        });
         
         
         // --- Toolbar ---------------------------------------------------------
@@ -679,5 +708,5 @@ final class MemoryView extends JPanel {
         public long getBytes() { return bytes; }
 
     }
-
+    
 }

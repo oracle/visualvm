@@ -35,9 +35,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.ItemEvent;
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.Icon;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
@@ -48,7 +53,9 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.cpu.LiveCPUView;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.lib.profiler.ui.swing.MultiButtonGroup;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
+import org.netbeans.modules.profiler.api.ActionsSupport;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -79,7 +86,7 @@ import org.openide.util.NbBundle;
     "MethodsFeatureUI_showDeltas=Show delta values"
 })
 final class CPUView extends JPanel {
-
+    
     private final AbstractSamplerSupport.Refresher refresher;
     private boolean forceRefresh = false;
     
@@ -228,6 +235,28 @@ final class CPUView extends JPanel {
             }
         };
         cpuView.putClientProperty(ProfilerResultsAction.PROP_APPLICATION, application);
+        
+        InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        ActionMap actionMap = getActionMap();
+        
+        final String filterKey = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        Action filterAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                Action action = cpuView.getActionMap().get(filterKey);
+                if (action != null && action.isEnabled()) action.actionPerformed(e);
+            }
+        };
+        ActionsSupport.registerAction(filterKey, filterAction, actionMap, inputMap);
+        
+        final String findKey = SearchUtils.FIND_ACTION_KEY;
+        Action findAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                Action action = cpuView.getActionMap().get(findKey);
+                if (action != null && action.isEnabled()) action.actionPerformed(e);
+            }
+        };
+        ActionsSupport.registerAction(findKey, findAction, actionMap, inputMap);
+        
         
         // --- Toolbar ---------------------------------------------------------
         
@@ -382,5 +411,5 @@ final class CPUView extends JPanel {
         add(cpuView, BorderLayout.CENTER);
         
     }
-
+    
 }

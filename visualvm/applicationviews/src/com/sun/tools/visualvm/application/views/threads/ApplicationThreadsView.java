@@ -50,8 +50,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -60,7 +62,9 @@ import javax.swing.SwingUtilities;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.lib.profiler.ui.threads.ThreadsPanel;
+import org.netbeans.modules.profiler.api.ActionsSupport;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
@@ -346,6 +350,27 @@ class ApplicationThreadsView extends DataSourceView implements DataRemovedListen
                 }
             };
             threadsPanel.threadsMonitoringEnabled();
+            
+            InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+            ActionMap actionMap = getActionMap();
+
+            final String filterKey = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+            Action filterAction = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    Action action = threadsPanel.getActionMap().get(filterKey);
+                    if (action != null && action.isEnabled()) action.actionPerformed(e);
+                }
+            };
+            ActionsSupport.registerAction(filterKey, filterAction, actionMap, inputMap);
+
+            final String findKey = SearchUtils.FIND_ACTION_KEY;
+            Action findAction = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    Action action = threadsPanel.getActionMap().get(findKey);
+                    if (action != null && action.isEnabled()) action.actionPerformed(e);
+                }
+            };
+            ActionsSupport.registerAction(findKey, findAction, actionMap, inputMap);
             
             // -----------------------------------------------------------------
             // --- copy-pasted timeline toolbar from org.netbeans.modules.profiler.v2.features.ThreadsFeatureUI

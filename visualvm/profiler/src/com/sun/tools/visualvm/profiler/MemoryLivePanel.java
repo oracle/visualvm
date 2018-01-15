@@ -29,8 +29,13 @@ import com.sun.tools.visualvm.profiling.actions.ProfilerResultsAction;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.Icon;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
@@ -40,8 +45,10 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.memory.LiveMemoryView;
 import org.netbeans.lib.profiler.ui.memory.LiveMemoryViewUpdater;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
+import org.netbeans.lib.profiler.ui.swing.SearchUtils;
 import org.netbeans.modules.profiler.actions.ResetResultsAction;
 import org.netbeans.modules.profiler.actions.TakeSnapshotAction;
+import org.netbeans.modules.profiler.api.ActionsSupport;
 import org.netbeans.modules.profiler.api.GoToSource;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -185,6 +192,28 @@ class MemoryLivePanel extends ProfilingResultsSupport.ResultsView {
         
         updater = new LiveMemoryViewUpdater(memoryView, Profiler.getDefault().getTargetAppRunner().getProfilerClient());        
         resetter = ProfilingResultsSupport.ResultsResetter.registerView(this);
+        
+        InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        ActionMap actionMap = getActionMap();
+        
+        final String filterKey = org.netbeans.lib.profiler.ui.swing.FilterUtils.FILTER_ACTION_KEY;
+        Action filterAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                Action action = memoryView.getActionMap().get(filterKey);
+                if (action != null && action.isEnabled()) action.actionPerformed(e);
+            }
+        };
+        ActionsSupport.registerAction(filterKey, filterAction, actionMap, inputMap);
+        
+        final String findKey = SearchUtils.FIND_ACTION_KEY;
+        Action findAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                Action action = memoryView.getActionMap().get(findKey);
+                if (action != null && action.isEnabled()) action.actionPerformed(e);
+            }
+        };
+        ActionsSupport.registerAction(findKey, findAction, actionMap, inputMap);
+        
         
         // --- Toolbar ---------------------------------------------------------
         
