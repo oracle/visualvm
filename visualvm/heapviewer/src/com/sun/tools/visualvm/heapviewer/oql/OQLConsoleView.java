@@ -130,6 +130,8 @@ import org.openide.util.RequestProcessor;
 })
 public class OQLConsoleView extends HeapViewerFeature {
     
+    private static final int RESULTS_LIMIT = Integer.parseInt(System.getProperty("OQLController.limitResults", "100")); // NOI18N
+    
     private static final Color SEPARATOR_COLOR = UIManager.getColor("Separator.foreground"); // NOI18N
     
     private final HeapContext context;
@@ -548,7 +550,7 @@ public class OQLConsoleView extends HeapViewerFeature {
 //            public void run() {
                 new RequestProcessor("OQL Query Processor").post(new Runnable() { // NOI18N
                     public void run() {
-                        final AtomicInteger counter = new AtomicInteger(100);
+                        final AtomicInteger counter = new AtomicInteger(RESULTS_LIMIT);
                         progressModel.setMaximum(100);
 
                         final StringBuilder sb = new StringBuilder();
