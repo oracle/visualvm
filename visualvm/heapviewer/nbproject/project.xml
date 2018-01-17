@@ -137,6 +137,7 @@
             </module-dependencies>
             <friend-packages>
                 <friend>com.sun.tools.visualvm.heapdump</friend>
+                <friend>com.sun.tools.visualvm.heapviewer.console</friend>
                 <friend>com.sun.tools.visualvm.heapviewer.truffle</friend>
                 <package>com.sun.tools.visualvm.heapviewer</package>
                 <package>com.sun.tools.visualvm.heapviewer.java</package>
