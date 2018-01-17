@@ -180,7 +180,7 @@ public class OQLConsoleView extends HeapViewerFeature {
         
         engine = null;
         if (OQLEngine.isOQLSupported()) try {
-            engine = new OQLEngine(context.getFragment().getHeap());
+            engine = new OQLEngine(heap);
         } catch (Exception e) {
 //            ProfilerLogger.log(e);
         }
