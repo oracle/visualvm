@@ -80,6 +80,7 @@ made subject to such option by the copyright holder.
                 <friend>com.sun.tools.visualvm.core</friend>
                 <friend>com.sun.tools.visualvm.heapdump</friend>
                 <friend>com.sun.tools.visualvm.heapviewer</friend>
+                <friend>com.sun.tools.visualvm.heapviewer.console</friend>
                 <friend>com.sun.tools.visualvm.heapviewer.truffle</friend>
                 <friend>com.sun.tools.visualvm.modules.appui</friend>
                 <friend>com.sun.tools.visualvm.profiler</friend>
