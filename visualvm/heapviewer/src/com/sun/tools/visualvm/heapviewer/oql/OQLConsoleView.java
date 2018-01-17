@@ -125,7 +125,11 @@ import org.openide.util.RequestProcessor;
     "OQLConsoleView_ObjectsTooltip=Objects",
     "OQLConsoleView_HTMLTooltip=Results:",
     "OQLConsoleView_Details=Details:",
-    "OQLConsoleView_EngineNotAvailable=<OQL engine not available>"
+    "OQLConsoleView_EngineNotAvailable=<OQL engine not available>",
+    "OQLConsoleView_NoResults2=no results",
+    "OQLConsoleView_TooManyResults=too many results",
+    "OQLConsoleView_QueryError=Query error",
+    "OQLConsoleView_BadQuery=Bad OQL query"
         
 })
 public class OQLConsoleView extends HeapViewerFeature {
@@ -583,11 +587,11 @@ public class OQLConsoleView extends HeapViewerFeature {
 
                             if (counter.get() == 0) {
                                 sb.append("<tr><td>");  // NOI18N
-                                sb.append("&lt;too many results&gt");      // NOI18N
+                                sb.append("&lt;" + Bundle.OQLConsoleView_TooManyResults() + "&gt;");      // NOI18N
                                 sb.append("</td></tr>");   // NOI18N
-                            } else if (counter.get() == 100) {
+                            } else if (counter.get() == RESULTS_LIMIT) {
                                 sb.append("<tr><td>"); // NOI18N
-                                sb.append("&lt;no results&gt"); // NOI18N
+                                sb.append("&lt;" + Bundle.OQLConsoleView_NoResults2() + "&gt;"); // NOI18N
                                 sb.append("</td></tr>" ); // NOI18N
                             }
 
@@ -596,10 +600,10 @@ public class OQLConsoleView extends HeapViewerFeature {
                             finalizeQuery(sb.toString());
                         } catch (OQLException oQLException) {
                             StringBuilder errorMessage = new StringBuilder();
-                            errorMessage.append("<h2>").append("Query error").append("</h2>"); // NOI18N
-                            errorMessage.append("Bad OQL query"); // NOI18N
-                            errorMessage.append("<hr>"); // noi18n
-                            errorMessage.append(oQLException.getLocalizedMessage().replace("\n", "<br>").replace("\r", "<br>"));
+                            errorMessage.append("<h2>").append(Bundle.OQLConsoleView_QueryError()).append("</h2>"); // NOI18N
+                            errorMessage.append(Bundle.OQLConsoleView_BadQuery()); // NOI18N
+                            errorMessage.append("<hr>"); // NOI18N
+                            errorMessage.append(oQLException.getLocalizedMessage().replace("\n", "<br>").replace("\r", "<br>")); // NOI18N
                             
                             finalizeQuery(errorMessage.toString());
                         }
