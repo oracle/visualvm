@@ -54,6 +54,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
@@ -90,18 +91,18 @@ import org.openide.util.RequestProcessor;
     "RConsoleView_RunActionTooltip=Execute R script",
     "RConsoleView_CancelAction=Cancel",
     "RConsoleView_CancelActionTooltip=Cancel R script execution",
-//    "OQLConsoleView_LoadAction=Load Script",
-//    "OQLConsoleView_LoadActionTooltip=Load OQL script",
-//    "OQLConsoleView_SaveAction=Save Script",
-//    "OQLConsoleView_SaveActionTooltip=Save OQL script",
+    "RConsoleView_LoadAction=Load Script",
+    "RConsoleView_LoadActionTooltip=Load R script",
+    "RConsoleView_SaveAction=Save Script",
+    "RConsoleView_SaveActionTooltip=Save R script",
 //    "OQLConsoleView_EditAction=Edit Scripts",
-//    "OQLConsoleView_EditActionTooltip=Edit Saved OQL scripts",
+//    "OQLConsoleView_EditActionTooltip=Edit Saved R scripts",
     "RConsoleView_ExecutingProgress=Executing..."
 //    "OQLConsoleView_Results=Results:",
 //    "OQLConsoleView_ObjectsTooltip=Objects",
 //    "OQLConsoleView_HTMLTooltip=Results:",
 //    "OQLConsoleView_Details=Details:",
-//    "OQLConsoleView_EngineNotAvailable=<OQL engine not available>"
+//    "OQLConsoleView_EngineNotAvailable=<R engine not available>"
 })
 class RConsoleView extends HeapViewerFeature {
     
@@ -118,8 +119,8 @@ class RConsoleView extends HeapViewerFeature {
     
     private Action runAction;
     private Action cancelAction;
-//    private Action loadAction;
-//    private Action saveAction;
+    private Action loadAction;
+    private Action saveAction;
 //    private Action editAction;
     
     private JLabel progressLabel;
@@ -141,6 +142,8 @@ class RConsoleView extends HeapViewerFeature {
 //    
 //    // TODO: synchronize!
 //    private Set<HeapViewerNode> nodeResults;
+    
+    private RQueries.Query currentQuery;
     
     
     public RConsoleView(HeapContext context, HeapViewerActions actions) {
@@ -263,12 +266,12 @@ class RConsoleView extends HeapViewerFeature {
         if (analysisRunning.get()) {
             runAction.setEnabled(false);
             cancelAction.setEnabled(true);
-//            loadAction.setEnabled(false);
+            loadAction.setEnabled(false);
             editor.setEditable(false);
         } else {
             runAction.setEnabled(scriptLength > 0 && queryValid);
             cancelAction.setEnabled(false);
-//            loadAction.setEnabled(true);
+            loadAction.setEnabled(true);
             editor.setEditable(true);
         }
     }
@@ -387,58 +390,58 @@ class RConsoleView extends HeapViewerFeature {
             JButton cancelButton = new JButton(cancelAction);
             cancelButton.setHideActionText(true);
             
-//            loadAction = new AbstractAction(Bundle.OQLConsoleView_LoadAction(), OQLQueries.ICON_LOAD) {
-//                {
-//                    putValue(Action.SHORT_DESCRIPTION, Bundle.OQLConsoleView_LoadActionTooltip());
-//                }
-//                public void actionPerformed(ActionEvent e) {
-//                    if (e.getSource() instanceof JComponent) {
-//                        JPopupMenu p = new JPopupMenu();
-//                        OQLQueries.instance().populateLoadQuery(p, currentQuery, new OQLQueries.Handler() {
-//                            protected void querySelected(OQLSupport.Query query) {
-//                                currentQuery = query;
-//                                if (editor != null) editor.setScript(currentQuery.getScript());
-//                            }
-//                        });
-//                        
-//                        JComponent c = (JComponent)e.getSource();
-//                        if (p.getComponentCount() > 0) {
-//                            if (c.getClientProperty("POPUP_LEFT") != null) p.show(c, c.getWidth() + 1, 0); // NOI18N
-//                            else p.show(c, 0, c.getHeight() + 1);
-//                        }
-//                        
-//                    }
-//                }
-//            };
-//            
-//            JButton loadButton = new JButton(loadAction);
-//            loadButton.setHideActionText(true);
-//            
-//            saveAction = new AbstractAction(Bundle.OQLConsoleView_SaveAction(), OQLQueries.ICON_SAVE) {
-//                {
-//                    putValue(Action.SHORT_DESCRIPTION, Bundle.OQLConsoleView_SaveActionTooltip());
-//                }
-//                public void actionPerformed(ActionEvent e) {
-//                    if (e.getSource() instanceof JComponent) {
-//                        JPopupMenu p = new JPopupMenu();
-//                        OQLQueries.instance().populateSaveQuery(p, currentQuery, editor.getScript(), new OQLQueries.Handler() {
-//                            protected void querySelected(OQLSupport.Query query) {
-//                                currentQuery = query;
-//                            }
-//                        });
-//                        
-//                        JComponent c = (JComponent)e.getSource();
-//                        if (p.getComponentCount() > 0) {
-//                            if (c.getClientProperty("POPUP_LEFT") != null) p.show(c, c.getWidth() + 1, 0); // NOI18N
-//                            else p.show(c, 0, c.getHeight() + 1);
-//                        }
-//                        
-//                    }
-//                }
-//            };
-//            
-//            JButton saveButton = new JButton(saveAction);
-//            saveButton.setHideActionText(true);
+            loadAction = new AbstractAction(Bundle.RConsoleView_LoadAction(), RQueries.ICON_LOAD) {
+                {
+                    putValue(Action.SHORT_DESCRIPTION, Bundle.RConsoleView_LoadActionTooltip());
+                }
+                public void actionPerformed(ActionEvent e) {
+                    if (e.getSource() instanceof JComponent) {
+                        JPopupMenu p = new JPopupMenu();
+                        RQueries.instance().populateLoadQuery(p, currentQuery, new RQueries.Handler() {
+                            protected void querySelected(RQueries.Query query) {
+                                currentQuery = query;
+                                if (editor != null) editor.setScript(currentQuery.getScript());
+                            }
+                        });
+                        
+                        JComponent c = (JComponent)e.getSource();
+                        if (p.getComponentCount() > 0) {
+                            if (c.getClientProperty("POPUP_LEFT") != null) p.show(c, c.getWidth() + 1, 0); // NOI18N
+                            else p.show(c, 0, c.getHeight() + 1);
+                        }
+                        
+                    }
+                }
+            };
+            
+            JButton loadButton = new JButton(loadAction);
+            loadButton.setHideActionText(true);
+            
+            saveAction = new AbstractAction(Bundle.RConsoleView_SaveAction(), RQueries.ICON_SAVE) {
+                {
+                    putValue(Action.SHORT_DESCRIPTION, Bundle.RConsoleView_SaveActionTooltip());
+                }
+                public void actionPerformed(ActionEvent e) {
+                    if (e.getSource() instanceof JComponent) {
+                        JPopupMenu p = new JPopupMenu();
+                        RQueries.instance().populateSaveQuery(p, currentQuery, editor.getScript(), new RQueries.Handler() {
+                            protected void querySelected(RQueries.Query query) {
+                                currentQuery = query;
+                            }
+                        });
+                        
+                        JComponent c = (JComponent)e.getSource();
+                        if (p.getComponentCount() > 0) {
+                            if (c.getClientProperty("POPUP_LEFT") != null) p.show(c, c.getWidth() + 1, 0); // NOI18N
+                            else p.show(c, 0, c.getHeight() + 1);
+                        }
+                        
+                    }
+                }
+            };
+            
+            JButton saveButton = new JButton(saveAction);
+            saveButton.setHideActionText(true);
 //            
 //            editAction = new AbstractAction(Bundle.OQLConsoleView_EditAction(), Icons.getIcon(HeapWalkerIcons.RULES)) {
 //                {
@@ -484,10 +487,10 @@ class RConsoleView extends HeapViewerFeature {
     //        toolbar.addSpace(2);
             toolbar.add(cancelButton);
             
-//            toolbar.addSpace(5);
-//            
-//            toolbar.add(loadButton);
-//            toolbar.add(saveButton);
+            toolbar.addSpace(5);
+            
+            toolbar.add(loadButton);
+            toolbar.add(saveButton);
 //            toolbar.add(editButton);
 
 //            resultsToolbar = ProfilerToolbar.create(false);
@@ -656,9 +659,9 @@ class RConsoleView extends HeapViewerFeature {
             controls.setBorderPainted(false);
             controls.add(runAction);
             controls.add(cancelAction);
-//            controls.addSeparator();
-//            controls.add(loadAction).putClientProperty("POPUP_LEFT", Boolean.TRUE); // NOI18N
-//            controls.add(saveAction).putClientProperty("POPUP_LEFT", Boolean.TRUE); // NOI18N
+            controls.addSeparator();
+            controls.add(loadAction).putClientProperty("POPUP_LEFT", Boolean.TRUE); // NOI18N
+            controls.add(saveAction).putClientProperty("POPUP_LEFT", Boolean.TRUE); // NOI18N
 //            controls.add(editAction).putClientProperty("POPUP_LEFT", Boolean.TRUE); // NOI18N
             
             JPanel controlsContainer = new JPanel(new BorderLayout());
