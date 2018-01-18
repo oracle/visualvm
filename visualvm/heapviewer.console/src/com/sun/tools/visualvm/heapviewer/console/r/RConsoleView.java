@@ -26,6 +26,8 @@ package com.sun.tools.visualvm.heapviewer.console.r;
 
 import com.sun.tools.visualvm.core.ui.components.ScrollableContainer;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
+import com.sun.tools.visualvm.heapviewer.console.r.engine.REngine;
+import com.sun.tools.visualvm.heapviewer.console.r.engine.REngine.ObjectVisitor;
 import com.sun.tools.visualvm.heapviewer.java.ClassNode;
 import com.sun.tools.visualvm.heapviewer.java.InstanceNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
@@ -40,6 +42,8 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -61,6 +65,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import org.netbeans.lib.profiler.ProfilerLogger;
+import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.UIUtils;
@@ -126,7 +132,7 @@ class RConsoleView extends HeapViewerFeature {
     private JLabel progressLabel;
     private JProgressBar progressBar;
     
-//    private OQLEngine engine;
+    private REngine engine;
     private REditorComponent editor;
     
     private JPanel resultsContainer;
@@ -141,7 +147,7 @@ class RConsoleView extends HeapViewerFeature {
     private boolean queryValid;
 //    
 //    // TODO: synchronize!
-//    private Set<HeapViewerNode> nodeResults;
+    private Set<HeapViewerNode> nodeResults;
     
     private RQueries.Query currentQuery;
     
@@ -150,16 +156,16 @@ class RConsoleView extends HeapViewerFeature {
         super("java_objects_rconsole", Bundle.RConsoleView_Name(), Bundle.RConsoleView_Description(), createIcon(), 1100); // NOI18N
         
         this.context = context;
-//        Heap heap = context.getFragment().getHeap();
+        Heap heap = context.getFragment().getHeap();
         
-//        engine = null;
-//        if (OQLEngine.isOQLSupported()) try {
-//            engine = new OQLEngine(context.getFragment().getHeap());
-//        } catch (Exception e) {
-////            ProfilerLogger.log(e);
-//        }
-//        
-//        if (engine != null) {
+        engine = null;
+        if (REngine.isSupported()) try {
+            engine = new REngine(heap);
+        } catch (Exception e) {
+            ProfilerLogger.log(e);
+        }
+        
+        if (engine != null) {
 //            TreeTableViewColumn[] ownColumns = new TreeTableViewColumn[] {
 //                new TreeTableViewColumn.Name(heap),
 //                new TreeTableViewColumn.Count(heap, false, false),
@@ -182,10 +188,10 @@ class RConsoleView extends HeapViewerFeature {
                     return RConsoleView.getNode(url, context);
                 }
             };
-//        } else {
+        } else {
 //            objectsView = null;
-//            htmlView = null;
-//        }
+            htmlView = null;
+        }
     }
 
     
@@ -203,8 +209,8 @@ class RConsoleView extends HeapViewerFeature {
     private void executeQuery() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-//                if (nodeResults == null) nodeResults = new HashSet();
-//                else nodeResults.clear();
+                if (nodeResults == null) nodeResults = new HashSet<>();
+                else nodeResults.clear();
 //                requestFocus();
                 executeQueryImpl(editor.getScript());
             }
@@ -214,11 +220,11 @@ class RConsoleView extends HeapViewerFeature {
     private void cancelQuery() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-//                try {
-//                    engine.cancelQuery();
-//                } catch (OQLException e) {
-//
-//                }
+                try {
+                    engine.cancelQuery();
+                } catch (Exception e) {
+
+                }
                 finalizeQuery(null);
             }
         });
@@ -298,22 +304,22 @@ class RConsoleView extends HeapViewerFeature {
 
                         sb.append("<table border='0' width='100%'>"); // NOI18N
 
-//                        try {
+                        try {
                             analysisRunning.compareAndSet(false, true);
                             queryStarted(progressModel);
                             progressUpdater.submit(new ProgressUpdater(progressModel));
-//                            engine.executeQuery(oqlQuery, new ObjectVisitor() {
-//                                public boolean visit(Object o) {
-////                                    System.err.println(">>> Visiting object " + o);
-//                                    sb.append(oddRow[0] ?
-//                                        "<tr><td style='background-color: " + // NOI18N
-//                                        oddRowBackgroundString + ";'>" : "<tr><td>"); // NOI18N
-//                                    oddRow[0] = !oddRow[0];
-//                                    dump(o, sb);
-//                                    sb.append("</td></tr>"); // NOI18N
-//                                    return counter.decrementAndGet() == 0 || (!analysisRunning.get() && !engine.isCancelled()); // process all hits while the analysis is running
-//                                }
-//                            });
+                            engine.executeQuery(rQuery, new ObjectVisitor() {
+                                public boolean visit(Object o) {
+//                                    System.err.println(">>> Visiting object " + o);
+                                    sb.append(oddRow[0] ?
+                                        "<tr><td style='background-color: " + // NOI18N
+                                        oddRowBackgroundString + ";'>" : "<tr><td>"); // NOI18N
+                                    oddRow[0] = !oddRow[0];
+                                    dump(o, sb);
+                                    sb.append("</td></tr>"); // NOI18N
+                                    return counter.decrementAndGet() == 0 || (!analysisRunning.get() && !engine.isCancelled()); // process all hits while the analysis is running
+                                }
+                            });
 
                             if (counter.get() == 0) {
                                 sb.append("<tr><td>");  // NOI18N
@@ -328,15 +334,15 @@ class RConsoleView extends HeapViewerFeature {
                             sb.append("</table>"); // NOI18N
 
                             finalizeQuery(sb.toString());
-//                        } catch (OQLException oQLException) {
-//                            StringBuilder errorMessage = new StringBuilder();
-//                            errorMessage.append("<h2>").append("Query error").append("</h2>"); // NOI18N
-//                            errorMessage.append("Bad OQL query"); // NOI18N
-//                            errorMessage.append("<hr>"); // noi18n
-//                            errorMessage.append(oQLException.getLocalizedMessage().replace("\n", "<br>").replace("\r", "<br>"));
-//                            
-//                            finalizeQuery(errorMessage.toString());
-//                        }
+                        } catch (Exception oQLException) {
+                            StringBuilder errorMessage = new StringBuilder();
+                            errorMessage.append("<h2>").append("Query error").append("</h2>"); // NOI18N
+                            errorMessage.append("Bad R query"); // NOI18N
+                            errorMessage.append("<hr>"); // noi18n
+                            errorMessage.append(oQLException.getLocalizedMessage().replace("\n", "<br>").replace("\r", "<br>"));
+                            
+                            finalizeQuery(errorMessage.toString());
+                        }
                     }
 
                 });
@@ -345,6 +351,13 @@ class RConsoleView extends HeapViewerFeature {
     }
     
     
+    private void dump(Object o, StringBuilder sb) {
+        String text = o.toString();
+        
+        text = text.replace(" ", "&nbsp;");
+        sb.append("<code>").append(text).append("</code>\n");
+    }
+
     private void init() {
         toolbar = ProfilerToolbar.create(false);
 //        if (engine != null) {
