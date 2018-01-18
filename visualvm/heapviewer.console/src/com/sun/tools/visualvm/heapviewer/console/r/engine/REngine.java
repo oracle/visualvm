@@ -72,8 +72,8 @@ public class REngine {
         String javaToDfSrc =
                 "function(c1, c2, c3, c4) { " +
                 "   data.frame(ClassName=as.vector(c1, 'character')," +
-                "              Instances=as.vector(c2, 'integer')," +
-                "              ClassId=as.vector(c3, 'character')," +
+                "              ClassId=as.vector(c2, 'character')," +
+                "              Instances=as.vector(c3, 'integer')," +
                 "              InstancesSize=as.vector(c4, 'integer')," +
                 "stringsAsFactors = F)" +
                 "}";
@@ -81,10 +81,11 @@ public class REngine {
         List classes = heap.getAllClasses();
         rContext.exportSymbol("HeapClasses", javaToDf.execute(
                 new NamesArray(classes),
-                new InstancesArray(classes),
                 new ClassIDArray(classes),
+                new InstancesArray(classes),
                 new InstancesSizeArray(classes)));
         rContext.eval("R", "HeapClasses <- import('HeapClasses');");
+        rContext.eval("R", "options(width=256)");
     }
 
     public synchronized void cancelQuery() {
