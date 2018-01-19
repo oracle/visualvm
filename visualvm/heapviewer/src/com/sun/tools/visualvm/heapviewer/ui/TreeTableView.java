@@ -242,6 +242,11 @@ public class TreeTableView {
         treeTable.expandPath(HeapViewerNode.fromNode(node));
     }
     
+    public void collapseChildren(HeapViewerNode node) {
+        if (treeTable == null) return;
+        treeTable.collapseChildren(HeapViewerNode.fromNode(node));
+    }
+    
     
 //    protected void willBeSorted(List<RowSorter.SortKey> sortKeys) {}
     
@@ -380,6 +385,8 @@ public class TreeTableView {
                         HeapViewerNodeAction.Actions.forNode(node, actionProviders, context, actions, new PinAction(node), new ResetPinAction());
                 nodeActions.populatePopup(popup);
                 
+                TreeTableView.this.populatePopup(node, popup);
+                
                 if (popup.getComponentCount() > 0) popup.addSeparator();
                 popup.add(treeTable.createCopyMenuItem());
                 TreeTableView.this.populatePopupLast(node, popup);
@@ -497,6 +504,9 @@ public class TreeTableView {
         });
         
         return comp;
+    }
+    
+    protected void populatePopup(HeapViewerNode node, JPopupMenu popup) {
     }
     
     protected void populatePopupLast(HeapViewerNode node, JPopupMenu popup) {
