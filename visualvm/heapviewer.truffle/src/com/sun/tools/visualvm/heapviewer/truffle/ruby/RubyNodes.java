@@ -81,7 +81,7 @@ class RubyNodes {
             Instance symbol = symbolField instanceof ObjectFieldValue ? ((ObjectFieldValue)symbolField).getInstance() : null;
             
             if (symbol != null) logicalValue = DetailsUtils.getInstanceString(symbol, heap);
-        } else if ("Class".equals(type) || "ModuleType".equals(type)) {
+        } else if ("Class".equals(type) || "Module".equals(type)) {
             FieldValue fieldsField = dobject.getFieldValue("fields (hidden)");
             Instance fields = fieldsField instanceof ObjectFieldValue ? ((ObjectFieldValue)fieldsField).getInstance() : null;
             
