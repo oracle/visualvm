@@ -47,8 +47,10 @@ public class TruffleFrame {
     private static final String TRUFFLE_FRAME_FQN = "com.oracle.truffle.api.impl.DefaultVirtualFrame";  // NOI18N
     private static final String COMPILER_FRAME_NOBOX_FQN = "org.graalvm.compiler.truffle.FrameWithoutBoxing"; // NOI18N
     private static final String ENT_COMPILER_FRAME_NOBOX_FQN = "com.oracle.graal.truffle.FrameWithoutBoxing"; // NOI18N
+    private static final String COMPILER_FRAME_NOBOX1_FQN = "org.graalvm.compiler.truffle.runtime.FrameWithoutBoxing"; // NOI18N
     private static final String COMPILER_FRAME_BOX_FQN = "org.graalvm.compiler.truffle.FrameWithBoxing"; // NOI18N
     private static final String ENT_COMPILER_FRAME_BOX_FQN = "com.oracle.graal.truffle.FrameWithBoxing"; // NOI18N
+    private static final String COMPILER_FRAME_BOX1_FQN = "org.graalvm.compiler.truffle.runtime.FrameWithBoxing"; // NOI18N
     private static final String ARG_PREFIX = "arg";         // NOI18N
     private static final String LOCAL_UNDEFINED = "undefined"; // NOI18N
 
@@ -105,8 +107,10 @@ public class TruffleFrame {
     private static boolean isTruffleFrameSubClass(Instance truffleFrame) {
         return isSubClassOf(truffleFrame, TRUFFLE_FRAME_FQN)
                 || isSubClassOf(truffleFrame, COMPILER_FRAME_NOBOX_FQN)
+                || isSubClassOf(truffleFrame, COMPILER_FRAME_NOBOX1_FQN)
                 || isSubClassOf(truffleFrame, ENT_COMPILER_FRAME_NOBOX_FQN)
                 || isSubClassOf(truffleFrame, COMPILER_FRAME_BOX_FQN)
+                || isSubClassOf(truffleFrame, COMPILER_FRAME_BOX1_FQN)
                 || isSubClassOf(truffleFrame, ENT_COMPILER_FRAME_BOX_FQN);
     }
 

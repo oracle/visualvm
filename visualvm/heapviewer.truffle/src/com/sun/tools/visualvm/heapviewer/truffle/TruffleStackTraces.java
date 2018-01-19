@@ -239,10 +239,13 @@ public class TruffleStackTraces {
     private static class HotSpotTruffleRuntime {
 
         private static final String HOTSPOT_TRUFFLE_RUNTIME_FQN = "org.graalvm.compiler.truffle.hotspot.HotSpotTruffleRuntime"; // NOI18N
+        private static final String HOTSPOT_TRUFFLE_RUNTIME1_FQN = "org.graalvm.compiler.truffle.runtime.hotspot.HotSpotTruffleRuntime"; // NOI18N
 
         private static final String DEFAULT_CALL_TARGET_FQN = "com.oracle.truffle.api.impl.DefaultCallTarget";   // NOI18N
         private static final String OPTIMIZED_CALL_TARGET_FQN = "org.graalvm.compiler.truffle.OptimizedCallTarget"; //NOI18N
         private static final String ENT_OPTIMIZED_CALL_TARGET_FQN = "com.oracle.graal.truffle.OptimizedCallTarget"; // NOI18N
+
+        private static final String OPTIMIZED_CALL_TARGET1_FQN = "org.graalvm.compiler.truffle.runtime.OptimizedCallTarget"; // NOI18N
 
         private Collection<StackTrace> truffleStackTraces;
         private Instance hotSpotRuntime;
@@ -251,6 +254,9 @@ public class TruffleStackTraces {
         private HotSpotTruffleRuntime(Heap h) {
             heap = h;
             hotSpotRuntime = getSigleton(HOTSPOT_TRUFFLE_RUNTIME_FQN, heap);
+            if (hotSpotRuntime == null) {
+                hotSpotRuntime = getSigleton(HOTSPOT_TRUFFLE_RUNTIME1_FQN, heap);
+            }
         }
 
         private boolean isHotSpotTruffleRuntime() {
@@ -349,13 +355,17 @@ public class TruffleStackTraces {
         }
 
         private Frame visitFrame(List<JavaFrameGCRoot> callTargetFrame, List<JavaFrameGCRoot> callNodeFrame) {
-            Instance callTarget = findLocalInstance(callTargetFrame, DEFAULT_CALL_TARGET_FQN, OPTIMIZED_CALL_TARGET_FQN, ENT_OPTIMIZED_CALL_TARGET_FQN);
+            Instance callTarget = findLocalInstance(callTargetFrame,
+                                    DEFAULT_CALL_TARGET_FQN, OPTIMIZED_CALL_TARGET_FQN, ENT_OPTIMIZED_CALL_TARGET_FQN,
+                                    OPTIMIZED_CALL_TARGET1_FQN);
             TruffleFrame localFrame = findLocalFrame(callNodeFrame);
 
             if (callTarget != null && localFrame != null) {
                 return new Frame(heap, callTarget, localFrame);
             }
-            callTarget = findLocalInstance(callNodeFrame, DEFAULT_CALL_TARGET_FQN, OPTIMIZED_CALL_TARGET_FQN, ENT_OPTIMIZED_CALL_TARGET_FQN);
+            callTarget = findLocalInstance(callNodeFrame,
+                                    DEFAULT_CALL_TARGET_FQN, OPTIMIZED_CALL_TARGET_FQN, ENT_OPTIMIZED_CALL_TARGET_FQN,
+                                    OPTIMIZED_CALL_TARGET1_FQN);
             localFrame = findLocalFrame(callTargetFrame);
             if (callTarget != null && localFrame != null) {
                 return new Frame(heap, callTarget, localFrame);
@@ -420,6 +430,7 @@ public class TruffleStackTraces {
     private static final class FrameVisitor {
 
         private static final String GRAAL_FRAME_INSTANCE_FQN = "org.graalvm.compiler.truffle.GraalFrameInstance"; // NOI18N
+        private static final String GRAAL_FRAME_INSTANCE1_FQN = "org.graalvm.compiler.truffle.runtime.GraalFrameInstance";  // NOI18N
 
         private final HotSpotTruffleRuntime visitor;
         private final JavaMethod callOSRMethod;
@@ -430,11 +441,20 @@ public class TruffleStackTraces {
 
         FrameVisitor(HotSpotTruffleRuntime visitor, Heap heap, int skip) {
             this.visitor = visitor;
-            JavaClass frameClass = heap.getJavaClassByName(GRAAL_FRAME_INSTANCE_FQN);
+            JavaClass frameClass = getFrameClass(heap);
             callOSRMethod = new JavaMethod(heap, frameClass, "CALL_OSR_METHOD");  // NOI18N
             callTargetMethod = new JavaMethod(heap, frameClass, "CALL_TARGET_METHOD");  // NOI18N
             callNodeMethod = new JavaMethod(heap, frameClass, "CALL_NODE_METHOD");  // NOI18N
             skipFrames = skip;
+        }
+
+        private static JavaClass getFrameClass(Heap heap) {
+            JavaClass frameClass = heap.getJavaClassByName(GRAAL_FRAME_INSTANCE_FQN);
+
+            if (frameClass == null) {
+                frameClass = heap.getJavaClassByName(GRAAL_FRAME_INSTANCE1_FQN);
+            }
+            return frameClass;
         }
 
         private Frame visitFrame(StackTraceElement frame, List<JavaFrameGCRoot> locals) {
