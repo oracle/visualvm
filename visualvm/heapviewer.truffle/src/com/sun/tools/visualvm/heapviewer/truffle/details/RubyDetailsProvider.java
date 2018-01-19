@@ -54,12 +54,14 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
     private static final String ENCODING_MASK = "org.jcodings.Encoding+";   // NOI18N
     private static final String MODULE_FIELDS_MASK = "org.truffleruby.core.module.ModuleFields"; // NOI18N
     private static final String BASIC_LAYOUT_MASK= "org.truffleruby.core.basicobject.BasicObjectLayoutImpl$BasicObjectType+"; // NI18N
+    private static final String METHOD_INFO_MASK = "org.truffleruby.language.methods.SharedMethodInfo"; // NOi18N
+    private static final String RUBY_ROOT_NODE_MASK = "org.truffleruby.language.RubyRootNode"; // NOI18N\
 
     public RubyDetailsProvider() {
         super(RUBY_OBJECT_TYPE_MASK,ASCII_ROPE_MASK,CONCAT_ROPE_MASK,SUB_ROPE_MASK,
                 ROPE_TABLE_KEY_MASK,INVALID_ROPE_MASK,VALID_ROPE_MASK,
                 INT_ROPE_MASK, ENCODING_MASK, MODULE_FIELDS_MASK,
-                BASIC_LAYOUT_MASK);
+                BASIC_LAYOUT_MASK, METHOD_INFO_MASK, RUBY_ROOT_NODE_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -145,6 +147,17 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
 
                 return DetailsUtils.getInstanceString(fields.getInstance(), heap);
             }
+        }
+        if (METHOD_INFO_MASK.equals(className)) {
+            Instance name = (Instance) instance.getValueOfField("name");   // NOI18N
+
+            if (name == null) {
+                name = (Instance) instance.getValueOfField("notes");   // NOI18N
+            }
+            return DetailsUtils.getInstanceString(name, heap);
+        }
+        if (RUBY_ROOT_NODE_MASK.equals(className)) {
+            return DetailsUtils.getInstanceFieldString(instance, "sharedMethodInfo", heap);
         }
         return null;
     }

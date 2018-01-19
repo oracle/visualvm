@@ -39,6 +39,7 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
 
     private static final String DEFAULT_CALL_TARGET_MASK = "com.oracle.truffle.api.impl.DefaultCallTarget";   // NOI18N
     private static final String OPTIMIZED_CALL_TARGET_MASK = "org.graalvm.compiler.truffle.OptimizedCallTarget"; //NOI18N
+    private static final String OPTIMIZED_CALL_TARGET1_MASK = "org.graalvm.compiler.truffle.runtime.OptimizedCallTarget"; // NOI18N
     private static final String ENT_OPTIMIZED_CALL_TARGET_MASK = "com.oracle.graal.truffle.OptimizedCallTarget"; // NOI18N
     private static final String LANG_INFO_MASK = "com.oracle.truffle.api.nodes.LanguageInfo"; // NOI18N
     private static final String LANG_CACHE_MASK = "com.oracle.truffle.api.vm.LanguageCache"; // NOI18N
@@ -46,7 +47,7 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
     private static final String INSTRUMENT_INFO_MASK = "com.oracle.truffle.api.InstrumentInfo"; // NOI18N
 
     public TruffleDetailsProvider() {
-        super(DEFAULT_CALL_TARGET_MASK, OPTIMIZED_CALL_TARGET_MASK,
+        super(DEFAULT_CALL_TARGET_MASK, OPTIMIZED_CALL_TARGET_MASK, OPTIMIZED_CALL_TARGET1_MASK,
                 ENT_OPTIMIZED_CALL_TARGET_MASK, LANG_INFO_MASK, LANG_CACHE_MASK,
                 POLYGLOT_MASK, INSTRUMENT_INFO_MASK);
     }
@@ -61,6 +62,7 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
             return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N 
         }
         if (OPTIMIZED_CALL_TARGET_MASK.equals(className)
+                || OPTIMIZED_CALL_TARGET1_MASK.equals(className)
                 || ENT_OPTIMIZED_CALL_TARGET_MASK.equals(className)) {
             String rootNode = DetailsUtils.getInstanceFieldString(instance, "rootNode", heap); // NOI18N
 

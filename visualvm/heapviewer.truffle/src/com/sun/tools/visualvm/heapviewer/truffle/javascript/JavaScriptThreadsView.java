@@ -46,6 +46,7 @@ import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
+import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
 import com.sun.tools.visualvm.heapviewer.ui.HTMLView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
@@ -78,7 +79,8 @@ public class JavaScriptThreadsView extends HeapViewerFeature {
         Heap heap = context.getFragment().getHeap();
         
         objectsView = new PluggableTreeTableView(VIEW_OBJECTS_ID, context, actions, TreeTableViewColumn.instances(heap, false)) {
-            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders) {
+            @Override
+            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 return JavaScriptThreadsObjects.getThreads(root, heap);
             }
             protected void childrenChanged() {
