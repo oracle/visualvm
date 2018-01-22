@@ -97,7 +97,7 @@ class RubyThreadsHTML {
                 List<TruffleStackTraces.Frame> frames = st.getFrames();
                 for (TruffleStackTraces.Frame f : frames) {
                     List<FieldValue> fields = f.getFieldValues();
-                    sb.append("    at "+f.getName()+"()");
+                    sb.append("    at "+HeapUtils.htmlize(f.getName()));
                     sb.append("<br>");  // NOI18N
 
     //                if (!fields.isEmpty()) sb.append("        Locals:");
