@@ -132,6 +132,7 @@ public final class HeapUtils {
     
     
     public static String htmlize(String text) {
+        if (text == null) return null;
         return text.replace(">", "&gt;").replace("<", "&lt;"); // NOI18N
     }
     

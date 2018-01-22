@@ -59,6 +59,9 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.PluggableTreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
+import javax.swing.AbstractAction;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -74,7 +77,9 @@ import org.openide.util.lookup.ServiceProvider;
     "JavaThreadsView_TooltipObjects=Objects",
     "JavaThreadsView_TooltipHTML=HTML",
     "JavaThreadsView_Details=Details:",
-    "JavaThreadsView_SelectAction=Select in Threads"
+    "JavaThreadsView_SelectAction=Select in Threads",
+    "JavaThreadsView_ExpandAction=Expand All Threads",
+    "JavaThreadsView_CollapseAction=Collapse All Threads"
 })
 public class JavaThreadsView extends HeapViewerFeature {
     
@@ -111,6 +116,35 @@ public class JavaThreadsView extends HeapViewerFeature {
             protected void childrenChanged() {
                 CCTNode[] children = getRoot().getChildren();
                 for (CCTNode child : children) expandNode((HeapViewerNode)child);
+            }
+            @Override
+            protected void populatePopup(HeapViewerNode node, JPopupMenu popup) {
+                if (popup.getComponentCount() > 0) popup.addSeparator();
+                
+                popup.add(new AbstractAction(Bundle.JavaThreadsView_ExpandAction()) {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                CCTNode[] children = getRoot().getChildren();
+                                for (CCTNode child : children) expandNode((HeapViewerNode)child);
+                            }
+                        });
+                    }
+                });
+                
+                popup.add(new AbstractAction(Bundle.JavaThreadsView_CollapseAction()) {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                collapseChildren((HeapViewerNode)getRoot());
+                            }
+                        });
+                    }
+                });
             }
         };
         objectsView.setViewName(Bundle.JavaThreadsView_Name());
