@@ -49,7 +49,7 @@ import com.sun.tools.visualvm.heapviewer.model.TextNode;
  */
 class RubyThreadsObjects {
     
-    private static final String RUBY_THREAD_NAME_PREFIX = "Ruby Thread";
+//    private static final String RUBY_THREAD_NAME_PREFIX = "Ruby Thread";
     
     
     static HeapViewerNode[] getThreads(RootNode rootNode, Heap heap) {
@@ -64,7 +64,7 @@ class RubyThreadsObjects {
             for (TruffleStackTraces.StackTrace st : threads) {
                 Instance threadInstance = st.getThread();
                 String threadName = DetailsSupport.getDetailsString(threadInstance, heap);
-                if (threadName == null || !threadName.startsWith(RUBY_THREAD_NAME_PREFIX)) continue;
+                if (threadName == null /*|| !threadName.startsWith(RUBY_THREAD_NAME_PREFIX)*/) continue;
                 
                 final List<HeapViewerNode> stackFrameNodes = new ArrayList();
                 ThreadNode threadNode = new ThreadNode(threadName, threadInstance) {
@@ -97,7 +97,9 @@ class RubyThreadsObjects {
 
                     }
     //                List<FieldValue> fields = f.getFieldValues();
-                    stackFrameNodes.add(new TruffleStackFrameNode(f.getName(), localObjects.toArray(HeapViewerNode.NO_NODES)));
+                    String stackFrameName = f.getName();
+                    if (stackFrameName == null) stackFrameName = "<unknown>";
+                    stackFrameNodes.add(new TruffleStackFrameNode(stackFrameName, localObjects.toArray(HeapViewerNode.NO_NODES)));
     //                sb.append("    at "+f.getName()+"()");
     //                sb.append("<br>");  // NOI18N
     //

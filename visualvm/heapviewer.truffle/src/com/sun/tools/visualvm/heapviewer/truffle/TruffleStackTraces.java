@@ -37,6 +37,8 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.heap.JavaFrameGCRoot;
 import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
+import org.netbeans.lib.profiler.heap.ObjectFieldValue;
+import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
 import org.netbeans.lib.profiler.heap.ThreadObjectGCRoot;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 
@@ -89,12 +91,12 @@ public class TruffleStackTraces {
         private final List<FieldValue> fieldValues;
 
         private Frame(Heap heap, Instance callTarget, TruffleFrame localFrame) {
-            name = DetailsUtils.getInstanceString(callTarget, heap);
+            name = getFrameName(callTarget, heap);
             fieldValues = localFrame.getFieldValues();
         }
 
         private Frame(Heap heap, Instance callTarget, Instance localFrame) {
-            name = DetailsUtils.getInstanceString(callTarget, heap);
+            name = getFrameName(callTarget, heap);
             fieldValues = new TruffleFrame(localFrame).getFieldValues();
         }
 
@@ -105,6 +107,64 @@ public class TruffleStackTraces {
         public List<FieldValue> getFieldValues() {
             return fieldValues;
         }
+
+        private static String getFrameName(Instance callTarget, Heap heap) {
+            Instance rootNode = (Instance) callTarget.getValueOfField("rootNode");
+
+            if (rootNode != null) {
+                String name = DetailsUtils.getInstanceString(rootNode, heap);
+                Instance sourceSection = getSourceSection(rootNode);
+                if (sourceSection != null) {
+                    Instance source = (Instance) sourceSection.getValueOfField("source");
+                    if (source != null) {
+                        String fileName = DetailsUtils.getInstanceFieldString(source, "name", heap);
+                        int slash = fileName.lastIndexOf('/');
+
+                        if (slash != -1) {
+                            fileName = fileName.substring(slash+1);
+                        }
+                        return name+" ("+fileName+":"+getLineNumber(sourceSection, source)+")";
+                    }
+                }
+                return name;
+            }
+            return DetailsUtils.getInstanceString(callTarget, heap);
+        }
+    }
+
+    private static Instance getSourceSection(Instance rootNode) {
+        if (rootNode == null) return null;
+        for (Object fv : rootNode.getFieldValues()) {
+            FieldValue fieldVal  = (FieldValue) fv;
+
+            if ("sourceSection".equals(fieldVal.getField().getName())) {
+                Instance sc = ((ObjectFieldValue)fieldVal).getInstance();
+
+                if (sc != null) {
+                    return sc;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static String getLineNumber(Instance sourceSection, Instance source) {
+        Integer charIndex = (Integer) sourceSection.getValueOfField("charIndex");
+        Instance textmap = (Instance) source.getValueOfField("textMap");
+        if (textmap != null) {
+            PrimitiveArrayInstance nlOffsets = (PrimitiveArrayInstance) textmap.getValueOfField("nlOffsets");
+            List vals = nlOffsets.getValues();
+
+            for (int i=0; i<vals.size(); i++) {
+                Integer off = Integer.valueOf((String)vals.get(i));
+
+                if (off>=charIndex) {
+                    return String.valueOf(i);
+                }
+            }
+            return String.valueOf(vals.size());
+        }
+        return "0";
     }
 
     private static Instance getSigleton(String javaClass, Heap heap) {

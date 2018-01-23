@@ -74,7 +74,7 @@ public class RubyThreadsView extends HeapViewerFeature {
     
     
     public RubyThreadsView(HeapContext context, HeapViewerActions actions) {
-        super(FEATURE_ID, "Thread", "Thread", RubySupport.createBadgedIcon(ProfilerIcons.WINDOW_THREADS), 300);
+        super(FEATURE_ID, "Threads", "Threads", RubySupport.createBadgedIcon(ProfilerIcons.WINDOW_THREADS), 300);
         
         Heap heap = context.getFragment().getHeap();
         

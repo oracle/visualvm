@@ -97,7 +97,9 @@ class JavaScriptThreadsObjects {
 
                     }
     //                List<FieldValue> fields = f.getFieldValues();
-                    stackFrameNodes.add(new TruffleStackFrameNode(f.getName(), localObjects.toArray(HeapViewerNode.NO_NODES)));
+                    String stackFrameName = f.getName();
+                    if (stackFrameName == null) stackFrameName = "<unknown>";
+                    stackFrameNodes.add(new TruffleStackFrameNode(stackFrameName, localObjects.toArray(HeapViewerNode.NO_NODES)));
     //                sb.append("    at "+f.getName()+"()");
     //                sb.append("<br>");  // NOI18N
     //

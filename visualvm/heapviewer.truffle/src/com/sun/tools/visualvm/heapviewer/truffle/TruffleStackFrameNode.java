@@ -82,46 +82,42 @@ public class TruffleStackFrameNode extends StackFrameNode {
 
 
         public void setValue(Object value, int row) {
-            String val = value.toString();
-            
-            int idx = val.indexOf('@');
-            if (idx != -1) {
-                // JavaScript Node@hashCode
-                name2 = val.substring(0, idx);
-                detail = " (" + val.substring(idx) + ")";
+            if (value == null) {
+                // no value - fallback to <unknown>
+                name1 = "";
+                name2 = "<unknown>";
+                detail = "";
             } else {
-                idx = val.indexOf(' ');
-                if (idx != -1) {
-                    // Ruby node with resource
-                    name2 = val.substring(0, idx);
+                String val = value.toString();
+                
+                int idx = val.lastIndexOf(' ');
+                if (idx != -1) { // multiple strings
                     detail = val.substring(idx);
-                    
-                    idx = detail.lastIndexOf('/');
-                    if (idx != -1) {
-                        detail = detail.substring(idx + 1);
+                    if (detail.startsWith(" (")) {
+                        val = val.substring(0, idx); // detail contains source:line
+                    } else {
+                        detail = ""; // no detail available
                     }
                     
-                    if (!detail.startsWith(" (")) detail = " (" + detail + ")";
-                } else {
-                    // JavaScript function
-                    name2 = val;
-                    detail = " ()";
-                }
-            }
-            
-            idx = name2.lastIndexOf('.');
-            if (idx != -1) {
-                // JavaScript function in package
-                name1 = name2.substring(0, idx + 1);
-                name2 = name2.substring(idx + 1);
-            } else {
-                idx = name2.lastIndexOf('#');
-                if (idx > 0) {
-                    // Ruby method in module
-                    name1 = name2.substring(0, idx);
-                    name2 = name2.substring(idx);
-                } else {
+                    idx = val.startsWith("<") ? -1 : val.lastIndexOf(' ');
+                    if (idx != -1) { // multiple strings - last bold
+                        name2 = val.substring(idx + 1);
+                        name1 = val.substring(0, idx + 1);
+                    } else { // single string or meta value - all bold
+                        name1 = "";
+                        name2 = val;
+                    }
+                    
+                    idx = name2.lastIndexOf('.');
+                    if (idx != -1) { // class.method detected in last string - only method bold
+                        if (!name1.isEmpty()) name1 += " ";
+                        name1 = name1 + name2.substring(0, idx + 1);
+                        name2 = name2.substring(idx + 1);
+                    }
+                } else { // single string - all bold
                     name1 = "";
+                    name2 = val;
+                    detail = "";
                 }
             }
             

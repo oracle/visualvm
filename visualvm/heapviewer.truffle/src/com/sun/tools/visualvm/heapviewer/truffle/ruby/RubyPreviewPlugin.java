@@ -74,7 +74,7 @@ class RubyPreviewPlugin extends HeapViewPlugin {
         if (!(node instanceof DynamicObjectNode)) { component.showInstance(null); return; }
         
         DynamicObjectNode dnode = (DynamicObjectNode)node;
-        if ("ProcType".equals(dnode.getType())) {
+        if ("Proc".equals(dnode.getType())) {
             DynamicObject dobject = dnode.getDynamicObject();
             FieldValue dataField = dobject.getFieldValue("sharedMethodInfo (hidden)");
             Instance data = dataField instanceof ObjectFieldValue ? ((ObjectFieldValue)dataField).getInstance() : null;
