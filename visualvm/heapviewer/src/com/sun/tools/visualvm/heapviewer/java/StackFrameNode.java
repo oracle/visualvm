@@ -28,6 +28,7 @@ package com.sun.tools.visualvm.heapviewer.java;
 import org.netbeans.lib.profiler.heap.Heap;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.model.NodesCache;
 
 /**
  *
@@ -52,6 +53,11 @@ public class StackFrameNode extends HeapViewerNode {
     public String toString() {
         return getName();
     }
+    
+    
+    protected void resetChildren() {}
+   
+    public void forgetChildren(NodesCache cache) {}
     
     
     protected Object getValue(DataType type, Heap heap) {
