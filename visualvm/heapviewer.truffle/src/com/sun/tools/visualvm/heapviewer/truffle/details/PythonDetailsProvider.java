@@ -37,29 +37,30 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider(service = DetailsProvider.class)
 public class PythonDetailsProvider extends DetailsProvider.Basic {
 
-    private static final String PCLASS_MASK = "com.oracle.graal.python.runtime.standardtype.PythonClass+";   // NOI18N
-    private static final String PFUNCTION_MASK = "com.oracle.graal.python.runtime.function.PFunction";   // NOI18N
-    private static final String PNONE_MASK = "com.oracle.graal.python.runtime.datatype.PNone";   // NOI18N
-    private static final String PLIST_MASK = "com.oracle.graal.python.runtime.sequence.PList";   // NOI18N
+    private static final String PCLASS_MASK = "com.oracle.graal.python.builtins.objects.type.PythonClass+";   // NOI18N
+    private static final String PFUNCTION_MASK = "com.oracle.graal.python.builtins.objects.function.PFunction";   // NOI18N
+    private static final String PBUILDIN_FUNCTION_MASK = "com.oracle.graal.python.builtins.objects.function.PBuiltinFunction";   // NOI18N
+    private static final String PNONE_MASK = "com.oracle.graal.python.builtins.objects.PNone";   // NOI18N
+    private static final String PLIST_MASK = "com.oracle.graal.python.builtins.objects.list.PList";   // NOI18N
     private static final String BASIC_STORAGE_MASK = "com.oracle.graal.python.runtime.sequence.storage.BasicSequenceStorage+";   // NOI18N
     private static final String EMPTY_STORAGE_MASK = "com.oracle.graal.python.runtime.sequence.storage.EmptySequenceStorage"; // NOI18N
-    private static final String PTUPLE_MASK = "com.oracle.graal.python.runtime.sequence.PTuple"; // NOI18N
-    private static final String PMODULE_MASK = "com.oracle.graal.python.runtime.standardtype.PythonModule"; // NOI18N
-    private static final String PBYTES_MASK = "com.oracle.graal.python.runtime.sequence.PBytes"; // NOI18N
-    private static final String PCOMPLEX_MASK = "com.oracle.graal.python.runtime.datatype.PComplex"; // NOI18N
-    private static final String PEXCEPTION_MASK = "com.oracle.graal.python.runtime.exception.PythonExceptionObject"; // NOI18N
+    private static final String PTUPLE_MASK = "com.oracle.graal.python.builtins.objects.tuple.PTuple"; // NOI18N
+    private static final String PMODULE_MASK = "com.oracle.graal.python.builtins.objects.module.PythonModule"; // NOI18N
+    private static final String PBYTES_MASK = "com.oracle.graal.python.builtins.objects.bytes.PBytes"; // NOI18N
+    private static final String PCOMPLEX_MASK = "com.oracle.graal.python.builtins.objects.complex.PComplex"; // NOI18N
+    private static final String PEXCEPTION_MASK = "com.oracle.graal.python.runtime.exception.PException"; // NOI18N
 
     public PythonDetailsProvider() {
         super(PCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,BASIC_STORAGE_MASK,
               PTUPLE_MASK,PMODULE_MASK,PBYTES_MASK,EMPTY_STORAGE_MASK,
-              PCOMPLEX_MASK, PEXCEPTION_MASK);
+              PCOMPLEX_MASK,PEXCEPTION_MASK,PBUILDIN_FUNCTION_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
         if (PCLASS_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "className", heap);
         }
-        if (PFUNCTION_MASK.equals(className)) {
+        if (PFUNCTION_MASK.equals(className) || PBUILDIN_FUNCTION_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "name", heap);
         }
         if (PNONE_MASK.equals(className)) {

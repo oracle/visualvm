@@ -139,7 +139,8 @@ public class JavaScriptFieldsProvider extends HeapViewerNode.Provider {
         
         // display java.lang.** and com.oracle.truffle.js.runtime.objects.** fields
         if (className.startsWith("java.lang.") ||
-            className.startsWith("com.oracle.truffle.js.runtime.objects."))
+            className.startsWith("com.oracle.truffle.js.runtime.objects.") ||
+            className.startsWith("com.oracle.truffle.api.object.DynamicObject[]"))
             return true;
         
         return false;

@@ -50,8 +50,8 @@ public class PythonObject {
 
     public static final DataType<PythonObject> DATA_TYPE = new DataType<PythonObject>(PythonObject.class, null, null);
 
-    static final String PYTHON_OBJECT_FQN = "com.oracle.graal.python.runtime.object.PythonObject"; // NOI18N
-    static final String PYTHON_LIST_FQN = "com.oracle.graal.python.runtime.sequence.PList"; // NOI18N
+    static final String PYTHON_OBJECT_FQN = "com.oracle.graal.python.builtins.objects.object.PythonObject"; // NOI18N
+    static final String PYTHON_LIST_FQN = "com.oracle.graal.python.builtins.objects.list.PList"; // NOI18N
     static final String TREEMAP_ENTRY_FQN = "java.util.TreeMap$Entry";  // NOI18N
     static final String TREEMAP_FQN = "java.util.TreeMap";  // NOI18N
 
