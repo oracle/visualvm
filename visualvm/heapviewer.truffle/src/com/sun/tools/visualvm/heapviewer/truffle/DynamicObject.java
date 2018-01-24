@@ -622,8 +622,8 @@ public class DynamicObject {
                 Instance actualLoc = (Instance) loc.getValueOfField("arrayLocation");   // NOI18N
                 ObjectFieldValue arrayVal = (ObjectFieldValue) getValueImpl(actualLoc, dynamicObject);
                 PrimitiveArrayInstance arr = (PrimitiveArrayInstance) arrayVal.getInstance();
-                long i1 = Integer.valueOf((String) arr.getValues().get(index)) & 0xFFFFFFFF;
-                long i2 = Integer.valueOf((String) arr.getValues().get(index+1)) & 0xFFFFFFFF;
+                long i1 = Integer.valueOf((String) arr.getValues().get(index)) & 0xFFFFFFFFL;
+                long i2 = Integer.valueOf((String) arr.getValues().get(index+1)) & 0xFFFFFFFFL;
                 Double d = Double.longBitsToDouble(i2<<32 | i1);
                 return getFieldValue(dynamicObject, Double.toString(d));
             }
@@ -632,8 +632,8 @@ public class DynamicObject {
                 Instance actualLoc = (Instance) loc.getValueOfField("arrayLocation");   // NOI18N
                 ObjectFieldValue arrayVal = (ObjectFieldValue) getValueImpl(actualLoc, dynamicObject);
                 PrimitiveArrayInstance arr = (PrimitiveArrayInstance) arrayVal.getInstance();
-                long i1 = Integer.valueOf((String) arr.getValues().get(index)) & 0xFFFFFFFF;
-                long i2 = Integer.valueOf((String) arr.getValues().get(index+1)) & 0xFFFFFFFF;
+                long i1 = Integer.valueOf((String) arr.getValues().get(index)) & 0xFFFFFFFFL;
+                long i2 = Integer.valueOf((String) arr.getValues().get(index+1)) & 0xFFFFFFFFL;
                 long l = i2<<32 | i1;
                 return getFieldValue(dynamicObject, Long.toString(l));
             }
@@ -670,8 +670,8 @@ public class DynamicObject {
                     PrimitiveArrayInstance arr = (PrimitiveArrayInstance) array;
                     if (loc.getValueOfField("allowInt") != null) {  // NOI18N
                         // long, double
-                        long i1 = Integer.valueOf((String) arr.getValues().get(index)) & 0xFFFFFFFF;
-                        long i2 = Integer.valueOf((String) arr.getValues().get(index+1)) & 0xFFFFFFFF;
+                        long i1 = Integer.valueOf((String) arr.getValues().get(index)) & 0xFFFFFFFFL;
+                        long i2 = Integer.valueOf((String) arr.getValues().get(index+1)) & 0xFFFFFFFFL;
                         Double d = Double.longBitsToDouble(i2<<32 | i1);
                         return getFieldValue(dynamicObject, Double.toString(d));
                     }
@@ -717,8 +717,8 @@ public class DynamicObject {
                         // primitive FieldLocation, long double
                         FieldValue fv1 = getDynamicObjectPrimitiveField(dynamicObject, index);
                         FieldValue fv2 = getDynamicObjectPrimitiveField(dynamicObject, index+1);
-                        long i1 = Integer.valueOf(fv1.getValue()) & 0xFFFFFFFF;
-                        long i2 = Integer.valueOf(fv2.getValue()) & 0xFFFFFFFF;
+                        long i1 = Integer.valueOf(fv1.getValue()) & 0xFFFFFFFFL;
+                        long i2 = Integer.valueOf(fv2.getValue()) & 0xFFFFFFFFL;
                         Double d = Double.longBitsToDouble(i2<<32 | i1);
                         return getFieldValue(dynamicObject, Double.toString(d));
                     }
