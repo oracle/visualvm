@@ -98,6 +98,16 @@ class JavaScriptNodes {
 
                 return new Date((long)time).toString();
             }
+        } else if ("JSBoolean".equals(type) || "JSNumber".equals(type)) {
+            FieldValue valueField = dobject.getFieldValue("value (hidden)");
+
+            if (valueField != null) {
+                if (valueField instanceof ObjectFieldValue) {
+                    Instance val = ((ObjectFieldValue)valueField).getInstance();
+                    return DetailsSupport.getDetailsString(val, heap);
+                }
+                return valueField.getValue().toString();
+            }
         }
 
         return logicalValue;
