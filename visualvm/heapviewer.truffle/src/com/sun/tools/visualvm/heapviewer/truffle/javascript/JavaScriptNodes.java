@@ -38,6 +38,7 @@ import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectReferenceNode;
 import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectsContainer;
 import com.sun.tools.visualvm.heapviewer.truffle.LocalDynamicObjectNode;
+import java.util.Date;
 import org.netbeans.lib.profiler.heap.ArrayItemValue;
 
 /**
@@ -81,12 +82,22 @@ class JavaScriptNodes {
             logicalValue = sb.toString();
         } else if ("JSArray".equals(type)) {
             FieldValue lengthField = dobject.getFieldValue("length (hidden)");
+            if (lengthField == null) {
+                lengthField = dobject.getFieldValue("usedLength (hidden)");
+            }
             if (lengthField != null) {
                 Integer length = Integer.parseInt(lengthField.getValue());
                 logicalValue = Formatters.numberFormat().format(length) + (length == 1 ? " item" : " items");
             }
         } else if ("Null$NullClass".equals(type)) {
             return DetailsSupport.getDetailsString(dobject.getInstance(), heap);
+        } else if ("JSDate".equals(type)) {
+            FieldValue timeField = dobject.getFieldValue("timeMillis (hidden)");
+            if (timeField != null) {
+                double time = Double.parseDouble(timeField.getValue());
+
+                return new Date((long)time).toString();
+            }
         }
 
         return logicalValue;
