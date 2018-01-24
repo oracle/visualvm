@@ -56,15 +56,23 @@ public class HTMLTextComponent extends HTMLTextArea {
     
     public void addNotify() {
         super.addNotify();
-        if (neverDisplayed) addHierarchyListener(new HierarchyListener() {
-            public void hierarchyChanged(HierarchyEvent e) {
-                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && HTMLTextComponent.this.isShowing()) {
-                    neverDisplayed = false;
-                    HTMLTextComponent.this.removeHierarchyListener(this);
-                    HTMLTextComponent.this.firstDisplayed();
-                }
+        
+        if (neverDisplayed) {
+            if (isShowing()) {
+                neverDisplayed = false;
+                firstDisplayed();
+            } else {
+                addHierarchyListener(new HierarchyListener() {
+                    public void hierarchyChanged(HierarchyEvent e) {
+                        if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && HTMLTextComponent.this.isShowing()) {
+                            neverDisplayed = false;
+                            HTMLTextComponent.this.removeHierarchyListener(this);
+                            HTMLTextComponent.this.firstDisplayed();
+                        }
+                    }
+                });
             }
-        });
+        }
     }
     
     public final boolean neverDisplayed() {
