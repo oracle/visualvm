@@ -314,6 +314,9 @@ class RConsoleView extends HeapViewerFeature {
     
     
     private void executeQueryImpl(final String rQuery) {
+        Color b = graphsPanel.getBackground();
+        final String rgb = "rgb(" + b.getRed() + ", " + b.getGreen() + ", " + b.getBlue() + ", maxColorValue = 255)";
+        
         final BoundedRangeModel progressModel = new DefaultBoundedRangeModel(0, 10, 0, 100);
 
 //        SwingUtilities.invokeLater(new Runnable() {
@@ -347,6 +350,8 @@ class RConsoleView extends HeapViewerFeature {
                             int rImageH = rImage.getHeight(graphsPanel);
                             
                             rContext.eval("R", "function(g, w, h) { grDevices:::awt(w, h, g); }").execute(rGraphics, rImageW, rImageH);
+                            
+                            rContext.eval("R","library(grid); grid.rect(width = 1, height = 1, gp = gpar(col = " + rgb + ", fill = " + rgb + "));");
                             
                             engine.executeQuery(rQuery, new ObjectVisitor() {
                                 public boolean visit(Object o) {

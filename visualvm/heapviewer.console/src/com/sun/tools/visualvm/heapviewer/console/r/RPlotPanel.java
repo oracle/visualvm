@@ -24,9 +24,11 @@
  */
 package com.sun.tools.visualvm.heapviewer.console.r;
 
+import java.awt.AWTException;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.ImageCapabilities;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.ui.UIUtils;
 
@@ -52,7 +54,15 @@ class RPlotPanel extends JPanel {
         if (w <= 0 || h <= 0) {
             offscreenImage = null;
         } else {
-            offscreenImage = createImage(getWidth(), getHeight());
+            try {
+                offscreenImage = createVolatileImage(getWidth(), getHeight(), new ImageCapabilities(true));
+            } catch (AWTException e1) {
+                try {
+                    offscreenImage = createVolatileImage(getWidth(), getHeight(), new ImageCapabilities(false));
+                } catch (AWTException e2) {
+                    offscreenImage = createImage(getWidth(), getHeight());
+                }
+            }
         }
         
         return offscreenImage;
@@ -72,6 +82,5 @@ class RPlotPanel extends JPanel {
             g2.drawImage(img, 0, 0, w, h, null);
         }
     }
- 
     
 }
