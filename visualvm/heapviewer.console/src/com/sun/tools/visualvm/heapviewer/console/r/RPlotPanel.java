@@ -26,7 +26,6 @@ package com.sun.tools.visualvm.heapviewer.console.r;
 
 import java.awt.AWTException;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.ImageCapabilities;
 import javax.swing.JPanel;
@@ -77,10 +76,7 @@ class RPlotPanel extends JPanel {
         int h = getHeight();
         
         Image img = offscreenImage; // not synchronized, createPlotImage() called from worker thread
-        if (img != null && w > 0 && h > 0 && g instanceof Graphics2D) {
-            Graphics2D g2 = (Graphics2D)g;
-            g2.drawImage(img, 0, 0, w, h, null);
-        }
+        if (img != null && w > 0 && h > 0) g.drawImage(img, 0, 0, w, h, null);
     }
     
 }
