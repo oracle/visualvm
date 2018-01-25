@@ -39,8 +39,10 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
@@ -52,6 +54,7 @@ import javax.swing.Action;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -60,11 +63,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import org.graalvm.polyglot.Context;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
@@ -139,8 +144,11 @@ class RConsoleView extends HeapViewerFeature {
     private final HTMLView htmlView;
 //    private final PluggableTreeTableView objectsView;
     
-//    private JToggleButton rObjects;
-//    private JToggleButton rHTML;
+    private JPanel graphsContainer;
+    private RPlotPanel graphsPanel;
+    
+    private JToggleButton rResults;
+    private JToggleButton rGraphs;
     
     private final AtomicBoolean analysisRunning = new AtomicBoolean(false);
     private final ExecutorService progressUpdater = Executors.newSingleThreadExecutor();
@@ -158,14 +166,14 @@ class RConsoleView extends HeapViewerFeature {
         this.context = context;
         Heap heap = context.getFragment().getHeap();
         
-        engine = null;
-        if (REngine.isSupported()) try {
-            engine = new REngine(heap);
-        } catch (Exception e) {
-            ProfilerLogger.log(e);
-        }
+//        engine = null;
+//        if (REngine.isSupported()) try {
+//            engine = new REngine(heap);
+//        } catch (Exception e) {
+//            ProfilerLogger.log(e);
+//        }
         
-        if (engine != null) {
+//        if (engine != null) {
 //            TreeTableViewColumn[] ownColumns = new TreeTableViewColumn[] {
 //                new TreeTableViewColumn.Name(heap),
 //                new TreeTableViewColumn.Count(heap, false, false),
@@ -182,16 +190,38 @@ class RConsoleView extends HeapViewerFeature {
 //            };
 //            objectsView.setViewName(Bundle.OQLConsoleView_ViewName());
 
-            String htmlS = Bundle.RConsoleView_NothingExecuted().replace("<", "&lt;").replace(">", "&gt;"); // NOI18N
+            String htmlS = "<initializing R engine...>".replace("<", "&lt;").replace(">", "&gt;"); // NOI18N
             htmlView = new HTMLView("java_objects_rconsole", context, actions, "<p>&nbsp;&nbsp;" + htmlS + "</p>") { // NOI18N
+                @Override
+                protected String computeData(HeapContext context, String viewID) {
+                    if (REngine.isSupported()) try {
+                        engine = new REngine(heap);
+                    } catch (Exception e) {
+                        ProfilerLogger.log(e);
+                    }
+                    
+                    updateUIState();
+                    
+                    if (engine != null) {
+//                        SwingUtilities.invokeLater(new Runnable() {
+//                            public void run() { graphsPanel.setContext(engine.getContext()); graphsPanel.repaint(); }
+//                        });
+                        
+                        String htmlS = Bundle.RConsoleView_NothingExecuted().replace("<", "&lt;").replace(">", "&gt;"); // NOI18N
+                        return "<p>&nbsp;&nbsp;" + htmlS + "</p>"; // NOI18N
+                    } else {
+                        String htmlS = "<R engine not available>".replace("<", "&lt;").replace(">", "&gt;"); // NOI18N
+                        return "<p>&nbsp;&nbsp;" + htmlS + "</p>"; // NOI18N
+                    }
+                }
                 protected HeapViewerNode nodeForURL(URL url, HeapContext context) {
                     return RConsoleView.getNode(url, context);
                 }
             };
-        } else {
-//            objectsView = null;
-            htmlView = null;
-        }
+//        } else {
+////            objectsView = null;
+//            htmlView = null;
+//        }
     }
 
     
@@ -275,7 +305,7 @@ class RConsoleView extends HeapViewerFeature {
             loadAction.setEnabled(false);
             editor.setEditable(false);
         } else {
-            runAction.setEnabled(scriptLength > 0 && queryValid);
+            runAction.setEnabled(engine != null && scriptLength > 0 && queryValid);
             cancelAction.setEnabled(false);
             loadAction.setEnabled(true);
             editor.setEditable(true);
@@ -308,9 +338,18 @@ class RConsoleView extends HeapViewerFeature {
                             analysisRunning.compareAndSet(false, true);
                             queryStarted(progressModel);
                             progressUpdater.submit(new ProgressUpdater(progressModel));
+                            
+                            Context rContext = engine.getContext();
+                            
+                            Image rImage = graphsPanel.createPlotImage();
+                            Graphics rGraphics = rImage.getGraphics();
+                            int rImageW = rImage.getWidth(graphsPanel);
+                            int rImageH = rImage.getHeight(graphsPanel);
+                            
+                            rContext.eval("R", "function(g, w, h) { grDevices:::awt(w, h, g); }").execute(rGraphics, rImageW, rImageH);
+                            
                             engine.executeQuery(rQuery, new ObjectVisitor() {
                                 public boolean visit(Object o) {
-//                                    System.err.println(">>> Visiting object " + o);
                                     sb.append(oddRow[0] ?
                                         "<tr><td style='background-color: " + // NOI18N
                                         oddRowBackgroundString + ";'>" : "<tr><td>"); // NOI18N
@@ -320,6 +359,11 @@ class RConsoleView extends HeapViewerFeature {
                                     return counter.decrementAndGet() == 0 || (!analysisRunning.get() && !engine.isCancelled()); // process all hits while the analysis is running
                                 }
                             });
+                            
+                            rContext.eval("R","dev.off();");
+                            rGraphics.dispose();
+                            
+                            graphsPanel.repaint();
 
                             if (counter.get() == 0) {
                                 sb.append("<tr><td>");  // NOI18N
@@ -508,42 +552,44 @@ class RConsoleView extends HeapViewerFeature {
 
 //            resultsToolbar = ProfilerToolbar.create(false);
 //
-//            resultsToolbar.addSpace(2);
-//            resultsToolbar.addSeparator();
-//            resultsToolbar.addSpace(5);
-//
-//            resultsToolbar.add(new GrayLabel(Bundle.OQLConsoleView_Results()));
-//            resultsToolbar.addSpace(3);
+            toolbar.addSpace(2);
+            toolbar.addSeparator();
+            toolbar.addSpace(5);
 
-//            ButtonGroup resultsBG = new ButtonGroup();
-//
-//            rObjects = new JToggleButton(Icons.getIcon(ProfilerIcons.TAB_HOTSPOTS), true) {
-//                protected void fireItemStateChanged(ItemEvent e) {
+            toolbar.add(new GrayLabel("Results:"));
+            toolbar.addSpace(3);
+
+            ButtonGroup resultsBG = new ButtonGroup();
+
+            String rResultsPath = RConsoleView.class.getPackage().getName().replace('.', '/') + "/properties.png";
+            Image rResultsImage = ImageUtilities.loadImage(rResultsPath, true);
+            rResults = new JToggleButton(new ImageIcon(rResultsImage), true) {
+                protected void fireItemStateChanged(ItemEvent e) {
 //                    if (e.getStateChange() == ItemEvent.SELECTED) {
-//                        if (resultsContainer != null) ((CardLayout)resultsContainer.getLayout()).first(resultsContainer);
-//                        if (pluginsToolbar != null) pluginsToolbar.getComponent().setVisible(true);
+                        if (resultsContainer != null) resultsContainer.setVisible(isSelected());
 //                    }
-//                }
-//            };
-//            rObjects.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
-//            rObjects.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
-//            rObjects.setToolTipText(Bundle.OQLConsoleView_ObjectsTooltip());
-//            resultsBG.add(rObjects);
-//            resultsToolbar.add(rObjects);
-//            
-//            rHTML = new JToggleButton(Icons.getIcon(HeapWalkerIcons.PROPERTIES)) {
-//                protected void fireItemStateChanged(ItemEvent e) {
+                }
+            };
+            rResults.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+            rResults.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
+            rResults.setToolTipText("Text");
+//            resultsBG.add(rResults);
+            toolbar.add(rResults);
+            
+            String rGraphsPath = RConsoleView.class.getPackage().getName().replace('.', '/') + "/showGraphs.png";
+            Image rGraphsImage = ImageUtilities.loadImage(rGraphsPath, true);
+            rGraphs = new JToggleButton(new ImageIcon(rGraphsImage), true) {
+                protected void fireItemStateChanged(ItemEvent e) {
 //                    if (e.getStateChange() == ItemEvent.SELECTED) {
-//                        if (resultsContainer != null) ((CardLayout)resultsContainer.getLayout()).last(resultsContainer);
-//                        if (pluginsToolbar != null) pluginsToolbar.getComponent().setVisible(false);
+                        if (graphsContainer != null) graphsContainer.setVisible(isSelected());
 //                    }
-//                }
-//            };
-//            rHTML.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
-//            rHTML.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
-//            rHTML.setToolTipText(Bundle.OQLConsoleView_HTMLTooltip());
-//            resultsBG.add(rHTML);
-//            resultsToolbar.add(rHTML);
+                }
+            };
+            rGraphs.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
+            rGraphs.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
+            rGraphs.setToolTipText("Graphs");
+//            resultsBG.add(rGraphs);
+            toolbar.add(rGraphs);
 //
 //            if (objectsView.hasPlugins()) {
 //                pluginsToolbar = ProfilerToolbar.create(false);
@@ -573,8 +619,16 @@ class RConsoleView extends HeapViewerFeature {
             resultsContainer = new JPanel(new CardLayout());
 //            resultsContainer.add(objectsView.getComponent());
             resultsContainer.add(new ResultsView(htmlView.getComponent()));
+            
+            graphsPanel = new RPlotPanel();
+            graphsContainer = new JPanel(new BorderLayout());
+            graphsContainer.add(graphsPanel, BorderLayout.CENTER);
+            
+            MultiSplitContainer resultsSplit = new MultiSplitContainer();
+            resultsSplit.add(resultsContainer);
+            resultsSplit.add(graphsContainer);
 
-            JExtendedSplitPane masterSplit = new JExtendedSplitPane(JExtendedSplitPane.VERTICAL_SPLIT, true, resultsContainer, new EditorView(editor));
+            JExtendedSplitPane masterSplit = new JExtendedSplitPane(JExtendedSplitPane.VERTICAL_SPLIT, true, resultsSplit, new EditorView(editor));
             BasicSplitPaneDivider masterDivider = ((BasicSplitPaneUI)masterSplit.getUI()).getDivider();
             masterDivider.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, SEPARATOR_COLOR));
             masterDivider.setDividerSize(6);

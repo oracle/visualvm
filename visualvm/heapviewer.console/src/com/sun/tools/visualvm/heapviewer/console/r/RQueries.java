@@ -141,6 +141,20 @@ final class RQueries {
         popup.add(new PopupCaption(Bundle.RQueries_PopupCaptionLoad()));
         
         popup.add(new PopupSpacer(3));
+        
+        // --- Test query for development purposes
+        
+        popup.add(new PopupSeparator("Sample Scripts"));
+        
+        String script1 = "library(grid)\n" +
+                         "\n" +
+                         "grid.rect(width = 0.5, height = 0.45, gp=gpar(col=\"blue\",lwd=3))\n" +
+                         "grid.circle(x = 0.5, y = 0.5, r = 0.45, gp=gpar(col=\"red\",lwd=10))";
+        Query sample1 = new Query(script1, "Test Query 1", "Test query for development purposes");
+        popup.add(new QueryMenuItem(sample1, currentQuery, ICON_LOAD, null, handler));
+        
+        // ---
+        
 //        popup.add(new PopupSeparator(Bundle.RQueries_PopupCustomScripts()));
 //        
 //        if (customQueries.isEmpty()) {

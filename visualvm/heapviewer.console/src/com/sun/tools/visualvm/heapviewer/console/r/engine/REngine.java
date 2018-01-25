@@ -63,6 +63,7 @@ public class REngine {
 
     public REngine(Heap h) {
         heap = h;
+        initRContext();
     }
 
     private void initRContext() {
@@ -103,6 +104,10 @@ public class REngine {
         cancelled.set(false);
         outStream.setVisitor(objectVisitor);
         rContext.eval("R", rQuery);
+    }
+    
+    public Context getContext() {
+        return rContext;
     }
 
     public static interface ObjectVisitor {
