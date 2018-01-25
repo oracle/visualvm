@@ -146,12 +146,10 @@ final class RQueries {
         
         popup.add(new PopupSeparator("Sample Scripts"));
         
-        String script1 = "library(grid)\n" +
-                         "\n" +
-                         "grid.rect(width = 0.5, height = 0.45, gp=gpar(col=\"blue\",lwd=3))\n" +
+        String script1 = "grid.rect(width = 0.5, height = 0.45, gp=gpar(col=\"blue\",lwd=3))\n" +
                          "grid.circle(x = 0.5, y = 0.5, r = 0.45, gp=gpar(col=\"red\",lwd=10))";
-        Query sample1 = new Query(script1, "Test Query 1", "Test query for development purposes");
-        popup.add(new QueryMenuItem(sample1, currentQuery, ICON_LOAD, null, handler));
+        Query sample1 = new Query(script1, "Sample Script 1", "Sample script drawing blue rectangle and red circle");
+        popup.add(new QueryMenuItem(sample1, currentQuery, null, ICON_LOAD, null, handler));
         
         // ---
         
@@ -178,7 +176,7 @@ final class RQueries {
         if (externalQueries != null && !externalQueries.isEmpty()) {
             popup.add(new PopupSpacer(5));
             for (final Query query : externalQueries)
-                popup.add(new QueryMenuItem(query, currentQuery, ICON_LOAD, null, handler));
+                popup.add(new QueryMenuItem(query, currentQuery, null, ICON_LOAD, null, handler));
         }
         
 //        if (!predefinedCategories.isEmpty()) {
@@ -265,7 +263,7 @@ final class RQueries {
         if (externalQueries != null && !externalQueries.isEmpty()) {
             popup.add(new PopupSpacer(5));
             for (final Query query : externalQueries)
-                popup.add(new QueryMenuItem(query, currentQuery, ICON_SAVE, null, handler));
+                popup.add(new QueryMenuItem(query, currentQuery, queryText, ICON_SAVE, null, handler));
         }  
     }
     
@@ -399,7 +397,7 @@ final class RQueries {
                 file = new File(file.getParentFile(), file.getName() + ".r"); // NOI18N
             final File fileF = file;
             
-            String script = query.getScript();
+            String script = queryText;
             String name = file.getName();
             String description = file.getAbsolutePath();
             final Query queryF = new Query(script, name, description);
@@ -555,19 +553,22 @@ final class RQueries {
     private static class QueryMenuItem extends JMenuItem {
         
         private final Query query;
+        private final String queryText;
         private final Icon icon;
         private final Handler handler;
         
-        QueryMenuItem(Query query, Query current, Icon icon, JMenu owner, Handler handler) {
+        QueryMenuItem(Query query, Query current, String queryText, Icon icon, JMenu owner, Handler handler) {
             super(getName(query, current, owner), ICON_EMPTY);
             
             this.query = query;
+            this.queryText = queryText;
             this.icon = icon;
             this.handler = handler;
         }
         
         protected void fireActionPerformed(ActionEvent e) {
             super.fireActionPerformed(e);
+            if (queryText != null) query.setScript(queryText);
             handler.querySelected(query);
         }
         
