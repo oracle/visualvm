@@ -86,6 +86,8 @@ public class REngine {
                 new InstancesArray(classes),
                 new InstancesSizeArray(classes)));
         rContext.eval("R", "HeapClasses <- import('HeapClasses');");
+        rContext.exportSymbol("heap", heap);
+        rContext.eval("R", "heap <- import('heap');");
         rContext.eval("R", "options(width=256)");
     }
 
