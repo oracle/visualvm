@@ -147,7 +147,8 @@ final class RQueries {
         popup.add(new PopupSeparator("Sample Scripts"));
         
         String script1 = "grid.rect(width = 0.5, height = 0.45, gp=gpar(col=\"blue\",lwd=3))\n" +
-                         "grid.circle(x = 0.5, y = 0.5, r = 0.45, gp=gpar(col=\"red\",lwd=10))";
+                         "grid.circle(x = 0.5, y = 0.5, r = 0.45, gp=gpar(col=\"red\",lwd=10))\n" +
+                         "grid.text(\"Box and Circle\")";
         Query sample1 = new Query(script1, "Sample Script 1", "Sample script drawing blue rectangle and red circle", null);
         popup.add(new QueryMenuItem(sample1, currentQuery, null, ICON_LOAD, null, handler));
         
