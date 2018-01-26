@@ -82,11 +82,15 @@ public class JavaHeapSummaryView extends HeapViewerFeature {
     private JComponent component;
     private ProfilerToolbar toolbar;
     
+    private String summaryText;
+    
     
     public JavaHeapSummaryView(HeapContext context) {
         super("java_heap_summary", Bundle.JavaHeapSummaryView_Name(), Bundle.JavaHeapSummaryView_Description(),
                Icons.getIcon(HeapWalkerIcons.PROPERTIES), 100); // NOI18N
         this.context = context;
+        
+        this.summaryText = createSummary();
     }
     
     
@@ -110,12 +114,13 @@ public class JavaHeapSummaryView extends HeapViewerFeature {
         toolbar = ProfilerToolbar.create(false);
         
         
-        HTMLTextArea text = new HTMLTextArea();
-        text.setText(createSummary());
+        HTMLTextArea text = new HTMLTextArea(summaryText);
         text.setCaretPosition(0);
         text.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         
         component = new ScrollableContainer(text);
+        
+        summaryText = null;
     }
     
     
