@@ -72,7 +72,7 @@ import org.openide.util.lookup.ServiceProvider;
 @NbBundle.Messages({
     "JavaThreadsView_Name=Threads",
     "JavaThreadsView_Description=Threads",
-    "JavaThreadsView_ComputingThreads=<br>&nbsp;&nbsp;computing threads...",
+    "JavaThreadsView_ComputingThreads=<br>&nbsp;&nbsp;&lt;computing threads...&gt;",
     "JavaThreadsView_Results=Results:",
     "JavaThreadsView_TooltipObjects=Objects",
     "JavaThreadsView_TooltipHTML=HTML",
