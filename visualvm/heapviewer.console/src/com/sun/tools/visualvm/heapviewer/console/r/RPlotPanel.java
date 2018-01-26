@@ -26,8 +26,11 @@ package com.sun.tools.visualvm.heapviewer.console.r;
 
 import java.awt.AWTException;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.ImageCapabilities;
+import java.awt.RenderingHints;
+import java.util.Objects;
 import javax.swing.JPanel;
 import org.netbeans.lib.profiler.ui.UIUtils;
 
@@ -39,10 +42,23 @@ class RPlotPanel extends JPanel {
     
     private Image offscreenImage;
     
+    private Boolean renderingQuality;
+    
     
     RPlotPanel() {
         setOpaque(true);
         setBackground(UIUtils.getProfilerResultsBackground());
+    }
+    
+    
+    final void setRenderingQuality(Boolean renderingQuality) {
+        boolean change = !Objects.equals(this.renderingQuality, renderingQuality);
+        this.renderingQuality = renderingQuality;
+        if (change) repaint();
+    }
+    
+    final Boolean getRenderingQuality() {
+        return renderingQuality;
     }
     
     
@@ -74,6 +90,12 @@ class RPlotPanel extends JPanel {
         
         int w = getWidth();
         int h = getHeight();
+        
+        if (renderingQuality != null && g instanceof Graphics2D) {
+            Object interpolation = renderingQuality ? RenderingHints.VALUE_INTERPOLATION_BICUBIC :
+                                                      RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
+            ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_INTERPOLATION, interpolation);
+        }
         
         Image img = offscreenImage; // not synchronized, createPlotImage() called from worker thread
         if (img != null && w > 0 && h > 0) g.drawImage(img, 0, 0, w, h, null);

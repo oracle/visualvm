@@ -148,7 +148,7 @@ final class RQueries {
         
         String script1 = "grid.rect(width = 0.5, height = 0.45, gp=gpar(col=\"blue\",lwd=3))\n" +
                          "grid.circle(x = 0.5, y = 0.5, r = 0.45, gp=gpar(col=\"red\",lwd=10))";
-        Query sample1 = new Query(script1, "Sample Script 1", "Sample script drawing blue rectangle and red circle");
+        Query sample1 = new Query(script1, "Sample Script 1", "Sample script drawing blue rectangle and red circle", null);
         popup.add(new QueryMenuItem(sample1, currentQuery, null, ICON_LOAD, null, handler));
         
         // ---
@@ -263,7 +263,11 @@ final class RQueries {
         if (externalQueries != null && !externalQueries.isEmpty()) {
             popup.add(new PopupSpacer(5));
             for (final Query query : externalQueries)
-                popup.add(new QueryMenuItem(query, currentQuery, queryText, ICON_SAVE, null, handler));
+                popup.add(new QueryMenuItem(query, currentQuery, queryText, ICON_SAVE, null, handler) {
+                    protected void handleActionPerformed(Query query, Handler handler) {
+                        saveQuery(query, handler);
+                    }
+                });
         }  
     }
     
@@ -328,7 +332,7 @@ final class RQueries {
                         String script = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
                         String name = file.getName();
                         String description = file.getAbsolutePath();
-                        final Query query = new Query(script, name, description);
+                        final Query query = new Query(script, name, description, file);
                         
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
@@ -358,7 +362,7 @@ final class RQueries {
         if (query == null) {
             String name = "query.r"; // NOI18N
             String descr = lastDirectory == null ? null : new File(lastDirectory, name).getPath();
-            query = new Query(queryText, name, descr);
+            query = new Query(queryText, name, descr, null);
         }
         
         String descr = query.getDescription();
@@ -395,43 +399,47 @@ final class RQueries {
             String fname = file.getName().toLowerCase();
             if (!fname.endsWith(".r") && !fname.endsWith(".txt")) // NOI18N
                 file = new File(file.getParentFile(), file.getName() + ".r"); // NOI18N
-            final File fileF = file;
             
             String script = queryText;
             String name = file.getName();
             String description = file.getAbsolutePath();
-            final Query queryF = new Query(script, name, description);
             
-            RequestProcessor.getDefault().post(new Runnable() {
-                public void run() {
-                    try {
-                        if (fileF.isFile() && !fileF.canWrite()) {
-                            ProfilerDialogs.displayError(Bundle.RQueries_InvalidScript());
-                            return;
-                        }
-
-                        Files.write(fileF.toPath(), queryF.getScript().getBytes());
-
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                handler.querySelected(queryF);
-
-                                if (externalQueries == null) externalQueries = new ArrayList(EXTERNAL_QUERIES_CACHE);
-                                if (containsQuery(externalQueries, queryF)) return;
-
-                                if (externalQueries.size() == EXTERNAL_QUERIES_CACHE)
-                                    externalQueries.remove(externalQueries.size() - 1);
-
-                                externalQueries.add(0, queryF);
-                            }
-                        });
-                    } catch (IOException ex) {
-                        ProfilerDialogs.displayError(Bundle.RQueries_SaveFailed());
-                        Exceptions.printStackTrace(ex);
-                    }
-                }
-            });
+            saveQuery(new Query(script, name, description, file), handler);
         }
+    }
+    
+    private void saveQuery(final Query query, final Handler handler) {
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                try {
+                    File file = query.getFile();
+
+                    if (file.isFile() && !file.canWrite()) {
+                        ProfilerDialogs.displayError(Bundle.RQueries_InvalidScript());
+                        return;
+                    }
+
+                    Files.write(file.toPath(), query.getScript().getBytes());
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            handler.querySelected(query);
+                            
+                            if (externalQueries == null) externalQueries = new ArrayList(EXTERNAL_QUERIES_CACHE);
+                            if (containsQuery(externalQueries, query)) return;
+
+                            if (externalQueries.size() == EXTERNAL_QUERIES_CACHE)
+                                externalQueries.remove(externalQueries.size() - 1);
+
+                            externalQueries.add(0, query);
+                        }
+                    });
+                } catch (IOException ex) {
+                    ProfilerDialogs.displayError(Bundle.RQueries_SaveFailed());
+                    Exceptions.printStackTrace(ex);
+                }
+            }
+        });
     }
     
     
@@ -569,6 +577,10 @@ final class RQueries {
         protected void fireActionPerformed(ActionEvent e) {
             super.fireActionPerformed(e);
             if (queryText != null) query.setScript(queryText);
+            handleActionPerformed(query, handler);
+        }
+        
+        protected void handleActionPerformed(Query query, Handler handler) {
             handler.querySelected(query);
         }
         
@@ -597,16 +609,18 @@ final class RQueries {
         private String script;
         private String name;
         private String description;
+        private File file;
 
         
 //        public Query(OQLQueryDefinition qdef) {
 //            this(qdef.getContent(), qdef.getName(), qdef.getDescription());
 //        }
 
-        public Query(String script, String name, String description) {
+        public Query(String script, String name, String description, File file) {
             setScript(script);
             setName(name);
             setDescription(description);
+            this.file = file;
         }
 
 
@@ -636,6 +650,10 @@ final class RQueries {
 
         public String getDescription() {
             return description;
+        }
+        
+        public File getFile() {
+            return file;
         }
 
         public String toString() {

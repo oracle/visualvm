@@ -40,7 +40,9 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.net.URL;
@@ -54,7 +56,6 @@ import javax.swing.Action;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -77,6 +78,7 @@ import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
+import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
 import org.netbeans.lib.profiler.ui.swing.GrayLabel;
 import org.netbeans.modules.profiler.api.ProfilerDialogs;
 import org.netbeans.modules.profiler.api.icons.GeneralIcons;
@@ -124,6 +126,7 @@ class RConsoleView extends HeapViewerFeature {
     private ProfilerToolbar toolbar;
 //    private ProfilerToolbar pluginsToolbar;
 //    private ProfilerToolbar resultsToolbar;
+    private ProfilerToolbar graphsToolbar;
     private ProfilerToolbar progressToolbar;
     
     private JComponent component;
@@ -264,7 +267,7 @@ class RConsoleView extends HeapViewerFeature {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 updateUIState();
-//                resultsToolbar.getComponent().setVisible(false);
+                graphsToolbar.getComponent().setVisible(false);
                 progressToolbar.getComponent().setVisible(true);
                 progressBar.setModel(model);
             }
@@ -276,7 +279,7 @@ class RConsoleView extends HeapViewerFeature {
             public void run() {
                 updateUIState();
                 progressToolbar.getComponent().setVisible(false);
-//                resultsToolbar.getComponent().setVisible(true);
+                graphsToolbar.getComponent().setVisible(rGraphs.isSelected());
                 progressBar.setModel(new DefaultBoundedRangeModel(0, 0, 0, 0));
 //                objectsView.reloadView();
                 
@@ -348,6 +351,17 @@ class RConsoleView extends HeapViewerFeature {
                             Graphics rGraphics = rImage.getGraphics();
                             int rImageW = rImage.getWidth(graphsPanel);
                             int rImageH = rImage.getHeight(graphsPanel);
+                            
+                            Boolean renderingQuality = graphsPanel.getRenderingQuality();
+                            if (renderingQuality != null && rGraphics instanceof Graphics2D) {
+                                Graphics2D g2 = (Graphics2D)rGraphics;
+                                Object antialiasing = renderingQuality ? RenderingHints.VALUE_ANTIALIAS_ON :
+                                                                         RenderingHints.VALUE_ANTIALIAS_OFF;
+                                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antialiasing);
+                                Object text_antialiasing = renderingQuality ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON :
+                                                                              RenderingHints.VALUE_TEXT_ANTIALIAS_OFF;
+                                g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, text_antialiasing);
+                            }
                             
                             rContext.eval("R", "function(g, w, h) { grDevices:::awt(w, h, g); }").execute(rGraphics, rImageW, rImageH);
                             
@@ -516,7 +530,38 @@ class RConsoleView extends HeapViewerFeature {
 //            
 //            JButton editButton = new JButton(editAction);
 //            editButton.setHideActionText(true);
+
+            graphsPanel = new RPlotPanel();
             
+            graphsToolbar = ProfilerToolbar.create(false);
+
+            graphsToolbar.addSpace(2);
+            graphsToolbar.addSeparator();
+            graphsToolbar.addSpace(5);
+
+            graphsToolbar.add(new GrayLabel("Rendering Quality:"));
+            graphsToolbar.addSpace(2);
+            
+            Action defaultA = new AbstractAction("Default") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    graphsPanel.setRenderingQuality(null);
+                }
+            };
+            Action highA = new AbstractAction("High") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    graphsPanel.setRenderingQuality(Boolean.TRUE);
+                }
+            };
+            Action lowA = new AbstractAction("Low") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    graphsPanel.setRenderingQuality(Boolean.FALSE);
+                }
+            };
+            
+            graphsToolbar.add(new ActionPopupButton(defaultA, highA, lowA));
             
             progressToolbar = ProfilerToolbar.create(false);
             progressToolbar.getComponent().setVisible(false);
@@ -564,7 +609,7 @@ class RConsoleView extends HeapViewerFeature {
             toolbar.add(new GrayLabel("Results:"));
             toolbar.addSpace(3);
 
-            ButtonGroup resultsBG = new ButtonGroup();
+//            ButtonGroup resultsBG = new ButtonGroup();
 
             String rResultsPath = RConsoleView.class.getPackage().getName().replace('.', '/') + "/properties.png";
             Image rResultsImage = ImageUtilities.loadImage(rResultsPath, true);
@@ -586,7 +631,11 @@ class RConsoleView extends HeapViewerFeature {
             rGraphs = new JToggleButton(new ImageIcon(rGraphsImage), true) {
                 protected void fireItemStateChanged(ItemEvent e) {
 //                    if (e.getStateChange() == ItemEvent.SELECTED) {
-                        if (graphsContainer != null) graphsContainer.setVisible(isSelected());
+                        if (graphsContainer != null) {
+                            boolean selected = isSelected();
+                            graphsToolbar.getComponent().setVisible(selected && !progressToolbar.getComponent().isVisible());
+                            graphsContainer.setVisible(selected);
+                        }
 //                    }
                 }
             };
@@ -611,6 +660,8 @@ class RConsoleView extends HeapViewerFeature {
 //            }
 //
 //            toolbar.add(resultsToolbar);
+
+            toolbar.add(graphsToolbar);
             
             toolbar.add(progressToolbar);
 
@@ -625,7 +676,7 @@ class RConsoleView extends HeapViewerFeature {
 //            resultsContainer.add(objectsView.getComponent());
             resultsContainer.add(new ResultsView(htmlView.getComponent()));
             
-            graphsPanel = new RPlotPanel();
+//            graphsPanel = new RPlotPanel();
             graphsContainer = new JPanel(new BorderLayout());
             graphsContainer.add(graphsPanel, BorderLayout.CENTER);
             
