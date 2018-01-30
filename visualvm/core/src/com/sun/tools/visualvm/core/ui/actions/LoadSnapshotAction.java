@@ -72,7 +72,7 @@ class LoadSnapshotAction extends AbstractAction {
         List<SnapshotCategory> categories = RegisteredSnapshotCategories.sharedInstance().getOpenSnapshotCategories();
         if (categories.isEmpty()) return; // TODO: should display a notification dialog
         
-        List<FileFilter> fileFilters = new ArrayList();
+        final List<FileFilter> fileFilters = new ArrayList();
         for (SnapshotCategory category : categories) fileFilters.add(category.getFileFilter());
         
         JFileChooser chooser = new JFileChooser() {
@@ -86,19 +86,33 @@ class LoadSnapshotAction extends AbstractAction {
 
                 // grab the ui and set the filename
                 BasicFileChooserUI ui = (BasicFileChooserUI) getUI();
-                ui.setFileName(file == null ? "" : file.getName());
+                ui.setFileName(file == null ? "" : file.getName());  // NOI18N
             }            
         };
         chooser.setDialogTitle(NbBundle.getMessage(LoadSnapshotAction.class, "LBL_Load"));  // NOI18N
         chooser.setAcceptAllFileFilterUsed(false);
-        int filterIndex = 0;
+        FileFilter allFilesFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                for (FileFilter ff : fileFilters)
+                    if (ff.accept(f)) return true;
+                return false;
+            }
+            @Override
+            public String getDescription() {
+                return NbBundle.getMessage(LoadSnapshotAction.class, "LBL_All_Snapshots");  // NOI18N
+            }
+            
+        };
+        chooser.addChoosableFileFilter(allFilesFilter);
+        int filterIndex = -1;
         for (int i = 0; i < fileFilters.size(); i++) {
             FileFilter fileFilter = fileFilters.get(i);
             chooser.addChoosableFileFilter(fileFilter);
             if (fileFilter.getDescription().equals(lastFilter)) filterIndex = i;
         }
         if (lastFile != null) chooser.setSelectedFile(new File(lastFile));
-        chooser.setFileFilter(fileFilters.get(filterIndex));
+        chooser.setFileFilter(filterIndex == -1 ? allFilesFilter : fileFilters.get(filterIndex));
         if (chooser.showOpenDialog(WindowManager.getDefault().getMainWindow()) == JFileChooser.APPROVE_OPTION) {
             File selectedFile = chooser.getSelectedFile();
             if (selectedFile == null || !selectedFile.exists()) {
@@ -108,16 +122,24 @@ class LoadSnapshotAction extends AbstractAction {
                                             NotifyDescriptor.ERROR_MESSAGE));
             } else {
                 FileFilter fileFilter = chooser.getFileFilter();
-                if (fileFilter.accept(selectedFile)) {
+                if (fileFilter == allFilesFilter) {
+                    for (FileFilter ff : fileFilters)
+                        if (ff.accept(selectedFile)) {
+                            lastFile = selectedFile.getAbsolutePath();
+                            lastFilter = null;
+                            categories.get(fileFilters.indexOf(ff)).openSnapshot(selectedFile);
+                            return;
+                        }
+                } else if (fileFilter.accept(selectedFile)) {
                     lastFile = selectedFile.getAbsolutePath();
                     lastFilter = fileFilter.getDescription();
                     categories.get(fileFilters.indexOf(fileFilter)).openSnapshot(selectedFile);
-                } else {
-                    DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(
-                                            NbBundle.getMessage(LoadSnapshotAction.class,
-                                            "MSG_Selected_file_does_not_match_snapshot_type"), // NOI18N
-                                            NotifyDescriptor.ERROR_MESSAGE));
+                    return;
                 }
+                DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(
+                                        NbBundle.getMessage(LoadSnapshotAction.class,
+                                        "MSG_Selected_file_does_not_match_snapshot_type"), // NOI18N
+                                        NotifyDescriptor.ERROR_MESSAGE));
             }
         }
     }
