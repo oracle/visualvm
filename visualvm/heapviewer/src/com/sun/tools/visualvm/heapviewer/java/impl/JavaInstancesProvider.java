@@ -64,7 +64,7 @@ public class JavaInstancesProvider extends HeapViewerNode.Provider {
     }
     
     public boolean supportsView(Heap heap, String viewID) {
-        return true;
+        return !viewID.startsWith("diff"); // NOI18N
     }
     
     public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {

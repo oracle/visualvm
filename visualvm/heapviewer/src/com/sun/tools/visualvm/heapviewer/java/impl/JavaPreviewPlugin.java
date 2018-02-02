@@ -142,7 +142,7 @@ class JavaPreviewPlugin extends HeapViewPlugin {
     public static class Provider extends HeapViewPlugin.Provider {
 
         public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
-            if (JavaHeapFragment.isJavaHeap(context)) return new JavaPreviewPlugin(context);
+            if (!viewID.startsWith("diff") && JavaHeapFragment.isJavaHeap(context)) return new JavaPreviewPlugin(context); // NOI18N
             return null;
         }
         

@@ -53,11 +53,14 @@ import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
+import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.PluggableTreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
+import javax.swing.JButton;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -67,6 +70,7 @@ import org.openide.util.lookup.ServiceProvider;
 @NbBundle.Messages({
     "JavaObjectsView_Name=Objects",
     "JavaObjectsView_Description=Objects",
+    "JavaObjectsView_Compare=Compare with another heap dump...",
     "JavaObjectsView_AllObjects=All Objects",
     "JavaObjectsView_Dominators=Dominators",
     "JavaObjectsView_GcRoots=GC Roots",
@@ -105,6 +109,7 @@ public class JavaObjectsView extends HeapViewerFeature {
     }
     
     private final HeapContext context;
+    private final HeapViewerActions actions;
     
     private final PluggableTreeTableView objectsView;
     private ProfilerToolbar toolbar;
@@ -122,6 +127,7 @@ public class JavaObjectsView extends HeapViewerFeature {
         super("java_objects", Bundle.JavaObjectsView_Name(), Bundle.JavaObjectsView_Description(), Icons.getIcon(LanguageIcons.CLASS), 200); // NOI18N
         
         this.context = context;
+        this.actions = actions;
         
         Heap heap = context.getFragment().getHeap();
         
@@ -242,6 +248,28 @@ public class JavaObjectsView extends HeapViewerFeature {
     
     private void init() {
         toolbar = ProfilerToolbar.create(false);
+        
+        toolbar.addSpace(2);
+        toolbar.addSeparator();
+        toolbar.addSpace(2);
+        
+        JButton compareButton = new JButton(Icons.getIcon(ProfilerIcons.SNAPSHOTS_COMPARE)) {
+            protected void fireActionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        final JavaDiffDumpSelector.Result r = JavaDiffDumpSelector.selectSnapshot(context, false);
+                        if (r != null) new RequestProcessor().post(new Runnable() {
+                            public void run() {
+                                HeapView v = new JavaDiffObjectsView(context, r.getFile(), r.compareRetained(), actions);
+                                actions.addView(v, true);
+                            }
+                        });
+                    }
+                });
+            }
+        };
+        compareButton.setToolTipText(Bundle.JavaObjectsView_Compare());
+        toolbar.add(compareButton);
         
         toolbar.addSpace(2);
         toolbar.addSeparator();
