@@ -84,6 +84,8 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.PluggableTreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
 import com.sun.tools.visualvm.heapviewer.utils.HeapUtils;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JPopupMenu;
@@ -138,6 +140,8 @@ public class OQLConsoleView extends HeapViewerFeature {
     private static final int RESULTS_LIMIT = Integer.parseInt(System.getProperty("OQLController.limitResults", "100")); // NOI18N
     
     private static final Color SEPARATOR_COLOR = UIManager.getColor("Separator.foreground"); // NOI18N
+
+    private static final Logger LOGGER = Logger.getLogger(OQLConsoleView.class.getName());
     
     private final HeapContext context;
     private final HeapViewerActions actions;
@@ -626,6 +630,7 @@ public class OQLConsoleView extends HeapViewerFeature {
 
                             finalizeQuery(sb.toString());
                         } catch (OQLException oQLException) {
+                            LOGGER.log(Level.INFO, "Error executing OQL", oQLException);   // NOI18N
                             StringBuilder errorMessage = new StringBuilder();
                             errorMessage.append("<h2>").append(Bundle.OQLConsoleView_QueryError()).append("</h2>"); // NOI18N
                             errorMessage.append(Bundle.OQLConsoleView_BadQuery()); // NOI18N
