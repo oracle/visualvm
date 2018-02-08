@@ -58,6 +58,7 @@ import org.netbeans.lib.profiler.ui.swing.ProfilerPopupMenu;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.HeapViewer;
 import java.awt.Dimension;
+import java.io.File;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -87,7 +88,9 @@ public final class HeapViewerComponent extends JPanel {
         
         add(new JLabel(Bundle.HeapViewerComponent_LoadingProgress(), JLabel.CENTER), BorderLayout.CENTER);
         
-        new RequestProcessor("HPROF initializer for " + getName()).post(new Runnable() { // NOI18N
+        File file = heapViewer.getFile();
+        String name = file == null ? "<no heap dump file>" : file.getName(); // NOI18N
+        new RequestProcessor("HPROF initializer for " + name).post(new Runnable() { // NOI18N
             public void run() { initImpl(); }
         });
     }

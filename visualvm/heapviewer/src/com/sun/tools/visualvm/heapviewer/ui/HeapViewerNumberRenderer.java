@@ -60,7 +60,8 @@ public class HeapViewerNumberRenderer extends NumberPercentRenderer {
     public void setValue(Object value, int row) {
         super.setValue(value, row);
         
-        boolean showsPercents = !(Objects.equals(value, dataType.getNoValue())) &&
+        boolean showsPercents = !isDiffMode() &&
+                                !(Objects.equals(value, dataType.getNoValue())) &&
                                 !(Objects.equals(value, dataType.getUnsupportedValue())) &&
                                 !(Objects.equals(value, dataType.getNotAvailableValue()));
         valueRenderers()[1].getComponent().setVisible(showsPercents);

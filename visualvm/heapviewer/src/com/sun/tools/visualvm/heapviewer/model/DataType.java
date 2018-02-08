@@ -105,6 +105,8 @@ public class DataType<T> {
     
     public boolean computeValues(Heap heap, Runnable whenComputed) { return true; }
     
+    public void computeValuesImmediately(Heap heap) {}
+    
     public void notifyWhenAvailable(Heap heap, Runnable target) {}
     
     public T getNotAvailableValue() { return null; }
@@ -123,6 +125,8 @@ public class DataType<T> {
         public abstract boolean valuesAvailable(Heap heap);
     
         public abstract boolean computeValues(Heap heap, Runnable whenComputed);
+        
+        public abstract void computeValuesImmediately(Heap heap);
         
         protected void valuesComputed(Heap heap, Runnable whenComputed) {
             if (whenComputed != null) whenComputed.run();
@@ -180,7 +184,7 @@ public class DataType<T> {
             return heap.isRetainedSizeComputed() && heap.isRetainedSizeByClassComputed();
         }
         
-        public boolean computeValues(final Heap heap, final Runnable whenComputed) {
+        public boolean computeValues(final Heap heap, Runnable whenComputed) {
             if (computing) return true;
             
             if (!ProfilerDialogs.displayConfirmationDNSA(Bundle.RetainedSize_ComputeRetainedMsg(), 
@@ -190,20 +194,32 @@ public class DataType<T> {
             
             computing = true;
             new RequestProcessor("Retained Sizes Computer").post(new Runnable() { // NOI18N
-                public void run() {
-                    List<JavaClass> classes = heap.getAllClasses();
-                    if (classes.size() > 0) {
-                        ProgressHandle pd = ProgressHandle.createHandle(Bundle.RetainedSize_ComputingRetainedMsg());
-                        pd.start();
-                        classes.get(0).getRetainedSizeByClass();
-                        pd.finish();
-                    }
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() { computing = false; valuesComputed(heap, whenComputed); }
-                    });
-                }
+                public void run() { computeValuesImmediately(heap, whenComputed); }
             });
             return true;
+        }
+        
+        public void computeValuesImmediately(Heap heap) {
+            if (computing) return;
+            
+            computing = true;
+            computeValuesImmediately(heap, null);
+        }
+        
+        public void computeValuesImmediately(Heap heap, final Runnable whenComputed) {
+            List<JavaClass> classes = heap.getAllClasses();
+            if (classes.size() > 0) {
+                ProgressHandle pd = ProgressHandle.createHandle(Bundle.RetainedSize_ComputingRetainedMsg());
+                pd.start();
+                classes.get(0).getRetainedSizeByClass();
+                pd.finish();
+            }
+            
+            computing = false;
+            
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() { valuesComputed(heap, whenComputed); }
+            });
         }
         
     }
