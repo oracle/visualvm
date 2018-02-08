@@ -66,20 +66,20 @@ public class JavaClassesProvider {
         "Classes_Messages_NoPackages=<no packages>",
         "Classes_Messages_NoPackagesFilter=<no packages matching the filter>"
     })
-    private static final class Classes_Messages {
-        private static String getMoreNodesString(String moreNodesCount)  {
+    static final class Classes_Messages {
+        static String getMoreNodesString(String moreNodesCount)  {
             return Bundle.Classes_Messages_MoreNodes(moreNodesCount);
         }
-        private static String getSamplesContainerString(String objectsCount)  {
+        static String getSamplesContainerString(String objectsCount)  {
             return Bundle.Classes_Messages_SamplesContainer(objectsCount);
         }
-        private static String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+        static String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
             return Bundle.Classes_Messages_NodesContainer(firstNodeIdx, lastNodeIdx);
         }
-        private static String getNoClassesString(HeapViewerNodeFilter viewFilter) {
+        static String getNoClassesString(HeapViewerNodeFilter viewFilter) {
             return viewFilter == null ? Bundle.Classes_Messages_NoClasses() : Bundle.Classes_Messages_NoClassesFilter();
         }
-        private static String getNoPackagesString(HeapViewerNodeFilter viewFilter) {
+        static String getNoPackagesString(HeapViewerNodeFilter viewFilter) {
             return viewFilter == null ? Bundle.Classes_Messages_NoPackages() : Bundle.Classes_Messages_NoPackagesFilter();
         }
     }
@@ -111,7 +111,7 @@ public class JavaClassesProvider {
         return nodes.length == 0 ? new HeapViewerNode[] { new TextNode(Classes_Messages.getNoClassesString(viewFilter)) } : nodes;
     }
     
-    
+
     public static HeapViewerNode[] getHeapPackages(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
         List<HeapViewerNode> nodes = new ArrayList();
         Map<String, ClassesContainer.Objects> packages = new HashMap();
@@ -141,7 +141,7 @@ public class JavaClassesProvider {
                                  nodes.toArray(HeapViewerNode.NO_NODES);
     }
     
-    
+
     @NbBundle.Messages({
         "GCRoots_Messages_MoreNodes=<another {0} GC roots left>",
         "GCRoots_Messages_SamplesContainer=<sample {0} GC roots>",
