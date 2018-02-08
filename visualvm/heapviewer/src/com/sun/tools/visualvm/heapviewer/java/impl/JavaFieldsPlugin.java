@@ -119,7 +119,7 @@ class JavaFieldsPlugin extends HeapViewPlugin {
     public static class Provider extends HeapViewPlugin.Provider {
 
         public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
-            if (JavaHeapFragment.isJavaHeap(context)) return new JavaFieldsPlugin(context, actions);
+            if (!viewID.startsWith("diff") && JavaHeapFragment.isJavaHeap(context)) return new JavaFieldsPlugin(context, actions); // NOI18N
             return null;
         }
         
