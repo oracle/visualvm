@@ -47,11 +47,13 @@ profiler.snaptracer,\
 profiler.utilities"
 PROFILER_LIGHT="$PROFILER_LIGHT -Dvalidation.nb.cluster.profiler=profiler"
 
+OPTS=-Dbuild.compiler.debuglevel=source,lines
+
 cd nbbuild
 ant clean
-ant -Dname=platform rebuild-cluster
-ant -Dname=harness rebuild-cluster
-ant -Dname=profiler rebuild-cluster $PROFILER_LIGHT
+ant $OPTS -Dname=platform rebuild-cluster
+ant $OPTS -Dname=harness rebuild-cluster
+ant $OPTS -Dname=profiler rebuild-cluster $PROFILER_LIGHT
 
 # cleanup remote packs and cvm support
 rm -rf netbeans/ide/
@@ -62,9 +64,9 @@ rm -f netbeans/profiler/lib/jfluid-server-cvm.jar
 zip -r $BUILD_ROOT/$ZIPNAME.zip netbeans
 
 ant clean
-ant -Dlocales=ja,zh_CN -Dname=platform rebuild-cluster
-ant -Dlocales=ja,zh_CN -Dname=harness rebuild-cluster
-ant -Dlocales=ja,zh_CN -Dname=profiler rebuild-cluster $PROFILER_LIGHT
+ant $OPTS -Dlocales=ja,zh_CN -Dname=platform rebuild-cluster
+ant $OPTS -Dlocales=ja,zh_CN -Dname=harness rebuild-cluster
+ant $OPTS -Dlocales=ja,zh_CN -Dname=profiler rebuild-cluster $PROFILER_LIGHT
 
 # cleanup remote packs and cvm support
 rm -rf netbeans/ide/
