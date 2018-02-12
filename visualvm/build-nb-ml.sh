@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REV=41da26b7de7506c8
+REV=1132e7bb80b0b3560
 REV_L10N=1180ea1ceb30
 ZIPNAME=nb90_visualvm_`date "+%d%m%Y"`
 
