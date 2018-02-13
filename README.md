@@ -12,7 +12,7 @@ First download or clone this repository into directory `visualvm`. There are two
   * visualvm (`visualvm/visualvm`) - suite for the core VisualVM tool
   * plugins (`visualvm/plugins`) - suite for the VisualVM plugins available in Plugins Center
 
-## Get the dependencies
+## Configure the dependencies
   
 Then extract the [NetBeans 9.0 Dev platform and profiler binaries](visualvm/nb90_visualvm_12022018.zip) into directory `visualvm/visualvm` (should create `visualvm/visualvm/netbeans`).
 
