@@ -30,6 +30,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
+import javax.swing.Icon;
 
 /**
  *
@@ -38,7 +39,11 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
 public class ClassNodeRenderer extends JavaNameRenderer implements HeapViewerRenderer {
     
     public ClassNodeRenderer(Heap heap) {
-        super(Icons.getIcon(LanguageIcons.CLASS));
+        this(Icons.getIcon(LanguageIcons.CLASS), heap);
+    }
+    
+    public ClassNodeRenderer(Icon icon, Heap heap) {
+        super(icon);
     }
     
     public String getShortName() {
