@@ -50,7 +50,7 @@ import org.openide.util.lookup.ServiceProvider;
 public class JavaOpenNodeAction extends HeapViewerNodeAction.Provider {
     
     public boolean supportsView(HeapContext context, String viewID) {
-        return viewID.startsWith("java_") && JavaHeapFragment.getJavaContext(context) != null; // NOI18N
+        return (viewID.startsWith("java_") || viewID.startsWith("diff_java_")) && JavaHeapFragment.getJavaContext(context) != null; // NOI18N
     }
 
     public HeapViewerNodeAction[] getActions(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {

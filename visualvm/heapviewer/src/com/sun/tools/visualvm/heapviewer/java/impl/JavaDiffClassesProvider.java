@@ -25,13 +25,17 @@
 
 package com.sun.tools.visualvm.heapviewer.java.impl;
 
+import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.java.ClassNode;
+import com.sun.tools.visualvm.heapviewer.java.ClassNodeRenderer;
 import com.sun.tools.visualvm.heapviewer.java.ClassesContainer;
+import com.sun.tools.visualvm.heapviewer.java.JavaHeapFragment;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.TextNode;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
@@ -41,10 +45,18 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.accessibility.AccessibleContext;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.SortOrder;
+import javax.swing.UIManager;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -116,11 +128,11 @@ class JavaDiffClassesProvider {
                 DataType.RETAINED_SIZE.computeValuesImmediately(h2);
         }
         
-        Map<String, DiffClassNode> classes = new HashMap();
+        Map<JavaClassID, DiffClassNode> classes = new HashMap();
         
         List<JavaClass> classes1 = h1.getAllClasses();
         for (JavaClass jc1 : classes1) {
-            String id1 = jc1.getName();
+            JavaClassID id1 = JavaClassID.create(jc1);
             DiffClassNode djc1 = classes.get(id1);
             if (djc1 == null) {
                 djc1 = DiffClassNode.own(jc1, retained);
@@ -132,7 +144,7 @@ class JavaDiffClassesProvider {
         
         List<JavaClass> classes2 = h2.getAllClasses();
         for (JavaClass jc2 : classes2) {
-            String id2 = jc2.getName();
+            JavaClassID id2 = JavaClassID.create(jc2);
             DiffClassNode djc2 = classes.get(id2);
             if (djc2 == null) {
                 djc2 = DiffClassNode.external(new ExternalJavaClass(jc2, retained), retained);
@@ -145,9 +157,37 @@ class JavaDiffClassesProvider {
         return new ArrayList(classes.values());
     }
     
+    private static class JavaClassID {
+        
+        static JavaClassID create(JavaClass jc) {
+            return new JavaClassID(jc);
+        }
+        
+        
+        private final String id;
+        
+        private JavaClassID(JavaClass jc) {
+            id = jc.getName();
+        }
+        
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof JavaClassID)) return false;
+            return id.equals(((JavaClassID)o).id);
+        }
+
+        @Override
+        public int hashCode() {
+            return id.hashCode();
+        }
+        
+    }
+    
     private static class DiffClassNode extends ClassNode {
         
         private final boolean trackRetained;
+        
+        private final boolean ownClass;
         
         private int instancesCount;
         private long ownSize;
@@ -155,24 +195,30 @@ class JavaDiffClassesProvider {
         
         
         static DiffClassNode own(JavaClass ownClass, boolean trackRetained) {
-            DiffClassNode dClass = new DiffClassNode(ownClass, trackRetained);
+            DiffClassNode dClass = new DiffClassNode(ownClass, true, trackRetained);
             dClass.mergeOwn(ownClass);
             return dClass;
         }
         
         static DiffClassNode external(JavaClass externalClass, boolean trackRetained) {
-            DiffClassNode dClass = new DiffClassNode(externalClass, trackRetained);
+            DiffClassNode dClass = new DiffClassNode(externalClass, false, trackRetained);
             dClass.mergeExternal(externalClass);
             return dClass;
         }
         
         
-        private DiffClassNode(JavaClass jClass, boolean trackRetained) {
+        private DiffClassNode(JavaClass jClass, boolean ownClass, boolean trackRetained) {
             super(jClass);
             
             this.trackRetained = trackRetained;
+            this.ownClass = ownClass;
             
             setChildren(NO_NODES);
+        }
+        
+        
+        boolean isOwnClass() {
+            return this.ownClass;
         }
         
         
@@ -188,6 +234,10 @@ class JavaDiffClassesProvider {
             if (trackRetained) retainedSize -= externalClass.getRetainedSizeByClass();
         }
         
+        
+        public JavaClass getJavaClass() {
+            return isOwnClass() ? super.getJavaClass() : null;
+        }
         
         public int getInstancesCount() {
             return instancesCount;
@@ -207,7 +257,19 @@ class JavaDiffClassesProvider {
         }
         
         public ClassNode createCopy() {
-            return null;
+            return ownClass ? super.createCopy() : null;
+        }
+        
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) return true;
+            if (!(o instanceof ClassNode)) return false;
+            return getName().equals(((ClassNode)o).getName());
+        }
+
+        @Override
+        public int hashCode() {
+            return getName().hashCode();
         }
         
         
@@ -246,6 +308,96 @@ class JavaDiffClassesProvider {
             if (trackRetained) retainedSize += getRetainedSize(item, heap);
         }
         
+    }
+    
+    private static class DiffClassNodeRenderer implements HeapViewerRenderer {
+        
+        private final Heap heap;
+
+        private ClassNodeRenderer currentRenderer;
+        private ClassNodeRenderer ownRenderer;
+        private ClassNodeRenderer externalRenderer;
+        
+        
+        public DiffClassNodeRenderer(Heap heap) {
+            this.heap = heap;
+        }
+        
+        
+
+        @Override
+        public Icon getIcon() {
+            return currentRenderer.getIcon();
+        }
+
+        @Override
+        public String getShortName() {
+            return currentRenderer.getShortName();
+        }
+
+        
+        @Override
+        public void setValue(Object o, int i) {
+            if (o == null) return;
+            
+            DiffClassNode cdn = (DiffClassNode)o;
+            currentRenderer = cdn.isOwnClass() ? ownRenderer() : externalRenderer();
+            
+            currentRenderer.setValue(o, i);
+        }
+
+        @Override
+        public int getHorizontalAlignment() {
+            return currentRenderer.getHorizontalAlignment();
+        }
+
+        @Override
+        public JComponent getComponent() {
+            return currentRenderer.getComponent();
+        }
+
+        @Override
+        public void move(int i, int i1) {
+            currentRenderer.move(i, i1);
+        }
+
+        @Override
+        public AccessibleContext getAccessibleContext() {
+            return currentRenderer.getAccessibleContext();
+        }
+        
+        
+        private ClassNodeRenderer ownRenderer() {
+            if (ownRenderer == null) ownRenderer = new ClassNodeRenderer(heap);
+            return ownRenderer;
+        }
+        
+        private ClassNodeRenderer externalRenderer() {
+            if (externalRenderer == null) {
+//                Image dis = GrayFilter.createDisabledImage(Icons.getImage(LanguageIcons.CLASS));
+//                Icon dis = ImageUtilities.createDisabledIcon(Icons.getIcon(LanguageIcons.CLASS));
+                Icon dis = UIManager.getLookAndFeel().getDisabledIcon(new JLabel(), Icons.getIcon(LanguageIcons.CLASS));
+                externalRenderer = new ClassNodeRenderer(dis, heap);
+            }
+            return externalRenderer;
+        }
+        
+    }
+    
+    @ServiceProvider(service=HeapViewerRenderer.Provider.class)
+    public static class DiffClassNodeRendererProvider extends HeapViewerRenderer.Provider {
+
+        public boolean supportsView(HeapContext context, String viewID) {
+            return viewID.startsWith("diff") && JavaHeapFragment.isJavaHeap(context); // NOI18N
+        }
+
+        public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
+            Heap heap = context.getFragment().getHeap();
+
+            DiffClassNodeRenderer dcnRenderer = new DiffClassNodeRenderer(heap);
+            renderers.put(DiffClassNode.class, dcnRenderer);
+        }
+
     }
     
     private static class ExternalJavaClass implements JavaClass {
@@ -342,6 +494,18 @@ class JavaDiffClassesProvider {
         public JavaClass getSuperClass() {
             // NOTE: breaks Hierarchy details, better provide synthetic <unknown class>
             return null;
+        }
+        
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) return true;
+            if (!(o instanceof JavaClass)) return false;
+            return getName().equals(((JavaClass)o).getName());
+        }
+
+        @Override
+        public int hashCode() {
+            return getName().hashCode();
         }
         
     }
