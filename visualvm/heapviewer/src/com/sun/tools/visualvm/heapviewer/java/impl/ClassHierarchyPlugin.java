@@ -144,7 +144,7 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
     public static class Provider extends HeapViewPlugin.Provider {
 
         public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
-            if (!viewID.startsWith("diff") && JavaHeapFragment.isJavaHeap(context)) return new ClassHierarchyPlugin(context, actions); // NOI18N
+            if (JavaHeapFragment.isJavaHeap(context)) return new ClassHierarchyPlugin(context, actions); // NOI18N
             return null;
         }
         
