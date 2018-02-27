@@ -45,7 +45,7 @@ made subject to such option by the copyright holder.
 -->
 <project basedir="." default="netbeans" name="lib.profiler">
     <description>Builds, tests, and runs the project org.netbeans.lib.profiler</description>
-    <import file="../nbbuild/templates/projectized.xml"/>
+    <import file="nbproject/build-impl.xml"/>
 
   <!-- Compile the JFluid engine system library, that depends on JDK version - so there are two libraries -->
   <!-- Compile the engine system library -->

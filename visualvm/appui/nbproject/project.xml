@@ -93,7 +93,7 @@
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.103</specification-version>
+                        <specification-version>1.108</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -111,7 +111,7 @@
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.147</specification-version>
+                        <specification-version>1.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>

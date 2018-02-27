@@ -45,5 +45,5 @@ made subject to such option by the copyright holder.
 -->
 <project basedir="." default="netbeans" name="profiler.snaptracer">
     <description>Builds, tests, and runs the project org.netbeans.modules.profiler.snaptracer</description>
-    <import file="../nbbuild/templates/projectized.xml"/>
+    <import file="nbproject/build-impl.xml"/>
 </project>

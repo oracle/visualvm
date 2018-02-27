@@ -43,6 +43,7 @@ Contributor(s):
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
             <code-name-base>org.netbeans.modules.profiler.oql</code-name-base>
+            <suite-component/>
             <module-dependencies>
                 <dependency>
                     <code-name-base>org.netbeans.api.annotations.common</code-name-base>

@@ -45,7 +45,7 @@ made subject to such option by the copyright holder.
 -->
 <project basedir="." default="netbeans" name="profiler">
     <description>Builds, tests, and runs the project org.yourorghere.main</description>
-    <import file="../nbbuild/templates/projectized.xml"/>
+    <import file="nbproject/build-impl.xml"/>
     <property name="test.run.args" value="-Dnetbeans.keyring.no.master=true -Dnetbeans.full.hack=true  -client -Xss4m -Xms64m -Xmx512m -XX:PermSize=64m -XX:MaxPermSize=300m -Dsun.java2d.noddraw=true"/>
     
   <target name="netbeans-extra-ml" depends="release-ml" if="locales"/>

@@ -1,7 +1,9 @@
 /visualvm/nbproject/private/
 /visualvm/*/nbproject/private/
+/visualvm/libs.profiler/*/nbproject/private/
 /visualvm/launcher/windows-src/nbproject/private/
 /visualvm/*/build/
+/visualvm/libs.profiler/*/build/
 /plugins/*/build/
 /plugins/*/nbproject/private/
 /plugins/visualvm/
