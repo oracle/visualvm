@@ -1,0 +1,13 @@
+function overallocation(it) {
+    return (2 * it.offset) + (2 * (it.value.length - (1*it.count + 1*it.offset)));
+}
+
+function showOAinfo(it) {
+    return toHtml(it) + " wasting " + overallocation(it) + "b";
+}
+
+function overallocationdiff(lhs, rhs) {
+    return overallocation(rhs) - overallocation(lhs);
+}
+
+map(top(heap.objects("java.lang.String", false, 'overallocation(it) > 0'), overallocationdiff), showOAinfo);

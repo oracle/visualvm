@@ -1,0 +1,163 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common
+ * Development and Distribution License("CDDL") (collectively, the
+ * "License"). You may not use this file except in compliance with the
+ * License. You can obtain a copy of the License at
+ * http://www.netbeans.org/cddl-gplv2.html
+ * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+ * specific language governing permissions and limitations under the
+ * License.  When distributing the software, include this License Header
+ * Notice in each file and include the License file at
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Oracle in the GPL Version 2 section of the License file that
+ * accompanied this code. If applicable, add the following below the
+ * License Header, with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Contributor(s):
+ *
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
+ * If you wish your version of this file to be governed by only the CDDL
+ * or only the GPL Version 2, indicate your decision by adding
+ * "[Contributor] elects to include this software in this distribution
+ * under the [CDDL or GPL Version 2] license." If you do not indicate a
+ * single choice of license, a recipient has the option to distribute
+ * your version of this file under either the CDDL, the GPL Version 2 or
+ * to extend the choice of license to its licensees as provided above.
+ * However, if you add GPL Version 2 code and therefore, elected the GPL
+ * Version 2 license, then the option applies only if the new code is
+ * made subject to such option by the copyright holder.
+ */
+/*
+ * author Tomas Hurka
+ *        Ian Formanek
+ *        Misha Dmitriev
+ */
+
+#ifdef WIN32
+#include <Windows.h>
+#else
+#include <sys/time.h>
+#include <fcntl.h>
+#include <time.h>
+#endif
+
+#ifdef SOLARIS
+#define _STRUCTURED_PROC 1
+#include <sys/procfs.h>
+#include <unistd.h>
+#endif
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+
+#include "jni.h"
+#include "jvmti.h"
+
+#include "org_netbeans_lib_profiler_server_system_Timers.h"
+
+#include "common_functions.h"
+
+#ifdef CVM
+/*
+ * Class:     org_netbeans_lib_profiler_server_system_Timers
+ * Method:    getCurrentTimeInCounts
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_org_netbeans_lib_profiler_server_system_Timers_getCurrentTimeInCounts
+  (JNIEnv *env, jclass clz)
+{
+        jlong time;
+        jvmtiError res;
+
+        res = (*_jvmti)->GetTime(_jvmti,&time);
+        if (res != JVMTI_ERROR_NONE) fprintf(stderr, "Profiler Agent Error: GetTime failed with %d\n",res);
+        assert(res == JVMTI_ERROR_NONE);
+        return time;
+}
+
+#endif
+
+/*
+ * Class:     org_netbeans_lib_profiler_server_system_Timers
+ * Method:    getThreadCPUTimeInNanos
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_org_netbeans_lib_profiler_server_system_Timers_getThreadCPUTimeInNanos
+  (JNIEnv *env, jclass clz)
+{   
+	jlong threadTime;
+	jvmtiError res;
+	
+	res = (*_jvmti)->GetCurrentThreadCpuTime(_jvmti,&threadTime);
+	if (res != JVMTI_ERROR_NONE) fprintf(stderr, "Profiler Agent Error: GetCurrentThreadCpuTime failed with %d\n",res);
+	assert(res == JVMTI_ERROR_NONE);
+	return threadTime;
+}
+
+
+/*
+ * Class:     org_netbeans_lib_profiler_server_system_Timers
+ * Method:    osSleep
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Timers_osSleep
+  (JNIEnv *env, jclass clz, jint ns)
+{
+#ifndef WIN32
+    struct timespec rqtp;
+    rqtp.tv_sec = 0;
+    rqtp.tv_nsec = ns;
+    nanosleep(&rqtp, NULL);
+#endif
+}
+
+
+/*
+ * Class:     org_netbeans_lib_profiler_server_system_Timers
+ * Method:    enableMicrostateAccounting
+ * Signature: (Z)V
+ */
+JNIEXPORT void JNICALL Java_org_netbeans_lib_profiler_server_system_Timers_enableMicrostateAccounting
+  (JNIEnv *env, jclass clz, jboolean enable)
+{
+#ifdef SOLARIS
+    int ctlfd;
+    long ctl[2];
+    char procname[1024];
+
+    sprintf(procname, "/proc/%d/ctl", getpid());
+    ctlfd = open(procname, O_WRONLY);
+    if (ctlfd < 0) {
+        /*fprintf(stderr, "open %s failed, errno = %d\n", procname, errno);*/
+        return;
+    }
+
+    if (enable) {
+        ctl[0] = PCSET;
+    } else {
+        ctl[0] = PCUNSET;
+    }
+    ctl[1] = PR_MSACCT;
+    if (write(ctlfd, ctl, 2*sizeof(long)) < 0) {
+    /*
+        fprintf(stderr, "write failed, errno = %d\n", errno);
+    */
+    }
+    close(ctlfd);
+#endif
+}

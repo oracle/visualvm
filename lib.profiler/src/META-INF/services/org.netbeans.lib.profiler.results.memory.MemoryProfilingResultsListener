@@ -1,0 +1,2 @@
+org.netbeans.lib.profiler.results.memory.MemoryCallGraphBuilder
+org.netbeans.lib.profiler.results.locks.LockGraphBuilder$MemoryLockGraphBuilder

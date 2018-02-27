@@ -1,0 +1,8 @@
+simple.cpu.Region.run100()                                    23 
+ when called from simple.cpu.Region.<init>()                  3  
+  simple.cpu.Region.<init>()                                  1  
+   simple.cpu.Region.main(String[])                           1  
+ when called from simple.cpu.Region.run2000()                 20 
+  simple.cpu.Region.run2000()                                 1  
+   simple.cpu.Region.<init>()                                 1  
+    simple.cpu.Region.main(String[])                          1  

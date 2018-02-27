@@ -1,0 +1,3 @@
+org.netbeans.lib.profiler.results.cpu.CPUCallGraphBuilder
+org.netbeans.lib.profiler.results.locks.LockGraphBuilder$CPULockGraphBuilder
+org.netbeans.lib.profiler.results.jdbc.JdbcGraphBuilder

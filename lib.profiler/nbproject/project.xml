@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+
+Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+Other names may be trademarks of their respective owners.
+
+
+The contents of this file are subject to the terms of either the GNU
+General Public License Version 2 only ("GPL") or the Common
+Development and Distribution License("CDDL") (collectively, the
+"License"). You may not use this file except in compliance with the
+License. You can obtain a copy of the License at
+http://www.netbeans.org/cddl-gplv2.html
+or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+specific language governing permissions and limitations under the
+License.  When distributing the software, include this License Header
+Notice in each file and include the License file at
+nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
+particular file as subject to the "Classpath" exception as provided
+by Oracle in the GPL Version 2 section of the License file that
+accompanied this code. If applicable, add the following below the
+License Header, with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+
+Contributor(s):
+
+The Original Software is NetBeans. The Initial Developer of the Original
+Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+Microsystems, Inc. All Rights Reserved.
+
+If you wish your version of this file to be governed by only the CDDL
+or only the GPL Version 2, indicate your decision by adding
+"[Contributor] elects to include this software in this distribution
+under the [CDDL or GPL Version 2] license." If you do not indicate a
+single choice of license, a recipient has the option to distribute
+your version of this file under either the CDDL, the GPL Version 2 or
+to extend the choice of license to its licensees as provided above.
+However, if you add GPL Version 2 code and therefore, elected the GPL
+Version 2 license, then the option applies only if the new code is
+made subject to such option by the copyright holder.
+-->
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.apisupport.project</type>
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
+            <code-name-base>org.netbeans.lib.profiler</code-name-base>
+            <module-dependencies/>
+            <test-dependencies>
+                <test-type>
+                    <name>unit</name>
+                    <test-dependency>
+                        <code-name-base>org.netbeans.libs.junit4</code-name-base>
+                        <compile-dependency/>
+                    </test-dependency>
+                    <test-dependency>
+                        <code-name-base>org.netbeans.modules.nbjunit</code-name-base>
+                        <recursive/>
+                        <compile-dependency/>
+                    </test-dependency>
+                </test-type>
+                <test-type>
+                    <name>qa-functional</name>
+                    <test-dependency>
+                        <code-name-base>org.netbeans.libs.junit4</code-name-base>
+                        <compile-dependency/>
+                    </test-dependency>
+                    <test-dependency>
+                        <code-name-base>org.netbeans.modules.nbjunit</code-name-base>
+                        <recursive/>
+                        <compile-dependency/>
+                    </test-dependency>
+                </test-type>
+            </test-dependencies>
+            <friend-packages>
+                <friend>com.sun.tools.visualvm.application.views</friend>
+                <friend>com.sun.tools.visualvm.core</friend>
+                <friend>com.sun.tools.visualvm.heapdump</friend>
+                <friend>com.sun.tools.visualvm.heapviewer</friend>
+                <friend>com.sun.tools.visualvm.heapviewer.console</friend>
+                <friend>com.sun.tools.visualvm.heapviewer.truffle</friend>
+                <friend>com.sun.tools.visualvm.modules.appui</friend>
+                <friend>com.sun.tools.visualvm.profiler</friend>
+                <friend>com.sun.tools.visualvm.profiling</friend>
+                <friend>com.sun.tools.visualvm.sampler</friend>
+                <friend>oracle.jdevimpl.profiler.impl</friend>
+                <friend>org.netbeans.lib.profiler.common</friend>
+                <friend>org.netbeans.lib.profiler.ui</friend>
+                <friend>org.netbeans.modules.debugger.jpda.heapwalk</friend>
+                <friend>org.netbeans.modules.javame.profiler</friend>
+                <friend>org.netbeans.modules.maven.profiler</friend>
+                <friend>org.netbeans.modules.profiler</friend>
+                <friend>org.netbeans.modules.profiler.api</friend>
+                <friend>org.netbeans.modules.profiler.attach</friend>
+                <friend>org.netbeans.modules.profiler.freeform</friend>
+                <friend>org.netbeans.modules.profiler.heapwalker</friend>
+                <friend>org.netbeans.modules.profiler.j2ee</friend>
+                <friend>org.netbeans.modules.profiler.j2se</friend>
+                <friend>org.netbeans.modules.profiler.nbimpl</friend>
+                <friend>org.netbeans.modules.profiler.nbmodule</friend>
+                <friend>org.netbeans.modules.profiler.options</friend>
+                <friend>org.netbeans.modules.profiler.oql</friend>
+                <friend>org.netbeans.modules.profiler.oql.language</friend>
+                <friend>org.netbeans.modules.profiler.ppoints</friend>
+                <friend>org.netbeans.modules.profiler.projectsupport</friend>
+                <friend>org.netbeans.modules.profiler.snaptracer</friend>
+                <friend>org.netbeans.modules.profiler.utilities</friend>
+                <package>org.netbeans.lib.profiler</package>
+                <package>org.netbeans.lib.profiler.classfile</package>
+                <package>org.netbeans.lib.profiler.client</package>
+                <package>org.netbeans.lib.profiler.filters</package>
+                <package>org.netbeans.lib.profiler.global</package>
+                <package>org.netbeans.lib.profiler.heap</package>
+                <package>org.netbeans.lib.profiler.instrumentation</package>
+                <package>org.netbeans.lib.profiler.jps</package>
+                <package>org.netbeans.lib.profiler.marker</package>
+                <package>org.netbeans.lib.profiler.results</package>
+                <package>org.netbeans.lib.profiler.results.coderegion</package>
+                <package>org.netbeans.lib.profiler.results.cpu</package>
+                <package>org.netbeans.lib.profiler.results.cpu.cct</package>
+                <package>org.netbeans.lib.profiler.results.cpu.cct.nodes</package>
+                <package>org.netbeans.lib.profiler.results.cpu.marking</package>
+                <package>org.netbeans.lib.profiler.results.jdbc</package>
+                <package>org.netbeans.lib.profiler.results.locks</package>
+                <package>org.netbeans.lib.profiler.results.memory</package>
+                <package>org.netbeans.lib.profiler.results.monitor</package>
+                <package>org.netbeans.lib.profiler.results.threads</package>
+                <package>org.netbeans.lib.profiler.utils</package>
+                <package>org.netbeans.lib.profiler.utils.formatting</package>
+                <package>org.netbeans.lib.profiler.wireprotocol</package>
+            </friend-packages>
+            <extra-compilation-unit>
+                <package-root>${src15.dir}</package-root>
+                <classpath>${build.classes.dir}</classpath>
+                <built-to>${build15.classes.dir}</built-to>
+                <built-to>${cluster}/${jfluid.server.15.jar}</built-to>
+            </extra-compilation-unit>
+            <extra-compilation-unit>
+                <package-root>${srccvm.dir}</package-root>
+                <classpath/>
+                <built-to>${buildcvm.classes.dir}</built-to>
+                <built-to>${cluster}/${jfluid.server.cvm.jar}</built-to>
+            </extra-compilation-unit>
+        </data>
+    </configuration>
+</project>
