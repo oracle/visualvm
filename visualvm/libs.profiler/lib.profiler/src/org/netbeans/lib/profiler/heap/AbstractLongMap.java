@@ -433,11 +433,9 @@ abstract class AbstractLongMap {
 
         private static MappedByteBuffer createBuffer(RandomAccessFile file, long length) throws IOException {
             FileChannel channel = file.getChannel();
-            try {
-                return channel.map(MAP_MODE, 0, length);
-            } finally {
-                channel.close();
-            }
+            MappedByteBuffer buf = channel.map(MAP_MODE, 0, length);
+            channel.close();
+            return buf;
         }
     }
 
