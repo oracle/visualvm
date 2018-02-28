@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -61,8 +61,8 @@ final class VisualVMStartup extends ModuleInstall {
         if (DISABLE_STARTUP_CHECK) {
             System.err.println("Starting with com.sun.tools.visualvm.modules.startup.DisableStartupCheck=true"); // NOI18N
         } else {
-            if (!isJava7or8or9()) {
-                displayError7or8or9();
+            if (!isJava8or9()) {
+                displayError8or9();
                 return false;
             } else if (!isJDK()) {
                 displayErrorJRE();
@@ -73,7 +73,7 @@ final class VisualVMStartup extends ModuleInstall {
         return true;
     }
     
-    private static void displayError7or8or9() {
+    private static void displayError8or9() {
         Utils.setSystemLaF();
         JDialog d = StartupDialog.create(ERROR_STARTUP_CAPTION, MessageFormat.format(INCORRECT_VERSION_MSG,
                 new Object[] { System.getProperty("java.specification.version"), getJavaInfo(), // NOI18N
@@ -90,10 +90,10 @@ final class VisualVMStartup extends ModuleInstall {
         d.setVisible(true);
     }
     
-    private static boolean isJava7or8or9() {
+    private static boolean isJava8or9() {
         String javaVersion = System.getProperty("java.specification.version"); // NOI18N
         if (javaVersion == null) return false;
-        return javaVersion.startsWith("1.7") || javaVersion.startsWith("1.8")  // NOI18N
+        return javaVersion.startsWith("1.8")  // NOI18N
             || javaVersion.startsWith("1.9") || javaVersion.startsWith("9"); // NOI18N
     }
     
