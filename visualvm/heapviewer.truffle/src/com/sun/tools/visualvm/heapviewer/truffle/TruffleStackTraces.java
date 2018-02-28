@@ -306,6 +306,7 @@ public class TruffleStackTraces {
         private static final String ENT_OPTIMIZED_CALL_TARGET_FQN = "com.oracle.graal.truffle.OptimizedCallTarget"; // NOI18N
 
         private static final String OPTIMIZED_CALL_TARGET1_FQN = "org.graalvm.compiler.truffle.runtime.OptimizedCallTarget"; // NOI18N
+        private static final String OPTIMIZED_CALL_TARGET2_FQN = "org.graalvm.compiler.truffle.runtime.hotspot.HotSpotOptimizedCallTarget";    // NOI18N
 
         private Collection<StackTrace> truffleStackTraces;
         private Instance hotSpotRuntime;
@@ -417,7 +418,7 @@ public class TruffleStackTraces {
         private Frame visitFrame(List<JavaFrameGCRoot> callTargetFrame, List<JavaFrameGCRoot> callNodeFrame) {
             Instance callTarget = findLocalInstance(callTargetFrame,
                                     DEFAULT_CALL_TARGET_FQN, OPTIMIZED_CALL_TARGET_FQN, ENT_OPTIMIZED_CALL_TARGET_FQN,
-                                    OPTIMIZED_CALL_TARGET1_FQN);
+                                    OPTIMIZED_CALL_TARGET1_FQN, OPTIMIZED_CALL_TARGET2_FQN);
             TruffleFrame localFrame = findLocalFrame(callNodeFrame);
 
             if (callTarget != null && localFrame != null) {
@@ -425,7 +426,7 @@ public class TruffleStackTraces {
             }
             callTarget = findLocalInstance(callNodeFrame,
                                     DEFAULT_CALL_TARGET_FQN, OPTIMIZED_CALL_TARGET_FQN, ENT_OPTIMIZED_CALL_TARGET_FQN,
-                                    OPTIMIZED_CALL_TARGET1_FQN);
+                                    OPTIMIZED_CALL_TARGET1_FQN, OPTIMIZED_CALL_TARGET2_FQN);
             localFrame = findLocalFrame(callTargetFrame);
             if (callTarget != null && localFrame != null) {
                 return new Frame(heap, callTarget, localFrame);
