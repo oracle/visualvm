@@ -56,6 +56,8 @@ public class REngine {
                 supported = Boolean.TRUE;
             } catch (Exception e) {
                 supported = Boolean.FALSE;
+            } catch (NoClassDefFoundError e) {
+                supported = Boolean.FALSE;
             }
         }
         return supported.booleanValue();
