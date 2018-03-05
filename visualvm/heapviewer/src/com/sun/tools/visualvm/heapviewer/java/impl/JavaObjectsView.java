@@ -108,6 +108,8 @@ public class JavaObjectsView extends HeapViewerFeature {
         public Icon getIcon() { return aggregationIcon; }
     }
     
+    private static final String FEATURE_ID = "java_objects"; // NOI18N
+    
     private final HeapContext context;
     private final HeapViewerActions actions;
     
@@ -124,14 +126,14 @@ public class JavaObjectsView extends HeapViewerFeature {
     
     
     public JavaObjectsView(HeapContext context, HeapViewerActions actions) {
-        super("java_objects", Bundle.JavaObjectsView_Name(), Bundle.JavaObjectsView_Description(), Icons.getIcon(LanguageIcons.CLASS), 200); // NOI18N
+        super(FEATURE_ID, Bundle.JavaObjectsView_Name(), Bundle.JavaObjectsView_Description(), Icons.getIcon(LanguageIcons.CLASS), 200);
         
         this.context = context;
         this.actions = actions;
         
         Heap heap = context.getFragment().getHeap();
         
-        objectsView = new PluggableTreeTableView("java_objects", context, actions, TreeTableViewColumn.classes(heap, true)) { // NOI18N
+        objectsView = new PluggableTreeTableView(FEATURE_ID, context, actions, TreeTableViewColumn.classes(heap, true)) {
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 switch (getPreset()) {
                     case ALL_OBJECTS:
