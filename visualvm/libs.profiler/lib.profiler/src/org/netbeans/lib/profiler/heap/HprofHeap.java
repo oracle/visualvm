@@ -492,9 +492,9 @@ class HprofHeap implements Heap {
             return new ObjectArrayDump(classDump, start);
         } else if (tag == CLASS_DUMP) {
             return new ClassDumpInstance(classDump);
-        } else {
-            throw new IllegalArgumentException("Illegal tag " + tag); // NOI18N
         }
+        // other heap dump tags, ROOT_ etc.
+        return null;
     }
 
     void computeInstances() {
