@@ -72,6 +72,7 @@ public final class ProfilerSupport {
     private static final String HP_VM_VENDOR_PREFIX = "\"Hewlett-Packard "; // NOI18N
     private static final String AZUL_VM_VENDOR_PREFIX = "Azul ";  // NOI18N
     private static final String SAP_VM_VENDOR_PREFIX = "SAP AG";  // NOI18N
+    private static final String GRAAL_VM_VENDOR_PREFIX = "GraalVM ";  // NOI18N
     
     private static final String JAVA_RT_16_PREFIX = "1.6.0";  // NOI18N
     private static final String JAVA_RT_17_PREFIX = "1.7.0";  // NOI18N
@@ -313,9 +314,9 @@ public final class ProfilerSupport {
         
         // VM has to be a HotSpot VM or OpenJDK by Sun Microsystems Inc. or 
         // Oracle Co. or Apple Inc. or Hewlett-Packard Co. or 
-        // Azul Systems, Inc. or SAP AG
+        // Azul Systems, Inc. or SAP AG or Graal VM
         return vmName != null && (vmName.startsWith(HOTSPOT_VM_NAME_PREFIX) || vmName.startsWith(OPENJDK_VM_NAME_PREFIX)
-                                  || vmName.startsWith(SAPJDK_VM_NAME_PREFIX)) &&
+                               || vmName.startsWith(SAPJDK_VM_NAME_PREFIX) || vmName.startsWith(GRAAL_VM_VENDOR_PREFIX)) &&
                vmVendor != null && (vmVendor.startsWith(ORACLE_VM_VENDOR_PREFIX) || vmVendor.startsWith(SUN_VM_VENDOR_PREFIX)
                                  || vmVendor.startsWith(APPLE_VM_VENDOR_PREFIX) || vmVendor.startsWith(HP_VM_VENDOR_PREFIX)
                                  || vmVendor.startsWith(AZUL_VM_VENDOR_PREFIX) || vmVendor.startsWith(SAP_VM_VENDOR_PREFIX));
