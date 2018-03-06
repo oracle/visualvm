@@ -3,7 +3,7 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>com.sun.tools.visualvm.heapviewer</code-name-base>
+            <code-name-base>com.sun.tools.visualvm.heapviewer.console</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
@@ -16,21 +16,12 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>com.sun.tools.visualvm.uisupport</code-name-base>
+                    <code-name-base>com.sun.tools.visualvm.heapviewer</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>0</release-version>
-                        <specification-version>1.4</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.api.progress</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>1</release-version>
-                        <specification-version>1.48</specification-version>
+                        <specification-version>1.0</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -39,7 +30,7 @@
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.107</specification-version>
+                        <specification-version>1.109</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -48,16 +39,7 @@
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.144</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.modules.options.api</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>1</release-version>
-                        <specification-version>1.46</specification-version>
+                        <specification-version>1.146</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -66,24 +48,7 @@
                     <compile-dependency/>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.50</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.modules.profiler.heapwalker</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>1.113</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.modules.profiler.oql</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>2</release-version>
-                        <specification-version>2.19</specification-version>
+                        <specification-version>1.51</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -92,22 +57,6 @@
                     <compile-dependency/>
                     <run-dependency>
                         <specification-version>7.68</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.dialogs</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>7.43</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.filesystems</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>9.11</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -143,16 +92,7 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <friend-packages>
-                <friend>com.sun.tools.visualvm.heapdump</friend>
-                <friend>com.sun.tools.visualvm.heapviewer.console</friend>
-                <friend>com.sun.tools.visualvm.heapviewer.truffle</friend>
-                <package>com.sun.tools.visualvm.heapviewer</package>
-                <package>com.sun.tools.visualvm.heapviewer.java</package>
-                <package>com.sun.tools.visualvm.heapviewer.model</package>
-                <package>com.sun.tools.visualvm.heapviewer.ui</package>
-                <package>com.sun.tools.visualvm.heapviewer.utils</package>
-            </friend-packages>
+            <public-packages/>
         </data>
     </configuration>
 </project>
