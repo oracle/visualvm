@@ -36,6 +36,8 @@ public abstract class HeapViewerActions {
     
     public abstract HeapViewerFeature findFeature(String id);
     
+    public abstract <T extends HeapViewerFeature> T findFeature(Class<T> featureClass);
+    
     public abstract void selectFeature(HeapViewerFeature feature);
     
     

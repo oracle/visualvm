@@ -64,7 +64,7 @@ public final class VerticalLayout implements LayoutManager {
                 if (proportionalWidth) {
                     int w = Math.min(pref.width, width);
                     int o = (width - w) / 2;
-                    comp.setBounds(posX, posY + o, w, pref.height);
+                    comp.setBounds(posX + o, posY, w, pref.height);
                 } else {
                     comp.setBounds(posX, posY, width, pref.height);
                 }

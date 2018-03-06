@@ -109,6 +109,12 @@ public final class HeapViewerComponent extends JPanel {
                         if (feature.getID().equals(id)) return feature;
                 return null;
             }
+            public <T extends HeapViewerFeature> T findFeature(Class<T> featureClass) {
+                for (HeapViewerFeature[] featureArr : features)
+                    for (HeapViewerFeature feature : featureArr)
+                        if (feature.getClass() == featureClass) return (T)feature;
+                return null;
+            }
             public void selectFeature(HeapViewerFeature feature) {
                 HeapViewerComponent.this.selectView(mainView);
                 mainView.selectFeature(contexts[feature.getScope()], feature);
