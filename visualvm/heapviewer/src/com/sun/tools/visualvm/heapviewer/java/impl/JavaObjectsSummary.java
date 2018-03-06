@@ -24,7 +24,6 @@
  */
 package com.sun.tools.visualvm.heapviewer.java.impl;
 
-import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.java.ClassNode;
 import com.sun.tools.visualvm.heapviewer.java.ClassNodeRenderer;
@@ -33,16 +32,19 @@ import com.sun.tools.visualvm.heapviewer.java.InstanceNodeRenderer;
 import com.sun.tools.visualvm.heapviewer.java.JavaHeapFragment;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.swing.LinkButton;
 import com.sun.tools.visualvm.heapviewer.swing.Splitter;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.SummaryView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
+import com.sun.tools.visualvm.uisupport.SeparatorLine;
 import com.sun.tools.visualvm.uisupport.VerticalLayout;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -143,7 +145,17 @@ class JavaObjectsSummary extends HeapView {
         
         TreeTableViewColumn classesByCountColumn = new TreeTableViewColumn.Count(heap);
         final HideableBarRenderer classesByCountRenderer = (HideableBarRenderer)classesByCountColumn.getRenderer();
-        final ResultsSnippet classesByCount = new ResultsSnippet(Bundle.JavaObjectsSummary_ClassesInstancesCount()) {
+        
+        Runnable classesByCountDisplayer = new Runnable() {
+            public void run() {
+                JavaObjectsView objectsView = actions.findFeature(JavaObjectsView.class);
+                if (objectsView != null) {
+                    objectsView.configureClassesByInstancesCount();
+                    actions.selectFeature(objectsView);
+                }
+            }
+        };
+        final ResultsSnippet classesByCount = new ResultsSnippet(Bundle.JavaObjectsSummary_ClassesInstancesCount(), classesByCountDisplayer) {
             protected void setupTable(ProfilerTable table) {
                 table.setColumnRenderer(0, classRenderer);
                 table.setColumnRenderer(1, classesByCountRenderer);
@@ -151,7 +163,16 @@ class JavaObjectsSummary extends HeapView {
             }
         };
         
-        final ResultsSnippet classesBySize = new ResultsSnippet(Bundle.JavaObjectsSummary_ClassesInstancesSize()) {
+        Runnable classesBySizeDisplayer = new Runnable() {
+            public void run() {
+                JavaObjectsView objectsView = actions.findFeature(JavaObjectsView.class);
+                if (objectsView != null) {
+                    objectsView.configureClassesByInstancesSize();
+                    actions.selectFeature(objectsView);
+                }
+            }
+        };
+        final ResultsSnippet classesBySize = new ResultsSnippet(Bundle.JavaObjectsSummary_ClassesInstancesSize(), classesBySizeDisplayer) {
             protected void setupTable(ProfilerTable table) {
                 table.setColumnRenderer(0, classRenderer);
                 table.setColumnRenderer(1, sizeRenderer);
@@ -161,8 +182,16 @@ class JavaObjectsSummary extends HeapView {
         
         Splitter classesRow = new Splitter(Splitter.HORIZONTAL_SPLIT, classesByCount, classesBySize);
         
-        
-        final ResultsSnippet instancesBySize = new ResultsSnippet(Bundle.JavaObjectsSummary_InstancesSize()) {
+        Runnable instancesBySizeDisplayer = new Runnable() {
+            public void run() {
+                JavaObjectsView objectsView = actions.findFeature(JavaObjectsView.class);
+                if (objectsView != null) {
+                    objectsView.configureInstancesBySize();
+                    actions.selectFeature(objectsView);
+                }
+            }
+        };
+        final ResultsSnippet instancesBySize = new ResultsSnippet(Bundle.JavaObjectsSummary_InstancesSize(), instancesBySizeDisplayer) {
             protected void setupTable(ProfilerTable table) {
                 table.setColumnRenderer(0, instanceRenderer);
                 table.setColumnRenderer(1, sizeRenderer);
@@ -171,7 +200,16 @@ class JavaObjectsSummary extends HeapView {
         };
         
         final boolean retainedAvailable = DataType.RETAINED_SIZE.valuesAvailable(heap);
-        final ResultsSnippet dominatorsByRetainedSize = new ResultsSnippet(Bundle.JavaObjectsSummary_DominatorsRetainedSize()) {
+        Runnable dominatorsByRetainedSizeDisplayer = new Runnable() {
+            public void run() {
+                JavaObjectsView objectsView = actions.findFeature(JavaObjectsView.class);
+                if (objectsView != null) {
+                    objectsView.configureDominatorsByRetainedSize();
+                    actions.selectFeature(objectsView);
+                }
+            }
+        };
+        final ResultsSnippet dominatorsByRetainedSize = new ResultsSnippet(Bundle.JavaObjectsSummary_DominatorsRetainedSize(), dominatorsByRetainedSizeDisplayer) {
             private Runnable retainedSizesUpdater;
             protected JComponent createComponent() {
                 if (retainedAvailable) {
@@ -382,22 +420,66 @@ class JavaObjectsSummary extends HeapView {
     
     
     private class ResultsSnippet extends JPanel {
-        private String text;
+        
+        private final LinkButton link;
         private ProfilerTable table;
         private boolean keepSelection;
         
-        ResultsSnippet(String text) {
+        ResultsSnippet(String text, final Runnable allDisplayer) {
             super(new BorderLayout(0, 6));
-            this.text = text;
             setOpaque(false);
             setBorder(BorderFactory.createEmptyBorder(10, 5, 5, 5));
             
-            add(new SectionSeparator(text), BorderLayout.NORTH);
-
-            JComponent c = createComponent();
+            JPanel sectionSeparator = new JPanel(new GridBagLayout());
+            sectionSeparator.setOpaque(false);
             
-            if (c instanceof ProfilerTable) table = (ProfilerTable)c;
-            if (c != null) add(c, BorderLayout.CENTER);
+            JLabel caption = new JLabel(text);
+            caption.setFont(caption.getFont().deriveFont(Font.BOLD));
+            GridBagConstraints c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = 0;
+            c.weighty = 1d;
+            sectionSeparator.add(caption, c);
+
+            c = new GridBagConstraints();
+            c.gridx = 1;
+            c.gridy = 0;
+            c.insets = new Insets(0, 5, 0, 0);
+            sectionSeparator.add(new JLabel("["), c); // NOI18N
+            
+            link = new LinkButton("view all") {
+                @Override
+                protected void clicked() {
+                    SwingUtilities.invokeLater(allDisplayer);
+                }
+            };
+            link.setEnabled(false);
+            c = new GridBagConstraints();
+            c.gridx = 2;
+            c.gridy = 0;
+            c.insets = new Insets(0, 0, 0, 0);
+            sectionSeparator.add(link, c);
+            
+            c = new GridBagConstraints();
+            c.gridx = 3;
+            c.gridy = 0;
+            c.insets = new Insets(0, 0, 0, 0);
+            sectionSeparator.add(new JLabel("]"), c); // NOI18N
+
+            c = new GridBagConstraints();
+            c.gridx = 4;
+            c.gridy = 0;
+            c.weightx = 1d;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.insets = new Insets(1, 4, 0, 0);
+            sectionSeparator.add(new SeparatorLine(), c);
+            
+            add(sectionSeparator, BorderLayout.NORTH);
+
+            JComponent comp = createComponent();
+            
+            if (comp instanceof ProfilerTable) table = (ProfilerTable)comp;
+            if (comp != null) add(comp, BorderLayout.CENTER);
         }
         
         public Dimension getMinimumSize() {
@@ -447,6 +529,8 @@ class JavaObjectsSummary extends HeapView {
             
             table.setModel(model);
             setupTable(table);
+            
+            link.setEnabled(true);
         }
         
         protected void setupTable(ProfilerTable table) {}
