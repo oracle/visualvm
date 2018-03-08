@@ -116,8 +116,10 @@ public class JavaObjectsView extends HeapViewerFeature {
     private final PluggableTreeTableView objectsView;
     private ProfilerToolbar toolbar;
     
-    private Preset preset;
-    private Aggregation aggregation;
+    private Preset preset = Preset.ALL_OBJECTS;
+    private Aggregation aggregation = Aggregation.CLASSES;
+    
+    private ActionPopupButton apbPreset;
     
     private JToggleButton tbType;
     private JToggleButton tbPackages;
@@ -206,9 +208,116 @@ public class JavaObjectsView extends HeapViewerFeature {
     }
     
     
+    private volatile boolean skipReload = false;
+    
+    void configureClassesByInstancesCount() {
+        try {
+            objectsView.setSortColumn(DataType.COUNT, SortOrder.DESCENDING);
+            
+            if (apbPreset == null) {
+                preset = Preset.ALL_OBJECTS;
+            } else if (preset != Preset.ALL_OBJECTS) {
+                skipReload = true;
+                setPreset(Preset.ALL_OBJECTS);
+                apbPreset.selectAction(preset.ordinal());
+            }
+
+            if (tbClasses == null) {
+                skipReload = true;
+                setAggregation(Aggregation.CLASSES);
+            } else if (!tbClasses.isSelected()) {
+                skipReload = true;
+                tbClasses.setSelected(true);
+            }
+            
+            if (skipReload) objectsView.reloadView();
+        } finally {
+            skipReload = false;
+        }
+    }
+    
+    void configureClassesByInstancesSize() {
+        try {
+            objectsView.setSortColumn(DataType.OWN_SIZE, SortOrder.DESCENDING);
+            
+            if (apbPreset == null) {
+                preset = Preset.ALL_OBJECTS;
+            } else if (preset != Preset.ALL_OBJECTS) {
+                skipReload = true;
+                setPreset(Preset.ALL_OBJECTS);
+                apbPreset.selectAction(preset.ordinal());
+            }
+
+            if (tbClasses == null) {
+                skipReload = true;
+                setAggregation(Aggregation.CLASSES);
+            } else if (!tbClasses.isSelected()) {
+                skipReload = true;
+                tbClasses.setSelected(true);
+            }
+            
+            if (skipReload) objectsView.reloadView();
+        } finally {
+            skipReload = false;
+        }
+    }
+    
+    void configureInstancesBySize() {
+        try {
+            objectsView.setSortColumn(DataType.OWN_SIZE, SortOrder.DESCENDING);
+            
+            if (apbPreset == null) {
+                preset = Preset.ALL_OBJECTS;
+            } else if (preset != Preset.ALL_OBJECTS) {
+                skipReload = true;
+                setPreset(Preset.ALL_OBJECTS);
+                apbPreset.selectAction(preset.ordinal());
+            }
+
+            if (tbInstances == null) {
+                skipReload = true;
+                setAggregation(Aggregation.INSTANCES);
+            } else if (!tbInstances.isSelected()) {
+                skipReload = true;
+                tbInstances.setSelected(true);
+            }
+            
+            if (skipReload) objectsView.reloadView();
+        } finally {
+            skipReload = false;
+        }
+    }
+    
+    void configureDominatorsByRetainedSize() {
+        try {
+            objectsView.setSortColumn(DataType.RETAINED_SIZE, SortOrder.DESCENDING);
+            
+            if (apbPreset == null) {
+                preset = Preset.DOMINATORS;
+            } else if (preset != Preset.DOMINATORS) {
+                skipReload = true;
+                setPreset(Preset.DOMINATORS);
+                apbPreset.selectAction(preset.ordinal());
+            }
+
+            if (tbInstances == null) {
+                skipReload = true;
+                setAggregation(Aggregation.INSTANCES);
+            } else if (!tbInstances.isSelected()) {
+                skipReload = true;
+                tbInstances.setSelected(true);
+            }
+            
+            if (skipReload) objectsView.reloadView();
+        } finally {
+            skipReload = false;
+        }
+    }
+    
+    
     private Runnable dominatorsRefresher;
     
-    private synchronized void setPreset(Preset preset) {
+    synchronized void setPreset(Preset preset) {
         if (preset == Preset.DOMINATORS) {
             final Heap heap = context.getFragment().getHeap();
             if (!DataType.RETAINED_SIZE.valuesAvailable(heap)) {
@@ -231,16 +340,16 @@ public class JavaObjectsView extends HeapViewerFeature {
         objectsView.setViewName(preset.toString());
         tbType.setVisible(preset == Preset.GC_ROOTS);
         if (tbType.isSelected() && !tbType.isVisible()) tbClasses.setSelected(true);
-        else objectsView.reloadView();
+        else if (!skipReload) objectsView.reloadView();
     }
     
     private synchronized Preset getPreset() {
         return preset;
     }
     
-    private synchronized void setAggregation(Aggregation aggregation) {
+    synchronized void setAggregation(Aggregation aggregation) {
         this.aggregation = aggregation;
-        objectsView.reloadView();
+        if (!skipReload) objectsView.reloadView();
     }
     
     private synchronized Aggregation getAggregation() {
@@ -293,9 +402,9 @@ public class JavaObjectsView extends HeapViewerFeature {
         Preset[] presetItems = Preset.values();
         Action[] presetActions = new PresetAction[presetItems.length];
         for (int i = 0; i < presetItems.length; i++) presetActions[i] = new PresetAction(presetItems[i]);
-        preset = Preset.ALL_OBJECTS;
-        objectsView.setViewName(Preset.ALL_OBJECTS.toString());
-        toolbar.add(new ActionPopupButton(0, presetActions));
+        apbPreset = new ActionPopupButton(0, presetActions);
+        apbPreset.selectAction(preset.ordinal());
+        toolbar.add(apbPreset);
         
         toolbar.addSpace(8);
         
@@ -305,18 +414,20 @@ public class JavaObjectsView extends HeapViewerFeature {
         final ButtonGroup aggregationBG = new ButtonGroup();
         class AggregationButton extends JToggleButton {
             private final Aggregation aggregation;
-            AggregationButton(Aggregation aggregation) {
-                super(aggregation.getIcon());
+            AggregationButton(Aggregation aggregation, boolean selected) {
+                super(aggregation.getIcon(), selected);
                 this.aggregation = aggregation;
                 setToolTipText(aggregation.toString());
                 aggregationBG.add(this);
             }
             protected void fireItemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) setAggregation(aggregation);
+                // invoked also from constructor: super(aggregation.getIcon(), selected)
+                // in this case aggregation is still null, ignore the event...
+                if (e.getStateChange() == ItemEvent.SELECTED && aggregation != null) setAggregation(aggregation);
             }
         }
         
-        tbType = new AggregationButton(Aggregation.TYPES) {
+        tbType = new AggregationButton(Aggregation.TYPES, Aggregation.TYPES.equals(aggregation)) {
             public void setVisible(boolean b) {
                 super.setVisible(b);
                 if (tbPackages != null) tbPackages.putClientProperty("JButton.segmentPosition", // NOI18N
@@ -327,24 +438,22 @@ public class JavaObjectsView extends HeapViewerFeature {
         tbType.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
         toolbar.add(tbType);
         
-        tbPackages = new AggregationButton(Aggregation.PACKAGES);
+        tbPackages = new AggregationButton(Aggregation.PACKAGES, Aggregation.PACKAGES.equals(aggregation));
         tbPackages.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
         tbPackages.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
         toolbar.add(tbPackages);
         
-        tbClasses = new AggregationButton(Aggregation.CLASSES);
+        tbClasses = new AggregationButton(Aggregation.CLASSES, Aggregation.CLASSES.equals(aggregation));
         tbClasses.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
         tbClasses.putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
         toolbar.add(tbClasses);
         
-        tbInstances = new AggregationButton(Aggregation.INSTANCES);
+        tbInstances = new AggregationButton(Aggregation.INSTANCES, Aggregation.INSTANCES.equals(aggregation));
         tbInstances.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
         tbInstances.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
         toolbar.add(tbInstances);
-        
-        tbClasses.setSelected(true);
-        aggregation = Aggregation.CLASSES;
-        tbType.setVisible(false);
+
+        setPreset(preset); // updates tbType visibility and sets objectsView name
         
         if (objectsView.hasPlugins()) {
             toolbar.addSpace(8);
