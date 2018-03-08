@@ -49,6 +49,7 @@ import javax.swing.text.html.HTMLDocument;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.swing.HTMLTextComponent;
+import javax.swing.text.DefaultCaret;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
@@ -114,7 +115,6 @@ public class HTMLView {
         if (htmlComponent == null || pendingText) {
             pendingReference = reference;
         } else {
-            pendingReference = null;
             Document d = htmlComponent.getDocument();
             if (d instanceof HTMLDocument) {
                 HTMLDocument doc = (HTMLDocument)d;
@@ -132,16 +132,23 @@ public class HTMLView {
     }
     
     private void selectReference(HTMLDocument.Iterator iter) {
-        try {
-            htmlComponent.requestFocusInWindow();
-            int start = iter.getStartOffset();
-            Rectangle rect = htmlComponent.modelToView(start);
-            if (rect != null) {
-                rect.height = htmlComponent.getVisibleRect().height;
-                htmlComponent.scrollRectToVisible(rect);
+        htmlComponent.requestFocus();
+        
+        int start = iter.getStartOffset();
+        htmlComponent.select(start, iter.getEndOffset());
+        
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    Rectangle rect = htmlComponent.modelToView(start);
+                    if (rect != null) {
+                        rect.x -= htmlComponent.getInsets().left + component.getInsets().left;
+                        rect.height = htmlComponent.getVisibleRect().height;
+                        htmlComponent.scrollRectToVisible(rect);
+                    }
+                } catch (BadLocationException e) {}
             }
-            htmlComponent.select(start, iter.getEndOffset());
-        } catch (BadLocationException e) {}
+        });
     }
     
     
@@ -181,7 +188,15 @@ public class HTMLView {
                         try {
                             HTMLView.this.setText(get());
                             pendingText = false;
-                            if (pendingReference != null) selectReference(pendingReference);
+                            if (pendingReference != null) {
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        selectReference(pendingReference);
+                                        pendingReference = null;
+                                    }
+                                });
+                                
+                            }
                         } catch (InterruptedException ex) {
                             Exceptions.printStackTrace(ex);
                         } catch (ExecutionException ex) {
@@ -202,15 +217,20 @@ public class HTMLView {
                 popup.add(createSelectAllMenuItem());
             }
         };
+        
+        //----------------------------------------------------------------------
         // NOTE: uncomment to allow the selection to survive focusLost
-//        htmlComponent.setCaret(new DefaultCaret() {
-//            public void setSelectionVisible(boolean visible) {
-//               super.setSelectionVisible(true);
-//            }
-//        });
+        htmlComponent.setCaret(new DefaultCaret() {
+            public void setSelectionVisible(boolean visible) {
+               super.setSelectionVisible(true);
+            }
+        });
+        //----------------------------------------------------------------------
+        
         if (currentText != null) htmlComponent.setText(currentText);
                 
         component = new JPanel(new BorderLayout());
+        component.setBackground(htmlComponent.getBackground());
         component.add(htmlComponent, BorderLayout.CENTER);
     }
     

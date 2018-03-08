@@ -60,6 +60,7 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.PluggableTreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import org.openide.util.NbBundle;
@@ -111,11 +112,10 @@ public class JavaThreadsView extends HeapViewerFeature {
         
         objectsView = new PluggableTreeTableView(VIEW_OBJECTS_ID, context, actions, TreeTableViewColumn.instances(heap, false)) {
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-                return JavaThreadsObjects.getThreads(root, heap);
+                return JavaThreadsProvider.getThreadsNodes(root, heap);
             }
             protected void childrenChanged() {
-                CCTNode[] children = getRoot().getChildren();
-                for (CCTNode child : children) expandNode((HeapViewerNode)child);
+                setupDefault();
             }
             @Override
             protected void populatePopup(HeapViewerNode node, JPopupMenu popup) {
@@ -127,8 +127,7 @@ public class JavaThreadsView extends HeapViewerFeature {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                CCTNode[] children = getRoot().getChildren();
-                                for (CCTNode child : children) expandNode((HeapViewerNode)child);
+                                setupDefault();
                             }
                         });
                     }
@@ -151,10 +150,10 @@ public class JavaThreadsView extends HeapViewerFeature {
         
         htmlView = new HTMLView(VIEW_HTML_ID, context, actions, Bundle.JavaThreadsView_ComputingThreads()) {
             protected String computeData(HeapContext context, String viewID) {
-                return JavaThreadsHTML.getThreads(context);
+                return JavaThreadsProvider.getThreadsHTML(context);
             }
             protected HeapViewerNode nodeForURL(URL url, HeapContext context) {
-                return JavaThreadsHTML.getNode(url, context);
+                return JavaThreadsProvider.getNode(url, context);
             }
         };
     }
@@ -176,6 +175,25 @@ public class JavaThreadsView extends HeapViewerFeature {
         
         rHTML.setSelected(true);
         htmlView.selectReference(Long.toString(instanceID));
+    }
+    
+    void configureAllThreads() {
+        if (component != null) {
+            rObjects.setSelected(true);
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    objectsView.collapseChildren((HeapViewerNode)objectsView.getRoot());
+                    setupDefault();
+                }
+            });
+        }
+    }
+    
+    
+    private void setupDefault() {
+        CCTNode[] children = objectsView.getRoot().getChildren();
+        for (CCTNode child : children) objectsView.expandNode((HeapViewerNode)child);
     }
     
     
@@ -235,7 +253,9 @@ public class JavaThreadsView extends HeapViewerFeature {
 
         component = new JPanel(new CardLayout());
         component.add(objectsView.getComponent());
-        component.add(new ScrollableContainer(htmlView.getComponent()));
+        JComponent html = htmlView.getComponent();
+        html.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        component.add(new ScrollableContainer(html));
     }
     
     
@@ -277,7 +297,7 @@ public class JavaThreadsView extends HeapViewerFeature {
     public static class SelectInstanceActionProvider extends HeapViewerNodeAction.Provider {
         
         public boolean supportsView(HeapContext context, String viewID) {
-            return !VIEW_HTML_ID.equals(viewID) && JavaHeapFragment.isJavaHeap(context);
+            return !viewID.startsWith(FEATURE_ID) && JavaHeapFragment.isJavaHeap(context);
         }
 
         public HeapViewerNodeAction[] getActions(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
@@ -287,10 +307,18 @@ public class JavaThreadsView extends HeapViewerFeature {
             if (instance == null) return null;
             
             GCRoot gcRoot = heap.getGCRoot(instance);
-            if (gcRoot == null || !GCRoot.JAVA_FRAME.equals(gcRoot.getKind())) return null;
+            if (gcRoot == null) return null;
             
-            JavaFrameGCRoot frameVar = (JavaFrameGCRoot)gcRoot;
-            if (frameVar.getFrameNumber() == -1) return null;
+            String gcRootKind = gcRoot.getKind();
+            
+            if (GCRoot.JAVA_FRAME.equals(gcRootKind)) {
+                JavaFrameGCRoot frameVar = (JavaFrameGCRoot)gcRoot;
+                if (frameVar.getFrameNumber() == -1) return null;
+            } else if (GCRoot.THREAD_OBJECT.equals(gcRootKind)) {
+//                ThreadObjectGCRoot thread = (ThreadObjectGCRoot)gcRoot;
+            } else {
+                return null;
+            }
             
             return new HeapViewerNodeAction[] { new SelectInstanceAction(instance.getInstanceId(), actions) };
         }

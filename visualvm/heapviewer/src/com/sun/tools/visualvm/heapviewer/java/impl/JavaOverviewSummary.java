@@ -140,7 +140,19 @@ class JavaOverviewSummary extends HeapView {
         
         SyspropsSnippet syspropsSnippet = new SyspropsSnippet(syspropsData);
         
-        component = new JPanel(new VerticalLayout(false));
+        component = new JPanel(new VerticalLayout(false)) {
+            public Dimension getMinimumSize() {
+                Dimension dim = super.getMinimumSize();
+                dim.width = 0;
+                return dim;
+            }
+
+            public Dimension getPreferredSize() {
+                Dimension dim = super.getPreferredSize();
+                dim.width = 100;
+                return dim;
+            }
+        };
         component.setOpaque(false);
         
         component.add(overviewRow);
@@ -442,10 +454,22 @@ class JavaOverviewSummary extends HeapView {
             add(new SeparatorLine(), c);
         }
         
+        public Dimension getMinimumSize() {
+            Dimension dim = super.getMinimumSize();
+            dim.width = 0;
+            return dim;
+        }
+        
+        public Dimension getPreferredSize() {
+            Dimension dim = super.getPreferredSize();
+            dim.width = 100;
+            return dim;
+        }
+        
     }
     
         
-    @ServiceProvider(service=SummaryView.ContentProvider.class, position = 10)
+    @ServiceProvider(service=SummaryView.ContentProvider.class, position = 100)
     public static class Provider extends SummaryView.ContentProvider {
 
         @Override
