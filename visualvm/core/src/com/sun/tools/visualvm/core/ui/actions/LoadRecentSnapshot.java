@@ -55,7 +55,7 @@ class LoadRecentSnapshot implements Presenter.Menu {
     
     private static final String PROP_LOAD_RECENT = "LoadRecentSnapshot.item."; // NOI18N
     
-    private static final int MAX_RECENT_ITEMS = 5;
+    private static final int MAX_RECENT_ITEMS = 9;
     
     private static LoadRecentSnapshot INSTANCE;
     
@@ -80,7 +80,8 @@ class LoadRecentSnapshot implements Presenter.Menu {
                     if (files.isEmpty()) {
                         menu.add(new JMenuItem(NbBundle.getMessage(LoadRecentSnapshot.class, "LoadRecentSnapshot_NoRecentSnapshots")) {{ setEnabled(false); }}); // NOI18N
                     } else {
-                        for (String file : files) menu.add(new RecentFileItem(file));
+                        int i = 0;
+                        for (String file : files) menu.add(new RecentFileItem(file, ++i));
                         menu.addSeparator();
                         menu.add(new ClearRecentItem());
                     }
@@ -154,10 +155,10 @@ class LoadRecentSnapshot implements Presenter.Menu {
         private final String f;
         private final File file;
         
-        RecentFileItem(String f) {
+        RecentFileItem(String f, int idx) {
             this.f = f;
             file = new File(f);
-            setText(file.getName());
+            Mnemonics.setLocalizedText(this, "&" + idx + ". " + file.getName()); // NOI18N
         }
         
         @Override
