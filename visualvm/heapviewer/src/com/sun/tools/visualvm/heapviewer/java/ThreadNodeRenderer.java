@@ -31,9 +31,10 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
+import java.awt.Color;
+import java.util.Objects;
+import javax.swing.JTable;
 
 /**
  *
@@ -43,8 +44,12 @@ public class ThreadNodeRenderer extends LabelRenderer implements HeapViewerRende
     
     private static final Icon ICON = Icons.getIcon(ProfilerIcons.THREAD);
     
+    private static final Color REPLACEABLE_FOREGROUND = new JTable().getForeground();
+    
     protected final Heap heap;
 
+    private Color customForeground;
+    
     
     public ThreadNodeRenderer(Heap heap) {
         this.heap = heap;
@@ -55,8 +60,9 @@ public class ThreadNodeRenderer extends LabelRenderer implements HeapViewerRende
     
     
     public void setValue(Object value, int row) {
-        HeapViewerNode node = (HeapViewerNode)value;
-        setText(HeapViewerNode.getValue(node, DataType.NAME, heap));
+        ThreadNode node = (ThreadNode)value;
+        setText(node.getName(heap));
+        setCustomForeground(node.isOOMEThread() ? Color.RED : null);
     }
     
     public String getShortName() {
@@ -64,6 +70,19 @@ public class ThreadNodeRenderer extends LabelRenderer implements HeapViewerRende
         int nameIdx = name.indexOf('"') + 1; // NOI18N
         if (nameIdx > 0) name = name.substring(nameIdx, name.indexOf('"', nameIdx)); // NOI18N
         return name;
+    }
+    
+    
+    public void setForeground(Color foreground) {
+        if (customForeground != null && Objects.equals(foreground, REPLACEABLE_FOREGROUND)) {
+            super.setForeground(customForeground);
+        } else {
+            super.setForeground(foreground);
+        }
+    }
+    
+    private void setCustomForeground(Color foreground) {
+        customForeground = foreground;
     }
     
 }
