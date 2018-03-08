@@ -68,8 +68,8 @@ public class LinkButton extends JButton {
     
     public void setText(String text) {
         this.text = text.replace("<", "&lt;").replace(">", "&gt;").replace(" ", "&nbsp;"); // NOI18N
-        if (!mouseOver && !focused) super.setText("<html>" + this.text + "</html>"); // NOI18N
-        else super.setText("<html><a href='#'>" + this.text + "</a></html>"); // NOI18N
+        if (isEnabled() && (mouseOver || focused)) super.setText("<html><a href='#'>" + this.text + "</a></html>"); // NOI18N
+        else super.setText("<html>" + this.text + "</html>"); // NOI18N
     }
     
     protected void fireActionPerformed(ActionEvent e) {
@@ -110,7 +110,7 @@ public class LinkButton extends JButton {
         setContentAreaFilled(false);
         setFocusPainted(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        addMouseListener(new MouseAdapter() {
+        MouseAdapter mouse = new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
                 mouseOver = true;
                 setText(text);
@@ -118,6 +118,12 @@ public class LinkButton extends JButton {
             public void mouseExited(MouseEvent e) {
                 mouseOver = false;
                 setText(text);
+            }
+            public void mouseMoved(MouseEvent e) {
+                if (!mouseOver) {
+                    mouseOver = true;
+                    setText(text);
+                }
             }
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger()) showPopupMenu(e);
@@ -128,7 +134,9 @@ public class LinkButton extends JButton {
             public void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isMiddleMouseButton(e)) middleClicked(e);
             }
-        });
+        };
+        addMouseListener(mouse);
+        addMouseMotionListener(mouse);
         addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent e) {
                 focused = true;
@@ -136,6 +144,7 @@ public class LinkButton extends JButton {
             }
             public void focusLost(FocusEvent e) {
                 focused = false;
+                mouseOver = false;
                 setText(text);
             }
         });

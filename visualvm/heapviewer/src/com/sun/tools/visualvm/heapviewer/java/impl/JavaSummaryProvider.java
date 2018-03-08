@@ -36,11 +36,11 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerFeature.Provider.class)
-public class JavaHeapSummaryProvider extends HeapViewerFeature.Provider {
+public class JavaSummaryProvider extends HeapViewerFeature.Provider {
     
     public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
-        if (JavaHeapFragment.isJavaHeap(context))
-            return new JavaHeapSummaryView(context);
+        if (JavaHeapFragment.isJavaHeap(context)) 
+            return new JavaSummaryView(context, actions);
 
         return null;
     }

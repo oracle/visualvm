@@ -49,7 +49,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
-import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
@@ -69,6 +68,7 @@ import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.NodesCache;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
+import javax.swing.RowSorter;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -113,6 +113,8 @@ public class TreeTableView {
     private JComponent filterComponent;
     
     private boolean hasSelection;
+    
+    private RowSorter.SortKey initialSortKey;
     
     
     public TreeTableView(String viewID, HeapContext context, HeapViewerActions actions, TreeTableViewColumn... columns) {
@@ -228,6 +230,35 @@ public class TreeTableView {
             if (_root != currentRoot) pinNode(null);
             _root.resetChildren();
             _root.updateChildren(null);
+        }
+    }
+    
+    
+    public void setSortColumn(DataType dataType, SortOrder sortOrder) {
+        int sortColumn = -1;
+        for (int i = 0; i < columns.size(); i++) {
+            TreeTableViewColumn column = columns.get(i);
+            if (column.getDataType() == dataType) {
+                sortColumn = i;
+                break;
+            }
+        }
+        
+        if (sortColumn == -1) return;
+        
+        if (treeTable == null) {
+            initialSortKey = new RowSorter.SortKey(sortColumn, sortOrder);
+        } else {
+            RowSorter sorter = treeTable.getRowSorter();
+
+            List<RowSorter.SortKey> sortKeys = sorter.getSortKeys();
+            if (sortKeys != null && sortKeys.size() == 1) {
+                RowSorter.SortKey sortKey = sortKeys.get(0);
+                if (sortKey.getColumn() == sortColumn && sortOrder.equals(sortKey.getSortOrder())) return;
+            }
+
+            RowSorter.SortKey sortKey = new RowSorter.SortKey(sortColumn, sortOrder);
+            sorter.setSortKeys(Collections.singletonList(sortKey));
         }
     }
     
@@ -431,6 +462,11 @@ public class TreeTableView {
 //
 //            protected void nodeCollapsed(TreeNode node)  { System.err.println(">>> Collapsed " + node); }
         };
+        
+        if (initialSortKey != null) {
+            treeTable.getRowSorter().setSortKeys(Collections.singletonList(initialSortKey));
+            initialSortKey = null;
+        }
         
         treeTable.setTreeCellRenderer(getNodesRenderer());
 

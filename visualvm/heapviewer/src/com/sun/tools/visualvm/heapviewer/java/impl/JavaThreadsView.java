@@ -264,10 +264,10 @@ public class JavaThreadsView extends HeapViewerFeature {
         }
 
         public void actionPerformed(ActionEvent e) {
-            HeapViewerFeature feature = actions.findFeature(FEATURE_ID);
-            if (feature instanceof JavaThreadsView) {
-                actions.selectFeature(feature);
-                ((JavaThreadsView)feature).selectInstance(id, VIEW_HTML_ID);
+            JavaThreadsView threadsView = actions.findFeature(JavaThreadsView.class);
+            if (threadsView != null) {
+                actions.selectFeature(threadsView);
+                threadsView.selectInstance(id, VIEW_HTML_ID);
             }
         }
         

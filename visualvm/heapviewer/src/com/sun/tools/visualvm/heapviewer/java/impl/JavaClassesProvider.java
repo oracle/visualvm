@@ -298,10 +298,7 @@ public class JavaClassesProvider {
         if (!DataType.RETAINED_SIZE.valuesAvailable(heap))
             return new HeapViewerNode[] { new TextNode(Bundle.Dominators_Messages_NoRetainedSizes()) };
         
-        int maxSearchInstances = 1000;
-        
-        List<Instance> searchInstances = heap.getBiggestObjectsByRetainedSize(maxSearchInstances);
-        List<Instance> dominators = new ArrayList(getDominatorRoots(searchInstances));
+        List<Instance> dominators = new ArrayList(getDominatorRoots(heap));
         
         if (aggregation == 0) {
             NodesComputer<Instance> computer = new NodesComputer<Instance>(dominators.size(), UIThresholds.MAX_TOPLEVEL_INSTANCES) {
@@ -388,7 +385,10 @@ public class JavaClassesProvider {
         }
     }
 
-    private static Set<Instance> getDominatorRoots(List<Instance> searchInstances) {
+    static Set<Instance> getDominatorRoots(Heap heap) {
+        int searchScope = 1000;
+        List<Instance> searchInstances = heap.getBiggestObjectsByRetainedSize(searchScope);
+                
         Set<Instance> dominators = new HashSet(searchInstances);
         Set<Instance> removed = new HashSet();
 
