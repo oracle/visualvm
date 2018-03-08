@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
- Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ Copyright (c) 2007, 2018, Oracle and/or its affiliates. All rights reserved.
  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 
  This code is free software; you can redistribute it and/or modify it
@@ -60,6 +60,14 @@
             <file name="com-sun-tools-visualvm-core-ui-actions-SaveSnapshotAsAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Other/com-sun-tools-visualvm-core-ui-actions-SaveSnapshotAsAction.instance"/>
                 <attr name="position" intvalue="200"/>
+            </file>
+            <file name="com-sun-tools-visualvm-core-ui-actions-LoadRecentSnapshot.instance">
+                <attr name="instanceCreate" methodvalue="com.sun.tools.visualvm.core.ui.actions.LoadRecentSnapshot.instance"/>
+                <attr name="position" intvalue="250"/>
+            </file>
+            <file name="File-Separator-280.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="280"/>
             </file>
             <file name="com-sun-tools-visualvm-core-ui-actions-DeleteSnapshotAction.shadow">
                 <attr name="originalFile" stringvalue="VisualVM/Actions/com-sun-tools-visualvm-core-ui-actions-DeleteSnapshotAction.instance"/>

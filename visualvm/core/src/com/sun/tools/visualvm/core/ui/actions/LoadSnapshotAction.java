@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+ *  Copyright (c) 2007, 2018, Oracle and/or its affiliates. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  *  This code is free software; you can redistribute it and/or modify it
@@ -128,12 +128,14 @@ class LoadSnapshotAction extends AbstractAction {
                             lastFile = selectedFile.getAbsolutePath();
                             lastFilter = null;
                             categories.get(fileFilters.indexOf(ff)).openSnapshot(selectedFile);
+                            LoadRecentSnapshot.instance().addFile(selectedFile);
                             return;
                         }
                 } else if (fileFilter.accept(selectedFile)) {
                     lastFile = selectedFile.getAbsolutePath();
                     lastFilter = fileFilter.getDescription();
                     categories.get(fileFilters.indexOf(fileFilter)).openSnapshot(selectedFile);
+                    LoadRecentSnapshot.instance().addFile(selectedFile);
                     return;
                 }
                 DialogDisplayer.getDefault().notifyLater(new NotifyDescriptor.Message(
