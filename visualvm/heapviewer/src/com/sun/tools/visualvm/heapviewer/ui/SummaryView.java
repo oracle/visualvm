@@ -92,6 +92,8 @@ public class SummaryView {
     
     protected HeapView createDefaultSummary() { return null; }
     
+    protected void uiCreated(List<HeapView> views) {}
+    
     
     private void initUI() {
         toolbar = ProfilerToolbar.create(false);
@@ -109,6 +111,8 @@ public class SummaryView {
             ProfilerToolbar viewToolbar = view.getToolbar();
             if (viewToolbar != null) toolbar.add(viewToolbar);
         }
+        
+        uiCreated(new ArrayList(content));
         
         component = new ScrollableContainer(p);
         
