@@ -338,7 +338,7 @@ class JavaOverviewSummary extends HeapView {
             add(new SectionSeparator(text), BorderLayout.NORTH);
             
             TableModel model = new DefaultTableModel(data, new Object[] { Bundle.JavaOverviewSummary_NameColumn(),
-                                                                          Bundle.JavaOverviewSummary_NameColumn() }) {
+                                                                          Bundle.JavaOverviewSummary_ValueColumn() }) {
                 public boolean isCellEditable(int row, int column) { return false; }
             };
             SummaryView.SimpleTable table = new SummaryView.SimpleTable(model, fillerColumn);
