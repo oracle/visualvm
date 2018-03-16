@@ -75,6 +75,9 @@ public class NetBeansApplicationTypeFactory extends MainClassApplicationTypeFact
             String clustersString=args.substring(clusterIndex);
             int endIndex = clustersString.indexOf(" -");  // NOI18N
             Scanner clusterScanner;
+            if (endIndex == -1) {
+                endIndex = clustersString.indexOf(" exit");  // NOI18N
+            }
             if (endIndex > -1) {
                 clustersString = clustersString.substring(0,endIndex);
             }
