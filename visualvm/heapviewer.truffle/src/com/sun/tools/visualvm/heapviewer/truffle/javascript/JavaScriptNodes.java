@@ -91,7 +91,7 @@ class JavaScriptNodes {
             }
         } else if ("Null$NullClass".equals(type)) {
             return DetailsSupport.getDetailsString(dobject.getInstance(), heap);
-        } else if ("JSDate".equals(type)) {
+        } else if ("Date".equals(type) || "JSDate".equals(type)) {
             FieldValue timeField = dobject.getFieldValue("timeMillis (hidden)");
             if (timeField != null) {
                 double time = Double.parseDouble(timeField.getValue());
