@@ -191,7 +191,8 @@ public class CalibrationDataFileIO {
                     || CommonConstants.JDK_16_STRING.equals(javaVersionString)
                     || CommonConstants.JDK_17_STRING.equals(javaVersionString)
                     || CommonConstants.JDK_18_STRING.equals(javaVersionString)
-                    || CommonConstants.JDK_19_STRING.equals(javaVersionString)) {
+                    || CommonConstants.JDK_19_STRING.equals(javaVersionString)
+                    || CommonConstants.JDK_100_STRING.equals(javaVersionString)) {
                 if (new File(javaExecutable).exists()) {
                     return true;
                 }

@@ -183,13 +183,13 @@ public class ProfilerInterface implements CommonConstants {
                 e.printStackTrace(System.err);
             }
 
-            if (Platform.getJDKVersionNumber() == CommonConstants.JDK_19) {
+            if (Platform.getJDKVersionNumber() >= CommonConstants.JDK_19) {
                 try {
                     // preload classes for classLoadHook()
-                    Class.forName("java.lang.reflect.WeakPairMap$Pair"); // NOI18N
-                    Class.forName("java.lang.reflect.WeakPairMap$WeakRefPeer");    // NOI18N
-                    Class.forName("java.lang.reflect.WeakPairMap$Pair$Weak"); // NOI18N
-                    Class.forName("java.lang.reflect.WeakPairMap$Pair$Weak$1"); // NOI18N
+                    Class.forName("java.lang.WeakPairMap$Pair"); // NOI18N
+                    Class.forName("java.lang.WeakPairMap$WeakRefPeer");    // NOI18N
+                    Class.forName("java.lang.WeakPairMap$Pair$Weak"); // NOI18N
+                    Class.forName("java.lang.WeakPairMap$Pair$Weak$1"); // NOI18N
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace(System.err);
                 }
@@ -1482,7 +1482,7 @@ public class ProfilerInterface implements CommonConstants {
                     }
                 }
             }
-        } else if (status.remoteProfiling || Platform.getJDKVersionNumber() == Platform.JDK_19) {
+        } else if (status.remoteProfiling || Platform.getJDKVersionNumber() >= Platform.JDK_19) {
             classFileBytes = ClassBytesLoader.getClassFileBytes(classURL);
         }
         return classFileBytes;

@@ -54,7 +54,7 @@ public interface JavaClassConstants {
 
     /* Class file constants */
     public static final int JAVA_MAGIC = 0xCAFEBABE;
-    public static final int JAVA_MAJOR_VERSION = 53;
+    public static final int JAVA_MAJOR_VERSION = 54;
     public static final int JAVA_MINOR_VERSION = 0;
     public static final int JAVA_MIN_MAJOR_VERSION = 45;
     public static final int JAVA_MIN_MINOR_VERSION = 3;
