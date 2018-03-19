@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/jvmfinder.o \
 	${OBJECTDIR}/o.n.bootstrap/utilsfuncs.o \
 	${OBJECTDIR}/visualvm.o \
 	${OBJECTDIR}/visualvmlauncher.o
@@ -63,17 +64,22 @@ LDLIBSOPTIONS=visualvm.res
 visualvm.exe: ${OBJECTFILES}
 	${LINK.cc} -o visualvm.exe ${OBJECTFILES} ${LDLIBSOPTIONS} -mwindows -Wl,--nxcompat -Wl,--dynamicbase -Wl,--no-seh
 
-${OBJECTDIR}/o.n.bootstrap/utilsfuncs.o: o.n.bootstrap/utilsfuncs.cpp 
+${OBJECTDIR}/jvmfinder.o: jvmfinder.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -s -DARCHITECTURE=32 -DNBEXEC_DLL=\"/lib/nbexec.dll\" -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/jvmfinder.o jvmfinder.cpp
+
+${OBJECTDIR}/o.n.bootstrap/utilsfuncs.o: o.n.bootstrap/utilsfuncs.cpp
 	${MKDIR} -p ${OBJECTDIR}/o.n.bootstrap
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -s -DARCHITECTURE=32 -DNBEXEC_DLL=\"/lib/nbexec.dll\" -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/o.n.bootstrap/utilsfuncs.o o.n.bootstrap/utilsfuncs.cpp
 
-${OBJECTDIR}/visualvm.o: visualvm.cpp 
+${OBJECTDIR}/visualvm.o: visualvm.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -s -DARCHITECTURE=32 -DNBEXEC_DLL=\"/lib/nbexec.dll\" -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/visualvm.o visualvm.cpp
 
-${OBJECTDIR}/visualvmlauncher.o: visualvmlauncher.cpp 
+${OBJECTDIR}/visualvmlauncher.o: visualvmlauncher.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -s -DARCHITECTURE=32 -DNBEXEC_DLL=\"/lib/nbexec.dll\" -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/visualvmlauncher.o visualvmlauncher.cpp
@@ -84,7 +90,6 @@ ${OBJECTDIR}/visualvmlauncher.o: visualvmlauncher.cpp
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} visualvm.exe
 
 # Subprojects
 .clean-subprojects:

@@ -30,9 +30,11 @@
 #include <windows.h>
 #include <cstddef>
 #include "cmdargs.h"
+#include "jvmfinder.h"
 
 class VisualVMLauncher {
 protected:
+    static const char *REQ_JAVA_VERSION;
     static const char *NBEXEC_FILE_PATH;
     static const char *OPT_VISUALVM_DEFAULT_USER_DIR;
     static const char *OPT_VISUALVM_DEFAULT_CACHE_DIR;
@@ -102,9 +104,11 @@ protected:
     std::string extraClusters;
     std::string nbOptions;
     std::string jdkHome;
+    bool jdkOptionFound;
     
 private:
     bool customUserDirFound;
+    JvmFinder jvmFinder;
 };
 
 #endif	/* _NBLAUNCHER_H */
