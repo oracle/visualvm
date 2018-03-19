@@ -96,15 +96,19 @@ class JavaScriptHeapFragment extends TruffleLanguageHeapFragment.DynamicObjectBa
 
     @Override
     protected String getObjectType(JavaScriptDynamicObject object) {
-        Instance instance = object.getInstance();
-        Instance prototype = JavaScriptDynamicObject.getPrototype(instance);
-        
-//        return JavaScriptDynamicObject.getJSTypeOrig(instance, heap);
-        
-        String type = typesCache.get(prototype);
+        Instance shape = object.getShape();
+        String type = typesCache.get(shape);
+
         if (type == null) {
-            type = JavaScriptDynamicObject.getJSType(instance, prototype, heap);
-            typesCache.put(prototype, type);
+            Instance instance = object.getInstance();
+            Instance prototype = JavaScriptDynamicObject.getPrototype(instance);
+
+            type = typesCache.get(prototype);
+            if (type == null) {
+                type = JavaScriptDynamicObject.getJSType(instance, prototype, heap);
+                typesCache.put(prototype, type);
+            }
+            typesCache.put(shape, type);
         }
         
         return type;
