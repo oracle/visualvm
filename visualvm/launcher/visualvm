@@ -211,6 +211,7 @@ case "`uname`" in
             '"-J-Xdock:icon=$basedir/etc/visualvm.icns"' \
             --branding visualvm \
             --clusters '"$visualvm_clusters"' \
+            --laf com.apple.laf.AquaLookAndFeel \
             ${visualvm_default_options} \
             '"$@"'
         ;;
