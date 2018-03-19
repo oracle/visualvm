@@ -71,6 +71,7 @@ public class DynamicObject {
     private List<FieldValue> staticValues;
 
     public DynamicObject(Instance dynObj) {
+        if (dynObj == null) throw new IllegalArgumentException("Instance cannot be null");
         this.instance = dynObj;
     }
     

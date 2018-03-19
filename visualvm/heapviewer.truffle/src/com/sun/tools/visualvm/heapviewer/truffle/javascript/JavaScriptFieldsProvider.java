@@ -42,6 +42,7 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
+import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectFieldNode;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
@@ -150,8 +151,14 @@ public class JavaScriptFieldsProvider extends HeapViewerNode.Provider {
         if (field instanceof ObjectFieldValue) {
             Instance instance = ((ObjectFieldValue)field).getInstance();
             if (DynamicObject.isDynamicObject(instance)) {
-                DynamicObject dobject = new DynamicObject(instance);
-                return new JavaScriptNodes.JavaScriptDynamicObjectFieldNode(dobject, dobject.getType(heap), field);
+                JavaScriptDynamicObject jsdobj = new JavaScriptDynamicObject(instance);
+                if (jsdobj.isJavaScriptObject()) {
+                    return new JavaScriptNodes.JavaScriptDynamicObjectFieldNode(jsdobj, jsdobj.getType(heap), field);
+                } else {
+                    // Non-JavaScript object
+                    DynamicObject dobj = new DynamicObject(jsdobj.getInstance());
+                    return new DynamicObjectFieldNode(dobj, dobj.getType(heap), field);
+                }
             } else {
                 return new TerminalJavaNodes.Field((ObjectFieldValue)field, false);
             }

@@ -42,6 +42,7 @@ import com.sun.tools.visualvm.heapviewer.truffle.TruffleStackTraces;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
 import com.sun.tools.visualvm.heapviewer.model.TextNode;
+import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
 
 /**
  *
@@ -91,8 +92,14 @@ class RubyThreadsObjects {
                         if (!DynamicObject.isDynamicObject(instance)) {
                             localObjects.add(new LocalObjectNode(instance));
                         } else {
-                            DynamicObject dobject = new DynamicObject(instance);
-                            localObjects.add(new RubyNodes.RubyLocalDynamicObjectNode(dobject, dobject.getType(heap)));
+                            RubyDynamicObject rbdobj = new RubyDynamicObject(instance);
+                            if (rbdobj.isRubyObject()) {
+                                localObjects.add(new RubyNodes.RubyLocalDynamicObjectNode(rbdobj, rbdobj.getType(heap)));
+                            } else {
+                                // Non-Ruby object
+                                DynamicObject dobj = new DynamicObject(rbdobj.getInstance());
+                                localObjects.add(new DynamicObjectNode(dobj, dobj.getType(heap)));
+                            }
                         }
 
                     }

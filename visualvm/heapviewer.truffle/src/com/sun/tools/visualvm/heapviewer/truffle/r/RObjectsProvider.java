@@ -63,7 +63,7 @@ public class RObjectsProvider extends AbstractObjectsProvider {
                     return new RObjectNode(robject);
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
-                    Iterator<Instance> rinstances = fragment.getRObjectsIterator();
+                    Iterator<Instance> rinstances = fragment.getInstancesIterator();
                     return new ProgressIterator(rinstances, index, true, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
@@ -82,7 +82,7 @@ public class RObjectsProvider extends AbstractObjectsProvider {
             List<HeapViewerNode> nodes = new ArrayList();
             Map<String, RObjectsContainer> types = new HashMap();
             
-            Iterator<Instance> instances = fragment.getRObjectsIterator();
+            Iterator<Instance> instances = fragment.getInstancesIterator();
             progress.setupUnknownSteps();
             
             while (instances.hasNext()) {
@@ -186,7 +186,7 @@ public class RObjectsProvider extends AbstractObjectsProvider {
         RHeapFragment fragment = (RHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
         
-        Iterator<Instance> instancesI = fragment.getRObjectsIterator();
+        Iterator<Instance> instancesI = fragment.getInstancesIterator();
         
         if (aggregation == 0) {
             progress.setupUnknownSteps();

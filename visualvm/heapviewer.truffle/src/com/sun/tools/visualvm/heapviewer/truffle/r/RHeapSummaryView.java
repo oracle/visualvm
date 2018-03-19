@@ -50,7 +50,7 @@ public class RHeapSummaryView extends TruffleLanguageSummaryView {
         long robjectsSize = 0;
         NumberFormat numberFormat = NumberFormat.getInstance();
         RHeapFragment fragment = (RHeapFragment)context.getFragment();
-        Iterator<Instance> robjIter = fragment.getRObjectsIterator();
+        Iterator<Instance> robjIter = fragment.getInstancesIterator();
 
         while (robjIter.hasNext()) {
             Instance robj = robjIter.next();

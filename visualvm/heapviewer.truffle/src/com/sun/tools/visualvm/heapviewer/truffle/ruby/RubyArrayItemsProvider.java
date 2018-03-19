@@ -40,9 +40,9 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
+import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectArrayItemNode;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
-import static com.sun.tools.visualvm.heapviewer.utils.NodesComputer.integerIterator;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -113,8 +113,14 @@ public class RubyArrayItemsProvider extends HeapViewerNode.Provider {
                     ArrayItemValue item = items.get(index);
                     Instance instance = item.getInstance();
                     if (DynamicObject.isDynamicObject(instance)) {
-                        DynamicObject dobject = new DynamicObject(instance);
-                        return new RubyNodes.RubyDynamicObjectArrayItemNode(dobject, dobject.getType(heap), item);
+                        RubyDynamicObject rbdobj = new RubyDynamicObject(instance);
+                        if (rbdobj.isRubyObject()) {
+                            return new RubyNodes.RubyDynamicObjectArrayItemNode(rbdobj, rbdobj.getType(heap), item);
+                        } else {
+                            // Non-Ruby object
+                            DynamicObject dobj = new DynamicObject(rbdobj.getInstance());
+                            return new DynamicObjectArrayItemNode(dobj, dobj.getType(heap), item);
+                        }
                     } else {
                         return new TerminalJavaNodes.ArrayItem(item, false);
                     }

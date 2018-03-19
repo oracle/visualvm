@@ -24,7 +24,6 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
 import java.io.File;
 import java.io.IOException;
 import org.netbeans.lib.profiler.heap.Heap;
@@ -32,6 +31,7 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.HeapFragment;
+import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageSupport;
 import java.util.Iterator;
@@ -42,13 +42,55 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
-class RubyHeapFragment extends TruffleLanguageHeapFragment {
+class RubyHeapFragment extends TruffleLanguageHeapFragment.DynamicObjectBased<RubyDynamicObject, RubyType> {
+    
+    static final String RUBY_LANG_ID = "org.truffleruby.language.RubyObjectType"; // NOI18N
     
     private static final String RUBY_HEAP_ID = "ruby_heap";
     
     
-    RubyHeapFragment(Instance langInfo, Heap heap) throws IOException {
-        super("Ruby Heap", RUBY_HEAP_ID, langInfo, heap);
+    RubyHeapFragment(Instance langID, Heap heap) throws IOException {
+        super(RUBY_HEAP_ID, "Ruby Heap", fragmentDescription(langID, heap), heap);
+    }
+    
+    
+    @Override
+    protected RubyDynamicObject createObject(Instance instance) {
+        return new RubyDynamicObject(instance);
+    }
+
+    @Override
+    protected RubyType createTruffleType(String name) {
+        return new RubyType(name);
+    }
+
+    
+    @Override
+    protected Iterator<Instance> getInstancesIterator() {
+        return languageInstancesIterator(RUBY_LANG_ID);
+    }
+    
+    @Override
+    protected Iterator<RubyDynamicObject> getObjectsIterator() {
+        return languageObjectsIterator(RUBY_LANG_ID);
+    }
+
+    
+    @Override
+    protected long getObjectSize(RubyDynamicObject object) {
+        return object.getInstance().getSize();
+    }
+    
+    @Override
+    protected long getObjectRetainedSize(RubyDynamicObject object) {
+        return DataType.RETAINED_SIZE.valuesAvailable(heap) ?
+               object.getInstance().getRetainedSize() :
+               DataType.RETAINED_SIZE.getNotAvailableValue();
+    }
+
+    @Override
+    protected String getObjectType(RubyDynamicObject object) {
+        return object.getType(heap);
     }
     
     
@@ -65,30 +107,17 @@ class RubyHeapFragment extends TruffleLanguageHeapFragment {
         return null;
     }
     
-    static RubyHeapFragment heap(Heap heap) {
-        return (RubyHeapFragment)heap;
-    }
-    
-    
-    Iterator<Instance> getRubyInstancesIterator() {
-        return getLanguageInstancesIterator(RubyObjectsProvider.RUBY_LANG_ID);
-    }
-    
-    Iterator<DynamicObject> getRubyObjectsIterator() {
-        return getDynamicObjectsIterator(RubyObjectsProvider.RUBY_LANG_ID);
-    }
-    
     
     @ServiceProvider(service=HeapFragment.Provider.class, position = 300)
     public static class Provider extends HeapFragment.Provider {
 
-        private static final String RUBY_LANG_ID = "Ruby";  // NOI18N
+        private static final String RUBY_LANGINFO_ID = "Ruby";  // NOI18N
 
         public HeapFragment getFragment(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) throws IOException {
-            Instance langInfo = TruffleLanguageSupport.getLanguageInfo(heap, RUBY_LANG_ID);
-            JavaClass RubyMainClass = heap.getJavaClassByName(RubyObjectsProvider.RUBY_LANG_ID);
+            Instance langID = TruffleLanguageSupport.getLanguageInfo(heap, RUBY_LANGINFO_ID);
+            JavaClass rubyMainClass = heap.getJavaClassByName(RUBY_LANG_ID);
 
-            return langInfo != null && RubyMainClass != null ? new RubyHeapFragment(langInfo, heap) : null;
+            return langID != null && rubyMainClass != null ? new RubyHeapFragment(langID, heap) : null;
         }
 
     }

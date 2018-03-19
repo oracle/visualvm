@@ -57,6 +57,8 @@ public class JavaScriptNodesRendererProvider extends HeapViewerRenderer.Provider
         
         renderers.put(JavaScriptNodes.JavaScriptDynamicObjectNode.class, new DynamicObjectNode.Renderer(heap, instanceIcon));
         
+        renderers.put(JavaScriptTypeNode.class, new DynamicObjectsContainer.Renderer(packageIcon));
+        
         renderers.put(JavaScriptNodes.JavaScriptDynamicObjectsContainer.class, new DynamicObjectsContainer.Renderer(packageIcon));
         
         renderers.put(JavaScriptNodes.JavaScriptDynamicObjectFieldNode.class, new DynamicObjectFieldNode.Renderer(heap, instanceIcon));

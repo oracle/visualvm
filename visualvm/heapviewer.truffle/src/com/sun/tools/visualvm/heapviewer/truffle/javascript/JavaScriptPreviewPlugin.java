@@ -75,7 +75,7 @@ class JavaScriptPreviewPlugin extends HeapViewPlugin {
         if (!(node instanceof DynamicObjectNode)) { component.showInstance(null); return; }
         
         DynamicObjectNode dnode = (DynamicObjectNode)node;
-        if ("JSFunction".equals(dnode.getType())) {
+        if ("Function".equals(dnode.getType()) || "JSFunction".equals(dnode.getType())) {
             DynamicObject dobject = dnode.getDynamicObject();
             FieldValue dataField = dobject.getFieldValue("functionData (hidden)");
             Instance data = dataField instanceof ObjectFieldValue ? ((ObjectFieldValue)dataField).getInstance() : null;

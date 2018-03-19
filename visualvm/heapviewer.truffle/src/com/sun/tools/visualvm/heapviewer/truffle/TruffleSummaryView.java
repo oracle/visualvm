@@ -35,12 +35,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.text.NumberFormat;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -185,43 +180,45 @@ public class TruffleSummaryView extends HeapViewerFeature {
         }
         
         
-        protected abstract Iterator getObjectsIterator();
-        
-        protected abstract String getType(Object object, Map<Object, String> typesCache);
-        
-        protected abstract long updateObjectsSize(Object object, long objectsSize);
-        
-        protected long getObjectsSize(long objectsSize, long objectsCount) { return objectsSize; };
+//        protected abstract Iterator getObjectsIterator();
+//        
+//        protected abstract String getType(Object object, Map<Object, String> typesCache);
+//        
+//        protected abstract long updateObjectsSize(Object object, long objectsSize);
+//        
+//        protected long getObjectsSize(long objectsSize, long objectsCount) { return objectsSize; };
         
         protected void computeHeapData(Object[][] heapData) {
-            long objectsCount = 0;
-            long objectsSize = 0;
-            
-            Map<Object, String> typesCache = new HashMap();
-            Set<String> types = new HashSet();
-            
-            Iterator objectsI = getObjectsIterator();
+//            long objectsCount = 0;
+//            long objectsSize = 0;
+//            
+//            Map<Object, String> typesCache = new HashMap();
+//            Set<String> types = new HashSet();
+//            
+//            Iterator objectsI = getObjectsIterator();
+//
+//            while (objectsI.hasNext()) {
+//                Object object = objectsI.next();
+//                
+//                objectsCount++;
+//                objectsSize = updateObjectsSize(object, objectsSize);
+//                
+//                String type = getType(object, typesCache);
+//                types.add(type);
+//            }
 
-            while (objectsI.hasNext()) {
-                Object object = objectsI.next();
-                
-                objectsCount++;
-                objectsSize = updateObjectsSize(object, objectsSize);
-                
-                String type = getType(object, typesCache);
-                types.add(type);
-            }
+            TruffleLanguageHeapFragment fragment = (TruffleLanguageHeapFragment)context.getFragment();
             
             NumberFormat numberFormat = NumberFormat.getInstance();
             
             heapData[0][0] = Bundle.TruffleOverviewSummary_SizeItem();
-            heapData[0][1] = numberFormat.format(getObjectsSize(objectsSize, objectsCount)) + " B";
+            heapData[0][1] = numberFormat.format(fragment.getHeapSize(null)) + " B";
             
             heapData[1][0] = Bundle.TruffleOverviewSummary_TypesItem();
-            heapData[1][1] = numberFormat.format(types.size());
+            heapData[1][1] = numberFormat.format(fragment.getTypes(null).size());
             
             heapData[2][0] = Bundle.TruffleOverviewSummary_ObjectsItem();
-            heapData[2][1] = numberFormat.format(objectsCount);
+            heapData[2][1] = numberFormat.format(fragment.getObjectsCount(null));
         }
         
         protected void computeEnvironmentData(Object[][] environmentData) {

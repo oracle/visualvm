@@ -34,131 +34,171 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import com.sun.tools.visualvm.heapviewer.HeapFragment;
+import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.utils.HeapUtils;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public abstract class TruffleLanguageHeapFragment extends HeapFragment {
+// TODO: TruffleObject should be introduced - superclass for DynamicObject, PythonObject, RObject
+//
+// O: type of base language objects (DynamicObject, PythonObject, RObject)
+// T: TruffleType or its subclass aggregating O objects
+public abstract class TruffleLanguageHeapFragment<O extends Object, T extends TruffleType<O>> extends HeapFragment {
+    
+    private long heapSize;
+    private long objectsCount;
+    private List<T> types;
+    private final Object statisticsLock = new Object();
+    
+//    private Progress statisticsProgress;
+//    private final Object statisticsProgressLock = new Object();
+    
 
-    protected TruffleLanguageHeapFragment(String name, String ID, Instance langInfo, Heap heap) throws IOException {
-        super(ID, name, createFragmentDescription(langInfo, heap), heap);
+    protected TruffleLanguageHeapFragment(String ID, String name, String description, Heap heap) throws IOException {
+        super(ID, name, description, heap);
     }
+    
+    
+    public long getHeapSize(Progress progress) {
+        synchronized (statisticsLock) {
+            if (types == null) computeStatistics(progress);
+            return heapSize;
+        }
+    }
+    
+    public long getObjectsCount(Progress progress) {
+        synchronized (statisticsLock) {
+            if (types == null) computeStatistics(progress);
+            return objectsCount;
+        }
+    }
+    
+    public List<T> getTypes(final Progress progress) {
+//        if (progress != null) {
+//            synchronized (statisticsProgressLock) {
+//                if (statisticsProgress != null) {
+//                    statisticsProgress.addChangeListener(new Progress.Listener() {
+//                        @Override
+//                        public void progressChanged(Progress.Event event) {
+//                            progress.setCurrentStep(event.getCurrentStep());
+//                        }
+//                    });
+//                }
+//            }
+//        }
+            
+        synchronized (statisticsLock) {
+            if (types == null) computeStatistics(progress);
+            return types;
+        }
+        
+//        TODO: remove progress listener
+    }
+    
+    
+    protected abstract O createObject(Instance instance);
+    
+    protected abstract T createTruffleType(String name);
+    
+    
+    protected abstract Iterator<Instance> getInstancesIterator();
+    
+    protected Iterator<O> getObjectsIterator() {
+        return new ObjectsIterator(getInstancesIterator());
+    }
+    
+    
+    protected abstract long getObjectSize(O object);
+    
+    protected abstract long getObjectRetainedSize(O object);
+    
+    protected abstract String getObjectType(O object);
+    
+    
+    private void computeStatistics(Progress progress) {
+//        if (statisticsProgress == null) synchronized (statisticsProgressLock) {
+//            if (progress != null) {
+//                statisticsProgress = progress;
+//            } else {
+//                statisticsProgress = new Progress();
+//                statisticsProgress.setupUnknownSteps();
+//            }
+//        }
+        
+        Map<String, T> cache = new HashMap();
+        Iterator<O> objects = getObjectsIterator();
+        
+        while (objects.hasNext()) {
+            O object = objects.next();
+            
+//            if (statisticsProgress != null) statisticsProgress.step();
+            objectsCount++;
+            
+            long objectSize = getObjectSize(object);
+            heapSize += objectSize;
+            
+            long objectRetainedSize = getObjectRetainedSize(object);
+            
+            String typeName = getObjectType(object);
+            T type = cache.get(typeName);
+            if (type == null) {
+                type = createTruffleType(typeName);
+                cache.put(typeName, type);
+            }
+            type.addObject(object, objectSize, objectRetainedSize);
+        }
+        
+        types = Collections.unmodifiableList(new ArrayList(cache.values()));
+    }
+    
+    
+    
 
-    public Iterator<Instance> getInstancesIterator(String javaClassFqn) {
+    protected final Iterator<Instance> instancesIterator(String javaClassFqn) {
         return new InstancesIterator(HeapUtils.getSubclasses(heap, javaClassFqn));
     }
     
-    public Iterator<Instance> getInstancesIterator(String[] javaClassFqns) {
+    protected final Iterator<Instance> instancesIterator(String[] javaClassFqns) {
         List classes = new ArrayList();
-
-        for (String fqn : javaClassFqns) {
+        for (String fqn : javaClassFqns)
             classes.addAll(HeapUtils.getSubclasses(heap, fqn));
-        }
         return new InstancesIterator(classes);
     }
-
-    public Iterator<Instance> getLanguageInstancesIterator(String languageID) {
-        Iterator<Instance> instIt = new InstancesIterator(HeapUtils.getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
-        
-        return new LanguageInstanceFilterIterator(instIt, languageID);
-    }
-
-    public Iterator<DynamicObject> getDynamicObjectsIterator() {
-        return new DynamicObjectsIterator(HeapUtils.getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
-    }
-
-    public Iterator<DynamicObject> getDynamicObjectsIterator(String languageID) {
-        Iterator<DynamicObject> dynIt = new DynamicObjectsIterator(HeapUtils.getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
-
-        return new LanguageFilterIterator(dynIt, languageID);
-    }
-
-    private static String createFragmentDescription(Instance langInfo, Heap heap) {
-        return DetailsSupport.getDetailsString(langInfo, heap);
-    }
-
-    private static class LanguageFilterIterator implements Iterator<DynamicObject> {
-        private final String languageID;
-        private final Iterator<DynamicObject> dynamicObjIterator;
-        private DynamicObject next;
-
-        private LanguageFilterIterator(Iterator<DynamicObject> dynIt, String langID) {
-            dynamicObjIterator = dynIt;
-            languageID = langID;
-        }
-
-        @Override
-        public boolean hasNext() {
-            if (next != null) {
-                return true;
-            }
-            while (dynamicObjIterator.hasNext()) {
-                DynamicObject dynObj = dynamicObjIterator.next();
-                if (languageID.equals(dynObj.getLanguageId().getName())) {
-                    next = dynObj;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        @Override
-        public DynamicObject next() {
-            if (hasNext()) {
-                DynamicObject dynObj = next;
-                next = null;
-                return dynObj;
-            }
-            throw new NoSuchElementException();
-        }
-    }
+//
+//    public Iterator<Instance> getLanguageInstancesIterator(String languageID) {
+//        Iterator<Instance> instIt = new InstancesIterator(HeapUtils.getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
+//        
+//        return new LanguageInstanceFilterIterator(instIt, languageID);
+//    }
+//
+//    public Iterator<O> getObjectsIterator() {
+//        return new ObjectsIterator(HeapUtils.getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
+//    }
+//
+//    protected Iterator<O> getObjectsIterator(String languageID) {
+//        Iterator<O> dynIt = new ObjectsIterator(HeapUtils.getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
+//
+//        return new LanguageFilterIterator(dynIt, languageID);
+//    }
     
-    private static class LanguageInstanceFilterIterator implements Iterator<Instance> {
-        private final String languageID;
-        private final Iterator<Instance> instancesIterator;
-        private Instance next;
 
-        private LanguageInstanceFilterIterator(Iterator<Instance> instIt, String langID) {
-            instancesIterator = instIt;
-            languageID = langID;
-        }
-
-        @Override
-        public boolean hasNext() {
-            if (next != null) {
-                return true;
-            }
-            while (instancesIterator.hasNext()) {
-                Instance inst = instancesIterator.next();
-                JavaClass langId = DynamicObject.getLanguageId(inst);
-                if (langId != null && languageID.equals(langId.getName())) {
-                    next = inst;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        @Override
-        public Instance next() {
-            if (hasNext()) {
-                Instance inst = next;
-                next = null;
-                return inst;
-            }
-            throw new NoSuchElementException();
-        }
+    
+    protected static String fragmentDescription(Instance langID, Heap heap) {
+        return DetailsSupport.getDetailsString(langID, heap);
     }
 
-    private class InstancesIterator implements Iterator<Instance> {
-        Iterator<JavaClass> classIt;
-        Iterator<Instance> instanceIt;
+    
+    protected static class InstancesIterator implements Iterator<Instance> {
+        private final Iterator<JavaClass> classIt;
+        private Iterator<Instance> instanceIt;
 
-        private InstancesIterator(Collection<JavaClass> cls) {
+        protected InstancesIterator(Collection<JavaClass> cls) {
             classIt = cls.iterator();
             instanceIt = Collections.EMPTY_LIST.iterator();
         }
@@ -181,10 +221,14 @@ public abstract class TruffleLanguageHeapFragment extends HeapFragment {
         }
     }
 
-    private class DynamicObjectsIterator implements Iterator<DynamicObject> {
-        InstancesIterator instancesIter;
+    protected class ObjectsIterator implements Iterator<O> {
+        private final Iterator<Instance> instancesIter;
+        
+        protected ObjectsIterator(Iterator<Instance> iter) {
+            instancesIter = iter;
+        }
 
-        private DynamicObjectsIterator(Collection<JavaClass> cls) {
+        protected ObjectsIterator(Collection<JavaClass> cls) {
             instancesIter = new InstancesIterator(cls);
         }
 
@@ -194,9 +238,105 @@ public abstract class TruffleLanguageHeapFragment extends HeapFragment {
         }
 
         @Override
-        public DynamicObject next() {
-            return new DynamicObject(instancesIter.next());
+        public O next() {
+            return createObject(instancesIter.next());
         }
+    }
+    
+    
+    public static abstract class DynamicObjectBased<D extends DynamicObject, T extends TruffleType<D>> extends TruffleLanguageHeapFragment<D, T> {
+        
+        protected DynamicObjectBased(String ID, String name, String description, Heap heap) throws IOException {
+            super(ID, name, description, heap);
+        }
+        
+        
+        protected final Iterator<Instance> languageInstancesIterator(String languageID) {
+            Iterator<Instance> instIt = new InstancesIterator(HeapUtils.getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
+
+            return new LanguageInstanceFilterIterator(instIt, languageID);
+        }
+        
+        protected final Iterator<D> languageObjectsIterator(String languageID) {
+            Iterator<D> dynIt = new ObjectsIterator(HeapUtils.getSubclasses(heap, DynamicObject.DYNAMIC_OBJECT_FQN));
+
+            return new LanguageFilterIterator(dynIt, languageID);
+        }
+        
+        
+        private class LanguageFilterIterator implements Iterator<D> {
+            private final String languageID;
+            private final Iterator<D> objIterator;
+            private D next;
+
+            private LanguageFilterIterator(Iterator<D> oit, String langID) {
+                objIterator = oit;
+                languageID = langID;
+            }
+
+            @Override
+            public boolean hasNext() {
+                if (next != null) {
+                    return true;
+                }
+                while (objIterator.hasNext()) {
+                    D dobj = objIterator.next();
+                    if (languageID.equals(dobj.getLanguageId().getName())) {
+                        next = dobj;
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public D next() {
+                if (hasNext()) {
+                    D dobj = next;
+                    next = null;
+                    return dobj;
+                }
+                throw new NoSuchElementException();
+            }
+        }
+
+        private static class LanguageInstanceFilterIterator implements Iterator<Instance> {
+            private final String languageID;
+            private final Iterator<Instance> instancesIterator;
+            private Instance next;
+
+            private LanguageInstanceFilterIterator(Iterator<Instance> instIt, String langID) {
+                instancesIterator = instIt;
+                languageID = langID;
+            }
+
+            @Override
+            public boolean hasNext() {
+                if (next != null) {
+                    return true;
+                }
+                while (instancesIterator.hasNext()) {
+                    Instance inst = instancesIterator.next();
+                    JavaClass langId = DynamicObject.getLanguageId(inst);
+                    if (langId != null && languageID.equals(langId.getName())) {
+                        next = inst;
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public Instance next() {
+                if (hasNext()) {
+                    Instance inst = next;
+                    next = null;
+                    return inst;
+                }
+                throw new NoSuchElementException();
+            }
+        }
+        
     }
 
 }

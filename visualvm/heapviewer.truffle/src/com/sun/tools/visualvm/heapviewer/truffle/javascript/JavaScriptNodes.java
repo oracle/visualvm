@@ -51,7 +51,7 @@ class JavaScriptNodes {
     static String getLogicalValue(DynamicObject dobject, String type, Heap heap) {
         String logicalValue = null;
 
-        if ("JSFunction".equals(type)) {
+        if ("Function".equals(type) || "JSFunction".equals(type)) {
             FieldValue dataField = dobject.getFieldValue("functionData (hidden)");
             Instance data = dataField instanceof ObjectFieldValue ? ((ObjectFieldValue)dataField).getInstance() : null;
 //                Instance data = (Instance)getInstance().getValueOfField("object2");
@@ -62,7 +62,7 @@ class JavaScriptNodes {
             Instance name = nameField instanceof ObjectFieldValue ? ((ObjectFieldValue)nameField).getInstance() : null;
 //                Instance name = (Instance)getInstance().getValueOfField("object2");
             logicalValue = name == null ? null : DetailsSupport.getDetailsString(name, heap);
-        } else if ("JSUserObject".equals(type)) {
+        } else if ("Object".equals(type) || "JSObject".equals(type)) {
             String head = "properties [";
             String sep = ", ";
             
@@ -80,7 +80,7 @@ class JavaScriptNodes {
             sb.append("]");
             
             logicalValue = sb.toString();
-        } else if ("JSArray".equals(type)) {
+        } else if ("Array".equals(type) || "JSArray".equals(type)) {
             FieldValue lengthField = dobject.getFieldValue("length (hidden)");
             if (lengthField == null) {
                 lengthField = dobject.getFieldValue("usedLength (hidden)");
@@ -116,7 +116,7 @@ class JavaScriptNodes {
     
     static class JavaScriptDynamicObjectNode extends DynamicObjectNode implements JavaScriptNode {
         
-        JavaScriptDynamicObjectNode(DynamicObject dobject, String type) {
+        JavaScriptDynamicObjectNode(JavaScriptDynamicObject dobject, String type) {
             super(dobject, type);
         }
         
@@ -128,7 +128,7 @@ class JavaScriptNodes {
         
         
         public JavaScriptDynamicObjectNode createCopy() {
-            JavaScriptDynamicObjectNode copy = new JavaScriptDynamicObjectNode(getDynamicObject(), getType());
+            JavaScriptDynamicObjectNode copy = new JavaScriptDynamicObjectNode((JavaScriptDynamicObject)getDynamicObject(), getType());
             setupCopy(copy);
             return copy;
         }
@@ -150,7 +150,7 @@ class JavaScriptNodes {
         }
         
         protected JavaScriptDynamicObjectNode createNode(Instance instance) {
-            return new JavaScriptDynamicObjectNode(new DynamicObject(instance), name);
+            return new JavaScriptDynamicObjectNode(new JavaScriptDynamicObject(instance), name);
         }
         
         
@@ -168,7 +168,7 @@ class JavaScriptNodes {
     
     static class JavaScriptDynamicObjectFieldNode extends DynamicObjectFieldNode implements JavaScriptNode {
         
-        JavaScriptDynamicObjectFieldNode(DynamicObject dobject, String type, FieldValue field) {
+        JavaScriptDynamicObjectFieldNode(JavaScriptDynamicObject dobject, String type, FieldValue field) {
             super(dobject, type, field);
         }
         
@@ -179,14 +179,14 @@ class JavaScriptNodes {
         
         
         public JavaScriptDynamicObjectNode createCopy() {
-            return new JavaScriptDynamicObjectNode(getDynamicObject(), getType());
+            return new JavaScriptDynamicObjectNode((JavaScriptDynamicObject)getDynamicObject(), getType());
         }
         
     }
     
     static class JavaScriptDynamicObjectArrayItemNode extends DynamicObjectArrayItemNode implements JavaScriptNode {
         
-        JavaScriptDynamicObjectArrayItemNode(DynamicObject dobject, String type, ArrayItemValue item) {
+        JavaScriptDynamicObjectArrayItemNode(JavaScriptDynamicObject dobject, String type, ArrayItemValue item) {
             super(dobject, type, item);
         }
         
@@ -197,7 +197,7 @@ class JavaScriptNodes {
         
         
         public JavaScriptDynamicObjectNode createCopy() {
-            return new JavaScriptDynamicObjectNode(getDynamicObject(), getType());
+            return new JavaScriptDynamicObjectNode((JavaScriptDynamicObject)getDynamicObject(), getType());
         }
         
     }
@@ -205,7 +205,7 @@ class JavaScriptNodes {
     
     static class JavaScriptDynamicObjectReferenceNode extends DynamicObjectReferenceNode implements JavaScriptNode {
         
-        JavaScriptDynamicObjectReferenceNode(DynamicObject dobject, String type, FieldValue value) {
+        JavaScriptDynamicObjectReferenceNode(JavaScriptDynamicObject dobject, String type, FieldValue value) {
             super(dobject, type, value);
         }
         
@@ -216,14 +216,14 @@ class JavaScriptNodes {
         
         
         public JavaScriptDynamicObjectNode createCopy() {
-            return new JavaScriptDynamicObjectNode(getDynamicObject(), getType()); 
+            return new JavaScriptDynamicObjectNode((JavaScriptDynamicObject)getDynamicObject(), getType()); 
         }
         
     }
     
     static class JavaScriptLocalDynamicObjectNode extends LocalDynamicObjectNode implements JavaScriptNode {
         
-        JavaScriptLocalDynamicObjectNode(DynamicObject dobject, String type) {
+        JavaScriptLocalDynamicObjectNode(JavaScriptDynamicObject dobject, String type) {
             super(dobject, type);
         }
         
@@ -234,7 +234,7 @@ class JavaScriptNodes {
         
         
         public JavaScriptDynamicObjectNode createCopy() {
-            return new JavaScriptDynamicObjectNode(getDynamicObject(), getType()); 
+            return new JavaScriptDynamicObjectNode((JavaScriptDynamicObject)getDynamicObject(), getType()); 
         }
         
     }

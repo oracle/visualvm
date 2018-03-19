@@ -40,6 +40,7 @@ import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.java.ClassNode;
 import com.sun.tools.visualvm.heapviewer.java.InstanceNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
 import com.sun.tools.visualvm.heapviewer.utils.HeapUtils;
 import org.openide.util.NbBundle;
 
@@ -60,8 +61,14 @@ class JavaScriptThreadsHTML {
             Heap heap = context.getFragment().getHeap();
             Instance instance = HeapUtils.instanceFromHtml(urls, heap);
             if (DynamicObject.isDynamicObject(instance)) {
-                DynamicObject dobject = new DynamicObject(instance);
-                return new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, dobject.getType(heap));
+                JavaScriptDynamicObject jsdobj = new JavaScriptDynamicObject(instance);
+                if (jsdobj.isJavaScriptObject()) {
+                    return new JavaScriptNodes.JavaScriptDynamicObjectNode(jsdobj, jsdobj.getType(heap));
+                } else {
+                    // Non-JavaScript object
+                    DynamicObject dobj = new DynamicObject(jsdobj.getInstance());
+                    return new DynamicObjectNode(dobj, dobj.getType(heap));
+                }
             } else if (instance != null) {
                 return new InstanceNode(instance);
             } else {
@@ -135,52 +142,21 @@ class JavaScriptThreadsHTML {
     
     private static String printInstance(Instance in, Heap h, JavaClass jc) {
         if (DynamicObject.isDynamicObject(in)) {
-            DynamicObject dobj = new DynamicObject(in);
-            String instanceString = HeapUtils.instanceToHtml(in, false, h, jc);
-            String type = dobj.getType(h);
-            instanceString = instanceString.replace(">" + in.getJavaClass().getName() + "#", ">" + type + "#");
-            String logValue = JavaScriptNodes.getLogicalValue(dobj, type, h);
-            if (logValue != null) instanceString += " <span style=\"color: #666666\">: " + logValue + "</span>";
-            return instanceString;
+            JavaScriptDynamicObject jsdobj = new JavaScriptDynamicObject(in);
+            if (jsdobj.isJavaScriptObject()) {
+                String instanceString = HeapUtils.instanceToHtml(in, false, h, jc);
+                String type = jsdobj.getType(h);
+                instanceString = instanceString.replace(">" + in.getJavaClass().getName() + "#", ">" + HeapUtils.htmlize(type) + "#");
+                String logValue = JavaScriptNodes.getLogicalValue(jsdobj, type, h);
+                if (logValue != null) instanceString += " <span style=\"color: #666666\">: " + HeapUtils.htmlize(logValue) + "</span>";
+                return instanceString;
+            } else {
+                // Non-JavaScript object
+                return HeapUtils.instanceToHtml(in, true, h, jc);
+            }
         } else {
             return HeapUtils.instanceToHtml(in, true, h, jc);
         }
-        
-        
-//        String className;
-//        JavaClass jcls;
-//        
-//        if (in == null) {
-//            return "null";
-//        }
-//        jcls = in.getJavaClass();
-//        if (jcls == null) {
-//            return "unknown instance #"+in.getInstanceId(); // NOI18N
-//        }
-//        if (jcls.equals(jc)) {
-//            JavaClass javaClass = h.getJavaClassByID(in.getInstanceId());
-//            
-//            if (javaClass != null) {
-//                className = javaClass.getName();
-//                return "<a href='"+ CLASS_URL_PREFIX + className + "/" + javaClass.getJavaClassId() + "'>class " + className + "</a>"; // NOI18N
-//            }
-//        }
-//        
-//        className = jcls.getName();
-//        String instanceString;
-//        if (DynamicObject.isDynamicObject(in)) {
-//            DynamicObject dobj = new DynamicObject(in);
-//            String type = dobj.getType(h);
-//            instanceString = "<a href='"+ INSTANCE_URL_PREFIX + className + "/" + in.getInstanceNumber() + "/" + in.getInstanceId() + "' name='" + in.getInstanceId() + "'>" + type + "#" + in.getInstanceNumber() + "</a>";
-//            String logValue = JavaScriptNodes.getLogicalValue(dobj, type, h);
-//            if (logValue != null) instanceString += " <span style=\"color: #666666\">: " + logValue + "</span>";
-//        } else {
-//            instanceString = "<a href='"+ INSTANCE_URL_PREFIX + className + "/" + in.getInstanceNumber() + "/" + in.getInstanceId() + "' name='" + in.getInstanceId() + "'>" + className + '#' + in.getInstanceNumber() + "</a>"; // NOI18N
-//            String logValue = DetailsSupport.getDetailsString(in, h);
-//            if (logValue != null) instanceString += " <span style=\"color: #666666\">(" + logValue + ")</span>";
-//        }
-//        
-//        return instanceString;
     }
     
 }

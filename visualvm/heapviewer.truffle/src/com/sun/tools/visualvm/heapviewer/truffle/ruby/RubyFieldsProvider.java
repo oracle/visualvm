@@ -42,6 +42,7 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
+import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectFieldNode;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
@@ -150,8 +151,14 @@ public class RubyFieldsProvider extends HeapViewerNode.Provider {
         if (field instanceof ObjectFieldValue) {
             Instance instance = ((ObjectFieldValue)field).getInstance();
             if (DynamicObject.isDynamicObject(instance)) {
-                DynamicObject dobject = new DynamicObject(instance);
-                return new RubyNodes.RubyDynamicObjectFieldNode(dobject, dobject.getType(heap), field);
+                RubyDynamicObject rbdobj = new RubyDynamicObject(instance);
+                if (rbdobj.isRubyObject()) {
+                    return new RubyNodes.RubyDynamicObjectFieldNode(rbdobj, rbdobj.getType(heap), field);
+                } else {
+                    // Non-Ruby object
+                    DynamicObject dobj = new DynamicObject(rbdobj.getInstance());
+                    return new DynamicObjectFieldNode(dobj, dobj.getType(heap), field);
+                }
             } else {
                 return new TerminalJavaNodes.Field((ObjectFieldValue)field, false);
             }

@@ -25,7 +25,6 @@
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleSummaryView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
@@ -33,11 +32,7 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.SummaryView;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
 import javax.swing.Icon;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -84,35 +79,37 @@ class JavaScriptHeapSummary {
             super(context);
         }
         
-        @Override
-        protected Iterator getObjectsIterator() {
-            JavaScriptHeapFragment fragment = (JavaScriptHeapFragment)getContext().getFragment();
-            return fragment.getJavaScriptObjectsIterator();
-        }
-
-        @Override
-        protected String getType(Object object, Map<Object, String> typesCache) {
-            DynamicObject dobject = (DynamicObject)object;
-            Instance shape = dobject.getShape();
-            
-            String type = typesCache.get(shape);
-            if (type == null) {
-                type = DetailsSupport.getDetailsString(shape, getContext().getFragment().getHeap());
-                typesCache.put(shape, type);
-            }
-            
-            return type;
-        }
-        
-        @Override
-        protected long updateObjectsSize(Object object, long objectsSize) {
-            return objectsSize == 0 ? ((DynamicObject)object).getInstance().getSize() : objectsSize;
-        }
-
-        @Override
-        protected long getObjectsSize(long objectsSize, long objectsCount) {
-            return objectsCount * objectsSize;
-        }
+//        @Override
+//        protected Iterator getObjectsIterator() {
+//            JavaScriptHeapFragment fragment = (JavaScriptHeapFragment)getContext().getFragment();
+//            return fragment.getObjectsIterator();
+//        }
+//
+//        @Override
+//        protected String getType(Object object, Map<Object, String> typesCache) {
+//            Heap heap = getContext().getFragment().getHeap();
+//            return ((JavaScriptDynamicObject)object).getType(heap);
+////            DynamicObject dobject = (DynamicObject)object;
+////            Instance shape = dobject.getShape();
+////            
+////            String type = typesCache.get(shape);
+////            if (type == null) {
+////                type = DetailsSupport.getDetailsString(shape, getContext().getFragment().getHeap());
+////                typesCache.put(shape, type);
+////            }
+////            
+////            return type;
+//        }
+//        
+//        @Override
+//        protected long updateObjectsSize(Object object, long objectsSize) {
+//            return objectsSize == 0 ? ((JavaScriptDynamicObject)object).getInstance().getSize() : objectsSize;
+//        }
+//
+//        @Override
+//        protected long getObjectsSize(long objectsSize, long objectsCount) {
+//            return objectsCount * objectsSize;
+//        }
 
     }
     

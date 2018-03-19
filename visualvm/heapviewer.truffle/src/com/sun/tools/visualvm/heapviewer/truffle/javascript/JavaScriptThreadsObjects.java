@@ -42,6 +42,7 @@ import com.sun.tools.visualvm.heapviewer.truffle.TruffleStackTraces;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
 import com.sun.tools.visualvm.heapviewer.model.TextNode;
+import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
 
 /**
  *
@@ -91,8 +92,14 @@ class JavaScriptThreadsObjects {
                         if (!DynamicObject.isDynamicObject(instance)) {
                             localObjects.add(new LocalObjectNode(instance));
                         } else {
-                            DynamicObject dobject = new DynamicObject(instance);
-                            localObjects.add(new JavaScriptNodes.JavaScriptLocalDynamicObjectNode(dobject, dobject.getType(heap)));
+                            JavaScriptDynamicObject jsdobj = new JavaScriptDynamicObject(instance);
+                            if (jsdobj.isJavaScriptObject()) {
+                                localObjects.add(new JavaScriptNodes.JavaScriptLocalDynamicObjectNode(jsdobj, jsdobj.getType(heap)));
+                            } else {
+                                // Non-JavaScript object
+                                DynamicObject dobj = new DynamicObject(jsdobj.getInstance());
+                                localObjects.add(new DynamicObjectNode(dobj, dobj.getType(heap)));
+                            }
                         }
 
                     }

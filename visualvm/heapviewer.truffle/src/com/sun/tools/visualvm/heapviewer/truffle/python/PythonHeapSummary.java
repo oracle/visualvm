@@ -32,10 +32,7 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.SummaryView;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
 import javax.swing.Icon;
-import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -82,28 +79,28 @@ class PythonHeapSummary {
             super(context);
         }
         
-        @Override
-        protected Iterator getObjectsIterator() {
-            PythonHeapFragment fragment = (PythonHeapFragment)getContext().getFragment();
-            return fragment.getPythonObjectsIterator();
-        }
-
-        @Override
-        protected String getType(Object object, Map<Object, String> typesCache) {
-            Instance pobj = (Instance)object;
-            return PythonObject.getType(pobj);
-        }
-
-        @Override
-        protected long updateObjectsSize(Object object, long objectsSize) {
-            Instance pobj = (Instance)object;
-            Instance data = (Instance)pobj.getValueOfField("data"); // NOI18N
-            
-            objectsSize += pobj.getSize();
-            if (data != null) objectsSize += data.getSize();
-            
-            return objectsSize;
-        }
+//        @Override
+//        protected Iterator getObjectsIterator() {
+//            PythonHeapFragment fragment = (PythonHeapFragment)getContext().getFragment();
+//            return fragment.getInstancesIterator();
+//        }
+//
+//        @Override
+//        protected String getType(Object object, Map<Object, String> typesCache) {
+//            Instance pobj = (Instance)object;
+//            return PythonObject.getType(pobj);
+//        }
+//
+//        @Override
+//        protected long updateObjectsSize(Object object, long objectsSize) {
+//            Instance pobj = (Instance)object;
+//            Instance data = (Instance)pobj.getValueOfField("data"); // NOI18N
+//            
+//            objectsSize += pobj.getSize();
+//            if (data != null) objectsSize += data.getSize();
+//            
+//            return objectsSize;
+//        }
 
     }
     

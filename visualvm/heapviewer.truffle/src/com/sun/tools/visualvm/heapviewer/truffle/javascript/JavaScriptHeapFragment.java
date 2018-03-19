@@ -24,7 +24,6 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
 import java.io.File;
 import java.io.IOException;
 import org.netbeans.lib.profiler.heap.Heap;
@@ -32,9 +31,12 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.HeapFragment;
+import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageSupport;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -42,13 +44,70 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
-class JavaScriptHeapFragment extends TruffleLanguageHeapFragment {
+class JavaScriptHeapFragment extends TruffleLanguageHeapFragment.DynamicObjectBased<JavaScriptDynamicObject, JavaScriptType> {
+    
+    static final String JS_LANG_ID = "com.oracle.truffle.js.runtime.builtins.JSClass";
     
     private static final String JS_HEAP_ID = "javascript_heap";
     
     
-    JavaScriptHeapFragment(Instance langInfo, Heap heap) throws IOException {
-        super("JavaScript Heap", JS_HEAP_ID, langInfo , heap);
+    private final Map<Instance, String> typesCache;
+    
+    
+    JavaScriptHeapFragment(Instance langID, Heap heap) throws IOException {
+        super(JS_HEAP_ID, "JavaScript Heap", fragmentDescription(langID, heap) , heap);
+        typesCache = new HashMap();
+    }
+    
+    
+    @Override
+    protected JavaScriptDynamicObject createObject(Instance instance) {
+        return new JavaScriptDynamicObject(instance);
+    }
+    
+    @Override
+    protected JavaScriptType createTruffleType(String name) {
+        return new JavaScriptType(name);
+    }    
+    
+    
+    @Override
+    protected Iterator<Instance> getInstancesIterator() {
+        return languageInstancesIterator(JS_LANG_ID);
+    }
+
+    @Override
+    protected Iterator<JavaScriptDynamicObject> getObjectsIterator() {
+        return languageObjectsIterator(JS_LANG_ID);
+    }
+    
+
+    @Override
+    protected long getObjectSize(JavaScriptDynamicObject object) {
+        return object.getInstance().getSize();
+    }
+    
+    @Override
+    protected long getObjectRetainedSize(JavaScriptDynamicObject object) {
+        return DataType.RETAINED_SIZE.valuesAvailable(heap) ?
+               object.getInstance().getRetainedSize() :
+               DataType.RETAINED_SIZE.getNotAvailableValue();
+    }
+
+    @Override
+    protected String getObjectType(JavaScriptDynamicObject object) {
+        Instance instance = object.getInstance();
+        Instance prototype = JavaScriptDynamicObject.getPrototype(instance);
+        
+//        return JavaScriptDynamicObject.getJSTypeOrig(instance, heap);
+        
+        String type = typesCache.get(prototype);
+        if (type == null) {
+            type = JavaScriptDynamicObject.getJSType(instance, prototype, heap);
+            typesCache.put(prototype, type);
+        }
+        
+        return type;
     }
     
     
@@ -65,34 +124,21 @@ class JavaScriptHeapFragment extends TruffleLanguageHeapFragment {
         return null;
     }
     
-    static JavaScriptHeapFragment heap(Heap heap) {
-        return (JavaScriptHeapFragment)heap;
-    }
-    
-    
-    Iterator<Instance> getJavaScriptInstancesIterator() {
-        return getLanguageInstancesIterator(JavaScriptObjectsProvider.JS_LANG_ID);
-    }
-    
-    Iterator<DynamicObject> getJavaScriptObjectsIterator() {
-        return getDynamicObjectsIterator(JavaScriptObjectsProvider.JS_LANG_ID);
-    }
-    
     
     @ServiceProvider(service=HeapFragment.Provider.class, position = 200)
     public static class Provider extends HeapFragment.Provider {
-        private static final String JS_LANG_ID = "JS";  // NOI18N
-        private static final String JAVA_SCRIPT_LANG_ID = "JavaScript";  // NOI18N
+        private static final String JS_LANGINFO_ID = "JS";  // NOI18N
+        private static final String JAVASCRIPT_LANGINFO_ID = "JavaScript";  // NOI18N
 
         public HeapFragment getFragment(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) throws IOException {
-            Instance langInfo = TruffleLanguageSupport.getLanguageInfo(heap, JS_LANG_ID);
+            Instance langID = TruffleLanguageSupport.getLanguageInfo(heap, JS_LANGINFO_ID);
 
-            if (langInfo == null) {
-                langInfo = TruffleLanguageSupport.getLanguageInfo(heap, JAVA_SCRIPT_LANG_ID);
+            if (langID == null) {
+                langID = TruffleLanguageSupport.getLanguageInfo(heap, JAVASCRIPT_LANGINFO_ID);
             }
-            JavaClass JSMainClass = heap.getJavaClassByName(JavaScriptObjectsProvider.JS_LANG_ID);
+            JavaClass JSMainClass = heap.getJavaClassByName(JS_LANG_ID);
 
-            return langInfo != null  && JSMainClass != null ? new JavaScriptHeapFragment(langInfo, heap) : null;
+            return langID != null && JSMainClass != null ? new JavaScriptHeapFragment(langID, heap) : null;
         }
     }
     

@@ -32,10 +32,7 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.SummaryView;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
 import javax.swing.Icon;
-import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -82,28 +79,28 @@ class RHeapSummary {
             super(context);
         }
         
-        @Override
-        protected Iterator getObjectsIterator() {
-            RHeapFragment fragment = (RHeapFragment)getContext().getFragment();
-            return fragment.getRObjectsIterator();
-        }
-
-        @Override
-        protected String getType(Object object, Map<Object, String> typesCache) {
-            Instance robj = (Instance)object;
-            return RObject.getType(robj);
-        }
-
-        @Override
-        protected long updateObjectsSize(Object object, long objectsSize) {
-            Instance robj = (Instance)object;
-            Instance data = (Instance)robj.getValueOfField("data"); // NOI18N
-            
-            objectsSize += robj.getSize();
-            if (data != null) objectsSize += data.getSize();
-            
-            return objectsSize;
-        }
+//        @Override
+//        protected Iterator getObjectsIterator() {
+//            RHeapFragment fragment = (RHeapFragment)getContext().getFragment();
+//            return fragment.getInstancesIterator();
+//        }
+//
+//        @Override
+//        protected String getType(Object object, Map<Object, String> typesCache) {
+//            Instance robj = (Instance)object;
+//            return RObject.getType(robj);
+//        }
+//
+//        @Override
+//        protected long updateObjectsSize(Object object, long objectsSize) {
+//            Instance robj = (Instance)object;
+//            Instance data = (Instance)robj.getValueOfField("data"); // NOI18N
+//            
+//            objectsSize += robj.getSize();
+//            if (data != null) objectsSize += data.getSize();
+//            
+//            return objectsSize;
+//        }
 
     }
     

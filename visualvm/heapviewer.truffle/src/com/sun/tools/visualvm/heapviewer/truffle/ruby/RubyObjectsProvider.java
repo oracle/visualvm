@@ -25,7 +25,6 @@
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
 import com.sun.tools.visualvm.heapviewer.truffle.AbstractObjectsProvider;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,22 +49,20 @@ import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
  */
 public class RubyObjectsProvider extends AbstractObjectsProvider {
     
-    static final String RUBY_LANG_ID = "org.truffleruby.language.RubyObjectType"; // NOI18N
-    
     public static HeapViewerNode[] getAllObjects(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
         final RubyHeapFragment fragment = (RubyHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
         
         if (aggregation == 0) {
-            NodesComputer<DynamicObject> computer = new NodesComputer<DynamicObject>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
+            NodesComputer<RubyDynamicObject> computer = new NodesComputer<RubyDynamicObject>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
                 protected boolean sorts(DataType dataType) {
                     return !DataType.COUNT.equals(dataType);
                 }
-                protected HeapViewerNode createNode(DynamicObject dobject) {
+                protected HeapViewerNode createNode(RubyDynamicObject dobject) {
                     return new RubyNodes.RubyDynamicObjectNode(dobject, dobject.getType(heap));
                 }
-                protected ProgressIterator<DynamicObject> objectsIterator(int index, Progress progress) {
-                    Iterator<DynamicObject> dobjects = fragment.getRubyObjectsIterator();
+                protected ProgressIterator<RubyDynamicObject> objectsIterator(int index, Progress progress) {
+                    Iterator<RubyDynamicObject> dobjects = fragment.getObjectsIterator();
                     return new ProgressIterator(dobjects, index, true, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
@@ -84,13 +81,13 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
             List<HeapViewerNode> nodes = new ArrayList();
             Map<String, RubyNodes.RubyDynamicObjectsContainer> types = new HashMap();
             
-            Iterator<Instance> instances = fragment.getRubyInstancesIterator();
+            Iterator<Instance> instances = fragment.getInstancesIterator();
             progress.setupUnknownSteps();
                         
             while (instances.hasNext()) {
                 Instance instance = instances.next();
                 progress.step();
-                String type = DynamicObject.getType(instance, heap);
+                String type = RubyDynamicObject.getType(instance, heap);
                 RubyNodes.RubyDynamicObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
@@ -123,7 +120,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
         while (searchInstancesIt.hasNext()) {
             Instance instance = searchInstancesIt.next();
             progress.step();
-            if (!DynamicObject.isDynamicObject(instance) || !isRubyObject(new DynamicObject(instance)))
+            if (!RubyDynamicObject.isDynamicObject(instance) || !new RubyDynamicObject(instance).isRubyObject())
                 searchInstancesIt.remove();
         }
         
@@ -137,7 +134,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                     return !DataType.COUNT.equals(dataType);
                 }
                 protected HeapViewerNode createNode(Instance instance) {
-                    DynamicObject dobject = new DynamicObject(instance);
+                    RubyDynamicObject dobject = new RubyDynamicObject(instance);
                     return new RubyNodes.RubyDynamicObjectNode(dobject, dobject.getType(heap));
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
@@ -165,7 +162,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
             
             for (Instance dominator : dominators) {
                 progress.step();
-                String type = DynamicObject.getType(dominator, heap);
+                String type = RubyDynamicObject.getType(dominator, heap);
                 RubyNodes.RubyDynamicObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
@@ -188,7 +185,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
         RubyHeapFragment fragment = (RubyHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
         
-        Iterator<Instance> instances = fragment.getRubyInstancesIterator();
+        Iterator<Instance> instances = fragment.getInstancesIterator();
         
         if (aggregation == 0) {
             progress.setupUnknownSteps();
@@ -207,7 +204,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                     return !DataType.COUNT.equals(dataType);
                 }
                 protected HeapViewerNode createNode(Instance instance) {
-                    DynamicObject dobject = new DynamicObject(instance);
+                    RubyDynamicObject dobject = new RubyDynamicObject(instance);
                     return new RubyNodes.RubyDynamicObjectNode(dobject, dobject.getType(heap));
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
@@ -238,7 +235,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
                 progress.step();
                 if (!instance.isGCRoot()) continue;
                 
-                String type = DynamicObject.getType(instance, heap);
+                String type = RubyDynamicObject.getType(instance, heap);
                 RubyNodes.RubyDynamicObjectsContainer typeNode = types.get(type);
                 
                 if (typeNode == null) {
@@ -255,10 +252,6 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
             if (nodes.isEmpty()) nodes.add(new TextNode("<No GC roots found>"));
             return nodes.toArray(HeapViewerNode.NO_NODES);
         }
-    }
-    
-    private static boolean isRubyObject(DynamicObject dobject) {
-        return RUBY_LANG_ID.equals(dobject.getLanguageId().getName());
     }
     
 }

@@ -133,7 +133,7 @@ class RubyNodes {
     
     static class RubyDynamicObjectNode extends DynamicObjectNode implements RubyNode {
         
-        RubyDynamicObjectNode(DynamicObject dobject, String type) {
+        RubyDynamicObjectNode(RubyDynamicObject dobject, String type) {
             super(dobject, type);
         }
         
@@ -145,7 +145,7 @@ class RubyNodes {
         
         
         public RubyDynamicObjectNode createCopy() {
-            RubyDynamicObjectNode copy = new RubyDynamicObjectNode(getDynamicObject(), getType());
+            RubyDynamicObjectNode copy = new RubyDynamicObjectNode((RubyDynamicObject)getDynamicObject(), getType());
             setupCopy(copy);
             return copy;
         }
@@ -168,7 +168,7 @@ class RubyNodes {
         
         
         protected RubyDynamicObjectNode createNode(Instance instance) {
-            return new RubyDynamicObjectNode(new DynamicObject(instance), name);
+            return new RubyDynamicObjectNode(new RubyDynamicObject(instance), name);
         }
         
         
@@ -186,7 +186,7 @@ class RubyNodes {
     
     static class RubyDynamicObjectFieldNode extends DynamicObjectFieldNode implements RubyNode {
         
-        RubyDynamicObjectFieldNode(DynamicObject dobject, String type, FieldValue field) {
+        RubyDynamicObjectFieldNode(RubyDynamicObject dobject, String type, FieldValue field) {
             super(dobject, type, field);
         }
         
@@ -197,14 +197,14 @@ class RubyNodes {
         
         
         public RubyDynamicObjectNode createCopy() {
-            return new RubyDynamicObjectNode(getDynamicObject(), getType());
+            return new RubyDynamicObjectNode((RubyDynamicObject)getDynamicObject(), getType());
         }
         
     }
     
     static class RubyDynamicObjectArrayItemNode extends DynamicObjectArrayItemNode implements RubyNode {
         
-        RubyDynamicObjectArrayItemNode(DynamicObject dobject, String type, ArrayItemValue item) {
+        RubyDynamicObjectArrayItemNode(RubyDynamicObject dobject, String type, ArrayItemValue item) {
             super(dobject, type, item);
         }
         
@@ -215,14 +215,14 @@ class RubyNodes {
         
         
         public RubyDynamicObjectNode createCopy() {
-            return new RubyDynamicObjectNode(getDynamicObject(), getType());
+            return new RubyDynamicObjectNode((RubyDynamicObject)getDynamicObject(), getType());
         }
         
     }
     
     static class RubyDynamicObjectReferenceNode extends DynamicObjectReferenceNode implements RubyNode {
         
-        RubyDynamicObjectReferenceNode(DynamicObject dobject, String type, FieldValue value) {
+        RubyDynamicObjectReferenceNode(RubyDynamicObject dobject, String type, FieldValue value) {
             super(dobject, type, value);
         }
         
@@ -233,14 +233,14 @@ class RubyNodes {
         
         
         public RubyDynamicObjectNode createCopy() {
-            return new RubyDynamicObjectNode(getDynamicObject(), getType());
+            return new RubyDynamicObjectNode((RubyDynamicObject)getDynamicObject(), getType());
         }
         
     }
     
     static class RubyLocalDynamicObjectNode extends LocalDynamicObjectNode implements RubyNode {
         
-        RubyLocalDynamicObjectNode(DynamicObject dobject, String type) {
+        RubyLocalDynamicObjectNode(RubyDynamicObject dobject, String type) {
             super(dobject, type);
         }
         
@@ -251,7 +251,7 @@ class RubyNodes {
         
         
         public RubyDynamicObjectNode createCopy() {
-            return new RubyDynamicObjectNode(getDynamicObject(), getType());
+            return new RubyDynamicObjectNode((RubyDynamicObject)getDynamicObject(), getType());
         }
         
     }

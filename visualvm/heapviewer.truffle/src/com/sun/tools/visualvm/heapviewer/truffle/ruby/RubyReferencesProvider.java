@@ -37,9 +37,9 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
+import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectReferenceNode;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
-import static com.sun.tools.visualvm.heapviewer.utils.NodesComputer.integerIterator;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -76,8 +76,14 @@ public class RubyReferencesProvider extends HeapViewerNode.Provider {
             }
             protected HeapViewerNode createNode(Integer index) {
                 FieldValue reference = references.get(index);
-                DynamicObject dobject = new DynamicObject(reference.getDefiningInstance());
-                return new RubyNodes.RubyDynamicObjectReferenceNode(dobject, dobject.getType(heap), reference);
+                RubyDynamicObject rbdobj = new RubyDynamicObject(reference.getDefiningInstance());
+                if (rbdobj.isRubyObject()) {
+                    return new RubyNodes.RubyDynamicObjectReferenceNode(rbdobj, rbdobj.getType(heap), reference);
+                } else {
+                    // Non-Ruby object
+                    DynamicObject dobj = new DynamicObject(rbdobj.getInstance());
+                    return new DynamicObjectReferenceNode(dobj, dobj.getType(heap), reference);
+                }
             }
             protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
                 Iterator<Integer> iterator = integerIterator(index, references.size());

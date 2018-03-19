@@ -25,7 +25,6 @@
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
 import com.sun.tools.visualvm.heapviewer.truffle.AbstractObjectsProvider;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,25 +47,22 @@ import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
  *
  * @author Jiri Sedlacek
  */
-public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
-    
-    static final String JS_LANG_ID = "com.oracle.truffle.js.runtime.builtins.JSClass";
-    
+public class JavaScriptObjectsProvider extends AbstractObjectsProvider {    
 
     public static HeapViewerNode[] getAllObjects(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
         final JavaScriptHeapFragment fragment = (JavaScriptHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
         
         if (aggregation == 0) {
-            NodesComputer<DynamicObject> computer = new NodesComputer<DynamicObject>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
+            NodesComputer<JavaScriptDynamicObject> computer = new NodesComputer<JavaScriptDynamicObject>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
                 protected boolean sorts(DataType dataType) {
                     return !DataType.COUNT.equals(dataType);
                 }
-                protected HeapViewerNode createNode(DynamicObject dobject) {
+                protected HeapViewerNode createNode(JavaScriptDynamicObject dobject) {
                     return new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, dobject.getType(heap));
                 }
-                protected ProgressIterator<DynamicObject> objectsIterator(int index, Progress progress) {
-                    Iterator<DynamicObject> dobjects = fragment.getJavaScriptObjectsIterator();
+                protected ProgressIterator<JavaScriptDynamicObject> objectsIterator(int index, Progress progress) {
+                    Iterator<JavaScriptDynamicObject> dobjects = fragment.getObjectsIterator();
                     return new ProgressIterator(dobjects, index, true, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
@@ -82,30 +78,56 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
 
             return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
         } else {
-            List<HeapViewerNode> nodes = new ArrayList();
-            Map<String, JavaScriptNodes.JavaScriptDynamicObjectsContainer> types = new HashMap();
-            
-            Iterator<Instance> instances = fragment.getJavaScriptInstancesIterator();
-            progress.setupUnknownSteps();
-            
-            while (instances.hasNext()) {
-                Instance instance = instances.next();
-                progress.step();
-                String type = DynamicObject.getType(instance, heap);
-                JavaScriptNodes.JavaScriptDynamicObjectsContainer typeNode = types.get(type);
-
-                if (typeNode == null) {
-                    typeNode = new JavaScriptNodes.JavaScriptDynamicObjectsContainer(type);
-                    nodes.add(typeNode);
-                    types.put(type, typeNode);
+            NodesComputer<JavaScriptType> computer = new NodesComputer<JavaScriptType>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
+                protected boolean sorts(DataType dataType) {
+                    return true;
                 }
-                
-                typeNode.add(instance, heap);
-            }
+                protected HeapViewerNode createNode(JavaScriptType type) {
+                    return new JavaScriptTypeNode(type);
+                }
+                protected ProgressIterator<JavaScriptType> objectsIterator(int index, Progress progress) {
+                    List<JavaScriptType> types = fragment.getTypes(progress);
+                    Iterator<JavaScriptType> typesI = types.listIterator(index);
+                    return new ProgressIterator(typesI, index, false, progress);
+                }
+                protected String getMoreNodesString(String moreNodesCount)  {
+                    return "<another " + moreNodesCount + " types left>";
+                }
+                protected String getSamplesContainerString(String objectsCount)  {
+                    return "<sample " + objectsCount + " types>";
+                }
+                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                    return "<types " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                }
+            };
+
+            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
             
-            progress.finish();
             
-            return nodes.toArray(HeapViewerNode.NO_NODES);
+//            List<HeapViewerNode> nodes = new ArrayList();
+//            Map<String, JavaScriptNodes.JavaScriptDynamicObjectsContainer> types = new HashMap();
+//            
+//            Iterator<Instance> instances = fragment.getInstancesIterator();
+//            progress.setupUnknownSteps();
+//            
+//            while (instances.hasNext()) {
+//                Instance instance = instances.next();
+//                progress.step();
+//                String type = JavaScriptDynamicObject.getJSType(instance, heap);
+//                JavaScriptNodes.JavaScriptDynamicObjectsContainer typeNode = types.get(type);
+//
+//                if (typeNode == null) {
+//                    typeNode = new JavaScriptNodes.JavaScriptDynamicObjectsContainer(type);
+//                    nodes.add(typeNode);
+//                    types.put(type, typeNode);
+//                }
+//                
+//                typeNode.add(instance, heap);
+//            }
+//            
+//            progress.finish();
+//            
+//            return nodes.toArray(HeapViewerNode.NO_NODES);
         }
     }
     
@@ -124,7 +146,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
         while (searchInstancesIt.hasNext()) {
             Instance instance = searchInstancesIt.next();
             progress.step();
-            if (!DynamicObject.isDynamicObject(instance) || !isJavaScriptObject(new DynamicObject(instance)))
+            if (!JavaScriptDynamicObject.isDynamicObject(instance) || !new JavaScriptDynamicObject(instance).isJavaScriptObject())
                 searchInstancesIt.remove();
         }
         
@@ -138,7 +160,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                     return !DataType.COUNT.equals(dataType);
                 }
                 protected HeapViewerNode createNode(Instance instance) {
-                    DynamicObject dobject = new DynamicObject(instance);
+                    JavaScriptDynamicObject dobject = new JavaScriptDynamicObject(instance);
                     return new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, dobject.getType(heap));
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
@@ -166,7 +188,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
             
             for (Instance dominator : dominators) {
                 progress.step();
-                String type = DynamicObject.getType(dominator, heap);
+                String type = JavaScriptDynamicObject.getJSType(dominator, heap);
                 JavaScriptNodes.JavaScriptDynamicObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
@@ -189,7 +211,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
         JavaScriptHeapFragment fragment = (JavaScriptHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
         
-        Iterator<Instance> instances = fragment.getJavaScriptInstancesIterator();
+        Iterator<Instance> instances = fragment.getInstancesIterator();
         
         if (aggregation == 0) {
             progress.setupUnknownSteps();
@@ -208,7 +230,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                     return !DataType.COUNT.equals(dataType);
                 }
                 protected HeapViewerNode createNode(Instance instance) {
-                    DynamicObject dobject = new DynamicObject(instance);
+                    JavaScriptDynamicObject dobject = new JavaScriptDynamicObject(instance);
                     return new JavaScriptNodes.JavaScriptDynamicObjectNode(dobject, dobject.getType(heap));
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
@@ -239,7 +261,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                 progress.step();
                 if (!instance.isGCRoot()) continue;
                 
-                String type = DynamicObject.getType(instance, heap);
+                String type = JavaScriptDynamicObject.getJSType(instance, heap);
 //                type = type.substring(type.lastIndexOf('.') + 1);
 
                 JavaScriptNodes.JavaScriptDynamicObjectsContainer typeNode = types.get(type);
@@ -256,10 +278,6 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
             if (nodes.isEmpty()) nodes.add(new TextNode("<No GC roots found>"));
             return nodes.toArray(HeapViewerNode.NO_NODES);
         }
-    }
-    
-    private static boolean isJavaScriptObject(DynamicObject dobject) {
-        return JS_LANG_ID.equals(dobject.getLanguageId().getName());
     }
     
 }

@@ -63,7 +63,7 @@ public class PythonObjectsProvider extends AbstractObjectsProvider {
                     return new PythonObjectNode(pyobject);
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
-                    Iterator<Instance> pyinstances = fragment.getPythonObjectsIterator();
+                    Iterator<Instance> pyinstances = fragment.getInstancesIterator();
                     return new ProgressIterator(pyinstances, index, true, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
@@ -82,7 +82,7 @@ public class PythonObjectsProvider extends AbstractObjectsProvider {
             List<HeapViewerNode> nodes = new ArrayList();
             Map<String, PythonObjectsContainer> types = new HashMap();
 
-            Iterator<Instance> instances = fragment.getPythonObjectsIterator();
+            Iterator<Instance> instances = fragment.getInstancesIterator();
             progress.setupUnknownSteps();
 
             while (instances.hasNext()) {
@@ -186,7 +186,7 @@ public class PythonObjectsProvider extends AbstractObjectsProvider {
         PythonHeapFragment fragment = (PythonHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
 
-        Iterator<Instance> instancesI = fragment.getPythonObjectsIterator();
+        Iterator<Instance> instancesI = fragment.getInstancesIterator();
 
         if (aggregation == 0) {
             progress.setupUnknownSteps();
