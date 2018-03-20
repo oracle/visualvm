@@ -102,7 +102,7 @@ public class DynamicObject extends TruffleObject {
                     for (Value arrRef : arrRefs) {
                         Instance arrInstanceRef = arrRef.getDefiningInstance();
                         if (foundRefs.add(arrInstanceRef)) {
-                            addReferences(arrInstanceRef, dynObjRefs);
+                            addReferences(instanceRef, arrInstanceRef, dynObjRefs);
                         }
                     }
                 }
@@ -197,6 +197,10 @@ public class DynamicObject extends TruffleObject {
     }
 
     private void addReferences(Instance instanceRef, List dynObjRefs) {
+        addReferences(null, instanceRef, dynObjRefs);
+    }
+
+    private void addReferences(Instance baseInstance, Instance instanceRef, List dynObjRefs) {
         if (DynamicObject.isDynamicObject(instanceRef)) {
             DynamicObject dynObj = new DynamicObject(instanceRef);
 
@@ -206,6 +210,9 @@ public class DynamicObject extends TruffleObject {
                     ObjectFieldValue fieldValObj = (ObjectFieldValue) fieldVal;
 
                     if (instance.equals(fieldValObj.getInstance())) {
+                        dynObjRefs.add(fieldVal);
+                    }
+                    if (baseInstance != null && baseInstance.equals(fieldValObj.getInstance())) {
                         dynObjRefs.add(fieldVal);
                     }
                 }
