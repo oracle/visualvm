@@ -24,6 +24,7 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
+import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import java.util.List;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
@@ -38,6 +39,7 @@ import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectReferenceNode;
 import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectsContainer;
 import com.sun.tools.visualvm.heapviewer.truffle.LocalDynamicObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import java.util.Date;
 import org.netbeans.lib.profiler.heap.ArrayItemValue;
 
@@ -50,7 +52,7 @@ class JavaScriptNodes {
     
     static String getLogicalValue(DynamicObject dobject, String type, Heap heap) {
         String logicalValue = null;
-
+        
         if ("Function".equals(type) || "JSFunction".equals(type)) {
             FieldValue dataField = dobject.getFieldValue("functionData (hidden)");
             Instance data = dataField instanceof ObjectFieldValue ? ((ObjectFieldValue)dataField).getInstance() : null;
@@ -134,6 +136,32 @@ class JavaScriptNodes {
         }
 
         protected void setupCopy(JavaScriptDynamicObjectNode copy) {
+            super.setupCopy(copy);
+        }
+        
+    }
+    
+    static class JavaScriptTypeNode extends TruffleTypeNode<JavaScriptDynamicObject, JavaScriptType> implements JavaScriptNode {
+        
+        JavaScriptTypeNode(JavaScriptType type) {
+            super(type);
+        }
+
+        @Override
+        public HeapViewerNode createNode(JavaScriptDynamicObject object, Heap heap) {
+            String type = getType().getName();
+            return !type.startsWith("<") ? new JavaScriptDynamicObjectNode(object, type) :
+                    new JavaScriptDynamicObjectNode(object, object.getType(heap));
+        }
+
+        @Override
+        public TruffleTypeNode createCopy() {
+            JavaScriptTypeNode copy = new JavaScriptTypeNode(getType());
+            setupCopy(copy);
+            return copy;
+        }
+        
+        protected void setupCopy(JavaScriptTypeNode copy) {
             super.setupCopy(copy);
         }
         

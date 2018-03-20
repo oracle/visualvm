@@ -25,11 +25,9 @@
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
 import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
-import java.util.List;
-import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.ObjectFieldValue;
+import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 
 /**
  *
@@ -46,70 +44,43 @@ class JavaScriptDynamicObject extends DynamicObject {
     
     JavaScriptDynamicObject(String type, Instance instance) {
         super(instance);
-        jsType = type;
+        if (!type.startsWith("<")) jsType = type;
     }
     
     
     public String getType(Heap heap) {
-        if (jsType == null) jsType = getJSType(getInstance(), heap);
+        if (jsType == null) {
+            jsType = JavaScriptHeapFragment.fromHeap(heap).getObjectType(this);
+            if (jsType.startsWith("<")) { // NOI18N
+                jsType = DetailsSupport.getDetailsString(getShape(), heap);
+                if (jsType.startsWith("JS")) jsType = jsType.substring(2); // NOI18N
+            }
+        }
         return jsType;
     }
     
     
-    // TODO: improve to use the HeapFragment typesCache
-    static String getJSType(Instance instance, Heap heap) {
-        return getJSType(instance, getPrototype(instance), heap);
-    }
-    
-    
-    static Instance getPrototype(Instance instance) {
-        DynamicObject dobj = new DynamicObject(instance);
-        List<FieldValue> staticFields = dobj.getStaticFieldValues();
-        for (FieldValue staticField : staticFields) {
-            if ("__proto__ (hidden)".equals(staticField.getField().getName())) {
-                return ((ObjectFieldValue)staticField).getInstance();
-            }
-        }
-        return null;
-    }
-    
-    static String getJSType(Instance instance, Instance prototype, Heap heap) {
-        if (prototype == null) return "<unknown type>";
-        
-        DynamicObject dprototype = new DynamicObject(prototype);
-        ObjectFieldValue constructorValue = (ObjectFieldValue)dprototype.getFieldValue("constructor");
-        if (constructorValue != null) {
-            Instance constructor = constructorValue.getInstance();
-            DynamicObject dconstructor = new DynamicObject(constructor);
-            String type = JavaScriptNodes.getLogicalValue(dconstructor, dconstructor.getType(heap), heap);
-            if (type == null) return "<unknown logical value for " + dconstructor.getType(heap) +">";
-            return type.endsWith("()") ? type.substring(0, type.length() - 2) : type;
-        } else {
-            return "<unknown constructorValue>";
-        }
-    }
-    
-    static String getJSTypeOrig(Instance instance, Heap heap) {
-        DynamicObject dobj = new DynamicObject(instance);
-        List<FieldValue> staticFields = dobj.getStaticFieldValues();
-        for (FieldValue staticField : staticFields) {
-            if ("__proto__ (hidden)".equals(staticField.getField().getName())) {
-                Instance prototype = ((ObjectFieldValue)staticField).getInstance();
-                DynamicObject dprototype = new DynamicObject(prototype);
-                ObjectFieldValue constructorValue = (ObjectFieldValue)dprototype.getFieldValue("constructor");
-                if (constructorValue != null) {
-                    Instance constructor = constructorValue.getInstance();
-                    DynamicObject dconstructor = new DynamicObject(constructor);
-                    String type = JavaScriptNodes.getLogicalValue(dconstructor, dconstructor.getType(heap), heap);
-                    if (type == null) return "<unknown logical value for " + dconstructor.getType(heap) +">";
-                    return type.endsWith("()") ? type.substring(0, type.length() - 2) : type;
-                } else {
-                    return "<unknown constructorValue>";
-                }
-            }
-        }
-        return "<unknown type>";
-    }
+//    static String getJSTypeOrig(Instance instance, Heap heap) {
+//        DynamicObject dobj = new DynamicObject(instance);
+//        List<FieldValue> staticFields = dobj.getStaticFieldValues();
+//        for (FieldValue staticField : staticFields) {
+//            if ("__proto__ (hidden)".equals(staticField.getField().getName())) {
+//                Instance prototype = ((ObjectFieldValue)staticField).getInstance();
+//                DynamicObject dprototype = new DynamicObject(prototype);
+//                ObjectFieldValue constructorValue = (ObjectFieldValue)dprototype.getFieldValue("constructor");
+//                if (constructorValue != null) {
+//                    Instance constructor = constructorValue.getInstance();
+//                    DynamicObject dconstructor = new DynamicObject(constructor);
+//                    String type = JavaScriptNodes.getLogicalValue(dconstructor, dconstructor.getType(heap), heap);
+//                    if (type == null) return "<unknown logical value for " + dconstructor.getType(heap) +">";
+//                    return type.endsWith("()") ? type.substring(0, type.length() - 2) : type;
+//                } else {
+//                    return "<unknown constructorValue>";
+//                }
+//            }
+//        }
+//        return "<unknown type>";
+//    }
     
     
     boolean isJavaScriptObject() {

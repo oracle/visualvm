@@ -32,11 +32,19 @@ import org.netbeans.lib.profiler.heap.JavaClass;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.HeapFragment;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
+import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageSupport;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
+import org.netbeans.lib.profiler.heap.FieldValue;
+import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -50,13 +58,40 @@ class JavaScriptHeapFragment extends TruffleLanguageHeapFragment.DynamicObjectBa
     
     private static final String JS_HEAP_ID = "javascript_heap";
     
+    // Copied from DynamicObjectDetailsProvider, unify!
+    private static final String JS_NULL_CLASS_FQN = "com.oracle.truffle.js.runtime.objects.Null";     // NOI18N
+    private static final String JS_UNDEFIED_CLASS_FQN = "com.oracle.truffle.js.runtime.objects.Undefined";     // NOI18N
+    
+    private static final Map<Heap, Reference<JavaScriptHeapFragment>> FRAGMENTS = Collections.synchronizedMap(new WeakHashMap());
+    
+    final Instance nullInstance;
+    final Instance undefinedInstance;
     
     private final Map<Instance, String> typesCache;
     
     
     JavaScriptHeapFragment(Instance langID, Heap heap) throws IOException {
         super(JS_HEAP_ID, "JavaScript Heap", fragmentDescription(langID, heap) , heap);
+        
+        JavaClass nullClass = heap.getJavaClassByName(JS_NULL_CLASS_FQN);
+        nullInstance = (Instance)nullClass.getValueOfStaticField("instance"); // NOI18N
+        
+        JavaClass undefinedClass = heap.getJavaClassByName(JS_UNDEFIED_CLASS_FQN);
+        undefinedInstance = (Instance)undefinedClass.getValueOfStaticField("instance"); // NOI18N
+        
         typesCache = new HashMap();
+        
+        FRAGMENTS.put(heap, new WeakReference(this));
+    }
+    
+    
+    static JavaScriptHeapFragment fromContext(HeapContext context) {
+        return (JavaScriptHeapFragment)context.getFragment();
+    }
+    
+    static JavaScriptHeapFragment fromHeap(Heap heap) {
+        Reference<JavaScriptHeapFragment> fragmentRef = FRAGMENTS.get(heap);
+        return fragmentRef == null ? null : fragmentRef.get();
     }
     
     
@@ -73,12 +108,26 @@ class JavaScriptHeapFragment extends TruffleLanguageHeapFragment.DynamicObjectBa
     
     @Override
     protected Iterator<Instance> getInstancesIterator() {
-        return languageInstancesIterator(JS_LANG_ID);
+        return new ExcludingInstancesIterator(languageInstancesIterator(JS_LANG_ID)) {
+            @Override
+            protected boolean exclude(Instance instance) {
+                return (nullInstance.equals(instance) || undefinedInstance.equals(instance));
+            }
+        };
+//        return languageInstancesIterator(JS_LANG_ID);
     }
 
     @Override
     protected Iterator<JavaScriptDynamicObject> getObjectsIterator() {
-        return languageObjectsIterator(JS_LANG_ID);
+        return new ExcludingObjectsIterator(languageObjectsIterator(JS_LANG_ID)) {
+            @Override
+            protected boolean exclude(JavaScriptDynamicObject object) {
+                Instance instance = object.getInstance();
+                return (nullInstance.equals(instance) || undefinedInstance.equals(instance));
+            }
+        };
+//        return super.getObjectsIterator();
+//        return languageObjectsIterator(JS_LANG_ID);
     }
     
 
@@ -96,22 +145,64 @@ class JavaScriptHeapFragment extends TruffleLanguageHeapFragment.DynamicObjectBa
 
     @Override
     protected String getObjectType(JavaScriptDynamicObject object) {
-        Instance shape = object.getShape();
+        return getObjectType(object.getInstance(), object.getShape());
+    }
+    
+    protected String getObjectType(Instance instance) {
+        return getObjectType(instance, null);
+    }
+    
+    private String getObjectType(Instance instance, Instance shape) {
+        if (shape == null) shape = JavaScriptDynamicObject.getShape(instance);
         String type = typesCache.get(shape);
 
         if (type == null) {
-            Instance instance = object.getInstance();
-            Instance prototype = JavaScriptDynamicObject.getPrototype(instance);
+            Instance prototype = getPrototype(instance);
 
             type = typesCache.get(prototype);
             if (type == null) {
-                type = JavaScriptDynamicObject.getJSType(instance, prototype, heap);
+                type = getJSType(prototype, this);
                 typesCache.put(prototype, type);
             }
             typesCache.put(shape, type);
         }
         
         return type;
+    }
+    
+    private static Instance getPrototype(Instance instance) {
+        DynamicObject dobj = new DynamicObject(instance);
+        List<FieldValue> staticFields = dobj.getStaticFieldValues();
+        for (FieldValue staticField : staticFields) {
+            if ("__proto__ (hidden)".equals(staticField.getField().getName())) { // NOI18N
+                return ((ObjectFieldValue)staticField).getInstance();
+            }
+        }
+        
+        FieldValue field = dobj.getFieldValue("__proto__ (hidden)"); // NOI18N
+        if (field != null) return ((ObjectFieldValue)field).getInstance();
+        
+        return null;
+    }
+    
+    private static String getJSType(Instance prototype, JavaScriptHeapFragment fragment) {
+        if (prototype == null) return "<unknown type>";
+        
+        if (fragment.nullInstance.equals(prototype)) return "<no prototype>";
+        
+        Heap heap = fragment.getHeap();
+        
+        DynamicObject dprototype = new DynamicObject(prototype);
+        ObjectFieldValue constructorValue = (ObjectFieldValue)dprototype.getFieldValue("constructor"); // NOI18N
+        if (constructorValue != null) {
+            Instance constructor = constructorValue.getInstance();
+            DynamicObject dconstructor = new DynamicObject(constructor);
+            String type = JavaScriptNodes.getLogicalValue(dconstructor, dconstructor.getType(heap), heap);
+            if (type == null) return "<anonymous prototype>";
+            return type.endsWith("()") ? type.substring(0, type.length() - 2) : type; // NOI18N
+        } else {
+            return "<unknown prototype>";
+        }
     }
     
     

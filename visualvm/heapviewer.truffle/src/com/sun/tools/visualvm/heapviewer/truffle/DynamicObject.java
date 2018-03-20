@@ -48,7 +48,7 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
-public class DynamicObject {
+public class DynamicObject extends TruffleObject {
     
     public static final DataType<DynamicObject> DATA_TYPE = new DataType<DynamicObject>(DynamicObject.class, null, null);
 
@@ -138,8 +138,12 @@ public class DynamicObject {
     }
 
     public Instance getShape() {
-        if (shape == null) shape = (Instance)instance.getValueOfField("shape"); // NOI18N
+        if (shape == null) shape = getShape(instance);
         return shape;
+    }
+    
+    public static Instance getShape(Instance instance) {
+        return (Instance)instance.getValueOfField("shape"); // NOI18N
     }
     
     public String getType(Heap heap) {

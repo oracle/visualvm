@@ -22,14 +22,13 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.javascript;
+package com.sun.tools.visualvm.heapviewer.truffle;
 
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
@@ -42,17 +41,22 @@ import org.netbeans.lib.profiler.heap.Heap;
  *
  * @author Jiri Sedlacek
  */
-class JavaScriptTypeNode extends HeapViewerNode {
+public abstract class TruffleTypeNode<O extends TruffleObject, T extends TruffleType<O>> extends HeapViewerNode {
     
-    private final TruffleType<JavaScriptDynamicObject> type;
+    private final T type;
     
     
-    JavaScriptTypeNode(TruffleType<JavaScriptDynamicObject> type) {
+    protected TruffleTypeNode(T type) {
         this.type = type;
     }
     
     
-    public TruffleType<JavaScriptDynamicObject> getType() {
+    public abstract HeapViewerNode createNode(O object, Heap heap);
+    
+    public abstract TruffleTypeNode createCopy();
+    
+    
+    public T getType() {
         return type;
     }
     
@@ -61,7 +65,7 @@ class JavaScriptTypeNode extends HeapViewerNode {
         return type.getName();
     }
     
-    public long getObjectsCount() {
+    public int getObjectsCount() {
         return type.getObjectsCount();
     }
     
@@ -86,12 +90,13 @@ class JavaScriptTypeNode extends HeapViewerNode {
     protected HeapViewerNode[] computeChildren(RootNode root) {
         int itemsCount = type.getObjectsCount();
         if (itemsCount <= UIThresholds.MAX_CLASS_INSTANCES) {
+            Heap heap = root.getContext().getFragment().getHeap();
             HeapViewerNode[] nodes = new HeapViewerNode[itemsCount];
-            Iterator<JavaScriptDynamicObject> iterator = type.getObjectsIterator();
+            Iterator<O> iterator = type.getObjectsIterator();
             int i = 0;
             while (iterator.hasNext()) {
-                JavaScriptDynamicObject object = iterator.next();
-                nodes[i++] = new JavaScriptNodes.JavaScriptDynamicObjectNode(object, object.getType(root.getContext().getFragment().getHeap()));
+                O object = iterator.next();
+                nodes[i++] = createNode(object, heap);
             }
             return nodes;
         } else {
@@ -100,15 +105,15 @@ class JavaScriptTypeNode extends HeapViewerNode {
     }
     
     protected HeapViewerNode[] lazilyComputeChildren(Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-        NodesComputer<JavaScriptDynamicObject> computer = new NodesComputer<JavaScriptDynamicObject>(type.getObjectsCount(), UIThresholds.MAX_CLASS_INSTANCES) {
+        NodesComputer<O> computer = new NodesComputer<O>(type.getObjectsCount(), UIThresholds.MAX_CLASS_INSTANCES) {
             protected boolean sorts(DataType dataType) {
                 return !DataType.COUNT.equals(dataType);
             }
-            protected HeapViewerNode createNode(JavaScriptDynamicObject object) {
-                return new JavaScriptNodes.JavaScriptDynamicObjectNode(object, object.getType(heap));
+            protected HeapViewerNode createNode(O object) {
+                return TruffleTypeNode.this.createNode(object, heap);
             }
-            protected ProgressIterator<JavaScriptDynamicObject> objectsIterator(int index, Progress progress) {
-                Iterator<JavaScriptDynamicObject> iterator = type.getObjectsIterator();
+            protected ProgressIterator<O> objectsIterator(int index, Progress progress) {
+                Iterator<O> iterator = type.getObjectsIterator();
                 return new ProgressIterator(iterator, index, true, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
@@ -121,14 +126,14 @@ class JavaScriptTypeNode extends HeapViewerNode {
                     return "<objects " + firstNodeIdx + "-" + lastNodeIdx + ">";
                 }
         };
-        return computer.computeNodes(JavaScriptTypeNode.this, heap, viewID, null, dataTypes, sortOrders, progress);
+        return computer.computeNodes(this, heap, viewID, null, dataTypes, sortOrders, progress);
     }
     
     
     public boolean equals(Object o) {
         if (o == this) return true;
-        if (!(o instanceof JavaScriptTypeNode)) return false;
-        return getName().equals(((JavaScriptTypeNode)o).getName());
+        if (!(o instanceof TruffleTypeNode)) return false;
+        return getName().equals(((TruffleTypeNode)o).getName());
     }
     
     public int hashCode() {
@@ -149,13 +154,7 @@ class JavaScriptTypeNode extends HeapViewerNode {
     }
     
     
-    public JavaScriptTypeNode createCopy() {
-        JavaScriptTypeNode copy = new JavaScriptTypeNode(type);
-        setupCopy(copy);
-        return copy;
-    }
-    
-    protected void setupCopy(JavaScriptTypeNode copy) {
+    protected void setupCopy(TruffleTypeNode copy) {
         super.setupCopy(copy);
     }
     

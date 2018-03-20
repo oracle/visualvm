@@ -56,49 +56,29 @@ public abstract class TruffleLanguageHeapFragment<O extends Object, T extends Tr
     private List<T> types;
     private final Object statisticsLock = new Object();
     
-//    private Progress statisticsProgress;
-//    private final Object statisticsProgressLock = new Object();
+    private Progress statisticsProgress;
+    private boolean ownProgress;
+    private final Object statisticsProgressLock = new Object();
     
-
+    
     protected TruffleLanguageHeapFragment(String ID, String name, String description, Heap heap) throws IOException {
         super(ID, name, description, heap);
     }
     
     
     public long getHeapSize(Progress progress) {
-        synchronized (statisticsLock) {
-            if (types == null) computeStatistics(progress);
-            return heapSize;
-        }
+        checkInitialized(progress);
+        return heapSize;
     }
     
     public long getObjectsCount(Progress progress) {
-        synchronized (statisticsLock) {
-            if (types == null) computeStatistics(progress);
-            return objectsCount;
-        }
+        checkInitialized(progress);
+        return objectsCount;
     }
     
-    public List<T> getTypes(final Progress progress) {
-//        if (progress != null) {
-//            synchronized (statisticsProgressLock) {
-//                if (statisticsProgress != null) {
-//                    statisticsProgress.addChangeListener(new Progress.Listener() {
-//                        @Override
-//                        public void progressChanged(Progress.Event event) {
-//                            progress.setCurrentStep(event.getCurrentStep());
-//                        }
-//                    });
-//                }
-//            }
-//        }
-            
-        synchronized (statisticsLock) {
-            if (types == null) computeStatistics(progress);
-            return types;
-        }
-        
-//        TODO: remove progress listener
+    public List<T> getTypes(Progress progress) {
+        checkInitialized(progress);
+        return types;
     }
     
     
@@ -121,15 +101,47 @@ public abstract class TruffleLanguageHeapFragment<O extends Object, T extends Tr
     protected abstract String getObjectType(O object);
     
     
+    private void checkInitialized(Progress progress) {
+        Progress.Listener progressListener = null;
+        
+        if (progress != null) {
+            synchronized (statisticsProgressLock) {
+                if (statisticsProgress != null) {
+                    statisticsProgress.addChangeListener(new Progress.Listener() {
+                        @Override
+                        public void progressChanged(Progress.Event event) {
+                            progress.setCurrentStep(event.getCurrentStep());
+                        }
+                    });
+                }
+            }
+        }
+        
+        synchronized (statisticsLock) {
+            if (types == null) computeStatistics(progress);
+        }
+
+        if (progressListener != null) {
+            synchronized (statisticsProgressLock) {
+                if (statisticsProgress != null) {
+                    statisticsProgress.removeChangeListener(progressListener);
+                }
+            }
+        }
+    }
+    
     private void computeStatistics(Progress progress) {
-//        if (statisticsProgress == null) synchronized (statisticsProgressLock) {
-//            if (progress != null) {
-//                statisticsProgress = progress;
-//            } else {
-//                statisticsProgress = new Progress();
-//                statisticsProgress.setupUnknownSteps();
-//            }
-//        }
+        if (statisticsProgress == null) {
+            synchronized (statisticsProgressLock) {
+                if (progress != null) {
+                    statisticsProgress = progress;
+                } else {
+                    ownProgress = true;
+                    statisticsProgress = new Progress();
+                    statisticsProgress.setupUnknownSteps();
+                }
+            }
+        }
         
         Map<String, T> cache = new HashMap();
         Iterator<O> objects = getObjectsIterator();
@@ -137,7 +149,7 @@ public abstract class TruffleLanguageHeapFragment<O extends Object, T extends Tr
         while (objects.hasNext()) {
             O object = objects.next();
             
-//            if (statisticsProgress != null) statisticsProgress.step();
+            if (statisticsProgress != null) statisticsProgress.step();
             objectsCount++;
             
             long objectSize = getObjectSize(object);
@@ -153,6 +165,8 @@ public abstract class TruffleLanguageHeapFragment<O extends Object, T extends Tr
             }
             type.addObject(object, objectSize, objectRetainedSize);
         }
+        
+        if (statisticsProgress != null && ownProgress) statisticsProgress.finish();
         
         types = Collections.unmodifiableList(new ArrayList(cache.values()));
     }
@@ -220,6 +234,38 @@ public abstract class TruffleLanguageHeapFragment<O extends Object, T extends Tr
             return instanceIt.next();
         }
     }
+    
+    protected static abstract class ExcludingInstancesIterator implements Iterator<Instance> {
+        private final Iterator<Instance> instancesIt;
+        private Instance next;
+
+        protected ExcludingInstancesIterator(Iterator<Instance> it) {
+            instancesIt = it;
+            computeNext();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return next != null;
+        }
+
+        @Override
+        public Instance next() {
+            Instance ret = next;
+            computeNext();
+            return ret;
+        }
+        
+        private void computeNext() {
+            while (instancesIt.hasNext()) {
+                next = instancesIt.next();
+                if (!exclude(next)) return;
+            }
+            next = null;
+        }
+        
+        protected abstract boolean exclude(Instance instance);
+    }
 
     protected class ObjectsIterator implements Iterator<O> {
         private final Iterator<Instance> instancesIter;
@@ -241,6 +287,38 @@ public abstract class TruffleLanguageHeapFragment<O extends Object, T extends Tr
         public O next() {
             return createObject(instancesIter.next());
         }
+    }
+    
+    protected abstract class ExcludingObjectsIterator implements Iterator<O> {
+        private final Iterator<O> objectsIt;
+        private O next;
+
+        protected ExcludingObjectsIterator(Iterator<O> it) {
+            objectsIt = it;
+            computeNext();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return next != null;
+        }
+
+        @Override
+        public O next() {
+            O ret = next;
+            computeNext();
+            return ret;
+        }
+        
+        private void computeNext() {
+            while (objectsIt.hasNext()) {
+                next = objectsIt.next();
+                if (!exclude(next)) return;
+            }
+            next = null;
+        }
+        
+        protected abstract boolean exclude(O object);
     }
     
     

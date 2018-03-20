@@ -50,7 +50,7 @@ import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
 public class JavaScriptObjectsProvider extends AbstractObjectsProvider {    
 
     public static HeapViewerNode[] getAllObjects(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
-        final JavaScriptHeapFragment fragment = (JavaScriptHeapFragment)context.getFragment();
+        final JavaScriptHeapFragment fragment = JavaScriptHeapFragment.fromContext(context);
         final Heap heap = fragment.getHeap();
         
         if (aggregation == 0) {
@@ -83,7 +83,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                     return true;
                 }
                 protected HeapViewerNode createNode(JavaScriptType type) {
-                    return new JavaScriptTypeNode(type);
+                    return new JavaScriptNodes.JavaScriptTypeNode(type);
                 }
                 protected ProgressIterator<JavaScriptType> objectsIterator(int index, Progress progress) {
                     List<JavaScriptType> types = fragment.getTypes(progress);
@@ -132,7 +132,8 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
     }
     
     public static HeapViewerNode[] getDominators(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
-        final Heap heap = context.getFragment().getHeap();
+        JavaScriptHeapFragment fragment = JavaScriptHeapFragment.fromContext(context);
+        final Heap heap = fragment.getHeap();
         
         if (!DataType.RETAINED_SIZE.valuesAvailable(heap))
             return new HeapViewerNode[] { new TextNode("<Retained sizes not computed yet>") };
@@ -188,7 +189,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
             
             for (Instance dominator : dominators) {
                 progress.step();
-                String type = JavaScriptDynamicObject.getJSType(dominator, heap);
+                String type = fragment.getObjectType(dominator);
                 JavaScriptNodes.JavaScriptDynamicObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
@@ -208,7 +209,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
     }
     
     public static HeapViewerNode[] getGCRoots(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
-        JavaScriptHeapFragment fragment = (JavaScriptHeapFragment)context.getFragment();
+        JavaScriptHeapFragment fragment = JavaScriptHeapFragment.fromContext(context);
         final Heap heap = fragment.getHeap();
         
         Iterator<Instance> instances = fragment.getInstancesIterator();
@@ -261,7 +262,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
                 progress.step();
                 if (!instance.isGCRoot()) continue;
                 
-                String type = JavaScriptDynamicObject.getJSType(instance, heap);
+                String type = fragment.getObjectType(instance);
 //                type = type.substring(type.lastIndexOf('.') + 1);
 
                 JavaScriptNodes.JavaScriptDynamicObjectsContainer typeNode = types.get(type);
