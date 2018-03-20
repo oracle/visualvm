@@ -54,7 +54,7 @@ public final class Progress {
     private Timer timer;
     
     
-    Progress() {}
+    public Progress() {}
     
     
     public void setupUnknownSteps() {
@@ -125,7 +125,7 @@ public final class Progress {
     }
     
     
-    void addChangeListener(final Listener listener) {
+    public void addChangeListener(final Listener listener) {
         UIUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 if (listeners == null) listeners = new HashSet();
@@ -134,7 +134,7 @@ public final class Progress {
         });
     }
     
-    void removeChangeListener(final Listener listener) {
+    public void removeChangeListener(final Listener listener) {
         UIUtils.runInEventDispatchThread(new Runnable() {
             public void run() {
                 if (listeners != null) {
