@@ -91,6 +91,9 @@ public class GraalJSDetailsProvider extends DetailsProvider.Basic {
             if (name == null || name.isEmpty()) {
                 name = DetailsUtils.getInstanceFieldString(instance, "lazyInit", heap); // NOI18N
             }
+            if (name == null || name.isEmpty()) {
+                name = DetailsUtils.getInstanceFieldString(instance, "callTarget", heap); // NOI18N
+            }
             return name;
         }
         if (JS_FUNCTION_ROOT_NODE_MASK.equals(className)) {
