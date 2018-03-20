@@ -92,7 +92,16 @@ public class GraalJSDetailsProvider extends DetailsProvider.Basic {
                 name = DetailsUtils.getInstanceFieldString(instance, "lazyInit", heap); // NOI18N
             }
             if (name == null || name.isEmpty()) {
-                name = DetailsUtils.getInstanceFieldString(instance, "callTarget", heap); // NOI18N
+                // fallback to callTarget and
+                // remove everything after first space
+                String callTargetName = DetailsUtils.getInstanceFieldString(instance, "callTarget", heap); // NOI18N
+                int spaceIndex = callTargetName.indexOf(' ');
+
+                if (spaceIndex > 0) {
+                    name = callTargetName.substring(0,spaceIndex);
+                } else {
+                    name = callTargetName;
+                }
             }
             return name;
         }
