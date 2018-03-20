@@ -24,10 +24,14 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle;
 
+import com.sun.tools.visualvm.heapviewer.model.DataType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import org.netbeans.lib.profiler.heap.ArrayItemValue;
 import org.netbeans.lib.profiler.heap.Field;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
@@ -41,7 +45,6 @@ import org.netbeans.lib.profiler.heap.Type;
 import org.netbeans.lib.profiler.heap.Value;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
 
 /**
  *
@@ -84,25 +87,23 @@ public class DynamicObject extends TruffleObject {
 
         if (getShape() != null) {
             List<Value> refs = instance.getReferences();
-            Instance lastInstanceRef = null;
+            Set<Instance> foundRefs = new HashSet();
 
             for (Value ref : refs) {
+                Instance instanceRef = ref.getDefiningInstance();
                 if (ref instanceof ObjectFieldValue) {
-                    ObjectFieldValue objRef = (ObjectFieldValue) ref;
-                    Instance instanceRef = objRef.getDefiningInstance();
+                    if (foundRefs.add(instanceRef)) {
+                        addReferences(instanceRef, dynObjRefs);
 
-                    if (!instanceRef.equals(lastInstanceRef) && DynamicObject.isDynamicObject(instanceRef)) {
-                        DynamicObject dynObj = new DynamicObject(instanceRef);
+                    }
+                }
+                if (ref instanceof ArrayItemValue) {
+                    List<Value> arrRefs = instanceRef.getReferences();
 
-                        List<FieldValue> fieldValues = dynObj.getFieldValues();
-                        for (FieldValue fieldVal : fieldValues) {
-                            if (fieldVal instanceof ObjectFieldValue) {
-                                ObjectFieldValue fieldValObj = (ObjectFieldValue) fieldVal;
-
-                                if (instance.equals(fieldValObj.getInstance())) {
-                                    dynObjRefs.add(fieldVal);
-                                }
-                            }
+                    for (Value arrRef : arrRefs) {
+                        Instance arrInstanceRef = arrRef.getDefiningInstance();
+                        if (foundRefs.add(arrInstanceRef)) {
+                            addReferences(arrInstanceRef, dynObjRefs);
                         }
                     }
                 }
@@ -225,6 +226,23 @@ public class DynamicObject extends TruffleObject {
         } else {
             values = Collections.EMPTY_LIST;
             staticValues = Collections.EMPTY_LIST;
+        }
+    }
+
+    private void addReferences(Instance instanceRef, List dynObjRefs) {
+        if (DynamicObject.isDynamicObject(instanceRef)) {
+            DynamicObject dynObj = new DynamicObject(instanceRef);
+
+            List<FieldValue> fieldValues = dynObj.getFieldValues();
+            for (FieldValue fieldVal : fieldValues) {
+                if (fieldVal instanceof ObjectFieldValue) {
+                    ObjectFieldValue fieldValObj = (ObjectFieldValue) fieldVal;
+
+                    if (instance.equals(fieldValObj.getInstance())) {
+                        dynObjRefs.add(fieldVal);
+                    }
+                }
+            }
         }
     }
 
