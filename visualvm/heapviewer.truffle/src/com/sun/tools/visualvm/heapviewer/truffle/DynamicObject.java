@@ -94,7 +94,6 @@ public class DynamicObject extends TruffleObject {
                 if (ref instanceof ObjectFieldValue) {
                     if (foundRefs.add(instanceRef)) {
                         addReferences(instanceRef, dynObjRefs);
-
                     }
                 }
                 if (ref instanceof ArrayItemValue) {
@@ -153,48 +152,16 @@ public class DynamicObject extends TruffleObject {
     }
     
     public static String getType(Instance instance, Heap heap) {
-        Instance shape = (Instance)instance.getValueOfField("shape"); // NOI18N
+        Instance shape = getShape(instance);
         return DetailsSupport.getDetailsString(shape, heap);
     }
     
     public JavaClass getLanguageId() {
-        Instance sh = getShape();
-        if (sh != null) {
-            Instance objectType = (Instance) sh.getValueOfField("objectType");
-            if (objectType != null) {
-                JavaClass objTypeCls = objectType.getJavaClass();
-
-                while (objTypeCls != null) {
-                    JavaClass superObjType = objTypeCls.getSuperClass();
-
-                    if (OBJECT_TYPE_FQN.equals(superObjType.getName())) {
-                        return objTypeCls;
-                    }
-                    objTypeCls = superObjType;
-                }
-            }
-        }
-        return null;
+        return getLanguageIdFromShape(getShape());
     }
     
     public static JavaClass getLanguageId(Instance instance) {
-        Instance sh = (Instance)instance.getValueOfField("shape"); // NOI18N
-        if (sh != null) {
-            Instance objectType = (Instance) sh.getValueOfField("objectType");
-            if (objectType != null) {
-                JavaClass objTypeCls = objectType.getJavaClass();
-
-                while (objTypeCls != null) {
-                    JavaClass superObjType = objTypeCls.getSuperClass();
-
-                    if (OBJECT_TYPE_FQN.equals(superObjType.getName())) {
-                        return objTypeCls;
-                    }
-                    objTypeCls = superObjType;
-                }
-            }
-        }
-        return null;
+        return getLanguageIdFromShape(getShape(instance));
     }
     
     
@@ -244,6 +211,25 @@ public class DynamicObject extends TruffleObject {
                 }
             }
         }
+    }
+
+    private static JavaClass getLanguageIdFromShape(Instance sh) {
+        if (sh != null) {
+            Instance objectType = (Instance) sh.getValueOfField("objectType");
+            if (objectType != null) {
+                JavaClass objTypeCls = objectType.getJavaClass();
+
+                while (objTypeCls != null) {
+                    JavaClass superObjType = objTypeCls.getSuperClass();
+
+                    if (OBJECT_TYPE_FQN.equals(superObjType.getName())) {
+                        return objTypeCls;
+                    }
+                    objTypeCls = superObjType;
+                }
+            }
+        }
+        return null;
     }
 
     private static Instance getValueofFields(Instance instance, String... fields) {
