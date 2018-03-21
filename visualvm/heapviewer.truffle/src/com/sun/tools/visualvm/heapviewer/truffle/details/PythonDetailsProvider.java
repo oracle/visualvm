@@ -44,6 +44,7 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     private static final String PLIST_MASK = "com.oracle.graal.python.builtins.objects.list.PList";   // NOI18N
     private static final String BASIC_STORAGE_MASK = "com.oracle.graal.python.runtime.sequence.storage.BasicSequenceStorage+";   // NOI18N
     private static final String EMPTY_STORAGE_MASK = "com.oracle.graal.python.runtime.sequence.storage.EmptySequenceStorage"; // NOI18N
+    private static final String BYTE_STORAGE_MASK = "com.oracle.graal.python.runtime.sequence.storage.ByteSequenceStorage"; // NOI18N
     private static final String PTUPLE_MASK = "com.oracle.graal.python.builtins.objects.tuple.PTuple"; // NOI18N
     private static final String PMODULE_MASK = "com.oracle.graal.python.builtins.objects.module.PythonModule"; // NOI18N
     private static final String PBYTES_MASK = "com.oracle.graal.python.builtins.objects.bytes.PBytes"; // NOI18N
@@ -53,7 +54,7 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
     public PythonDetailsProvider() {
         super(PCLASS_MASK,PFUNCTION_MASK,PNONE_MASK,PLIST_MASK,BASIC_STORAGE_MASK,
               PTUPLE_MASK,PMODULE_MASK,PBYTES_MASK,EMPTY_STORAGE_MASK,
-              PCOMPLEX_MASK,PEXCEPTION_MASK,PBUILDIN_FUNCTION_MASK);
+              PCOMPLEX_MASK,PEXCEPTION_MASK,PBUILDIN_FUNCTION_MASK, BYTE_STORAGE_MASK);
     }
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
@@ -82,7 +83,11 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
             return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
         }
         if (PBYTES_MASK.equals(className)) {
-            return DetailsUtils.getPrimitiveArrayFieldString(instance, "bytes", 0, -1, ",", "...");
+            String bytes = DetailsUtils.getPrimitiveArrayFieldString(instance, "bytes", 0, -1, ",", "...");
+
+            if (bytes == null) {
+                return DetailsUtils.getInstanceFieldString(instance, "store", heap); // NOI18N
+            }
         }
         if (PCOMPLEX_MASK.equals(className)) {
             Double realObj = (Double) instance.getValueOfField("real");    // NOI18N
@@ -94,6 +99,9 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
         }
         if (PEXCEPTION_MASK.equals(className)) {
              return DetailsUtils.getInstanceFieldString(instance, "message", heap); // NOI18N
+        }
+        if (BYTE_STORAGE_MASK.equals(className)) {
+            return DetailsUtils.getPrimitiveArrayFieldString(instance, "values", 0, -1, ",", "...");
         }
         return null;
     }

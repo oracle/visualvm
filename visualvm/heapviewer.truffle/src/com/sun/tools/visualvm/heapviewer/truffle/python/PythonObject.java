@@ -60,6 +60,7 @@ public class PythonObject extends TruffleObject.InstanceBased {
     private final Instance instance;
     private final Instance storage;
     private final Instance store;
+    private final Instance dictStorage;
     private final ObjectArrayInstance array;
     private final Instance map;
     private final Instance set;
@@ -85,6 +86,7 @@ public class PythonObject extends TruffleObject.InstanceBased {
         array = (ObjectArrayInstance) instance.getValueOfField("array"); // NOI18N
         map = (Instance) instance.getValueOfField("map"); // NOI18N
         set = (Instance) instance.getValueOfField("set"); // NOI18N
+        dictStorage = (Instance) instance.getValueOfField("dictStorage"); // NOI18N
     }
 
     public static boolean isPythonObject(Instance rObj) {
@@ -104,6 +106,9 @@ public class PythonObject extends TruffleObject.InstanceBased {
         }
         if (set != null) {
             return getSetFields();
+        }
+        if (dictStorage != null) {
+            return getDictFields();
         }
         return new DynamicObject(storage).getFieldValues();
     }
@@ -316,19 +321,82 @@ public class PythonObject extends TruffleObject.InstanceBased {
     }
 
     private List<FieldValue> getMapFields() {
-        List fields = new ArrayList();
-        Instance rootEntry = (Instance) map.getValueOfField("root");
+        return getEntriesFromTreeMap(false, map);
+    }
 
-        getEntries(false, rootEntry, fields);
-        return fields;
+    private List<FieldValue> getDictFields() {
+        Instance fastStore = (Instance) dictStorage.getValueOfField("store");
+
+        if (DynamicObject.isDynamicObject(fastStore)) {
+            return new DynamicObject(fastStore).getFieldValues();
+        }
+        Instance keywords = (Instance) dictStorage.getValueOfField("keywords");
+        if (keywords instanceof ObjectArrayInstance) {
+            return getEntriesFromKeywords((ObjectArrayInstance) keywords);
+        }
+        return getEntriesFromEconomicMapStorage(false, dictStorage);
     }
 
     private List<FieldValue> getSetFields() {
-        List fields = new ArrayList();
         Instance m = (Instance) set.getValueOfField("m");
-        Instance rootEntry = (Instance) m.getValueOfField("root");
+        if (m != null) {    // TreeMap
+            return getEntriesFromTreeMap(true, m);
+        }
+        // EconomicMapStorage
+        return getEntriesFromEconomicMapStorage(true, set);
+    }
 
-        getEntries(true, rootEntry, fields);
+    private List<FieldValue> getEntriesFromKeywords(ObjectArrayInstance keywords) {
+        List fields = new ArrayList();
+
+        for (Object keyword : keywords.getValues()) {
+            if (keyword instanceof Instance) {
+                fields.add(new PythonKeywordEntryFieldValue(false, (Instance) keyword));
+            }
+        }
+        return fields;
+    }
+
+    private List<FieldValue> getEntriesFromEconomicMapStorage(boolean isSet, Instance economicMapStorage) {
+        List fields = new ArrayList();
+        Instance entries = (Instance) economicMapStorage.getValueOfField("entries");
+
+        if (entries instanceof ObjectArrayInstance) {
+            ObjectArrayInstance entriesArr = (ObjectArrayInstance) entries;
+            String mapClassName = economicMapStorage.getJavaClass().getName();
+            int size = entriesArr.getLength();
+            List entriesList = entriesArr.getValues();
+
+            for (int i = 0; i < size; i+=2) {
+                Instance key = (Instance) entriesList.get(i);
+                Instance value = (Instance) entriesList.get(i+1);
+                if (key != null) {
+                    if (isSet) {
+                        fields.add(new PythonEconomicEntryFieldValue(key));
+                    } else {    // Map
+                        if (value != null) {
+                            if (value instanceof Instance) {
+                                Instance ival = ((Instance)value);
+                                Instance linkValue = (Instance) ival.getValueOfField("value");
+
+                                if (linkValue != null && ival.getJavaClass().getName().startsWith(mapClassName)) {
+                                    value = linkValue;
+                                }
+                            }
+                        }
+                        fields.add(new PythonEconomicEntryFieldValue(key, value));
+                    }
+                }
+            }
+        }
+        return fields;
+    }
+
+    private List<FieldValue> getEntriesFromTreeMap(boolean isSet, Instance treeMap) {
+        List fields = new ArrayList();
+        Instance rootEntry = (Instance) treeMap.getValueOfField("root");
+
+        getEntries(isSet, rootEntry, fields);
         return fields;
     }
 
@@ -340,23 +408,87 @@ public class PythonObject extends TruffleObject.InstanceBased {
         }
     }
 
+    private class PythonEconomicEntryFieldValue extends AbstractPythonMapEntryFieldValue {
+        Instance key;
+        Instance value;
 
-    private class PythonMapEntryFieldValue implements ObjectFieldValue {
+        private PythonEconomicEntryFieldValue(Instance k) {
+            super(true);
+            key = k;
+        }
 
+        private PythonEconomicEntryFieldValue(Instance k, Instance v) {
+            super(false);
+            key = k;
+            value = v;
+        }
+
+        @Override
+        Instance getEntryKey() {
+            return key;
+        }
+
+        @Override
+        Instance getEntryValue() {
+            return value;
+        }
+    }
+
+    private class PythonKeywordEntryFieldValue extends AbstractPythonMapEntryFieldValue {
+        Instance keyword;
+
+        private PythonKeywordEntryFieldValue(boolean set, Instance k) {
+            super(set);
+            keyword = k;
+        }
+
+        @Override
+        Instance getEntryKey() {
+            return (Instance) keyword.getValueOfField("name");  // NOI18N
+        }
+
+        @Override
+        Instance getEntryValue() {
+            return (Instance) keyword.getValueOfField("value");  // NOI18N
+        }
+    }
+
+    private class PythonMapEntryFieldValue extends AbstractPythonMapEntryFieldValue {
         Instance entry;
-        boolean isSet;
 
         private PythonMapEntryFieldValue(boolean set, Instance e) {
+            super(set);
             entry = e;
+        }
+
+        @Override
+        Instance getEntryKey() {
+            return (Instance) entry.getValueOfField("key");  // NOI18N
+        }
+
+        @Override
+        Instance getEntryValue() {
+            return (Instance) entry.getValueOfField("value");  // NOI18N
+        }
+    }
+
+    private abstract class AbstractPythonMapEntryFieldValue implements ObjectFieldValue {
+
+        boolean isSet;
+
+        private AbstractPythonMapEntryFieldValue(boolean set) {
             isSet = set;
         }
+
+        abstract Instance getEntryKey();
+        abstract Instance getEntryValue();
 
         @Override
         public Instance getInstance() {
             if (isSet) {
-                return (Instance) entry.getValueOfField("key");  // NOI18N
+                return getEntryKey();
             }
-            return (Instance) entry.getValueOfField("value");  // NOI18N
+            return getEntryValue();
         }
 
         @Override
@@ -364,7 +496,7 @@ public class PythonObject extends TruffleObject.InstanceBased {
             if (isSet) {
                 return new PythonMapEntryField("item");
             }
-            Instance key = (Instance)entry.getValueOfField("key");
+            Instance key = getEntryKey();
             String name = DetailsUtils.getInstanceString(key, null);
             return new PythonMapEntryField(name);
         }
