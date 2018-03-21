@@ -25,15 +25,32 @@
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
+import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.AbstractObjectsProvider;
+import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectsContainer;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleSummaryView;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
+import com.sun.tools.visualvm.heapviewer.truffle.python.PythonObject;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.SummaryView;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import javax.swing.Icon;
+import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
+import org.openide.util.Exceptions;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -78,38 +95,106 @@ class JavaScriptHeapSummary {
         JavaScriptSummaryOverview(HeapContext context) {
             super(context);
         }
+
+    }
+    
+    
+    @ServiceProvider(service=SummaryView.ContentProvider.class, position = 200)
+    public static class JavaScriptSummaryObjectsProvider extends SummaryView.ContentProvider {
+
+        @Override
+        public HeapView createSummary(String viewID, HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
+            if (JavaScriptHeapFragment.isJavaScriptHeap(context))
+                return new JavaScriptSummaryObjects(context, actions, actionProviders);
+            
+            return null;
+        }
         
-//        @Override
-//        protected Iterator getObjectsIterator() {
-//            JavaScriptHeapFragment fragment = (JavaScriptHeapFragment)getContext().getFragment();
-//            return fragment.getObjectsIterator();
-//        }
-//
-//        @Override
-//        protected String getType(Object object, Map<Object, String> typesCache) {
-//            Heap heap = getContext().getFragment().getHeap();
-//            return ((JavaScriptDynamicObject)object).getType(heap);
-////            DynamicObject dobject = (DynamicObject)object;
-////            Instance shape = dobject.getShape();
-////            
-////            String type = typesCache.get(shape);
-////            if (type == null) {
-////                type = DetailsSupport.getDetailsString(shape, getContext().getFragment().getHeap());
-////                typesCache.put(shape, type);
-////            }
-////            
-////            return type;
-//        }
-//        
-//        @Override
-//        protected long updateObjectsSize(Object object, long objectsSize) {
-//            return objectsSize == 0 ? ((JavaScriptDynamicObject)object).getInstance().getSize() : objectsSize;
-//        }
-//
-//        @Override
-//        protected long getObjectsSize(long objectsSize, long objectsCount) {
-//            return objectsCount * objectsSize;
-//        }
+    }
+    
+    private static class JavaScriptSummaryObjects extends TruffleSummaryView.ObjectsSection {
+        
+        JavaScriptSummaryObjects(HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
+            super(context, actions, actionProviders);
+        }
+
+        
+        @Override
+        protected Runnable classesByCountDisplayer(HeapViewerActions actions) {
+            return new Runnable() {
+                public void run() {}
+            };
+        }
+
+        @Override
+        protected Runnable classesBySizeDisplayer(HeapViewerActions actions) {
+            return new Runnable() {
+                public void run() {}
+            };
+        }
+
+        @Override
+        protected Runnable instancesBySizeDisplayer(HeapViewerActions actions) {
+            return new Runnable() {
+                public void run() {}
+            };
+        }
+
+        @Override
+        protected Runnable dominatorsByRetainedSizeDisplayer(HeapViewerActions actions) {
+            return new Runnable() {
+                public void run() {}
+            };
+        }
+        
+        
+        @Override
+        protected List<JavaScriptDynamicObject> dominators(TruffleLanguageHeapFragment heapFragment) {
+            int maxSearchInstances = 10000;
+
+            List<Instance> searchInstances = heapFragment.getHeap().getBiggestObjectsByRetainedSize(maxSearchInstances);
+            Iterator<Instance> searchInstancesI = searchInstances.iterator();
+            while (searchInstancesI.hasNext()) {
+                Instance instance = searchInstancesI.next();
+                if (!JavaScriptDynamicObject.isJavaScriptObject(instance))
+                    searchInstancesI.remove();
+            }
+            
+            Set<Instance> rootInstances = AbstractObjectsProvider.getDominatorRoots(searchInstances);
+            List<JavaScriptDynamicObject> rootObjects = new ArrayList();
+            for (Instance root : rootInstances) rootObjects.add(new JavaScriptDynamicObject(root));
+            
+//            try {
+//                Thread.sleep(5000);
+//            } catch (InterruptedException ex) {
+//                Exceptions.printStackTrace(ex);
+//            }
+            
+            return rootObjects;
+        }
+        
+        
+        @Override
+        protected HeapViewerNode typeNode(TruffleType type, Heap heap) {
+            return new JavaScriptNodes.JavaScriptTypeNode((JavaScriptType)type);
+        }
+
+        @Override
+        protected ProfilerRenderer typeRenderer(Heap heap) {
+            Icon packageIcon = JavaScriptSupport.createBadgedIcon(LanguageIcons.PACKAGE);
+            return new DynamicObjectsContainer.Renderer(packageIcon);
+        }
+        
+        @Override
+        protected HeapViewerNode objectNode(TruffleObject object, Heap heap) {
+            return new JavaScriptNodes.JavaScriptDynamicObjectNode((JavaScriptDynamicObject)object, object.getType(heap));
+        }
+
+        @Override
+        protected ProfilerRenderer objectRenderer(Heap heap) {
+            Icon instanceIcon = JavaScriptSupport.createBadgedIcon(LanguageIcons.INSTANCE);
+            return new DynamicObjectNode.Renderer(heap, instanceIcon);
+        }
 
     }
     

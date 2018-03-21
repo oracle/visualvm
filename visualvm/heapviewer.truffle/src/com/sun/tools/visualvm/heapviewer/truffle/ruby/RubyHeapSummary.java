@@ -78,38 +78,6 @@ class RubyHeapSummary {
         RubySummaryOverview(HeapContext context) {
             super(context);
         }
-        
-//        @Override
-//        protected Iterator getObjectsIterator() {
-//            RubyHeapFragment fragment = (RubyHeapFragment)getContext().getFragment();
-//            return fragment.getObjectsIterator();
-//        }
-//
-//        @Override
-//        protected String getType(Object object, Map<Object, String> typesCache) {
-//            Heap heap = getContext().getFragment().getHeap();
-//            return ((RubyDynamicObject)object).getType(heap);
-////            DynamicObject dobject = (DynamicObject)object;
-////            Instance shape = dobject.getShape();
-////            
-////            String type = typesCache.get(shape);
-////            if (type == null) {
-////                type = DetailsSupport.getDetailsString(shape, getContext().getFragment().getHeap());
-////                typesCache.put(shape, type);
-////            }
-////            
-////            return type;
-//        }
-//
-//        @Override
-//        protected long updateObjectsSize(Object object, long objectsSize) {
-//            return objectsSize == 0 ? ((RubyDynamicObject)object).getInstance().getSize() : objectsSize;
-//        }
-//
-//        @Override
-//        protected long getObjectsSize(long objectsSize, long objectsCount) {
-//            return objectsCount * objectsSize;
-//        }
 
     }
     

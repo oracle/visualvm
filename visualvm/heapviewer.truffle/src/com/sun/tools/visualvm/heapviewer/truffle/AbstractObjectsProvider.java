@@ -35,7 +35,7 @@ import org.netbeans.lib.profiler.heap.Instance;
  */
 public abstract class AbstractObjectsProvider {
     
-    protected static Set<Instance> getDominatorRoots(List<Instance> searchInstances) {
+    public static Set<Instance> getDominatorRoots(List<Instance> searchInstances) {
         Set<Instance> dominators = new HashSet(searchInstances);
         Set<Instance> removed = new HashSet();
 

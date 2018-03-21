@@ -121,7 +121,7 @@ public class JavaScriptObjectsProvider extends AbstractObjectsProvider {
         while (searchInstancesIt.hasNext()) {
             Instance instance = searchInstancesIt.next();
             progress.step();
-            if (!JavaScriptDynamicObject.isDynamicObject(instance) || !new JavaScriptDynamicObject(instance).isJavaScriptObject())
+            if (JavaScriptDynamicObject.isJavaScriptObject(instance))
                 searchInstancesIt.remove();
         }
         

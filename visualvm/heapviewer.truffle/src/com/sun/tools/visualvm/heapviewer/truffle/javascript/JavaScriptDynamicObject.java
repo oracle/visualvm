@@ -62,4 +62,9 @@ class JavaScriptDynamicObject extends DynamicObject {
         return JavaScriptHeapFragment.JS_LANG_ID.equals(getLanguageId().getName());
     }
     
+    static boolean isJavaScriptObject(Instance instance) {
+        return DynamicObject.isDynamicObject(instance) &&
+               JavaScriptHeapFragment.JS_LANG_ID.equals(DynamicObject.getLanguageId(instance).getName());
+    }
+    
 }

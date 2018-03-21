@@ -78,29 +78,6 @@ class RHeapSummary {
         RSummaryOverview(HeapContext context) {
             super(context);
         }
-        
-//        @Override
-//        protected Iterator getObjectsIterator() {
-//            RHeapFragment fragment = (RHeapFragment)getContext().getFragment();
-//            return fragment.getInstancesIterator();
-//        }
-//
-//        @Override
-//        protected String getType(Object object, Map<Object, String> typesCache) {
-//            Instance robj = (Instance)object;
-//            return RObject.getType(robj);
-//        }
-//
-//        @Override
-//        protected long updateObjectsSize(Object object, long objectsSize) {
-//            Instance robj = (Instance)object;
-//            Instance data = (Instance)robj.getValueOfField("data"); // NOI18N
-//            
-//            objectsSize += robj.getSize();
-//            if (data != null) objectsSize += data.getSize();
-//            
-//            return objectsSize;
-//        }
 
     }
     

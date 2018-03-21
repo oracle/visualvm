@@ -78,29 +78,6 @@ class PythonHeapSummary {
         PythonSummaryOverview(HeapContext context) {
             super(context);
         }
-        
-//        @Override
-//        protected Iterator getObjectsIterator() {
-//            PythonHeapFragment fragment = (PythonHeapFragment)getContext().getFragment();
-//            return fragment.getInstancesIterator();
-//        }
-//
-//        @Override
-//        protected String getType(Object object, Map<Object, String> typesCache) {
-//            Instance pobj = (Instance)object;
-//            return PythonObject.getType(pobj);
-//        }
-//
-//        @Override
-//        protected long updateObjectsSize(Object object, long objectsSize) {
-//            Instance pobj = (Instance)object;
-//            Instance data = (Instance)pobj.getValueOfField("data"); // NOI18N
-//            
-//            objectsSize += pobj.getSize();
-//            if (data != null) objectsSize += data.getSize();
-//            
-//            return objectsSize;
-//        }
 
     }
     

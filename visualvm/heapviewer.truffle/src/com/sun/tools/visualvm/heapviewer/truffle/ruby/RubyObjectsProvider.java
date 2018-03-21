@@ -120,7 +120,7 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
         while (searchInstancesIt.hasNext()) {
             Instance instance = searchInstancesIt.next();
             progress.step();
-            if (!RubyDynamicObject.isDynamicObject(instance) || !new RubyDynamicObject(instance).isRubyObject())
+            if (!RubyDynamicObject.isRubyObject(instance))
                 searchInstancesIt.remove();
         }
         
