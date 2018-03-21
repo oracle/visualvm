@@ -25,14 +25,29 @@
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
+import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.AbstractObjectsProvider;
+import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectsContainer;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleSummaryView;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.SummaryView;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import javax.swing.Icon;
+import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -77,6 +92,124 @@ class RubyHeapSummary {
         
         RubySummaryOverview(HeapContext context) {
             super(context);
+        }
+
+    }
+    
+    
+    @ServiceProvider(service=SummaryView.ContentProvider.class, position = 300)
+    public static class RubySummaryObjectsProvider extends SummaryView.ContentProvider {
+
+        @Override
+        public HeapView createSummary(String viewID, HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
+            if (RubyHeapFragment.isRubyHeap(context))
+                return new RubySummaryObjects(context, actions, actionProviders);
+            
+            return null;
+        }
+        
+    }
+    
+    private static class RubySummaryObjects extends TruffleSummaryView.ObjectsSection {
+        
+        RubySummaryObjects(HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
+            super(context, actions, actionProviders);
+        }
+
+        
+        @Override
+        protected Runnable typesByCountDisplayer(HeapViewerActions actions) {
+            return new Runnable() {
+                public void run() {
+                    RubyObjectsView objectsView = actions.findFeature(RubyObjectsView.class);
+                    if (objectsView != null) {
+                        objectsView.configureTypesByObjectsCount();
+                        actions.selectFeature(objectsView);
+                    }
+                }
+            };
+        }
+
+        @Override
+        protected Runnable typesBySizeDisplayer(HeapViewerActions actions) {
+            return new Runnable() {
+                public void run() {
+                    RubyObjectsView objectsView = actions.findFeature(RubyObjectsView.class);
+                    if (objectsView != null) {
+                        objectsView.configureTypesByObjectsSize();
+                        actions.selectFeature(objectsView);
+                    }
+                }
+            };
+        }
+
+        @Override
+        protected Runnable objectsBySizeDisplayer(HeapViewerActions actions) {
+            return new Runnable() {
+                public void run() {
+                    RubyObjectsView objectsView = actions.findFeature(RubyObjectsView.class);
+                    if (objectsView != null) {
+                        objectsView.configureObjectsBySize();
+                        actions.selectFeature(objectsView);
+                    }
+                }
+            };
+        }
+
+        @Override
+        protected Runnable dominatorsByRetainedSizeDisplayer(HeapViewerActions actions) {
+            return new Runnable() {
+                public void run() {
+                    RubyObjectsView objectsView = actions.findFeature(RubyObjectsView.class);
+                    if (objectsView != null) {
+                        objectsView.configureDominatorsByRetainedSize();
+                        actions.selectFeature(objectsView);
+                    }
+                }
+            };
+        }
+        
+        
+        @Override
+        protected List<RubyDynamicObject> dominators(TruffleLanguageHeapFragment heapFragment) {
+            int maxSearchInstances = 10000;
+
+            List<Instance> searchInstances = heapFragment.getHeap().getBiggestObjectsByRetainedSize(maxSearchInstances);
+            Iterator<Instance> searchInstancesI = searchInstances.iterator();
+            while (searchInstancesI.hasNext()) {
+                Instance instance = searchInstancesI.next();
+                if (!RubyDynamicObject.isRubyObject(instance))
+                    searchInstancesI.remove();
+            }
+            
+            Set<Instance> rootInstances = AbstractObjectsProvider.getDominatorRoots(searchInstances);
+            List<RubyDynamicObject> rootObjects = new ArrayList();
+            for (Instance root : rootInstances) rootObjects.add(new RubyDynamicObject(root));
+            
+            return rootObjects;
+        }
+        
+        
+        @Override
+        protected HeapViewerNode typeNode(TruffleType type, Heap heap) {
+            return new RubyNodes.RubyTypeNode((RubyType)type);
+        }
+
+        @Override
+        protected ProfilerRenderer typeRenderer(Heap heap) {
+            Icon packageIcon = RubySupport.createBadgedIcon(LanguageIcons.PACKAGE);
+            return new DynamicObjectsContainer.Renderer(packageIcon);
+        }
+        
+        @Override
+        protected HeapViewerNode objectNode(TruffleObject object, Heap heap) {
+            return new RubyNodes.RubyDynamicObjectNode((RubyDynamicObject)object, object.getType(heap));
+        }
+
+        @Override
+        protected ProfilerRenderer objectRenderer(Heap heap) {
+            Icon instanceIcon = RubySupport.createBadgedIcon(LanguageIcons.INSTANCE);
+            return new DynamicObjectNode.Renderer(heap, instanceIcon);
         }
 
     }

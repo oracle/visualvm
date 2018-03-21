@@ -25,14 +25,26 @@
 package com.sun.tools.visualvm.heapviewer.truffle.python;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
+import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.AbstractObjectsProvider;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleSummaryView;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.SummaryView;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import javax.swing.Icon;
+import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -77,6 +89,122 @@ class PythonHeapSummary {
         
         PythonSummaryOverview(HeapContext context) {
             super(context);
+        }
+
+    }
+    
+    
+    @ServiceProvider(service=SummaryView.ContentProvider.class, position = 300)
+    public static class PythonSummaryObjectsProvider extends SummaryView.ContentProvider {
+
+        @Override
+        public HeapView createSummary(String viewID, HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
+            if (PythonHeapFragment.isPythonHeap(context))
+                return new PythonSummaryObjects(context, actions, actionProviders);
+            
+            return null;
+        }
+        
+    }
+    
+    private static class PythonSummaryObjects extends TruffleSummaryView.ObjectsSection {
+        
+        PythonSummaryObjects(HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
+            super(context, actions, actionProviders);
+        }
+
+        
+        @Override
+        protected Runnable typesByCountDisplayer(HeapViewerActions actions) {
+            return new Runnable() {
+                public void run() {
+                    PythonObjectsView objectsView = actions.findFeature(PythonObjectsView.class);
+                    if (objectsView != null) {
+                        objectsView.configureTypesByObjectsCount();
+                        actions.selectFeature(objectsView);
+                    }
+                }
+            };
+        }
+
+        @Override
+        protected Runnable typesBySizeDisplayer(HeapViewerActions actions) {
+            return new Runnable() {
+                public void run() {
+                    PythonObjectsView objectsView = actions.findFeature(PythonObjectsView.class);
+                    if (objectsView != null) {
+                        objectsView.configureTypesByObjectsSize();
+                        actions.selectFeature(objectsView);
+                    }
+                }
+            };
+        }
+
+        @Override
+        protected Runnable objectsBySizeDisplayer(HeapViewerActions actions) {
+            return new Runnable() {
+                public void run() {
+                    PythonObjectsView objectsView = actions.findFeature(PythonObjectsView.class);
+                    if (objectsView != null) {
+                        objectsView.configureObjectsBySize();
+                        actions.selectFeature(objectsView);
+                    }
+                }
+            };
+        }
+
+        @Override
+        protected Runnable dominatorsByRetainedSizeDisplayer(HeapViewerActions actions) {
+            return new Runnable() {
+                public void run() {
+                    PythonObjectsView objectsView = actions.findFeature(PythonObjectsView.class);
+                    if (objectsView != null) {
+                        objectsView.configureDominatorsByRetainedSize();
+                        actions.selectFeature(objectsView);
+                    }
+                }
+            };
+        }
+        
+        
+        @Override
+        protected List<PythonObject> dominators(TruffleLanguageHeapFragment heapFragment) {
+            int maxSearchInstances = 10000;
+
+            List<Instance> searchInstances = heapFragment.getHeap().getBiggestObjectsByRetainedSize(maxSearchInstances);
+            Iterator<Instance> searchInstancesI = searchInstances.iterator();
+            while (searchInstancesI.hasNext()) {
+                Instance instance = searchInstancesI.next();
+                if (!PythonObject.isPythonObject(instance))
+                    searchInstancesI.remove();
+            }
+            
+            Set<Instance> rootInstances = AbstractObjectsProvider.getDominatorRoots(searchInstances);
+            List<PythonObject> rootObjects = new ArrayList();
+            for (Instance root : rootInstances) rootObjects.add(new PythonObject(root));
+            
+            return rootObjects;
+        }
+        
+        
+        @Override
+        protected HeapViewerNode typeNode(TruffleType type, Heap heap) {
+            return new PythonTypeNode((PythonType)type);
+        }
+
+        @Override
+        protected ProfilerRenderer typeRenderer(Heap heap) {
+            return new PythonObjectsContainer.Renderer();
+        }
+        
+        @Override
+        protected HeapViewerNode objectNode(TruffleObject object, Heap heap) {
+            return new PythonObjectNode((PythonObject)object, object.getType(heap));
+        }
+
+        @Override
+        protected ProfilerRenderer objectRenderer(Heap heap) {
+            return new PythonObjectNode.Renderer(heap);
         }
 
     }

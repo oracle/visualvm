@@ -102,30 +102,6 @@ public class RObjectsProvider extends AbstractObjectsProvider {
             };
 
             return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
-//            List<HeapViewerNode> nodes = new ArrayList();
-//            Map<String, RObjectsContainer> types = new HashMap();
-//            
-//            Iterator<Instance> instances = fragment.getInstancesIterator();
-//            progress.setupUnknownSteps();
-//            
-//            while (instances.hasNext()) {
-//                Instance instance = instances.next();
-//                progress.step();
-//                String type = RObject.getRType(instance);
-//                RObjectsContainer typeNode = types.get(type);
-//
-//                if (typeNode == null) {
-//                    typeNode = new RObjectsContainer(type);
-//                    nodes.add(typeNode);
-//                    types.put(type, typeNode);
-//                }
-//                
-//                typeNode.add(instance, heap);
-//            }
-//            
-//            progress.finish();
-//            
-//            return nodes.toArray(HeapViewerNode.NO_NODES);
         }
     }
     

@@ -33,7 +33,6 @@ import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleSummaryView;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
-import com.sun.tools.visualvm.heapviewer.truffle.python.PythonObject;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
@@ -50,7 +49,6 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
-import org.openide.util.Exceptions;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -99,7 +97,7 @@ class JavaScriptHeapSummary {
     }
     
     
-    @ServiceProvider(service=SummaryView.ContentProvider.class, position = 200)
+    @ServiceProvider(service=SummaryView.ContentProvider.class, position = 300)
     public static class JavaScriptSummaryObjectsProvider extends SummaryView.ContentProvider {
 
         @Override
@@ -120,30 +118,54 @@ class JavaScriptHeapSummary {
 
         
         @Override
-        protected Runnable classesByCountDisplayer(HeapViewerActions actions) {
+        protected Runnable typesByCountDisplayer(HeapViewerActions actions) {
             return new Runnable() {
-                public void run() {}
+                public void run() {
+                    JavaScriptObjectsView objectsView = actions.findFeature(JavaScriptObjectsView.class);
+                    if (objectsView != null) {
+                        objectsView.configureTypesByObjectsCount();
+                        actions.selectFeature(objectsView);
+                    }
+                }
             };
         }
 
         @Override
-        protected Runnable classesBySizeDisplayer(HeapViewerActions actions) {
+        protected Runnable typesBySizeDisplayer(HeapViewerActions actions) {
             return new Runnable() {
-                public void run() {}
+                public void run() {
+                    JavaScriptObjectsView objectsView = actions.findFeature(JavaScriptObjectsView.class);
+                    if (objectsView != null) {
+                        objectsView.configureTypesByObjectsSize();
+                        actions.selectFeature(objectsView);
+                    }
+                }
             };
         }
 
         @Override
-        protected Runnable instancesBySizeDisplayer(HeapViewerActions actions) {
+        protected Runnable objectsBySizeDisplayer(HeapViewerActions actions) {
             return new Runnable() {
-                public void run() {}
+                public void run() {
+                    JavaScriptObjectsView objectsView = actions.findFeature(JavaScriptObjectsView.class);
+                    if (objectsView != null) {
+                        objectsView.configureObjectsBySize();
+                        actions.selectFeature(objectsView);
+                    }
+                }
             };
         }
 
         @Override
         protected Runnable dominatorsByRetainedSizeDisplayer(HeapViewerActions actions) {
             return new Runnable() {
-                public void run() {}
+                public void run() {
+                    JavaScriptObjectsView objectsView = actions.findFeature(JavaScriptObjectsView.class);
+                    if (objectsView != null) {
+                        objectsView.configureDominatorsByRetainedSize();
+                        actions.selectFeature(objectsView);
+                    }
+                }
             };
         }
         
@@ -163,12 +185,6 @@ class JavaScriptHeapSummary {
             Set<Instance> rootInstances = AbstractObjectsProvider.getDominatorRoots(searchInstances);
             List<JavaScriptDynamicObject> rootObjects = new ArrayList();
             for (Instance root : rootInstances) rootObjects.add(new JavaScriptDynamicObject(root));
-            
-//            try {
-//                Thread.sleep(5000);
-//            } catch (InterruptedException ex) {
-//                Exceptions.printStackTrace(ex);
-//            }
             
             return rootObjects;
         }

@@ -28,7 +28,6 @@ import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.truffle.python.PythonObject;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
@@ -70,7 +69,6 @@ import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import org.netbeans.lib.profiler.ui.swing.ProfilerTable;
@@ -380,11 +378,11 @@ public class TruffleSummaryView extends HeapViewerFeature {
         }
         
         
-        protected abstract Runnable classesByCountDisplayer(HeapViewerActions actions);
+        protected abstract Runnable typesByCountDisplayer(HeapViewerActions actions);
         
-        protected abstract Runnable classesBySizeDisplayer(HeapViewerActions actions);
+        protected abstract Runnable typesBySizeDisplayer(HeapViewerActions actions);
         
-        protected abstract Runnable instancesBySizeDisplayer(HeapViewerActions actions);
+        protected abstract Runnable objectsBySizeDisplayer(HeapViewerActions actions);
         
         protected abstract Runnable dominatorsByRetainedSizeDisplayer(HeapViewerActions actions);
         
@@ -497,7 +495,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
             TreeTableViewColumn classesByCountColumn = new TreeTableViewColumn.Count(heap);
             final HideableBarRenderer classesByCountRenderer = (HideableBarRenderer)classesByCountColumn.getRenderer();
 
-            typesByCount = new ResultsSnippet(Bundle.JavaObjectsSummary_ClassesInstancesCount(), classesByCountDisplayer(actions)) {
+            typesByCount = new ResultsSnippet(Bundle.JavaObjectsSummary_ClassesInstancesCount(), typesByCountDisplayer(actions)) {
                 protected void setupTable(ProfilerTable table) {
                     table.setColumnRenderer(0, typeRenderer);
                     table.setColumnRenderer(1, classesByCountRenderer);
@@ -505,7 +503,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
                 }
             };
 
-            typesBySize = new ResultsSnippet(Bundle.JavaObjectsSummary_ClassesInstancesSize(), classesBySizeDisplayer(actions)) {
+            typesBySize = new ResultsSnippet(Bundle.JavaObjectsSummary_ClassesInstancesSize(), typesBySizeDisplayer(actions)) {
                 protected void setupTable(ProfilerTable table) {
                     table.setColumnRenderer(0, typeRenderer);
                     table.setColumnRenderer(1, sizeRenderer);
@@ -515,7 +513,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
 
             Splitter classesRow = new Splitter(Splitter.HORIZONTAL_SPLIT, typesByCount, typesBySize);
 
-            objectsBySize = new ResultsSnippet(Bundle.JavaObjectsSummary_InstancesSize(), instancesBySizeDisplayer(actions)) {
+            objectsBySize = new ResultsSnippet(Bundle.JavaObjectsSummary_InstancesSize(), objectsBySizeDisplayer(actions)) {
                 protected void setupTable(ProfilerTable table) {
                     table.setColumnRenderer(0, objectRenderer);
                     table.setColumnRenderer(1, sizeRenderer);

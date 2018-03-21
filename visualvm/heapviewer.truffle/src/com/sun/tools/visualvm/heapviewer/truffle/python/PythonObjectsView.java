@@ -30,224 +30,61 @@ import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectsView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
-import com.sun.tools.visualvm.heapviewer.ui.PluggableTreeTableView;
-import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
 import java.util.List;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import static javax.swing.Action.NAME;
-import javax.swing.ButtonGroup;
 import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JToggleButton;
 import javax.swing.SortOrder;
-import javax.swing.SwingUtilities;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.swing.ActionPopupButton;
-import org.netbeans.lib.profiler.ui.swing.GrayLabel;
-import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Tomas Hurka
+ * @author Jiri Sedlacek
  */
-public class PythonObjectsView extends HeapViewerFeature {
+public class PythonObjectsView extends TruffleObjectsView {
+    
+    private static final String FEATURE_ID = "python_objects"; // NOI18N
+    
+    
+    PythonObjectsView(HeapContext context, HeapViewerActions actions) {
+        super(FEATURE_ID, context, actions);
+    }
+    
 
-    private static enum Preset {
-        ALL_OBJECTS ("All Objects"),
-        DOMINATORS ("Dominators"),
-        GC_ROOTS ("GC Roots");
-
-        private final String presetName;
-        private Preset(String presetName) { this.presetName = presetName; }
-        public String toString() { return presetName; }
+    @Override
+    protected Icon languageBrandedIcon(String iconKey) {
+        return PythonSupport.createBadgedIcon(iconKey);
     }
 
-    private static enum Aggregation {
-        TYPES ("Types", PythonSupport.createBadgedIcon(LanguageIcons.PACKAGE)),
-        OBJECTS ("Objects", PythonSupport.createBadgedIcon(LanguageIcons.INSTANCE));
-
-        private final String aggregationName;
-        private final Icon aggregationIcon;
-        private Aggregation(String aggregationName, Icon aggregationIcon) { this.aggregationName = aggregationName; this.aggregationIcon = aggregationIcon; }
-        public String toString() { return aggregationName; }
-        public Icon getIcon() { return aggregationIcon; }
-    }
-
-    private final HeapContext context;
-
-    private ProfilerToolbar toolbar;
-    private final PluggableTreeTableView objectsView;
-
-    private Preset preset;
-    private Aggregation aggregation;
-
-    private JToggleButton tbType;
-    private JToggleButton tbObject;
-
-
-    public PythonObjectsView(HeapContext context, HeapViewerActions actions) {
-        super("python_objects", "Objects", "Objects", PythonSupport.createBadgedIcon(LanguageIcons.CLASS), 200);
-
-        this.context = context;
-        Heap heap = context.getFragment().getHeap();
-
-        objectsView = new PluggableTreeTableView("python_objects", context, actions, TreeTableViewColumn.classes(heap, true)) {
-            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-                switch (getPreset()) {
-                    case ALL_OBJECTS:
-                        switch (getAggregation()) {
-                            case TYPES:
-                                return PythonObjectsProvider.getAllObjects(root, PythonObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
-                            default:
-                                return PythonObjectsProvider.getAllObjects(root, PythonObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
-                        }
-                    case DOMINATORS:
-                        switch (getAggregation()) {
-                            case TYPES:
-                                return PythonObjectsProvider.getDominators(root, PythonObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
-                            default:
-                                return PythonObjectsProvider.getDominators(root, PythonObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
-                        }
-                    case GC_ROOTS:
-                        switch (getAggregation()) {
-                            case TYPES:
-                                return PythonObjectsProvider.getGCRoots(root, PythonObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
-                            default:
-                                return PythonObjectsProvider.getGCRoots(root, PythonObjectsView.this.context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
-                        }
+    @Override
+    protected HeapViewerNode[] computeData(Preset preset, Aggregation aggregation, RootNode root, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+        switch (preset) {
+            case ALL_OBJECTS:
+                switch (aggregation) {
+                    case TYPES:
+                        return PythonObjectsProvider.getAllObjects(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
                     default:
-                        return HeapViewerNode.NO_NODES;
+                        return PythonObjectsProvider.getAllObjects(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
                 }
-            }
-        };
-    }
-
-
-    public JComponent getComponent() {
-        if (toolbar == null) init();
-        return objectsView.getComponent();
-    }
-
-    public ProfilerToolbar getToolbar() {
-        if (toolbar == null) init();
-        return toolbar;
-    }
-
-
-    private Runnable dominatorsRefresher;
-
-    private synchronized void setPreset(Preset preset) {
-        if (preset == Preset.DOMINATORS) {
-            final Heap heap = context.getFragment().getHeap();
-            if (!DataType.RETAINED_SIZE.valuesAvailable(heap)) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        dominatorsRefresher = new Runnable() {
-                            public void run() {
-                                if (getPreset() == Preset.DOMINATORS) objectsView.reloadView();
-                                dominatorsRefresher = null;
-                            }
-                        };
-                        DataType.RETAINED_SIZE.notifyWhenAvailable(heap, dominatorsRefresher);
-                        DataType.RETAINED_SIZE.computeValues(heap, null);
-                    }
-                });
-            }
+            case DOMINATORS:
+                switch (aggregation) {
+                    case TYPES:
+                        return PythonObjectsProvider.getDominators(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
+                    default:
+                        return PythonObjectsProvider.getDominators(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
+                }
+            case GC_ROOTS:
+                switch (aggregation) {
+                    case TYPES:
+                        return PythonObjectsProvider.getGCRoots(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
+                    default:
+                        return PythonObjectsProvider.getGCRoots(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
+                }
+            default:
+                return HeapViewerNode.NO_NODES;
         }
-
-        this.preset = preset;
-        objectsView.setViewName(preset.toString());
-        objectsView.reloadView();
-    }
-
-    private synchronized Preset getPreset() {
-        return preset;
-    }
-
-    private synchronized void setAggregation(Aggregation aggregation) {
-        this.aggregation = aggregation;
-        objectsView.reloadView();
-    }
-
-    private synchronized Aggregation getAggregation() {
-        return aggregation;
-    }
-
-
-    private void init() {
-        toolbar = ProfilerToolbar.create(false);
-
-        toolbar.addSpace(2);
-        toolbar.addSeparator();
-        toolbar.addSpace(5);
-
-        toolbar.add(new GrayLabel("Presets:"));
-        toolbar.addSpace(2);
-
-        class PresetAction extends AbstractAction {
-            final Preset preset;
-            PresetAction(Preset preset) {
-                this.preset = preset;
-                putValue(NAME, preset.toString());
-            }
-            public void actionPerformed(ActionEvent e) {
-                setPreset(preset);
-            }
-        }
-        Preset[] presetItems = Preset.values();
-        Action[] presetActions = new PresetAction[presetItems.length];
-        for (int i = 0; i < presetItems.length; i++) presetActions[i] = new PresetAction(presetItems[i]);
-        preset = Preset.ALL_OBJECTS;
-        objectsView.setViewName(Preset.ALL_OBJECTS.toString());
-        toolbar.add(new ActionPopupButton(0, presetActions));
-
-        toolbar.addSpace(8);
-
-        toolbar.add(new GrayLabel("Aggregation:"));
-        toolbar.addSpace(2);
-
-        final ButtonGroup aggregationBG = new ButtonGroup();
-        class AggregationButton extends JToggleButton {
-            private final Aggregation aggregation;
-            AggregationButton(Aggregation aggregation) {
-                super(aggregation.getIcon());
-                this.aggregation = aggregation;
-                setToolTipText(aggregation.toString());
-                aggregationBG.add(this);
-            }
-            protected void fireItemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) setAggregation(aggregation);
-            }
-        }
-
-        tbType = new AggregationButton(Aggregation.TYPES);
-        tbType.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
-        tbType.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
-        toolbar.add(tbType);
-
-        tbObject = new AggregationButton(Aggregation.OBJECTS);
-        tbObject.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
-        tbObject.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
-        toolbar.add(tbObject);
-
-        if (objectsView.hasPlugins()) {
-            toolbar.addSpace(8);
-
-            toolbar.add(new GrayLabel("Details:"));
-            toolbar.addSpace(2);
-
-            toolbar.add(objectsView.getToolbar());
-        }
-
-        tbType.setSelected(true);
-        aggregation = Aggregation.TYPES;
     }
 
 
