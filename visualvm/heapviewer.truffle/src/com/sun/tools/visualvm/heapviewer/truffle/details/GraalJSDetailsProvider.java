@@ -95,7 +95,7 @@ public class GraalJSDetailsProvider extends DetailsProvider.Basic {
                 // fallback to callTarget and
                 // remove everything after first space
                 String callTargetName = DetailsUtils.getInstanceFieldString(instance, "callTarget", heap); // NOI18N
-                int spaceIndex = callTargetName.indexOf(' ');
+                int spaceIndex = callTargetName == null ? -1 : callTargetName.indexOf(' ');
 
                 if (spaceIndex > 0) {
                     name = callTargetName.substring(0,spaceIndex);

@@ -54,17 +54,16 @@ public class PythonObjectsProvider extends AbstractObjectsProvider {
         final Heap heap = fragment.getHeap();
 
         if (aggregation == 0) {
-            NodesComputer<Instance> computer = new NodesComputer<Instance>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
+            NodesComputer<PythonObject> computer = new NodesComputer<PythonObject>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
                 protected boolean sorts(DataType dataType) {
                     return !DataType.COUNT.equals(dataType);
                 }
-                protected HeapViewerNode createNode(Instance instance) {
-                    PythonObject pyobject = new PythonObject(instance);
+                protected HeapViewerNode createNode(PythonObject pyobject) {
                     return new PythonObjectNode(pyobject);
                 }
-                protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
-                    Iterator<Instance> pyinstances = fragment.getInstancesIterator();
-                    return new ProgressIterator(pyinstances, index, true, progress);
+                protected ProgressIterator<PythonObject> objectsIterator(int index, Progress progress) {
+                    Iterator<PythonObject> pyobjects = fragment.getObjectsIterator();
+                    return new ProgressIterator(pyobjects, index, true, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return "<another " + moreNodesCount + " objects left>";
@@ -79,30 +78,30 @@ public class PythonObjectsProvider extends AbstractObjectsProvider {
 
             return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
         } else {
-            List<HeapViewerNode> nodes = new ArrayList();
-            Map<String, PythonObjectsContainer> types = new HashMap();
-
-            Iterator<Instance> instances = fragment.getInstancesIterator();
-            progress.setupUnknownSteps();
-
-            while (instances.hasNext()) {
-                Instance instance = instances.next();
-                progress.step();
-                String type = PythonObject.getType(instance);
-                PythonObjectsContainer typeNode = types.get(type);
-
-                if (typeNode == null) {
-                    typeNode = new PythonObjectsContainer(type);
-                    nodes.add(typeNode);
-                    types.put(type, typeNode);
+            NodesComputer<PythonType> computer = new NodesComputer<PythonType>(UIThresholds.MAX_TOPLEVEL_CLASSES) {
+                protected boolean sorts(DataType dataType) {
+                    return true;
                 }
+                protected HeapViewerNode createNode(PythonType type) {
+                    return new PythonTypeNode(type);
+                }
+                protected ProgressIterator<PythonType> objectsIterator(int index, Progress progress) {
+                    List<PythonType> types = fragment.getTypes(progress);
+                    Iterator<PythonType> typesI = types.listIterator(index);
+                    return new ProgressIterator(typesI, index, false, progress);
+                }
+                protected String getMoreNodesString(String moreNodesCount)  {
+                    return "<another " + moreNodesCount + " types left>";
+                }
+                protected String getSamplesContainerString(String objectsCount)  {
+                    return "<sample " + objectsCount + " types>";
+                }
+                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                    return "<types " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                }
+            };
 
-                typeNode.add(instance, heap);
-            }
-
-            progress.finish();
-
-            return nodes.toArray(HeapViewerNode.NO_NODES);
+            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
         }
     }
 
@@ -163,7 +162,7 @@ public class PythonObjectsProvider extends AbstractObjectsProvider {
 
             for (Instance dominator : dominators) {
                 progress.step();
-                String type = PythonObject.getType(dominator);
+                String type = PythonObject.getPythonType(dominator);
                 PythonObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
@@ -236,7 +235,7 @@ public class PythonObjectsProvider extends AbstractObjectsProvider {
                 progress.step();
                 if (!instance.isGCRoot()) continue;
                 
-                String type = PythonObject.getType(instance);
+                String type = PythonObject.getPythonType(instance);
 //                type = type.substring(type.lastIndexOf('.') + 1);
                 PythonObjectsContainer typeNode = types.get(type);
 

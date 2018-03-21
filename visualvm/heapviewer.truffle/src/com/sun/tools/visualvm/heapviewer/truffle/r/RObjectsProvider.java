@@ -54,17 +54,16 @@ public class RObjectsProvider extends AbstractObjectsProvider {
         final Heap heap = fragment.getHeap();
         
         if (aggregation == 0) {
-            NodesComputer<Instance> computer = new NodesComputer<Instance>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
+            NodesComputer<RObject> computer = new NodesComputer<RObject>(UIThresholds.MAX_TOPLEVEL_INSTANCES) {
                 protected boolean sorts(DataType dataType) {
                     return !DataType.COUNT.equals(dataType);
                 }
-                protected HeapViewerNode createNode(Instance instance) {
-                    RObject robject = new RObject(instance);
+                protected HeapViewerNode createNode(RObject robject) {
                     return new RObjectNode(robject);
                 }
-                protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
-                    Iterator<Instance> rinstances = fragment.getInstancesIterator();
-                    return new ProgressIterator(rinstances, index, true, progress);
+                protected ProgressIterator<RObject> objectsIterator(int index, Progress progress) {
+                    Iterator<RObject> robjects = fragment.getObjectsIterator();
+                    return new ProgressIterator(robjects, index, true, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
                     return "<another " + moreNodesCount + " objects left>";
@@ -79,30 +78,54 @@ public class RObjectsProvider extends AbstractObjectsProvider {
 
             return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
         } else {
-            List<HeapViewerNode> nodes = new ArrayList();
-            Map<String, RObjectsContainer> types = new HashMap();
-            
-            Iterator<Instance> instances = fragment.getInstancesIterator();
-            progress.setupUnknownSteps();
-            
-            while (instances.hasNext()) {
-                Instance instance = instances.next();
-                progress.step();
-                String type = RObject.getType(instance);
-                RObjectsContainer typeNode = types.get(type);
-
-                if (typeNode == null) {
-                    typeNode = new RObjectsContainer(type);
-                    nodes.add(typeNode);
-                    types.put(type, typeNode);
+            NodesComputer<RType> computer = new NodesComputer<RType>(UIThresholds.MAX_TOPLEVEL_CLASSES) {
+                protected boolean sorts(DataType dataType) {
+                    return true;
                 }
-                
-                typeNode.add(instance, heap);
-            }
-            
-            progress.finish();
-            
-            return nodes.toArray(HeapViewerNode.NO_NODES);
+                protected HeapViewerNode createNode(RType type) {
+                    return new RTypeNode(type);
+                }
+                protected ProgressIterator<RType> objectsIterator(int index, Progress progress) {
+                    List<RType> types = fragment.getTypes(progress);
+                    Iterator<RType> typesI = types.listIterator(index);
+                    return new ProgressIterator(typesI, index, false, progress);
+                }
+                protected String getMoreNodesString(String moreNodesCount)  {
+                    return "<another " + moreNodesCount + " types left>";
+                }
+                protected String getSamplesContainerString(String objectsCount)  {
+                    return "<sample " + objectsCount + " types>";
+                }
+                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                    return "<types " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                }
+            };
+
+            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
+//            List<HeapViewerNode> nodes = new ArrayList();
+//            Map<String, RObjectsContainer> types = new HashMap();
+//            
+//            Iterator<Instance> instances = fragment.getInstancesIterator();
+//            progress.setupUnknownSteps();
+//            
+//            while (instances.hasNext()) {
+//                Instance instance = instances.next();
+//                progress.step();
+//                String type = RObject.getRType(instance);
+//                RObjectsContainer typeNode = types.get(type);
+//
+//                if (typeNode == null) {
+//                    typeNode = new RObjectsContainer(type);
+//                    nodes.add(typeNode);
+//                    types.put(type, typeNode);
+//                }
+//                
+//                typeNode.add(instance, heap);
+//            }
+//            
+//            progress.finish();
+//            
+//            return nodes.toArray(HeapViewerNode.NO_NODES);
         }
     }
     
@@ -163,7 +186,7 @@ public class RObjectsProvider extends AbstractObjectsProvider {
             
             for (Instance dominator : dominators) {
                 progress.step();
-                String type = RObject.getType(dominator);
+                String type = RObject.getRType(dominator);
                 RObjectsContainer typeNode = types.get(type);
 
                 if (typeNode == null) {
@@ -236,7 +259,7 @@ public class RObjectsProvider extends AbstractObjectsProvider {
                 progress.step();
                 if (!instance.isGCRoot()) continue;
                 
-                String type = RObject.getType(instance);
+                String type = RObject.getRType(instance);
 //                type = type.substring(type.lastIndexOf('.') + 1);
                 RObjectsContainer typeNode = types.get(type);
 

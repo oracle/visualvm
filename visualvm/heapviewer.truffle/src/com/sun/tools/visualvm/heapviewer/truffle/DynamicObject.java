@@ -51,7 +51,7 @@ import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
-public class DynamicObject extends TruffleObject {
+public class DynamicObject extends TruffleObject.InstanceBased {
     
     public static final DataType<DynamicObject> DATA_TYPE = new DataType<DynamicObject>(DynamicObject.class, null, null);
 
@@ -73,11 +73,18 @@ public class DynamicObject extends TruffleObject {
     private List<FieldValue> values;
     private List<FieldValue> staticValues;
 
-    public DynamicObject(Instance dynObj) {
-        if (dynObj == null) throw new IllegalArgumentException("Instance cannot be null");
-        this.instance = dynObj;
+    public DynamicObject(Instance instance) {
+        this(null, instance);
     }
     
+    public DynamicObject(String type, Instance instance) {
+        if (instance == null) throw new IllegalArgumentException("Instance cannot be null");
+        
+        this.instance = instance;
+        this.type = type;
+    }
+    
+    @Override
     public Instance getInstance() {
         return instance;
     }
@@ -146,14 +153,29 @@ public class DynamicObject extends TruffleObject {
         return (Instance)instance.getValueOfField("shape"); // NOI18N
     }
     
+    @Override
     public String getType(Heap heap) {
-        if (type == null) type = DetailsSupport.getDetailsString(getShape(), heap);
+        if (type == null) type = computeType(heap);
         return type;
+    }
+    
+    protected String computeType(Heap heap) {
+        return DetailsSupport.getDetailsString(getShape(), heap);
     }
     
     public static String getType(Instance instance, Heap heap) {
         Instance shape = getShape(instance);
         return DetailsSupport.getDetailsString(shape, heap);
+    }
+    
+    @Override
+    public long getSize() {
+        return instance.getSize();
+    }
+    
+    @Override
+    public long getRetainedSize() {
+        return instance.getRetainedSize();
     }
     
     public JavaClass getLanguageId() {

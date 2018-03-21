@@ -25,10 +25,15 @@
 package com.sun.tools.visualvm.heapviewer.truffle.r;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
+import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.NodeObjectsView;
+import java.util.ArrayList;
+import java.util.List;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -36,6 +41,9 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerNodeAction.Provider.class)
+@NbBundle.Messages({
+    "ROpenNodeAction_OpenTypeTab=Open Type in New Tab"
+})
 public class ROpenNodeAction extends HeapViewerNodeAction.Provider {
     
     public boolean supportsView(HeapContext context, String viewID) {
@@ -44,8 +52,28 @@ public class ROpenNodeAction extends HeapViewerNodeAction.Provider {
 
     public HeapViewerNodeAction[] getActions(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
         HeapContext rContext = RHeapFragment.getRContext(context);
-        HeapViewerNode copy = node instanceof RObjectNode || node instanceof RObjectsContainer ? node.createCopy() : null;
-        return new HeapViewerNodeAction[] { new OpenNodeAction(copy, rContext, actions) };
+        
+        List<HeapViewerNodeAction> actionsList = new ArrayList(2);
+        
+        HeapViewerNode copy = node instanceof RObjectNode ||
+                              node instanceof RTypeNode ||
+                              node instanceof RObjectsContainer ? node.createCopy() : null;
+        actionsList.add(new OpenNodeAction(copy, rContext, actions));
+        
+        Instance instance = HeapViewerNode.getValue(node, DataType.INSTANCE, context.getFragment().getHeap());
+        if (instance != null && RObject.isRObject(instance)) {
+            String typeName = RObject.getRType(instance);
+            List<RType> types = ((RHeapFragment)rContext.getFragment()).getTypes(null); // should already be computed
+            for (RType type : types) {
+                if (typeName.equals(type.getName())) {
+                    RTypeNode typeNode = new RTypeNode(type);
+                    actionsList.add(new OpenClassAction(typeNode, rContext, actions));
+                    break;
+                }
+            }
+        }
+        
+        return actionsList.toArray(new HeapViewerNodeAction[0]);
     }
     
     
@@ -53,6 +81,18 @@ public class ROpenNodeAction extends HeapViewerNodeAction.Provider {
         
         private OpenNodeAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
             super(node, context, actions);
+        }
+
+        public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
+            return new RObjectView(node, context, actions);
+        }
+        
+    }
+    
+    private static class OpenClassAction extends NodeObjectsView.OpenAction {
+        
+        private OpenClassAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
+            super(Bundle.ROpenNodeAction_OpenTypeTab(), 1, node, context, actions);
         }
 
         public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {

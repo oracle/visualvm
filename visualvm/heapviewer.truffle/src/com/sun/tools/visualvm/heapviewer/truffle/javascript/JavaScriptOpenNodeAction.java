@@ -25,10 +25,15 @@
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
+import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.NodeObjectsView;
+import java.util.ArrayList;
+import java.util.List;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -36,6 +41,9 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerNodeAction.Provider.class)
+@NbBundle.Messages({
+    "JavaScriptOpenNodeAction_OpenTypeTab=Open Type in New Tab"
+})
 public class JavaScriptOpenNodeAction extends HeapViewerNodeAction.Provider {
     
     public boolean supportsView(HeapContext context, String viewID) {
@@ -43,9 +51,27 @@ public class JavaScriptOpenNodeAction extends HeapViewerNodeAction.Provider {
     }
 
     public HeapViewerNodeAction[] getActions(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-        HeapContext javaScriptContext = JavaScriptHeapFragment.getJavaScriptContext(context);
+        HeapContext jsContext = JavaScriptHeapFragment.getJavaScriptContext(context);
+        
+        List<HeapViewerNodeAction> actionsList = new ArrayList(2);
+        
         HeapViewerNode copy = node instanceof JavaScriptNodes.JavaScriptNode ? node.createCopy() : null;
-        return new HeapViewerNodeAction[] { new OpenNodeAction(copy, javaScriptContext, actions) };
+        actionsList.add(new OpenNodeAction(copy, jsContext, actions));
+        
+        Instance instance = HeapViewerNode.getValue(node, DataType.INSTANCE, context.getFragment().getHeap());
+        if (instance != null && JavaScriptDynamicObject.isDynamicObject(instance)) {
+            JavaScriptDynamicObject object = new JavaScriptDynamicObject(instance);
+            if (object.isJavaScriptObject()) {
+                String typeName = object.getType(jsContext.getFragment().getHeap());
+                JavaScriptType type = ((JavaScriptHeapFragment)jsContext.getFragment()).getType(typeName, null); // should already be computed
+                if (type != null) {
+                    JavaScriptNodes.JavaScriptTypeNode typeNode = new JavaScriptNodes.JavaScriptTypeNode(type);
+                    actionsList.add(new OpenClassAction(typeNode, jsContext, actions));
+                }
+            }
+        }
+        
+        return actionsList.toArray(new HeapViewerNodeAction[0]);
     }
     
     
@@ -53,6 +79,18 @@ public class JavaScriptOpenNodeAction extends HeapViewerNodeAction.Provider {
         
         private OpenNodeAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
             super(node, context, actions);
+        }
+
+        public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
+            return new JavaScriptObjectView(node, context, actions);
+        }
+        
+    }
+    
+    private static class OpenClassAction extends NodeObjectsView.OpenAction {
+        
+        private OpenClassAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
+            super(Bundle.JavaScriptOpenNodeAction_OpenTypeTab(), 1, node, context, actions);
         }
 
         public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {

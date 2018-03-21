@@ -57,6 +57,8 @@ public class RubyNodesRendererProvider extends HeapViewerRenderer.Provider {
         
         renderers.put(RubyNodes.RubyDynamicObjectNode.class, new DynamicObjectNode.Renderer(heap, instanceIcon));
         
+        renderers.put(RubyNodes.RubyTypeNode.class, new DynamicObjectsContainer.Renderer(packageIcon));
+        
         renderers.put(RubyNodes.RubyDynamicObjectsContainer.class, new DynamicObjectsContainer.Renderer(packageIcon));
         
         renderers.put(RubyNodes.RubyDynamicObjectFieldNode.class, new DynamicObjectFieldNode.Renderer(heap, instanceIcon));

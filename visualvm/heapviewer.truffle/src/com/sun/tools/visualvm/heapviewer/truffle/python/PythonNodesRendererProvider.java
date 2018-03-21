@@ -46,6 +46,8 @@ public class PythonNodesRendererProvider extends HeapViewerRenderer.Provider {
         Heap heap = context.getFragment().getHeap();
 
         renderers.put(PythonObjectNode.class, new PythonObjectNode.Renderer(heap));
+        
+        renderers.put(PythonTypeNode.class, new PythonObjectsContainer.Renderer());
 
         renderers.put(PythonObjectsContainer.class, new PythonObjectsContainer.Renderer());
 

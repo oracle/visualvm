@@ -25,60 +25,22 @@
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
-import java.util.Collections;
-import java.util.Iterator;
+import org.netbeans.lib.profiler.heap.Instance;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class RubyType extends TruffleType<RubyDynamicObject> {
-    
-//    private final List<Instance> instances;
-    
+class RubyType extends TruffleType.InstanceBased<RubyDynamicObject> {
     
     public RubyType(String name) {
         super(name);
-//        this.instances = new ArrayList();
     }
     
     
     @Override
-    public Iterator<RubyDynamicObject> getObjectsIterator() {
-        return Collections.emptyIterator();
+    protected RubyDynamicObject createObject(Instance i) {
+        return new RubyDynamicObject(getName(), i);
     }
-    
-//    @Override
-//    public Iterator<RubyDynamicObject> getObjectsIterator() {
-//        return new ObjectsIterator(instances.iterator());
-//    }
-//    
-//    @Override
-//    protected void addObject(RubyDynamicObject object, long objectSize, long objectRetainedSize) {
-//        super.addObject(object, objectSize, objectRetainedSize);
-//        instances.add(object.getInstance());
-//    }
-//    
-//    
-//    // Copied from TruffleLanguageHeapFragment, share somehow!
-//    private static class ObjectsIterator implements Iterator<RubyDynamicObject> {
-//        
-//        private final Iterator<Instance> instancesIter;
-//        
-//        protected ObjectsIterator(Iterator<Instance> iter) {
-//            instancesIter = iter;
-//        }
-//
-//        @Override
-//        public boolean hasNext() {
-//            return instancesIter.hasNext();
-//        }
-//
-//        @Override
-//        public RubyDynamicObject next() {
-//            return new RubyDynamicObject(instancesIter.next());
-//        }
-//        
-//    }
     
 }

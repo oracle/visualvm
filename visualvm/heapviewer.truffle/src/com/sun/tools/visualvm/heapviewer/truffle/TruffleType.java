@@ -25,19 +25,23 @@
 package com.sun.tools.visualvm.heapviewer.truffle;
 
 import com.sun.tools.visualvm.heapviewer.model.DataType;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.lib.profiler.heap.Instance;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public abstract class TruffleType<T> {
+public abstract class TruffleType<O extends TruffleObject> {
     
     private final String name;
     
     protected int count;
     protected long size;
-    protected long retained;
+    protected long retained = DataType.RETAINED_SIZE.getNotAvailableValue();
 
 
     public TruffleType(String name) {
@@ -51,16 +55,27 @@ public abstract class TruffleType<T> {
 
     public long getAllObjectsSize() { return size; }
     
-    public long getRetainedSizeByType() { return DataType.RETAINED_SIZE.getNoValue(); }
+    // TODO: slow objectsIterator called in EDT, resolve somehow!
+    public long getRetainedSizeByType(Heap heap) {
+        if (retained < 0 && DataType.RETAINED_SIZE.valuesAvailable(heap)) {
+            retained = 0;
+            Iterator<O> objects = getObjectsIterator();
+            while (objects.hasNext()) retained += objects.next().getRetainedSize();
+        }
+        return retained;
+    }
 
     
-    public abstract Iterator<T> getObjectsIterator();
+    public abstract Iterator<O> getObjectsIterator();
 
 
-    protected void addObject(T object, long objectSize, long objectRetainedSize) {
+    protected void addObject(O object, long objectSize, long objectRetainedSize) {
         count++;
         this.size += objectSize;
-        if (objectRetainedSize > 0) this.retained += objectRetainedSize;
+        if (objectRetainedSize >= 0) {
+            if (this.retained < 0) this.retained = 0;
+            this.retained += objectRetainedSize;
+        }
     }
 
 
@@ -72,6 +87,38 @@ public abstract class TruffleType<T> {
         if (o == this) return true;
         if (!(o instanceof TruffleType)) return false;
         return name.equals(((TruffleType)o).name);
+    }
+    
+    
+    public static abstract class InstanceBased<O extends TruffleObject.InstanceBased> extends TruffleType<O> {
+        
+        private final List<Instance> instances;
+        
+        
+        public InstanceBased(String name) {
+            super(name);
+            this.instances = new ArrayList();
+        }
+        
+        
+        protected abstract O createObject(Instance i);
+        
+        
+        @Override
+        protected void addObject(O object, long objectSize, long objectRetainedSize) {
+            super.addObject(object, objectSize, objectRetainedSize);
+            instances.add(object.getInstance());
+        }
+        
+        @Override
+        public Iterator<O> getObjectsIterator() {
+            return new Iterator<O>() {
+                private final Iterator<Instance> i = instances.iterator();
+                @Override public boolean hasNext() { return i.hasNext(); }
+                @Override public O next() { return createObject(i.next()); }
+            };
+        }
+        
     }
     
 }

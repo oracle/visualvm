@@ -26,7 +26,6 @@ package com.sun.tools.visualvm.heapviewer.truffle.python;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.HeapFragment;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageSupport;
 import java.io.File;
@@ -67,23 +66,10 @@ public class PythonHeapFragment extends TruffleLanguageHeapFragment<PythonObject
     protected Iterator<Instance> getInstancesIterator() {
         return instancesIterator(PythonObject.PYTHON_OBJECT_FQN);
     }
-
     
     @Override
-    protected long getObjectSize(PythonObject object) {
-        return object.getSize();
-    }
-    
-    @Override
-    protected long getObjectRetainedSize(PythonObject object) {
-        return DataType.RETAINED_SIZE.valuesAvailable(heap) ?
-               object.getInstance().getRetainedSize() :
-               DataType.RETAINED_SIZE.getNotAvailableValue();
-    }
-
-    @Override
-    protected String getObjectType(PythonObject object) {
-        return object.getType();
+    protected Iterator<PythonObject> getObjectsIterator() {
+        return super.getObjectsIterator();
     }
 
 

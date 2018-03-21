@@ -32,7 +32,6 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.HeapFragment;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageSupport;
 import org.openide.util.Lookup;
@@ -68,23 +67,10 @@ class RHeapFragment extends TruffleLanguageHeapFragment<RObject, RType> {
         String[] topClasses = new String[] { RObject.R_OBJECT_FQN, RObject.R_SCALAR_FQN, RObject.R_WRAPPER_FQN };
         return instancesIterator(topClasses);
     }
-
     
     @Override
-    protected long getObjectSize(RObject object) {
-        return object.getSize();
-    }
-    
-    @Override
-    protected long getObjectRetainedSize(RObject object) {
-        return DataType.RETAINED_SIZE.valuesAvailable(heap) ?
-               object.getInstance().getRetainedSize() :
-               DataType.RETAINED_SIZE.getNotAvailableValue();
-    }
-
-    @Override
-    protected String getObjectType(RObject object) {
-        return object.getType();
+    protected Iterator<RObject> getObjectsIterator() {
+        return super.getObjectsIterator();
     }
     
     

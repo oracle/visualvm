@@ -69,7 +69,7 @@ class JavaScriptObjectsView extends HeapViewerFeature {
     }
     
     private static enum Aggregation {
-        TYPES ("Prototypes", JavaScriptSupport.createBadgedIcon(LanguageIcons.PACKAGE)),
+        TYPES ("Types", JavaScriptSupport.createBadgedIcon(LanguageIcons.PACKAGE)),
         OBJECTS ("Objects", JavaScriptSupport.createBadgedIcon(LanguageIcons.INSTANCE));
         
         private final String aggregationName;

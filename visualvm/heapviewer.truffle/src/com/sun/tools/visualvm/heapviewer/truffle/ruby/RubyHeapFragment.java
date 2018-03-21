@@ -31,7 +31,6 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.HeapFragment;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageSupport;
 import java.util.Iterator;
@@ -73,24 +72,6 @@ class RubyHeapFragment extends TruffleLanguageHeapFragment.DynamicObjectBased<Ru
     @Override
     protected Iterator<RubyDynamicObject> getObjectsIterator() {
         return languageObjectsIterator(RUBY_LANG_ID);
-    }
-
-    
-    @Override
-    protected long getObjectSize(RubyDynamicObject object) {
-        return object.getInstance().getSize();
-    }
-    
-    @Override
-    protected long getObjectRetainedSize(RubyDynamicObject object) {
-        return DataType.RETAINED_SIZE.valuesAvailable(heap) ?
-               object.getInstance().getRetainedSize() :
-               DataType.RETAINED_SIZE.getNotAvailableValue();
-    }
-
-    @Override
-    protected String getObjectType(RubyDynamicObject object) {
-        return object.getType(heap);
     }
     
     

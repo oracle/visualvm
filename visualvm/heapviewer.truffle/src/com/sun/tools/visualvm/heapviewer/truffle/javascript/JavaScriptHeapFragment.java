@@ -31,7 +31,6 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.HeapFragment;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageSupport;
@@ -131,28 +130,11 @@ class JavaScriptHeapFragment extends TruffleLanguageHeapFragment.DynamicObjectBa
     }
     
 
-    @Override
-    protected long getObjectSize(JavaScriptDynamicObject object) {
-        return object.getInstance().getSize();
-    }
-    
-    @Override
-    protected long getObjectRetainedSize(JavaScriptDynamicObject object) {
-        return DataType.RETAINED_SIZE.valuesAvailable(heap) ?
-               object.getInstance().getRetainedSize() :
-               DataType.RETAINED_SIZE.getNotAvailableValue();
-    }
-
-    @Override
-    protected String getObjectType(JavaScriptDynamicObject object) {
-        return getObjectType(object.getInstance(), object.getShape());
-    }
-    
-    protected String getObjectType(Instance instance) {
+    String getObjectType(Instance instance) {
         return getObjectType(instance, null);
     }
     
-    private String getObjectType(Instance instance, Instance shape) {
+    String getObjectType(Instance instance, Instance shape) {
         if (shape == null) shape = JavaScriptDynamicObject.getShape(instance);
         String type = typesCache.get(shape);
 

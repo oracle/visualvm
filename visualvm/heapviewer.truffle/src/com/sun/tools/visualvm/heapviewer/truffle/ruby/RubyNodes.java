@@ -24,6 +24,7 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
+import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import java.util.List;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
@@ -38,6 +39,7 @@ import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectReferenceNode;
 import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectsContainer;
 import com.sun.tools.visualvm.heapviewer.truffle.LocalDynamicObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import org.netbeans.lib.profiler.heap.ArrayItemValue;
 
 /**
@@ -151,6 +153,31 @@ class RubyNodes {
         }
 
         protected void setupCopy(RubyDynamicObjectNode copy) {
+            super.setupCopy(copy);
+        }
+        
+    }
+    
+    static class RubyTypeNode extends TruffleTypeNode<RubyDynamicObject, RubyType> implements RubyNode {
+        
+        RubyTypeNode(RubyType type) {
+            super(type);
+        }
+
+        @Override
+        public HeapViewerNode createNode(RubyDynamicObject object, Heap heap) {
+            String type = getType().getName();
+            return new RubyDynamicObjectNode(object, type);
+        }
+
+        @Override
+        public TruffleTypeNode createCopy() {
+            RubyTypeNode copy = new RubyTypeNode(getType());
+            setupCopy(copy);
+            return copy;
+        }
+        
+        protected void setupCopy(RubyTypeNode copy) {
             super.setupCopy(copy);
         }
         

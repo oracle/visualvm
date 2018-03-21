@@ -78,30 +78,30 @@ public class RubyObjectsProvider extends AbstractObjectsProvider {
 
             return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
         } else {
-            List<HeapViewerNode> nodes = new ArrayList();
-            Map<String, RubyNodes.RubyDynamicObjectsContainer> types = new HashMap();
-            
-            Iterator<Instance> instances = fragment.getInstancesIterator();
-            progress.setupUnknownSteps();
-                        
-            while (instances.hasNext()) {
-                Instance instance = instances.next();
-                progress.step();
-                String type = RubyDynamicObject.getType(instance, heap);
-                RubyNodes.RubyDynamicObjectsContainer typeNode = types.get(type);
-
-                if (typeNode == null) {
-                    typeNode = new RubyNodes.RubyDynamicObjectsContainer(type);
-                    nodes.add(typeNode);
-                    types.put(type, typeNode);
+            NodesComputer<RubyType> computer = new NodesComputer<RubyType>(UIThresholds.MAX_TOPLEVEL_CLASSES) {
+                protected boolean sorts(DataType dataType) {
+                    return true;
                 }
-                
-                typeNode.add(instance, heap);
-            }
-            
-            progress.finish();
-            
-            return nodes.toArray(HeapViewerNode.NO_NODES);
+                protected HeapViewerNode createNode(RubyType type) {
+                    return new RubyNodes.RubyTypeNode(type);
+                }
+                protected ProgressIterator<RubyType> objectsIterator(int index, Progress progress) {
+                    List<RubyType> types = fragment.getTypes(progress);
+                    Iterator<RubyType> typesI = types.listIterator(index);
+                    return new ProgressIterator(typesI, index, false, progress);
+                }
+                protected String getMoreNodesString(String moreNodesCount)  {
+                    return "<another " + moreNodesCount + " types left>";
+                }
+                protected String getSamplesContainerString(String objectsCount)  {
+                    return "<sample " + objectsCount + " types>";
+                }
+                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                    return "<types " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                }
+            };
+
+            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
         }
     }
     

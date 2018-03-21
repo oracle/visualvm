@@ -34,6 +34,7 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import com.sun.tools.visualvm.heapviewer.HeapFragment;
+import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.utils.HeapUtils;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ import java.util.Map;
 //
 // O: type of base language objects (DynamicObject, PythonObject, RObject)
 // T: TruffleType or its subclass aggregating O objects
-public abstract class TruffleLanguageHeapFragment<O extends Object, T extends TruffleType<O>> extends HeapFragment {
+public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T extends TruffleType<O>> extends HeapFragment {
     
     private long heapSize;
     private long objectsCount;
@@ -81,6 +82,12 @@ public abstract class TruffleLanguageHeapFragment<O extends Object, T extends Tr
         return types;
     }
     
+    public T getType(String name, Progress progress) {
+        List<T> _types = getTypes(progress);
+        for (T type : _types) if (name.equals(type.getName())) return type;
+        return null;
+    }
+    
     
     protected abstract O createObject(Instance instance);
     
@@ -92,13 +99,6 @@ public abstract class TruffleLanguageHeapFragment<O extends Object, T extends Tr
     protected Iterator<O> getObjectsIterator() {
         return new ObjectsIterator(getInstancesIterator());
     }
-    
-    
-    protected abstract long getObjectSize(O object);
-    
-    protected abstract long getObjectRetainedSize(O object);
-    
-    protected abstract String getObjectType(O object);
     
     
     private void checkInitialized(Progress progress) {
@@ -146,18 +146,21 @@ public abstract class TruffleLanguageHeapFragment<O extends Object, T extends Tr
         Map<String, T> cache = new HashMap();
         Iterator<O> objects = getObjectsIterator();
         
+        boolean retainedAvailable = DataType.RETAINED_SIZE.valuesAvailable(heap);
+        
         while (objects.hasNext()) {
             O object = objects.next();
             
             if (statisticsProgress != null) statisticsProgress.step();
             objectsCount++;
             
-            long objectSize = getObjectSize(object);
+            long objectSize = object.getSize();
             heapSize += objectSize;
             
-            long objectRetainedSize = getObjectRetainedSize(object);
+            long objectRetainedSize = retainedAvailable ? object.getRetainedSize() :
+                                      DataType.RETAINED_SIZE.getNotAvailableValue();
             
-            String typeName = getObjectType(object);
+            String typeName = object.getType(heap);
             T type = cache.get(typeName);
             if (type == null) {
                 type = createTruffleType(typeName);

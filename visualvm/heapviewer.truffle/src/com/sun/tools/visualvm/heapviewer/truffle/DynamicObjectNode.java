@@ -63,8 +63,12 @@ public class DynamicObjectNode extends InstanceNode {
     }
     
     public String getName(Heap heap) {
-        if (nameString == null) nameString = getType() + "#" + getInstance().getInstanceNumber();
+        if (nameString == null) nameString = computeName(heap);
         return nameString;
+    }
+    
+    protected String computeName(Heap heap) {
+        return getType() + "#" + getInstance().getInstanceNumber(); // NOI18N
     }
     
     public String getType() {

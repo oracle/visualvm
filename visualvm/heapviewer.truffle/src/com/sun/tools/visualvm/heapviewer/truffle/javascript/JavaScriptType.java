@@ -25,59 +25,22 @@
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import org.netbeans.lib.profiler.heap.Instance;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class JavaScriptType extends TruffleType<JavaScriptDynamicObject> {
-    
-    private final List<Instance> instances;
-    
+class JavaScriptType extends TruffleType.InstanceBased<JavaScriptDynamicObject> {
     
     public JavaScriptType(String name) {
         super(name);
-        this.instances = new ArrayList();
     }
-    
+
     
     @Override
-    public Iterator<JavaScriptDynamicObject> getObjectsIterator() {
-        return new ObjectsIterator(getName(), instances.iterator());
-    }
-    
-    @Override
-    protected void addObject(JavaScriptDynamicObject object, long objectSize, long objectRetainedSize) {
-        super.addObject(object, objectSize, objectRetainedSize);
-        instances.add(object.getInstance());
-    }
-    
-    
-    // Copied from TruffleLanguageHeapFragment, share somehow!
-    private static class ObjectsIterator implements Iterator<JavaScriptDynamicObject> {
-        
-        private final String type;
-        private final Iterator<Instance> instancesIter;
-        
-        protected ObjectsIterator(String t, Iterator<Instance> iter) {
-            type = t;
-            instancesIter = iter;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return instancesIter.hasNext();
-        }
-
-        @Override
-        public JavaScriptDynamicObject next() {
-            return new JavaScriptDynamicObject(type, instancesIter.next());
-        }
-        
+    protected JavaScriptDynamicObject createObject(Instance i) {
+        return new JavaScriptDynamicObject(getName(), i);
     }
     
 }

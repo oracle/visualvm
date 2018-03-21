@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  * This code is free software; you can redistribute it and/or modify it
@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.ruby;
+package com.sun.tools.visualvm.heapviewer.truffle.python;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
@@ -42,31 +42,33 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @ServiceProvider(service=HeapViewerNodeAction.Provider.class)
 @NbBundle.Messages({
-    "RubyOpenNodeAction_OpenTypeTab=Open Type in New Tab"
+    "PythonOpenNodeAction_OpenTypeTab=Open Type in New Tab"
 })
-public class RubyOpenNodeAction extends HeapViewerNodeAction.Provider {
+public class PythonOpenNodeAction extends HeapViewerNodeAction.Provider {
     
     public boolean supportsView(HeapContext context, String viewID) {
-        return viewID.startsWith("ruby_") && RubyHeapFragment.getRubyContext(context) != null;
+        return viewID.startsWith("python_") && PythonHeapFragment.getPythonContext(context) != null;
     }
 
     public HeapViewerNodeAction[] getActions(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-        HeapContext rbContext = RubyHeapFragment.getRubyContext(context);
+        HeapContext pyContext = PythonHeapFragment.getPythonContext(context);
         
         List<HeapViewerNodeAction> actionsList = new ArrayList(2);
         
-        HeapViewerNode copy = node instanceof RubyNodes.RubyNode ? node.createCopy() : null;
-        actionsList.add(new OpenNodeAction(copy, rbContext, actions));
+        HeapViewerNode copy = node instanceof PythonObjectNode ||
+                              node instanceof PythonTypeNode ||
+                              node instanceof PythonObjectsContainer ? node.createCopy() : null;
+        actionsList.add(new OpenNodeAction(copy, pyContext, actions));
         
         Instance instance = HeapViewerNode.getValue(node, DataType.INSTANCE, context.getFragment().getHeap());
-        if (instance != null && RubyDynamicObject.isDynamicObject(instance)) {
-            RubyDynamicObject object = new RubyDynamicObject(instance);
-            if (object.isRubyObject()) {
-                String typeName = object.getType(rbContext.getFragment().getHeap());
-                RubyType type = ((RubyHeapFragment)rbContext.getFragment()).getType(typeName, null); // should already be computed
-                if (type != null) {
-                    RubyNodes.RubyTypeNode typeNode = new RubyNodes.RubyTypeNode(type);
-                    actionsList.add(new OpenClassAction(typeNode, rbContext, actions));
+        if (instance != null && PythonObject.isPythonObject(instance)) {
+            String typeName = PythonObject.getPythonType(instance);
+            List<PythonType> types = ((PythonHeapFragment)pyContext.getFragment()).getTypes(null); // should already be computed
+            for (PythonType type : types) {
+                if (typeName.equals(type.getName())) {
+                    PythonTypeNode typeNode = new PythonTypeNode(type);
+                    actionsList.add(new OpenClassAction(typeNode, pyContext, actions));
+                    break;
                 }
             }
         }
@@ -82,7 +84,7 @@ public class RubyOpenNodeAction extends HeapViewerNodeAction.Provider {
         }
 
         public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            return new RubyObjectView(node, context, actions);
+            return new PythonObjectView(node, context, actions);
         }
         
     }
@@ -90,11 +92,11 @@ public class RubyOpenNodeAction extends HeapViewerNodeAction.Provider {
     private static class OpenClassAction extends NodeObjectsView.OpenAction {
         
         private OpenClassAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            super(Bundle.RubyOpenNodeAction_OpenTypeTab(), 1, node, context, actions);
+            super(Bundle.PythonOpenNodeAction_OpenTypeTab(), 1, node, context, actions);
         }
 
         public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            return new RubyObjectView(node, context, actions);
+            return new PythonObjectView(node, context, actions);
         }
         
     }

@@ -25,60 +25,22 @@
 package com.sun.tools.visualvm.heapviewer.truffle.r;
 
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
-import java.util.Collections;
-import java.util.Iterator;
+import org.netbeans.lib.profiler.heap.Instance;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class RType extends TruffleType<RObject> {
-    
-//    private final List<Instance> instances;
-    
+class RType extends TruffleType.InstanceBased<RObject> {
     
     public RType(String name) {
         super(name);
-//        this.instances = new ArrayList();
     }
     
     
     @Override
-    public Iterator<RObject> getObjectsIterator() {
-        return Collections.emptyIterator();
+    protected RObject createObject(Instance i) {
+        return new RObject(getName(), i);
     }
-    
-//    @Override
-//    public Iterator<RObject> getObjectsIterator() {
-//        return new ObjectsIterator(instances.iterator());
-//    }
-//    
-//    @Override
-//    protected void addObject(RObject object, long objectSize, long objectRetainedSize) {
-//        super.addObject(object, objectSize, objectRetainedSize);
-//        instances.add(object.getInstance());
-//    }
-//    
-//    
-//    // Copied from TruffleLanguageHeapFragment, share somehow!
-//    private static class ObjectsIterator implements Iterator<RObject> {
-//        
-//        private final Iterator<Instance> instancesIter;
-//        
-//        protected ObjectsIterator(Iterator<Instance> iter) {
-//            instancesIter = iter;
-//        }
-//
-//        @Override
-//        public boolean hasNext() {
-//            return instancesIter.hasNext();
-//        }
-//
-//        @Override
-//        public RObject next() {
-//            return new RObject(instancesIter.next());
-//        }
-//        
-//    }
     
 }

@@ -45,12 +45,14 @@ import org.netbeans.lib.profiler.heap.Value;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
+import org.netbeans.lib.profiler.heap.Heap;
 
 /**
  *
  * @author Tomas Hurka
  */
-public class RObject {
+public class RObject extends TruffleObject.InstanceBased {
     
     public static final DataType<RObject> DATA_TYPE = new DataType<RObject>(RObject.class, null, null);
     
@@ -105,24 +107,31 @@ public class RObject {
     private final Instance attributesInstance;
     private final String className;
     private final Instance frameInstance;
-    private String type;
+    private final String dataType;
     private DynamicObject attributes;
-    private List<FieldValue> fieldValues;
+    private final List<FieldValue> fieldValues;
     private boolean namesComputed;
     private List<String> names;
     private boolean dimComputed;
     private List<Integer> dim;
     private TruffleFrame frame;
+    
+    private String type;
+
 
     public RObject(Instance instance) {
+        this(null, instance);
+    }
+
+    public RObject(String type, Instance instance) {
         this.instance = instance;
+        this.type = type;
         data = (Instance) instance.getValueOfField("data"); // NOI18N
         complete = (Boolean) instance.getValueOfField("complete");  // NOI18N
         refCount = (Integer) instance.getValueOfField("refCount");  // NOI18N
         attributesInstance = (Instance) instance.getValueOfField("attributes"); // NOI18N
         className = instance.getJavaClass().getName();
-        type = null;
-        if (data != null) type = data.getJavaClass().getName().replace("[]", "");
+        dataType = data == null ? null : data.getJavaClass().getName().replace("[]", ""); // NOI18N
         fieldValues = new LazyFieldValues();
         Instance frameAccess = (Instance) instance.getValueOfField("frameAccess"); // NOI18N
         if (frameAccess != null) {
@@ -158,13 +167,24 @@ public class RObject {
     }
     
     
+    @Override
     public Instance getInstance() {
         return instance;
     }
     
-    public String getType() {
-        String type = className.substring(className.lastIndexOf('.') + 1);
-        int dindex = type.indexOf('$');
+    @Override
+    public String getType(Heap heap) {
+        if (type == null) type = getType(className);
+        return type;
+    }
+    
+    static String getRType(Instance instance) {
+        return getType(instance.getJavaClass().getName());
+    }
+    
+    private static String getType(String className) {
+        String type = className.substring(className.lastIndexOf('.') + 1); // NOI18N
+        int dindex = type.indexOf('$'); // NOI18N
         if (dindex>0) {
             type = type.substring(0, dindex);
         }
@@ -175,28 +195,19 @@ public class RObject {
         }
         return type;
     }
-    
-    public static String getType(Instance instance) {
-        String cnameS = instance.getJavaClass().getName();
-        String typeS = cnameS.substring(cnameS.lastIndexOf('.') + 1);
-        int dindex = typeS.indexOf('$');
-        if (dindex>0) {
-            typeS = typeS.substring(0, dindex);
-        }
-        String convertedType = typeMap.get(typeS);
 
-        if (convertedType != null) {
-            return convertedType;
-        }
-        return typeS;
-    }
-
+    @Override
     public long getSize() {
         long size = instance.getSize();
         if (data != null) {
             size += data.getSize();
         }
         return size;
+    }
+    
+    @Override
+    public long getRetainedSize() {
+        return instance.getRetainedSize();
     }
     
     public List getValues() {
@@ -744,7 +755,7 @@ public class RObject {
             return new Type() {
                 @Override
                 public String getName() {
-                    return type;
+                    return dataType;
                 }
             };
         }

@@ -26,6 +26,7 @@ package com.sun.tools.visualvm.heapviewer.truffle.python;
 
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,6 +34,7 @@ import java.util.List;
 import org.netbeans.lib.profiler.heap.ArrayItemValue;
 import org.netbeans.lib.profiler.heap.Field;
 import org.netbeans.lib.profiler.heap.FieldValue;
+import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
@@ -46,7 +48,7 @@ import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
  *
  * @author Tomas Hurka
  */
-public class PythonObject {
+public class PythonObject extends TruffleObject.InstanceBased {
 
     public static final DataType<PythonObject> DATA_TYPE = new DataType<PythonObject>(PythonObject.class, null, null);
 
@@ -64,9 +66,19 @@ public class PythonObject {
     private final Instance pythonClass;
     private String listType;
     private boolean isPrimitiveList;
-
+    
+    private String type;
+    
+    
     public PythonObject(Instance instance) {
+        this(null, instance);
+    }
+
+    public PythonObject(String type, Instance instance) {
+        if (instance == null) throw new IllegalArgumentException("Instance cannot be null");
+        
         this.instance = instance;
+        this.type = type;
         storage = (Instance) instance.getValueOfField("storage"); // NOI18N
         pythonClass = (Instance) instance.getValueOfField("pythonClass"); // NOI18N
         store = (Instance) instance.getValueOfField("store"); // NOI18N
@@ -96,18 +108,22 @@ public class PythonObject {
         return new DynamicObject(storage).getFieldValues();
     }
 
+    @Override
     public Instance getInstance() {
         return instance;
     }
 
-    public String getType() {
-        return DetailsUtils.getInstanceString(pythonClass, null);
+    @Override
+    public String getType(Heap heap) {
+        if (type == null) type = DetailsUtils.getInstanceString(pythonClass, null);
+        return type;
     }
     
-    public static String getType(Instance instance) {
+    public static String getPythonType(Instance instance) {
         return DetailsUtils.getInstanceString((Instance) instance.getValueOfField("pythonClass"), null);
     }
 
+    @Override
     public long getSize() {
         long size = instance.getSize();
         if (storage != null) {
@@ -120,6 +136,11 @@ public class PythonObject {
             size += array.getSize();
         }
         return size;
+    }
+    
+    @Override
+    public long getRetainedSize() {
+        return instance.getRetainedSize();
     }
 
     List<FieldValue> getReferences() {

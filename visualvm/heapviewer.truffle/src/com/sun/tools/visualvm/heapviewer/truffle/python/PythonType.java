@@ -25,60 +25,22 @@
 package com.sun.tools.visualvm.heapviewer.truffle.python;
 
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
-import java.util.Collections;
-import java.util.Iterator;
+import org.netbeans.lib.profiler.heap.Instance;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class PythonType extends TruffleType<PythonObject> {
-    
-//    private final List<Instance> instances;
-    
+class PythonType extends TruffleType.InstanceBased<PythonObject> {
     
     public PythonType(String name) {
         super(name);
-//        this.instances = new ArrayList();
     }
     
     
     @Override
-    public Iterator<PythonObject> getObjectsIterator() {
-        return Collections.emptyIterator();
+    protected PythonObject createObject(Instance i) {
+        return new PythonObject(getName(), i);
     }
-    
-//    @Override
-//    public Iterator<PythonObject> getObjectsIterator() {
-//        return new ObjectsIterator(instances.iterator());
-//    }
-//    
-//    @Override
-//    protected void addObject(PythonObject object, long objectSize, long objectRetainedSize) {
-//        super.addObject(object, objectSize, objectRetainedSize);
-//        instances.add(object.getInstance());
-//    }
-//    
-//    
-//    // Copied from TruffleLanguageHeapFragment, share somehow!
-//    private static class ObjectsIterator implements Iterator<PythonObject> {
-//        
-//        private final Iterator<Instance> instancesIter;
-//        
-//        protected ObjectsIterator(Iterator<Instance> iter) {
-//            instancesIter = iter;
-//        }
-//
-//        @Override
-//        public boolean hasNext() {
-//            return instancesIter.hasNext();
-//        }
-//
-//        @Override
-//        public PythonObject next() {
-//            return new PythonObject(instancesIter.next());
-//        }
-//        
-//    }
     
 }

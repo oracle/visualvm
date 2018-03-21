@@ -54,7 +54,7 @@ class RObjectNode extends InstanceNode {
     
     
     public RObjectNode(RObject robject) {
-        this(robject, robject.getType());
+        this(robject, robject.getType(null));
     }
     
     public RObjectNode(RObject robject, String type) {

@@ -47,6 +47,8 @@ public class RNodesRendererProvider extends HeapViewerRenderer.Provider {
         
         renderers.put(RObjectNode.class, new RObjectNode.Renderer(heap));
         
+        renderers.put(RTypeNode.class, new RObjectsContainer.Renderer());
+        
         renderers.put(RObjectsContainer.class, new RObjectsContainer.Renderer());
         
         renderers.put(RObjectFieldNode.class, new RObjectFieldNode.Renderer(heap));

@@ -52,7 +52,7 @@ public class PythonObjectNode extends InstanceNode {
     private String nameString;
 
     public PythonObjectNode(PythonObject pyobject) {
-        this(pyobject, pyobject.getType());
+        this(pyobject, pyobject.getType(null));
     }
 
     public PythonObjectNode(PythonObject pyobject, String type) {

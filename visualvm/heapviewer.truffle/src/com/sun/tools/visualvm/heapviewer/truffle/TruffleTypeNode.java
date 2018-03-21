@@ -74,7 +74,7 @@ public abstract class TruffleTypeNode<O extends TruffleObject, T extends Truffle
     }
     
     public long getRetainedSize(Heap heap) {
-        return type.getRetainedSizeByType();
+        return type.getRetainedSizeByType(heap);
     }
     
     

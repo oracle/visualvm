@@ -37,6 +37,10 @@ class RubyDynamicObject extends DynamicObject {
         super(instance);
     }
     
+    RubyDynamicObject(String type, Instance instance) {
+        super(type, instance);
+    }
+    
     boolean isRubyObject() {
         return RubyHeapFragment.RUBY_LANG_ID.equals(getLanguageId().getName());
     }

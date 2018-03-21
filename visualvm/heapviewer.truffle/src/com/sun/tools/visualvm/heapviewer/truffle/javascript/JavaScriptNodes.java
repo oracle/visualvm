@@ -123,6 +123,11 @@ class JavaScriptNodes {
         }
         
         
+        @Override
+        protected String computeName(Heap heap) {
+            return ((JavaScriptDynamicObject)getDynamicObject()).computeDisplayType(heap) + "#" + getInstance().getInstanceNumber(); // NOI18N
+        }
+        
         protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
             String logicalValue = JavaScriptNodes.getLogicalValue(dobject, type, heap);
             return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
@@ -200,6 +205,11 @@ class JavaScriptNodes {
             super(dobject, type, field);
         }
         
+        @Override
+        protected String computeName(Heap heap) {
+            return ((JavaScriptDynamicObject)getDynamicObject()).computeDisplayType(heap) + "#" + getInstance().getInstanceNumber(); // NOI18N
+        }
+        
         protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
             String logicalValue = JavaScriptNodes.getLogicalValue(dobject, type, heap);
             return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
@@ -216,6 +226,11 @@ class JavaScriptNodes {
         
         JavaScriptDynamicObjectArrayItemNode(JavaScriptDynamicObject dobject, String type, ArrayItemValue item) {
             super(dobject, type, item);
+        }
+        
+        @Override
+        protected String computeName(Heap heap) {
+            return ((JavaScriptDynamicObject)getDynamicObject()).computeDisplayType(heap) + "#" + getInstance().getInstanceNumber(); // NOI18N
         }
         
         protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
@@ -237,6 +252,11 @@ class JavaScriptNodes {
             super(dobject, type, value);
         }
         
+        @Override
+        protected String computeName(Heap heap) {
+            return ((JavaScriptDynamicObject)getDynamicObject()).computeDisplayType(heap) + "#" + getInstance().getInstanceNumber(); // NOI18N
+        }
+        
         protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
             String logicalValue = JavaScriptNodes.getLogicalValue(dobject, type, heap);
             return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
@@ -253,6 +273,11 @@ class JavaScriptNodes {
         
         JavaScriptLocalDynamicObjectNode(JavaScriptDynamicObject dobject, String type) {
             super(dobject, type);
+        }
+        
+        @Override
+        protected String computeName(Heap heap) {
+            return ((JavaScriptDynamicObject)getDynamicObject()).computeDisplayType(heap) + "#" + getInstance().getInstanceNumber(); // NOI18N
         }
         
         protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {

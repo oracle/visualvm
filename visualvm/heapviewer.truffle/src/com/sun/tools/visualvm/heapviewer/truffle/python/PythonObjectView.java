@@ -1,11 +1,5 @@
-package com.sun.tools.visualvm.heapviewer.truffle;
-
-
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-
 /*
- * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  * 
  * This code is free software; you can redistribute it and/or modify it
@@ -28,24 +22,21 @@ import org.netbeans.lib.profiler.heap.Instance;
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+package com.sun.tools.visualvm.heapviewer.truffle.python;
+
+import com.sun.tools.visualvm.heapviewer.HeapContext;
+import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
+import com.sun.tools.visualvm.heapviewer.ui.NodeObjectsView;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public abstract class TruffleObject {
+class PythonObjectView extends NodeObjectsView {
     
-    public abstract long getSize();
-    
-    public abstract long getRetainedSize();
-    
-    public abstract String getType(Heap heap);
-    
-    
-    public static abstract class InstanceBased extends TruffleObject {
-        
-        public abstract Instance getInstance();
-        
+    public PythonObjectView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
+        super("python_objects", node, context, actions);
     }
     
 }

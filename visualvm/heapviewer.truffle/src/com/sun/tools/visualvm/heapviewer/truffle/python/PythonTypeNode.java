@@ -1,9 +1,3 @@
-package com.sun.tools.visualvm.heapviewer.truffle;
-
-
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-
 /*
  * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
@@ -28,24 +22,37 @@ import org.netbeans.lib.profiler.heap.Instance;
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+package com.sun.tools.visualvm.heapviewer.truffle.python;
+
+import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
+import org.netbeans.lib.profiler.heap.Heap;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public abstract class TruffleObject {
-    
-    public abstract long getSize();
-    
-    public abstract long getRetainedSize();
-    
-    public abstract String getType(Heap heap);
-    
-    
-    public static abstract class InstanceBased extends TruffleObject {
+class PythonTypeNode extends TruffleTypeNode<PythonObject, PythonType> {
         
-        public abstract Instance getInstance();
-        
+    PythonTypeNode(PythonType type) {
+        super(type);
     }
-    
+
+    @Override
+    public HeapViewerNode createNode(PythonObject object, Heap heap) {
+        String type = getType().getName();
+        return new PythonObjectNode(object, type);
+    }
+
+    @Override
+    public TruffleTypeNode createCopy() {
+        PythonTypeNode copy = new PythonTypeNode(getType());
+        setupCopy(copy);
+        return copy;
+    }
+
+    protected void setupCopy(PythonTypeNode copy) {
+        super.setupCopy(copy);
+    }
+
 }
