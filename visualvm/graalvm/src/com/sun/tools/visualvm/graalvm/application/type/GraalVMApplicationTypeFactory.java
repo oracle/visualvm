@@ -40,7 +40,7 @@ public class GraalVMApplicationTypeFactory extends MainClassApplicationTypeFacto
     private static final String MAIN_CLASS = "com.oracle.graalvm.Main"; // NOI18N
     private static final String LEGACY_MAIN_CLASS = "com.oracle.graalvm.launcher.LegacyLauncher"; // NOI18N
     private static final String JAVASCRIPT_MAIN_CLASS = "com.oracle.truffle.js.shell.JSLauncher";   // NOI18N
-    private static final String RUBY_MAIN_CLASS = "com.oracle.graalvm.launcher.ruby.RubyLauncher"; // NOI18N
+    private static final String RUBY_MAIN_CLASS = "org.truffleruby.launcher.RubyLauncher"; // NOI18N
     private static final String PYTHON_MAIN_CLASS = "com.oracle.graal.python.shell.GraalPythonMain"; // NOI18N
     private static final String JVM_ARG_GRAAL_ID = "-Dgraalvm.home="; // NOI18N
     private static final String ARG_GRAAL_ID = "--"; // NOI18N
