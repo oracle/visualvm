@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.heapviewer.truffle.r;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.truffle.AbstractObjectsProvider;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleFrame;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleSummaryView;
@@ -42,9 +43,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.swing.Icon;
+import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
+import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -88,7 +93,58 @@ class RHeapSummary {
     private static class RSummaryOverview extends TruffleSummaryView.OverviewSection {
         
         RSummaryOverview(HeapContext context) {
-            super(context);
+            super(context, 3, 3);
+        }
+        
+        protected void computeEnvironmentData(Object[][] environmentData) {
+            super.computeEnvironmentData(environmentData);
+            
+            environmentData[1][0] = "Version:";
+            environmentData[2][0] = "Platform:";
+            
+            RHeapFragment fragment = (RHeapFragment)getContext().getFragment();
+            Heap heap = fragment.getHeap();
+            
+            JavaClass envClass = heap.getJavaClassByName("com.oracle.truffle.r.runtime.env.REnvironment$Base"); // NOI18N
+            if (envClass != null && envClass.getInstancesCount() > 0) {
+                Instance envInstance = (Instance)envClass.getInstancesIterator().next();
+                if (RObject.isRObject(envInstance)) {
+                    RObject envObj = new RObject(envInstance);
+                    TruffleFrame envFrame = envObj.getFrame();
+                    if (envFrame != null) {
+                        List<FieldValue> fields = envFrame.getLocalFieldValues();
+                        for (FieldValue field : fields) {
+                            String fieldName = field.getField().getName();
+                            if (("R.version".equals(fieldName) || "version".equals(fieldName)) && field instanceof ObjectFieldValue) {
+                                Instance envI = ((ObjectFieldValue)field).getInstance();
+                                if (RObject.isRObject(envI)) {
+                                    RObject env = new RObject(envI);
+                                    environmentData[1][1] = itemValue(env, "version.string", heap);
+                                    environmentData[2][1] = itemValue(env, "system", heap);
+                                }
+                                                                
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (environmentData[1][1] == null) environmentData[1][1] = "<unknown>";
+            if (environmentData[2][1] == null) environmentData[2][1] = "<unknown>";
+        }
+        
+        private static String itemValue(RObject object, String item, Heap heap) {
+            item = "(" + item + ")";
+            List<FieldValue> items = object.getFieldValues();
+            for (FieldValue itemv : items) {
+                String itemn = itemv.getField().getName();
+                if (itemn != null && itemn.contains(item)) {
+                    Instance instance = itemv instanceof ObjectFieldValue ? ((ObjectFieldValue)itemv).getInstance() : null;
+                    return instance == null ? null : DetailsSupport.getDetailsString(instance, heap);
+                }
+            }
+            return null;
         }
 
     }

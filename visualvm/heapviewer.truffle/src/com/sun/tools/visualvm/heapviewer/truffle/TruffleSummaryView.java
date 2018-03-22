@@ -238,7 +238,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
         
         private void init() {
             heapSnippet = new TruffleOverviewSnippet(Bundle.TruffleOverviewSummary_HeapSection(), heapItemsCount, 0);
-            environmentSnippet = new TruffleOverviewSnippet(Bundle.TruffleOverviewSummary_EnvironmentSection(), environmentItemsCount, 0);
+            environmentSnippet = new TruffleOverviewSnippet(Bundle.TruffleOverviewSummary_EnvironmentSection(), environmentItemsCount, 1);
             Splitter overviewRow = new Splitter(Splitter.HORIZONTAL_SPLIT, heapSnippet, environmentSnippet);
 
             component = new JPanel(new VerticalLayout(false)) {
@@ -290,7 +290,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
             this.fillerColumn = fillerColumn;
 
             table = new SummaryView.SimpleTable(model, fillerColumn);
-            table.setDefaultRenderer(Object.class, renderer);
+            table.setColumnRenderer(0, renderer, fillerColumn != 0);
             
             add(table, BorderLayout.CENTER);
         }

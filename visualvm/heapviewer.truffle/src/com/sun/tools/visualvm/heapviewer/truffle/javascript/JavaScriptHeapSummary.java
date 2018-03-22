@@ -100,13 +100,13 @@ class JavaScriptHeapSummary {
         protected void computeEnvironmentData(Object[][] environmentData) {
             super.computeEnvironmentData(environmentData);
             
+            environmentData[1][0] = "Node.js:";
+            environmentData[2][0] = "Platform:";
+            
             JavaScriptHeapFragment fragment = (JavaScriptHeapFragment)getContext().getFragment();
             JavaScriptType processType = fragment.getType("process", null);
             JavaScriptDynamicObject process = processType == null || processType.getObjectsCount() == 0 ?
                                               null : processType.getObjectsIterator().next();
-            
-            environmentData[1][0] = "Node.js:";
-            environmentData[2][0] = "Platform:";
             
             if (process == null) {
                 environmentData[1][1] = "<not present>";
@@ -128,16 +128,17 @@ class JavaScriptHeapSummary {
                             
                             String platformFV = fieldValue(process, "platform", heap);
                             String archFV = fieldValue(process, "arch", heap);
-                            String platform = platformFV == null ? null : platformFV.toString();
-                            if (archFV != null) {
-                                if (platform != null) platform += " "; else platform = "";
-                                platform += archFV.toString();
-                            } else if (platform == null) {
-                                platform = "<unknown>";
+                            if (platformFV == null && archFV == null) {
+                                environmentData[2][1] = "<unknown>";
+                            } else {
+                                String platform = platformFV;
+                                if (archFV != null) {
+                                    if (platform != null) platform += " "; else platform = "";
+                                    platform += archFV;
+                                }
+                                environmentData[2][1] = platform;
                             }
 
-                            environmentData[2][1] = platform;
-                            
                             return;
                         }                        
                     }

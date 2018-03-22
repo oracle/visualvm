@@ -42,9 +42,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.swing.Icon;
+import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
+import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -88,7 +91,49 @@ class PythonHeapSummary {
     private static class PythonSummaryOverview extends TruffleSummaryView.OverviewSection {
         
         PythonSummaryOverview(HeapContext context) {
-            super(context);
+            super(context, 3, 3);
+        }
+        
+        protected void computeEnvironmentData(Object[][] environmentData) {
+            super.computeEnvironmentData(environmentData);
+            
+            environmentData[1][0] = "Version:";
+            environmentData[2][0] = "Platform:";
+            
+            PythonHeapFragment fragment = (PythonHeapFragment)getContext().getFragment();
+            PythonType moduleType = fragment.getType("module", null);
+            
+            if (moduleType != null) {
+                Heap heap = fragment.getHeap();
+                
+                PythonObject sysModule = null;
+                Iterator<PythonObject> objects = moduleType.getObjectsIterator();
+                while (objects.hasNext()) {
+                    PythonObject object = objects.next();
+                    if ("sys".equals(DetailsSupport.getDetailsString(object.getInstance(), heap))) {
+                        sysModule = object;
+                        break;
+                    }
+                }
+                if (sysModule != null) {
+                    environmentData[1][1] = attributeValue(sysModule, "version", heap);
+                    environmentData[2][1] = attributeValue(sysModule, "platform", heap);
+                }
+            }
+            
+            if (environmentData[1][1] == null) environmentData[1][1] = "<unknown>";
+            if (environmentData[2][1] == null) environmentData[2][1] = "<unknown>";
+        }
+        
+        private static String attributeValue(PythonObject object, String attribute, Heap heap) {
+            List<FieldValue> attributes = object.getAttributes();
+            for (FieldValue attr : attributes) {
+                if (attribute.equals(attr.getField().getName())) {
+                    Instance instance = attr instanceof ObjectFieldValue ? ((ObjectFieldValue)attr).getInstance() : null;
+                    return instance == null ? null : DetailsSupport.getDetailsString(instance, heap);
+                }
+            }
+            return null;
         }
 
     }

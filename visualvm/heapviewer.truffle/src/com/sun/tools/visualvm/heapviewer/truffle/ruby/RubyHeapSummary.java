@@ -44,8 +44,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.swing.Icon;
+import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
@@ -91,7 +93,43 @@ class RubyHeapSummary {
     private static class RubySummaryOverview extends TruffleSummaryView.OverviewSection {
         
         RubySummaryOverview(HeapContext context) {
-            super(context);
+            super(context, 3, 2);
+        }
+        
+        protected void computeEnvironmentData(Object[][] environmentData) {
+            super.computeEnvironmentData(environmentData);
+            
+            environmentData[1][0] = "Platform:";
+            
+            RubyHeapFragment fragment = (RubyHeapFragment)getContext().getFragment();
+            RubyType gemPlatform = fragment.getType("Gem::Platform", null);
+            RubyDynamicObject platformO = gemPlatform == null || gemPlatform.getObjectsCount() == 0 ?
+                                         null : gemPlatform.getObjectsIterator().next();
+            
+            if (platformO != null) {
+                Heap heap = fragment.getHeap();
+                
+                String osFV = variableValue(platformO, "@os", heap);
+                String cpuFV = variableValue(platformO, "@cpu", heap);
+                if (osFV != null || cpuFV != null) {
+                    String platform = osFV;
+                    if (cpuFV != null) {
+                        if (platform != null) platform += " "; else platform = "";
+                        platform += cpuFV;
+                    }
+                    environmentData[1][1] = platform;
+                }
+            }
+            
+            if (environmentData[1][1] == null) environmentData[1][1] = "<unknown>";
+        }
+        
+        private static String variableValue(RubyDynamicObject object, String field, Heap heap) {
+            FieldValue value = object == null ? null : object.getFieldValue(field);
+            Instance instance = value instanceof ObjectFieldValue ? ((ObjectFieldValue)value).getInstance() : null;
+            if (instance == null || !RubyDynamicObject.isRubyObject(instance)) return null;
+            RubyDynamicObject variableO = new RubyDynamicObject(instance);
+            return RubyNodes.getLogicalValue(variableO, variableO.getType(heap), heap);
         }
 
     }
