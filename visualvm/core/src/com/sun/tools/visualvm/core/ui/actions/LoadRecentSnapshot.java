@@ -70,39 +70,26 @@ class LoadRecentSnapshot implements Presenter.Menu {
         return INSTANCE;
     }
     
+    void setupMenu() {
+        assert SwingUtilities.isEventDispatchThread();
+        menu.removeAll();
+        if (files.isEmpty()) {
+            menu.add(new JMenuItem(NbBundle.getMessage(LoadRecentSnapshot.class, "LoadRecentSnapshot_NoRecentSnapshots")) {{ setEnabled(false); }}); // NOI18N
+        } else {
+            int i = 0;
+            for (String file : files) menu.add(new RecentFileItem(file, ++i));
+            menu.addSeparator();
+            menu.add(new ClearRecentItem());
+        }
+    }
 
     @Override
     public JMenuItem getMenuPresenter() {
         if (menu == null) {
-            menu = new JMenu() {
-                @Override
-                protected void fireMenuSelected() {
-                    if (files.isEmpty()) {
-                        menu.add(new JMenuItem(NbBundle.getMessage(LoadRecentSnapshot.class, "LoadRecentSnapshot_NoRecentSnapshots")) {{ setEnabled(false); }}); // NOI18N
-                    } else {
-                        int i = 0;
-                        for (String file : files) menu.add(new RecentFileItem(file, ++i));
-                        menu.addSeparator();
-                        menu.add(new ClearRecentItem());
-                    }
-                    
-                    super.fireMenuSelected();
-                }
-                @Override
-                protected void fireMenuDeselected() {
-                    menu.removeAll();
-                    
-                    super.fireMenuDeselected();
-                }
-                @Override
-                protected void fireMenuCanceled() {
-                    menu.removeAll();
-                    
-                    super.fireMenuCanceled();
-                }
-            };
+            menu = new JMenu();
             Mnemonics.setLocalizedText(menu, NbBundle.getMessage(LoadRecentSnapshot.class, "LoadRecentSnapshot_LoadRecentItem")); // NOI18N
         }
+        setupMenu();
         return menu;
     }
     
@@ -119,6 +106,12 @@ class LoadRecentSnapshot implements Presenter.Menu {
         }
         
         saveFiles(prefs, files);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                setupMenu();
+            }
+        });
     }
     
     
@@ -184,6 +177,7 @@ class LoadRecentSnapshot implements Presenter.Menu {
                                     files.remove(f);
                                     files.add(0, f);
                                     saveFiles(prefs, files);
+                                    setupMenu();
                                 }
                             });
                             return;
@@ -195,6 +189,7 @@ class LoadRecentSnapshot implements Presenter.Menu {
                                 //       should the snapshot be kept in the list?
                                 files.remove(f);
                                 saveFiles(prefs, files);
+                                setupMenu();
                                 ProfilerDialogs.displayError(MessageFormat.format(NbBundle.getMessage(LoadRecentSnapshot.class, "LoadRecentSnapshot_CannotLoadMsg"), file.getName()));
                             }
                         });
@@ -203,6 +198,7 @@ class LoadRecentSnapshot implements Presenter.Menu {
                             public void run() {
                                 files.remove(f);
                                 saveFiles(prefs, files);
+                                setupMenu();
                                 ProfilerDialogs.displayError(MessageFormat.format(NbBundle.getMessage(LoadRecentSnapshot.class, "LoadRecentSnapshot_NotAvailableMsg"), file.getName()));
                             }
                         });
@@ -223,6 +219,7 @@ class LoadRecentSnapshot implements Presenter.Menu {
         protected void fireActionPerformed(ActionEvent e) {
             files.clear();
             saveFiles(prefs, files);
+            setupMenu();
         }
         
     }
