@@ -544,6 +544,7 @@ class JavaObjectsSummary extends HeapView {
             
             table.setModel(model);
             setupTable(table);
+            enableTableEvents(table);
             
             link.setEnabled(true);
         }
@@ -553,6 +554,8 @@ class JavaObjectsSummary extends HeapView {
         private ProfilerTable createTable(TableModel model) {
             ProfilerTable t = new SummaryView.SimpleTable(model, 0) {
                 protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
+                    if (!(value instanceof HeapViewerNode)) return;
+                    
                     requestFocusInWindow(); // TODO: should be done by ProfilerTable on selectRow(...) in processMouseEvent(...)
                     
                     HeapViewerNode node = (HeapViewerNode)value;
@@ -563,6 +566,8 @@ class JavaObjectsSummary extends HeapView {
                     popup.add(createCopyMenuItem());
                 }
                 public void performDefaultAction(ActionEvent e) {
+                    if (!getRowSelectionAllowed()) return;
+                    
                     int row = getSelectedRow();
                     if (row == -1) return;
 
@@ -587,6 +592,11 @@ class JavaObjectsSummary extends HeapView {
                     }) { { setRepeats(false); } }.start();
                 }
             };
+            
+            return t;
+        }
+        
+        private void enableTableEvents(ProfilerTable t) {
             t.setRowSelectionAllowed(true);
             t.addFocusListener(new FocusAdapter() {
                 public void focusLost(FocusEvent e) {
@@ -612,8 +622,6 @@ class JavaObjectsSummary extends HeapView {
                     }
                 }
             });
-            
-            return t;
         }
         
     }
