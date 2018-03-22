@@ -69,6 +69,8 @@ public class DynamicObject extends TruffleObject.InstanceBased {
     private Instance shape;
     private String type;
     
+    private long size = -1;
+    
 //    private List<Property> properties;
     private List<FieldValue> values;
     private List<FieldValue> staticValues;
@@ -170,18 +172,20 @@ public class DynamicObject extends TruffleObject.InstanceBased {
     
     @Override
     public long getSize() {
-        long size = instance.getSize();
+        if (size == -1) {
+            size = instance.getSize();
 
-        for (Object fv : instance.getFieldValues()) {
-            if (fv instanceof ObjectFieldValue) {
-                ObjectFieldValue ofv = (ObjectFieldValue) fv;
-                Instance value = ofv.getInstance();
+            for (Object fv : instance.getFieldValues()) {
+                if (fv instanceof ObjectFieldValue) {
+                    ObjectFieldValue ofv = (ObjectFieldValue) fv;
+                    Instance value = ofv.getInstance();
 
-                if (value instanceof ObjectArrayInstance) {
-                    size += value.getSize();
-                }
-                if (value instanceof PrimitiveArrayInstance) {
-                    size += value.getSize();
+                    if (value instanceof ObjectArrayInstance) {
+                        size += value.getSize();
+                    }
+                    if (value instanceof PrimitiveArrayInstance) {
+                        size += value.getSize();
+                    }
                 }
             }
         }

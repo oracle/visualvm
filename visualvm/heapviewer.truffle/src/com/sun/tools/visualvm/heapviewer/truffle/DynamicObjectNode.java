@@ -85,6 +85,10 @@ public class DynamicObjectNode extends InstanceNode {
         return "shape #" + dobject.getShape().getInstanceNumber();
     }
     
+    public long getOwnSize() {
+        return dobject.getSize();
+    }
+    
     
     protected Object getValue(DataType type, Heap heap) {
         if (type == DynamicObject.DATA_TYPE) return getDynamicObject();

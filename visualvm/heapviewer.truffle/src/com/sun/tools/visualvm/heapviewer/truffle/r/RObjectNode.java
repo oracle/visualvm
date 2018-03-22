@@ -90,6 +90,10 @@ class RObjectNode extends InstanceNode {
 //        return null;
 //    }
     
+    public long getOwnSize() {
+        return robject.getSize();
+    }
+    
     
     protected Object getValue(DataType type, Heap heap) {
         if (type == DataType.OWN_SIZE) return robject.getSize();

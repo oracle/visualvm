@@ -77,6 +77,10 @@ public class PythonObjectNode extends InstanceNode {
     public String getType() {
         return type;
     }
+    
+    public long getOwnSize() {
+        return pyobject.getSize();
+    }
 
 
     protected Object getValue(DataType type, Heap heap) {
