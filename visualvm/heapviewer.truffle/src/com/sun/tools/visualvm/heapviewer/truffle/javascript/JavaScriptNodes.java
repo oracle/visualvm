@@ -49,6 +49,8 @@ import org.netbeans.lib.profiler.heap.ArrayItemValue;
  */
 class JavaScriptNodes {
     
+    private static final int MAX_LOGVALUE_LENGTH = 160;
+    
     
     static String getLogicalValue(DynamicObject dobject, String type, Heap heap) {
         String logicalValue = null;
@@ -92,13 +94,12 @@ class JavaScriptNodes {
                 logicalValue = Formatters.numberFormat().format(length) + (length == 1 ? " item" : " items");
             }
         } else if ("Null$NullClass".equals(type)) {
-            return DetailsSupport.getDetailsString(dobject.getInstance(), heap);
+            logicalValue = DetailsSupport.getDetailsString(dobject.getInstance(), heap);
         } else if ("Date".equals(type) || "JSDate".equals(type)) {
             FieldValue timeField = dobject.getFieldValue("timeMillis (hidden)");
             if (timeField != null) {
                 double time = Double.parseDouble(timeField.getValue());
-
-                return new Date((long)time).toString();
+                logicalValue = new Date((long)time).toString();
             }
         } else if ("JSBoolean".equals(type) || "JSNumber".equals(type)) {
             FieldValue valueField = dobject.getFieldValue("value (hidden)");
@@ -106,11 +107,15 @@ class JavaScriptNodes {
             if (valueField != null) {
                 if (valueField instanceof ObjectFieldValue) {
                     Instance val = ((ObjectFieldValue)valueField).getInstance();
-                    return DetailsSupport.getDetailsString(val, heap);
+                    logicalValue = DetailsSupport.getDetailsString(val, heap);
+                } else {
+                    logicalValue = valueField.getValue();
                 }
-                return valueField.getValue().toString();
             }
         }
+        
+        if (logicalValue != null && logicalValue.length() > MAX_LOGVALUE_LENGTH)
+            logicalValue = logicalValue.substring(0, MAX_LOGVALUE_LENGTH) + "..."; // NOI18N
 
         return logicalValue;
     }

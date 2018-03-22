@@ -48,6 +48,8 @@ import org.netbeans.lib.profiler.heap.ArrayItemValue;
  */
 class RubyNodes {
     
+    private static final int MAX_LOGVALUE_LENGTH = 160;
+    
     
     static String getLogicalValue(DynamicObject dobject, String type, Heap heap) {
         String logicalValue = null;
@@ -128,6 +130,9 @@ class RubyNodes {
             Instance encoding = encodingField instanceof ObjectFieldValue ? ((ObjectFieldValue)encodingField).getInstance() : null;
             if (encoding != null) logicalValue = DetailsUtils.getInstanceString(encoding, heap);
         }
+        
+        if (logicalValue != null && logicalValue.length() > MAX_LOGVALUE_LENGTH)
+            logicalValue = logicalValue.substring(0, MAX_LOGVALUE_LENGTH) + "..."; // NOI18N
 
         return logicalValue;
     }
