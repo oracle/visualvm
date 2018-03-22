@@ -275,7 +275,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
             add(new SectionSeparator(text), BorderLayout.NORTH);
             
             
-            TableModel model = new DefaultTableModel(itemsCount, 1) {
+            TableModel model = new DefaultTableModel(itemsCount, 2) {
                 { setValueAt(Bundle.TruffleSummaryView_ComputingProgress(), 0, 0); }
                 public boolean isCellEditable(int row, int column) { return false; }
             };
@@ -291,6 +291,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
 
             table = new SummaryView.SimpleTable(model, fillerColumn);
             table.setColumnRenderer(0, renderer, fillerColumn != 0);
+            table.setColumnRenderer(1, renderer, fillerColumn != 1);
             
             add(table, BorderLayout.CENTER);
         }
@@ -796,6 +797,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
 
                 table.setModel(model);
                 setupTable(table);
+                enableTableEvents(table);
 
                 link.setEnabled(true);
             }
@@ -805,6 +807,8 @@ public class TruffleSummaryView extends HeapViewerFeature {
             private ProfilerTable createTable(TableModel model) {
                 ProfilerTable t = new SummaryView.SimpleTable(model, 0) {
                     protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
+                        if (!(value instanceof HeapViewerNode)) return;
+                        
                         requestFocusInWindow(); // TODO: should be done by ProfilerTable on selectRow(...) in processMouseEvent(...)
 
                         HeapViewerNode node = (HeapViewerNode)value;
@@ -815,6 +819,8 @@ public class TruffleSummaryView extends HeapViewerFeature {
                         popup.add(createCopyMenuItem());
                     }
                     public void performDefaultAction(ActionEvent e) {
+                        if (!getRowSelectionAllowed()) return;
+                        
                         int row = getSelectedRow();
                         if (row == -1) return;
 
@@ -839,6 +845,11 @@ public class TruffleSummaryView extends HeapViewerFeature {
                         }) { { setRepeats(false); } }.start();
                     }
                 };
+                
+                return t;
+            }
+            
+            private void enableTableEvents(ProfilerTable t) {
                 t.setRowSelectionAllowed(true);
                 t.addFocusListener(new FocusAdapter() {
                     public void focusLost(FocusEvent e) {
@@ -864,8 +875,6 @@ public class TruffleSummaryView extends HeapViewerFeature {
                         }
                     }
                 });
-
-                return t;
             }
 
         }
