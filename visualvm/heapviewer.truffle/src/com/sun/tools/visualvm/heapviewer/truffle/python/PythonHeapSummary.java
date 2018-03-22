@@ -116,13 +116,36 @@ class PythonHeapSummary {
                     }
                 }
                 if (sysModule != null) {
-                    environmentData[1][1] = attributeValue(sysModule, "version", heap);
+                    String version = attributeValue(sysModule, "version", heap);
+                    int graalInfoIdx = version.indexOf('[');
+                    if (graalInfoIdx != -1) version = version.substring(0, graalInfoIdx);
+                    environmentData[1][1] = version;
                     environmentData[2][1] = attributeValue(sysModule, "platform", heap);
+                    
+                    PythonObject implementation = attributeObject(sysModule, "implementation");                    
+                    if (implementation != null) {
+                        PythonObject _ns_ = attributeObject(implementation, "__ns__");
+                        if (_ns_ != null) {
+                            environmentData[1][1] = attributeValue(_ns_, "name", heap) + " " + version;
+                            environmentData[2][1] = attributeValue(_ns_, "_multiarch", heap);
+                        }
+                    }
                 }
             }
             
             if (environmentData[1][1] == null) environmentData[1][1] = "<unknown>";
             if (environmentData[2][1] == null) environmentData[2][1] = "<unknown>";
+        }
+        
+        private static PythonObject attributeObject(PythonObject object, String attribute) {
+            List<FieldValue> attributes = object.getAttributes();
+            for (FieldValue attr : attributes) {
+                if (attribute.equals(attr.getField().getName())) {
+                    Instance instance = attr instanceof ObjectFieldValue ? ((ObjectFieldValue)attr).getInstance() : null;
+                    return PythonObject.isPythonObject(instance) ? new PythonObject(instance) : null;
+                }
+            }
+            return null;
         }
         
         private static String attributeValue(PythonObject object, String attribute, Heap heap) {
