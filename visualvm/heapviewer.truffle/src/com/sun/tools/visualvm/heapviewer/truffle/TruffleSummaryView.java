@@ -206,14 +206,13 @@ public class TruffleSummaryView extends HeapViewerFeature {
         
         @Override
         protected final void computeData() {
-            // Should be displayed after heapData, but is much faster to compute
-            Object[][] environmentData = new Object[environmentItemsCount][2];
-            computeEnvironmentData(environmentData);
-            environmentSnippet.setData(environmentData);
-            
             Object[][] heapData = new Object[heapItemsCount][2];
             computeHeapData(heapData);
             heapSnippet.setData(heapData);
+            
+            Object[][] environmentData = new Object[environmentItemsCount][2];
+            computeEnvironmentData(environmentData);
+            environmentSnippet.setData(environmentData);
         }
         
         protected void computeHeapData(Object[][] heapData) {

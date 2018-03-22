@@ -44,10 +44,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.swing.Icon;
+import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
+import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -91,7 +94,70 @@ class JavaScriptHeapSummary {
     private static class JavaScriptSummaryOverview extends TruffleSummaryView.OverviewSection {
         
         JavaScriptSummaryOverview(HeapContext context) {
-            super(context);
+            super(context, 3, 3);
+        }
+        
+        protected void computeEnvironmentData(Object[][] environmentData) {
+            super.computeEnvironmentData(environmentData);
+            
+            JavaScriptHeapFragment fragment = (JavaScriptHeapFragment)getContext().getFragment();
+            JavaScriptType processType = fragment.getType("process", null);
+            JavaScriptDynamicObject process = processType == null || processType.getObjectsCount() == 0 ?
+                                              null : processType.getObjectsIterator().next();
+            
+            environmentData[1][0] = "Node.js:";
+            environmentData[2][0] = "Platform:";
+            
+            if (process == null) {
+                environmentData[1][1] = "<not present>";
+                environmentData[2][1] = "<unknown>";
+            } else {
+                Heap heap = fragment.getHeap();
+                
+                FieldValue releaseFV = process.getFieldValue("release");
+                if (releaseFV instanceof ObjectFieldValue) {
+                    Instance releaseI = ((ObjectFieldValue)releaseFV).getInstance();
+                    if (JavaScriptDynamicObject.isJavaScriptObject(releaseI)) {
+                        JavaScriptDynamicObject releaseO = new JavaScriptDynamicObject(releaseI);
+                        if ("node".equals(fieldValue(releaseO, "name", heap))) {
+                            String versionFV = fieldValue(process, "version", heap);
+                            String node = versionFV != null ? "node " + versionFV : "<unknown>";
+                            String ltsFV = fieldValue(releaseO, "lts", heap);
+                            if (ltsFV != null) node += " (" + ltsFV + ")";
+                            environmentData[1][1] = node;
+                            
+                            String platformFV = fieldValue(process, "platform", heap);
+                            String archFV = fieldValue(process, "arch", heap);
+                            String platform = platformFV == null ? null : platformFV.toString();
+                            if (archFV != null) {
+                                if (platform != null) platform += " "; else platform = "";
+                                platform += archFV.toString();
+                            } else if (platform == null) {
+                                platform = "<unknown>";
+                            }
+
+                            environmentData[2][1] = platform;
+                            
+                            return;
+                        }                        
+                    }
+                    
+                    environmentData[1][1] = "<unknown>";
+                    environmentData[2][1] = "<unknown>";
+                    
+                    return;
+                }
+                
+                environmentData[1][1] = "<not present>";
+                environmentData[2][1] = "<unknown>";
+            }
+        }
+        
+        
+        private static String fieldValue(JavaScriptDynamicObject object, String field, Heap heap) {
+            FieldValue value = object == null ? null : object.getFieldValue(field);
+            Instance instance = value instanceof ObjectFieldValue ? ((ObjectFieldValue)value).getInstance() : null;
+            return instance == null ? null : DetailsSupport.getDetailsString(instance, heap);
         }
 
     }
