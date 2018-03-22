@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.netbeans.api.progress.ProgressHandle;
 
 /**
  *
@@ -148,28 +149,36 @@ public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T ext
         
         boolean retainedAvailable = DataType.RETAINED_SIZE.valuesAvailable(heap);
         
-        while (objects.hasNext()) {
-            O object = objects.next();
-            
-            if (statisticsProgress != null) statisticsProgress.step();
-            objectsCount++;
-            
-            long objectSize = object.getSize();
-            heapSize += objectSize;
-            
-            long objectRetainedSize = retainedAvailable ? object.getRetainedSize() :
-                                      DataType.RETAINED_SIZE.getNotAvailableValue();
-            
-            String typeName = object.getType(heap);
-            T type = cache.get(typeName);
-            if (type == null) {
-                type = createTruffleType(typeName);
-                cache.put(typeName, type);
+        int verIdx = getDescription().indexOf(" (");
+        String language = verIdx != -1 ? getDescription().substring(0, verIdx) : "Language";
+        ProgressHandle pHandle = ProgressHandle.createHandle("Initializing " + language + " Model...");
+        pHandle.setInitialDelay(1000);
+        pHandle.start();
+        try {
+            while (objects.hasNext()) {
+                O object = objects.next();
+
+                if (statisticsProgress != null) statisticsProgress.step();
+                objectsCount++;
+
+                long objectSize = object.getSize();
+                heapSize += objectSize;
+
+                long objectRetainedSize = retainedAvailable ? object.getRetainedSize() :
+                                          DataType.RETAINED_SIZE.getNotAvailableValue();
+
+                String typeName = object.getType(heap);
+                T type = cache.get(typeName);
+                if (type == null) {
+                    type = createTruffleType(typeName);
+                    cache.put(typeName, type);
+                }
+                type.addObject(object, objectSize, objectRetainedSize);
             }
-            type.addObject(object, objectSize, objectRetainedSize);
+        } finally {
+            if (statisticsProgress != null && ownProgress) statisticsProgress.finish();
+            pHandle.finish();
         }
-        
-        if (statisticsProgress != null && ownProgress) statisticsProgress.finish();
         
         types = Collections.unmodifiableList(new ArrayList(cache.values()));
     }
