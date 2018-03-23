@@ -61,6 +61,11 @@ public class InstanceNodeRenderer extends JavaNameRenderer implements HeapViewer
     }
     
     public void setValue(Object value, int row) {
+        if (value == null) {
+            super.setValue(null, row);
+            return;
+        }
+        
         HeapViewerNode loop = HeapViewerNode.getValue((HeapViewerNode)value, DataType.LOOP, heap);
         boolean isLoop = loop != null;
         InstanceNode node = isLoop ? (InstanceNode)loop : (InstanceNode)value;

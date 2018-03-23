@@ -46,6 +46,13 @@ public class ClassNodeRenderer extends JavaNameRenderer implements HeapViewerRen
         super(icon);
     }
     
+    
+    public void setValue(Object value, int row) {
+        super.setValue(value, row);
+        if (value == null) setIcon(null);
+    }
+    
+    
     public String getShortName() {
         return getBoldValue();
     }
