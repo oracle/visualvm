@@ -69,6 +69,7 @@ public class TruffleFrame {
 
     public TruffleFrame(Instance truffleFrame) {
         values = Collections.EMPTY_LIST;
+        localValues = Collections.EMPTY_LIST;
         if (isTruffleFrameSubClass(truffleFrame)) {
             List<Instance> locals = getObjectArray(truffleFrame, "locals");         // NOI18N
             List<String> primitiveLocals = getPrimitiveArray(truffleFrame, "primitiveLocals");  // NOI18N       // NOI18N
