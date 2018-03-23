@@ -111,7 +111,7 @@ class RHeapSummary {
                 if (RObject.isRObject(envInstance)) {
                     RObject envObj = new RObject(envInstance);
                     TruffleFrame envFrame = envObj.getFrame();
-                    if (envFrame != null) {
+                    if (envFrame != null && envFrame.isTruffleFrame()) {
                         List<FieldValue> fields = envFrame.getLocalFieldValues();
                         for (FieldValue field : fields) {
                             String fieldName = field.getField().getName();
