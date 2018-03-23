@@ -52,6 +52,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -120,6 +122,8 @@ import org.openide.util.RequestProcessor;
 class RConsoleView extends HeapViewerFeature {
     
     private static final Color SEPARATOR_COLOR = UIManager.getColor("Separator.foreground"); // NOI18N
+
+    private static final Logger LOGGER = Logger.getLogger(RConsoleView.class.getName());
     
     private final HeapContext context;
     
@@ -398,12 +402,15 @@ class RConsoleView extends HeapViewerFeature {
 
                             finalizeQuery(sb.toString());
                         } catch (Exception oQLException) {
+                            LOGGER.log(Level.INFO, "Error executing R", oQLException);   // NOI18N
                             StringBuilder errorMessage = new StringBuilder();
+                            String exceptionMsg = oQLException.getLocalizedMessage();
                             errorMessage.append("<h2>").append("Query error").append("</h2>"); // NOI18N
                             errorMessage.append("Bad R query"); // NOI18N
-                            errorMessage.append("<hr>"); // noi18n
-                            errorMessage.append(oQLException.getLocalizedMessage().replace("\n", "<br>").replace("\r", "<br>"));
-                            
+                            errorMessage.append("<hr>"); // NOI18N
+                            if (exceptionMsg != null) {
+                                errorMessage.append(exceptionMsg.replace("\n", "<br>").replace("\r", "<br>"));  // NOI18N
+                            }
                             finalizeQuery(errorMessage.toString());
                         }
                     }
