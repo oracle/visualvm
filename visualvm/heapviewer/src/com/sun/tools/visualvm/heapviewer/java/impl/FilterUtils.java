@@ -381,9 +381,10 @@ final class FilterUtils {
         
         final Runnable hider = new Runnable() {
             public void run() {
+                boolean wasAll = activeFilter.isAll();
                 activeFilter.setValue(""); // NOI18N
                 updateFilterButton(filter, currentFilter, activeFilter);
-                filter(view, activeFilter, excludesFilter);
+                if (!wasAll) filter(view, activeFilter, excludesFilter);
                 panel.setVisible(false);
             }
         };
