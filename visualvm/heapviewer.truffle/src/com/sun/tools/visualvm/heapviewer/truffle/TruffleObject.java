@@ -1,9 +1,3 @@
-package com.sun.tools.visualvm.heapviewer.truffle;
-
-
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-
 /*
  * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
@@ -28,6 +22,12 @@ import org.netbeans.lib.profiler.heap.Instance;
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+package com.sun.tools.visualvm.heapviewer.truffle;
+
+
+import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.lib.profiler.heap.Instance;
 
 /**
  *
