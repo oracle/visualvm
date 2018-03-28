@@ -38,6 +38,7 @@ import com.sun.tools.visualvm.uisupport.SeparatorLine;
 import com.sun.tools.visualvm.uisupport.VerticalLayout;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -790,9 +791,12 @@ public class TruffleSummaryView extends HeapViewerFeature {
                     table = createTable(model);
                     add(table, BorderLayout.CENTER);
 
-                    getParent().invalidate();
-                    getParent().revalidate();
-                    getParent().repaint();
+                    Container parent = getParent();
+                    if (parent != null) {
+                        parent.invalidate();
+                        parent.revalidate();
+                        parent.repaint();
+                    }
                 }
 
                 table.setModel(model);
