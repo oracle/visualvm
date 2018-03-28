@@ -35,6 +35,7 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.utils.HeapUtils;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -303,7 +304,8 @@ class JavaWindowsView extends HeapViewerFeature {
                         component.add(new ScrollableContainer(container), BorderLayout.CENTER);
 
                         component.invalidate();
-                        component.getParent().revalidate();
+                        Container parent = component.getParent();
+                        if (parent != null) parent.revalidate();
                         component.repaint();
                     }
                 });
@@ -479,7 +481,8 @@ class JavaWindowsView extends HeapViewerFeature {
                                     c.setMinimumSize(c.getPreferredSize());
                                     
                                     c.invalidate();
-                                    c.getParent().revalidate();
+                                    Container parent = c.getParent();
+                                    if (parent != null) parent.revalidate();
                                     c.doLayout();
 
                                     double ratio;
