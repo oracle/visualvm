@@ -46,6 +46,21 @@ public abstract class TruffleObject {
         
         public abstract Instance getInstance();
         
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+            if (!(o instanceof InstanceBased)) {
+                return false;
+            }
+            return getInstance().equals(((InstanceBased) o).getInstance());
+        }
+
+        @Override
+        public int hashCode() {
+            return getInstance().hashCode();
+        }
     }
     
 }

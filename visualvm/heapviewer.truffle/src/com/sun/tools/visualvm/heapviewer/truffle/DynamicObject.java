@@ -206,16 +206,6 @@ public class DynamicObject extends TruffleObject.InstanceBased {
     }
     
     
-    public boolean equals(Object o) {
-        if (o == this) return true;
-        if (!(o instanceof DynamicObject)) return false;
-        return instance.equals(((DynamicObject)o).instance);
-    }
-    
-    public int hashCode() {
-        return instance.hashCode();
-    }
-    
     
     private void initFields() {
         Instance propertyMap = getValueofFields(instance, "shape", "fastMapRef", "referent"); // NOI18N
