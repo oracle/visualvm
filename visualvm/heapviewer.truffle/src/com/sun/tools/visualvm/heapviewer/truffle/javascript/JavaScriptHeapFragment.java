@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.WeakHashMap;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
@@ -110,7 +111,7 @@ class JavaScriptHeapFragment extends TruffleLanguageHeapFragment.DynamicObjectBa
         return new ExcludingInstancesIterator(languageInstancesIterator(JS_LANG_ID)) {
             @Override
             protected boolean exclude(Instance instance) {
-                return (nullInstance.equals(instance) || undefinedInstance.equals(instance));
+                return (Objects.equals(nullInstance, instance) || Objects.equals(undefinedInstance, instance));
             }
         };
 //        return languageInstancesIterator(JS_LANG_ID);
@@ -122,7 +123,7 @@ class JavaScriptHeapFragment extends TruffleLanguageHeapFragment.DynamicObjectBa
             @Override
             protected boolean exclude(JavaScriptDynamicObject object) {
                 Instance instance = object.getInstance();
-                return (nullInstance.equals(instance) || undefinedInstance.equals(instance));
+                return (Objects.equals(nullInstance, instance) || Objects.equals(undefinedInstance, instance));
             }
         };
 //        return super.getObjectsIterator();
@@ -170,7 +171,7 @@ class JavaScriptHeapFragment extends TruffleLanguageHeapFragment.DynamicObjectBa
     private static String getJSType(Instance prototype, JavaScriptHeapFragment fragment) {
         if (prototype == null) return "<unknown type>";
         
-        if (fragment.nullInstance.equals(prototype)) return "<no prototype>";
+        if (Objects.equals(fragment.nullInstance, prototype)) return "<no prototype>";
         
         Heap heap = fragment.getHeap();
         
