@@ -167,7 +167,7 @@ public class TruffleStackTraces {
         return "0";
     }
 
-    private static Instance getSigleton(String javaClass, Heap heap) {
+    private static Instance getSingleton(String javaClass, Heap heap) {
         JavaClass jcls = heap.getJavaClassByName(javaClass);
 
         if (jcls != null) {
@@ -189,7 +189,7 @@ public class TruffleStackTraces {
         private Collection<StackTrace> truffleStackTraces;
 
         private DefaultTruffleRuntime(Heap heap) {
-            Instance runtime = getSigleton(TRUFFLE_RUNTIME_FQN, heap);
+            Instance runtime = getSingleton(TRUFFLE_RUNTIME_FQN, heap);
 
             if (runtime != null) {
                 Instance stackTraces = (Instance) runtime.getValueOfField("stackTraces");
@@ -314,9 +314,9 @@ public class TruffleStackTraces {
 
         private HotSpotTruffleRuntime(Heap h) {
             heap = h;
-            hotSpotRuntime = getSigleton(HOTSPOT_TRUFFLE_RUNTIME_FQN, heap);
+            hotSpotRuntime = getSingleton(HOTSPOT_TRUFFLE_RUNTIME_FQN, heap);
             if (hotSpotRuntime == null) {
-                hotSpotRuntime = getSigleton(HOTSPOT_TRUFFLE_RUNTIME1_FQN, heap);
+                hotSpotRuntime = getSingleton(HOTSPOT_TRUFFLE_RUNTIME1_FQN, heap);
             }
         }
 
