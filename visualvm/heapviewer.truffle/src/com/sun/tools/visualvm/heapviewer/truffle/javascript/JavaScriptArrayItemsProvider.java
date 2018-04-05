@@ -118,7 +118,7 @@ public class JavaScriptArrayItemsProvider extends HeapViewerNode.Provider {
                             return new JavaScriptNodes.JavaScriptDynamicObjectArrayItemNode(jsdobj, jsdobj.getType(heap), item);
                         } else {
                             // Non-JavaScript object
-                            DynamicObject dobj = new DynamicObject(jsdobj.getInstance());
+                            DynamicObject dobj = new DynamicObject(instance);
                             return new DynamicObjectArrayItemNode(dobj, dobj.getType(heap), item);
                         }
                     } else {

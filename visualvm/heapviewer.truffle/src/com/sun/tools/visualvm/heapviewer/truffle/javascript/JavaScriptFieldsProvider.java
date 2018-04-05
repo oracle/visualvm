@@ -156,7 +156,7 @@ public class JavaScriptFieldsProvider extends HeapViewerNode.Provider {
                     return new JavaScriptNodes.JavaScriptDynamicObjectFieldNode(jsdobj, jsdobj.getType(heap), field);
                 } else {
                     // Non-JavaScript object
-                    DynamicObject dobj = new DynamicObject(jsdobj.getInstance());
+                    DynamicObject dobj = new DynamicObject(instance);
                     return new DynamicObjectFieldNode(dobj, dobj.getType(heap), field);
                 }
             } else {
