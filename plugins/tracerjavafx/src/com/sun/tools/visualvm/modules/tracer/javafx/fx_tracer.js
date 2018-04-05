@@ -23,12 +23,11 @@
  *  questions.
  */
 
-importPackage(net.java.btrace.visualvm.tracer.deployer);
-
 var loc = new L11N("com.sun.tools.visualvm.modules.tracer.javafx")
 
 var scriptPath = "nbres:/com/sun/tools/visualvm/modules/tracer/javafx/resources/JavaFXTracer.probe"
-var btraceDeployer = BTraceDeployer.instance()
+var btraceDeployer = typeof(Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer) == "function" ?
+                        Packages.net.java.btrace.visualvm.tracer.deployer.BTraceDeployer.instance() : undefined;
 
 VisualVM.Tracer.addPackages({
     // JavaFX Metrics package
@@ -46,6 +45,10 @@ VisualVM.Tracer.addPackages({
             // FX Metrics
             name: loc.message("VisualVM/Tracer/packages/jfx/probes/metrics"),
             desc: "Monitors Invalidation Rate and Replacement Rate",
+            reqs: "Requires BTrace Deployer plugin.",
+            validator: function() {
+                return btraceDeployer != undefined;
+            },
             deployment: {
                 deployer: btraceDeployer,
                 fragment: "metrics",
@@ -70,6 +73,10 @@ VisualVM.Tracer.addPackages({
             // FX Objects
             name: loc.message("VisualVM/Tracer/packages/jfx/probes/objects"),
             desc: "Monitors Overall Rate and Hot Class Rate",
+            reqs: "Requires BTrace Deployer plugin.",
+            validator: function() {
+                return btraceDeployer != undefined;
+            },
             deployment: {
                 deployer: btraceDeployer,
                 fragment: "objects",
@@ -88,6 +95,10 @@ VisualVM.Tracer.addPackages({
             // Average FPS
             name: loc.message("VisualVM/Tracer/packages/jfx/probes/fps"),
             desc: "Monitors average frame per second rate",
+            reqs: "Requires BTrace Deployer plugin.",
+            validator: function() {
+                return btraceDeployer != undefined;
+            },
             deployment: {
                 deployer: btraceDeployer,
                 fragment: "fps",
@@ -106,6 +117,10 @@ VisualVM.Tracer.addPackages({
             // Scenegraph mouse and key statistics
             name: loc.message("VisualVM/Tracer/packages/jfx/probes/pulseCount"),
             desc: "Monitors mouse and keyboard activity",
+            reqs: "Requires BTrace Deployer plugin.",
+            validator: function() {
+                return btraceDeployer != undefined;
+            },
             deployment: {
                 deployer: btraceDeployer,
                 fragment: "pulseCount",
@@ -130,6 +145,10 @@ VisualVM.Tracer.addPackages({
             // Scenegraph mouse and key event timing
             name: loc.message("VisualVM/Tracer/packages/jfx/probes/pulseTiming"),
             desc: "Monitors mouse and keyboard event timing",
+            reqs: "Requires BTrace Deployer plugin.",
+            validator: function() {
+                return btraceDeployer != undefined;
+            },
             deployment: {
                 deployer: btraceDeployer,
                 fragment: "pulseTiming",
@@ -154,6 +173,10 @@ VisualVM.Tracer.addPackages({
             // Scenegraph timing monitoring
             name: loc.message("VisualVM/Tracer/packages/jfx/probes/sgTiming"),
             desc: "Monitors scenegraph timing",
+            reqs: "Requires BTrace Deployer plugin.",
+            validator: function() {
+                return btraceDeployer != undefined;
+            },
             deployment: {
                 deployer: btraceDeployer,
                 fragment: "sgTiming",
@@ -184,6 +207,10 @@ VisualVM.Tracer.addPackages({
             // Scenegraph nodes statistics
             name: loc.message("VisualVM/Tracer/packages/jfx/probes/sgNode"),
             desc: "Scenegraph nodes statistic",
+            reqs: "Requires BTrace Deployer plugin.",
+            validator: function() {
+                return btraceDeployer != undefined;
+            },
             deployment: {
                 deployer: btraceDeployer,
                 fragment: "sgNode",
@@ -208,6 +235,10 @@ VisualVM.Tracer.addPackages({
             // Scenegraph CSS statistics
             name: loc.message("VisualVM/Tracer/packages/jfx/probes/sgCss"),
             desc: "Scenegraph CSS statistic",
+            reqs: "Requires BTrace Deployer plugin.",
+            validator: function() {
+                return btraceDeployer != undefined;
+            },
             deployment: {
                 deployer: btraceDeployer,
                 fragment: "sgCss",
@@ -244,6 +275,10 @@ VisualVM.Tracer.addPackages({
             // Synchronization calls
             name: loc.message("VisualVM/Tracer/packages/jfx/probes/synCalls"),
             desc: "Monitors amount of synchronization calls",
+            reqs: "Requires BTrace Deployer plugin.",
+            validator: function() {
+                return btraceDeployer != undefined;
+            },
             deployment: {
                 deployer: btraceDeployer,
                 fragment: "synCalls",
