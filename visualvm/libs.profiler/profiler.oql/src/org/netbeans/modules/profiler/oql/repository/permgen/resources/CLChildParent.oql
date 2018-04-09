@@ -1,0 +1,10 @@
+select map(heap.objects('java.lang.ClassLoader'),
+        function(it) {
+            var res='';
+            while (it != null) {
+                res += toHtml(it) + "->";
+                it = it.parent;
+            }
+            res += "null";
+            return res + "<br>";
+       })

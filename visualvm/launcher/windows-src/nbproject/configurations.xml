@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="90">
+<configurationDescriptor version="100">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>cmdargs.h</itemPath>
+      <itemPath>jvmfinder.h</itemPath>
       <itemPath>o.n.bootstrap/utilsfuncs.h</itemPath>
       <itemPath>version.h</itemPath>
       <itemPath>visualvmlauncher.h</itemPath>
@@ -19,6 +20,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>jvmfinder.cpp</itemPath>
       <itemPath>o.n.bootstrap/utilsfuncs.cpp</itemPath>
       <itemPath>visualvm.cpp</itemPath>
       <itemPath>visualvmlauncher.cpp</itemPath>
@@ -57,6 +59,10 @@
         </linkerTool>
       </compileType>
       <item path="cmdargs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="jvmfinder.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="jvmfinder.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="o.n.bootstrap/utilsfuncs.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -103,6 +109,10 @@
         </linkerTool>
       </compileType>
       <item path="cmdargs.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="jvmfinder.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="jvmfinder.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="o.n.bootstrap/utilsfuncs.cpp" ex="false" tool="1" flavor2="0">
       </item>

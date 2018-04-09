@@ -64,6 +64,10 @@ class DefaultJvm extends Jvm {
         return false;
     }
     
+    public boolean is100() {
+        return false;
+    }
+
     public boolean isAttachable() {
         return false;
     }

@@ -1,0 +1,3 @@
+select { loader: cl,
+             classes: filter(map(cl.classes.elementData, 'it'), 'it != null') }
+    from instanceof java.lang.ClassLoader cl

@@ -1,13 +1,51 @@
-#!/bin/sh
+#!/bin/bash
+
+REV=1132e7bb80b0b3560
+REV_L10N=1180ea1ceb30
+ZIPNAME=nb90_platform_`date "+%d%m%Y"`
+
+set -e
+
+mkdir -p build/nb/
+cd build/nb/
+BUILD_ROOT=`pwd`
+if [ -e netbeans ]; then
+  cd netbeans
+  git fetch
+else
+  git clone https://github.com/apache/incubator-netbeans/ netbeans
+  cd netbeans
+fi
+
+if [ -e l10n ]; then
+  cd l10n
+  hg pull 
+else
+  hg clone http://hg.netbeans.org/releases/l10n/
+  cd l10n
+fi
+
+hg up -C $REV_L10N
+hg status
+cd ..
+
+git checkout -f $REV
+git status
+
+OPTS=-Dbuild.compiler.debuglevel=source,lines
 
 cd nbbuild
-ant -Dname=platform rebuild-cluster
-ant -Dname=harness rebuild-cluster
-ant -Dname=profiler rebuild-cluster
-zip -r /tmp/nb90_visualvm_`date "+%d%m%Y"`.zip netbeans
 ant clean
-ant -Dlocales=ja,zh_CN -Dname=platform rebuild-cluster
-ant -Dlocales=ja,zh_CN -Dname=harness rebuild-cluster
-ant -Dlocales=ja,zh_CN -Dname=profiler rebuild-cluster
-zip -r /tmp/nb90_visualvm_`date "+%d%m%Y"`-ml.zip netbeans
+ant $OPTS -Dname=platform rebuild-cluster
+ant $OPTS -Dname=harness rebuild-cluster
 
+zip -r $BUILD_ROOT/$ZIPNAME.zip netbeans
+
+ant clean
+ant $OPTS -Dlocales=ja,zh_CN -Dname=platform rebuild-cluster
+ant $OPTS -Dlocales=ja,zh_CN -Dname=harness rebuild-cluster
+
+zip -r $BUILD_ROOT/$ZIPNAME-ml.zip netbeans
+
+rm -rf netbeans
+unzip $BUILD_ROOT/$ZIPNAME.zip

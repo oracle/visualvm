@@ -1,0 +1,1 @@
+select unique(map(heap.objects('java.lang.ClassLoader'), 'classof(it)'))

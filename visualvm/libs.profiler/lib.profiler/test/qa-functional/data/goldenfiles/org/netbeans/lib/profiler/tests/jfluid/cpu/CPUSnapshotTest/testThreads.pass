@@ -1,0 +1,19 @@
+simple.cpu.Region.run100()                                    76 
+ when called from simple.cpu.Region.<init>()                  6  
+  simple.cpu.Region.<init>()                                  2  
+   when called from simple.cpu.Region.main(String[])          1  
+    simple.cpu.Region.main(String[])                          1  
+   when called from simple.cpu.AnotherThread.run()            1  
+    simple.cpu.AnotherThread.run()                            1  
+ when called from simple.cpu.Region.run2000()                 60 
+  simple.cpu.Region.run2000()                                 3  
+   when called from simple.cpu.Region.<init>()                2  
+    simple.cpu.Region.<init>()                                2  
+     when called from simple.cpu.Region.main(String[])        1  
+      simple.cpu.Region.main(String[])                        1  
+     when called from simple.cpu.AnotherThread.run()          1  
+      simple.cpu.AnotherThread.run()                          1  
+   when called from simple.cpu.AnotherThread.run()            1  
+    simple.cpu.AnotherThread.run()                            1  
+ when called from simple.cpu.AnotherThread.run()              10 
+  simple.cpu.AnotherThread.run()                              1  

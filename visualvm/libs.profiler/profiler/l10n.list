@@ -1,0 +1,4 @@
+# profiler/modules/main 
+read global
+${l10n-module}/src/org/netbeans/modules/profiler/heapwalk/oqlqueries-default.xml
+

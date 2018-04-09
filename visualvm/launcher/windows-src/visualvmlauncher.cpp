@@ -36,6 +36,7 @@
 
 using namespace std;
 
+const char *VisualVMLauncher::REQ_JAVA_VERSION = "1.8";
 const char *VisualVMLauncher::NBEXEC_FILE_PATH = NBEXEC_DLL;
 const char *VisualVMLauncher::OPT_VISUALVM_DEFAULT_USER_DIR = "visualvm_default_userdir=";
 const char *VisualVMLauncher::OPT_VISUALVM_DEFAULT_CACHE_DIR = "visualvm_default_cachedir=";
@@ -130,6 +131,11 @@ int VisualVMLauncher::start(int argc, char *argv[]) {
     }
     for (int i = 0; i < argc; i++) {
         newArgs.add(argv[i]);
+    }
+    if (!jdkOptionFound && jdkHome.empty()) {
+        if (jvmFinder.findJava(REQ_JAVA_VERSION)) {
+            jvmFinder.getJavaPath(jdkHome);
+        }
     }
     if (!jdkHome.empty()) {
         newArgs.add(ARG_NAME_JDKHOME);
@@ -321,6 +327,7 @@ bool VisualVMLauncher::parseArgs(int argc, char *argv[]) {
         logMsg("\t%s", argv[i]);
     }
     customUserDirFound = 0;
+    jdkOptionFound = false;
     for (int i = 0; i < argc; i++) {
         if (strcmp(ARG_NAME_USER_DIR, argv[i]) == 0) {
             CHECK_ARG;
@@ -344,6 +351,9 @@ bool VisualVMLauncher::parseArgs(int argc, char *argv[]) {
             }
             cacheDir = tmp;
             logMsg("Cache dir: %s", cacheDir.c_str());
+        }
+        if (strcmp(ARG_NAME_JDKHOME, argv[i]) == 0) {
+            jdkOptionFound = true;
         }
     }
     logMsg("parseArgs() finished");
