@@ -84,6 +84,7 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.PluggableTreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
 import com.sun.tools.visualvm.heapviewer.utils.HeapUtils;
+import java.awt.Container;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -469,9 +470,12 @@ public class OQLConsoleView extends HeapViewerFeature {
                             component.removeAll();
                             component.add(masterSplit, BorderLayout.CENTER);
                             
-                            component.getParent().invalidate();
-                            component.getParent().revalidate();
-                            component.getParent().repaint();
+                            Container parent = component.getParent();
+                            if (parent != null) {
+                                parent.invalidate();
+                                parent.revalidate();
+                                parent.repaint();
+                            }
                             
                             toolbar.getComponent().repaint();
 
@@ -490,9 +494,12 @@ public class OQLConsoleView extends HeapViewerFeature {
                             component.removeAll();
                             component.add(l, BorderLayout.CENTER);
                             
-                            component.getParent().invalidate();
-                            component.getParent().revalidate();
-                            component.getParent().repaint();
+                            Container parent = component.getParent();
+                            if (parent != null) {
+                                parent.invalidate();
+                                parent.revalidate();
+                                parent.repaint();
+                            }
                         }
                     });
                 }

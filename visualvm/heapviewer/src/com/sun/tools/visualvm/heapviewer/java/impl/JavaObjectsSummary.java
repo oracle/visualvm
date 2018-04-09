@@ -49,6 +49,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -67,6 +68,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import org.netbeans.lib.profiler.heap.Heap;
@@ -100,6 +102,7 @@ import org.openide.util.lookup.ServiceProvider;
     "JavaObjectsSummary_ComputeRetainedSizesBtn=Compute Retained Sizes",
     "JavaObjectsSummary_ComputingRetainedSizes=computing retained sizes...",
     "JavaObjectsSummary_ComputingProgress=computing...",
+    "JavaObjectsSummary_ViewAll=view all",
     "JavaObjectsSummary_NameColumn=Name",
     "JavaObjectsSummary_ValueColumn=Value"
 })
@@ -306,7 +309,19 @@ class JavaObjectsSummary extends HeapView {
         Splitter instancesRow = new Splitter(Splitter.HORIZONTAL_SPLIT, instancesBySize, dominatorsByRetainedSize);
         
         
-        component = new JPanel(new VerticalLayout(false, 5));
+        component = new JPanel(new VerticalLayout(false, 5)) {
+            public Dimension getMinimumSize() {
+                Dimension dim = super.getMinimumSize();
+                dim.width = 0;
+                return dim;
+            }
+
+            public Dimension getPreferredSize() {
+                Dimension dim = super.getPreferredSize();
+                dim.width = 100;
+                return dim;
+            }
+        };
         component.setOpaque(false);
         
         component.add(classesRow);
@@ -447,7 +462,7 @@ class JavaObjectsSummary extends HeapView {
             c.insets = new Insets(0, 5, 0, 0);
             sectionSeparator.add(new JLabel("["), c); // NOI18N
             
-            link = new LinkButton("view all") {
+            link = new LinkButton(Bundle.JavaObjectsSummary_ViewAll()) {
                 @Override
                 protected void clicked() {
                     SwingUtilities.invokeLater(allDisplayer);
@@ -529,6 +544,7 @@ class JavaObjectsSummary extends HeapView {
             
             table.setModel(model);
             setupTable(table);
+            enableTableEvents(table);
             
             link.setEnabled(true);
         }
@@ -538,6 +554,8 @@ class JavaObjectsSummary extends HeapView {
         private ProfilerTable createTable(TableModel model) {
             ProfilerTable t = new SummaryView.SimpleTable(model, 0) {
                 protected void populatePopup(JPopupMenu popup, Object value, Object userValue) {
+                    if (!(value instanceof HeapViewerNode)) return;
+                    
                     requestFocusInWindow(); // TODO: should be done by ProfilerTable on selectRow(...) in processMouseEvent(...)
                     
                     HeapViewerNode node = (HeapViewerNode)value;
@@ -548,6 +566,8 @@ class JavaObjectsSummary extends HeapView {
                     popup.add(createCopyMenuItem());
                 }
                 public void performDefaultAction(ActionEvent e) {
+                    if (!getRowSelectionAllowed()) return;
+                    
                     int row = getSelectedRow();
                     if (row == -1) return;
 
@@ -558,13 +578,31 @@ class JavaObjectsSummary extends HeapView {
                             HeapViewerNodeAction.Actions.forNode((HeapViewerNode)value, actionProviders, context, actions);
                     nodeActions.performDefaultAction(e);
                 }
-                protected void popupShowing() { keepSelection = true; }
-                protected void popupHidden() { keepSelection = false; }
+                protected void popupShowing() {
+                    keepSelection = true;
+                }
+                protected void popupHidden() {
+                    keepSelection = false;
+
+                    new Timer(100, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            if (!isFocusOwner()) clearSelection();
+                        }
+                    }) { { setRepeats(false); } }.start();
+                }
             };
+            
+            return t;
+        }
+        
+        private void enableTableEvents(ProfilerTable t) {
             t.setRowSelectionAllowed(true);
             t.addFocusListener(new FocusAdapter() {
-//                public void focusGained(FocusEvent e) { System.err.println(">>> " + text + " focusGained, keepSelection " + keepSelection); }
-                public void focusLost(FocusEvent e) { if (!keepSelection) t.clearSelection(); else keepSelection = false; }
+                public void focusLost(FocusEvent e) {
+                    if (!keepSelection) t.clearSelection();
+                    else keepSelection = false;
+                }
             });
             t.providePopupMenu(true);
             t.setSelectionOnMiddlePress(true);
@@ -584,14 +622,12 @@ class JavaObjectsSummary extends HeapView {
                     }
                 }
             });
-            
-            return t;
         }
         
     }
     
     
-    @ServiceProvider(service=SummaryView.ContentProvider.class, position = 20)
+    @ServiceProvider(service=SummaryView.ContentProvider.class, position = 300)
     public static class Provider extends SummaryView.ContentProvider {
 
         @Override

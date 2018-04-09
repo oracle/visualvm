@@ -40,16 +40,26 @@ import org.openide.util.NbBundle;
 public class ThreadNode extends InstanceNode {
     
     private final String name;
+    private final boolean isOOME;
     
     
     public ThreadNode(String name, Instance instance) {
+        this(name, false, instance);
+    }
+    
+    public ThreadNode(String name, boolean isOOME, Instance instance) {
         super(instance);
         this.name = name;
+        this.isOOME = isOOME;
     }
     
     
     public String getName(Heap heap) {
         return name;
+    }
+    
+    public boolean isOOMEThread() {
+        return isOOME;
     }
     
     

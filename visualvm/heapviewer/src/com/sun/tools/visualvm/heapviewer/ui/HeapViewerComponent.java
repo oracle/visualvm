@@ -450,7 +450,10 @@ public final class HeapViewerComponent extends JPanel {
                 c.gridy = y++;
                 c.insets = new Insets(5, labl, 5, 5);
                 c.fill = GridBagConstraints.HORIZONTAL;
-                popup.add(scopeL, c);            
+                popup.add(scopeL, c);    
+                
+                // Prevent leaking-alike behavior of structures referenced by StayOpenPopupMenu.RadioButtonItem instances
+                MultiResolutionImageHack.hackIcon("RadioButtonMenuItem.checkIcon"); // NOI18N
 
                 JMenuItem toSelect = null;
                 final ButtonGroup bg = new ButtonGroup();
