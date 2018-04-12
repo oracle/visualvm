@@ -128,26 +128,41 @@ class InstanceDump extends HprofObject implements Instance {
     }
 
     public Object getValueOfField(String name) {
-        Iterator fIt = getFieldValues().iterator();
-        FieldValue matchingFieldValue = null;
-
-        while (fIt.hasNext()) {
-            FieldValue fieldValue = (FieldValue) fIt.next();
-
+        List<FieldValue> fieldValues = getFieldValues();
+        
+        for (int i = fieldValues.size() - 1; i >= 0; i--) {
+            FieldValue fieldValue = fieldValues.get(i);
             if (fieldValue.getField().getName().equals(name)) {
-                matchingFieldValue = fieldValue;
+                if (fieldValue instanceof HprofInstanceObjectValue) {
+                    return ((HprofInstanceObjectValue) fieldValue).getInstance();
+                } else {
+                    return ((HprofInstanceValue) fieldValue).getTypeValue();
+                }
             }
         }
-
-        if (matchingFieldValue == null) {
-            return null;
-        }
-
-        if (matchingFieldValue instanceof HprofInstanceObjectValue) {
-            return ((HprofInstanceObjectValue) matchingFieldValue).getInstance();
-        } else {
-            return ((HprofInstanceValue) matchingFieldValue).getTypeValue();
-        }
+        
+        return null;
+        
+//        Iterator fIt = getFieldValues().iterator();
+//        FieldValue matchingFieldValue = null;
+//
+//        while (fIt.hasNext()) {
+//            FieldValue fieldValue = (FieldValue) fIt.next();
+//
+//            if (fieldValue.getField().getName().equals(name)) {
+//                matchingFieldValue = fieldValue;
+//            }
+//        }
+//
+//        if (matchingFieldValue == null) {
+//            return null;
+//        }
+//
+//        if (matchingFieldValue instanceof HprofInstanceObjectValue) {
+//            return ((HprofInstanceObjectValue) matchingFieldValue).getInstance();
+//        } else {
+//            return ((HprofInstanceValue) matchingFieldValue).getTypeValue();
+//        }
     }
 
     private int getInstanceFieldValuesOffset() {
