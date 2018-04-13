@@ -32,13 +32,12 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectArrayItemNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectFieldNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectReferenceNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectsContainer;
-import com.sun.tools.visualvm.heapviewer.truffle.LocalDynamicObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectArrayItemNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectFieldNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectReferenceNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.LocalDynamicObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import org.netbeans.lib.profiler.heap.ArrayItemValue;
 
@@ -51,11 +50,11 @@ class RubyNodes {
     private static final int MAX_LOGVALUE_LENGTH = 160;
     
     
-    static String getLogicalValue(DynamicObject dobject, String type, Heap heap) {
+    static String getLogicalValue(RubyObject object, String type, Heap heap) {
         String logicalValue = null;
 
         if ("Proc".equals(type)) {
-            FieldValue infoField = dobject.getFieldValue("sharedMethodInfo (hidden)");
+            FieldValue infoField = object.getFieldValue("sharedMethodInfo (hidden)");
             Instance info = infoField instanceof ObjectFieldValue ? ((ObjectFieldValue)infoField).getInstance() : null;
             if (info != null) {
                 String name = DetailsUtils.getInstanceFieldString(info, "name", heap);
@@ -66,7 +65,7 @@ class RubyNodes {
                 else if (notes != null) logicalValue = notes;
             }
         } else if ("Method".equals(type) || "UnboundMethod".equals(type)) {
-            FieldValue methodField = dobject.getFieldValue("method (hidden)");
+            FieldValue methodField = object.getFieldValue("method (hidden)");
             Instance method = methodField instanceof ObjectFieldValue ? ((ObjectFieldValue)methodField).getInstance() : null;
             
             Object infoField = method == null ? null : method.getValueOfField("sharedMethodInfo");
@@ -81,12 +80,12 @@ class RubyNodes {
                 else if (notes != null) logicalValue = notes;
             }
         } else if ("Symbol".equals(type)) {
-            FieldValue symbolField = dobject.getFieldValue("string (hidden)");
+            FieldValue symbolField = object.getFieldValue("string (hidden)");
             Instance symbol = symbolField instanceof ObjectFieldValue ? ((ObjectFieldValue)symbolField).getInstance() : null;
             
             if (symbol != null) logicalValue = DetailsUtils.getInstanceString(symbol, heap);
         } else if ("Class".equals(type) || "Module".equals(type)) {
-            FieldValue fieldsField = dobject.getFieldValue("fields (hidden)");
+            FieldValue fieldsField = object.getFieldValue("fields (hidden)");
             Instance fields = fieldsField instanceof ObjectFieldValue ? ((ObjectFieldValue)fieldsField).getInstance() : null;
             
             Object nameField = fields == null ? null : fields.getValueOfField("name");
@@ -100,7 +99,7 @@ class RubyNodes {
             StringBuilder sb = new StringBuilder();
             sb.append(head);
             
-            List<FieldValue> fields = dobject.getFieldValues();
+            List<FieldValue> fields = object.getFieldValues();
             for (FieldValue field : fields) {
                 String name = field.getField().getName();
                 if (!name.contains("(hidden)")) sb.append(name).append(sep);
@@ -112,21 +111,21 @@ class RubyNodes {
             
             logicalValue = sb.toString();
         } else if ("Array".equals(type)) {
-            FieldValue sizeField = dobject.getFieldValue("size (hidden)");
+            FieldValue sizeField = object.getFieldValue("size (hidden)");
             if (sizeField != null) {
                 Integer size = Integer.parseInt(sizeField.getValue());
                 logicalValue = Formatters.numberFormat().format(size) + (size == 1 ? " item" : " items");
             }
         } else if ("String".equals(type)) {
-            FieldValue ropeField = dobject.getFieldValue("rope (hidden)");
+            FieldValue ropeField = object.getFieldValue("rope (hidden)");
             Instance rope = ropeField instanceof ObjectFieldValue ? ((ObjectFieldValue)ropeField).getInstance() : null;
             if (rope != null) logicalValue = DetailsUtils.getInstanceString(rope, heap);
         } else if ("Regexp".equals(type)) {
-            FieldValue sourceField = dobject.getFieldValue("source (hidden)");
+            FieldValue sourceField = object.getFieldValue("source (hidden)");
             Instance source = sourceField instanceof ObjectFieldValue ? ((ObjectFieldValue)sourceField).getInstance() : null;
             if (source != null) logicalValue = DetailsUtils.getInstanceString(source, heap);
         } else if ("Encoding".equals(type)) {
-            FieldValue encodingField = dobject.getFieldValue("encoding (hidden)");
+            FieldValue encodingField = object.getFieldValue("encoding (hidden)");
             Instance encoding = encodingField instanceof ObjectFieldValue ? ((ObjectFieldValue)encodingField).getInstance() : null;
             if (encoding != null) logicalValue = DetailsUtils.getInstanceString(encoding, heap);
         }
@@ -138,41 +137,57 @@ class RubyNodes {
     }
     
     
-    static class RubyDynamicObjectNode extends DynamicObjectNode implements RubyNode {
+    // TODO: uncomment once types caching is available for RubyHeapFragment
+//    private static String computeName(TruffleObjectNode.InstanceBased<RubyDynamicObject> node, Heap heap) {
+//        return node.getTruffleObject().computeDisplayType(heap) + "#" + node.getInstance().getInstanceNumber(); // NOI18N
+//    }
+    
+    private static RubyObjectNode createCopy(TruffleObjectNode.InstanceBased<RubyObject> node) {
+        return new RubyObjectNode(node.getTruffleObject(), node.getTypeName());
+    }
+    
+    
+    static class RubyObjectNode extends DynamicObjectNode<RubyObject> implements RubyNode {
         
-        RubyDynamicObjectNode(RubyDynamicObject dobject, String type) {
-            super(dobject, type);
+        RubyObjectNode(RubyObject object, String type) {
+            super(object, type);
         }
         
         
-        protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
-            String logicalValue = RubyNodes.getLogicalValue(dobject, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
+        // TODO: uncomment once types caching is available for RubyHeapFragment
+//        @Override
+//        protected String computeName(Heap heap) {
+//            return RubyNodes.computeName(this, heap);
+//        }
+        
+        protected String computeLogicalValue(RubyObject object, String type, Heap heap) {
+            String logicalValue = RubyNodes.getLogicalValue(object, type, heap);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
         }
         
         
-        public RubyDynamicObjectNode createCopy() {
-            RubyDynamicObjectNode copy = new RubyDynamicObjectNode((RubyDynamicObject)getDynamicObject(), getType());
+        public RubyObjectNode createCopy() {
+            RubyObjectNode copy = RubyNodes.createCopy(this);
             setupCopy(copy);
             return copy;
         }
 
-        protected void setupCopy(RubyDynamicObjectNode copy) {
+        protected void setupCopy(RubyObjectNode copy) {
             super.setupCopy(copy);
         }
         
     }
     
-    static class RubyTypeNode extends TruffleTypeNode<RubyDynamicObject, RubyType> implements RubyNode {
+    static class RubyTypeNode extends TruffleTypeNode<RubyObject, RubyType> implements RubyNode {
         
         RubyTypeNode(RubyType type) {
             super(type);
         }
 
         @Override
-        public HeapViewerNode createNode(RubyDynamicObject object, Heap heap) {
+        public HeapViewerNode createNode(RubyObject object, Heap heap) {
             String type = getType().getName();
-            return new RubyDynamicObjectNode(object, type);
+            return new RubyObjectNode(object, type);
         }
 
         @Override
@@ -188,102 +203,102 @@ class RubyNodes {
         
     }
     
-    static class RubyDynamicObjectsContainer extends DynamicObjectsContainer implements RubyNode {
+    static class RubyObjectFieldNode extends DynamicObjectFieldNode<RubyObject> implements RubyNode {
         
-        RubyDynamicObjectsContainer(String name) {
-            super(name);
-        }
-
-        RubyDynamicObjectsContainer(String name, int maxObjects) {
-            super(name, maxObjects);
+        RubyObjectFieldNode(RubyObject object, String type, FieldValue field) {
+            super(object, type, field);
         }
         
         
-        protected RubyDynamicObjectNode createNode(Instance instance) {
-            return new RubyDynamicObjectNode(new RubyDynamicObject(instance), name);
+        // TODO: uncomment once types caching is available for RubyHeapFragment
+//        @Override
+//        protected String computeName(Heap heap) {
+//            return RubyNodes.computeName(this, heap);
+//        }
+        
+        protected String computeLogicalValue(RubyObject object, String type, Heap heap) {
+            String logicalValue = RubyNodes.getLogicalValue(object, type, heap);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
         }
         
         
-        public RubyDynamicObjectsContainer createCopy() {
-            RubyDynamicObjectsContainer copy = new RubyDynamicObjectsContainer(name, maxNodes);
-            setupCopy(copy);
-            return copy;
-        }
-
-        protected void setupCopy(RubyDynamicObjectNode copy) {
-            super.setupCopy(copy);
+        public RubyObjectNode createCopy() {
+            return RubyNodes.createCopy(this);
         }
         
     }
     
-    static class RubyDynamicObjectFieldNode extends DynamicObjectFieldNode implements RubyNode {
+    static class RubyObjectArrayItemNode extends DynamicObjectArrayItemNode<RubyObject> implements RubyNode {
         
-        RubyDynamicObjectFieldNode(RubyDynamicObject dobject, String type, FieldValue field) {
-            super(dobject, type, field);
-        }
-        
-        protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
-            String logicalValue = RubyNodes.getLogicalValue(dobject, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
+        RubyObjectArrayItemNode(RubyObject object, String type, ArrayItemValue item) {
+            super(object, type, item);
         }
         
         
-        public RubyDynamicObjectNode createCopy() {
-            return new RubyDynamicObjectNode((RubyDynamicObject)getDynamicObject(), getType());
-        }
+        // TODO: uncomment once types caching is available for RubyHeapFragment
+//        @Override
+//        protected String computeName(Heap heap) {
+//            return RubyNodes.computeName(this, heap);
+//        }
         
-    }
-    
-    static class RubyDynamicObjectArrayItemNode extends DynamicObjectArrayItemNode implements RubyNode {
-        
-        RubyDynamicObjectArrayItemNode(RubyDynamicObject dobject, String type, ArrayItemValue item) {
-            super(dobject, type, item);
-        }
-        
-        protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
-            String logicalValue = RubyNodes.getLogicalValue(dobject, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
+        protected String computeLogicalValue(RubyObject object, String type, Heap heap) {
+            String logicalValue = RubyNodes.getLogicalValue(object, type, heap);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
         }
         
         
-        public RubyDynamicObjectNode createCopy() {
-            return new RubyDynamicObjectNode((RubyDynamicObject)getDynamicObject(), getType());
+        public RubyObjectNode createCopy() {
+            return RubyNodes.createCopy(this);
         }
         
     }
     
-    static class RubyDynamicObjectReferenceNode extends DynamicObjectReferenceNode implements RubyNode {
+    static class RubyObjectReferenceNode extends DynamicObjectReferenceNode<RubyObject> implements RubyNode {
         
-        RubyDynamicObjectReferenceNode(RubyDynamicObject dobject, String type, FieldValue value) {
-            super(dobject, type, value);
-        }
-        
-        protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
-            String logicalValue = RubyNodes.getLogicalValue(dobject, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
+        RubyObjectReferenceNode(RubyObject object, String type, FieldValue value) {
+            super(object, type, value);
         }
         
         
-        public RubyDynamicObjectNode createCopy() {
-            return new RubyDynamicObjectNode((RubyDynamicObject)getDynamicObject(), getType());
+        // TODO: uncomment once types caching is available for RubyHeapFragment
+//        @Override
+//        protected String computeName(Heap heap) {
+//            return RubyNodes.computeName(this, heap);
+//        }
+        
+        protected String computeLogicalValue(RubyObject object, String type, Heap heap) {
+            String logicalValue = RubyNodes.getLogicalValue(object, type, heap);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        }
+        
+        
+        public RubyObjectNode createCopy() {
+            return RubyNodes.createCopy(this);
         }
         
     }
     
-    static class RubyLocalDynamicObjectNode extends LocalDynamicObjectNode implements RubyNode {
+    static class RubyLocalObjectNode extends LocalDynamicObjectNode<RubyObject> implements RubyNode {
         
-        RubyLocalDynamicObjectNode(RubyDynamicObject dobject, String type) {
-            super(dobject, type);
-        }
-        
-        protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
-            String logicalValue = RubyNodes.getLogicalValue(dobject, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
+        RubyLocalObjectNode(RubyObject object, String type) {
+            super(object, type);
         }
         
         
-        public RubyDynamicObjectNode createCopy() {
-            return new RubyDynamicObjectNode((RubyDynamicObject)getDynamicObject(), getType());
+        // TODO: uncomment once types caching is available for RubyHeapFragment
+//        @Override
+//        protected String computeName(Heap heap) {
+//            return RubyNodes.computeName(this, heap);
+//        }
+        
+        protected String computeLogicalValue(RubyObject object, String type, Heap heap) {
+            String logicalValue = RubyNodes.getLogicalValue(object, type, heap);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        }
+        
+        
+        public RubyObjectNode createCopy() {
+            return RubyNodes.createCopy(this);
         }
         
     }

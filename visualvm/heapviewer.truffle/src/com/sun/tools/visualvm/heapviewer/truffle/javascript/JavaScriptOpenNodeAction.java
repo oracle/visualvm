@@ -25,15 +25,13 @@
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleOpenNodeActionProvider;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.NodeObjectsView;
-import java.util.ArrayList;
-import java.util.List;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -41,62 +39,41 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerNodeAction.Provider.class)
-@NbBundle.Messages({
-    "JavaScriptOpenNodeAction_OpenTypeTab=Open Type in New Tab"
-})
-public class JavaScriptOpenNodeAction extends HeapViewerNodeAction.Provider {
+public class JavaScriptOpenNodeAction extends TruffleOpenNodeActionProvider<JavaScriptObject, JavaScriptType> {
     
+    @Override
     public boolean supportsView(HeapContext context, String viewID) {
-        return viewID.startsWith("javascript_") && JavaScriptHeapFragment.getJavaScriptContext(context) != null;
-    }
-
-    public HeapViewerNodeAction[] getActions(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-        HeapContext jsContext = JavaScriptHeapFragment.getJavaScriptContext(context);
-        
-        List<HeapViewerNodeAction> actionsList = new ArrayList(2);
-        
-        HeapViewerNode copy = node instanceof JavaScriptNodes.JavaScriptNode ? node.createCopy() : null;
-        actionsList.add(new OpenNodeAction(copy, jsContext, actions));
-        
-        Instance instance = HeapViewerNode.getValue(node, DataType.INSTANCE, context.getFragment().getHeap());
-        if (instance != null && JavaScriptDynamicObject.isDynamicObject(instance)) {
-            JavaScriptDynamicObject object = new JavaScriptDynamicObject(instance);
-            if (object.isJavaScriptObject()) {
-                String typeName = object.getType(jsContext.getFragment().getHeap());
-                JavaScriptType type = ((JavaScriptHeapFragment)jsContext.getFragment()).getType(typeName, null); // should already be computed
-                if (type != null) {
-                    JavaScriptNodes.JavaScriptTypeNode typeNode = new JavaScriptNodes.JavaScriptTypeNode(type);
-                    actionsList.add(new OpenClassAction(typeNode, jsContext, actions));
-                }
-            }
-        }
-        
-        return actionsList.toArray(new HeapViewerNodeAction[0]);
+        return JavaScriptHeapFragment.isJavaScriptHeap(context);
     }
     
-    
-    private static class OpenNodeAction extends NodeObjectsView.DefaultOpenAction {
-        
-        private OpenNodeAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            super(node, context, actions);
-        }
-
-        public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            return new JavaScriptObjectView(node, context, actions);
-        }
-        
+    @Override
+    protected boolean supportsNode(HeapViewerNode node) {
+        return node instanceof JavaScriptNodes.JavaScriptNode;
     }
     
-    private static class OpenClassAction extends NodeObjectsView.OpenAction {
-        
-        private OpenClassAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            super(Bundle.JavaScriptOpenNodeAction_OpenTypeTab(), 1, node, context, actions);
-        }
+    @Override
+    protected boolean isLanguageObject(Instance instance) {
+        return JavaScriptObject.isJavaScriptObject(instance);
+    }
+    
+    @Override
+    protected JavaScriptObject createObject(Instance instance) {
+        return new JavaScriptObject(instance);
+    }
+    
+    @Override
+    protected JavaScriptType getType(String name, HeapContext context) {
+        return JavaScriptHeapFragment.fromContext(context).getType(name, null);
+    }
 
-        public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            return new JavaScriptObjectView(node, context, actions);
-        }
-        
+    @Override
+    protected TruffleTypeNode<JavaScriptObject, JavaScriptType> createTypeNode(JavaScriptType type) {
+        return new JavaScriptNodes.JavaScriptTypeNode(type);
+    }
+
+    @Override
+    protected NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
+        return new JavaScriptObjectView(node, context, actions);
     }
     
 }

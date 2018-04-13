@@ -24,159 +24,53 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
-import java.awt.CardLayout;
-import java.awt.event.ItemEvent;
-import java.net.URL;
-import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JToggleButton;
-import javax.swing.SortOrder;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.results.CCTNode;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.swing.GrayLabel;
-import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.model.RootNode;
-import com.sun.tools.visualvm.heapviewer.ui.HTMLView;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLocalObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleThreadsProvider;
+import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleThreadsView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
-import com.sun.tools.visualvm.heapviewer.ui.PluggableTreeTableView;
-import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.netbeans.lib.profiler.heap.Instance;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class JavaScriptThreadsView extends HeapViewerFeature {
+class JavaScriptThreadsView extends TruffleThreadsView {
     
     private static final String FEATURE_ID = "javascript_threads"; // NOI18N
-    private static final String VIEW_OBJECTS_ID = FEATURE_ID + "_objects"; // NOI18N
-    private static final String VIEW_HTML_ID = FEATURE_ID + "_html"; // NOI18N
-    
-    private JComponent component;
-    private ProfilerToolbar toolbar;
-    private ProfilerToolbar pluginsToolbar;
-    
-    private final HTMLView htmlView;
-    private final PluggableTreeTableView objectsView;
     
     
     public JavaScriptThreadsView(HeapContext context, HeapViewerActions actions) {
-        super(FEATURE_ID, "Thread", "Thread", JavaScriptSupport.createBadgedIcon(ProfilerIcons.WINDOW_THREADS), 300);
-        
-        Heap heap = context.getFragment().getHeap();
-        
-        objectsView = new PluggableTreeTableView(VIEW_OBJECTS_ID, context, actions, TreeTableViewColumn.instances(heap, false)) {
-            @Override
-            protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-                return JavaScriptThreadsObjects.getThreads(root, heap);
-            }
-            protected void childrenChanged() {
-                CCTNode[] children = getRoot().getChildren();
-                for (CCTNode child : children) expandNode((HeapViewerNode)child);
-            }
-        };
-        objectsView.setViewName("Thread");
-        
-        htmlView = new HTMLView(VIEW_HTML_ID, context, actions, "<br>&nbsp;&nbsp;computing thread...") {
-            protected String computeData(HeapContext context, String viewID) {
-                return JavaScriptThreadsHTML.getThreads(context);
-            }
-            protected HeapViewerNode nodeForURL(URL url, HeapContext context) {
-                return JavaScriptThreadsHTML.getNode(url, context);
-            }
-        };
-    }
-    
-
-    public JComponent getComponent() {
-        if (component == null) init();
-        return component;
-    }
-
-    public ProfilerToolbar getToolbar() {
-        if (toolbar == null) init();
-        return toolbar;
+        super(FEATURE_ID, JavaScriptSupport.createBadgedIcon(ProfilerIcons.WINDOW_THREADS), context, actions, new JavaScriptThreadsProvider());
     }
     
     
-    private void init() {
-        toolbar = ProfilerToolbar.create(false);
-        
-        toolbar.addSpace(2);
-        toolbar.addSeparator();
-        toolbar.addSpace(5);
-        
-        toolbar.add(new GrayLabel("Results:"));
-        toolbar.addSpace(3);
-        
-        ButtonGroup resultsBG = new ButtonGroup();
-        
-        JToggleButton rObjects = new JToggleButton(Icons.getIcon(ProfilerIcons.TAB_HOTSPOTS), true) {
-            protected void fireItemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (component != null) ((CardLayout)component.getLayout()).first(component);
-                    if (pluginsToolbar != null) pluginsToolbar.getComponent().setVisible(true);
-                }
-            }
-        };
-        rObjects.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
-        rObjects.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
-        rObjects.setToolTipText("Objects");
-        resultsBG.add(rObjects);
-        toolbar.add(rObjects);
-        
-        JToggleButton rHTML = new JToggleButton(Icons.getIcon(HeapWalkerIcons.PROPERTIES)) {
-            protected void fireItemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (component != null) ((CardLayout)component.getLayout()).last(component);
-                    if (pluginsToolbar != null) pluginsToolbar.getComponent().setVisible(false);
-                }
-            }
-        };
-        rHTML.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
-        rHTML.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
-        rHTML.setToolTipText("HTML");
-        resultsBG.add(rHTML);
-        toolbar.add(rHTML);
+    private static class JavaScriptThreadsProvider extends TruffleThreadsProvider<JavaScriptObject> {
 
-        if (objectsView.hasPlugins()) {
-            pluginsToolbar = ProfilerToolbar.create(false);
-//            detailsToolbar.addSpace(2);
-//            detailsToolbar.addSeparator();
-            pluginsToolbar.addSpace(8);
+        @Override
+        protected boolean isLanguageObject(Instance instance) {
+            return JavaScriptObject.isJavaScriptObject(instance);
+        }
 
-            pluginsToolbar.add(new GrayLabel("Details:"));
-            pluginsToolbar.addSpace(2);
-            
-            pluginsToolbar.add(objectsView.getToolbar());
-            
-            toolbar.add(pluginsToolbar);
+        @Override
+        protected JavaScriptObject createObject(Instance instance) {
+            return new JavaScriptObject(instance);
+        }
+
+        @Override
+        protected TruffleObjectNode<JavaScriptObject> createObjectNode(JavaScriptObject object, String type) {
+            return new JavaScriptNodes.JavaScriptObjectNode(object, type);
+        }
+
+        @Override
+        protected TruffleLocalObjectNode<JavaScriptObject> createLocalObjectNode(JavaScriptObject object, String type) {
+            return new JavaScriptNodes.JavaScriptLocalObjectNode(object, type);
         }
         
-        JScrollPane htmlViewScroll = new JScrollPane(htmlView.getComponent(),
-                                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        htmlViewScroll.setBorder(BorderFactory.createEmptyBorder());
-        htmlViewScroll.setViewportBorder(BorderFactory.createEmptyBorder());
-        htmlViewScroll.getVerticalScrollBar().setUnitIncrement(10);
-        htmlViewScroll.getHorizontalScrollBar().setUnitIncrement(10);
-
-        component = new JPanel(new CardLayout());
-        component.add(objectsView.getComponent());
-        component.add(htmlViewScroll);
     }
     
     

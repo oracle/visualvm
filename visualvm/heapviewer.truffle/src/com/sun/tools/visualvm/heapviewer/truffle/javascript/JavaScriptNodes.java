@@ -32,13 +32,12 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.ui.Formatters;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectArrayItemNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectFieldNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectReferenceNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectsContainer;
-import com.sun.tools.visualvm.heapviewer.truffle.LocalDynamicObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectArrayItemNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectFieldNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectReferenceNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.LocalDynamicObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import java.util.Date;
 import org.netbeans.lib.profiler.heap.ArrayItemValue;
@@ -52,17 +51,17 @@ class JavaScriptNodes {
     private static final int MAX_LOGVALUE_LENGTH = 160;
     
     
-    static String getLogicalValue(DynamicObject dobject, String type, Heap heap) {
+    static String getLogicalValue(JavaScriptObject object, String type, Heap heap) {
         String logicalValue = null;
         
         if ("Function".equals(type) || "JSFunction".equals(type)) {
-            FieldValue dataField = dobject.getFieldValue("functionData (hidden)");
+            FieldValue dataField = object.getFieldValue("functionData (hidden)");
             Instance data = dataField instanceof ObjectFieldValue ? ((ObjectFieldValue)dataField).getInstance() : null;
 //                Instance data = (Instance)getInstance().getValueOfField("object2");
             logicalValue = data == null ? null : DetailsSupport.getDetailsString(data, heap);
             if (logicalValue != null) logicalValue += "()";
         } else if ("JavaPackage".equals(type)) {
-            FieldValue nameField = dobject.getFieldValue("packageName (hidden)");
+            FieldValue nameField = object.getFieldValue("packageName (hidden)");
             Instance name = nameField instanceof ObjectFieldValue ? ((ObjectFieldValue)nameField).getInstance() : null;
 //                Instance name = (Instance)getInstance().getValueOfField("object2");
             logicalValue = name == null ? null : DetailsSupport.getDetailsString(name, heap);
@@ -73,7 +72,7 @@ class JavaScriptNodes {
             StringBuilder sb = new StringBuilder();
             sb.append(head);
             
-            List<FieldValue> fields = dobject.getFieldValues();
+            List<FieldValue> fields = object.getFieldValues();
             for (FieldValue field : fields) {
                 String name = field.getField().getName();
                 if (!name.contains("(hidden)")) sb.append(name).append(sep);
@@ -85,24 +84,24 @@ class JavaScriptNodes {
             
             logicalValue = sb.toString();
         } else if ("Array".equals(type) || "JSArray".equals(type)) {
-            FieldValue lengthField = dobject.getFieldValue("length (hidden)");
+            FieldValue lengthField = object.getFieldValue("length (hidden)");
             if (lengthField == null) {
-                lengthField = dobject.getFieldValue("usedLength (hidden)");
+                lengthField = object.getFieldValue("usedLength (hidden)");
             }
             if (lengthField != null) {
                 Integer length = Integer.parseInt(lengthField.getValue());
                 logicalValue = Formatters.numberFormat().format(length) + (length == 1 ? " item" : " items");
             }
         } else if ("Null$NullClass".equals(type)) {
-            logicalValue = DetailsSupport.getDetailsString(dobject.getInstance(), heap);
+            logicalValue = DetailsSupport.getDetailsString(object.getInstance(), heap);
         } else if ("Date".equals(type) || "JSDate".equals(type)) {
-            FieldValue timeField = dobject.getFieldValue("timeMillis (hidden)");
+            FieldValue timeField = object.getFieldValue("timeMillis (hidden)");
             if (timeField != null) {
                 double time = Double.parseDouble(timeField.getValue());
                 logicalValue = new Date((long)time).toString();
             }
         } else if ("JSBoolean".equals(type) || "JSNumber".equals(type)) {
-            FieldValue valueField = dobject.getFieldValue("value (hidden)");
+            FieldValue valueField = object.getFieldValue("value (hidden)");
 
             if (valueField != null) {
                 if (valueField instanceof ObjectFieldValue) {
@@ -121,47 +120,56 @@ class JavaScriptNodes {
     }
     
     
-    static class JavaScriptDynamicObjectNode extends DynamicObjectNode implements JavaScriptNode {
+    private static String computeName(TruffleObjectNode.InstanceBased<JavaScriptObject> node, Heap heap) {
+        return node.getTruffleObject().computeDisplayType(heap) + "#" + node.getInstance().getInstanceNumber(); // NOI18N
+    }
+    
+    private static JavaScriptObjectNode createCopy(TruffleObjectNode.InstanceBased<JavaScriptObject> node) {
+        return new JavaScriptObjectNode(node.getTruffleObject(), node.getTypeName());
+    }
+    
+    
+    static class JavaScriptObjectNode extends DynamicObjectNode<JavaScriptObject> implements JavaScriptNode {
         
-        JavaScriptDynamicObjectNode(JavaScriptDynamicObject dobject, String type) {
-            super(dobject, type);
+        JavaScriptObjectNode(JavaScriptObject object, String type) {
+            super(object, type);
         }
         
         
         @Override
         protected String computeName(Heap heap) {
-            return ((JavaScriptDynamicObject)getDynamicObject()).computeDisplayType(heap) + "#" + getInstance().getInstanceNumber(); // NOI18N
+            return JavaScriptNodes.computeName(this, heap);
         }
         
-        protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
-            String logicalValue = JavaScriptNodes.getLogicalValue(dobject, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
+        protected String computeLogicalValue(JavaScriptObject object, String type, Heap heap) {
+            String logicalValue = JavaScriptNodes.getLogicalValue(object, type, heap);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
         }
         
         
-        public JavaScriptDynamicObjectNode createCopy() {
-            JavaScriptDynamicObjectNode copy = new JavaScriptDynamicObjectNode((JavaScriptDynamicObject)getDynamicObject(), getType());
+        public JavaScriptObjectNode createCopy() {
+            JavaScriptObjectNode copy = JavaScriptNodes.createCopy(this);
             setupCopy(copy);
             return copy;
         }
 
-        protected void setupCopy(JavaScriptDynamicObjectNode copy) {
+        protected void setupCopy(JavaScriptObjectNode copy) {
             super.setupCopy(copy);
         }
         
     }
     
-    static class JavaScriptTypeNode extends TruffleTypeNode<JavaScriptDynamicObject, JavaScriptType> implements JavaScriptNode {
+    static class JavaScriptTypeNode extends TruffleTypeNode<JavaScriptObject, JavaScriptType> implements JavaScriptNode {
         
         JavaScriptTypeNode(JavaScriptType type) {
             super(type);
         }
 
         @Override
-        public HeapViewerNode createNode(JavaScriptDynamicObject object, Heap heap) {
+        public HeapViewerNode createNode(JavaScriptObject object, Heap heap) {
             String type = getType().getName();
-            return !type.startsWith("<") ? new JavaScriptDynamicObjectNode(object, type) :
-                    new JavaScriptDynamicObjectNode(object, object.getType(heap));
+            return !type.startsWith("<") ? new JavaScriptObjectNode(object, type) :
+                    new JavaScriptObjectNode(object, object.getType(heap));
         }
 
         @Override
@@ -177,122 +185,95 @@ class JavaScriptNodes {
         
     }
     
-    static class JavaScriptDynamicObjectsContainer extends DynamicObjectsContainer implements JavaScriptNode {
+    static class JavaScriptObjectFieldNode extends DynamicObjectFieldNode<JavaScriptObject> implements JavaScriptNode {
         
-        JavaScriptDynamicObjectsContainer(String name) {
-            super(name);
-        }
-
-        JavaScriptDynamicObjectsContainer(String name, int maxObjects) {
-            super(name, maxObjects);
-        }
-        
-        protected JavaScriptDynamicObjectNode createNode(Instance instance) {
-            return new JavaScriptDynamicObjectNode(new JavaScriptDynamicObject(instance), name);
-        }
-        
-        
-        public JavaScriptDynamicObjectsContainer createCopy() {
-            JavaScriptDynamicObjectsContainer copy = new JavaScriptDynamicObjectsContainer(name, maxNodes);
-            setupCopy(copy);
-            return copy;
-        }
-
-        protected void setupCopy(JavaScriptDynamicObjectsContainer copy) {
-            super.setupCopy(copy);
-        }
-
-    }
-    
-    static class JavaScriptDynamicObjectFieldNode extends DynamicObjectFieldNode implements JavaScriptNode {
-        
-        JavaScriptDynamicObjectFieldNode(JavaScriptDynamicObject dobject, String type, FieldValue field) {
-            super(dobject, type, field);
+        JavaScriptObjectFieldNode(JavaScriptObject object, String type, FieldValue field) {
+            super(object, type, field);
         }
         
         @Override
         protected String computeName(Heap heap) {
-            return ((JavaScriptDynamicObject)getDynamicObject()).computeDisplayType(heap) + "#" + getInstance().getInstanceNumber(); // NOI18N
+            return JavaScriptNodes.computeName(this, heap);
         }
         
-        protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
-            String logicalValue = JavaScriptNodes.getLogicalValue(dobject, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
+        protected String computeLogicalValue(JavaScriptObject object, String type, Heap heap) {
+            String logicalValue = JavaScriptNodes.getLogicalValue(object, type, heap);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
         }
         
         
-        public JavaScriptDynamicObjectNode createCopy() {
-            return new JavaScriptDynamicObjectNode((JavaScriptDynamicObject)getDynamicObject(), getType());
+        public JavaScriptObjectNode createCopy() {
+            return JavaScriptNodes.createCopy(this);
         }
         
     }
     
-    static class JavaScriptDynamicObjectArrayItemNode extends DynamicObjectArrayItemNode implements JavaScriptNode {
+    static class JavaScriptObjectArrayItemNode extends DynamicObjectArrayItemNode<JavaScriptObject> implements JavaScriptNode {
         
-        JavaScriptDynamicObjectArrayItemNode(JavaScriptDynamicObject dobject, String type, ArrayItemValue item) {
-            super(dobject, type, item);
+        JavaScriptObjectArrayItemNode(JavaScriptObject object, String type, ArrayItemValue item) {
+            super(object, type, item);
         }
         
         @Override
         protected String computeName(Heap heap) {
-            return ((JavaScriptDynamicObject)getDynamicObject()).computeDisplayType(heap) + "#" + getInstance().getInstanceNumber(); // NOI18N
+            return JavaScriptNodes.computeName(this, heap);
         }
         
-        protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
-            String logicalValue = JavaScriptNodes.getLogicalValue(dobject, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
+        protected String computeLogicalValue(JavaScriptObject object, String type, Heap heap) {
+            String logicalValue = JavaScriptNodes.getLogicalValue(object, type, heap);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
         }
         
         
-        public JavaScriptDynamicObjectNode createCopy() {
-            return new JavaScriptDynamicObjectNode((JavaScriptDynamicObject)getDynamicObject(), getType());
+        public JavaScriptObjectNode createCopy() {
+            return JavaScriptNodes.createCopy(this);
         }
         
     }
         
     
-    static class JavaScriptDynamicObjectReferenceNode extends DynamicObjectReferenceNode implements JavaScriptNode {
+    static class JavaScriptObjectReferenceNode extends DynamicObjectReferenceNode<JavaScriptObject> implements JavaScriptNode {
         
-        JavaScriptDynamicObjectReferenceNode(JavaScriptDynamicObject dobject, String type, FieldValue value) {
-            super(dobject, type, value);
+        JavaScriptObjectReferenceNode(JavaScriptObject object, String type, FieldValue value) {
+            super(object, type, value);
         }
         
         @Override
         protected String computeName(Heap heap) {
-            return ((JavaScriptDynamicObject)getDynamicObject()).computeDisplayType(heap) + "#" + getInstance().getInstanceNumber(); // NOI18N
+            return JavaScriptNodes.computeName(this, heap);
         }
         
-        protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
-            String logicalValue = JavaScriptNodes.getLogicalValue(dobject, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
+        protected String computeLogicalValue(JavaScriptObject object, String type, Heap heap) {
+            String logicalValue = JavaScriptNodes.getLogicalValue(object, type, heap);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
         }
         
         
-        public JavaScriptDynamicObjectNode createCopy() {
-            return new JavaScriptDynamicObjectNode((JavaScriptDynamicObject)getDynamicObject(), getType()); 
+        public JavaScriptObjectNode createCopy() {
+            return JavaScriptNodes.createCopy(this);
         }
         
     }
     
-    static class JavaScriptLocalDynamicObjectNode extends LocalDynamicObjectNode implements JavaScriptNode {
+    static class JavaScriptLocalObjectNode extends LocalDynamicObjectNode<JavaScriptObject> implements JavaScriptNode {
         
-        JavaScriptLocalDynamicObjectNode(JavaScriptDynamicObject dobject, String type) {
-            super(dobject, type);
+        JavaScriptLocalObjectNode(JavaScriptObject object, String type) {
+            super(object, type);
         }
         
         @Override
         protected String computeName(Heap heap) {
-            return ((JavaScriptDynamicObject)getDynamicObject()).computeDisplayType(heap) + "#" + getInstance().getInstanceNumber(); // NOI18N
+            return JavaScriptNodes.computeName(this, heap);
         }
         
-        protected String computeLogicalValue(DynamicObject dobject, String type, Heap heap) {
-            String logicalValue = JavaScriptNodes.getLogicalValue(dobject, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(dobject, type, heap);
+        protected String computeLogicalValue(JavaScriptObject object, String type, Heap heap) {
+            String logicalValue = JavaScriptNodes.getLogicalValue(object, type, heap);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
         }
         
         
-        public JavaScriptDynamicObjectNode createCopy() {
-            return new JavaScriptDynamicObjectNode((JavaScriptDynamicObject)getDynamicObject(), getType()); 
+        public JavaScriptObjectNode createCopy() {
+            return JavaScriptNodes.createCopy(this);
         }
         
     }

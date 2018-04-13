@@ -25,15 +25,13 @@
 package com.sun.tools.visualvm.heapviewer.truffle.python;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleOpenNodeActionProvider;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.NodeObjectsView;
-import java.util.ArrayList;
-import java.util.List;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -41,64 +39,41 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerNodeAction.Provider.class)
-@NbBundle.Messages({
-    "PythonOpenNodeAction_OpenTypeTab=Open Type in New Tab"
-})
-public class PythonOpenNodeAction extends HeapViewerNodeAction.Provider {
+public class PythonOpenNodeAction  extends TruffleOpenNodeActionProvider<PythonObject, PythonType> {
     
+    @Override
     public boolean supportsView(HeapContext context, String viewID) {
-        return viewID.startsWith("python_") && PythonHeapFragment.getPythonContext(context) != null;
-    }
-
-    public HeapViewerNodeAction[] getActions(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-        HeapContext pyContext = PythonHeapFragment.getPythonContext(context);
-        
-        List<HeapViewerNodeAction> actionsList = new ArrayList(2);
-        
-        HeapViewerNode copy = node instanceof PythonObjectNode ||
-                              node instanceof PythonTypeNode ||
-                              node instanceof PythonObjectsContainer ? node.createCopy() : null;
-        actionsList.add(new OpenNodeAction(copy, pyContext, actions));
-        
-        Instance instance = HeapViewerNode.getValue(node, DataType.INSTANCE, context.getFragment().getHeap());
-        if (instance != null && PythonObject.isPythonObject(instance)) {
-            String typeName = PythonObject.getPythonType(instance);
-            List<PythonType> types = ((PythonHeapFragment)pyContext.getFragment()).getTypes(null); // should already be computed
-            for (PythonType type : types) {
-                if (typeName.equals(type.getName())) {
-                    PythonTypeNode typeNode = new PythonTypeNode(type);
-                    actionsList.add(new OpenClassAction(typeNode, pyContext, actions));
-                    break;
-                }
-            }
-        }
-        
-        return actionsList.toArray(new HeapViewerNodeAction[0]);
+        return PythonHeapFragment.isPythonHeap(context);
     }
     
-    
-    private static class OpenNodeAction extends NodeObjectsView.DefaultOpenAction {
-        
-        private OpenNodeAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            super(node, context, actions);
-        }
-
-        public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            return new PythonObjectView(node, context, actions);
-        }
-        
+    @Override
+    protected boolean supportsNode(HeapViewerNode node) {
+        return node instanceof PythonNodes.PythonNode;
     }
     
-    private static class OpenClassAction extends NodeObjectsView.OpenAction {
-        
-        private OpenClassAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            super(Bundle.PythonOpenNodeAction_OpenTypeTab(), 1, node, context, actions);
-        }
+    @Override
+    protected boolean isLanguageObject(Instance instance) {
+        return PythonObject.isPythonObject(instance);
+    }
+    
+    @Override
+    protected PythonObject createObject(Instance instance) {
+        return new PythonObject(instance);
+    }
+    
+    @Override
+    protected PythonType getType(String name, HeapContext context) {
+        return PythonHeapFragment.fromContext(context).getType(name, null);
+    }
 
-        public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            return new PythonObjectView(node, context, actions);
-        }
-        
+    @Override
+    protected TruffleTypeNode createTypeNode(PythonType type) {
+        return new PythonNodes.PythonTypeNode(type);
+    }
+
+    @Override
+    protected NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
+        return new PythonObjectView(node, context, actions);
     }
     
 }

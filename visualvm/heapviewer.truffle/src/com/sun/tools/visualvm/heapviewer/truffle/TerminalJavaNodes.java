@@ -29,7 +29,6 @@ import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.heap.Value;
 import com.sun.tools.visualvm.heapviewer.java.InstanceNode;
 import com.sun.tools.visualvm.heapviewer.java.InstanceReferenceNode;
-import static com.sun.tools.visualvm.heapviewer.model.HeapViewerNode.NO_NODES;
 
 /**
  *

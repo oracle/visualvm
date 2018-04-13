@@ -24,10 +24,8 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectFieldNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectArrayItemNode;
+import com.sun.tools.visualvm.heapviewer.HeapFragment;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.SortOrder;
@@ -37,16 +35,23 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectReferenceNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectReferenceNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.lib.profiler.heap.HeapProgress;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "JavaScriptReferencesProvider_References=Computing references..."
+})
 @ServiceProvider(service=HeapViewerNode.Provider.class, position = 400)
 public class JavaScriptReferencesProvider extends HeapViewerNode.Provider {
     
@@ -59,8 +64,7 @@ public class JavaScriptReferencesProvider extends HeapViewerNode.Provider {
     }
     
     public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
-        return parent instanceof DynamicObjectNode && !(parent instanceof DynamicObjectFieldNode) && !(parent instanceof DynamicObjectArrayItemNode);
-//        return parent instanceof DynamicObjectNode /*&& !(parent instanceof DynamicObjectFieldNode)*/ || parent instanceof ReferenceNode;
+        return parent instanceof JavaScriptNodes.JavaScriptNode && !(parent instanceof JavaScriptNodes.JavaScriptObjectFieldNode || parent instanceof JavaScriptNodes.JavaScriptObjectArrayItemNode);
     }
     
     public HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
@@ -76,12 +80,12 @@ public class JavaScriptReferencesProvider extends HeapViewerNode.Provider {
             }
             protected HeapViewerNode createNode(Integer index) {
                 FieldValue reference = references.get(index);
-                JavaScriptDynamicObject jsdobj = new JavaScriptDynamicObject(reference.getDefiningInstance());
-                if (jsdobj.isJavaScriptObject()) {
-                    return new JavaScriptNodes.JavaScriptDynamicObjectReferenceNode(jsdobj, jsdobj.getType(heap), reference);
+                JavaScriptObject jsobj = new JavaScriptObject(reference.getDefiningInstance());
+                if (jsobj.isJavaScriptObject()) {
+                    return new JavaScriptNodes.JavaScriptObjectReferenceNode(jsobj, jsobj.getType(heap), reference);
                 } else {
                     // Non-JavaScript object
-                    DynamicObject dobj = new DynamicObject(jsdobj.getInstance());
+                    DynamicObject dobj = new DynamicObject(jsobj.getInstance());
                     return new DynamicObjectReferenceNode(dobj, dobj.getType(heap), reference);
                 }
             }
@@ -104,10 +108,24 @@ public class JavaScriptReferencesProvider extends HeapViewerNode.Provider {
     }
     
     private List<FieldValue> getReferences(HeapViewerNode parent, Heap heap) {
-        DynamicObject dobject = parent == null ? null : HeapViewerNode.getValue(parent, DynamicObject.DATA_TYPE, heap);
-        if (dobject == null) return null;
+        TruffleObject object = parent == null ? null : HeapViewerNode.getValue(parent, TruffleObject.DATA_TYPE, heap);
+        JavaScriptObject jsobj = object instanceof JavaScriptObject ? (JavaScriptObject)object : null;
+        if (jsobj == null) return null;
+        
+        ProgressHandle pHandle = null;
 
-        return dobject.getReferences();
+        try {
+            pHandle = ProgressHandle.createHandle(Bundle.JavaScriptReferencesProvider_References());
+            pHandle.setInitialDelay(1000);
+            pHandle.start(HeapProgress.PROGRESS_MAX);
+
+            HeapFragment.setProgress(pHandle, 0);
+            return jsobj.getReferences();
+        } finally {
+            if (pHandle != null) {
+                pHandle.finish();
+            }
+        }
     }
     
 }

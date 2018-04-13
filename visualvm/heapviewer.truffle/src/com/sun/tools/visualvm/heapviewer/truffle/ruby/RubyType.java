@@ -31,7 +31,7 @@ import org.netbeans.lib.profiler.heap.Instance;
  *
  * @author Jiri Sedlacek
  */
-class RubyType extends TruffleType.InstanceBased<RubyDynamicObject> {
+class RubyType extends TruffleType.InstanceBased<RubyObject> {
     
     public RubyType(String name) {
         super(name);
@@ -39,8 +39,8 @@ class RubyType extends TruffleType.InstanceBased<RubyDynamicObject> {
     
     
     @Override
-    protected RubyDynamicObject createObject(Instance i) {
-        return new RubyDynamicObject(getName(), i);
+    protected RubyObject createObject(Instance i) {
+        return new RubyObject(getName(), i);
     }
     
 }

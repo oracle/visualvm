@@ -43,8 +43,6 @@ import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import org.openide.util.lookup.ServiceProvider;
@@ -72,12 +70,12 @@ class JavaScriptPreviewPlugin extends HeapViewPlugin {
     
     
     protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
-        if (!(node instanceof DynamicObjectNode)) { component.showInstance(null); return; }
+        if (!(node instanceof JavaScriptNodes.JavaScriptObjectNode)) { component.showInstance(null); return; }
         
-        DynamicObjectNode dnode = (DynamicObjectNode)node;
-        if ("Function".equals(dnode.getType()) || "JSFunction".equals(dnode.getType())) {
-            DynamicObject dobject = dnode.getDynamicObject();
-            FieldValue dataField = dobject.getFieldValue("functionData (hidden)");
+        JavaScriptNodes.JavaScriptObjectNode dnode = (JavaScriptNodes.JavaScriptObjectNode)node;
+        if ("Function".equals(dnode.getTypeName()) || "JSFunction".equals(dnode.getTypeName())) {
+            JavaScriptObject jsobj = dnode.getTruffleObject();
+            FieldValue dataField = jsobj.getFieldValue("functionData (hidden)");
             Instance data = dataField instanceof ObjectFieldValue ? ((ObjectFieldValue)dataField).getInstance() : null;
             if (data == null) { component.showInstance(null); return; }
 

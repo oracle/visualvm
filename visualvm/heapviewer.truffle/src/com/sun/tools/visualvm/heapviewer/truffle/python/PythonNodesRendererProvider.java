@@ -26,9 +26,15 @@ package com.sun.tools.visualvm.heapviewer.truffle.python;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectFieldNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectReferenceNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
 import java.util.Map;
+import javax.swing.Icon;
 import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -44,16 +50,18 @@ public class PythonNodesRendererProvider extends HeapViewerRenderer.Provider {
 
     public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
         Heap heap = context.getFragment().getHeap();
+        Icon instanceIcon = PythonSupport.createBadgedIcon(LanguageIcons.INSTANCE);
+        Icon packageIcon = PythonSupport.createBadgedIcon(LanguageIcons.PACKAGE);
 
-        renderers.put(PythonObjectNode.class, new PythonObjectNode.Renderer(heap));
+        renderers.put(PythonNodes.PythonObjectNode.class, new TruffleObjectNode.Renderer(heap, instanceIcon));
         
-        renderers.put(PythonTypeNode.class, new PythonObjectsContainer.Renderer());
+        renderers.put(PythonNodes.PythonTypeNode.class, new TruffleTypeNode.Renderer(packageIcon));
 
-        renderers.put(PythonObjectsContainer.class, new PythonObjectsContainer.Renderer());
+        renderers.put(PythonNodes.PythonObjectFieldNode.class, new TruffleObjectFieldNode.Renderer(heap, instanceIcon));
 
-        renderers.put(PythonObjectFieldNode.class, new PythonObjectFieldNode.Renderer(heap));
-
-        renderers.put(PythonObjectReferenceNode.class, new PythonObjectReferenceNode.Renderer(heap));
+        renderers.put(PythonNodes.PythonObjectReferenceNode.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon));
+        
+        renderers.put(PythonNodes.PythonObjectAttributeReferenceNode.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon, "attribute in"));
     }
 
 }

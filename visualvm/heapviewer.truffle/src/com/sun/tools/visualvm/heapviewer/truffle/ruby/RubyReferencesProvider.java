@@ -24,10 +24,8 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectFieldNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectArrayItemNode;
+import com.sun.tools.visualvm.heapviewer.HeapFragment;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.SortOrder;
@@ -37,16 +35,23 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectReferenceNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectReferenceNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.lib.profiler.heap.HeapProgress;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "RubyReferencesProvider_References=Computing references..."
+})
 @ServiceProvider(service=HeapViewerNode.Provider.class, position = 400)
 public class RubyReferencesProvider extends HeapViewerNode.Provider {
     
@@ -59,7 +64,7 @@ public class RubyReferencesProvider extends HeapViewerNode.Provider {
     }
     
     public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
-        return parent instanceof DynamicObjectNode && !(parent instanceof DynamicObjectFieldNode) && !(parent instanceof DynamicObjectArrayItemNode);
+        return parent instanceof RubyNodes.RubyNode && !(parent instanceof RubyNodes.RubyObjectFieldNode || parent instanceof RubyNodes.RubyObjectArrayItemNode);
 //        return parent instanceof DynamicObjectNode /*&& !(parent instanceof DynamicObjectFieldNode)*/ || parent instanceof ReferenceNode;
     }
     
@@ -76,12 +81,12 @@ public class RubyReferencesProvider extends HeapViewerNode.Provider {
             }
             protected HeapViewerNode createNode(Integer index) {
                 FieldValue reference = references.get(index);
-                RubyDynamicObject rbdobj = new RubyDynamicObject(reference.getDefiningInstance());
-                if (rbdobj.isRubyObject()) {
-                    return new RubyNodes.RubyDynamicObjectReferenceNode(rbdobj, rbdobj.getType(heap), reference);
+                RubyObject rbobj = new RubyObject(reference.getDefiningInstance());
+                if (rbobj.isRubyObject()) {
+                    return new RubyNodes.RubyObjectReferenceNode(rbobj, rbobj.getType(heap), reference);
                 } else {
                     // Non-Ruby object
-                    DynamicObject dobj = new DynamicObject(rbdobj.getInstance());
+                    DynamicObject dobj = new DynamicObject(rbobj.getInstance());
                     return new DynamicObjectReferenceNode(dobj, dobj.getType(heap), reference);
                 }
             }
@@ -104,10 +109,24 @@ public class RubyReferencesProvider extends HeapViewerNode.Provider {
     }
     
     private List<FieldValue> getReferences(HeapViewerNode parent, Heap heap) {
-        DynamicObject dobject = parent == null ? null : HeapViewerNode.getValue(parent, DynamicObject.DATA_TYPE, heap);
-        if (dobject == null) return null;
+        TruffleObject object = parent == null ? null : HeapViewerNode.getValue(parent, TruffleObject.DATA_TYPE, heap);
+        RubyObject rbobj = object instanceof RubyObject ? (RubyObject)object : null;
+        if (rbobj == null) return null;
 
-        return dobject.getReferences();
+        ProgressHandle pHandle = null;
+
+        try {
+            pHandle = ProgressHandle.createHandle(Bundle.RubyReferencesProvider_References());
+            pHandle.setInitialDelay(1000);
+            pHandle.start(HeapProgress.PROGRESS_MAX);
+
+            HeapFragment.setProgress(pHandle, 0);
+            return rbobj.getReferences();
+        } finally {
+            if (pHandle != null) {
+                pHandle.finish();
+            }
+        }
     }
     
 }

@@ -24,7 +24,7 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.r;
 
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import com.sun.tools.visualvm.heapviewer.truffle.TerminalJavaNodes;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -40,6 +40,7 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
@@ -65,8 +66,9 @@ public class RAttributesProvider extends HeapViewerNode.Provider {
     }
 
     public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
-        if (parent instanceof RObjectNode && !(parent instanceof RObjectReferenceNode)) {
-            RObject robject = HeapViewerNode.getValue(parent, RObject.DATA_TYPE, heap);
+        if (parent instanceof RNodes.RNode && !(parent instanceof RNodes.RObjectReferenceNode || parent instanceof RNodes.RObjectAttributeReferenceNode)) {
+            TruffleObject object = HeapViewerNode.getValue(parent, TruffleObject.DATA_TYPE, heap);
+            RObject robject = object instanceof RObject ? (RObject)object : null;
             if (robject != null && robject.getAttributes() != null) return true;
         }
         return false;
@@ -106,7 +108,8 @@ public class RAttributesProvider extends HeapViewerNode.Provider {
 
     
     private List<FieldValue> getFields(HeapViewerNode parent, Heap heap) {
-        RObject robject = parent == null ? null : HeapViewerNode.getValue(parent, RObject.DATA_TYPE, heap);
+        TruffleObject object = parent == null ? null : HeapViewerNode.getValue(parent, TruffleObject.DATA_TYPE, heap);
+        RObject robject = object instanceof RObject ? (RObject)object : null;
         if (robject == null) return null;
         
         DynamicObject attributes = robject.getAttributes();
@@ -153,7 +156,8 @@ public class RAttributesProvider extends HeapViewerNode.Provider {
         if (field instanceof ObjectFieldValue) {
             Instance instance = ((ObjectFieldValue)field).getInstance();
             if (RObject.isRObject(instance)) {
-                return new RObjectFieldNode(new RObject(instance), field);
+                RObject object = new RObject(instance);
+                return new RNodes.RObjectFieldNode(object, object.getType(heap), field);
             } else {
                 return new TerminalJavaNodes.Field((ObjectFieldValue)field, false);
             }

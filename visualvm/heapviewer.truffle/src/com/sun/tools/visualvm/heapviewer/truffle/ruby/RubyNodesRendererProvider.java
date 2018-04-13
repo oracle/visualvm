@@ -24,18 +24,18 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectArrayItemNode;
-import com.sun.tools.visualvm.heapviewer.truffle.LocalDynamicObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectReferenceNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectFieldNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectsContainer;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
 import java.util.Map;
 import javax.swing.Icon;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLocalObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectArrayItemNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectFieldNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectReferenceNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -55,19 +55,17 @@ public class RubyNodesRendererProvider extends HeapViewerRenderer.Provider {
         Icon instanceIcon = RubySupport.createBadgedIcon(LanguageIcons.INSTANCE);
         Icon packageIcon = RubySupport.createBadgedIcon(LanguageIcons.PACKAGE);
         
-        renderers.put(RubyNodes.RubyDynamicObjectNode.class, new DynamicObjectNode.Renderer(heap, instanceIcon));
+        renderers.put(RubyNodes.RubyObjectNode.class, new TruffleObjectNode.Renderer(heap, instanceIcon));
         
-        renderers.put(RubyNodes.RubyTypeNode.class, new DynamicObjectsContainer.Renderer(packageIcon));
+        renderers.put(RubyNodes.RubyTypeNode.class, new TruffleTypeNode.Renderer(packageIcon));
         
-        renderers.put(RubyNodes.RubyDynamicObjectsContainer.class, new DynamicObjectsContainer.Renderer(packageIcon));
+        renderers.put(RubyNodes.RubyObjectFieldNode.class, new TruffleObjectFieldNode.Renderer(heap, instanceIcon));
         
-        renderers.put(RubyNodes.RubyDynamicObjectFieldNode.class, new DynamicObjectFieldNode.Renderer(heap, instanceIcon));
+        renderers.put(RubyNodes.RubyObjectArrayItemNode.class, new TruffleObjectArrayItemNode.Renderer(heap, instanceIcon));
         
-        renderers.put(RubyNodes.RubyDynamicObjectArrayItemNode.class, new DynamicObjectArrayItemNode.Renderer(heap, instanceIcon));
+        renderers.put(RubyNodes.RubyObjectReferenceNode.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon));
         
-        renderers.put(RubyNodes.RubyDynamicObjectReferenceNode.class, new DynamicObjectReferenceNode.Renderer(heap, instanceIcon));
-        
-        renderers.put(RubyNodes.RubyLocalDynamicObjectNode.class, new LocalDynamicObjectNode.Renderer(heap, instanceIcon));
+        renderers.put(RubyNodes.RubyLocalObjectNode.class, new TruffleLocalObjectNode.Renderer(heap, instanceIcon));
     }
     
 }

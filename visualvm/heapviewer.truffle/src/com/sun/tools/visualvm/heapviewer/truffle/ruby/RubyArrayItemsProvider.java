@@ -24,7 +24,7 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import com.sun.tools.visualvm.heapviewer.truffle.TerminalJavaNodes;
 import java.util.Iterator;
 import java.util.List;
@@ -40,7 +40,7 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectArrayItemNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectArrayItemNode;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
@@ -113,12 +113,12 @@ public class RubyArrayItemsProvider extends HeapViewerNode.Provider {
                     ArrayItemValue item = items.get(index);
                     Instance instance = item.getInstance();
                     if (DynamicObject.isDynamicObject(instance)) {
-                        RubyDynamicObject rbdobj = new RubyDynamicObject(instance);
-                        if (rbdobj.isRubyObject()) {
-                            return new RubyNodes.RubyDynamicObjectArrayItemNode(rbdobj, rbdobj.getType(heap), item);
+                        RubyObject rbobj = new RubyObject(instance);
+                        if (rbobj.isRubyObject()) {
+                            return new RubyNodes.RubyObjectArrayItemNode(rbobj, rbobj.getType(heap), item);
                         } else {
                             // Non-Ruby object
-                            DynamicObject dobj = new DynamicObject(rbdobj.getInstance());
+                            DynamicObject dobj = new DynamicObject(rbobj.getInstance());
                             return new DynamicObjectArrayItemNode(dobj, dobj.getType(heap), item);
                         }
                     } else {

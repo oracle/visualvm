@@ -41,7 +41,7 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
     private static final String FSOURCE_NAME_MASK = "com.oracle.truffle.api.source.FileSourceImpl";    // NOI18N
     private static final String CONTENT_NAME_MASK = "com.oracle.truffle.api.source.Content+";    // NOI18N
     private static final String SOURCE_NAME_MASK = "com.oracle.truffle.api.source.Source+";     // NOI18N
-    static final String SOURCE_SECTION_MASK = "com.oracle.truffle.api.source.SourceSection";    // NOI18N
+    public  static final String SOURCE_SECTION_MASK = "com.oracle.truffle.api.source.SourceSection";    // NOI18N
     private static final String ASSUMPTION_MASK = "com.oracle.truffle.api.impl.AbstractAssumption+";    // NOI18N
     private static final String HIDDEN_KEY_MASK = "com.oracle.truffle.api.object.HiddenKey"; // NOI18N
     private static final String PROPERTY_MASK = "com.oracle.truffle.object.PropertyImpl";    // NOI18N

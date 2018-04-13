@@ -31,8 +31,8 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.HeapFragment;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageSupport;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectLanguageHeapFragment;
 import java.util.Iterator;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
@@ -41,7 +41,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
-class RubyHeapFragment extends TruffleLanguageHeapFragment.DynamicObjectBased<RubyDynamicObject, RubyType> {
+class RubyHeapFragment extends DynamicObjectLanguageHeapFragment<RubyObject, RubyType> {
     
     static final String RUBY_LANG_ID = "org.truffleruby.language.RubyObjectType"; // NOI18N
     
@@ -53,9 +53,25 @@ class RubyHeapFragment extends TruffleLanguageHeapFragment.DynamicObjectBased<Ru
     }
     
     
+    static RubyHeapFragment fromContext(HeapContext context) {
+        return (RubyHeapFragment)context.getFragment();
+    }
+    
+    
     @Override
-    protected RubyDynamicObject createObject(Instance instance) {
-        return new RubyDynamicObject(instance);
+    public Iterator<Instance> getInstancesIterator() {
+        return languageInstancesIterator(RUBY_LANG_ID);
+    }
+    
+    @Override
+    public Iterator<RubyObject> getObjectsIterator() {
+        return languageObjectsIterator(RUBY_LANG_ID);
+    }
+    
+    
+    @Override
+    protected RubyObject createObject(Instance instance) {
+        return new RubyObject(instance);
     }
 
     @Override
@@ -63,17 +79,6 @@ class RubyHeapFragment extends TruffleLanguageHeapFragment.DynamicObjectBased<Ru
         return new RubyType(name);
     }
 
-    
-    @Override
-    protected Iterator<Instance> getInstancesIterator() {
-        return languageInstancesIterator(RUBY_LANG_ID);
-    }
-    
-    @Override
-    protected Iterator<RubyDynamicObject> getObjectsIterator() {
-        return languageObjectsIterator(RUBY_LANG_ID);
-    }
-    
     
     static boolean isRubyHeap(HeapContext context) {
         return RUBY_HEAP_ID.equals(context.getFragment().getID()); // NOI18N

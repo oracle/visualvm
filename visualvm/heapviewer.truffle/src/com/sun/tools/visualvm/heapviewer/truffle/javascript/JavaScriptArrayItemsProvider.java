@@ -24,7 +24,7 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import com.sun.tools.visualvm.heapviewer.truffle.TerminalJavaNodes;
 import java.util.Iterator;
 import java.util.List;
@@ -40,7 +40,7 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectArrayItemNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectArrayItemNode;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
@@ -113,9 +113,9 @@ public class JavaScriptArrayItemsProvider extends HeapViewerNode.Provider {
                     ArrayItemValue item = items.get(index);
                     Instance instance = item.getInstance();
                     if (DynamicObject.isDynamicObject(instance)) {
-                        JavaScriptDynamicObject jsdobj = new JavaScriptDynamicObject(instance);
-                        if (jsdobj.isJavaScriptObject()) {
-                            return new JavaScriptNodes.JavaScriptDynamicObjectArrayItemNode(jsdobj, jsdobj.getType(heap), item);
+                        JavaScriptObject jsobj = new JavaScriptObject(instance);
+                        if (jsobj.isJavaScriptObject()) {
+                            return new JavaScriptNodes.JavaScriptObjectArrayItemNode(jsobj, jsobj.getType(heap), item);
                         } else {
                             // Non-JavaScript object
                             DynamicObject dobj = new DynamicObject(instance);

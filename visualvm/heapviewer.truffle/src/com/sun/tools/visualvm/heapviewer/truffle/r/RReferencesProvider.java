@@ -36,10 +36,12 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
-import static com.sun.tools.visualvm.heapviewer.utils.NodesComputer.integerIterator;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.heap.Value;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -62,14 +64,14 @@ public class RReferencesProvider extends HeapViewerNode.Provider {
     }
 
     public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
-        return parent instanceof RObjectNode && !(parent instanceof RObjectFieldNode);
+        return parent instanceof RNodes.RNode && !(parent instanceof RNodes.RObjectFieldNode);
     }
 
     public HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
         return getNodes(getReferences(parent, heap), parent, heap, viewID, dataTypes, sortOrders, progress);
     }
 
-    static HeapViewerNode[] getNodes(List<FieldValue> references, HeapViewerNode parent, Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    static HeapViewerNode[] getNodes(List<FieldValue> references, HeapViewerNode parent, final Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
         if (references == null) {
             return null;
         }
@@ -80,8 +82,25 @@ public class RReferencesProvider extends HeapViewerNode.Provider {
             }
 
             protected HeapViewerNode createNode(Integer index) {
-                FieldValue reference = references.get(index);
-                return new RObjectReferenceNode(reference);
+                FieldValue field = references.get(index);
+                Instance instance = field.getDefiningInstance();
+                
+                // TODO: references are broken!!!
+                if (RObject.isRObject(instance)) {
+                    RObject robj = new RObject(instance);
+                    return new RNodes.RObjectReferenceNode(robj, robj.getType(heap), field);
+                } else {
+                    List<Value> references = (List<Value>)instance.getReferences();
+                    for (Value reference : references) {
+                        instance = reference.getDefiningInstance();
+                        if (RObject.isRObject(instance)) {
+                            RObject robj = new RObject(instance);
+                            return new RNodes.RObjectAttributeReferenceNode(robj, robj.getType(heap), field);
+                        }
+                    }
+                }
+                
+                throw new IllegalArgumentException("Illegal reference " + field);
             }
 
             protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
@@ -106,10 +125,10 @@ public class RReferencesProvider extends HeapViewerNode.Provider {
     }
 
     private List<FieldValue> getReferences(HeapViewerNode parent, Heap heap) {
-        RObject robject = parent == null ? null : HeapViewerNode.getValue(parent, RObject.DATA_TYPE, heap);
-        if (robject == null) {
-            return null;
-        }
+        TruffleObject object = parent == null ? null : HeapViewerNode.getValue(parent, TruffleObject.DATA_TYPE, heap);
+        RObject robject = object instanceof RObject ? (RObject)object : null;
+        if (robject == null) return null;
+        
         ProgressHandle pHandle = null;
 
         try {

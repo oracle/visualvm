@@ -29,13 +29,17 @@ import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import java.awt.Font;
 import java.util.Iterator;
 import java.util.List;
+import javax.swing.Icon;
 import javax.swing.SortOrder;
 import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 
 /**
  *
@@ -117,14 +121,14 @@ public abstract class TruffleTypeNode<O extends TruffleObject, T extends Truffle
                 return new ProgressIterator(iterator, index, true, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
-                    return "<another " + moreNodesCount + " objects left>";
-                }
-                protected String getSamplesContainerString(String objectsCount)  {
-                    return "<sample " + objectsCount + " objects>";
-                }
-                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                    return "<objects " + firstNodeIdx + "-" + lastNodeIdx + ">";
-                }
+                return "<another " + moreNodesCount + " objects left>";
+            }
+            protected String getSamplesContainerString(String objectsCount)  {
+                return "<sample " + objectsCount + " objects>";
+            }
+            protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
+                return "<objects " + firstNodeIdx + "-" + lastNodeIdx + ">";
+            }
         };
         return computer.computeNodes(this, heap, viewID, null, dataTypes, sortOrders, progress);
     }
@@ -147,6 +151,8 @@ public abstract class TruffleTypeNode<O extends TruffleObject, T extends Truffle
         if (type == DataType.OWN_SIZE) return getOwnSize();
         if (type == DataType.RETAINED_SIZE) return getRetainedSize(heap);
         
+        if (type == TruffleType.TYPE_NAME) return getName();
+        
         if (type == DataType.LOGICAL_VALUE) return DataType.LOGICAL_VALUE.getNoValue();
         if (type == DataType.OBJECT_ID) return DataType.OBJECT_ID.getNoValue();
         
@@ -156,6 +162,16 @@ public abstract class TruffleTypeNode<O extends TruffleObject, T extends Truffle
     
     protected void setupCopy(TruffleTypeNode copy) {
         super.setupCopy(copy);
+    }
+    
+    
+    public static class Renderer extends LabelRenderer implements HeapViewerRenderer {
+        
+        public Renderer(Icon icon) {
+            setIcon(icon);
+            setFont(getFont().deriveFont(Font.BOLD));
+        }
+        
     }
     
 }

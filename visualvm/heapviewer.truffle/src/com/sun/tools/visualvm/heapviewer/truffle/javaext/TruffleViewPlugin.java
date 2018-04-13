@@ -24,8 +24,8 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.javaext;
 
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleFrame;
 import java.util.List;
 import java.util.Objects;
@@ -44,6 +44,7 @@ import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
 import com.sun.tools.visualvm.heapviewer.model.TextNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageSupport;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableView;
@@ -107,7 +108,7 @@ class TruffleViewPlugin extends HeapViewPlugin {
     
     
     private static Icon graalIcon() {
-        String path = DynamicObject.class.getPackage().getName().replace('.', '/') + "/GraalVM.png";
+        String path = TruffleLanguageSupport.class.getPackage().getName().replace('.', '/') + "/GraalVM.png";
         return new ImageIcon(ImageUtilities.loadImage(path, true));
     }
     

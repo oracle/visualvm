@@ -24,7 +24,7 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.r;
 
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +41,7 @@ import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
 import com.sun.tools.visualvm.heapviewer.model.TextNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableView;
@@ -92,12 +93,11 @@ public class RAttributesPlugin extends HeapViewPlugin {
     }
 
     protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
-        RObject selectedObject = node == null ? null : HeapViewerNode.getValue(node, RObject.DATA_TYPE, heap);
-        if (Objects.equals(selected, selectedObject)) {
-            return;
-        }
+        TruffleObject selectedObject = node == null ? null : HeapViewerNode.getValue(node, TruffleObject.DATA_TYPE, heap);
+        RObject selectedRObject = selectedObject instanceof RObject ? (RObject)selectedObject : null;
+        if (Objects.equals(selected, selectedRObject)) return;
 
-        selected = selectedObject;
+        selected = selectedRObject;
 
         objectsView.reloadView();
     }

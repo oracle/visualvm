@@ -24,9 +24,7 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectReferenceNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import com.sun.tools.visualvm.heapviewer.truffle.TerminalJavaNodes;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -42,7 +40,8 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectFieldNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectFieldNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
@@ -69,7 +68,7 @@ public class JavaScriptFieldsProvider extends HeapViewerNode.Provider {
     }
 
     public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
-        return parent instanceof DynamicObjectNode && !(parent instanceof DynamicObjectReferenceNode);
+        return parent instanceof JavaScriptNodes.JavaScriptNode && !(parent instanceof JavaScriptNodes.JavaScriptObjectReferenceNode);
     }
     
     public HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
@@ -105,13 +104,14 @@ public class JavaScriptFieldsProvider extends HeapViewerNode.Provider {
     }
     
     private List<FieldValue> getFields(HeapViewerNode parent, Heap heap) {
-        DynamicObject dobject = parent == null ? null : HeapViewerNode.getValue(parent, DynamicObject.DATA_TYPE, heap);
-        if (dobject == null) return null;
+        TruffleObject object = parent == null ? null : HeapViewerNode.getValue(parent, TruffleObject.DATA_TYPE, heap);
+        JavaScriptObject jsobj = object instanceof JavaScriptObject ? (JavaScriptObject)object : null;
+        if (jsobj == null) return null;
         
         List<FieldValue> fields = new ArrayList();
         
-        if (includeInstanceFields) fields.addAll(dobject.getFieldValues());
-        if (includeStaticFields) fields.addAll(dobject.getStaticFieldValues());
+        if (includeInstanceFields) fields.addAll(jsobj.getFieldValues());
+        if (includeStaticFields) fields.addAll(jsobj.getStaticFieldValues());
         
         Iterator<FieldValue> fieldsIt = fields.iterator();
         while (fieldsIt.hasNext())
@@ -151,9 +151,9 @@ public class JavaScriptFieldsProvider extends HeapViewerNode.Provider {
         if (field instanceof ObjectFieldValue) {
             Instance instance = ((ObjectFieldValue)field).getInstance();
             if (DynamicObject.isDynamicObject(instance)) {
-                JavaScriptDynamicObject jsdobj = new JavaScriptDynamicObject(instance);
-                if (jsdobj.isJavaScriptObject()) {
-                    return new JavaScriptNodes.JavaScriptDynamicObjectFieldNode(jsdobj, jsdobj.getType(heap), field);
+                JavaScriptObject jsobj = new JavaScriptObject(instance);
+                if (jsobj.isJavaScriptObject()) {
+                    return new JavaScriptNodes.JavaScriptObjectFieldNode(jsobj, jsobj.getType(heap), field);
                 } else {
                     // Non-JavaScript object
                     DynamicObject dobj = new DynamicObject(instance);

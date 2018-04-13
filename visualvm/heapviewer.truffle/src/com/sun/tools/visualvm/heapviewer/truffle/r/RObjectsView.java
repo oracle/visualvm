@@ -24,18 +24,15 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.r;
 
-import java.util.List;
 import javax.swing.Icon;
-import javax.swing.SortOrder;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.model.RootNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectsView;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectsProvider;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
+import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleObjectsView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
+import org.netbeans.lib.profiler.heap.Instance;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -48,7 +45,7 @@ class RObjectsView extends TruffleObjectsView {
     
     
     RObjectsView(HeapContext context, HeapViewerActions actions) {
-        super(FEATURE_ID, context, actions);
+        super(FEATURE_ID, context, actions, new RObjectsProvider());
     }
     
 
@@ -56,34 +53,35 @@ class RObjectsView extends TruffleObjectsView {
     protected Icon languageBrandedIcon(String iconKey) {
         return RSupport.createBadgedIcon(iconKey);
     }
-
-    @Override
-    protected HeapViewerNode[] computeData(Preset preset, Aggregation aggregation, RootNode root, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-        switch (preset) {
-            case ALL_OBJECTS:
-                switch (aggregation) {
-                    case TYPES:
-                        return RObjectsProvider.getAllObjects(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
-                    default:
-                        return RObjectsProvider.getAllObjects(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
-                }
-            case DOMINATORS:
-                switch (aggregation) {
-                    case TYPES:
-                        return RObjectsProvider.getDominators(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
-                    default:
-                        return RObjectsProvider.getDominators(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
-                }
-            case GC_ROOTS:
-                switch (aggregation) {
-                    case TYPES:
-                        return RObjectsProvider.getGCRoots(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
-                    default:
-                        return RObjectsProvider.getGCRoots(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
-                }
-            default:
-                return HeapViewerNode.NO_NODES;
+    
+    
+    private static class RObjectsProvider extends TruffleObjectsProvider<RObject, RType> {
+    
+        @Override
+        protected TruffleObjectNode<RObject> createObjectNode(RObject object, String type) {
+            return new RNodes.RObjectNode(object, type);
         }
+
+        @Override
+        protected TruffleTypeNode<RObject, RType> createTypeNode(RType type) {
+            return new RNodes.RTypeNode(type);
+        }
+
+        @Override
+        protected boolean isLanguageObject(Instance instance) {
+            return RObject.isRObject(instance);
+        }
+
+        @Override
+        protected RObject createObject(Instance instance) {
+            return new RObject(instance);
+        }
+
+        @Override
+        protected RType createTypeContainer(String name) {
+            return new RType(name);
+        }
+
     }
     
     

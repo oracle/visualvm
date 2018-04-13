@@ -29,9 +29,9 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
-import static com.sun.tools.visualvm.heapviewer.utils.NodesComputer.integerIterator;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +40,8 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.HeapProgress;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.lib.profiler.heap.Value;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -62,14 +64,14 @@ public class PythonReferencesProvider extends HeapViewerNode.Provider {
     }
 
     public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
-        return parent instanceof PythonObjectNode && !(parent instanceof PythonObjectFieldNode);
+        return parent instanceof PythonNodes.PythonNode && !(parent instanceof PythonNodes.PythonObjectFieldNode);
     }
 
     public HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
         return getNodes(getReferences(parent, heap), parent, heap, viewID, dataTypes, sortOrders, progress);
     }
 
-    static HeapViewerNode[] getNodes(List<FieldValue> references, HeapViewerNode parent, Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    static HeapViewerNode[] getNodes(List<FieldValue> references, HeapViewerNode parent, final Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
         if (references == null) {
             return null;
         }
@@ -80,8 +82,25 @@ public class PythonReferencesProvider extends HeapViewerNode.Provider {
             }
 
             protected HeapViewerNode createNode(Integer index) {
-                FieldValue reference = references.get(index);
-                return new PythonObjectReferenceNode(reference);
+                FieldValue field = references.get(index);
+                Instance instance = field.getDefiningInstance();
+                
+                // TODO: references are broken!!!
+                if (PythonObject.isPythonObject(instance)) {
+                    PythonObject robj = new PythonObject(instance);
+                    return new PythonNodes.PythonObjectReferenceNode(robj, robj.getType(heap), field);
+                } else {
+                    List<Value> references = (List<Value>)instance.getReferences();
+                    for (Value reference : references) {
+                        instance = reference.getDefiningInstance();
+                        if (PythonObject.isPythonObject(instance)) {
+                            PythonObject robj = new PythonObject(instance);
+                            return new PythonNodes.PythonObjectAttributeReferenceNode(robj, robj.getType(heap), field);
+                        }
+                    }
+                }
+                
+                throw new IllegalArgumentException("Illegal reference " + field);
             }
 
             protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
@@ -106,10 +125,10 @@ public class PythonReferencesProvider extends HeapViewerNode.Provider {
     }
 
     private List<FieldValue> getReferences(HeapViewerNode parent, Heap heap) {
-        PythonObject pobject = parent == null ? null : HeapViewerNode.getValue(parent, PythonObject.DATA_TYPE, heap);
-        if (pobject == null) {
-            return null;
-        }
+        TruffleObject object = parent == null ? null : HeapViewerNode.getValue(parent, TruffleObject.DATA_TYPE, heap);
+        PythonObject pyobject = object instanceof PythonObject ? (PythonObject)object : null;
+        if (pyobject == null) return null;
+        
         ProgressHandle pHandle = null;
 
         try {
@@ -118,7 +137,7 @@ public class PythonReferencesProvider extends HeapViewerNode.Provider {
             pHandle.start(HeapProgress.PROGRESS_MAX);
 
             HeapFragment.setProgress(pHandle, 0);
-            return pobject.getReferences();
+            return pyobject.getReferences();
         } finally {
             if (pHandle != null) {
                 pHandle.finish();

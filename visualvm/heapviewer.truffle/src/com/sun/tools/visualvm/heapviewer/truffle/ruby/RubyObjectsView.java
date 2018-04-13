@@ -24,18 +24,15 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
-import java.util.List;
 import javax.swing.Icon;
-import javax.swing.SortOrder;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.model.RootNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectsView;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectsProvider;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
+import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleObjectsView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
+import org.netbeans.lib.profiler.heap.Instance;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -48,7 +45,7 @@ class RubyObjectsView extends TruffleObjectsView {
     
     
     RubyObjectsView(HeapContext context, HeapViewerActions actions) {
-        super(FEATURE_ID, context, actions);
+        super(FEATURE_ID, context, actions, new RubyObjectsProvider());
     }
     
 
@@ -56,34 +53,35 @@ class RubyObjectsView extends TruffleObjectsView {
     protected Icon languageBrandedIcon(String iconKey) {
         return RubySupport.createBadgedIcon(iconKey);
     }
-
-    @Override
-    protected HeapViewerNode[] computeData(Preset preset, Aggregation aggregation, RootNode root, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-        switch (preset) {
-            case ALL_OBJECTS:
-                switch (aggregation) {
-                    case TYPES:
-                        return RubyObjectsProvider.getAllObjects(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
-                    default:
-                        return RubyObjectsProvider.getAllObjects(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
-                }
-            case DOMINATORS:
-                switch (aggregation) {
-                    case TYPES:
-                        return RubyObjectsProvider.getDominators(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
-                    default:
-                        return RubyObjectsProvider.getDominators(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
-                }
-            case GC_ROOTS:
-                switch (aggregation) {
-                    case TYPES:
-                        return RubyObjectsProvider.getGCRoots(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 1);
-                    default:
-                        return RubyObjectsProvider.getGCRoots(root, context, viewID, viewFilter, dataTypes, sortOrders, progress, 0);
-                }
-            default:
-                return HeapViewerNode.NO_NODES;
+    
+    
+    private static class RubyObjectsProvider extends TruffleObjectsProvider<RubyObject, RubyType> {
+    
+        @Override
+        protected TruffleObjectNode<RubyObject> createObjectNode(RubyObject object, String type) {
+            return new RubyNodes.RubyObjectNode(object, type);
         }
+
+        @Override
+        protected TruffleTypeNode<RubyObject, RubyType> createTypeNode(RubyType type) {
+            return new RubyNodes.RubyTypeNode(type);
+        }
+
+        @Override
+        protected boolean isLanguageObject(Instance instance) {
+            return RubyObject.isRubyObject(instance);
+        }
+
+        @Override
+        protected RubyObject createObject(Instance instance) {
+            return new RubyObject(instance);
+        }
+
+        @Override
+        protected RubyType createTypeContainer(String name) {
+            return new RubyType(name);
+        }
+
     }
     
     

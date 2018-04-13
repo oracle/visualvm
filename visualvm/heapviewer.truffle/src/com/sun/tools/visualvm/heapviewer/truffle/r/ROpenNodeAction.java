@@ -25,15 +25,13 @@
 package com.sun.tools.visualvm.heapviewer.truffle.r;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleOpenNodeActionProvider;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.NodeObjectsView;
-import java.util.ArrayList;
-import java.util.List;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -41,64 +39,41 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerNodeAction.Provider.class)
-@NbBundle.Messages({
-    "ROpenNodeAction_OpenTypeTab=Open Type in New Tab"
-})
-public class ROpenNodeAction extends HeapViewerNodeAction.Provider {
+public class ROpenNodeAction extends TruffleOpenNodeActionProvider<RObject, RType> {
     
+    @Override
     public boolean supportsView(HeapContext context, String viewID) {
-        return viewID.startsWith("r_") && RHeapFragment.getRContext(context) != null;
-    }
-
-    public HeapViewerNodeAction[] getActions(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-        HeapContext rContext = RHeapFragment.getRContext(context);
-        
-        List<HeapViewerNodeAction> actionsList = new ArrayList(2);
-        
-        HeapViewerNode copy = node instanceof RObjectNode ||
-                              node instanceof RTypeNode ||
-                              node instanceof RObjectsContainer ? node.createCopy() : null;
-        actionsList.add(new OpenNodeAction(copy, rContext, actions));
-        
-        Instance instance = HeapViewerNode.getValue(node, DataType.INSTANCE, context.getFragment().getHeap());
-        if (instance != null && RObject.isRObject(instance)) {
-            String typeName = RObject.getRType(instance);
-            List<RType> types = ((RHeapFragment)rContext.getFragment()).getTypes(null); // should already be computed
-            for (RType type : types) {
-                if (typeName.equals(type.getName())) {
-                    RTypeNode typeNode = new RTypeNode(type);
-                    actionsList.add(new OpenClassAction(typeNode, rContext, actions));
-                    break;
-                }
-            }
-        }
-        
-        return actionsList.toArray(new HeapViewerNodeAction[0]);
+        return RHeapFragment.isRHeap(context);
     }
     
-    
-    private static class OpenNodeAction extends NodeObjectsView.DefaultOpenAction {
-        
-        private OpenNodeAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            super(node, context, actions);
-        }
-
-        public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            return new RObjectView(node, context, actions);
-        }
-        
+    @Override
+    protected boolean supportsNode(HeapViewerNode node) {
+        return node instanceof RNodes.RNode;
     }
     
-    private static class OpenClassAction extends NodeObjectsView.OpenAction {
-        
-        private OpenClassAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            super(Bundle.ROpenNodeAction_OpenTypeTab(), 1, node, context, actions);
-        }
+    @Override
+    protected boolean isLanguageObject(Instance instance) {
+        return RObject.isRObject(instance);
+    }
+    
+    @Override
+    protected RObject createObject(Instance instance) {
+        return new RObject(instance);
+    }
+    
+    @Override
+    protected RType getType(String name, HeapContext context) {
+        return RHeapFragment.fromContext(context).getType(name, null);
+    }
 
-        public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            return new RObjectView(node, context, actions);
-        }
-        
+    @Override
+    protected TruffleTypeNode<RObject, RType> createTypeNode(RType type) {
+        return new RNodes.RTypeNode(type);
+    }
+
+    @Override
+    protected NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
+        return new RObjectView(node, context, actions);
     }
     
 }

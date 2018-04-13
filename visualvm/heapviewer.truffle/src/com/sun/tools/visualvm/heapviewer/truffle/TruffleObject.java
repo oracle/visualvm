@@ -26,6 +26,7 @@
 package com.sun.tools.visualvm.heapviewer.truffle;
 
 
+import com.sun.tools.visualvm.heapviewer.model.DataType;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 
@@ -34,6 +35,9 @@ import org.netbeans.lib.profiler.heap.Instance;
  * @author Jiri Sedlacek
  */
 public abstract class TruffleObject {
+    
+    public static final DataType<TruffleObject> DATA_TYPE = new DataType<TruffleObject>(TruffleObject.class, null, null);
+    
     
     public abstract long getSize();
     

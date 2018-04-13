@@ -26,13 +26,13 @@ package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.truffle.AbstractObjectsProvider;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectsContainer;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectsProvider;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleSummaryView;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleSummaryView;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
@@ -105,7 +105,7 @@ class JavaScriptHeapSummary {
             
             JavaScriptHeapFragment fragment = (JavaScriptHeapFragment)getContext().getFragment();
             JavaScriptType processType = fragment.getType("process", null);
-            JavaScriptDynamicObject process = processType == null || processType.getObjectsCount() == 0 ?
+            JavaScriptObject process = processType == null || processType.getObjectsCount() == 0 ?
                                               null : processType.getObjectsIterator().next();
             
             if (process == null) {
@@ -117,8 +117,8 @@ class JavaScriptHeapSummary {
                 FieldValue releaseFV = process.getFieldValue("release");
                 if (releaseFV instanceof ObjectFieldValue) {
                     Instance releaseI = ((ObjectFieldValue)releaseFV).getInstance();
-                    if (JavaScriptDynamicObject.isJavaScriptObject(releaseI)) {
-                        JavaScriptDynamicObject releaseO = new JavaScriptDynamicObject(releaseI);
+                    if (JavaScriptObject.isJavaScriptObject(releaseI)) {
+                        JavaScriptObject releaseO = new JavaScriptObject(releaseI);
                         if ("node".equals(fieldValue(releaseO, "name", heap))) {
                             String versionFV = fieldValue(process, "version", heap);
                             String node = versionFV != null ? "node " + versionFV : "<unknown>";
@@ -155,7 +155,7 @@ class JavaScriptHeapSummary {
         }
         
         
-        private static String fieldValue(JavaScriptDynamicObject object, String field, Heap heap) {
+        private static String fieldValue(JavaScriptObject object, String field, Heap heap) {
             FieldValue value = object == null ? null : object.getFieldValue(field);
             Instance instance = value instanceof ObjectFieldValue ? ((ObjectFieldValue)value).getInstance() : null;
             return instance == null ? null : DetailsSupport.getDetailsString(instance, heap);
@@ -238,20 +238,20 @@ class JavaScriptHeapSummary {
         
         
         @Override
-        protected List<JavaScriptDynamicObject> dominators(TruffleLanguageHeapFragment heapFragment) {
+        protected List<JavaScriptObject> dominators(TruffleLanguageHeapFragment heapFragment) {
             int maxSearchInstances = 10000;
 
             List<Instance> searchInstances = heapFragment.getHeap().getBiggestObjectsByRetainedSize(maxSearchInstances);
             Iterator<Instance> searchInstancesI = searchInstances.iterator();
             while (searchInstancesI.hasNext()) {
                 Instance instance = searchInstancesI.next();
-                if (!JavaScriptDynamicObject.isJavaScriptObject(instance))
+                if (!JavaScriptObject.isJavaScriptObject(instance))
                     searchInstancesI.remove();
             }
             
-            Set<Instance> rootInstances = AbstractObjectsProvider.getDominatorRoots(searchInstances);
-            List<JavaScriptDynamicObject> rootObjects = new ArrayList();
-            for (Instance root : rootInstances) rootObjects.add(new JavaScriptDynamicObject(root));
+            Set<Instance> rootInstances = TruffleObjectsProvider.getDominatorRoots(searchInstances);
+            List<JavaScriptObject> rootObjects = new ArrayList();
+            for (Instance root : rootInstances) rootObjects.add(new JavaScriptObject(root));
             
             return rootObjects;
         }
@@ -265,18 +265,18 @@ class JavaScriptHeapSummary {
         @Override
         protected ProfilerRenderer typeRenderer(Heap heap) {
             Icon packageIcon = JavaScriptSupport.createBadgedIcon(LanguageIcons.PACKAGE);
-            return new DynamicObjectsContainer.Renderer(packageIcon);
+            return new TruffleTypeNode.Renderer(packageIcon);
         }
         
         @Override
         protected HeapViewerNode objectNode(TruffleObject object, Heap heap) {
-            return new JavaScriptNodes.JavaScriptDynamicObjectNode((JavaScriptDynamicObject)object, object.getType(heap));
+            return new JavaScriptNodes.JavaScriptObjectNode((JavaScriptObject)object, object.getType(heap));
         }
 
         @Override
         protected ProfilerRenderer objectRenderer(Heap heap) {
             Icon instanceIcon = JavaScriptSupport.createBadgedIcon(LanguageIcons.INSTANCE);
-            return new DynamicObjectNode.Renderer(heap, instanceIcon);
+            return new TruffleObjectNode.Renderer(heap, instanceIcon);
         }
 
     }

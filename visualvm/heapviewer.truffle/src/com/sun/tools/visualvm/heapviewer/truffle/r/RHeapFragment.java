@@ -51,6 +51,23 @@ class RHeapFragment extends TruffleLanguageHeapFragment<RObject, RType> {
     }
     
     
+    static RHeapFragment fromContext(HeapContext context) {
+        return (RHeapFragment)context.getFragment();
+    }
+    
+    
+    @Override
+    public Iterator<Instance> getInstancesIterator() {
+        String[] topClasses = new String[] { RObject.R_OBJECT_FQN, RObject.R_SCALAR_FQN, RObject.R_WRAPPER_FQN };
+        return instancesIterator(topClasses);
+    }
+    
+    @Override
+    public Iterator<RObject> getObjectsIterator() {
+        return super.getObjectsIterator();
+    }
+    
+    
     @Override
     protected RObject createObject(Instance instance) {
         return new RObject(instance);
@@ -59,18 +76,6 @@ class RHeapFragment extends TruffleLanguageHeapFragment<RObject, RType> {
     @Override
     protected RType createTruffleType(String name) {
         return new RType(name);
-    }
-
-    
-    @Override
-    protected Iterator<Instance> getInstancesIterator() {
-        String[] topClasses = new String[] { RObject.R_OBJECT_FQN, RObject.R_SCALAR_FQN, RObject.R_WRAPPER_FQN };
-        return instancesIterator(topClasses);
-    }
-    
-    @Override
-    protected Iterator<RObject> getObjectsIterator() {
-        return super.getObjectsIterator();
     }
     
     

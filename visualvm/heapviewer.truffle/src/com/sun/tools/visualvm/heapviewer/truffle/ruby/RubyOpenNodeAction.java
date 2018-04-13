@@ -25,15 +25,13 @@
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleOpenNodeActionProvider;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.NodeObjectsView;
-import java.util.ArrayList;
-import java.util.List;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -41,62 +39,41 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerNodeAction.Provider.class)
-@NbBundle.Messages({
-    "RubyOpenNodeAction_OpenTypeTab=Open Type in New Tab"
-})
-public class RubyOpenNodeAction extends HeapViewerNodeAction.Provider {
+public class RubyOpenNodeAction extends TruffleOpenNodeActionProvider<RubyObject, RubyType> {
     
+    @Override
     public boolean supportsView(HeapContext context, String viewID) {
-        return viewID.startsWith("ruby_") && RubyHeapFragment.getRubyContext(context) != null;
-    }
-
-    public HeapViewerNodeAction[] getActions(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-        HeapContext rbContext = RubyHeapFragment.getRubyContext(context);
-        
-        List<HeapViewerNodeAction> actionsList = new ArrayList(2);
-        
-        HeapViewerNode copy = node instanceof RubyNodes.RubyNode ? node.createCopy() : null;
-        actionsList.add(new OpenNodeAction(copy, rbContext, actions));
-        
-        Instance instance = HeapViewerNode.getValue(node, DataType.INSTANCE, context.getFragment().getHeap());
-        if (instance != null && RubyDynamicObject.isDynamicObject(instance)) {
-            RubyDynamicObject object = new RubyDynamicObject(instance);
-            if (object.isRubyObject()) {
-                String typeName = object.getType(rbContext.getFragment().getHeap());
-                RubyType type = ((RubyHeapFragment)rbContext.getFragment()).getType(typeName, null); // should already be computed
-                if (type != null) {
-                    RubyNodes.RubyTypeNode typeNode = new RubyNodes.RubyTypeNode(type);
-                    actionsList.add(new OpenClassAction(typeNode, rbContext, actions));
-                }
-            }
-        }
-        
-        return actionsList.toArray(new HeapViewerNodeAction[0]);
+        return RubyHeapFragment.isRubyHeap(context);
     }
     
-    
-    private static class OpenNodeAction extends NodeObjectsView.DefaultOpenAction {
-        
-        private OpenNodeAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            super(node, context, actions);
-        }
-
-        public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            return new RubyObjectView(node, context, actions);
-        }
-        
+    @Override
+    protected boolean supportsNode(HeapViewerNode node) {
+        return node instanceof RubyNodes.RubyNode;
     }
     
-    private static class OpenClassAction extends NodeObjectsView.OpenAction {
-        
-        private OpenClassAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            super(Bundle.RubyOpenNodeAction_OpenTypeTab(), 1, node, context, actions);
-        }
+    @Override
+    protected boolean isLanguageObject(Instance instance) {
+        return RubyObject.isRubyObject(instance);
+    }
+    
+    @Override
+    protected RubyObject createObject(Instance instance) {
+        return new RubyObject(instance);
+    }
+    
+    @Override
+    protected RubyType getType(String name, HeapContext context) {
+        return RubyHeapFragment.fromContext(context).getType(name, null);
+    }
 
-        public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            return new RubyObjectView(node, context, actions);
-        }
-        
+    @Override
+    protected TruffleTypeNode<RubyObject, RubyType> createTypeNode(RubyType type) {
+        return new RubyNodes.RubyTypeNode(type);
+    }
+
+    @Override
+    protected NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
+        return new RubyObjectView(node, context, actions);
     }
     
 }

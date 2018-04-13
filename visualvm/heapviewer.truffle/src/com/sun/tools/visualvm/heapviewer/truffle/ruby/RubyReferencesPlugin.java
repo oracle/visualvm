@@ -31,7 +31,7 @@ import org.netbeans.lib.profiler.heap.Heap;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleReferencesPlugin;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectReferencesPlugin;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
@@ -41,7 +41,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
-class RubyReferencesPlugin extends TruffleReferencesPlugin {
+class RubyReferencesPlugin extends DynamicObjectReferencesPlugin {
     
     public RubyReferencesPlugin(HeapContext context, HeapViewerActions actions) {
         super("ruby_objects_references", context, actions);

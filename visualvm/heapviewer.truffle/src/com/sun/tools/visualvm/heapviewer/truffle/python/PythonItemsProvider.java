@@ -30,9 +30,9 @@ import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.truffle.TerminalJavaNodes;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
-import static com.sun.tools.visualvm.heapviewer.utils.NodesComputer.integerIterator;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -61,8 +61,9 @@ public class PythonItemsProvider extends HeapViewerNode.Provider {
     }
 
     public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
-        if (parent instanceof PythonObjectNode && !(parent instanceof PythonObjectReferenceNode)) {
-            PythonObject pyobject = HeapViewerNode.getValue(parent, PythonObject.DATA_TYPE, heap);
+        if (parent instanceof PythonNodes.PythonNode && !(parent instanceof PythonNodes.PythonObjectReferenceNode || parent instanceof PythonNodes.PythonObjectAttributeReferenceNode)) {
+            TruffleObject object = HeapViewerNode.getValue(parent, TruffleObject.DATA_TYPE, heap);
+            PythonObject pyobject = object instanceof PythonObject ? (PythonObject)object : null;
             if (pyobject != null) {
                 if (getRawFields(pyobject).isEmpty()) {
                     return false;
@@ -107,7 +108,8 @@ public class PythonItemsProvider extends HeapViewerNode.Provider {
 
 
     protected List<FieldValue> getFields(HeapViewerNode parent, Heap heap) {
-        PythonObject pyobject = parent == null ? null : HeapViewerNode.getValue(parent, PythonObject.DATA_TYPE, heap);
+        TruffleObject object = parent == null ? null : HeapViewerNode.getValue(parent, TruffleObject.DATA_TYPE, heap);
+        PythonObject pyobject = object instanceof PythonObject ? (PythonObject)object : null;
         if (pyobject == null) return null;
 
         List<FieldValue> fields = new ArrayList(getRawFields(pyobject));
@@ -152,7 +154,8 @@ public class PythonItemsProvider extends HeapViewerNode.Provider {
         if (field instanceof ObjectFieldValue) {
             Instance instance = ((ObjectFieldValue)field).getInstance();
             if (PythonObject.isPythonObject(instance)) {
-                return new PythonObjectFieldNode(new PythonObject(instance), field);
+                PythonObject object = new PythonObject(instance);
+                return new PythonNodes.PythonObjectFieldNode(new PythonObject(instance), object.getType(heap), field);
             } else {
                 return new TerminalJavaNodes.Field((ObjectFieldValue)field, false);
             }

@@ -48,17 +48,15 @@ public class TruffleNodesRendererProvider extends HeapViewerRenderer.Provider {
     public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
         Heap heap = context.getFragment().getHeap();
         Icon instanceIcon = Icons.getIcon(LanguageIcons.INSTANCE);
-        Icon packageIcon = Icons.getIcon(LanguageIcons.PACKAGE);
+//        Icon packageIcon = Icons.getIcon(LanguageIcons.PACKAGE);
         
-        renderers.put(DynamicObjectNode.class, new DynamicObjectNode.Renderer(heap, instanceIcon));
+        renderers.put(TruffleObjectNode.InstanceBased.class, new TruffleObjectNode.Renderer(heap, instanceIcon));
         
-        renderers.put(DynamicObjectsContainer.class, new DynamicObjectsContainer.Renderer(packageIcon));
+        renderers.put(TruffleObjectFieldNode.InstanceBased.class, new TruffleObjectFieldNode.Renderer(heap, instanceIcon));
         
-        renderers.put(DynamicObjectFieldNode.class, new DynamicObjectFieldNode.Renderer(heap, instanceIcon));
+        renderers.put(TruffleObjectReferenceNode.InstanceBased.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon));
         
-        renderers.put(DynamicObjectReferenceNode.class, new DynamicObjectReferenceNode.Renderer(heap, instanceIcon));
-        
-        renderers.put(LocalDynamicObjectNode.class, new LocalDynamicObjectNode.Renderer(heap, instanceIcon));
+        renderers.put(TruffleLocalObjectNode.InstanceBased.class, new TruffleLocalObjectNode.Renderer(heap, instanceIcon));
         
         renderers.put(TruffleStackFrameNode.class, new TruffleStackFrameNode.Renderer());
     }

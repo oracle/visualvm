@@ -24,9 +24,9 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.python;
 
-import com.sun.tools.visualvm.heapviewer.model.DataType;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
+import com.sun.tools.visualvm.heapviewer.utils.HeapUtils;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,7 +50,7 @@ import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
  */
 public class PythonObject extends TruffleObject.InstanceBased {
 
-    public static final DataType<PythonObject> DATA_TYPE = new DataType<PythonObject>(PythonObject.class, null, null);
+//    public static final DataType<PythonObject> DATA_TYPE = new DataType<PythonObject>(PythonObject.class, null, null);
 
     static final String PYTHON_OBJECT_FQN = "com.oracle.graal.python.builtins.objects.object.PythonObject"; // NOI18N
     static final String PYTHON_LIST_FQN = "com.oracle.graal.python.builtins.objects.list.PList"; // NOI18N
@@ -80,13 +80,34 @@ public class PythonObject extends TruffleObject.InstanceBased {
         
         this.instance = instance;
         this.type = type;
-        storage = (Instance) instance.getValueOfField("storage"); // NOI18N
-        pythonClass = (Instance) instance.getValueOfField("pythonClass"); // NOI18N
-        store = (Instance) instance.getValueOfField("store"); // NOI18N
-        array = (ObjectArrayInstance) instance.getValueOfField("array"); // NOI18N
-        map = (Instance) instance.getValueOfField("map"); // NOI18N
-        set = (Instance) instance.getValueOfField("set"); // NOI18N
-        dictStorage = (Instance) instance.getValueOfField("dictStorage"); // NOI18N
+        
+        Object[] values = HeapUtils.getValuesOfFields(instance, "storage", "pythonClass", "store", "array", "map", "set", "dictStorage");
+        
+        storage = (Instance) values[0]; // NOI18N
+        pythonClass = (Instance) values[1]; // NOI18N
+        store = (Instance) values[2]; // NOI18N
+        array = (ObjectArrayInstance) values[3]; // NOI18N
+        map = (Instance) values[4]; // NOI18N
+        set = (Instance) values[5]; // NOI18N
+        dictStorage = (Instance) values[6]; // NOI18N
+        
+//        Map values = HeapUtils.getValuesOfFields(instance, "storage", "pythonClass", "store", "array", "map", "set", "dictStorage");
+//        
+//        storage = (Instance) values.get("storage"); // NOI18N
+//        pythonClass = (Instance) values.get("pythonClass"); // NOI18N
+//        store = (Instance) values.get("store"); // NOI18N
+//        array = (ObjectArrayInstance) values.get("array"); // NOI18N
+//        map = (Instance) values.get("map"); // NOI18N
+//        set = (Instance) values.get("set"); // NOI18N
+//        dictStorage = (Instance) values.get("dictStorage"); // NOI18N
+        
+//        storage = (Instance) instance.getValueOfField("storage"); // NOI18N
+//        pythonClass = (Instance) instance.getValueOfField("pythonClass"); // NOI18N
+//        store = (Instance) instance.getValueOfField("store"); // NOI18N
+//        array = (ObjectArrayInstance) instance.getValueOfField("array"); // NOI18N
+//        map = (Instance) instance.getValueOfField("map"); // NOI18N
+//        set = (Instance) instance.getValueOfField("set"); // NOI18N
+//        dictStorage = (Instance) instance.getValueOfField("dictStorage"); // NOI18N
     }
 
     public static boolean isPythonObject(Instance rObj) {
@@ -124,7 +145,7 @@ public class PythonObject extends TruffleObject.InstanceBased {
         return type;
     }
     
-    public static String getPythonType(Instance instance) {
+    static String getPythonType(Instance instance) {
         return DetailsUtils.getInstanceString((Instance) instance.getValueOfField("pythonClass"), null);
     }
 

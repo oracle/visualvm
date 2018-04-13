@@ -29,7 +29,7 @@ import java.util.Iterator;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageSummaryView;
+import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleLanguageSummaryView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import org.openide.util.lookup.ServiceProvider;

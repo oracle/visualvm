@@ -24,7 +24,7 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.r;
 
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleFrame;
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -44,8 +44,8 @@ import org.netbeans.lib.profiler.heap.Type;
 import org.netbeans.lib.profiler.heap.Value;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
+import com.sun.tools.visualvm.heapviewer.utils.HeapUtils;
 import org.netbeans.lib.profiler.heap.Heap;
 
 /**
@@ -54,7 +54,7 @@ import org.netbeans.lib.profiler.heap.Heap;
  */
 public class RObject extends TruffleObject.InstanceBased {
     
-    public static final DataType<RObject> DATA_TYPE = new DataType<RObject>(RObject.class, null, null);
+//    public static final DataType<RObject> DATA_TYPE = new DataType<RObject>(RObject.class, null, null);
     
     static final String R_OBJECT_FQN = "com.oracle.truffle.r.runtime.data.RBaseObject"; // NOI18N
     static final String R_SCALAR_FQN = "com.oracle.truffle.r.runtime.data.RScalarVector";   // NOI18N
@@ -126,16 +126,24 @@ public class RObject extends TruffleObject.InstanceBased {
     public RObject(String type, Instance instance) {
         this.instance = instance;
         this.type = type;
-        data = (Instance) instance.getValueOfField("data"); // NOI18N
-        complete = (Boolean) instance.getValueOfField("complete");  // NOI18N
-        refCount = (Integer) instance.getValueOfField("refCount");  // NOI18N
-        attributesInstance = (Instance) instance.getValueOfField("attributes"); // NOI18N
+        
+        Object[] values = HeapUtils.getValuesOfFields(instance, "data", "complete", "refCount", "attributes", "frameAccess", "frame");
+        
+        data = (Instance) values[0]; // NOI18N
+        
+        Object completeO = values[1];  // NOI18N
+        complete = completeO == null ? null : Boolean.parseBoolean(completeO.toString());
+        
+        Object refCountO = values[2];  // NOI18N
+        refCount = refCountO == null ? null : Integer.parseInt(refCountO.toString());
+        
+        attributesInstance = (Instance) values[3]; // NOI18N
         className = instance.getJavaClass().getName();
         dataType = data == null ? null : data.getJavaClass().getName().replace("[]", ""); // NOI18N
         fieldValues = new LazyFieldValues();
-        Instance frameAccess = (Instance) instance.getValueOfField("frameAccess"); // NOI18N
+        Instance frameAccess = (Instance) values[4]; // NOI18N
         if (frameAccess != null) {
-            frameInstance = (Instance) frameAccess.getValueOfField("frame");
+            frameInstance = (Instance) values[5];
         } else {
             frameInstance = null;
         }
@@ -145,6 +153,52 @@ public class RObject extends TruffleObject.InstanceBased {
         if (data == null && isSubClassOf(instance, R_WRAPPER_FQN)) {
             data = getDataFromWrapper(instance);
         }
+        
+//        Map values = HeapUtils.getValuesOfFields(instance, "data", "complete", "refCount", "attributes", "frameAccess", "frame");
+//        
+//        data = (Instance) values.get("data"); // NOI18N
+//        
+//        Object completeO = values.get("complete");  // NOI18N
+//        complete = completeO == null ? null : Boolean.parseBoolean(completeO.toString());
+//        
+//        Object refCountO = values.get("refCount");  // NOI18N
+//        refCount = refCountO == null ? null : Integer.parseInt(refCountO.toString());
+//        attributesInstance = (Instance) values.get("attributes"); // NOI18N
+//        className = instance.getJavaClass().getName();
+//        dataType = data == null ? null : data.getJavaClass().getName().replace("[]", ""); // NOI18N
+//        fieldValues = new LazyFieldValues();
+//        Instance frameAccess = (Instance) values.get("frameAccess"); // NOI18N
+//        if (frameAccess != null) {
+//            frameInstance = (Instance) values.get("frame");
+//        } else {
+//            frameInstance = null;
+//        }
+//        if (data == null && RPAIR_LIST_FQN.equals(className)) {
+//            data = new RPairList(instance);
+//        }
+//        if (data == null && isSubClassOf(instance, R_WRAPPER_FQN)) {
+//            data = getDataFromWrapper(instance);
+//        }
+        
+//        data = (Instance) instance.getValueOfField("data"); // NOI18N
+//        complete = (Boolean) instance.getValueOfField("complete");  // NOI18N
+//        refCount = (Integer) instance.getValueOfField("refCount");  // NOI18N
+//        attributesInstance = (Instance) instance.getValueOfField("attributes"); // NOI18N
+//        className = instance.getJavaClass().getName();
+//        dataType = data == null ? null : data.getJavaClass().getName().replace("[]", ""); // NOI18N
+//        fieldValues = new LazyFieldValues();
+//        Instance frameAccess = (Instance) instance.getValueOfField("frameAccess"); // NOI18N
+//        if (frameAccess != null) {
+//            frameInstance = (Instance) frameAccess.getValueOfField("frame");
+//        } else {
+//            frameInstance = null;
+//        }
+//        if (data == null && RPAIR_LIST_FQN.equals(className)) {
+//            data = new RPairList(instance);
+//        }
+//        if (data == null && isSubClassOf(instance, R_WRAPPER_FQN)) {
+//            data = getDataFromWrapper(instance);
+//        }
     }
     
     

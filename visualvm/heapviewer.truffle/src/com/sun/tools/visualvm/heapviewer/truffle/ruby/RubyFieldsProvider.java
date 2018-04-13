@@ -24,9 +24,7 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectReferenceNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObject;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import com.sun.tools.visualvm.heapviewer.truffle.TerminalJavaNodes;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -42,7 +40,8 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectFieldNode;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectFieldNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
@@ -69,7 +68,7 @@ public class RubyFieldsProvider extends HeapViewerNode.Provider {
     }
 
     public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
-        return parent instanceof DynamicObjectNode && !(parent instanceof DynamicObjectReferenceNode);
+        return parent instanceof RubyNodes.RubyNode && !(parent instanceof RubyNodes.RubyObjectReferenceNode);
     }
     
     public HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
@@ -106,13 +105,14 @@ public class RubyFieldsProvider extends HeapViewerNode.Provider {
     
     
     private List<FieldValue> getFields(HeapViewerNode parent, Heap heap) {
-        DynamicObject dobject = parent == null ? null : HeapViewerNode.getValue(parent, DynamicObject.DATA_TYPE, heap);
-        if (dobject == null) return null;
+        TruffleObject object = parent == null ? null : HeapViewerNode.getValue(parent, TruffleObject.DATA_TYPE, heap);
+        RubyObject rbobj = object instanceof RubyObject ? (RubyObject)object : null;
+        if (rbobj == null) return null;
         
         List<FieldValue> fields = new ArrayList();
         
-        if (includeInstanceFields) fields.addAll(dobject.getFieldValues());
-        if (includeStaticFields) fields.addAll(dobject.getStaticFieldValues());
+        if (includeInstanceFields) fields.addAll(rbobj.getFieldValues());
+        if (includeStaticFields) fields.addAll(rbobj.getStaticFieldValues());
         
         Iterator<FieldValue> fieldsIt = fields.iterator();
         while (fieldsIt.hasNext())
@@ -151,12 +151,12 @@ public class RubyFieldsProvider extends HeapViewerNode.Provider {
         if (field instanceof ObjectFieldValue) {
             Instance instance = ((ObjectFieldValue)field).getInstance();
             if (DynamicObject.isDynamicObject(instance)) {
-                RubyDynamicObject rbdobj = new RubyDynamicObject(instance);
-                if (rbdobj.isRubyObject()) {
-                    return new RubyNodes.RubyDynamicObjectFieldNode(rbdobj, rbdobj.getType(heap), field);
+                RubyObject rbobj = new RubyObject(instance);
+                if (rbobj.isRubyObject()) {
+                    return new RubyNodes.RubyObjectFieldNode(rbobj, rbobj.getType(heap), field);
                 } else {
                     // Non-Ruby object
-                    DynamicObject dobj = new DynamicObject(rbdobj.getInstance());
+                    DynamicObject dobj = new DynamicObject(rbobj.getInstance());
                     return new DynamicObjectFieldNode(dobj, dobj.getType(heap), field);
                 }
             } else {

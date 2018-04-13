@@ -31,6 +31,7 @@ import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
 import com.sun.tools.visualvm.heapviewer.model.TextNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableView;
@@ -87,12 +88,11 @@ class PythonItemsPlugin extends HeapViewPlugin {
 
     @Override
     protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
-        PythonObject selectedObject = node == null ? null : HeapViewerNode.getValue(node, PythonObject.DATA_TYPE, heap);
-        if (Objects.equals(selected, selectedObject)) {
-            return;
-        }
+        TruffleObject selectedObject = node == null ? null : HeapViewerNode.getValue(node, TruffleObject.DATA_TYPE, heap);
+        PythonObject selectedPythonObject = selectedObject instanceof PythonObject ? (PythonObject)selectedObject : null;
+        if (Objects.equals(selected, selectedPythonObject)) return;
 
-        selected = selectedObject;
+        selected = selectedPythonObject;
 
         objectsView.reloadView();
     }

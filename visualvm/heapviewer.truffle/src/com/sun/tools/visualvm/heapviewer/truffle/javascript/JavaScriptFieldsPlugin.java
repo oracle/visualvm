@@ -31,7 +31,7 @@ import org.netbeans.lib.profiler.heap.Heap;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleFieldsPlugin;
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectFieldsPlugin;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
@@ -42,7 +42,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
-class JavaScriptFieldsPlugin extends TruffleFieldsPlugin {
+class JavaScriptFieldsPlugin extends DynamicObjectFieldsPlugin {
     
     public JavaScriptFieldsPlugin(HeapContext context, HeapViewerActions actions) {
         super("Properties", "Properties", "javascript_objects_fields", context, actions);

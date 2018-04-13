@@ -24,18 +24,18 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectArrayItemNode;
-import com.sun.tools.visualvm.heapviewer.truffle.LocalDynamicObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectReferenceNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectFieldNode;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectsContainer;
-import com.sun.tools.visualvm.heapviewer.truffle.DynamicObjectNode;
 import java.util.Map;
 import javax.swing.Icon;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLocalObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectArrayItemNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectFieldNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectReferenceNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -55,19 +55,17 @@ public class JavaScriptNodesRendererProvider extends HeapViewerRenderer.Provider
         Icon instanceIcon = JavaScriptSupport.createBadgedIcon(LanguageIcons.INSTANCE);
         Icon packageIcon = JavaScriptSupport.createBadgedIcon(LanguageIcons.PACKAGE);
         
-        renderers.put(JavaScriptNodes.JavaScriptDynamicObjectNode.class, new DynamicObjectNode.Renderer(heap, instanceIcon));
+        renderers.put(JavaScriptNodes.JavaScriptObjectNode.class, new TruffleObjectNode.Renderer(heap, instanceIcon));
         
-        renderers.put(JavaScriptNodes.JavaScriptTypeNode.class, new DynamicObjectsContainer.Renderer(packageIcon));
+        renderers.put(JavaScriptNodes.JavaScriptTypeNode.class, new TruffleTypeNode.Renderer(packageIcon));
         
-        renderers.put(JavaScriptNodes.JavaScriptDynamicObjectsContainer.class, new DynamicObjectsContainer.Renderer(packageIcon));
+        renderers.put(JavaScriptNodes.JavaScriptObjectFieldNode.class, new TruffleObjectFieldNode.Renderer(heap, instanceIcon));
         
-        renderers.put(JavaScriptNodes.JavaScriptDynamicObjectFieldNode.class, new DynamicObjectFieldNode.Renderer(heap, instanceIcon));
+        renderers.put(JavaScriptNodes.JavaScriptObjectArrayItemNode.class, new TruffleObjectArrayItemNode.Renderer(heap, instanceIcon));
         
-        renderers.put(JavaScriptNodes.JavaScriptDynamicObjectArrayItemNode.class, new DynamicObjectArrayItemNode.Renderer(heap, instanceIcon));
+        renderers.put(JavaScriptNodes.JavaScriptObjectReferenceNode.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon));
         
-        renderers.put(JavaScriptNodes.JavaScriptDynamicObjectReferenceNode.class, new DynamicObjectReferenceNode.Renderer(heap, instanceIcon));
-        
-        renderers.put(JavaScriptNodes.JavaScriptLocalDynamicObjectNode.class, new LocalDynamicObjectNode.Renderer(heap, instanceIcon));
+        renderers.put(JavaScriptNodes.JavaScriptLocalObjectNode.class, new TruffleLocalObjectNode.Renderer(heap, instanceIcon));
     }
     
 }

@@ -28,7 +28,13 @@ import java.util.Map;
 import org.netbeans.lib.profiler.heap.Heap;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectFieldNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectReferenceNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
+import javax.swing.Icon;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -44,16 +50,18 @@ public class RNodesRendererProvider extends HeapViewerRenderer.Provider {
 
     public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
         Heap heap = context.getFragment().getHeap();
+        Icon instanceIcon = RSupport.createBadgedIcon(LanguageIcons.INSTANCE);
+        Icon packageIcon = RSupport.createBadgedIcon(LanguageIcons.PACKAGE);
         
-        renderers.put(RObjectNode.class, new RObjectNode.Renderer(heap));
+        renderers.put(RNodes.RObjectNode.class, new TruffleObjectNode.Renderer(heap, instanceIcon));
         
-        renderers.put(RTypeNode.class, new RObjectsContainer.Renderer());
+        renderers.put(RNodes.RTypeNode.class, new TruffleTypeNode.Renderer(packageIcon));
         
-        renderers.put(RObjectsContainer.class, new RObjectsContainer.Renderer());
+        renderers.put(RNodes.RObjectFieldNode.class, new TruffleObjectFieldNode.Renderer(heap, instanceIcon));
         
-        renderers.put(RObjectFieldNode.class, new RObjectFieldNode.Renderer(heap));
+        renderers.put(RNodes.RObjectReferenceNode.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon));
         
-        renderers.put(RObjectReferenceNode.class, new RObjectReferenceNode.Renderer(heap));
+        renderers.put(RNodes.RObjectAttributeReferenceNode.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon, "attribute in"));
     }
     
 }

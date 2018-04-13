@@ -26,8 +26,11 @@ package com.sun.tools.visualvm.heapviewer.truffle;
 
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 
@@ -36,6 +39,8 @@ import org.netbeans.lib.profiler.heap.Instance;
  * @author Jiri Sedlacek
  */
 public abstract class TruffleType<O extends TruffleObject> {
+    
+    public static final DataType<String> TYPE_NAME = new DataType<String>(String.class, null, null);
     
     private final String name;
     
@@ -119,6 +124,51 @@ public abstract class TruffleType<O extends TruffleObject> {
             };
         }
         
+    }
+    
+    
+    public static abstract class TypesComputer<O extends TruffleObject, T extends TruffleType<O>> {
+        
+        private final boolean retainedAvailable;
+        
+        private final Heap heap;
+        private final Map<String, T> cache;
+        
+        
+        public TypesComputer(Heap heap) {
+            this.heap = heap;
+            cache = new HashMap();
+            retainedAvailable = DataType.RETAINED_SIZE.valuesAvailable(heap);
+        }
+        
+        
+        protected abstract T createTruffleType(String name);
+        
+        
+        protected void addingObject(long size, long retained, String type) {}
+        
+        
+        public final void addObject(O object) {
+            long objectSize = object.getSize();
+            long objectRetainedSize = retainedAvailable ? object.getRetainedSize() :
+                                      DataType.RETAINED_SIZE.getNotAvailableValue();
+            String typeName = object.getType(heap);
+            
+            addingObject(objectSize, objectRetainedSize, typeName);
+            
+            T type = cache.get(typeName);
+            if (type == null) {
+                type = createTruffleType(typeName);
+                cache.put(typeName, type);
+            }
+            
+            type.addObject(object, objectSize, objectRetainedSize);
+        }
+        
+        public final List<T> getTypes() {
+            return Collections.unmodifiableList(new ArrayList(cache.values()));
+        }
+                
     }
     
 }

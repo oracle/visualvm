@@ -31,7 +31,7 @@ import org.netbeans.lib.profiler.heap.Instance;
  *
  * @author Jiri Sedlacek
  */
-class JavaScriptType extends TruffleType.InstanceBased<JavaScriptDynamicObject> {
+class JavaScriptType extends TruffleType.InstanceBased<JavaScriptObject> {
     
     public JavaScriptType(String name) {
         super(name);
@@ -39,8 +39,8 @@ class JavaScriptType extends TruffleType.InstanceBased<JavaScriptDynamicObject> 
 
     
     @Override
-    protected JavaScriptDynamicObject createObject(Instance i) {
-        return new JavaScriptDynamicObject(getName(), i);
+    protected JavaScriptObject createObject(Instance i) {
+        return new JavaScriptObject(getName(), i);
     }
     
 }

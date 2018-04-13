@@ -26,11 +26,13 @@ package com.sun.tools.visualvm.heapviewer.truffle.python;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.truffle.AbstractObjectsProvider;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectsProvider;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleSummaryView;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleSummaryView;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
@@ -47,6 +49,7 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.lookup.ServiceProvider;
@@ -247,7 +250,7 @@ class PythonHeapSummary {
                     searchInstancesI.remove();
             }
             
-            Set<Instance> rootInstances = AbstractObjectsProvider.getDominatorRoots(searchInstances);
+            Set<Instance> rootInstances = TruffleObjectsProvider.getDominatorRoots(searchInstances);
             List<PythonObject> rootObjects = new ArrayList();
             for (Instance root : rootInstances) rootObjects.add(new PythonObject(root));
             
@@ -257,22 +260,24 @@ class PythonHeapSummary {
         
         @Override
         protected HeapViewerNode typeNode(TruffleType type, Heap heap) {
-            return new PythonTypeNode((PythonType)type);
+            return new PythonNodes.PythonTypeNode((PythonType)type);
         }
 
         @Override
         protected ProfilerRenderer typeRenderer(Heap heap) {
-            return new PythonObjectsContainer.Renderer();
+            Icon packageIcon = PythonSupport.createBadgedIcon(LanguageIcons.PACKAGE);
+            return new TruffleTypeNode.Renderer(packageIcon);
         }
         
         @Override
         protected HeapViewerNode objectNode(TruffleObject object, Heap heap) {
-            return new PythonObjectNode((PythonObject)object, object.getType(heap));
+            return new PythonNodes.PythonObjectNode((PythonObject)object, object.getType(heap));
         }
 
         @Override
         protected ProfilerRenderer objectRenderer(Heap heap) {
-            return new PythonObjectNode.Renderer(heap);
+            Icon instanceIcon = PythonSupport.createBadgedIcon(LanguageIcons.INSTANCE);
+            return new TruffleObjectNode.Renderer(heap, instanceIcon);
         }
 
     }

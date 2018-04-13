@@ -73,7 +73,7 @@ import org.openide.util.RequestProcessor;
     "SourceSectionView_Save=Save to File",                                             // NOI18N
     "SourceSectionView_OutOfMemory=Out of memory - value too long."                    // NOI18N
 })
-final class SourceSectionView extends DetailsProvider.View implements Scrollable, ExportAction.ExportProvider {
+public final class SourceSectionView extends DetailsProvider.View implements Scrollable, ExportAction.ExportProvider {
 
     private static final int MAX_PREVIEW_LENGTH = 256;
     private static final int MAX_ARRAY_ITEMS = 1000;
@@ -94,7 +94,7 @@ final class SourceSectionView extends DetailsProvider.View implements Scrollable
     private boolean chararray;
     private String instanceIdentifier;
 
-    protected SourceSectionView(String className, Instance instance, int offset, int size, Heap heap) {
+    public SourceSectionView(String className, Instance instance, int offset, int size, Heap heap) {
         super(instance, heap);
         sectionOffset = offset;
         sectionSize = size;

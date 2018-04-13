@@ -24,6 +24,7 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle;
 
+import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import java.io.IOException;
 import java.util.List;
 import org.netbeans.lib.profiler.heap.Field;
