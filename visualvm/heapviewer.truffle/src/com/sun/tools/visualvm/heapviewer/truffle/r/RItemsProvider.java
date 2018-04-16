@@ -24,26 +24,22 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.r;
 
-import com.sun.tools.visualvm.heapviewer.truffle.TerminalJavaNodes;
+import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleFrame;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import javax.swing.SortOrder;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
-import com.sun.tools.visualvm.heapviewer.java.PrimitiveNode;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
-import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
-import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
-import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPropertyPlugin;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPropertyProvider;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
+import java.util.Collection;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -51,28 +47,27 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service = HeapViewerNode.Provider.class, position = 200)
-public class RItemsProvider extends HeapViewerNode.Provider {
-
-    public String getName() {
-        return "items";
+public class RItemsProvider extends TruffleObjectPropertyProvider.Fields<RObject> {
+    
+    public RItemsProvider() {
+        super("items", RObject.class, true);
     }
-
+    
+    
+    @Override
     public boolean supportsView(Heap heap, String viewID) {
         return viewID.startsWith("r_");
     }
 
-    public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
-        if (parent instanceof RNodes.RNode && !(parent instanceof RNodes.RObjectReferenceNode || parent instanceof RNodes.RObjectAttributeReferenceNode)) {
-            TruffleObject object = HeapViewerNode.getValue(parent, TruffleObject.DATA_TYPE, heap);
+    @Override
+    public boolean supportsNode(HeapViewerNode node, Heap heap, String viewID) {
+        if (node instanceof RNodes.RNode && !(node instanceof RNodes.RObjectReferenceNode || node instanceof RNodes.RObjectAttributeReferenceNode)) {
+            TruffleObject object = HeapViewerNode.getValue(node, TruffleObject.DATA_TYPE, heap);
             RObject robject = object instanceof RObject ? (RObject)object : null;
             if (robject != null) {
                 if (robject.getFieldValues().isEmpty()) {
                     TruffleFrame frame = robject.getFrame();
-                    if (frame != null) {
-                        return frame.isTruffleFrame();
-                    } else {
-                        return false;
-                    }
+                    return frame != null && frame.isTruffleFrame();
                 }
                 return true;
             }
@@ -80,73 +75,36 @@ public class RItemsProvider extends HeapViewerNode.Provider {
         return false;
     }
 
-    public HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-        return getNodes(getFields(parent, heap), parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
+    @Override
+    protected boolean isLanguageObject(Instance instance) {
+        return RObject.isRObject(instance);
     }
 
-    static HeapViewerNode[] getNodes(List<FieldValue> fields, HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-        if (fields == null) return null;
-
-        NodesComputer<Integer> computer = new NodesComputer<Integer>(fields.size(), UIThresholds.MAX_INSTANCE_FIELDS) {
-            protected boolean sorts(DataType dataType) {
-                return !DataType.COUNT.equals(dataType);
-            }
-            protected HeapViewerNode createNode(Integer index) {
-                return RItemsProvider.createNode(fields.get(index), heap);
-            }
-            protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
-                Iterator<Integer> iterator = integerIterator(index, fields.size());
-                return new ProgressIterator(iterator, index, false, progress);
-            }
-            protected String getMoreNodesString(String moreNodesCount)  {
-                return "<another " + moreNodesCount + " items left>";
-            }
-            protected String getSamplesContainerString(String objectsCount)  {
-                return "<sample " + objectsCount + " items>";
-            }
-            protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                return "<items " + firstNodeIdx + "-" + lastNodeIdx + ">";
-            }
-        };
-
-        return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
+    @Override
+    protected RObject createObject(Instance instance) {
+        return new RObject(instance);
     }
 
+    @Override
+    protected HeapViewerNode createObjectFieldNode(RObject object, String type, FieldValue field) {
+        return new RNodes.RObjectFieldNode(object, type, field);
+    }
     
-    protected List<FieldValue> getFields(HeapViewerNode parent, Heap heap) {
-        TruffleObject object = parent == null ? null : HeapViewerNode.getValue(parent, TruffleObject.DATA_TYPE, heap);
-        RObject robject = object instanceof RObject ? (RObject)object : null;
-        if (robject == null) return null;
-
-        List<FieldValue> fields = new ArrayList(robject.getFieldValues());
-        if (fields.isEmpty()) fields.addAll(robject.getFrame().getLocalFieldValues());
-        
-        Iterator<FieldValue> fieldsIt = fields.iterator();
-        while (fieldsIt.hasNext())
-            if (!displayField(fieldsIt.next()))
-                fieldsIt.remove();
+    @Override
+    protected Collection<FieldValue> getPropertyItems(RObject object, Heap heap) {
+        List<FieldValue> fields = object.getFieldValues();
+        if (fields.isEmpty()) {
+            TruffleFrame frame = object.getFrame();
+            fields = frame == null ? null : frame.getLocalFieldValues();
+        }
 
         return fields;
     }
     
-    private boolean displayField(FieldValue field) {
-        // display primitive fields
-        if (!(field instanceof ObjectFieldValue)) return true;
-        
-        Instance instance = ((ObjectFieldValue)field).getInstance();
-        
-        // display null fields
-        if (instance == null) return true;
-        
-        // display DynamicObject fields
-        if (RObject.isRObject(instance)) return true;
-        
-        // display primitive arrays
-        if (instance instanceof PrimitiveArrayInstance) return true;
-        
+    @Override
+    protected boolean includeInstance(Instance instance) {
         String className = instance.getJavaClass().getName();
         
-        // display java.lang.** and com.oracle.truffle.r.runtime.data.** fields
         if (className.startsWith("java.lang.") ||
             className.startsWith("com.oracle.truffle.r.runtime.data."))
             return true;
@@ -154,18 +112,19 @@ public class RItemsProvider extends HeapViewerNode.Provider {
         return false;
     }
     
-    private static HeapViewerNode createNode(FieldValue field, Heap heap) {
-        if (field instanceof ObjectFieldValue) {
-            Instance instance = ((ObjectFieldValue)field).getInstance();
-            if (RObject.isRObject(instance)) {
-                RObject object = new RObject(instance);
-                return new RNodes.RObjectFieldNode(object, object.getType(heap), field);
-            } else {
-                return new TerminalJavaNodes.Field((ObjectFieldValue)field, false);
-            }
-        } else {
-            return new PrimitiveNode.Field(field);
+    
+    @ServiceProvider(service=HeapViewPlugin.Provider.class, position = 200)
+    public static class PluginProvider extends HeapViewPlugin.Provider {
+
+        public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
+            if (!RHeapFragment.isRHeap(context)) return null;
+            
+            Lookup.getDefault().lookupAll(HeapViewerNode.Provider.class);
+            RItemsProvider fieldsProvider = Lookup.getDefault().lookup(RItemsProvider.class);
+            
+            return new TruffleObjectPropertyPlugin("Items", "Items", Icons.getIcon(ProfilerIcons.NODE_FORWARD), "r_objects_items", context, actions, fieldsProvider);
         }
+        
     }
 
 }

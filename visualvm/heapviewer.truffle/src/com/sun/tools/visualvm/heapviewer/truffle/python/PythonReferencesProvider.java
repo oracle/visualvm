@@ -24,125 +24,92 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.python;
 
-import com.sun.tools.visualvm.heapviewer.HeapFragment;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
+import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
-import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
-import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
-import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
-import java.util.Iterator;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPropertyPlugin;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPropertyProvider;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
+import java.util.Collection;
 import java.util.List;
-import javax.swing.SortOrder;
-import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.HeapProgress;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.Value;
-import org.openide.util.NbBundle;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Tomas Hurka
  */
-@NbBundle.Messages({
-    "PythonReferencesProvider_References=Computing references..."
-})
-@ServiceProvider(service = HeapViewerNode.Provider.class, position = 500)
-public class PythonReferencesProvider extends HeapViewerNode.Provider {
-
-    public String getName() {
-        return "references";
+@ServiceProvider(service = HeapViewerNode.Provider.class, position = 300)
+public class PythonReferencesProvider extends TruffleObjectPropertyProvider.References<PythonObject> {
+    
+    public PythonReferencesProvider() {
+        super("references", PythonObject.class, false);
     }
-
+    
+    
+    @Override
     public boolean supportsView(Heap heap, String viewID) {
         return viewID.startsWith("python_");
     }
 
-    public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
-        return parent instanceof PythonNodes.PythonNode && !(parent instanceof PythonNodes.PythonObjectFieldNode);
+    @Override
+    public boolean supportsNode(HeapViewerNode node, Heap heap, String viewID) {
+        return node instanceof PythonNodes.PythonNode && !(node instanceof PythonNodes.PythonObjectFieldNode);
     }
 
-    public HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-        return getNodes(getReferences(parent, heap), parent, heap, viewID, dataTypes, sortOrders, progress);
+    @Override
+    protected boolean isLanguageObject(Instance instance) {
+        return PythonObject.isPythonObject(instance);
     }
 
-    static HeapViewerNode[] getNodes(List<FieldValue> references, HeapViewerNode parent, final Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-        if (references == null) {
-            return null;
+    @Override
+    protected PythonObject createObject(Instance instance) {
+        return new PythonObject(instance);
+    }
+
+    @Override
+    protected HeapViewerNode createObjectReferenceNode(PythonObject object, String type, FieldValue field) {
+        return new PythonNodes.PythonObjectReferenceNode(object, type, field);
+    }
+    
+    @Override
+    protected HeapViewerNode createForeignReferenceNode(Instance instance, FieldValue field, Heap heap) {
+        List<Value> references = (List<Value>)instance.getReferences();
+        for (Value reference : references) {
+            instance = reference.getDefiningInstance();
+            if (isLanguageObject(instance)) {
+                PythonObject robj = createObject(instance);
+                return new PythonNodes.PythonObjectAttributeReferenceNode(robj, robj.getType(heap), field);
+            }
         }
-
-        NodesComputer<Integer> computer = new NodesComputer<Integer>(references.size(), UIThresholds.MAX_INSTANCE_REFERENCES) {
-            protected boolean sorts(DataType dataType) {
-                return !DataType.COUNT.equals(dataType);
-            }
-
-            protected HeapViewerNode createNode(Integer index) {
-                FieldValue field = references.get(index);
-                Instance instance = field.getDefiningInstance();
-                
-                // TODO: references are broken!!!
-                if (PythonObject.isPythonObject(instance)) {
-                    PythonObject robj = new PythonObject(instance);
-                    return new PythonNodes.PythonObjectReferenceNode(robj, robj.getType(heap), field);
-                } else {
-                    List<Value> references = (List<Value>)instance.getReferences();
-                    for (Value reference : references) {
-                        instance = reference.getDefiningInstance();
-                        if (PythonObject.isPythonObject(instance)) {
-                            PythonObject robj = new PythonObject(instance);
-                            return new PythonNodes.PythonObjectAttributeReferenceNode(robj, robj.getType(heap), field);
-                        }
-                    }
-                }
-                
-                throw new IllegalArgumentException("Illegal reference " + field);
-            }
-
-            protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
-                Iterator<Integer> iterator = integerIterator(index, references.size());
-                return new ProgressIterator(iterator, index, false, progress);
-            }
-
-            protected String getMoreNodesString(String moreNodesCount) {
-                return "<another " + moreNodesCount + " references left>";
-            }
-
-            protected String getSamplesContainerString(String objectsCount) {
-                return "<sample " + objectsCount + " references>";
-            }
-
-            protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx) {
-                return "<references " + firstNodeIdx + "-" + lastNodeIdx + ">";
-            }
-        };
-
-        return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
-    }
-
-    private List<FieldValue> getReferences(HeapViewerNode parent, Heap heap) {
-        TruffleObject object = parent == null ? null : HeapViewerNode.getValue(parent, TruffleObject.DATA_TYPE, heap);
-        PythonObject pyobject = object instanceof PythonObject ? (PythonObject)object : null;
-        if (pyobject == null) return null;
         
-        ProgressHandle pHandle = null;
-
-        try {
-            pHandle = ProgressHandle.createHandle(Bundle.PythonReferencesProvider_References());
-            pHandle.setInitialDelay(1000);
-            pHandle.start(HeapProgress.PROGRESS_MAX);
-
-            HeapFragment.setProgress(pHandle, 0);
-            return pyobject.getReferences();
-        } finally {
-            if (pHandle != null) {
-                pHandle.finish();
-            }
-        }
-
+        return super.createForeignReferenceNode(instance, field, heap);
     }
+
+    @Override
+    protected Collection<FieldValue> getPropertyItems(PythonObject object, Heap heap) {
+        return object.getReferences();
+    }
+    
+    
+    @ServiceProvider(service=HeapViewPlugin.Provider.class, position = 300)
+    public static class PluginProvider extends HeapViewPlugin.Provider {
+
+        public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
+            if (!PythonHeapFragment.isPythonHeap(context)) return null;
+            
+            Lookup.getDefault().lookupAll(HeapViewerNode.Provider.class);
+            PythonReferencesProvider fieldsProvider = Lookup.getDefault().lookup(PythonReferencesProvider.class);
+            
+            return new TruffleObjectPropertyPlugin("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE), "python_objects_references", context, actions, fieldsProvider);
+        }
+        
+    }
+
 }

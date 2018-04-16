@@ -24,126 +24,92 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.r;
 
-import java.util.Iterator;
+import com.sun.tools.visualvm.heapviewer.HeapContext;
 import java.util.List;
-import javax.swing.SortOrder;
-import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.HeapProgress;
-import com.sun.tools.visualvm.heapviewer.HeapFragment;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
-import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
-import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
-import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPropertyPlugin;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPropertyProvider;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
+import java.util.Collection;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.Value;
-import org.openide.util.NbBundle;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Tomas Hurka
  */
-@NbBundle.Messages({
-    "RReferencesProvider_References=Computing references..."
-})
 @ServiceProvider(service = HeapViewerNode.Provider.class, position = 300)
-public class RReferencesProvider extends HeapViewerNode.Provider {
-
-    public String getName() {
-        return "references";
+public class RReferencesProvider extends TruffleObjectPropertyProvider.References<RObject> {
+    
+    public RReferencesProvider() {
+        super("references", RObject.class, false);
     }
-
+    
+    
+    @Override
     public boolean supportsView(Heap heap, String viewID) {
         return viewID.startsWith("r_");
     }
 
-    public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
-        return parent instanceof RNodes.RNode && !(parent instanceof RNodes.RObjectFieldNode);
+    @Override
+    public boolean supportsNode(HeapViewerNode node, Heap heap, String viewID) {
+        return node instanceof RNodes.RNode && !(node instanceof RNodes.RObjectFieldNode);
     }
 
-    public HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-        return getNodes(getReferences(parent, heap), parent, heap, viewID, dataTypes, sortOrders, progress);
+    @Override
+    protected boolean isLanguageObject(Instance instance) {
+        return RObject.isRObject(instance);
     }
 
-    static HeapViewerNode[] getNodes(List<FieldValue> references, HeapViewerNode parent, final Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-        if (references == null) {
-            return null;
+    @Override
+    protected RObject createObject(Instance instance) {
+        return new RObject(instance);
+    }
+
+    @Override
+    protected HeapViewerNode createObjectReferenceNode(RObject object, String type, FieldValue field) {
+        return new RNodes.RObjectReferenceNode(object, type, field);
+    }
+    
+    @Override
+    protected HeapViewerNode createForeignReferenceNode(Instance instance, FieldValue field, Heap heap) {
+        List<Value> references = (List<Value>)instance.getReferences();
+        for (Value reference : references) {
+            instance = reference.getDefiningInstance();
+            if (isLanguageObject(instance)) {
+                RObject robj = createObject(instance);
+                return new RNodes.RObjectAttributeReferenceNode(robj, robj.getType(heap), field);
+            }
         }
-
-        NodesComputer<Integer> computer = new NodesComputer<Integer>(references.size(), UIThresholds.MAX_INSTANCE_REFERENCES) {
-            protected boolean sorts(DataType dataType) {
-                return !DataType.COUNT.equals(dataType);
-            }
-
-            protected HeapViewerNode createNode(Integer index) {
-                FieldValue field = references.get(index);
-                Instance instance = field.getDefiningInstance();
-                
-                // TODO: references are broken!!!
-                if (RObject.isRObject(instance)) {
-                    RObject robj = new RObject(instance);
-                    return new RNodes.RObjectReferenceNode(robj, robj.getType(heap), field);
-                } else {
-                    List<Value> references = (List<Value>)instance.getReferences();
-                    for (Value reference : references) {
-                        instance = reference.getDefiningInstance();
-                        if (RObject.isRObject(instance)) {
-                            RObject robj = new RObject(instance);
-                            return new RNodes.RObjectAttributeReferenceNode(robj, robj.getType(heap), field);
-                        }
-                    }
-                }
-                
-                throw new IllegalArgumentException("Illegal reference " + field);
-            }
-
-            protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
-                Iterator<Integer> iterator = integerIterator(index, references.size());
-                return new ProgressIterator(iterator, index, false, progress);
-            }
-
-            protected String getMoreNodesString(String moreNodesCount) {
-                return "<another " + moreNodesCount + " references left>";
-            }
-
-            protected String getSamplesContainerString(String objectsCount) {
-                return "<sample " + objectsCount + " references>";
-            }
-
-            protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx) {
-                return "<references " + firstNodeIdx + "-" + lastNodeIdx + ">";
-            }
-        };
-
-        return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
-    }
-
-    private List<FieldValue> getReferences(HeapViewerNode parent, Heap heap) {
-        TruffleObject object = parent == null ? null : HeapViewerNode.getValue(parent, TruffleObject.DATA_TYPE, heap);
-        RObject robject = object instanceof RObject ? (RObject)object : null;
-        if (robject == null) return null;
         
-        ProgressHandle pHandle = null;
+        return super.createForeignReferenceNode(instance, field, heap);
+    }
 
-        try {
-            pHandle = ProgressHandle.createHandle(Bundle.RReferencesProvider_References());
-            pHandle.setInitialDelay(1000);
-            pHandle.start(HeapProgress.PROGRESS_MAX);
+    @Override
+    protected Collection<FieldValue> getPropertyItems(RObject object, Heap heap) {
+        return object.getReferences();
+    }
+    
+    
+    @ServiceProvider(service=HeapViewPlugin.Provider.class, position = 300)
+    public static class PluginProvider extends HeapViewPlugin.Provider {
 
-            HeapFragment.setProgress(pHandle, 0);
-            return robject.getReferences();
-        } finally {
-            if (pHandle != null) {
-                pHandle.finish();
-            }
+        public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
+            if (!RHeapFragment.isRHeap(context)) return null;
+            
+            Lookup.getDefault().lookupAll(HeapViewerNode.Provider.class);
+            RReferencesProvider fieldsProvider = Lookup.getDefault().lookup(RReferencesProvider.class);
+            
+            return new TruffleObjectPropertyPlugin("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE), "r_objects_references", context, actions, fieldsProvider);
         }
-
+        
     }
 
 }

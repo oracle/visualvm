@@ -24,108 +24,76 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
-import com.sun.tools.visualvm.heapviewer.HeapFragment;
-import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
-import java.util.Iterator;
-import java.util.List;
-import javax.swing.SortOrder;
+import com.sun.tools.visualvm.heapviewer.HeapContext;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectReferenceNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
-import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
-import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
-import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.lib.profiler.heap.HeapProgress;
-import org.openide.util.NbBundle;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPropertyPlugin;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPropertyProvider;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
+import java.util.Collection;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@NbBundle.Messages({
-    "JavaScriptReferencesProvider_References=Computing references..."
-})
 @ServiceProvider(service=HeapViewerNode.Provider.class, position = 400)
-public class JavaScriptReferencesProvider extends HeapViewerNode.Provider {
+public class JavaScriptReferencesProvider extends TruffleObjectPropertyProvider.References<JavaScriptObject> {
     
-    public String getName() {
-        return "references";
+    public JavaScriptReferencesProvider() {
+        super("references", JavaScriptObject.class, false);
     }
     
+    
+    @Override
     public boolean supportsView(Heap heap, String viewID) {
         return viewID.startsWith("javascript_");
     }
-    
-    public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
-        return parent instanceof JavaScriptNodes.JavaScriptNode && !(parent instanceof JavaScriptNodes.JavaScriptObjectFieldNode || parent instanceof JavaScriptNodes.JavaScriptObjectArrayItemNode);
+
+    @Override
+    public boolean supportsNode(HeapViewerNode node, Heap heap, String viewID) {
+        return node instanceof JavaScriptNodes.JavaScriptNode && !(node instanceof JavaScriptNodes.JavaScriptObjectFieldNode || node instanceof JavaScriptNodes.JavaScriptObjectArrayItemNode);
+    }
+
+    @Override
+    protected boolean isLanguageObject(Instance instance) {
+        return JavaScriptObject.isJavaScriptObject(instance);
+    }
+
+    @Override
+    protected JavaScriptObject createObject(Instance instance) {
+        return new JavaScriptObject(instance);
+    }
+
+    @Override
+    protected HeapViewerNode createObjectReferenceNode(JavaScriptObject object, String type, FieldValue field) {
+        return new JavaScriptNodes.JavaScriptObjectReferenceNode(object, type, field);
+    }
+
+    @Override
+    protected Collection<FieldValue> getPropertyItems(JavaScriptObject object, Heap heap) {
+        return object.getReferences();
     }
     
-    public HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-        return getNodes(getReferences(parent, heap), parent, heap, viewID, dataTypes, sortOrders, progress);
-    }
     
-    static HeapViewerNode[] getNodes(List<FieldValue> references, HeapViewerNode parent, Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-        if (references == null) return null;
-        
-        NodesComputer<Integer> computer = new NodesComputer<Integer>(references.size(), UIThresholds.MAX_INSTANCE_REFERENCES) {
-            protected boolean sorts(DataType dataType) {
-                return !DataType.COUNT.equals(dataType);
-            }
-            protected HeapViewerNode createNode(Integer index) {
-                FieldValue reference = references.get(index);
-                JavaScriptObject jsobj = new JavaScriptObject(reference.getDefiningInstance());
-                if (jsobj.isJavaScriptObject()) {
-                    return new JavaScriptNodes.JavaScriptObjectReferenceNode(jsobj, jsobj.getType(heap), reference);
-                } else {
-                    // Non-JavaScript object
-                    DynamicObject dobj = new DynamicObject(jsobj.getInstance());
-                    return new DynamicObjectReferenceNode(dobj, dobj.getType(heap), reference);
-                }
-            }
-            protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
-                Iterator<Integer> iterator = integerIterator(index, references.size());
-                return new ProgressIterator(iterator, index, false, progress);
-            }
-            protected String getMoreNodesString(String moreNodesCount)  {
-                return "<another " + moreNodesCount + " references left>";
-            }
-            protected String getSamplesContainerString(String objectsCount)  {
-                return "<sample " + objectsCount + " references>";
-            }
-            protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                return "<references " + firstNodeIdx + "-" + lastNodeIdx + ">";
-            }
-        };
+    @ServiceProvider(service=HeapViewPlugin.Provider.class, position = 300)
+    public static class PluginProvider extends HeapViewPlugin.Provider {
 
-        return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
-    }
-    
-    private List<FieldValue> getReferences(HeapViewerNode parent, Heap heap) {
-        TruffleObject object = parent == null ? null : HeapViewerNode.getValue(parent, TruffleObject.DATA_TYPE, heap);
-        JavaScriptObject jsobj = object instanceof JavaScriptObject ? (JavaScriptObject)object : null;
-        if (jsobj == null) return null;
-        
-        ProgressHandle pHandle = null;
-
-        try {
-            pHandle = ProgressHandle.createHandle(Bundle.JavaScriptReferencesProvider_References());
-            pHandle.setInitialDelay(1000);
-            pHandle.start(HeapProgress.PROGRESS_MAX);
-
-            HeapFragment.setProgress(pHandle, 0);
-            return jsobj.getReferences();
-        } finally {
-            if (pHandle != null) {
-                pHandle.finish();
-            }
+        public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
+            if (!JavaScriptHeapFragment.isJavaScriptHeap(context)) return null;
+            
+            Lookup.getDefault().lookupAll(HeapViewerNode.Provider.class);
+            JavaScriptReferencesProvider fieldsProvider = Lookup.getDefault().lookup(JavaScriptReferencesProvider.class);
+            
+            return new TruffleObjectPropertyPlugin("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE), "javascript_objects_references", context, actions, fieldsProvider);
         }
+        
     }
     
 }

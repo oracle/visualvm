@@ -24,27 +24,21 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
-import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
-import com.sun.tools.visualvm.heapviewer.truffle.TerminalJavaNodes;
+import com.sun.tools.visualvm.heapviewer.HeapContext;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import javax.swing.SortOrder;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
-import com.sun.tools.visualvm.heapviewer.java.PrimitiveNode;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectFieldNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
-import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
-import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
-import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPropertyPlugin;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPropertyProvider;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
+import java.util.Collection;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
+import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -52,94 +46,52 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerNode.Provider.class, position = 210)
-public class RubyFieldsProvider extends HeapViewerNode.Provider {
+public class RubyFieldsProvider extends TruffleObjectPropertyProvider.Fields<RubyObject> {
     
-    // TODO: will be configurable, ideally by instance
-    private boolean includeStaticFields = true;
-    private boolean includeInstanceFields = true;
-    
-    
-    public String getName() {
-        return "variables";
+    public RubyFieldsProvider() {
+        super("variables", RubyObject.class, true);
     }
-
+    
+    
+    @Override
     public boolean supportsView(Heap heap, String viewID) {
         return viewID.startsWith("ruby_");
     }
 
-    public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
-        return parent instanceof RubyNodes.RubyNode && !(parent instanceof RubyNodes.RubyObjectReferenceNode);
+    @Override
+    public boolean supportsNode(HeapViewerNode node, Heap heap, String viewID) {
+        return node instanceof RubyNodes.RubyNode && !(node instanceof RubyNodes.RubyObjectReferenceNode);
     }
-    
-    public HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-        return getNodes(getFields(parent, heap), parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
-    }
-    
-    static HeapViewerNode[] getNodes(List<FieldValue> fields, HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-        if (fields == null) return null;
-        
-        NodesComputer<Integer> computer = new NodesComputer<Integer>(fields.size(), UIThresholds.MAX_INSTANCE_FIELDS) {
-            protected boolean sorts(DataType dataType) {
-                return !DataType.COUNT.equals(dataType);
-            }
-            protected HeapViewerNode createNode(Integer index) {
-                return RubyFieldsProvider.createNode(fields.get(index), heap);
-            }
-            protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
-                Iterator<Integer> iterator = integerIterator(index, fields.size());
-                return new ProgressIterator(iterator, index, false, progress);
-            }
-            protected String getMoreNodesString(String moreNodesCount)  {
-                return "<another " + moreNodesCount + " variables left>";
-            }
-            protected String getSamplesContainerString(String objectsCount)  {
-                return "<sample " + objectsCount + " variables>";
-            }
-            protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                return "<variables " + firstNodeIdx + "-" + lastNodeIdx + ">";
-            }
-        };
 
-        return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
+    @Override
+    protected boolean isLanguageObject(Instance instance) {
+        return RubyObject.isRubyObject(instance);
+    }
+
+    @Override
+    protected RubyObject createObject(Instance instance) {
+        return new RubyObject(instance);
+    }
+
+    @Override
+    protected HeapViewerNode createObjectFieldNode(RubyObject object, String type, FieldValue field) {
+        return new RubyNodes.RubyObjectFieldNode(object, type, field);
     }
     
-    
-    private List<FieldValue> getFields(HeapViewerNode parent, Heap heap) {
-        TruffleObject object = parent == null ? null : HeapViewerNode.getValue(parent, TruffleObject.DATA_TYPE, heap);
-        RubyObject rbobj = object instanceof RubyObject ? (RubyObject)object : null;
-        if (rbobj == null) return null;
-        
+    @Override
+    protected Collection<FieldValue> getPropertyItems(RubyObject object, Heap heap) {
         List<FieldValue> fields = new ArrayList();
         
-        if (includeInstanceFields) fields.addAll(rbobj.getFieldValues());
-        if (includeStaticFields) fields.addAll(rbobj.getStaticFieldValues());
+        fields.addAll(object.getFieldValues());
+        fields.addAll(object.getStaticFieldValues());
         
-        Iterator<FieldValue> fieldsIt = fields.iterator();
-        while (fieldsIt.hasNext())
-            if (!displayField(fieldsIt.next()))
-                fieldsIt.remove();
-
         return fields;
     }
     
-    private boolean displayField(FieldValue field) {
-        // display primitive fields
-        if (!(field instanceof ObjectFieldValue)) return true;
-        
-        Instance instance = ((ObjectFieldValue)field).getInstance();
-        
-        // display null fields
-        if (instance == null) return true;
-        
-        // display DynamicObject fields
-        if (DynamicObject.isDynamicObject(instance)) return true;
-        
-        // display primitive arrays
-        if (instance instanceof PrimitiveArrayInstance) return true;
-        
+    @Override
+    protected boolean includeInstance(Instance instance) {
         String className = instance.getJavaClass().getName();
         
-        // display java.lang.** and org.truffleruby.core.rope.** fields
         if (className.startsWith("java.lang.") ||
             className.startsWith("org.truffleruby.core.rope."))
             return true;
@@ -147,24 +99,19 @@ public class RubyFieldsProvider extends HeapViewerNode.Provider {
         return false;
     }
     
-    private static HeapViewerNode createNode(FieldValue field, Heap heap) {
-        if (field instanceof ObjectFieldValue) {
-            Instance instance = ((ObjectFieldValue)field).getInstance();
-            if (DynamicObject.isDynamicObject(instance)) {
-                RubyObject rbobj = new RubyObject(instance);
-                if (rbobj.isRubyObject()) {
-                    return new RubyNodes.RubyObjectFieldNode(rbobj, rbobj.getType(heap), field);
-                } else {
-                    // Non-Ruby object
-                    DynamicObject dobj = new DynamicObject(rbobj.getInstance());
-                    return new DynamicObjectFieldNode(dobj, dobj.getType(heap), field);
-                }
-            } else {
-                return new TerminalJavaNodes.Field((ObjectFieldValue)field, false);
-            }
-        } else {
-            return new PrimitiveNode.Field(field);
+    
+    @ServiceProvider(service=HeapViewPlugin.Provider.class, position = 200)
+    public static class PluginProvider extends HeapViewPlugin.Provider {
+
+        public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
+            if (!RubyHeapFragment.isRubyHeap(context)) return null;
+            
+            Lookup.getDefault().lookupAll(HeapViewerNode.Provider.class);
+            RubyFieldsProvider fieldsProvider = Lookup.getDefault().lookup(RubyFieldsProvider.class);
+            
+            return new TruffleObjectPropertyPlugin("Variables", "Variables", Icons.getIcon(ProfilerIcons.NODE_FORWARD), "ruby_objects_fields", context, actions, fieldsProvider);
         }
+        
     }
     
 }
