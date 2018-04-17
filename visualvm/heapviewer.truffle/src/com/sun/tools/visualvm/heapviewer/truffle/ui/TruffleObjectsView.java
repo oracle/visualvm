@@ -51,6 +51,7 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.PluggableTreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.netbeans.modules.profiler.api.icons.Icons;
 
 /**
  *
@@ -69,14 +70,14 @@ public abstract class TruffleObjectsView extends HeapViewerFeature {
     }
     
     protected static enum Aggregation {
-        TYPES ("Types", LanguageIcons.PACKAGE),
-        OBJECTS ("Objects", LanguageIcons.INSTANCE);
+        TYPES ("Types", Icons.getIcon(LanguageIcons.PACKAGE)),
+        OBJECTS ("Objects", Icons.getIcon(LanguageIcons.INSTANCE));
         
         private final String aggregationName;
-        private final String aggregationIcon;
-        private Aggregation(String aggregationName, String aggregationIcon) { this.aggregationName = aggregationName; this.aggregationIcon = aggregationIcon; }
+        private final Icon aggregationIcon;
+        private Aggregation(String aggregationName, Icon aggregationIcon) { this.aggregationName = aggregationName; this.aggregationIcon = aggregationIcon; }
         public String toString() { return aggregationName; }
-        public String getIcon() { return aggregationIcon; }
+        public Icon getIcon() { return aggregationIcon; }
     }
     
     private final HeapContext context;
@@ -140,11 +141,11 @@ public abstract class TruffleObjectsView extends HeapViewerFeature {
     }
     
     
-    protected abstract Icon languageBrandedIcon(String iconKey);
+    protected abstract Icon createLanguageIcon(Icon icon);
     
 
     public Icon getIcon() {
-        if (brandedIcon == null) brandedIcon = languageBrandedIcon(LanguageIcons.CLASS);
+        if (brandedIcon == null) brandedIcon = createLanguageIcon(Icons.getIcon(LanguageIcons.CLASS));
         return brandedIcon;
     }
     
@@ -342,7 +343,7 @@ public abstract class TruffleObjectsView extends HeapViewerFeature {
         class AggregationButton extends JToggleButton {
             private final Aggregation aggregation;
             AggregationButton(Aggregation aggregation, boolean selected) {
-                super(languageBrandedIcon(aggregation.getIcon()), selected);
+                super(createLanguageIcon(aggregation.getIcon()), selected);
                 this.aggregation = aggregation;
                 setToolTipText(aggregation.toString());
                 aggregationBG.add(this);

@@ -50,8 +50,8 @@ class RubyObjectsView extends TruffleObjectsView {
     
 
     @Override
-    protected Icon languageBrandedIcon(String iconKey) {
-        return RubySupport.createBadgedIcon(iconKey);
+    protected Icon createLanguageIcon(Icon icon) {
+        return RubySupport.createLanguageIcon(icon);
     }
     
     

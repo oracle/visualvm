@@ -33,6 +33,7 @@ import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleThreadsView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -45,7 +46,7 @@ public class RubyThreadsView extends TruffleThreadsView {
     
     
     public RubyThreadsView(HeapContext context, HeapViewerActions actions) {
-        super(FEATURE_ID, RubySupport.createBadgedIcon(ProfilerIcons.WINDOW_THREADS), context, actions, new RubyThreadsProvider());
+        super(FEATURE_ID, RubySupport.createLanguageIcon(Icons.getIcon(ProfilerIcons.WINDOW_THREADS)), context, actions, new RubyThreadsProvider());
     }
     
     

@@ -51,8 +51,8 @@ public class PythonObjectsView extends TruffleObjectsView {
     
 
     @Override
-    protected Icon languageBrandedIcon(String iconKey) {
-        return PythonSupport.createBadgedIcon(iconKey);
+    protected Icon createLanguageIcon(Icon icon) {
+        return PythonSupport.createLanguageIcon(icon);
     }
     
     

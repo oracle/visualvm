@@ -34,6 +34,7 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
 import java.util.Map;
 import javax.swing.Icon;
 import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -50,8 +51,8 @@ public class PythonNodesRendererProvider extends HeapViewerRenderer.Provider {
 
     public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
         Heap heap = context.getFragment().getHeap();
-        Icon instanceIcon = PythonSupport.createBadgedIcon(LanguageIcons.INSTANCE);
-        Icon packageIcon = PythonSupport.createBadgedIcon(LanguageIcons.PACKAGE);
+        Icon instanceIcon = PythonSupport.createLanguageIcon(Icons.getIcon(LanguageIcons.INSTANCE));
+        Icon packageIcon = PythonSupport.createLanguageIcon(Icons.getIcon(LanguageIcons.PACKAGE));
 
         renderers.put(PythonNodes.PythonObjectNode.class, new TruffleObjectNode.Renderer(heap, instanceIcon));
         

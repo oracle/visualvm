@@ -26,11 +26,7 @@ package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleSummaryView;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
@@ -42,8 +38,7 @@ import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
-import org.netbeans.modules.profiler.api.icons.LanguageIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -61,7 +56,7 @@ class RubyHeapSummary {
 
         public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
             if (RubyHeapFragment.isRubyHeap(context)) {
-                Icon icon = RubySupport.createBadgedIcon(HeapWalkerIcons.PROPERTIES);
+                Icon icon = RubySupport.createLanguageIcon(Icons.getIcon(HeapWalkerIcons.PROPERTIES));
                 return new TruffleSummaryView(VIEW_ID, icon, context, actions);
             }
 
@@ -142,12 +137,17 @@ class RubyHeapSummary {
         
     }
     
-    private static class RubySummaryObjects extends TruffleSummaryView.ObjectsSection<RubyObject> {
+    private static class RubySummaryObjects extends TruffleSummaryView.ObjectsSection<RubyObject, RubyType> {
         
         RubySummaryObjects(HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
             super(RubyObjectsView.class, context, actions, actionProviders);
         }
 
+        
+        @Override
+        protected Icon createLanguageIcon(Icon icon) {
+            return RubySupport.createLanguageIcon(icon);
+        }
         
         @Override
         protected boolean isLanguageObject(Instance instance) {
@@ -160,25 +160,13 @@ class RubyHeapSummary {
         }
         
         @Override
-        protected HeapViewerNode createTypeNode(TruffleType type, Heap heap) {
-            return new RubyNodes.RubyTypeNode((RubyType)type);
-        }
-
-        @Override
-        protected ProfilerRenderer typeRenderer(Heap heap) {
-            Icon packageIcon = RubySupport.createBadgedIcon(LanguageIcons.PACKAGE);
-            return new TruffleTypeNode.Renderer(packageIcon);
+        protected HeapViewerNode createTypeNode(RubyType type, Heap heap) {
+            return new RubyNodes.RubyTypeNode(type);
         }
         
         @Override
-        protected HeapViewerNode createObjectNode(TruffleObject object, Heap heap) {
-            return new RubyNodes.RubyObjectNode((RubyObject)object, object.getType(heap));
-        }
-
-        @Override
-        protected ProfilerRenderer objectRenderer(Heap heap) {
-            Icon instanceIcon = RubySupport.createBadgedIcon(LanguageIcons.INSTANCE);
-            return new TruffleObjectNode.Renderer(heap, instanceIcon);
+        protected HeapViewerNode createObjectNode(RubyObject object, Heap heap) {
+            return new RubyNodes.RubyObjectNode(object, object.getType(heap));
         }
 
     }

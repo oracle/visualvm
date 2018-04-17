@@ -37,6 +37,7 @@ import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectReferenceNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -52,8 +53,8 @@ public class JavaScriptNodesRendererProvider extends HeapViewerRenderer.Provider
 
     public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
         Heap heap = context.getFragment().getHeap();
-        Icon instanceIcon = JavaScriptSupport.createBadgedIcon(LanguageIcons.INSTANCE);
-        Icon packageIcon = JavaScriptSupport.createBadgedIcon(LanguageIcons.PACKAGE);
+        Icon instanceIcon = JavaScriptSupport.createLanguageIcon(Icons.getIcon(LanguageIcons.INSTANCE));
+        Icon packageIcon = JavaScriptSupport.createLanguageIcon(Icons.getIcon(LanguageIcons.PACKAGE));
         
         renderers.put(JavaScriptNodes.JavaScriptObjectNode.class, new TruffleObjectNode.Renderer(heap, instanceIcon));
         

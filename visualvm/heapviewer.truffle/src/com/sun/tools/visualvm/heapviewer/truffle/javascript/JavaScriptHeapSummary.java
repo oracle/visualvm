@@ -26,11 +26,7 @@ package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleSummaryView;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
@@ -42,8 +38,7 @@ import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
-import org.netbeans.modules.profiler.api.icons.LanguageIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.lookup.ServiceProvider;
@@ -62,7 +57,7 @@ class JavaScriptHeapSummary {
 
         public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
             if (JavaScriptHeapFragment.isJavaScriptHeap(context)) {
-                Icon icon = JavaScriptSupport.createBadgedIcon(HeapWalkerIcons.PROPERTIES);
+                Icon icon = JavaScriptSupport.createLanguageIcon(Icons.getIcon(HeapWalkerIcons.PROPERTIES));
                 return new TruffleSummaryView(VIEW_ID, icon, context, actions);
             }
 
@@ -171,12 +166,17 @@ class JavaScriptHeapSummary {
         
     }
     
-    private static class JavaScriptSummaryObjects extends TruffleSummaryView.ObjectsSection<JavaScriptObject> {
+    private static class JavaScriptSummaryObjects extends TruffleSummaryView.ObjectsSection<JavaScriptObject, JavaScriptType> {
         
         JavaScriptSummaryObjects(HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
             super(JavaScriptObjectsView.class, context, actions, actionProviders);
         }
 
+        
+        @Override
+        protected Icon createLanguageIcon(Icon icon) {
+            return JavaScriptSupport.createLanguageIcon(icon);
+        }
         
         @Override
         protected boolean isLanguageObject(Instance instance) {
@@ -189,25 +189,13 @@ class JavaScriptHeapSummary {
         }
         
         @Override
-        protected HeapViewerNode createTypeNode(TruffleType type, Heap heap) {
-            return new JavaScriptNodes.JavaScriptTypeNode((JavaScriptType)type);
-        }
-
-        @Override
-        protected ProfilerRenderer typeRenderer(Heap heap) {
-            Icon packageIcon = JavaScriptSupport.createBadgedIcon(LanguageIcons.PACKAGE);
-            return new TruffleTypeNode.Renderer(packageIcon);
+        protected HeapViewerNode createTypeNode(JavaScriptType type, Heap heap) {
+            return new JavaScriptNodes.JavaScriptTypeNode(type);
         }
         
         @Override
-        protected HeapViewerNode createObjectNode(TruffleObject object, Heap heap) {
-            return new JavaScriptNodes.JavaScriptObjectNode((JavaScriptObject)object, object.getType(heap));
-        }
-
-        @Override
-        protected ProfilerRenderer objectRenderer(Heap heap) {
-            Icon instanceIcon = JavaScriptSupport.createBadgedIcon(LanguageIcons.INSTANCE);
-            return new TruffleObjectNode.Renderer(heap, instanceIcon);
+        protected HeapViewerNode createObjectNode(JavaScriptObject object, Heap heap) {
+            return new JavaScriptNodes.JavaScriptObjectNode(object, object.getType(heap));
         }
 
     }

@@ -30,8 +30,10 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectsProvider;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
@@ -83,6 +85,7 @@ import org.netbeans.lib.profiler.ui.swing.renderer.HideableBarRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -358,7 +361,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
         "JavaObjectsSummary_NameColumn=Name",
         "JavaObjectsSummary_ValueColumn=Value"
     })
-    public static abstract class ObjectsSection<O extends TruffleObject> extends TruffleSummarySection {
+    public static abstract class ObjectsSection<O extends TruffleObject, T extends TruffleType<O>> extends TruffleSummarySection {
 
         private static final int PREVIEW_ITEMS = 5;
         
@@ -389,19 +392,17 @@ public class TruffleSummaryView extends HeapViewerFeature {
         }
         
         
+        protected abstract Icon createLanguageIcon(Icon icon);
+        
+        
         protected abstract boolean isLanguageObject(Instance instance);
         
         protected abstract O createObject(Instance instance);
         
         
-        protected abstract HeapViewerNode createObjectNode(TruffleObject object, Heap heap);
+        protected abstract HeapViewerNode createObjectNode(O object, Heap heap);
         
-        protected abstract HeapViewerNode createTypeNode(TruffleType type, Heap heap);
-        
-        
-        protected abstract ProfilerRenderer typeRenderer(Heap heap);
-        
-        protected abstract ProfilerRenderer objectRenderer(Heap heap);
+        protected abstract HeapViewerNode createTypeNode(T type, Heap heap);
 
 
         @Override
@@ -418,7 +419,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
         
         @Override
         protected final void computeData() {
-            TruffleLanguageHeapFragment fragment = (TruffleLanguageHeapFragment)context.getFragment();
+            TruffleLanguageHeapFragment<O, T> fragment = (TruffleLanguageHeapFragment)context.getFragment();
             Heap heap = fragment.getHeap();
             
             List<TruffleType> allTypes = new ArrayList(fragment.getTypes(null));
@@ -434,7 +435,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
             TruffleType[] typesByCountArr = allTypes.subList(0, items).toArray(new TruffleType[0]);
             Object[][] typesByCountData = new Object[typesByCountArr.length][2];
             for (int i = 0; i < typesByCountData.length; i++) {
-                typesByCountData[i][0] = createTypeNode(typesByCountArr[i], heap);
+                typesByCountData[i][0] = createTypeNode((T)typesByCountArr[i], heap);
                 typesByCountData[i][1] = typesByCountArr[i].getObjectsCount();
             }
             configureSnippet(typesByCount, typesByCountData);
@@ -450,7 +451,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
             TruffleType[] typesBySizeArr = allTypes.subList(0, items).toArray(new TruffleType[0]);
             Object[][] typesBySizeData = new Object[typesBySizeArr.length][2];
             for (int i = 0; i < typesBySizeData.length; i++) {
-                typesBySizeData[i][0] = createTypeNode(typesBySizeArr[i], heap);
+                typesBySizeData[i][0] = createTypeNode((T)typesBySizeArr[i], heap);
                 typesBySizeData[i][1] = typesBySizeArr[i].getAllObjectsSize();
             }
             configureSnippet(typesBySize, typesBySizeData);
@@ -465,9 +466,9 @@ public class TruffleSummaryView extends HeapViewerFeature {
                     return Long.compare(o1.getSize(), o2.getSize());
                 }
             });
-            Iterator<TruffleObject> allObjects = fragment.getObjectsIterator();
+            Iterator<O> allObjects = fragment.getObjectsIterator();
             while (allObjects.hasNext()) {
-                TruffleObject in = allObjects.next();
+                O in = allObjects.next();
                 if (pqBySize.size() < items || pqBySize.peek().getSize() < in.getSize()) {
                     if (pqBySize.size() == items) pqBySize.remove();
                     pqBySize.add(in);
@@ -478,7 +479,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
                 objectsBySizeArr[i] = pqBySize.poll();
             Object[][] instancesBySizeData = new Object[objectsBySizeArr.length][2];
             for (int i = 0; i < instancesBySizeData.length; i++) {
-                instancesBySizeData[i][0] = createObjectNode(objectsBySizeArr[i], heap);
+                instancesBySizeData[i][0] = createObjectNode((O)objectsBySizeArr[i], heap);
                 instancesBySizeData[i][1] = objectsBySizeArr[i].getSize();
             }
             configureSnippet(objectsBySize, instancesBySizeData);
@@ -491,8 +492,12 @@ public class TruffleSummaryView extends HeapViewerFeature {
 
         private void init() {
             Heap heap = context.getFragment().getHeap();
-            final ProfilerRenderer typeRenderer = typeRenderer(heap);
-            final ProfilerRenderer objectRenderer = objectRenderer(heap);
+            
+            Icon typeIcon = createLanguageIcon(Icons.getIcon(LanguageIcons.CLASS));
+            final ProfilerRenderer typeRenderer = new TruffleTypeNode.Renderer(typeIcon);
+            
+            Icon instanceIcon = createLanguageIcon(Icons.getIcon(LanguageIcons.INSTANCE));
+            final ProfilerRenderer objectRenderer = new TruffleObjectNode.Renderer(heap, instanceIcon);
 
             TreeTableViewColumn sizeColumn = new TreeTableViewColumn.OwnSize(heap);
             final HideableBarRenderer sizeRenderer = (HideableBarRenderer)sizeColumn.getRenderer();
@@ -706,7 +711,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
             TruffleObject[] dominatorsByRetainedSizeArr = dominators.subList(0, items).toArray(new TruffleObject[0]);
             Object[][] dominatorsByRetainedSizeData = new Object[dominatorsByRetainedSizeArr.length][2];
             for (int i = 0; i < dominatorsByRetainedSizeData.length; i++) {
-                dominatorsByRetainedSizeData[i][0] = createObjectNode(dominatorsByRetainedSizeArr[i], heap);
+                dominatorsByRetainedSizeData[i][0] = createObjectNode((O)dominatorsByRetainedSizeArr[i], heap);
                 dominatorsByRetainedSizeData[i][1] = dominatorsByRetainedSizeArr[i].getRetainedSize();
             }
             configureSnippet(dominatorsByRetainedSize, dominatorsByRetainedSizeData);

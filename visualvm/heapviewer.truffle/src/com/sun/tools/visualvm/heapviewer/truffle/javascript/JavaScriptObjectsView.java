@@ -50,8 +50,8 @@ class JavaScriptObjectsView extends TruffleObjectsView {
     
 
     @Override
-    protected Icon languageBrandedIcon(String iconKey) {
-        return JavaScriptSupport.createBadgedIcon(iconKey);
+    protected Icon createLanguageIcon(Icon icon) {
+        return JavaScriptSupport.createLanguageIcon(icon);
     }
     
     

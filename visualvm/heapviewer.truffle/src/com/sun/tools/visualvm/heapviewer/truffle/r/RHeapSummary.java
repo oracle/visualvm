@@ -27,11 +27,7 @@ package com.sun.tools.visualvm.heapviewer.truffle.r;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleFrame;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleSummaryView;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
@@ -45,8 +41,7 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
-import org.netbeans.modules.profiler.api.icons.LanguageIcons;
+import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.lookup.ServiceProvider;
@@ -65,7 +60,7 @@ class RHeapSummary {
 
         public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
             if (RHeapFragment.isRHeap(context)) {
-                Icon icon = RSupport.createBadgedIcon(HeapWalkerIcons.PROPERTIES);
+                Icon icon = RSupport.createLanguageIcon(Icons.getIcon(HeapWalkerIcons.PROPERTIES));
                 return new TruffleSummaryView(VIEW_ID, icon, context, actions);
             }
 
@@ -161,12 +156,17 @@ class RHeapSummary {
         
     }
     
-    private static class RSummaryObjects extends TruffleSummaryView.ObjectsSection<RObject> {
+    private static class RSummaryObjects extends TruffleSummaryView.ObjectsSection<RObject, RType> {
         
         RSummaryObjects(HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
             super(RObjectsView.class, context, actions, actionProviders);
         }
 
+        
+        @Override
+        protected Icon createLanguageIcon(Icon icon) {
+            return RSupport.createLanguageIcon(icon);
+        }
         
         @Override
         protected boolean isLanguageObject(Instance instance) {
@@ -179,25 +179,13 @@ class RHeapSummary {
         }
         
         @Override
-        protected HeapViewerNode createTypeNode(TruffleType type, Heap heap) {
-            return new RNodes.RTypeNode((RType)type);
-        }
-
-        @Override
-        protected ProfilerRenderer typeRenderer(Heap heap) {
-            Icon packageIcon = RSupport.createBadgedIcon(LanguageIcons.PACKAGE);
-            return new TruffleTypeNode.Renderer(packageIcon);
+        protected HeapViewerNode createTypeNode(RType type, Heap heap) {
+            return new RNodes.RTypeNode(type);
         }
         
         @Override
-        protected HeapViewerNode createObjectNode(TruffleObject object, Heap heap) {
-            return new RNodes.RObjectNode((RObject)object, object.getType(heap));
-        }
-
-        @Override
-        protected ProfilerRenderer objectRenderer(Heap heap) {
-            Icon instanceIcon = RSupport.createBadgedIcon(LanguageIcons.INSTANCE);
-            return new TruffleObjectNode.Renderer(heap, instanceIcon);
+        protected HeapViewerNode createObjectNode(RObject object, Heap heap) {
+            return new RNodes.RObjectNode(object, object.getType(heap));
         }
 
     }

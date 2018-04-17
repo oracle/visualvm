@@ -50,8 +50,8 @@ class RObjectsView extends TruffleObjectsView {
     
 
     @Override
-    protected Icon languageBrandedIcon(String iconKey) {
-        return RSupport.createBadgedIcon(iconKey);
+    protected Icon createLanguageIcon(Icon icon) {
+        return RSupport.createLanguageIcon(icon);
     }
     
     
