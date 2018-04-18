@@ -41,7 +41,6 @@ import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
-import static com.sun.tools.visualvm.heapviewer.utils.NodesComputer.integerIterator;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
 import org.openide.util.lookup.ServiceProvider;
 

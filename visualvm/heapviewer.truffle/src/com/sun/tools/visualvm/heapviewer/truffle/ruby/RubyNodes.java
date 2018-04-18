@@ -26,6 +26,9 @@ package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLocalObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectArrayItemNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectFieldNode;
 import java.util.List;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
@@ -39,10 +42,16 @@ import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectNode
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectReferenceNode;
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.LocalDynamicObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectReferenceNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleOpenNodeActionProvider;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
+import java.util.Map;
+import javax.swing.Icon;
 import org.netbeans.lib.profiler.heap.ArrayItemValue;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -165,6 +174,9 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
     private static RubyObjectNode createCopy(TruffleObjectNode.InstanceBased<RubyObject> node) {
         return new RubyObjectNode(node.getTruffleObject(), node.getTypeName());
     }
+    
+    
+    static interface RubyNode {}
     
     
     static class RubyObjectNode extends DynamicObjectNode<RubyObject> implements RubyNode {
@@ -325,6 +337,33 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
     }
     
     
-    static interface RubyNode {}
+    @ServiceProvider(service=HeapViewerRenderer.Provider.class)
+    public static class RubyNodesRendererProvider extends HeapViewerRenderer.Provider {
+
+        public boolean supportsView(HeapContext context, String viewID) {
+            return true;
+        }
+
+        public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
+            RubyLanguage language = RubyLanguage.instance();
+            Icon instanceIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.INSTANCE));
+            Icon packageIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.PACKAGE));
+
+            Heap heap = context.getFragment().getHeap();
+
+            renderers.put(RubyNodes.RubyObjectNode.class, new TruffleObjectNode.Renderer(heap, instanceIcon));
+
+            renderers.put(RubyNodes.RubyTypeNode.class, new TruffleTypeNode.Renderer(packageIcon));
+
+            renderers.put(RubyNodes.RubyObjectFieldNode.class, new TruffleObjectFieldNode.Renderer(heap, instanceIcon));
+
+            renderers.put(RubyNodes.RubyObjectArrayItemNode.class, new TruffleObjectArrayItemNode.Renderer(heap, instanceIcon));
+
+            renderers.put(RubyNodes.RubyObjectReferenceNode.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon));
+
+            renderers.put(RubyNodes.RubyLocalObjectNode.class, new TruffleLocalObjectNode.Renderer(heap, instanceIcon));
+        }
+
+    }
     
 }

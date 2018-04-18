@@ -22,75 +22,91 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.dynamicobject;
+package com.sun.tools.visualvm.heapviewer.truffle.javaext;
 
 import java.util.List;
 import java.util.Objects;
 import javax.swing.JComponent;
 import javax.swing.SortOrder;
-import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
+import org.netbeans.lib.profiler.heap.Instance;
+import org.netbeans.modules.profiler.api.icons.GeneralIcons;
 import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
+import com.sun.tools.visualvm.heapviewer.java.InstanceNode;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
 import com.sun.tools.visualvm.heapviewer.model.TextNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public abstract class DynamicObjectReferencesPlugin extends HeapViewPlugin {
+public class TruffleJavaViewPlugin extends HeapViewPlugin {
     
     private final Heap heap;
-    private DynamicObject selected;
+    private Instance selected;
     
     private final TreeTableView objectsView;
     
-
-    public DynamicObjectReferencesPlugin(String viewID, HeapContext context, HeapViewerActions actions) {
-        super("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE));
+    
+    public TruffleJavaViewPlugin(HeapContext context, HeapViewerActions actions) {
+        super("Java Object", "Java Object", Icons.getIcon(GeneralIcons.JAVA_PROCESS));
         
         heap = context.getFragment().getHeap();
         
-        objectsView = new TreeTableView(viewID, context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
+        objectsView = new TreeTableView("java_objects_truffleext", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-                if (selected != null) {
-                    List<FieldValue> references = selected.getReferences();                
-                    HeapViewerNode[] nodes = getNodes(references, root, heap, viewID, dataTypes, sortOrders, progress);
-                    return nodes == null || nodes.length == 0 ? new HeapViewerNode[] { new TextNode("<no references>") } : nodes;
-                }
+                InstanceNode instanceNode = selected == null ? null : new InstanceNode(selected);
+                HeapViewerNode result = instanceNode == null ? new TextNode("<no object selected>") : instanceNode;
+                return new HeapViewerNode[] { result };
+            }
+            protected void childrenChanged() {
+                HeapViewerNode[] children = getRoot().getChildren();
+                for (HeapViewerNode child : children) expandNode(child);
                 
-                return new HeapViewerNode[] { new TextNode("<no object selected>") };
+                if (children.length > 0) {
+                    children = children[0].getChildren();
+                    if (children.length > 0 && children[0] instanceof TextNode) expandNode(children[0]);
+                }
             }
         };
     }
 
+    
     protected JComponent createComponent() {
         return objectsView.getComponent();
     }
     
     
-    protected abstract HeapViewerNode[] getNodes(List<FieldValue> fields, HeapViewerNode parent, Heap heap, String viewID, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress);
-    
-    
     protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
-        TruffleObject selectedObject = node == null ? null : HeapViewerNode.getValue(node, TruffleObject.DATA_TYPE, heap);
-        DynamicObject selectedDynamicObject = selectedObject instanceof DynamicObject ? (DynamicObject)selectedObject : null;
-        if (Objects.equals(selected, selectedDynamicObject)) return;
+        Instance selectedInstance = node == null ? null : HeapViewerNode.getValue(node, DataType.INSTANCE, heap);
+        if (Objects.equals(selected, selectedInstance)) return;
 
-        selected = selectedDynamicObject;
+        selected = selectedInstance;
         
         objectsView.reloadView();
+    }
+    
+    
+    @ServiceProvider(service=HeapViewPlugin.Provider.class, position = 1000)
+    public static class Provider extends HeapViewPlugin.Provider {
+
+        public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
+            if (TruffleLanguageHeapFragment.isTruffleHeap(context))
+                return new TruffleJavaViewPlugin(context, actions);
+            return null;
+        }
+        
     }
     
 }

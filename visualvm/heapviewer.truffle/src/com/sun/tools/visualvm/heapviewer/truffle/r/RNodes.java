@@ -35,7 +35,12 @@ import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectReferenceNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleOpenNodeActionProvider;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
+import java.util.Map;
+import javax.swing.Icon;
 import org.netbeans.lib.profiler.heap.FieldValue;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -79,6 +84,9 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
     private static RObjectNode createCopy(TruffleObjectNode.InstanceBased<RObject> node) {
         return new RObjectNode(node.getTruffleObject(), node.getTypeName());
     }
+    
+    
+    static interface RNode {}
     
     
     static class RObjectNode extends TruffleObjectNode.InstanceBased<RObject> implements RNode {
@@ -235,6 +243,31 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
     }
     
     
-    static interface RNode {}
+    @ServiceProvider(service=HeapViewerRenderer.Provider.class)
+    public static class RNodesRendererProvider extends HeapViewerRenderer.Provider {
+
+        public boolean supportsView(HeapContext context, String viewID) {
+            return true;
+        }
+
+        public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
+            RLanguage language = RLanguage.instance();
+            Icon instanceIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.INSTANCE));
+            Icon packageIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.PACKAGE));
+
+            Heap heap = context.getFragment().getHeap();
+
+            renderers.put(RNodes.RObjectNode.class, new TruffleObjectNode.Renderer(heap, instanceIcon));
+
+            renderers.put(RNodes.RTypeNode.class, new TruffleTypeNode.Renderer(packageIcon));
+
+            renderers.put(RNodes.RObjectFieldNode.class, new TruffleObjectFieldNode.Renderer(heap, instanceIcon));
+
+            renderers.put(RNodes.RObjectReferenceNode.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon));
+
+            renderers.put(RNodes.RObjectAttributeReferenceNode.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon, "attribute in"));
+        }
+
+    }
     
 }

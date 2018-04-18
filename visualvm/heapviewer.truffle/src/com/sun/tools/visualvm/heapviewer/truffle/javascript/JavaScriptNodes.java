@@ -26,6 +26,9 @@ package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLocalObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectArrayItemNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectFieldNode;
 import java.util.List;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
@@ -39,11 +42,17 @@ import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectNode
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectReferenceNode;
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.LocalDynamicObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectReferenceNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleOpenNodeActionProvider;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
 import java.util.Date;
+import java.util.Map;
+import javax.swing.Icon;
 import org.netbeans.lib.profiler.heap.ArrayItemValue;
+import org.netbeans.modules.profiler.api.icons.Icons;
+import org.netbeans.modules.profiler.api.icons.LanguageIcons;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -147,6 +156,9 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
     private static JavaScriptObjectNode createCopy(TruffleObjectNode.InstanceBased<JavaScriptObject> node) {
         return new JavaScriptObjectNode(node.getTruffleObject(), node.getTypeName());
     }
+    
+    
+    static interface JavaScriptNode {}
     
     
     static class JavaScriptObjectNode extends DynamicObjectNode<JavaScriptObject> implements JavaScriptNode {
@@ -299,6 +311,33 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
     }
     
     
-    static interface JavaScriptNode {}
+    @ServiceProvider(service=HeapViewerRenderer.Provider.class)
+    public static class JavaScriptNodesRendererProvider extends HeapViewerRenderer.Provider {
+
+        public boolean supportsView(HeapContext context, String viewID) {
+            return true;
+        }
+
+        public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
+            JavaScriptLanguage language = JavaScriptLanguage.instance();
+            Icon instanceIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.INSTANCE));
+            Icon packageIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.PACKAGE));
+
+            Heap heap = context.getFragment().getHeap();
+
+            renderers.put(JavaScriptNodes.JavaScriptObjectNode.class, new TruffleObjectNode.Renderer(heap, instanceIcon));
+
+            renderers.put(JavaScriptNodes.JavaScriptTypeNode.class, new TruffleTypeNode.Renderer(packageIcon));
+
+            renderers.put(JavaScriptNodes.JavaScriptObjectFieldNode.class, new TruffleObjectFieldNode.Renderer(heap, instanceIcon));
+
+            renderers.put(JavaScriptNodes.JavaScriptObjectArrayItemNode.class, new TruffleObjectArrayItemNode.Renderer(heap, instanceIcon));
+
+            renderers.put(JavaScriptNodes.JavaScriptObjectReferenceNode.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon));
+
+            renderers.put(JavaScriptNodes.JavaScriptLocalObjectNode.class, new TruffleLocalObjectNode.Renderer(heap, instanceIcon));
+        }
+
+    }
     
 }

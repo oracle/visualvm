@@ -65,6 +65,11 @@ public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T ext
     }
     
     
+    public static boolean isTruffleHeap(HeapContext context) {
+        return context.getFragment() instanceof TruffleLanguageHeapFragment; // NOI18N
+    }
+    
+    
     public long getHeapSize(Progress progress) {
         checkInitialized(progress);
         return heapSize;
@@ -91,11 +96,6 @@ public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T ext
     
     public Iterator<O> getObjectsIterator() {
         return new ObjectsIterator(getInstancesIterator());
-    }
-    
-    
-    static boolean isTruffleHeap(HeapContext context) {
-        return context.getFragment() instanceof TruffleLanguageHeapFragment; // NOI18N
     }
     
     
