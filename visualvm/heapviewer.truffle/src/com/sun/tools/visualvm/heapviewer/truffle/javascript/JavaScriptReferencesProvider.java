@@ -37,12 +37,16 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@ServiceProvider(service=HeapViewerNode.Provider.class, position = 400)
+@ServiceProviders(value={
+    @ServiceProvider(service=HeapViewerNode.Provider.class, position = 300),
+    @ServiceProvider(service=JavaScriptReferencesProvider.class, position = 300)}
+)
 public class JavaScriptReferencesProvider extends TruffleObjectPropertyProvider.References<JavaScriptObject, JavaScriptType, JavaScriptHeapFragment, JavaScriptLanguage> {
     
     public JavaScriptReferencesProvider() {
@@ -77,9 +81,7 @@ public class JavaScriptReferencesProvider extends TruffleObjectPropertyProvider.
         public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
             if (!JavaScriptHeapFragment.isJavaScriptHeap(context)) return null;
             
-            Lookup.getDefault().lookupAll(HeapViewerNode.Provider.class);
             JavaScriptReferencesProvider fieldsProvider = Lookup.getDefault().lookup(JavaScriptReferencesProvider.class);
-            
             return new TruffleObjectPropertyPlugin("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE), "javascript_objects_references", context, actions, fieldsProvider);
         }
         

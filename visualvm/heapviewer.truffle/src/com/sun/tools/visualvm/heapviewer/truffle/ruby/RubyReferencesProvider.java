@@ -37,12 +37,16 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@ServiceProvider(service=HeapViewerNode.Provider.class, position = 400)
+@ServiceProviders(value={
+    @ServiceProvider(service=HeapViewerNode.Provider.class, position = 300),
+    @ServiceProvider(service=RubyReferencesProvider.class, position = 300)}
+)
 public class RubyReferencesProvider extends TruffleObjectPropertyProvider.References<RubyObject, RubyType, RubyHeapFragment, RubyLanguage> {
     
     public RubyReferencesProvider() {
@@ -77,9 +81,7 @@ public class RubyReferencesProvider extends TruffleObjectPropertyProvider.Refere
         public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
             if (!RubyHeapFragment.isRubyHeap(context)) return null;
             
-            Lookup.getDefault().lookupAll(HeapViewerNode.Provider.class);
             RubyReferencesProvider fieldsProvider = Lookup.getDefault().lookup(RubyReferencesProvider.class);
-            
             return new TruffleObjectPropertyPlugin("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE), "ruby_objects_references", context, actions, fieldsProvider);
         }
         

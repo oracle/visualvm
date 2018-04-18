@@ -39,12 +39,16 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 
 /**
  *
  * @author Tomas Hurka
  */
-@ServiceProvider(service = HeapViewerNode.Provider.class, position = 200)
+@ServiceProviders(value={
+    @ServiceProvider(service=HeapViewerNode.Provider.class, position = 250),
+    @ServiceProvider(service=PythonItemsProvider.class, position = 250)}
+)
 public class PythonItemsProvider extends TruffleObjectPropertyProvider.Fields<PythonObject, PythonType, PythonHeapFragment, PythonLanguage> {
     
     public PythonItemsProvider() {
@@ -89,15 +93,13 @@ public class PythonItemsProvider extends TruffleObjectPropertyProvider.Fields<Py
     }
     
     
-    @ServiceProvider(service=HeapViewPlugin.Provider.class, position = 200)
+    @ServiceProvider(service=HeapViewPlugin.Provider.class, position = 250)
     public static class PluginProvider extends HeapViewPlugin.Provider {
 
         public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
             if (!PythonHeapFragment.isPythonHeap(context)) return null;
             
-            Lookup.getDefault().lookupAll(HeapViewerNode.Provider.class);
             PythonItemsProvider fieldsProvider = Lookup.getDefault().lookup(PythonItemsProvider.class);
-            
             return new TruffleObjectPropertyPlugin("Items", "Items", Icons.getIcon(ProfilerIcons.NODE_FORWARD), "python_objects_items", context, actions, fieldsProvider);
         }
         

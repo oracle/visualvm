@@ -40,12 +40,16 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 
 /**
  *
  * @author Tomas Hurka
  */
-@ServiceProvider(service = HeapViewerNode.Provider.class, position = 300)
+@ServiceProviders(value={
+    @ServiceProvider(service=HeapViewerNode.Provider.class, position = 300),
+    @ServiceProvider(service=RReferencesProvider.class, position = 300)}
+)
 public class RReferencesProvider extends TruffleObjectPropertyProvider.References<RObject, RType, RHeapFragment, RLanguage> {
     
     public RReferencesProvider() {
@@ -94,9 +98,7 @@ public class RReferencesProvider extends TruffleObjectPropertyProvider.Reference
         public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
             if (!RHeapFragment.isRHeap(context)) return null;
             
-            Lookup.getDefault().lookupAll(HeapViewerNode.Provider.class);
             RReferencesProvider fieldsProvider = Lookup.getDefault().lookup(RReferencesProvider.class);
-            
             return new TruffleObjectPropertyPlugin("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE), "r_objects_references", context, actions, fieldsProvider);
         }
         

@@ -40,12 +40,16 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@ServiceProvider(service=HeapViewerNode.Provider.class, position = 210)
+@ServiceProviders(value={
+    @ServiceProvider(service=HeapViewerNode.Provider.class, position = 200),
+    @ServiceProvider(service=JavaScriptFieldsProvider.class, position = 200)}
+)
 public class JavaScriptFieldsProvider extends TruffleObjectPropertyProvider.Fields<JavaScriptObject, JavaScriptType, JavaScriptHeapFragment, JavaScriptLanguage> {
     
     public JavaScriptFieldsProvider() {
@@ -97,9 +101,7 @@ public class JavaScriptFieldsProvider extends TruffleObjectPropertyProvider.Fiel
         public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
             if (!JavaScriptHeapFragment.isJavaScriptHeap(context)) return null;
             
-            Lookup.getDefault().lookupAll(HeapViewerNode.Provider.class);
             JavaScriptFieldsProvider fieldsProvider = Lookup.getDefault().lookup(JavaScriptFieldsProvider.class);
-            
             return new TruffleObjectPropertyPlugin("Properties", "Properties", Icons.getIcon(ProfilerIcons.NODE_FORWARD), "javascript_objects_fields", context, actions, fieldsProvider);
         }
         

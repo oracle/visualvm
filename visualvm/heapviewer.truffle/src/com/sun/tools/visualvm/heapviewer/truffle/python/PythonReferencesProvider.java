@@ -40,12 +40,16 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 
 /**
  *
  * @author Tomas Hurka
  */
-@ServiceProvider(service = HeapViewerNode.Provider.class, position = 300)
+@ServiceProviders(value={
+    @ServiceProvider(service=HeapViewerNode.Provider.class, position = 300),
+    @ServiceProvider(service=PythonReferencesProvider.class, position = 300)}
+)
 public class PythonReferencesProvider extends TruffleObjectPropertyProvider.References<PythonObject, PythonType, PythonHeapFragment, PythonLanguage> {
     
     public PythonReferencesProvider() {
@@ -94,9 +98,7 @@ public class PythonReferencesProvider extends TruffleObjectPropertyProvider.Refe
         public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
             if (!PythonHeapFragment.isPythonHeap(context)) return null;
             
-            Lookup.getDefault().lookupAll(HeapViewerNode.Provider.class);
             PythonReferencesProvider fieldsProvider = Lookup.getDefault().lookup(PythonReferencesProvider.class);
-            
             return new TruffleObjectPropertyPlugin("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE), "python_objects_references", context, actions, fieldsProvider);
         }
         

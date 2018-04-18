@@ -31,12 +31,16 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@ServiceProvider(service=HeapFragment.Provider.class, position = 200)
+@ServiceProviders(value={
+    @ServiceProvider(service=HeapFragment.Provider.class, position = 500),
+    @ServiceProvider(service=RubyLanguage.class, position = 500)}
+)
 public class RubyLanguage extends TruffleLanguage<RubyObject, RubyType, RubyHeapFragment> {
     
     private static final String ID = "ruby"; // NOI18N

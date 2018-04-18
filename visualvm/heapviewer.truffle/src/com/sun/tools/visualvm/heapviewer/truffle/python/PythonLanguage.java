@@ -31,12 +31,16 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@ServiceProvider(service=HeapFragment.Provider.class, position = 400)
+@ServiceProviders(value={
+    @ServiceProvider(service=HeapFragment.Provider.class, position = 300),
+    @ServiceProvider(service=PythonLanguage.class, position = 300)}
+)
 public class PythonLanguage extends TruffleLanguage<PythonObject, PythonType, PythonHeapFragment> {
     
     private static final String ID = "python"; // NOI18N

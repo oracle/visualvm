@@ -41,12 +41,16 @@ import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@ServiceProvider(service = HeapViewerNode.Provider.class, position = 200)
+@ServiceProviders(value={
+    @ServiceProvider(service=HeapViewerNode.Provider.class, position = 250),
+    @ServiceProvider(service=RItemsProvider.class, position = 250)}
+)
 public class RItemsProvider extends TruffleObjectPropertyProvider.Fields<RObject, RType, RHeapFragment, RLanguage> {
     
     public RItemsProvider() {
@@ -103,15 +107,13 @@ public class RItemsProvider extends TruffleObjectPropertyProvider.Fields<RObject
     }
     
     
-    @ServiceProvider(service=HeapViewPlugin.Provider.class, position = 200)
+    @ServiceProvider(service=HeapViewPlugin.Provider.class, position = 250)
     public static class PluginProvider extends HeapViewPlugin.Provider {
 
         public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
             if (!RHeapFragment.isRHeap(context)) return null;
             
-            Lookup.getDefault().lookupAll(HeapViewerNode.Provider.class);
             RItemsProvider fieldsProvider = Lookup.getDefault().lookup(RItemsProvider.class);
-            
             return new TruffleObjectPropertyPlugin("Items", "Items", Icons.getIcon(ProfilerIcons.NODE_FORWARD), "r_objects_items", context, actions, fieldsProvider);
         }
         
