@@ -25,17 +25,10 @@
 package com.sun.tools.visualvm.heapviewer.truffle.python;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.HeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageSupport;
-import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.openide.util.Lookup;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -46,13 +39,17 @@ public class PythonHeapFragment extends TruffleLanguageHeapFragment<PythonObject
     private static final String PYTHON_HEAP_ID = "python_heap";
 
 
-    PythonHeapFragment(Instance langID, Heap heap) throws IOException {
-        super(PYTHON_HEAP_ID, "Python Heap", fragmentDescription(langID, heap), heap);
+    PythonHeapFragment(PythonLanguage language, Instance langID, Heap heap) {
+        super(PYTHON_HEAP_ID, "Python Heap", fragmentDescription(langID, heap), language, heap);
     }
     
     
     static PythonHeapFragment fromContext(HeapContext context) {
         return (PythonHeapFragment)context.getFragment();
+    }
+    
+    static boolean isPythonHeap(HeapContext context) {
+        return PYTHON_HEAP_ID.equals(context.getFragment().getID()); // NOI18N
     }
     
     
@@ -66,49 +63,14 @@ public class PythonHeapFragment extends TruffleLanguageHeapFragment<PythonObject
         return super.getObjectsIterator();
     }
     
-    
-    @Override
-    protected PythonObject createObject(Instance instance) {
-        return new PythonObject(instance);
-    }
 
-    @Override
-    protected PythonType createTruffleType(String name) {
-        return new PythonType(name);
-    }
-
-
-    static boolean isPythonHeap(HeapContext context) {
-        return PYTHON_HEAP_ID.equals(context.getFragment().getID()); // NOI18N
-    }
-
-    public static HeapContext getPythonContext(HeapContext context) {
-        if (isPythonHeap(context)) return context;
-
-        for (HeapContext otherContext : context.getOtherContexts())
-            if (isPythonHeap(otherContext)) return otherContext;
-
-        return null;
-    }
-
-
-    @ServiceProvider(service=HeapFragment.Provider.class, position = 400)
-    public static class Provider extends HeapFragment.Provider {
-
-        private static final String PYTHON_LANGINFO_ID_OLD = "python";  // NOI18N
-        private static final String PYTHON_LANGINFO_ID = "Python";  // NOI18N
-
-        public HeapFragment getFragment(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) throws IOException {
-            Instance langID = TruffleLanguageSupport.getLanguageInfo(heap, PYTHON_LANGINFO_ID);
-            JavaClass pythonMainClass = heap.getJavaClassByName(PythonObject.PYTHON_OBJECT_FQN);
-
-            if (langID == null) {
-                langID = TruffleLanguageSupport.getLanguageInfo(heap, PYTHON_LANGINFO_ID_OLD);
-            }
-
-            return langID != null && pythonMainClass != null ? new PythonHeapFragment(langID, heap) : null;
-        }
-
-    }
+//    public static HeapContext getPythonContext(HeapContext context) {
+//        if (isPythonHeap(context)) return context;
+//
+//        for (HeapContext otherContext : context.getOtherContexts())
+//            if (isPythonHeap(otherContext)) return otherContext;
+//
+//        return null;
+//    }
 
 }

@@ -24,6 +24,7 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
+import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import java.util.List;
 import org.netbeans.lib.profiler.heap.FieldValue;
@@ -38,17 +39,36 @@ import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectNode
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectReferenceNode;
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.LocalDynamicObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleOpenNodeActionProvider;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import org.netbeans.lib.profiler.heap.ArrayItemValue;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class RubyNodes {
+@ServiceProvider(service=HeapViewerNodeAction.Provider.class)
+public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyType, RubyHeapFragment, RubyLanguage> {
+    
+    @Override
+    public boolean supportsView(HeapContext context, String viewID) {
+        return RubyHeapFragment.isRubyHeap(context);
+    }
+    
+    @Override
+    protected boolean supportsNode(HeapViewerNode node) {
+        return node instanceof RubyNodes.RubyNode;
+    }
+
+    @Override
+    protected RubyLanguage getLanguage() {
+        return RubyLanguage.instance();
+    }
+    
     
     private static final int MAX_LOGVALUE_LENGTH = 160;
-    
     
     static String getLogicalValue(RubyObject object, String type, Heap heap) {
         String logicalValue = null;
@@ -178,6 +198,31 @@ class RubyNodes {
         
     }
     
+    static class RubyLocalObjectNode extends LocalDynamicObjectNode<RubyObject> implements RubyNode {
+        
+        RubyLocalObjectNode(RubyObject object, String type) {
+            super(object, type);
+        }
+        
+        
+        // TODO: uncomment once types caching is available for RubyHeapFragment
+//        @Override
+//        protected String computeName(Heap heap) {
+//            return RubyNodes.computeName(this, heap);
+//        }
+        
+        protected String computeLogicalValue(RubyObject object, String type, Heap heap) {
+            String logicalValue = RubyNodes.getLogicalValue(object, type, heap);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        }
+        
+        
+        public RubyObjectNode createCopy() {
+            return RubyNodes.createCopy(this);
+        }
+        
+    }
+    
     static class RubyTypeNode extends TruffleTypeNode<RubyObject, RubyType> implements RubyNode {
         
         RubyTypeNode(RubyType type) {
@@ -202,6 +247,7 @@ class RubyNodes {
         }
         
     }
+    
     
     static class RubyObjectFieldNode extends DynamicObjectFieldNode<RubyObject> implements RubyNode {
         
@@ -257,31 +303,6 @@ class RubyNodes {
         
         RubyObjectReferenceNode(RubyObject object, String type, FieldValue value) {
             super(object, type, value);
-        }
-        
-        
-        // TODO: uncomment once types caching is available for RubyHeapFragment
-//        @Override
-//        protected String computeName(Heap heap) {
-//            return RubyNodes.computeName(this, heap);
-//        }
-        
-        protected String computeLogicalValue(RubyObject object, String type, Heap heap) {
-            String logicalValue = RubyNodes.getLogicalValue(object, type, heap);
-            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
-        }
-        
-        
-        public RubyObjectNode createCopy() {
-            return RubyNodes.createCopy(this);
-        }
-        
-    }
-    
-    static class RubyLocalObjectNode extends LocalDynamicObjectNode<RubyObject> implements RubyNode {
-        
-        RubyLocalObjectNode(RubyObject object, String type) {
-            super(object, type);
         }
         
         

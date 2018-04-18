@@ -46,10 +46,10 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerNode.Provider.class, position = 210)
-public class JavaScriptFieldsProvider extends TruffleObjectPropertyProvider.Fields<JavaScriptObject> {
+public class JavaScriptFieldsProvider extends TruffleObjectPropertyProvider.Fields<JavaScriptObject, JavaScriptType, JavaScriptHeapFragment, JavaScriptLanguage> {
     
     public JavaScriptFieldsProvider() {
-        super("properties", JavaScriptObject.class, true);
+        super("properties", JavaScriptObject.class, JavaScriptLanguage.instance(), true);
     }
     
     
@@ -61,16 +61,6 @@ public class JavaScriptFieldsProvider extends TruffleObjectPropertyProvider.Fiel
     @Override
     public boolean supportsNode(HeapViewerNode node, Heap heap, String viewID) {
         return node instanceof JavaScriptNodes.JavaScriptNode && !(node instanceof JavaScriptNodes.JavaScriptObjectReferenceNode);
-    }
-
-    @Override
-    protected boolean isLanguageObject(Instance instance) {
-        return JavaScriptObject.isJavaScriptObject(instance);
-    }
-
-    @Override
-    protected JavaScriptObject createObject(Instance instance) {
-        return new JavaScriptObject(instance);
     }
 
     @Override

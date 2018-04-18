@@ -24,63 +24,24 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleLocalObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleThreadsProvider;
 import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleThreadsView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.modules.profiler.api.icons.Icons;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-public class RubyThreadsView extends TruffleThreadsView {
-    
-    private static final String FEATURE_ID = "ruby_threads"; // NOI18N
-    
-    
-    public RubyThreadsView(HeapContext context, HeapViewerActions actions) {
-        super(FEATURE_ID, RubySupport.createLanguageIcon(Icons.getIcon(ProfilerIcons.WINDOW_THREADS)), context, actions, new RubyThreadsProvider());
-    }
-    
-    
-    private static class RubyThreadsProvider extends TruffleThreadsProvider<RubyObject> {
-
-        @Override
-        protected boolean isLanguageObject(Instance instance) {
-            return RubyObject.isRubyObject(instance);
-        }
-
-        @Override
-        protected RubyObject createObject(Instance instance) {
-            return new RubyObject(instance);
-        }
-
-        @Override
-        protected TruffleObjectNode<RubyObject> createObjectNode(RubyObject object, String type) {
-            return new RubyNodes.RubyObjectNode(object, type);
-        }
-
-        @Override
-        protected TruffleLocalObjectNode<RubyObject> createLocalObjectNode(RubyObject object, String type) {
-            return new RubyNodes.RubyLocalObjectNode(object, type);
-        }
-        
-    }
-    
+class RubyThreadsView {
     
     @ServiceProvider(service=HeapViewerFeature.Provider.class)
     public static class Provider extends HeapViewerFeature.Provider {
 
         public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
             if (RubyHeapFragment.isRubyHeap(context))
-                return new RubyThreadsView(context, actions);
+                return new TruffleThreadsView(RubyLanguage.instance(), context, actions);
             
             return null;
         }

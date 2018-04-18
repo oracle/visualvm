@@ -25,14 +25,9 @@
 package com.sun.tools.visualvm.heapviewer.truffle.python;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectsProvider;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleObjectsView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
-import javax.swing.Icon;
-import org.netbeans.lib.profiler.heap.Instance;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -40,58 +35,14 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Tomas Hurka
  * @author Jiri Sedlacek
  */
-public class PythonObjectsView extends TruffleObjectsView {
+class PythonObjectsView {
     
-    private static final String FEATURE_ID = "python_objects"; // NOI18N
-    
-    
-    PythonObjectsView(HeapContext context, HeapViewerActions actions) {
-        super(FEATURE_ID, context, actions, new PythonObjectsProvider());
-    }
-    
-
-    @Override
-    protected Icon createLanguageIcon(Icon icon) {
-        return PythonSupport.createLanguageIcon(icon);
-    }
-    
-    
-    private static class PythonObjectsProvider extends TruffleObjectsProvider<PythonObject, PythonType> {
-    
-        @Override
-        protected TruffleObjectNode<PythonObject> createObjectNode(PythonObject object, String type) {
-            return new PythonNodes.PythonObjectNode(object, type);
-        }
-
-        @Override
-        protected TruffleTypeNode<PythonObject, PythonType> createTypeNode(PythonType type) {
-            return new PythonNodes.PythonTypeNode(type);
-        }
-
-        @Override
-        protected boolean isLanguageObject(Instance instance) {
-            return PythonObject.isPythonObject(instance);
-        }
-
-        @Override
-        protected PythonObject createObject(Instance instance) {
-            return new PythonObject(instance);
-        }
-
-        @Override
-        protected PythonType createTypeContainer(String name) {
-            return new PythonType(name);
-        }
-
-    }
-
-
     @ServiceProvider(service=HeapViewerFeature.Provider.class)
     public static class Provider extends HeapViewerFeature.Provider {
 
         public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
             if (PythonHeapFragment.isPythonHeap(context))
-                return new PythonObjectsView(context, actions);
+                return new TruffleObjectsView(PythonLanguage.instance(), context, actions);
 
             return null;
         }

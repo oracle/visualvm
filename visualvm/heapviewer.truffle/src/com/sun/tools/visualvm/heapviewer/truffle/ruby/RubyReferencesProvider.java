@@ -33,7 +33,6 @@ import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPropertyProvider;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import java.util.Collection;
-import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
@@ -44,10 +43,10 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerNode.Provider.class, position = 400)
-public class RubyReferencesProvider extends TruffleObjectPropertyProvider.References<RubyObject> {
+public class RubyReferencesProvider extends TruffleObjectPropertyProvider.References<RubyObject, RubyType, RubyHeapFragment, RubyLanguage> {
     
     public RubyReferencesProvider() {
-        super("references", RubyObject.class, false);
+        super("references", RubyObject.class, RubyLanguage.instance(), false);
     }
     
     
@@ -59,16 +58,6 @@ public class RubyReferencesProvider extends TruffleObjectPropertyProvider.Refere
     @Override
     public boolean supportsNode(HeapViewerNode node, Heap heap, String viewID) {
         return node instanceof RubyNodes.RubyNode && !(node instanceof RubyNodes.RubyObjectFieldNode || node instanceof RubyNodes.RubyObjectArrayItemNode);
-    }
-
-    @Override
-    protected boolean isLanguageObject(Instance instance) {
-        return RubyObject.isRubyObject(instance);
-    }
-
-    @Override
-    protected RubyObject createObject(Instance instance) {
-        return new RubyObject(instance);
     }
 
     @Override
@@ -91,7 +80,7 @@ public class RubyReferencesProvider extends TruffleObjectPropertyProvider.Refere
             Lookup.getDefault().lookupAll(HeapViewerNode.Provider.class);
             RubyReferencesProvider fieldsProvider = Lookup.getDefault().lookup(RubyReferencesProvider.class);
             
-            return new TruffleObjectPropertyPlugin("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE), "javascript_objects_references", context, actions, fieldsProvider);
+            return new TruffleObjectPropertyPlugin("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE), "ruby_objects_references", context, actions, fieldsProvider);
         }
         
     }

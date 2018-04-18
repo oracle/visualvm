@@ -127,22 +127,22 @@ public abstract class TruffleType<O extends TruffleObject> {
     }
     
     
-    public static abstract class TypesComputer<O extends TruffleObject, T extends TruffleType<O>> {
+    public static class TypesComputer<O extends TruffleObject, T extends TruffleType<O>> {
         
         private final boolean retainedAvailable;
+        
+        private final TruffleLanguage<O, T, ? extends TruffleLanguageHeapFragment<O, T>> language;
         
         private final Heap heap;
         private final Map<String, T> cache;
         
         
-        public TypesComputer(Heap heap) {
+        public TypesComputer(TruffleLanguage<O, T, ? extends TruffleLanguageHeapFragment<O, T>> language, Heap heap) {
+            this.language = language;
             this.heap = heap;
             cache = new HashMap();
             retainedAvailable = DataType.RETAINED_SIZE.valuesAvailable(heap);
         }
-        
-        
-        protected abstract T createTruffleType(String name);
         
         
         protected void addingObject(long size, long retained, String type) {}
@@ -158,7 +158,7 @@ public abstract class TruffleType<O extends TruffleObject> {
             
             T type = cache.get(typeName);
             if (type == null) {
-                type = createTruffleType(typeName);
+                type = language.createType(typeName);
                 cache.put(typeName, type);
             }
             

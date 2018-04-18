@@ -50,9 +50,11 @@ public class RNodesRendererProvider extends HeapViewerRenderer.Provider {
     }
 
     public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
+        RLanguage language = RLanguage.instance();
+        Icon instanceIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.INSTANCE));
+        Icon packageIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.PACKAGE));
+        
         Heap heap = context.getFragment().getHeap();
-        Icon instanceIcon = RSupport.createLanguageIcon(Icons.getIcon(LanguageIcons.INSTANCE));
-        Icon packageIcon = RSupport.createLanguageIcon(Icons.getIcon(LanguageIcons.PACKAGE));
         
         renderers.put(RNodes.RObjectNode.class, new TruffleObjectNode.Renderer(heap, instanceIcon));
         

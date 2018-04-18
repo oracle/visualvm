@@ -25,7 +25,6 @@
 package com.sun.tools.visualvm.heapviewer.truffle.python;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleSummaryView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
@@ -35,14 +34,11 @@ import com.sun.tools.visualvm.heapviewer.ui.SummaryView;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.Icon;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
-import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -51,17 +47,12 @@ import org.openide.util.lookup.ServiceProvider;
  */
 class PythonHeapSummary {
     
-    private static final String VIEW_ID = "python_summary"; // NOI18N
-    
-    
     @ServiceProvider(service=HeapViewerFeature.Provider.class)
     public static class PythonSummaryProvider extends HeapViewerFeature.Provider {
 
         public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
-            if (PythonHeapFragment.isPythonHeap(context)) {
-                Icon icon = PythonSupport.createLanguageIcon(Icons.getIcon(HeapWalkerIcons.PROPERTIES));
-                return new TruffleSummaryView(VIEW_ID, icon, context, actions);
-            }
+            if (PythonHeapFragment.isPythonHeap(context))
+                return new TruffleSummaryView(PythonLanguage.instance(), context, actions);
 
             return null;
         }
@@ -162,45 +153,11 @@ class PythonHeapSummary {
         @Override
         public HeapView createSummary(String viewID, HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
             if (PythonHeapFragment.isPythonHeap(context))
-                return new PythonSummaryObjects(context, actions, actionProviders);
+                return new TruffleSummaryView.ObjectsSection(PythonLanguage.instance(), context, actions, actionProviders);
             
             return null;
         }
         
-    }
-    
-    private static class PythonSummaryObjects extends TruffleSummaryView.ObjectsSection<PythonObject, PythonType> {
-        
-        PythonSummaryObjects(HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
-            super(PythonObjectsView.class, context, actions, actionProviders);
-        }
-
-        
-        @Override
-        protected Icon createLanguageIcon(Icon icon) {
-            return PythonSupport.createLanguageIcon(icon);
-        }
-        
-        @Override
-        protected boolean isLanguageObject(Instance instance) {
-            return PythonObject.isPythonObject(instance);
-        }
-        
-        @Override
-        protected PythonObject createObject(Instance instance) {
-            return new PythonObject(instance);
-        }
-        
-        @Override
-        protected HeapViewerNode createTypeNode(PythonType type, Heap heap) {
-            return new PythonNodes.PythonTypeNode(type);
-        }
-        
-        @Override
-        protected HeapViewerNode createObjectNode(PythonObject object, Heap heap) {
-            return new PythonNodes.PythonObjectNode(object, object.getType(heap));
-        }
-
     }
     
 }

@@ -24,29 +24,19 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
-import java.io.File;
-import java.io.IOException;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.HeapFragment;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageSupport;
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectLanguageHeapFragment;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.WeakHashMap;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.openide.util.Lookup;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -62,7 +52,6 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
     private static final String JS_NULL_CLASS_FQN = "com.oracle.truffle.js.runtime.objects.Null";     // NOI18N
     private static final String JS_UNDEFIED_CLASS_FQN = "com.oracle.truffle.js.runtime.objects.Undefined";     // NOI18N
     
-    private static final Map<Heap, Reference<JavaScriptHeapFragment>> FRAGMENTS = Collections.synchronizedMap(new WeakHashMap());
     
     final Instance nullInstance;
     final Instance undefinedInstance;
@@ -70,8 +59,8 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
     private final Map<Instance, String> typesCache;
     
     
-    JavaScriptHeapFragment(Instance langID, Heap heap) throws IOException {
-        super(JS_HEAP_ID, "JavaScript Heap", fragmentDescription(langID, heap) , heap);
+    JavaScriptHeapFragment(JavaScriptLanguage language, Instance langID, Heap heap) {
+        super(JS_HEAP_ID, "JavaScript Heap", fragmentDescription(langID, heap), language, heap);
         
         JavaClass nullClass = heap.getJavaClassByName(JS_NULL_CLASS_FQN);
         nullInstance = (Instance)nullClass.getValueOfStaticField("instance"); // NOI18N
@@ -80,8 +69,6 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
         undefinedInstance = (Instance)undefinedClass.getValueOfStaticField("instance"); // NOI18N
         
         typesCache = new HashMap();
-        
-        FRAGMENTS.put(heap, new WeakReference(this));
     }
     
     
@@ -89,9 +76,8 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
         return (JavaScriptHeapFragment)context.getFragment();
     }
     
-    static JavaScriptHeapFragment fromHeap(Heap heap) {
-        Reference<JavaScriptHeapFragment> fragmentRef = FRAGMENTS.get(heap);
-        return fragmentRef == null ? null : fragmentRef.get();
+    static boolean isJavaScriptHeap(HeapContext context) {
+        return JS_HEAP_ID.equals(context.getFragment().getID()); // NOI18N
     }
     
     
@@ -120,17 +106,6 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
     }
     
     
-    @Override
-    protected JavaScriptObject createObject(Instance instance) {
-        return new JavaScriptObject(instance);
-    }
-    
-    @Override
-    protected JavaScriptType createTruffleType(String name) {
-        return new JavaScriptType(name);
-    }    
-    
-
     String getObjectType(Instance instance) {
         return getObjectType(instance, null);
     }
@@ -190,35 +165,13 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
     }
     
     
-    static boolean isJavaScriptHeap(HeapContext context) {
-        return JS_HEAP_ID.equals(context.getFragment().getID()); // NOI18N
-    }
-    
-    public static HeapContext getJavaScriptContext(HeapContext context) {
-        if (isJavaScriptHeap(context)) return context;
-        
-        for (HeapContext otherContext : context.getOtherContexts())
-            if (isJavaScriptHeap(otherContext)) return otherContext;
-        
-        return null;
-    }
-    
-    
-    @ServiceProvider(service=HeapFragment.Provider.class, position = 200)
-    public static class Provider extends HeapFragment.Provider {
-        private static final String JS_LANGINFO_ID = "JS";  // NOI18N
-        private static final String JAVASCRIPT_LANGINFO_ID = "JavaScript";  // NOI18N
-
-        public HeapFragment getFragment(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) throws IOException {
-            Instance langID = TruffleLanguageSupport.getLanguageInfo(heap, JS_LANGINFO_ID);
-
-            if (langID == null) {
-                langID = TruffleLanguageSupport.getLanguageInfo(heap, JAVASCRIPT_LANGINFO_ID);
-            }
-            JavaClass JSMainClass = heap.getJavaClassByName(JS_LANG_ID);
-
-            return langID != null && JSMainClass != null ? new JavaScriptHeapFragment(langID, heap) : null;
-        }
-    }
+//    public static HeapContext getJavaScriptContext(HeapContext context) {
+//        if (isJavaScriptHeap(context)) return context;
+//        
+//        for (HeapContext otherContext : context.getOtherContexts())
+//            if (isJavaScriptHeap(otherContext)) return otherContext;
+//        
+//        return null;
+//    }
     
 }

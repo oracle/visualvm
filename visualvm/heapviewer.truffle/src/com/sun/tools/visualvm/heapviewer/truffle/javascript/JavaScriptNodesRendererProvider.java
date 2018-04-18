@@ -52,9 +52,11 @@ public class JavaScriptNodesRendererProvider extends HeapViewerRenderer.Provider
     }
 
     public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
+        JavaScriptLanguage language = JavaScriptLanguage.instance();
+        Icon instanceIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.INSTANCE));
+        Icon packageIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.PACKAGE));
+        
         Heap heap = context.getFragment().getHeap();
-        Icon instanceIcon = JavaScriptSupport.createLanguageIcon(Icons.getIcon(LanguageIcons.INSTANCE));
-        Icon packageIcon = JavaScriptSupport.createLanguageIcon(Icons.getIcon(LanguageIcons.PACKAGE));
         
         renderers.put(JavaScriptNodes.JavaScriptObjectNode.class, new TruffleObjectNode.Renderer(heap, instanceIcon));
         

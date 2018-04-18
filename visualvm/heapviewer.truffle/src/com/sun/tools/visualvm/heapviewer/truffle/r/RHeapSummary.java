@@ -25,7 +25,6 @@
 package com.sun.tools.visualvm.heapviewer.truffle.r;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleFrame;
 import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleSummaryView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
@@ -35,15 +34,12 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.SummaryView;
 import java.util.Collection;
 import java.util.List;
-import javax.swing.Icon;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
-import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -52,17 +48,12 @@ import org.openide.util.lookup.ServiceProvider;
  */
 class RHeapSummary {
     
-    private static final String VIEW_ID = "r_summary"; // NOI18N
-    
-    
     @ServiceProvider(service=HeapViewerFeature.Provider.class)
     public static class RSummaryProvider extends HeapViewerFeature.Provider {
 
         public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
-            if (RHeapFragment.isRHeap(context)) {
-                Icon icon = RSupport.createLanguageIcon(Icons.getIcon(HeapWalkerIcons.PROPERTIES));
-                return new TruffleSummaryView(VIEW_ID, icon, context, actions);
-            }
+            if (RHeapFragment.isRHeap(context))
+                return new TruffleSummaryView(RLanguage.instance(), context, actions);
 
             return null;
         }
@@ -149,45 +140,11 @@ class RHeapSummary {
         @Override
         public HeapView createSummary(String viewID, HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
             if (RHeapFragment.isRHeap(context))
-                return new RSummaryObjects(context, actions, actionProviders);
+                return new TruffleSummaryView.ObjectsSection(RLanguage.instance(), context, actions, actionProviders);
             
             return null;
         }
         
-    }
-    
-    private static class RSummaryObjects extends TruffleSummaryView.ObjectsSection<RObject, RType> {
-        
-        RSummaryObjects(HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
-            super(RObjectsView.class, context, actions, actionProviders);
-        }
-
-        
-        @Override
-        protected Icon createLanguageIcon(Icon icon) {
-            return RSupport.createLanguageIcon(icon);
-        }
-        
-        @Override
-        protected boolean isLanguageObject(Instance instance) {
-            return RObject.isRObject(instance);
-        }
-        
-        @Override
-        protected RObject createObject(Instance instance) {
-            return new RObject(instance);
-        }
-        
-        @Override
-        protected HeapViewerNode createTypeNode(RType type, Heap heap) {
-            return new RNodes.RTypeNode(type);
-        }
-        
-        @Override
-        protected HeapViewerNode createObjectNode(RObject object, Heap heap) {
-            return new RNodes.RObjectNode(object, object.getType(heap));
-        }
-
     }
     
 }

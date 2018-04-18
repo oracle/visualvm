@@ -24,63 +24,24 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleLocalObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleThreadsProvider;
 import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleThreadsView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.modules.profiler.api.icons.Icons;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class JavaScriptThreadsView extends TruffleThreadsView {
-    
-    private static final String FEATURE_ID = "javascript_threads"; // NOI18N
-    
-    
-    public JavaScriptThreadsView(HeapContext context, HeapViewerActions actions) {
-        super(FEATURE_ID, JavaScriptSupport.createLanguageIcon(Icons.getIcon(ProfilerIcons.WINDOW_THREADS)), context, actions, new JavaScriptThreadsProvider());
-    }
-    
-    
-    private static class JavaScriptThreadsProvider extends TruffleThreadsProvider<JavaScriptObject> {
-
-        @Override
-        protected boolean isLanguageObject(Instance instance) {
-            return JavaScriptObject.isJavaScriptObject(instance);
-        }
-
-        @Override
-        protected JavaScriptObject createObject(Instance instance) {
-            return new JavaScriptObject(instance);
-        }
-
-        @Override
-        protected TruffleObjectNode<JavaScriptObject> createObjectNode(JavaScriptObject object, String type) {
-            return new JavaScriptNodes.JavaScriptObjectNode(object, type);
-        }
-
-        @Override
-        protected TruffleLocalObjectNode<JavaScriptObject> createLocalObjectNode(JavaScriptObject object, String type) {
-            return new JavaScriptNodes.JavaScriptLocalObjectNode(object, type);
-        }
-        
-    }
-    
+class JavaScriptThreadsView {
     
     @ServiceProvider(service=HeapViewerFeature.Provider.class)
     public static class Provider extends HeapViewerFeature.Provider {
 
         public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
             if (JavaScriptHeapFragment.isJavaScriptHeap(context))
-                return new JavaScriptThreadsView(context, actions);
+                return new TruffleThreadsView(JavaScriptLanguage.instance(), context, actions);
             
             return null;
         }

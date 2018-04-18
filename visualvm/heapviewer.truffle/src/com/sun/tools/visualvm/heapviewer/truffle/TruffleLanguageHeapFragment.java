@@ -25,7 +25,6 @@
 package com.sun.tools.visualvm.heapviewer.truffle;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -48,6 +47,8 @@ import org.netbeans.api.progress.ProgressHandle;
 // T: TruffleType or its subclass aggregating O objects
 public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T extends TruffleType<O>> extends HeapFragment {
     
+    private final TruffleLanguage<O, T, ? extends TruffleLanguageHeapFragment<O, T>> language;
+    
     private long heapSize;
     private long objectsCount;
     private List<T> types;
@@ -58,8 +59,9 @@ public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T ext
     private final Object statisticsProgressLock = new Object();
     
     
-    protected TruffleLanguageHeapFragment(String ID, String name, String description, Heap heap) throws IOException {
+    protected TruffleLanguageHeapFragment(String ID, String name, String description, TruffleLanguage<O, T, ? extends TruffleLanguageHeapFragment<O, T>> language, Heap heap) {
         super(ID, name, description, heap);
+        this.language = language;
     }
     
     
@@ -90,11 +92,6 @@ public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T ext
     public Iterator<O> getObjectsIterator() {
         return new ObjectsIterator(getInstancesIterator());
     }
-    
-    
-    protected abstract O createObject(Instance instance);
-    
-    protected abstract T createTruffleType(String name);
     
     
     static boolean isTruffleHeap(HeapContext context) {
@@ -145,16 +142,12 @@ public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T ext
         }
         
         int verIdx = getDescription().indexOf(" (");
-        String language = verIdx != -1 ? getDescription().substring(0, verIdx) : "Language";
-        ProgressHandle pHandle = ProgressHandle.createHandle("Initializing " + language + " Model...");
+        String langName = verIdx != -1 ? getDescription().substring(0, verIdx) : "Language";
+        ProgressHandle pHandle = ProgressHandle.createHandle("Initializing " + langName + " Model...");
         pHandle.setInitialDelay(1000);
         pHandle.start();
         
-        TruffleType.TypesComputer<O, T> computer = new TruffleType.TypesComputer(heap) {
-            @Override
-            protected T createTruffleType(String name) {
-                return TruffleLanguageHeapFragment.this.createTruffleType(name);
-            }
+        TruffleType.TypesComputer<O, T> computer = new TruffleType.TypesComputer(language, heap) {
             @Override
             protected void addingObject(long size, long retained, String type) {
                 objectsCount++;
@@ -273,7 +266,7 @@ public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T ext
 
         @Override
         public O next() {
-            return createObject(instancesIter.next());
+            return language.createObject(instancesIter.next());
         }
     }
     

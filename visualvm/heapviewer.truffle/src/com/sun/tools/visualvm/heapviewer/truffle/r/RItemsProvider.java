@@ -47,10 +47,10 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service = HeapViewerNode.Provider.class, position = 200)
-public class RItemsProvider extends TruffleObjectPropertyProvider.Fields<RObject> {
+public class RItemsProvider extends TruffleObjectPropertyProvider.Fields<RObject, RType, RHeapFragment, RLanguage> {
     
     public RItemsProvider() {
-        super("items", RObject.class, true);
+        super("items", RObject.class, RLanguage.instance(), true);
     }
     
     
@@ -73,16 +73,6 @@ public class RItemsProvider extends TruffleObjectPropertyProvider.Fields<RObject
             }
         }
         return false;
-    }
-
-    @Override
-    protected boolean isLanguageObject(Instance instance) {
-        return RObject.isRObject(instance);
-    }
-
-    @Override
-    protected RObject createObject(Instance instance) {
-        return new RObject(instance);
     }
 
     @Override

@@ -46,10 +46,10 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Tomas Hurka
  */
 @ServiceProvider(service = HeapViewerNode.Provider.class, position = 300)
-public class PythonReferencesProvider extends TruffleObjectPropertyProvider.References<PythonObject> {
+public class PythonReferencesProvider extends TruffleObjectPropertyProvider.References<PythonObject, PythonType, PythonHeapFragment, PythonLanguage> {
     
     public PythonReferencesProvider() {
-        super("references", PythonObject.class, false);
+        super("references", PythonObject.class, PythonLanguage.instance(), false);
     }
     
     
@@ -64,16 +64,6 @@ public class PythonReferencesProvider extends TruffleObjectPropertyProvider.Refe
     }
 
     @Override
-    protected boolean isLanguageObject(Instance instance) {
-        return PythonObject.isPythonObject(instance);
-    }
-
-    @Override
-    protected PythonObject createObject(Instance instance) {
-        return new PythonObject(instance);
-    }
-
-    @Override
     protected HeapViewerNode createObjectReferenceNode(PythonObject object, String type, FieldValue field) {
         return new PythonNodes.PythonObjectReferenceNode(object, type, field);
     }
@@ -83,8 +73,8 @@ public class PythonReferencesProvider extends TruffleObjectPropertyProvider.Refe
         List<Value> references = (List<Value>)instance.getReferences();
         for (Value reference : references) {
             instance = reference.getDefiningInstance();
-            if (isLanguageObject(instance)) {
-                PythonObject robj = createObject(instance);
+            if (getLanguage().isLanguageObject(instance)) {
+                PythonObject robj = getLanguage().createObject(instance);
                 return new PythonNodes.PythonObjectAttributeReferenceNode(robj, robj.getType(heap), field);
             }
         }

@@ -46,10 +46,10 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerNode.Provider.class, position = 210)
-public class RubyFieldsProvider extends TruffleObjectPropertyProvider.Fields<RubyObject> {
+public class RubyFieldsProvider extends TruffleObjectPropertyProvider.Fields<RubyObject, RubyType, RubyHeapFragment, RubyLanguage> {
     
     public RubyFieldsProvider() {
-        super("variables", RubyObject.class, true);
+        super("variables", RubyObject.class, RubyLanguage.instance(), true);
     }
     
     
@@ -61,16 +61,6 @@ public class RubyFieldsProvider extends TruffleObjectPropertyProvider.Fields<Rub
     @Override
     public boolean supportsNode(HeapViewerNode node, Heap heap, String viewID) {
         return node instanceof RubyNodes.RubyNode && !(node instanceof RubyNodes.RubyObjectReferenceNode);
-    }
-
-    @Override
-    protected boolean isLanguageObject(Instance instance) {
-        return RubyObject.isRubyObject(instance);
-    }
-
-    @Override
-    protected RubyObject createObject(Instance instance) {
-        return new RubyObject(instance);
     }
 
     @Override

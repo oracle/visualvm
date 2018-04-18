@@ -27,6 +27,7 @@ package com.sun.tools.visualvm.heapviewer.truffle;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleObjectView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.NodeObjectsView;
@@ -43,19 +44,11 @@ import org.openide.util.NbBundle;
 @NbBundle.Messages({
     "TruffleOpenNodeActionProvider_OpenTypeTab=Open Type in New Tab"
 })
-public abstract class TruffleOpenNodeActionProvider<O extends TruffleObject, T extends TruffleType<O>> extends HeapViewerNodeAction.Provider {
+public abstract class TruffleOpenNodeActionProvider<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>> extends HeapViewerNodeAction.Provider {
     
     protected abstract boolean supportsNode(HeapViewerNode node);
     
-    protected abstract boolean isLanguageObject(Instance instance);
-    
-    protected abstract O createObject(Instance instance);
-    
-    protected abstract T getType(String name, HeapContext context);
-    
-    protected abstract TruffleTypeNode<O, T> createTypeNode(T type);
-    
-    protected abstract NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions);
+    protected abstract L getLanguage();
     
     
     public HeapViewerNodeAction[] getActions(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
@@ -64,17 +57,28 @@ public abstract class TruffleOpenNodeActionProvider<O extends TruffleObject, T e
         Heap heap = context.getFragment().getHeap();
         List<HeapViewerNodeAction> actionsList = new ArrayList(2);
         
+        final L language = getLanguage();
+        
         // Open in New Tab action
-        actionsList.add(new OpenNodeAction(node.createCopy(), context, actions));
+        actionsList.add(new NodeObjectsView.DefaultOpenAction(node.createCopy(), context, actions) {
+            public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
+                return TruffleOpenNodeActionProvider.this.createView(language, node, context, actions);
+            }
+        });
         
         // Open Type in New Tab action
         Instance instance = HeapViewerNode.getValue(node, DataType.INSTANCE, heap);
-        if (instance != null && isLanguageObject(instance)) {
-            O object = createObject(instance);
-            T type = getType(object.getType(heap), context);
+        if (instance != null && language.isLanguageObject(instance)) {
+            O object = language.createObject(instance);
+            F fragment = language.fragmentFromHeap(heap);
+            T type = fragment.getType(object.getType(heap), null);
             if (type != null) {
-                HeapViewerNode typeNode = createTypeNode(type);
-                actionsList.add(new OpenClassAction(typeNode, context, actions));
+                HeapViewerNode typeNode = language.createTypeNode(type, heap);
+                actionsList.add(new NodeObjectsView.OpenAction(Bundle.TruffleOpenNodeActionProvider_OpenTypeTab(), 1, typeNode, context, actions) {
+                    public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
+                        return TruffleOpenNodeActionProvider.this.createView(language, node, context, actions);
+                    }
+                });
             }
         }
         
@@ -82,28 +86,8 @@ public abstract class TruffleOpenNodeActionProvider<O extends TruffleObject, T e
     }
     
     
-    private class OpenNodeAction extends NodeObjectsView.DefaultOpenAction {
-        
-        private OpenNodeAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            super(node, context, actions);
-        }
-
-        public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            return TruffleOpenNodeActionProvider.this.createView(node, context, actions);
-        }
-        
-    }
-    
-    private class OpenClassAction extends NodeObjectsView.OpenAction {
-        
-        private OpenClassAction(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            super(Bundle.TruffleOpenNodeActionProvider_OpenTypeTab(), 1, node, context, actions);
-        }
-
-        public NodeObjectsView createView(HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
-            return TruffleOpenNodeActionProvider.this.createView(node, context, actions);
-        }
-        
+    private NodeObjectsView createView(L language, HeapViewerNode node, HeapContext context, HeapViewerActions actions) {
+        return new TruffleObjectView(language, node, context, actions);
     }
     
 }

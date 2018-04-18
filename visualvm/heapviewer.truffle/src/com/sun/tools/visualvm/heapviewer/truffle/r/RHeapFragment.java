@@ -24,18 +24,11 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.r;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.HeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageSupport;
-import org.openide.util.Lookup;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -46,8 +39,8 @@ class RHeapFragment extends TruffleLanguageHeapFragment<RObject, RType> {
     private static final String R_HEAP_ID = "r_heap";
     
     
-    RHeapFragment(Instance langID, Heap heap) throws IOException {
-        super(R_HEAP_ID, "R Heap", fragmentDescription(langID, heap), heap);
+    RHeapFragment(RLanguage language, Instance langID, Heap heap) {
+        super(R_HEAP_ID, "R Heap", fragmentDescription(langID, heap), language, heap);
     }
     
     
@@ -68,17 +61,6 @@ class RHeapFragment extends TruffleLanguageHeapFragment<RObject, RType> {
     }
     
     
-    @Override
-    protected RObject createObject(Instance instance) {
-        return new RObject(instance);
-    }
-
-    @Override
-    protected RType createTruffleType(String name) {
-        return new RType(name);
-    }
-    
-    
     static boolean isRHeap(HeapContext context) {
         return R_HEAP_ID.equals(context.getFragment().getID()); // NOI18N
     }
@@ -90,21 +72,6 @@ class RHeapFragment extends TruffleLanguageHeapFragment<RObject, RType> {
             if (isRHeap(otherContext)) return otherContext;
         
         return null;
-    }
-    
-    
-    @ServiceProvider(service=HeapFragment.Provider.class, position = 400)
-    public static class Provider extends HeapFragment.Provider {
-
-        private static final String R_LANGINFO_ID = "R";  // NOI18N
-
-        public HeapFragment getFragment(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) throws IOException {
-            Instance langID = TruffleLanguageSupport.getLanguageInfo(heap, R_LANGINFO_ID);
-            JavaClass rMainClass = heap.getJavaClassByName(RObject.R_OBJECT_FQN);
-
-            return langID != null && rMainClass != null ? new RHeapFragment(langID, heap) : null;
-        }
-
     }
     
 }

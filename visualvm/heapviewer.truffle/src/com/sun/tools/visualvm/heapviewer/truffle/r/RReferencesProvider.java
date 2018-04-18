@@ -46,10 +46,10 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Tomas Hurka
  */
 @ServiceProvider(service = HeapViewerNode.Provider.class, position = 300)
-public class RReferencesProvider extends TruffleObjectPropertyProvider.References<RObject> {
+public class RReferencesProvider extends TruffleObjectPropertyProvider.References<RObject, RType, RHeapFragment, RLanguage> {
     
     public RReferencesProvider() {
-        super("references", RObject.class, false);
+        super("references", RObject.class, RLanguage.instance(), false);
     }
     
     
@@ -64,16 +64,6 @@ public class RReferencesProvider extends TruffleObjectPropertyProvider.Reference
     }
 
     @Override
-    protected boolean isLanguageObject(Instance instance) {
-        return RObject.isRObject(instance);
-    }
-
-    @Override
-    protected RObject createObject(Instance instance) {
-        return new RObject(instance);
-    }
-
-    @Override
     protected HeapViewerNode createObjectReferenceNode(RObject object, String type, FieldValue field) {
         return new RNodes.RObjectReferenceNode(object, type, field);
     }
@@ -83,8 +73,8 @@ public class RReferencesProvider extends TruffleObjectPropertyProvider.Reference
         List<Value> references = (List<Value>)instance.getReferences();
         for (Value reference : references) {
             instance = reference.getDefiningInstance();
-            if (isLanguageObject(instance)) {
-                RObject robj = createObject(instance);
+            if (getLanguage().isLanguageObject(instance)) {
+                RObject robj = getLanguage().createObject(instance);
                 return new RNodes.RObjectAttributeReferenceNode(robj, robj.getType(heap), field);
             }
         }

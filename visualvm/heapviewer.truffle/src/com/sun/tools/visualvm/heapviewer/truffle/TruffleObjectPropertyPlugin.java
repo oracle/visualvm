@@ -46,9 +46,9 @@ import javax.swing.Icon;
  *
  * @author Jiri Sedlacek
  */
-public class TruffleObjectPropertyPlugin<O extends TruffleObject> extends HeapViewPlugin {
+public class TruffleObjectPropertyPlugin<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>> extends HeapViewPlugin {
     
-    private final TruffleObjectPropertyProvider<O, ? extends Object> provider;
+    private final TruffleObjectPropertyProvider<O, T, F, L, ? extends Object> provider;
     
     private final Heap heap;
     
@@ -57,7 +57,7 @@ public class TruffleObjectPropertyPlugin<O extends TruffleObject> extends HeapVi
     private final TreeTableView objectsView;
     
 
-    public TruffleObjectPropertyPlugin(String name, String description, Icon icon, String viewID, HeapContext context, HeapViewerActions actions, TruffleObjectPropertyProvider<O, ? extends Object> provider) {
+    public TruffleObjectPropertyPlugin(String name, String description, Icon icon, String viewID, HeapContext context, HeapViewerActions actions, TruffleObjectPropertyProvider<O, T, F, L, ? extends Object> provider) {
         super(name, description, icon);
         
         this.provider = provider;

@@ -24,20 +24,42 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.python;
 
+import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLocalObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectFieldNode;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectReferenceNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleOpenNodeActionProvider;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import org.netbeans.lib.profiler.heap.FieldValue;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class PythonNodes {
+@ServiceProvider(service=HeapViewerNodeAction.Provider.class)
+public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, PythonType, PythonHeapFragment, PythonLanguage> {
+    
+    @Override
+    public boolean supportsView(HeapContext context, String viewID) {
+        return PythonHeapFragment.isPythonHeap(context);
+    }
+    
+    @Override
+    protected boolean supportsNode(HeapViewerNode node) {
+        return node instanceof PythonNodes.PythonNode;
+    }
+
+    @Override
+    protected PythonLanguage getLanguage() {
+        return PythonLanguage.instance();
+    }
+    
     
     static String getLogicalValue(PythonObject object, String type, Heap heap) {
         return DetailsSupport.getDetailsString(object.getInstance(), heap);
@@ -88,6 +110,29 @@ class PythonNodes {
         
     }
     
+    static class PythonLocalObjectNode extends TruffleLocalObjectNode.InstanceBased<PythonObject> implements PythonNode {
+        
+        PythonLocalObjectNode(PythonObject object, String type) {
+            super(object, type);
+        }
+        
+        @Override
+        protected String computeName(Heap heap) {
+            return PythonNodes.computeName(this, heap);
+        }
+        
+        protected String computeLogicalValue(PythonObject object, String type, Heap heap) {
+            String logicalValue = PythonNodes.getLogicalValue(object, type, heap);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        }
+        
+        
+        public PythonObjectNode createCopy() {
+            return PythonNodes.createCopy(this);
+        }
+        
+    }
+    
     static class PythonTypeNode extends TruffleTypeNode<PythonObject, PythonType> implements PythonNode {
         
         PythonTypeNode(PythonType type) {
@@ -112,6 +157,7 @@ class PythonNodes {
         }
         
     }
+    
     
     static class PythonObjectFieldNode extends TruffleObjectFieldNode.InstanceBased<PythonObject> implements PythonNode {
         

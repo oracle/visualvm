@@ -63,15 +63,14 @@ import org.openide.util.NbBundle;
     "TruffleThreadsProvider_CannotResolveClassMsg=Cannot resolve class",
     "TruffleThreadsProvider_CannotResolveInstanceMsg=Cannot resolve instance"
 })
-public abstract class TruffleThreadsProvider<O extends TruffleObject> {
+public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>> {
     
-    protected abstract boolean isLanguageObject(Instance instance);
+    private final L language;
     
-    protected abstract O createObject(Instance instance);
     
-    protected abstract TruffleObjectNode<O> createObjectNode(O object, String type);
-    
-    protected abstract TruffleLocalObjectNode<O> createLocalObjectNode(O object, String type);
+    public TruffleThreadsProvider(L language) {
+        this.language = language;
+    }
     
     
     public HeapViewerNode[] getThreadsObjects(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
@@ -111,9 +110,9 @@ public abstract class TruffleThreadsProvider<O extends TruffleObject> {
                         Instance instance = ((ObjectFieldValue)fv).getInstance();
                         if (instance == null) continue;
                         
-                        if (isLanguageObject(instance)) {
-                            O object = createObject(instance);
-                            localObjects.add((HeapViewerNode)createLocalObjectNode(object, object.getType(heap)));
+                        if (language.isLanguageObject(instance)) {
+                            O object = language.createObject(instance);
+                            localObjects.add((HeapViewerNode)language.createLocalObjectNode(object, object.getType(heap)));
                         } else if (DynamicObject.isDynamicObject(instance)) {
                             DynamicObject dobj = new DynamicObject(instance);
                             localObjects.add(new LocalDynamicObjectNode(dobj, dobj.getType(heap)));
@@ -148,9 +147,9 @@ public abstract class TruffleThreadsProvider<O extends TruffleObject> {
             Heap heap = context.getFragment().getHeap();
             Instance instance = HeapUtils.instanceFromHtml(urls, heap);
             
-            if (isLanguageObject(instance)) {
-                O object = createObject(instance);
-                return (HeapViewerNode)createObjectNode(object, object.getType(heap));
+            if (language.isLanguageObject(instance)) {
+                O object = language.createObject(instance);
+                return (HeapViewerNode)language.createObjectNode(object, object.getType(heap));
             } else if (DynamicObject.isDynamicObject(instance)) {
                 DynamicObject dobj = new DynamicObject(instance);
                 return new LocalDynamicObjectNode(dobj, dobj.getType(heap));
@@ -226,9 +225,9 @@ public abstract class TruffleThreadsProvider<O extends TruffleObject> {
     }
     
     private String printInstance(Instance instance, Heap heap, JavaClass javaClassClass) {
-        if (isLanguageObject(instance)) {
-            O object = createObject(instance);
-            TruffleObjectNode<O> node = createObjectNode(object, object.getType(heap));
+        if (language.isLanguageObject(instance)) {
+            O object = language.createObject(instance);
+            TruffleObjectNode<O> node = language.createObjectNode(object, object.getType(heap));
             String instanceString = HeapUtils.instanceToHtml(instance, false, heap, javaClassClass);
             String type = node.getTypeName();
             instanceString = instanceString.replace(">" + instance.getJavaClass().getName() + "#", ">" + HeapUtils.htmlize(type) + "#");

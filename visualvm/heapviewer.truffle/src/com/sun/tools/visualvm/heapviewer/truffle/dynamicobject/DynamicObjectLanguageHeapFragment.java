@@ -24,10 +24,10 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.dynamicobject;
 
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguage;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
 import com.sun.tools.visualvm.heapviewer.utils.HeapUtils;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -45,8 +45,8 @@ public abstract class DynamicObjectLanguageHeapFragment<D extends DynamicObject,
     private final Map<Instance, JavaClass> languageIDsCache;
     
     
-    protected DynamicObjectLanguageHeapFragment(String ID, String name, String description, Heap heap) throws IOException {
-        super(ID, name, description, heap);
+    protected DynamicObjectLanguageHeapFragment(String ID, String name, String description, TruffleLanguage<D, T, ? extends TruffleLanguageHeapFragment<D, T>> language, Heap heap) {
+        super(ID, name, description, language, heap);
         
         languageIDsCache = new HashMap();
     }

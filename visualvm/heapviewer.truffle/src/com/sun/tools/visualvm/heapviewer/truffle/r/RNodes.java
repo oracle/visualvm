@@ -24,20 +24,42 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.r;
 
+import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLocalObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectFieldNode;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectReferenceNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleOpenNodeActionProvider;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import org.netbeans.lib.profiler.heap.FieldValue;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class RNodes {
+@ServiceProvider(service=HeapViewerNodeAction.Provider.class)
+public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapFragment, RLanguage> {
+    
+    @Override
+    public boolean supportsView(HeapContext context, String viewID) {
+        return RHeapFragment.isRHeap(context);
+    }
+    
+    @Override
+    protected boolean supportsNode(HeapViewerNode node) {
+        return node instanceof RNodes.RNode;
+    }
+
+    @Override
+    protected RLanguage getLanguage() {
+        return RLanguage.instance();
+    }
+    
     
     static String getLogicalValue(RObject object, String type, Heap heap) {
         return DetailsSupport.getDetailsString(object.getInstance(), heap);
@@ -93,6 +115,30 @@ class RNodes {
         
     }
     
+    static class RLocalObjectNode extends TruffleLocalObjectNode.InstanceBased<RObject> implements RNode {
+        
+        RLocalObjectNode(RObject object, String type) {
+            super(object, type);
+        }
+        
+        
+        @Override
+        protected String computeName(Heap heap) {
+            return RNodes.computeName(this, heap);
+        }
+        
+        protected String computeLogicalValue(RObject object, String type, Heap heap) {
+            String logicalValue = RNodes.getLogicalValue(object, type, heap);
+            return logicalValue != null ? logicalValue : super.computeLogicalValue(object, type, heap);
+        }
+        
+        
+        public RObjectNode createCopy() {
+            return RNodes.createCopy(this);
+        }
+        
+    }
+    
     static class RTypeNode extends TruffleTypeNode<RObject, RType> implements RNode {
         
         RTypeNode(RType type) {
@@ -117,6 +163,7 @@ class RNodes {
         }
         
     }
+    
     
     static class RObjectFieldNode extends TruffleObjectFieldNode.InstanceBased<RObject> implements RNode {
         

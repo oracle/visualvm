@@ -48,6 +48,7 @@ import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguage;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleThreadsProvider;
 import com.sun.tools.visualvm.heapviewer.ui.HTMLView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
@@ -62,8 +63,10 @@ import javax.swing.Icon;
  */
 public class TruffleThreadsView extends HeapViewerFeature {
     
-    private static final String VIEW_OBJECTS_ID = "_objects"; // NOI18N
-    private static final String VIEW_HTML_ID = "_html"; // NOI18N
+    private static final String FEATURE_ID = "threads"; // NOI18N
+    
+    private static final String OBJECTS_ID = "_objects"; // NOI18N
+    private static final String HTML_ID = "_html"; // NOI18N
     
     private JComponent component;
     private ProfilerToolbar toolbar;
@@ -73,12 +76,14 @@ public class TruffleThreadsView extends HeapViewerFeature {
     private final PluggableTreeTableView objectsView;
     
     
-    public TruffleThreadsView(String id, Icon icon, HeapContext context, HeapViewerActions actions, final TruffleThreadsProvider threadsProvider) {
-        super(id, "Threads", "Threads", icon, 300);
+    public TruffleThreadsView(TruffleLanguage language, HeapContext context, HeapViewerActions actions) {
+        super(idFromLanguage(language), "Threads", "Threads", iconFromLanguage(language), 300);
         
         Heap heap = context.getFragment().getHeap();
         
-        objectsView = new PluggableTreeTableView(id + VIEW_OBJECTS_ID, context, actions, TreeTableViewColumn.instances(heap, false)) {
+        final TruffleThreadsProvider threadsProvider = new TruffleThreadsProvider(language);
+        
+        objectsView = new PluggableTreeTableView(getID() + OBJECTS_ID, context, actions, TreeTableViewColumn.instances(heap, false)) {
             @Override
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 return threadsProvider.getThreadsObjects(root, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
@@ -90,7 +95,7 @@ public class TruffleThreadsView extends HeapViewerFeature {
         };
         objectsView.setViewName("Threads");
         
-        htmlView = new HTMLView(id + VIEW_HTML_ID, context, actions, "<br>&nbsp;&nbsp;computing threads...") {
+        htmlView = new HTMLView(getID() + HTML_ID, context, actions, "<br>&nbsp;&nbsp;computing threads...") {
             protected String computeData(HeapContext context, String viewID) {
                 return threadsProvider.getThreadsHTML(context);
             }
@@ -98,6 +103,15 @@ public class TruffleThreadsView extends HeapViewerFeature {
                 return threadsProvider.getNodeForURL(url, context);
             }
         };
+    }
+    
+    
+    static String idFromLanguage(TruffleLanguage language) {
+        return language.getID() + "_" + FEATURE_ID; // NOI18N
+    }
+    
+    static Icon iconFromLanguage(TruffleLanguage language) {
+        return language.createLanguageIcon(Icons.getIcon(ProfilerIcons.WINDOW_THREADS));
     }
     
 

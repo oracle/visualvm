@@ -24,24 +24,12 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
-import java.awt.BorderLayout;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import org.netbeans.lib.profiler.heap.FieldValue;
-import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
-import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPreviewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import org.openide.util.lookup.ServiceProvider;
@@ -50,99 +38,34 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
-class RubyPreviewPlugin extends HeapViewPlugin {
+class RubyPreviewPlugin extends TruffleObjectPreviewPlugin {
     
-    private final Heap heap;
-    
-     private InstanceScrollPane component;
-    
-
-    public RubyPreviewPlugin(HeapContext context) {
-        super("Preview", "Preview", Icons.getIcon(HeapWalkerIcons.PROPERTIES));
-        heap = context.getFragment().getHeap();
-    }
-
-    protected JComponent createComponent() {
-        if (component == null) init();
-        return component;
+    RubyPreviewPlugin(HeapContext context) {
+        super(context);
     }
     
     
-    protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
-        if (!(node instanceof RubyNodes.RubyObjectNode)) { component.showInstance(null); return; }
-        
+    @Override
+    protected boolean supportsNode(HeapViewerNode node) {
+        return node instanceof RubyNodes.RubyObjectNode;
+    }
+
+    @Override
+    protected Instance getPreviewInstance(HeapViewerNode node) {
         RubyNodes.RubyObjectNode dnode = (RubyNodes.RubyObjectNode)node;
         if ("Proc".equals(dnode.getTypeName())) {
             RubyObject rbobj = dnode.getTruffleObject();
             FieldValue dataField = rbobj.getFieldValue("sharedMethodInfo (hidden)");
             Instance data = dataField instanceof ObjectFieldValue ? ((ObjectFieldValue)dataField).getInstance() : null;
-            if (data == null) { component.showInstance(null); return; }
+            if (data == null) return null;
 
             Object sourceSection = ((Instance)data).getValueOfField("sourceSection");
-            if (!(sourceSection instanceof Instance)) { component.showInstance(null); return; }
+            if (!(sourceSection instanceof Instance)) return null;
 
-            component.showInstance((Instance)sourceSection);
+            return (Instance)sourceSection;
         } else {
-            component.showInstance(null);
+            return null;
         }
-    }
-    
-    
-    private void init() {
-        component = new InstanceScrollPane();
-    }
-    
-    
-    private class InstanceScrollPane extends JScrollPane {
-        
-        private Instance selectedInstance = null;
-        private boolean instancePending = false;
-        
-        
-        InstanceScrollPane() {
-            setBorder(BorderFactory.createEmptyBorder());
-            setViewportBorder(BorderFactory.createEmptyBorder());
-//            setViewportBorder(BorderFactory.createLineBorder(
-//                    UIManager.getLookAndFeel().getID().equals("Metal") ? // NOI18N
-//                    UIManager.getColor("Button.darkShadow") : // NOI18N
-//                    UIManager.getColor("Button.shadow"))); // NOI18N
-            
-            addHierarchyListener(new HierarchyListener() {
-                public void hierarchyChanged(HierarchyEvent e) {
-                    if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                        if (instancePending && isShowing()) showInstanceImpl();
-                    }
-                }
-            });
-            
-            showInstanceImpl();
-        }
-        
-        
-        void showInstance(Instance instance) {
-            if (selectedInstance == instance) return;
-            selectedInstance = instance;
-            if (isShowing()) showInstanceImpl();
-            else instancePending = true;
-        }
-        
-        private void showInstanceImpl() {
-            JComponent instanceView = selectedInstance == null ? null :
-                       DetailsSupport.getDetailsView(selectedInstance, heap);
-            if (instanceView == null) {
-                JLabel noDetails = new JLabel("<no details>", JLabel.CENTER);
-                noDetails.setEnabled(false);
-                
-                instanceView = new JPanel(new BorderLayout());
-                instanceView.setOpaque(true);
-                instanceView.setBackground(UIUtils.getProfilerResultsBackground());
-                instanceView.add(noDetails, BorderLayout.CENTER);
-            }
-            setViewportView(instanceView);
-            //doLayout();
-            instancePending = false;
-        }
-        
     }
     
     
@@ -150,7 +73,8 @@ class RubyPreviewPlugin extends HeapViewPlugin {
     public static class Provider extends HeapViewPlugin.Provider {
 
         public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
-            if (RubyHeapFragment.isRubyHeap(context)) return new RubyPreviewPlugin(context);
+            if (RubyHeapFragment.isRubyHeap(context))
+                return new RubyPreviewPlugin(context);
             return null;
         }
         

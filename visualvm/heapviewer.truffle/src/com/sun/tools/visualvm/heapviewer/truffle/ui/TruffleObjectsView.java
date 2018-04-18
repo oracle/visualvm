@@ -46,6 +46,7 @@ import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguage;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectsProvider;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
@@ -57,7 +58,9 @@ import org.netbeans.modules.profiler.api.icons.Icons;
  *
  * @author Jiri Sedlacek
  */
-public abstract class TruffleObjectsView extends HeapViewerFeature {
+public class TruffleObjectsView extends HeapViewerFeature {
+    
+    private static final String FEATURE_ID = "objects"; // NOI18N
     
     protected static enum Preset {
         ALL_OBJECTS ("All Objects"),
@@ -80,9 +83,10 @@ public abstract class TruffleObjectsView extends HeapViewerFeature {
         public Icon getIcon() { return aggregationIcon; }
     }
     
-    private final HeapContext context;
     
-    private Icon brandedIcon;
+    private final TruffleLanguage language;
+    
+    private final HeapContext context;
     
     private ProfilerToolbar toolbar;
     private final PluggableTreeTableView objectsView;
@@ -96,13 +100,16 @@ public abstract class TruffleObjectsView extends HeapViewerFeature {
     private JToggleButton tbObject;
     
     
-    public TruffleObjectsView(String id, HeapContext context, HeapViewerActions actions, final TruffleObjectsProvider objectsProvider) {
-        super(id, "Objects", "Objects", null, 200);
+    public TruffleObjectsView(TruffleLanguage language, HeapContext context, HeapViewerActions actions) {
+        super(idFromLanguage(language), "Objects", "Objects", iconFromLanguage(language), 200);
         
+        this.language = language;
         this.context = context;
         Heap heap = context.getFragment().getHeap();
         
-        objectsView = new PluggableTreeTableView(id, context, actions, TreeTableViewColumn.classes(heap, true)) {
+        final TruffleObjectsProvider objectsProvider = new TruffleObjectsProvider(language);
+        
+        objectsView = new PluggableTreeTableView(getID(), context, actions, TreeTableViewColumn.classes(heap, true)) {
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 switch (getPreset()) {
                     case ALL_OBJECTS:
@@ -141,13 +148,14 @@ public abstract class TruffleObjectsView extends HeapViewerFeature {
     }
     
     
-    protected abstract Icon createLanguageIcon(Icon icon);
-    
-
-    public Icon getIcon() {
-        if (brandedIcon == null) brandedIcon = createLanguageIcon(Icons.getIcon(LanguageIcons.CLASS));
-        return brandedIcon;
+    static String idFromLanguage(TruffleLanguage language) {
+        return language.getID() + "_" + FEATURE_ID; // NOI18N
     }
+    
+    static Icon iconFromLanguage(TruffleLanguage language) {
+        return language.createLanguageIcon(Icons.getIcon(LanguageIcons.CLASS));
+    }
+    
     
     public JComponent getComponent() {
         if (toolbar == null) init();
@@ -343,7 +351,7 @@ public abstract class TruffleObjectsView extends HeapViewerFeature {
         class AggregationButton extends JToggleButton {
             private final Aggregation aggregation;
             AggregationButton(Aggregation aggregation, boolean selected) {
-                super(createLanguageIcon(aggregation.getIcon()), selected);
+                super(language.createLanguageIcon(aggregation.getIcon()), selected);
                 this.aggregation = aggregation;
                 setToolTipText(aggregation.toString());
                 aggregationBG.add(this);

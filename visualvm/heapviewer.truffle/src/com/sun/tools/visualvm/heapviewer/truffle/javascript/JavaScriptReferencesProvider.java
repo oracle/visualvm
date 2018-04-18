@@ -33,7 +33,6 @@ import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPropertyProvider;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import java.util.Collection;
-import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
@@ -44,10 +43,10 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerNode.Provider.class, position = 400)
-public class JavaScriptReferencesProvider extends TruffleObjectPropertyProvider.References<JavaScriptObject> {
+public class JavaScriptReferencesProvider extends TruffleObjectPropertyProvider.References<JavaScriptObject, JavaScriptType, JavaScriptHeapFragment, JavaScriptLanguage> {
     
     public JavaScriptReferencesProvider() {
-        super("references", JavaScriptObject.class, false);
+        super("references", JavaScriptObject.class, JavaScriptLanguage.instance(), false);
     }
     
     
@@ -59,16 +58,6 @@ public class JavaScriptReferencesProvider extends TruffleObjectPropertyProvider.
     @Override
     public boolean supportsNode(HeapViewerNode node, Heap heap, String viewID) {
         return node instanceof JavaScriptNodes.JavaScriptNode && !(node instanceof JavaScriptNodes.JavaScriptObjectFieldNode || node instanceof JavaScriptNodes.JavaScriptObjectArrayItemNode);
-    }
-
-    @Override
-    protected boolean isLanguageObject(Instance instance) {
-        return JavaScriptObject.isJavaScriptObject(instance);
-    }
-
-    @Override
-    protected JavaScriptObject createObject(Instance instance) {
-        return new JavaScriptObject(instance);
     }
 
     @Override

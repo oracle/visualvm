@@ -50,9 +50,11 @@ public class PythonNodesRendererProvider extends HeapViewerRenderer.Provider {
     }
 
     public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
+        PythonLanguage language = PythonLanguage.instance();
+        Icon instanceIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.INSTANCE));
+        Icon packageIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.PACKAGE));
+        
         Heap heap = context.getFragment().getHeap();
-        Icon instanceIcon = PythonSupport.createLanguageIcon(Icons.getIcon(LanguageIcons.INSTANCE));
-        Icon packageIcon = PythonSupport.createLanguageIcon(Icons.getIcon(LanguageIcons.PACKAGE));
 
         renderers.put(PythonNodes.PythonObjectNode.class, new TruffleObjectNode.Renderer(heap, instanceIcon));
         

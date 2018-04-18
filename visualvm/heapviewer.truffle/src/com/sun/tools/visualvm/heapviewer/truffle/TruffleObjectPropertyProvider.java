@@ -53,9 +53,11 @@ import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
  *
  * @author Jiri Sedlacek
  */
-public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, I> extends HeapViewerNode.Provider {
+public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>, I> extends HeapViewerNode.Provider {
     
     private final Class<O> objectClass;
+    
+    private final L language;
     
     private final String propertyName;
     private final int maxPropertyItems;
@@ -64,7 +66,8 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, I> 
     private final boolean filtersProperties;
     
     
-    protected TruffleObjectPropertyProvider(String propertyName, Class<O> objectClass, boolean displaysProgress, boolean filtersProperties, int maxPropertyItems) {
+    protected TruffleObjectPropertyProvider(String propertyName, Class<O> objectClass, L language, boolean displaysProgress, boolean filtersProperties, int maxPropertyItems) {
+        this.language = language;
         this.objectClass = objectClass;
         this.propertyName = propertyName;
         this.maxPropertyItems = maxPropertyItems;
@@ -76,6 +79,11 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, I> 
     @Override
     public String getName() {
         return propertyName;
+    }
+    
+    
+    protected final L getLanguage() {
+        return language;
     }
 
     
@@ -158,16 +166,16 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, I> 
     }
     
     
-    public static abstract class Fields<O extends TruffleObject> extends TruffleObjectPropertyProvider<O, FieldValue> {
+    public static abstract class Fields<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>> extends TruffleObjectPropertyProvider<O, T, F, L, FieldValue> {
         
-        protected Fields(String propertyName, Class<O> objectClass, boolean filtersProperties) {
-            super(propertyName, objectClass, false, filtersProperties, UIThresholds.MAX_INSTANCE_FIELDS);
+        protected Fields(String propertyName, Class<O> objectClass, L language, boolean filtersProperties) {
+            super(propertyName, objectClass, language, false, filtersProperties, UIThresholds.MAX_INSTANCE_FIELDS);
         }
         
         
-        protected abstract boolean isLanguageObject(Instance instance);
-        
-        protected abstract O createObject(Instance instance);
+//        protected abstract boolean isLanguageObject(Instance instance);
+//        
+//        protected abstract O createObject(Instance instance);
     
         protected abstract HeapViewerNode createObjectFieldNode(O object, String type, FieldValue field);
         
@@ -186,7 +194,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, I> 
             if (instance instanceof PrimitiveArrayInstance) return true;
             
             // display language objects
-            if (isLanguageObject(instance)) return true;
+            if (getLanguage().isLanguageObject(instance)) return true;
 
             // display DynamicObject fields
             if (DynamicObject.isDynamicObject(instance)) return true;
@@ -201,8 +209,8 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, I> 
         protected final HeapViewerNode createNode(FieldValue field, Heap heap) {
             if (field instanceof ObjectFieldValue) {
                 Instance instance = ((ObjectFieldValue)field).getInstance();
-                if (isLanguageObject(instance)) {
-                    O object = createObject(instance);
+                if (getLanguage().isLanguageObject(instance)) {
+                    O object = getLanguage().createObject(instance);
                     return createObjectFieldNode(object, object.getType(heap), field);
                 } else {
                     return createForeignFieldNode(instance, field, heap);
@@ -224,17 +232,13 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, I> 
     }
     
     
-    public static abstract class References<O extends TruffleObject> extends TruffleObjectPropertyProvider<O, FieldValue> {
+    public static abstract class References<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>> extends TruffleObjectPropertyProvider<O, T, F, L, FieldValue> {
         
-        protected References(String propertyName, Class<O> objectClass, boolean filtersProperties) {
-            super(propertyName, objectClass, true, filtersProperties, UIThresholds.MAX_INSTANCE_REFERENCES);
+        protected References(String propertyName, Class<O> objectClass, L language, boolean filtersProperties) {
+            super(propertyName, objectClass, language, true, filtersProperties, UIThresholds.MAX_INSTANCE_REFERENCES);
         }
         
         
-        protected abstract boolean isLanguageObject(Instance instance);
-        
-        protected abstract O createObject(Instance instance);
-    
         protected abstract HeapViewerNode createObjectReferenceNode(O object, String type, FieldValue field);
         
         
@@ -246,7 +250,7 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, I> 
             if (instance == null) return false;
             
             // display language references
-            if (isLanguageObject(instance)) return true;
+            if (getLanguage().isLanguageObject(instance)) return true;
 
             // display DynamicObject references
             if (DynamicObject.isDynamicObject(instance)) return true;
@@ -260,8 +264,8 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, I> 
         @Override
         protected final HeapViewerNode createNode(FieldValue field, Heap heap) {
             Instance instance = field.getDefiningInstance();
-            if (isLanguageObject(instance)) {
-                O object = createObject(instance);
+            if (getLanguage().isLanguageObject(instance)) {
+                O object = getLanguage().createObject(instance);
                 return createObjectReferenceNode(object, object.getType(heap), field);
             } else {
                 return createForeignReferenceNode(instance, field, heap);

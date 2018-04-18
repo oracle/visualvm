@@ -45,7 +45,7 @@ class JavaScriptObject extends DynamicObject {
     
     @Override
     protected String computeType(Heap heap) {
-        return JavaScriptHeapFragment.fromHeap(heap).getObjectType(getInstance(), getShape());
+        return JavaScriptLanguage.instance().fragmentFromHeap(heap).getObjectType(getInstance(), getShape());
     }
     
     String computeDisplayType(Heap heap) {

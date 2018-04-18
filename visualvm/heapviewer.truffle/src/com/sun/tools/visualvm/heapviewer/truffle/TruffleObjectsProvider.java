@@ -47,23 +47,17 @@ import org.netbeans.lib.profiler.heap.Instance;
  *
  * @author Jiri Sedlacek
  */
-public abstract class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleType<O>> {
+public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>> {
     
-//    protected abstract TruffleLanguageHeapFragment getHeapFragment(HeapContext context);
+    private final L language;
     
-    protected abstract TruffleObjectNode<O> createObjectNode(O object, String type);
     
-    protected abstract TruffleTypeNode<O, T> createTypeNode(T type);
-    
-    protected abstract boolean isLanguageObject(Instance instance);
-    
-    protected abstract O createObject(Instance instance);
-    
-    protected abstract T createTypeContainer(String name);
+    public TruffleObjectsProvider(L language) {
+        this.language = language;
+    }
     
     
     public HeapViewerNode[] getAllObjects(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
-//        final TruffleLanguageHeapFragment fragment = getHeapFragment(context);
         final TruffleLanguageHeapFragment fragment = (TruffleLanguageHeapFragment)context.getFragment();
         final Heap heap = fragment.getHeap();
         
@@ -74,7 +68,7 @@ public abstract class TruffleObjectsProvider<O extends TruffleObject, T extends 
                     return !DataType.COUNT.equals(dataType);
                 }
                 protected HeapViewerNode createNode(O object) {
-                    return (HeapViewerNode)createObjectNode(object, object.getType(heap));
+                    return (HeapViewerNode)language.createObjectNode(object, object.getType(heap));
                 }
                 protected ProgressIterator<O> objectsIterator(int index, Progress progress) {
                     Iterator<O> objects = fragment.getObjectsIterator();
@@ -98,7 +92,7 @@ public abstract class TruffleObjectsProvider<O extends TruffleObject, T extends 
                     return true;
                 }
                 protected HeapViewerNode createNode(T type) {
-                    return createTypeNode(type);
+                    return language.createTypeNode(type, heap);
                 }
                 protected ProgressIterator<T> objectsIterator(int index, Progress progress) {
                     List<T> types = fragment.getTypes(progress);
@@ -137,7 +131,7 @@ public abstract class TruffleObjectsProvider<O extends TruffleObject, T extends 
         while (searchInstancesIt.hasNext()) {
             Instance instance = searchInstancesIt.next();
             progress.step();
-            if (!isLanguageObject(instance)) searchInstancesIt.remove();
+            if (!language.isLanguageObject(instance)) searchInstancesIt.remove();
         }
         
         progress.finish();
@@ -151,8 +145,8 @@ public abstract class TruffleObjectsProvider<O extends TruffleObject, T extends 
                     return !DataType.COUNT.equals(dataType);
                 }
                 protected HeapViewerNode createNode(Instance instance) {
-                    O object = createObject(instance);
-                    return (HeapViewerNode)createObjectNode(object, object.getType(heap));
+                    O object = language.createObject(instance);
+                    return (HeapViewerNode)language.createObjectNode(object, object.getType(heap));
                 }
                 protected ProgressIterator<Instance> objectsIterator(int index, Progress progress) {
                     Iterator<Instance> dominatorsIt = dominators.listIterator(index);
@@ -171,18 +165,13 @@ public abstract class TruffleObjectsProvider<O extends TruffleObject, T extends 
             
             nodes = computer.computeNodes(parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
         } else {
-            TruffleType.TypesComputer<O, T> tcomputer = new TruffleType.TypesComputer(heap) {
-                @Override
-                protected T createTruffleType(String name) {
-                    return createTypeContainer(name);
-                }
-            };
-            
             progress.setupKnownSteps(dominators.size());
+            
+            TruffleType.TypesComputer<O, T> tcomputer = new TruffleType.TypesComputer(language, heap);
             
             for (Instance dominator : dominators) {
                 progress.step();
-                tcomputer.addObject(createObject(dominator));
+                tcomputer.addObject(language.createObject(dominator));
             }
             
             final List<T> types = tcomputer.getTypes();
@@ -194,7 +183,7 @@ public abstract class TruffleObjectsProvider<O extends TruffleObject, T extends 
                     return true;
                 }
                 protected HeapViewerNode createNode(T type) {
-                    return createTypeNode(type);
+                    return language.createTypeNode(type, heap);
                 }
                 protected ProgressIterator<T> objectsIterator(int index, Progress progress) {
                     Iterator<T> typesIt = types.listIterator(index);
@@ -226,7 +215,7 @@ public abstract class TruffleObjectsProvider<O extends TruffleObject, T extends 
         Iterator<GCRoot> gcrootsI = gcroots.iterator();
         while (gcrootsI.hasNext()) {
             Instance instance = gcrootsI.next().getInstance();
-            if (!isLanguageObject(instance)) gcrootsI.remove();
+            if (!language.isLanguageObject(instance)) gcrootsI.remove();
             progress.step();
         }
         
@@ -239,8 +228,8 @@ public abstract class TruffleObjectsProvider<O extends TruffleObject, T extends 
                     return !DataType.COUNT.equals(dataType);
                 }
                 protected HeapViewerNode createNode(GCRoot gcroot) {
-                    O object = createObject(gcroot.getInstance());
-                    return (HeapViewerNode)createObjectNode(object, object.getType(heap));
+                    O object = language.createObject(gcroot.getInstance());
+                    return (HeapViewerNode)language.createObjectNode(object, object.getType(heap));
                 }
                 protected ProgressIterator<GCRoot> objectsIterator(int index, Progress progress) {
                     Iterator<GCRoot> gcRootsIt = gcroots.listIterator(index);
@@ -259,17 +248,12 @@ public abstract class TruffleObjectsProvider<O extends TruffleObject, T extends 
 
             nodes = computer.computeNodes(parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
         } else {
-            TruffleType.TypesComputer<O, T> tcomputer = new TruffleType.TypesComputer(heap) {
-                @Override
-                protected T createTruffleType(String name) {
-                    return createTypeContainer(name);
-                }
-            };
-            
             progress.setupUnknownSteps();
             
+            TruffleType.TypesComputer<O, T> tcomputer = new TruffleType.TypesComputer(language, heap);
+            
             for (GCRoot gcroot : gcroots) {
-                tcomputer.addObject(createObject(gcroot.getInstance()));
+                tcomputer.addObject(language.createObject(gcroot.getInstance()));
                 progress.step();
             }
             final List<T> types = tcomputer.getTypes();
@@ -281,7 +265,7 @@ public abstract class TruffleObjectsProvider<O extends TruffleObject, T extends 
                     return true;
                 }
                 protected HeapViewerNode createNode(T type) {
-                    return createTypeNode(type);
+                    return language.createTypeNode(type, heap);
                 }
                 protected ProgressIterator<T> objectsIterator(int index, Progress progress) {
                     Iterator<T> typesIt = types.listIterator(index);
@@ -330,6 +314,7 @@ public abstract class TruffleObjectsProvider<O extends TruffleObject, T extends 
                 }
             }
         }
+        
         return dominators;
     }
     

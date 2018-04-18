@@ -24,6 +24,7 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
+import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import java.util.List;
 import org.netbeans.lib.profiler.heap.FieldValue;
@@ -38,19 +39,38 @@ import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectNode
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectReferenceNode;
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.LocalDynamicObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleOpenNodeActionProvider;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
+import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import java.util.Date;
 import org.netbeans.lib.profiler.heap.ArrayItemValue;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class JavaScriptNodes {
+@ServiceProvider(service=HeapViewerNodeAction.Provider.class)
+public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObject, JavaScriptType, JavaScriptHeapFragment, JavaScriptLanguage> {
+    
+    @Override
+    public boolean supportsView(HeapContext context, String viewID) {
+        return JavaScriptHeapFragment.isJavaScriptHeap(context);
+    }
+
+    @Override
+    protected boolean supportsNode(HeapViewerNode node) {
+        return node instanceof JavaScriptNodes.JavaScriptNode;
+    }
+
+    @Override
+    protected JavaScriptLanguage getLanguage() {
+        return JavaScriptLanguage.instance();
+    }
+    
     
     private static final int MAX_LOGVALUE_LENGTH = 160;
-    
-    
+        
     static String getLogicalValue(JavaScriptObject object, String type, Heap heap) {
         String logicalValue = null;
         

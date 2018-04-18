@@ -24,25 +24,13 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
-import java.awt.BorderLayout;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import org.netbeans.lib.profiler.heap.FieldValue;
-import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
-import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPreviewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import org.openide.util.lookup.ServiceProvider;
@@ -51,41 +39,34 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
-class JavaScriptPreviewPlugin extends HeapViewPlugin {
+class JavaScriptPreviewPlugin extends TruffleObjectPreviewPlugin {
     
-    private final Heap heap;
-    
-     private InstanceScrollPane component;
-    
-
-    public JavaScriptPreviewPlugin(HeapContext context) {
-        super("Preview", "Preview", Icons.getIcon(HeapWalkerIcons.PROPERTIES));
-        heap = context.getFragment().getHeap();
-    }
-
-    protected JComponent createComponent() {
-        if (component == null) init();
-        return component;
+    JavaScriptPreviewPlugin(HeapContext context) {
+        super(context);
     }
     
     
-    protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
-        if (!(node instanceof JavaScriptNodes.JavaScriptObjectNode)) { component.showInstance(null); return; }
-        
-        JavaScriptNodes.JavaScriptObjectNode dnode = (JavaScriptNodes.JavaScriptObjectNode)node;
-        if ("Function".equals(dnode.getTypeName()) || "JSFunction".equals(dnode.getTypeName())) {
-            JavaScriptObject jsobj = dnode.getTruffleObject();
+    @Override
+    protected boolean supportsNode(HeapViewerNode node) {
+        return node instanceof JavaScriptNodes.JavaScriptObjectNode;
+    }
+
+    @Override
+    protected Instance getPreviewInstance(HeapViewerNode node) {
+        JavaScriptNodes.JavaScriptObjectNode jsnode = (JavaScriptNodes.JavaScriptObjectNode)node;
+        if ("Function".equals(jsnode.getTypeName()) || "JSFunction".equals(jsnode.getTypeName())) {
+            JavaScriptObject jsobj = jsnode.getTruffleObject();
             FieldValue dataField = jsobj.getFieldValue("functionData (hidden)");
             Instance data = dataField instanceof ObjectFieldValue ? ((ObjectFieldValue)dataField).getInstance() : null;
-            if (data == null) { component.showInstance(null); return; }
+            if (data == null) return null;
 
             Object rootNode = ((Instance)data).getValueOfField("lazyInit");
             if (!(rootNode instanceof Instance)) {
                 Object callTarget = data.getValueOfField("callTarget");
-                if (!(callTarget instanceof Instance)) { component.showInstance(null); return; }
+                if (!(callTarget instanceof Instance)) return null;
 
                 rootNode = ((Instance)callTarget).getValueOfField("rootNode");
-                if (!(rootNode instanceof Instance)) { component.showInstance(null); return; }
+                if (!(rootNode instanceof Instance)) return null;
             }
 
             Instance sourceSection = null;
@@ -102,76 +83,18 @@ class JavaScriptPreviewPlugin extends HeapViewPlugin {
 
             if (!(sourceSection instanceof Instance)) {
                 Object nnode = ((Instance)rootNode).getValueOfField("node");
-                if (!(nnode instanceof Instance)) { component.showInstance(null); return; }
+                if (!(nnode instanceof Instance)) return null;
 
                 Object ssourceSection = ((Instance)nnode).getValueOfField("source");
-                if (!(ssourceSection instanceof Instance)) { component.showInstance(null); return; }
+                if (!(ssourceSection instanceof Instance)) return null;
 
                 sourceSection = (Instance)ssourceSection;
             }
 
-            component.showInstance((Instance)sourceSection);
+            return (Instance)sourceSection;
         } else {
-            component.showInstance(null);
+            return null;
         }
-    }
-    
-    
-    private void init() {
-        component = new InstanceScrollPane();
-    }
-    
-    
-    private class InstanceScrollPane extends JScrollPane {
-        
-        private Instance selectedInstance = null;
-        private boolean instancePending = false;
-        
-        
-        InstanceScrollPane() {
-            setBorder(BorderFactory.createEmptyBorder());
-            setViewportBorder(BorderFactory.createEmptyBorder());
-//            setViewportBorder(BorderFactory.createLineBorder(
-//                    UIManager.getLookAndFeel().getID().equals("Metal") ? // NOI18N
-//                    UIManager.getColor("Button.darkShadow") : // NOI18N
-//                    UIManager.getColor("Button.shadow"))); // NOI18N
-            
-            addHierarchyListener(new HierarchyListener() {
-                public void hierarchyChanged(HierarchyEvent e) {
-                    if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                        if (instancePending && isShowing()) showInstanceImpl();
-                    }
-                }
-            });
-            
-            showInstanceImpl();
-        }
-        
-        
-        void showInstance(Instance instance) {
-            if (selectedInstance == instance) return;
-            selectedInstance = instance;
-            if (isShowing()) showInstanceImpl();
-            else instancePending = true;
-        }
-        
-        private void showInstanceImpl() {
-            JComponent instanceView = selectedInstance == null ? null :
-                       DetailsSupport.getDetailsView(selectedInstance, heap);
-            if (instanceView == null) {
-                JLabel noDetails = new JLabel("<no details>", JLabel.CENTER);
-                noDetails.setEnabled(false);
-                
-                instanceView = new JPanel(new BorderLayout());
-                instanceView.setOpaque(true);
-                instanceView.setBackground(UIUtils.getProfilerResultsBackground());
-                instanceView.add(noDetails, BorderLayout.CENTER);
-            }
-            setViewportView(instanceView);
-            //doLayout();
-            instancePending = false;
-        }
-        
     }
     
     
@@ -179,7 +102,8 @@ class JavaScriptPreviewPlugin extends HeapViewPlugin {
     public static class Provider extends HeapViewPlugin.Provider {
 
         public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
-            if (JavaScriptHeapFragment.isJavaScriptHeap(context)) return new JavaScriptPreviewPlugin(context);
+            if (JavaScriptHeapFragment.isJavaScriptHeap(context))
+                return new JavaScriptPreviewPlugin(context);
             return null;
         }
         

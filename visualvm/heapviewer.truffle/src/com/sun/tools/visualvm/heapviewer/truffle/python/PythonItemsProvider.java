@@ -45,10 +45,10 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Tomas Hurka
  */
 @ServiceProvider(service = HeapViewerNode.Provider.class, position = 200)
-public class PythonItemsProvider extends TruffleObjectPropertyProvider.Fields<PythonObject> {
+public class PythonItemsProvider extends TruffleObjectPropertyProvider.Fields<PythonObject, PythonType, PythonHeapFragment, PythonLanguage> {
     
     public PythonItemsProvider() {
-        super("items", PythonObject.class, true);
+        super("items", PythonObject.class, PythonLanguage.instance(), true);
     }
     
     
@@ -65,16 +65,6 @@ public class PythonItemsProvider extends TruffleObjectPropertyProvider.Fields<Py
             if (pyobject != null) return !getPropertyItems(pyobject, heap).isEmpty();
         }
         return false;
-    }
-
-    @Override
-    protected boolean isLanguageObject(Instance instance) {
-        return PythonObject.isPythonObject(instance);
-    }
-
-    @Override
-    protected PythonObject createObject(Instance instance) {
-        return new PythonObject(instance);
     }
 
     @Override

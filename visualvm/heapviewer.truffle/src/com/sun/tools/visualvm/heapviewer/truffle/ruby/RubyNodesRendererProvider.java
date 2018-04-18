@@ -52,9 +52,11 @@ public class RubyNodesRendererProvider extends HeapViewerRenderer.Provider {
     }
 
     public void registerRenderers(Map<Class<? extends HeapViewerNode>, HeapViewerRenderer> renderers, HeapContext context) {
+        RubyLanguage language = RubyLanguage.instance();
+        Icon instanceIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.INSTANCE));
+        Icon packageIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.PACKAGE));
+        
         Heap heap = context.getFragment().getHeap();
-        Icon instanceIcon = RubySupport.createLanguageIcon(Icons.getIcon(LanguageIcons.INSTANCE));
-        Icon packageIcon = RubySupport.createLanguageIcon(Icons.getIcon(LanguageIcons.PACKAGE));
         
         renderers.put(RubyNodes.RubyObjectNode.class, new TruffleObjectNode.Renderer(heap, instanceIcon));
         

@@ -24,73 +24,24 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
-import javax.swing.Icon;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectsProvider;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleObjectsView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
-import org.netbeans.lib.profiler.heap.Instance;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-class RubyObjectsView extends TruffleObjectsView {
-    
-    private static final String FEATURE_ID = "ruby_objects"; // NOI18N
-    
-    
-    RubyObjectsView(HeapContext context, HeapViewerActions actions) {
-        super(FEATURE_ID, context, actions, new RubyObjectsProvider());
-    }
-    
-
-    @Override
-    protected Icon createLanguageIcon(Icon icon) {
-        return RubySupport.createLanguageIcon(icon);
-    }
-    
-    
-    private static class RubyObjectsProvider extends TruffleObjectsProvider<RubyObject, RubyType> {
-    
-        @Override
-        protected TruffleObjectNode<RubyObject> createObjectNode(RubyObject object, String type) {
-            return new RubyNodes.RubyObjectNode(object, type);
-        }
-
-        @Override
-        protected TruffleTypeNode<RubyObject, RubyType> createTypeNode(RubyType type) {
-            return new RubyNodes.RubyTypeNode(type);
-        }
-
-        @Override
-        protected boolean isLanguageObject(Instance instance) {
-            return RubyObject.isRubyObject(instance);
-        }
-
-        @Override
-        protected RubyObject createObject(Instance instance) {
-            return new RubyObject(instance);
-        }
-
-        @Override
-        protected RubyType createTypeContainer(String name) {
-            return new RubyType(name);
-        }
-
-    }
-    
+class RubyObjectsView {
     
     @ServiceProvider(service=HeapViewerFeature.Provider.class)
     public static class Provider extends HeapViewerFeature.Provider {
 
         public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
             if (RubyHeapFragment.isRubyHeap(context))
-                return new RubyObjectsView(context, actions);
+                return new TruffleObjectsView(RubyLanguage.instance(), context, actions);
             
             return null;
         }

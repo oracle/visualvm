@@ -24,18 +24,11 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
-import java.io.File;
-import java.io.IOException;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.HeapFragment;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageSupport;
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectLanguageHeapFragment;
 import java.util.Iterator;
-import org.openide.util.Lookup;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
@@ -48,8 +41,8 @@ class RubyHeapFragment extends DynamicObjectLanguageHeapFragment<RubyObject, Rub
     private static final String RUBY_HEAP_ID = "ruby_heap";
     
     
-    RubyHeapFragment(Instance langID, Heap heap) throws IOException {
-        super(RUBY_HEAP_ID, "Ruby Heap", fragmentDescription(langID, heap), heap);
+    RubyHeapFragment(RubyLanguage language, Instance langID, Heap heap) {
+        super(RUBY_HEAP_ID, "Ruby Heap", fragmentDescription(langID, heap), language, heap);
     }
     
     
@@ -67,45 +60,19 @@ class RubyHeapFragment extends DynamicObjectLanguageHeapFragment<RubyObject, Rub
     public Iterator<RubyObject> getObjectsIterator() {
         return languageObjectsIterator(RUBY_LANG_ID);
     }
-    
-    
-    @Override
-    protected RubyObject createObject(Instance instance) {
-        return new RubyObject(instance);
-    }
-
-    @Override
-    protected RubyType createTruffleType(String name) {
-        return new RubyType(name);
-    }
 
     
     static boolean isRubyHeap(HeapContext context) {
         return RUBY_HEAP_ID.equals(context.getFragment().getID()); // NOI18N
     }
     
-    public static HeapContext getRubyContext(HeapContext context) {
-        if (isRubyHeap(context)) return context;
-        
-        for (HeapContext otherContext : context.getOtherContexts())
-            if (isRubyHeap(otherContext)) return otherContext;
-        
-        return null;
-    }
-    
-    
-    @ServiceProvider(service=HeapFragment.Provider.class, position = 300)
-    public static class Provider extends HeapFragment.Provider {
-
-        private static final String RUBY_LANGINFO_ID = "Ruby";  // NOI18N
-
-        public HeapFragment getFragment(File heapDumpFile, Lookup.Provider heapDumpProject, Heap heap) throws IOException {
-            Instance langID = TruffleLanguageSupport.getLanguageInfo(heap, RUBY_LANGINFO_ID);
-            JavaClass rubyMainClass = heap.getJavaClassByName(RUBY_LANG_ID);
-
-            return langID != null && rubyMainClass != null ? new RubyHeapFragment(langID, heap) : null;
-        }
-
-    }
+//    public static HeapContext getRubyContext(HeapContext context) {
+//        if (isRubyHeap(context)) return context;
+//        
+//        for (HeapContext otherContext : context.getOtherContexts())
+//            if (isRubyHeap(otherContext)) return otherContext;
+//        
+//        return null;
+//    }
     
 }
