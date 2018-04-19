@@ -24,6 +24,8 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.ui;
 
+import com.sun.tools.visualvm.heapviewer.truffle.swing.LinkButton;
+import com.sun.tools.visualvm.heapviewer.truffle.swing.Splitter;
 import com.sun.tools.visualvm.core.ui.components.SectionSeparator;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.DataType;

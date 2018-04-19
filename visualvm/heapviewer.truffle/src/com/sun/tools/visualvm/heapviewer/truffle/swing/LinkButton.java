@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.truffle.ui;
+package com.sun.tools.visualvm.heapviewer.truffle.swing;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -45,7 +45,7 @@ import javax.swing.SwingUtilities;
  *
  * @author Jiri Sedlacek
  */
-class LinkButton extends JButton {
+public class LinkButton extends JButton {
     
     private boolean mouseOver;
     private boolean focused;

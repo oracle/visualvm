@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.truffle.ui;
+package com.sun.tools.visualvm.heapviewer.truffle.swing;
 
 import com.sun.tools.visualvm.uisupport.UISupport;
 import java.awt.Color;
@@ -44,7 +44,7 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
  *
  * @author Jiri Sedlacek
  */
-class Splitter extends JSplitPane {
+public class Splitter extends JSplitPane {
     
     private CustomizedSplitPaneUI splitterUI;
 

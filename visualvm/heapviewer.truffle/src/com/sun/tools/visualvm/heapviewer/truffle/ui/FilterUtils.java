@@ -25,6 +25,7 @@
 
 package com.sun.tools.visualvm.heapviewer.truffle.ui;
 
+import com.sun.tools.visualvm.heapviewer.truffle.swing.EditableHistoryCombo;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;

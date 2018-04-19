@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.truffle.ui;
+package com.sun.tools.visualvm.heapviewer.truffle.swing;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -39,11 +39,11 @@ import org.netbeans.lib.profiler.ui.UIUtils;
  *
  * @author Jiri Sedlacek
  */
-class EditableHistoryCombo extends JComboBox {
+public class EditableHistoryCombo extends JComboBox {
     
     private Runnable onTextChange;
     
-    EditableHistoryCombo() {
+    public EditableHistoryCombo() {
         super(new ComboHistoryModel(10));
         
         setEditable(true);
@@ -68,17 +68,17 @@ class EditableHistoryCombo extends JComboBox {
     }
     
     
-    JTextComponent getTextComponent() {
+    public JTextComponent getTextComponent() {
         Component comp = getEditor().getEditorComponent();
         return comp instanceof JTextComponent ? (JTextComponent)comp : null;
     }
     
-    String getText() {
+    public String getText() {
         JTextComponent textC = getTextComponent();
         return textC != null ? textC.getText() : getSelectedItem().toString();
     }
     
-    void setOnTextChangeHandler(Runnable handler) {
+    public void setOnTextChangeHandler(Runnable handler) {
         onTextChange = handler;
     }
     
