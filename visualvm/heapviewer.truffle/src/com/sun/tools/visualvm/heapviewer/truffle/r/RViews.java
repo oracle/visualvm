@@ -26,6 +26,7 @@ package com.sun.tools.visualvm.heapviewer.truffle.r;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleFrame;
+import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleObjectsView;
 import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleSummaryView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
@@ -46,10 +47,14 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
-class RHeapSummary {
+final class RViews {
+    
+    // -------------------------------------------------------------------------
+    // --- Summary -------------------------------------------------------------
+    // -------------------------------------------------------------------------
     
     @ServiceProvider(service=HeapViewerFeature.Provider.class)
-    public static class RSummaryProvider extends HeapViewerFeature.Provider {
+    public static class SummaryViewProvider extends HeapViewerFeature.Provider {
 
         public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
             if (RHeapFragment.isRHeap(context))
@@ -62,21 +67,21 @@ class RHeapSummary {
     
     
     @ServiceProvider(service=SummaryView.ContentProvider.class, position = 100)
-    public static class RSummaryOverviewProvider extends SummaryView.ContentProvider {
+    public static class SummaryOverviewProvider extends SummaryView.ContentProvider {
 
         @Override
         public HeapView createSummary(String viewID, HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
             if (RHeapFragment.isRHeap(context))
-                return new RSummaryOverview(context);
+                return new SummaryOverview(context);
             
             return null;
         }
         
     }
     
-    private static class RSummaryOverview extends TruffleSummaryView.OverviewSection {
+    private static class SummaryOverview extends TruffleSummaryView.OverviewSection {
         
-        RSummaryOverview(HeapContext context) {
+        SummaryOverview(HeapContext context) {
             super(context, 3, 3);
         }
         
@@ -135,7 +140,7 @@ class RHeapSummary {
     
     
     @ServiceProvider(service=SummaryView.ContentProvider.class, position = 300)
-    public static class RSummaryObjectsProvider extends SummaryView.ContentProvider {
+    public static class SummaryObjectsProvider extends SummaryView.ContentProvider {
 
         @Override
         public HeapView createSummary(String viewID, HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
@@ -145,6 +150,23 @@ class RHeapSummary {
             return null;
         }
         
+    }
+    
+    
+    // -------------------------------------------------------------------------
+    // --- Objects -------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    
+    @ServiceProvider(service=HeapViewerFeature.Provider.class)
+    public static class ObjectsViewProvider extends HeapViewerFeature.Provider {
+
+        public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
+            if (RHeapFragment.isRHeap(context))
+                return new TruffleObjectsView(RLanguage.instance(), context, actions);
+            
+            return null;
+        }
+
     }
     
 }

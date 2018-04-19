@@ -25,6 +25,7 @@
 package com.sun.tools.visualvm.heapviewer.truffle.python;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
+import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleObjectsView;
 import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleSummaryView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
@@ -45,10 +46,14 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
-class PythonHeapSummary {
+final class PythonViews {
+    
+    // -------------------------------------------------------------------------
+    // --- Summary -------------------------------------------------------------
+    // -------------------------------------------------------------------------
     
     @ServiceProvider(service=HeapViewerFeature.Provider.class)
-    public static class PythonSummaryProvider extends HeapViewerFeature.Provider {
+    public static class SummaryViewProvider extends HeapViewerFeature.Provider {
 
         public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
             if (PythonHeapFragment.isPythonHeap(context))
@@ -61,21 +66,21 @@ class PythonHeapSummary {
     
     
     @ServiceProvider(service=SummaryView.ContentProvider.class, position = 100)
-    public static class PythonSummaryOverviewProvider extends SummaryView.ContentProvider {
+    public static class SummaryOverviewProvider extends SummaryView.ContentProvider {
 
         @Override
         public HeapView createSummary(String viewID, HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
             if (PythonHeapFragment.isPythonHeap(context))
-                return new PythonSummaryOverview(context);
+                return new SummaryOverview(context);
             
             return null;
         }
         
     }
     
-    private static class PythonSummaryOverview extends TruffleSummaryView.OverviewSection {
+    private static class SummaryOverview extends TruffleSummaryView.OverviewSection {
         
-        PythonSummaryOverview(HeapContext context) {
+        SummaryOverview(HeapContext context) {
             super(context, 3, 3);
         }
         
@@ -148,7 +153,7 @@ class PythonHeapSummary {
     
     
     @ServiceProvider(service=SummaryView.ContentProvider.class, position = 300)
-    public static class PythonSummaryObjectsProvider extends SummaryView.ContentProvider {
+    public static class SummaryObjectsProvider extends SummaryView.ContentProvider {
 
         @Override
         public HeapView createSummary(String viewID, HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
@@ -158,6 +163,23 @@ class PythonHeapSummary {
             return null;
         }
         
+    }
+    
+    
+    // -------------------------------------------------------------------------
+    // --- Objects -------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    
+    @ServiceProvider(service=HeapViewerFeature.Provider.class)
+    public static class ObjectsViewProvider extends HeapViewerFeature.Provider {
+
+        public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
+            if (PythonHeapFragment.isPythonHeap(context))
+                return new TruffleObjectsView(PythonLanguage.instance(), context, actions);
+
+            return null;
+        }
+
     }
     
 }

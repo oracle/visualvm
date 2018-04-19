@@ -25,7 +25,9 @@
 package com.sun.tools.visualvm.heapviewer.truffle.ruby;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
+import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleObjectsView;
 import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleSummaryView;
+import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleThreadsView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
@@ -42,10 +44,14 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Jiri Sedlacek
  */
-class RubyHeapSummary {
+final class RubyViews {
+    
+    // -------------------------------------------------------------------------
+    // --- Summary -------------------------------------------------------------
+    // -------------------------------------------------------------------------
     
     @ServiceProvider(service=HeapViewerFeature.Provider.class)
-    public static class RubySummaryProvider extends HeapViewerFeature.Provider {
+    public static class SummaryViewProvider extends HeapViewerFeature.Provider {
 
         public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
             if (RubyHeapFragment.isRubyHeap(context))
@@ -58,21 +64,21 @@ class RubyHeapSummary {
     
     
     @ServiceProvider(service=SummaryView.ContentProvider.class, position = 100)
-    public static class RubySummaryOverviewProvider extends SummaryView.ContentProvider {
+    public static class SummaryOverviewProvider extends SummaryView.ContentProvider {
 
         @Override
         public HeapView createSummary(String viewID, HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
             if (RubyHeapFragment.isRubyHeap(context))
-                return new RubySummaryOverview(context);
+                return new SummaryOverview(context);
             
             return null;
         }
         
     }
     
-    private static class RubySummaryOverview extends TruffleSummaryView.OverviewSection {
+    private static class SummaryOverview extends TruffleSummaryView.OverviewSection {
         
-        RubySummaryOverview(HeapContext context) {
+        SummaryOverview(HeapContext context) {
             super(context, 3, 2);
         }
         
@@ -116,7 +122,7 @@ class RubyHeapSummary {
     
     
     @ServiceProvider(service=SummaryView.ContentProvider.class, position = 300)
-    public static class RubySummaryObjectsProvider extends SummaryView.ContentProvider {
+    public static class SummaryObjectsProvider extends SummaryView.ContentProvider {
 
         @Override
         public HeapView createSummary(String viewID, HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
@@ -126,6 +132,40 @@ class RubyHeapSummary {
             return null;
         }
         
+    }
+    
+    
+    // -------------------------------------------------------------------------
+    // --- Objects -------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    
+    @ServiceProvider(service=HeapViewerFeature.Provider.class)
+    public static class ObjectsViewProvider extends HeapViewerFeature.Provider {
+
+        public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
+            if (RubyHeapFragment.isRubyHeap(context))
+                return new TruffleObjectsView(RubyLanguage.instance(), context, actions);
+            
+            return null;
+        }
+
+    }
+    
+    
+    // -------------------------------------------------------------------------
+    // --- Threads -------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    
+    @ServiceProvider(service=HeapViewerFeature.Provider.class)
+    public static class ThreadsViewProvider extends HeapViewerFeature.Provider {
+
+        public HeapViewerFeature getFeature(HeapContext context, HeapViewerActions actions) {
+            if (RubyHeapFragment.isRubyHeap(context))
+                return new TruffleThreadsView(RubyLanguage.instance(), context, actions);
+            
+            return null;
+        }
+
     }
     
 }
