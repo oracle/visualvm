@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle;
+package com.sun.tools.visualvm.heapviewer.truffle.nodes;
 
 import java.awt.Image;
 import javax.swing.Icon;
@@ -35,6 +35,8 @@ import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
 import com.sun.tools.visualvm.heapviewer.java.InstanceNode;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.openide.util.ImageUtilities;
 

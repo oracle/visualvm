@@ -22,11 +22,12 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle;
+package com.sun.tools.visualvm.heapviewer.truffle.nodes;
 
 import com.sun.tools.visualvm.heapviewer.java.InstanceNode;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
 import javax.swing.Icon;
 import org.netbeans.lib.profiler.heap.FieldValue;
@@ -42,44 +43,40 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  *
  * @author Jiri Sedlacek
  */
-public interface TruffleObjectFieldNode<O extends TruffleObject> {
+public interface TruffleObjectReferenceNode<O extends TruffleObject> {
     
     public FieldValue getField();
     
     public String getFieldName();
     
     
-    public static abstract class InstanceBased<O extends TruffleObject.InstanceBased> extends TruffleObjectNode.InstanceBased<O> implements TruffleObjectFieldNode<O> {
+    public static abstract class InstanceBased<O extends TruffleObject.InstanceBased> extends TruffleObjectNode.InstanceBased<O> implements TruffleObjectReferenceNode<O> {
         
         private FieldValue field;
     
         private String fieldName;
+
         
-        
-        public InstanceBased(O object, String type, FieldValue field) {
+        public InstanceBased(O object, String type, FieldValue value) {
             super(object, type);
-            this.field = field;
+            this.field = value;
         }
-        
+
         
         public FieldValue getField() {
             return field;
         }
-        
+
         public String getFieldName() {
-            if (fieldName == null) fieldName = computeFieldName(field);
+            if (fieldName == null) fieldName = (field.getField().isStatic() ? "static " : "") + field.getField().getName();
             return fieldName;
-        }
-        
-        protected String computeFieldName(FieldValue field) {
-            return (field.getField().isStatic() ? "static " : "") + field.getField().getName();
         }
 
 
         public boolean equals(Object o) {
             if (o == this) return true;
-            if (!(o instanceof TruffleObjectFieldNode.InstanceBased)) return false;
-            return field.equals(((TruffleObjectFieldNode.InstanceBased)o).field);
+            if (!(o instanceof TruffleObjectReferenceNode.InstanceBased)) return false;
+            return field.equals(((TruffleObjectReferenceNode.InstanceBased)o).field);
         }
 
         public int hashCode() {
@@ -91,26 +88,26 @@ public interface TruffleObjectFieldNode<O extends TruffleObject> {
             return null;
         }
         
-        protected void setupCopy(TruffleObjectFieldNode.InstanceBased copy) {
+        protected void setupCopy(TruffleObjectReferenceNode.InstanceBased copy) {
             super.setupCopy(copy);
             copy.field = field;
             copy.fieldName = fieldName;
         }
-        
+                
     }
     
     
     public static class Renderer extends MultiRenderer implements HeapViewerRenderer {
         
         private final NormalBoldGrayRenderer fieldRenderer;
-        private final LabelRenderer equalsRenderer;
+        private final LabelRenderer inRenderer;
         private final TruffleObjectNode.Renderer dobjectRenderer;
         private final ProfilerRenderer[] renderers;
         
         private final Heap heap;
         
         public Renderer(Heap heap, Icon icon) {
-            this(heap, icon, "=");
+            this(heap, icon, "in");
         }
         
         public Renderer(Heap heap, Icon icon, String divider) {
@@ -118,7 +115,7 @@ public interface TruffleObjectFieldNode<O extends TruffleObject> {
             
             fieldRenderer = new NormalBoldGrayRenderer() {
                 public void setValue(Object value, int row) {
-                    TruffleObjectFieldNode node = (TruffleObjectFieldNode)value;
+                    TruffleObjectReferenceNode node = (TruffleObjectReferenceNode)value;
                     String name = node.getFieldName();
                     if (name.startsWith("static ")) {
                         setNormalValue("static ");
@@ -127,17 +124,17 @@ public interface TruffleObjectFieldNode<O extends TruffleObject> {
                         setNormalValue("");
                         setBoldValue(name);
                     }
-                    setIcon(Icons.getIcon(ProfilerIcons.NODE_FORWARD));
+                    setIcon(Icons.getIcon(ProfilerIcons.NODE_REVERSE));
                 }
             };
             
-            equalsRenderer = new LabelRenderer();
-            equalsRenderer.setText(divider);
-            equalsRenderer.setMargin(3, 0, 3, 0);
+            inRenderer = new LabelRenderer();
+            inRenderer.setText(divider);
+            inRenderer.setMargin(3, 0, 3, 0);
             
             dobjectRenderer = new TruffleObjectNode.Renderer(heap, icon);
             
-            renderers = new ProfilerRenderer[] { fieldRenderer, equalsRenderer, dobjectRenderer };
+            renderers = new ProfilerRenderer[] { fieldRenderer, inRenderer, dobjectRenderer };
         }
 
         protected ProfilerRenderer[] valueRenderers() {

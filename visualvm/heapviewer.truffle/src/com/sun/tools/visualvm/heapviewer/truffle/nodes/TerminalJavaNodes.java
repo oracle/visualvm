@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle;
+package com.sun.tools.visualvm.heapviewer.truffle.nodes;
 
 import org.netbeans.lib.profiler.heap.ArrayItemValue;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;

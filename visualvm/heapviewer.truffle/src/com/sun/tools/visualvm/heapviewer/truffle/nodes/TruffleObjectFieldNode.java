@@ -22,14 +22,15 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle;
+package com.sun.tools.visualvm.heapviewer.truffle.nodes;
 
 import com.sun.tools.visualvm.heapviewer.java.InstanceNode;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
 import javax.swing.Icon;
-import org.netbeans.lib.profiler.heap.ArrayItemValue;
+import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.MultiRenderer;
@@ -42,41 +43,48 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
  *
  * @author Jiri Sedlacek
  */
-public interface TruffleObjectArrayItemNode<O extends TruffleObject> {
+public interface TruffleObjectFieldNode<O extends TruffleObject> {
     
-    public ArrayItemValue getItem();
+    public FieldValue getField();
     
-    public String getItemName();
+    public String getFieldName();
     
     
-    public static abstract class InstanceBased<O extends TruffleObject.InstanceBased> extends TruffleObjectNode.InstanceBased<O> implements TruffleObjectArrayItemNode<O> {
+    public static abstract class InstanceBased<O extends TruffleObject.InstanceBased> extends TruffleObjectNode.InstanceBased<O> implements TruffleObjectFieldNode<O> {
         
-        private ArrayItemValue item;
+        private FieldValue field;
+    
+        private String fieldName;
         
         
-        public InstanceBased(O object, String type, ArrayItemValue item) {
+        public InstanceBased(O object, String type, FieldValue field) {
             super(object, type);
-            this.item = item;
+            this.field = field;
         }
         
         
-        public String getItemName() {
-            return "[" + item.getIndex() + "]";
+        public FieldValue getField() {
+            return field;
         }
-
-        public ArrayItemValue getItem() {
-            return item;
+        
+        public String getFieldName() {
+            if (fieldName == null) fieldName = computeFieldName(field);
+            return fieldName;
+        }
+        
+        protected String computeFieldName(FieldValue field) {
+            return (field.getField().isStatic() ? "static " : "") + field.getField().getName();
         }
 
 
         public boolean equals(Object o) {
             if (o == this) return true;
-            if (!(o instanceof TruffleObjectArrayItemNode.InstanceBased)) return false;
-            return item.equals(((TruffleObjectArrayItemNode.InstanceBased)o).item);
+            if (!(o instanceof TruffleObjectFieldNode.InstanceBased)) return false;
+            return field.equals(((TruffleObjectFieldNode.InstanceBased)o).field);
         }
 
         public int hashCode() {
-            return item.hashCode();
+            return field.hashCode();
         }
 
 
@@ -84,9 +92,10 @@ public interface TruffleObjectArrayItemNode<O extends TruffleObject> {
             return null;
         }
         
-        protected void setupCopy(TruffleObjectArrayItemNode.InstanceBased copy) {
+        protected void setupCopy(TruffleObjectFieldNode.InstanceBased copy) {
             super.setupCopy(copy);
-            copy.item = item;
+            copy.field = field;
+            copy.fieldName = fieldName;
         }
         
     }
@@ -110,8 +119,8 @@ public interface TruffleObjectArrayItemNode<O extends TruffleObject> {
             
             fieldRenderer = new NormalBoldGrayRenderer() {
                 public void setValue(Object value, int row) {
-                    TruffleObjectArrayItemNode node = (TruffleObjectArrayItemNode)value;
-                    String name = node.getItemName();
+                    TruffleObjectFieldNode node = (TruffleObjectFieldNode)value;
+                    String name = node.getFieldName();
                     if (name.startsWith("static ")) {
                         setNormalValue("static ");
                         setBoldValue(name.substring("static ".length()));

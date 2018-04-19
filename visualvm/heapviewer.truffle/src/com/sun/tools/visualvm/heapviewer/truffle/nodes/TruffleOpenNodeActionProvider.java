@@ -22,11 +22,15 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle;
+package com.sun.tools.visualvm.heapviewer.truffle.nodes;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguage;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
 import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleObjectView;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;

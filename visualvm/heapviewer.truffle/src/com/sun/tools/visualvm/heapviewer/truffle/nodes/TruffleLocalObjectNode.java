@@ -22,9 +22,10 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle;
+package com.sun.tools.visualvm.heapviewer.truffle.nodes;
 
 import com.sun.tools.visualvm.heapviewer.java.InstanceNode;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
 import javax.swing.Icon;
 import org.netbeans.lib.profiler.heap.Heap;

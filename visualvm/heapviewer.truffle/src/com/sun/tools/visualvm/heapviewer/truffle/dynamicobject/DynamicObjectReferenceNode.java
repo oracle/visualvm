@@ -24,7 +24,7 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.dynamicobject;
 
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectReferenceNode;
+import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleObjectReferenceNode;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 

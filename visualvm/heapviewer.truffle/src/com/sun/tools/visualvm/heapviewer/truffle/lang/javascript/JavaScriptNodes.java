@@ -26,9 +26,9 @@ package com.sun.tools.visualvm.heapviewer.truffle.lang.javascript;
 
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleLocalObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectArrayItemNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectFieldNode;
+import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleLocalObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleObjectArrayItemNode;
+import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleObjectFieldNode;
 import java.util.List;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
@@ -41,10 +41,10 @@ import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectFiel
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectNode;
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectReferenceNode;
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.LocalDynamicObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectReferenceNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleOpenNodeActionProvider;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleTypeNode;
+import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleObjectReferenceNode;
+import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleOpenNodeActionProvider;
+import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleTypeNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
 import java.util.Date;

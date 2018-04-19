@@ -24,6 +24,7 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle;
 
+import com.sun.tools.visualvm.heapviewer.truffle.nodes.TerminalJavaNodes;
 import com.sun.tools.visualvm.heapviewer.HeapFragment;
 import com.sun.tools.visualvm.heapviewer.java.PrimitiveNode;
 import com.sun.tools.visualvm.heapviewer.model.DataType;

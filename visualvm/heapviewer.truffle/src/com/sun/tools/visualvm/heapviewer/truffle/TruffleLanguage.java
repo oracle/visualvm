@@ -24,6 +24,9 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle;
 
+import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleTypeNode;
+import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleObjectNode;
+import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleLocalObjectNode;
 import com.sun.tools.visualvm.heapviewer.HeapFragment;
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import java.awt.Image;

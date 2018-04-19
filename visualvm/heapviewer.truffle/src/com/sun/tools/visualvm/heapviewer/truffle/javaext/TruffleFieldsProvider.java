@@ -27,7 +27,7 @@ package com.sun.tools.visualvm.heapviewer.truffle.javaext;
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectFieldNode;
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectReferenceNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TerminalJavaNodes;
+import com.sun.tools.visualvm.heapviewer.truffle.nodes.TerminalJavaNodes;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleFrame;
 import java.util.ArrayList;
 import java.util.Iterator;
