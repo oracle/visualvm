@@ -48,9 +48,12 @@ public class RLanguage extends TruffleLanguage<RObject, RType, RHeapFragment> {
     private static final String R_LANGINFO_ID = "R";  // NOI18N
         
     
-    static RLanguage instance() {
-        return Lookup.getDefault().lookup(RLanguage.class);
+    private static RLanguage INSTANCE; 
+    static synchronized RLanguage instance() {
+        if (INSTANCE == null) Lookup.getDefault().lookup(RLanguage.class);
+        return INSTANCE;
     }
+    public RLanguage() { INSTANCE = this; }
     
     
     public String getID() { return ID; }

@@ -49,9 +49,12 @@ public class JavaScriptLanguage extends TruffleLanguage<JavaScriptObject, JavaSc
     private static final String JAVASCRIPT_LANGINFO_ID = "JavaScript";  // NOI18N
     
     
-    static JavaScriptLanguage instance() {
-        return Lookup.getDefault().lookup(JavaScriptLanguage.class);
+    private static JavaScriptLanguage INSTANCE; 
+    static synchronized JavaScriptLanguage instance() {
+        if (INSTANCE == null) Lookup.getDefault().lookup(JavaScriptLanguage.class);
+        return INSTANCE;
     }
+    public JavaScriptLanguage() { INSTANCE = this; }
     
     
     public String getID() { return ID; }

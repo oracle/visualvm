@@ -48,9 +48,12 @@ public class RubyLanguage extends TruffleLanguage<RubyObject, RubyType, RubyHeap
     private static final String RUBY_LANGINFO_ID = "Ruby";  // NOI18N
     
     
-    static RubyLanguage instance() {
-        return Lookup.getDefault().lookup(RubyLanguage.class);
+    private static RubyLanguage INSTANCE; 
+    static synchronized RubyLanguage instance() {
+        if (INSTANCE == null) Lookup.getDefault().lookup(RubyLanguage.class);
+        return INSTANCE;
     }
+    public RubyLanguage() { INSTANCE = this; }
     
     
     public String getID() { return ID; }

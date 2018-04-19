@@ -49,9 +49,12 @@ public class PythonLanguage extends TruffleLanguage<PythonObject, PythonType, Py
     private static final String PYTHON_LANGINFO_ID = "Python";  // NOI18N
         
     
-    static PythonLanguage instance() {
-        return Lookup.getDefault().lookup(PythonLanguage.class);
+    private static PythonLanguage INSTANCE; 
+    static synchronized PythonLanguage instance() {
+        if (INSTANCE == null) Lookup.getDefault().lookup(PythonLanguage.class);
+        return INSTANCE;
     }
+    public PythonLanguage() { INSTANCE = this; }
     
     
     public String getID() { return ID; }
