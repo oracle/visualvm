@@ -24,26 +24,10 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.javascript;
 
-import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
-import com.sun.tools.visualvm.heapviewer.truffle.TerminalJavaNodes;
-import java.util.Iterator;
-import java.util.List;
-import javax.swing.SortOrder;
 import org.netbeans.lib.profiler.heap.ArrayItemValue;
 import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
-import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
-import com.sun.tools.visualvm.heapviewer.java.InstanceNode;
-import com.sun.tools.visualvm.heapviewer.java.PrimitiveNode;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectArrayItemNode;
-import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
-import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
-import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import com.sun.tools.visualvm.heapviewer.truffle.TruffleInstancePropertyProvider;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -51,99 +35,22 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jiri Sedlacek
  */
 @ServiceProvider(service=HeapViewerNode.Provider.class, position = 300)
-public class JavaScriptArrayItemsProvider extends HeapViewerNode.Provider {
+public class JavaScriptArrayItemsProvider extends TruffleInstancePropertyProvider.ArrayItems<JavaScriptObject, JavaScriptType, JavaScriptHeapFragment, JavaScriptLanguage> {
     
-    public String getName() {
-        return "items";
+    public JavaScriptArrayItemsProvider() {
+        super("items", JavaScriptLanguage.instance(), false);
     }
     
+    
+    @Override
     public boolean supportsView(Heap heap, String viewID) {
         return viewID.startsWith("javascript_");
     }
     
-    public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
-        if (parent instanceof InstanceNode && !InstanceNode.Mode.INCOMING_REFERENCE.equals(((InstanceNode)parent).getMode())) {
-            Instance instance = ((InstanceNode)parent).getInstance();
-            return instance != null && instance.getJavaClass().isArray();
-        } else {
-            return false;
-        }
-    }
     
-    public HeapViewerNode[] getNodes(final HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-        final Instance instance = HeapViewerNode.getValue(parent, DataType.INSTANCE, heap);
-        if (instance == null) return null;
-        
-        if (instance instanceof PrimitiveArrayInstance) {
-            final String type = instance.getJavaClass().getName().replace("[]", "");
-            final List<String> items = ((PrimitiveArrayInstance)instance).getValues();
-            
-            NodesComputer<Integer> computer = new NodesComputer<Integer>(items.size(), UIThresholds.MAX_ARRAY_ITEMS) {
-                protected boolean sorts(DataType dataType) {
-                    if (DataType.COUNT == dataType || DataType.OWN_SIZE == dataType || DataType.RETAINED_SIZE == dataType) return false;
-                    return true;
-                }
-                protected HeapViewerNode createNode(Integer index) {
-                    return new PrimitiveNode.ArrayItem(index, type, items.get(index), instance);
-                }
-                protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
-                    Iterator<Integer> iterator = integerIterator(index, items.size());
-                    return new ProgressIterator(iterator, index, false, progress);
-                }
-                protected String getMoreNodesString(String moreNodesCount)  {
-                    return "<another " + moreNodesCount + " items left>";
-                }
-                protected String getSamplesContainerString(String objectsCount)  {
-                    return "<sample " + objectsCount + " items>";
-                }
-                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                    return "<items " + firstNodeIdx + "-" + lastNodeIdx + ">";
-                }
-            };
-        
-            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
-        } else if (instance instanceof ObjectArrayInstance) {
-            final List<ArrayItemValue> items = ((ObjectArrayInstance)instance).getItems();
-            
-            NodesComputer<Integer> computer = new NodesComputer<Integer>(items.size(), UIThresholds.MAX_ARRAY_ITEMS) {
-                protected boolean sorts(DataType dataType) {
-                    return !DataType.COUNT.equals(dataType);
-                }
-                protected HeapViewerNode createNode(Integer index) {
-                    ArrayItemValue item = items.get(index);
-                    Instance instance = item.getInstance();
-                    if (DynamicObject.isDynamicObject(instance)) {
-                        JavaScriptObject jsobj = new JavaScriptObject(instance);
-                        if (jsobj.isJavaScriptObject()) {
-                            return new JavaScriptNodes.JavaScriptObjectArrayItemNode(jsobj, jsobj.getType(heap), item);
-                        } else {
-                            // Non-JavaScript object
-                            DynamicObject dobj = new DynamicObject(instance);
-                            return new DynamicObjectArrayItemNode(dobj, dobj.getType(heap), item);
-                        }
-                    } else {
-                        return new TerminalJavaNodes.ArrayItem(item, false);
-                    }
-                }
-                protected ProgressIterator<Integer> objectsIterator(int index, Progress progress) {
-                    Iterator<Integer> iterator = integerIterator(index, items.size());
-                    return new ProgressIterator(iterator, index, false, progress);
-                }
-                protected String getMoreNodesString(String moreNodesCount)  {
-                    return "<another " + moreNodesCount + " items left>";
-                }
-                protected String getSamplesContainerString(String objectsCount)  {
-                    return "<sample " + objectsCount + " items>";
-                }
-                protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                    return "<items " + firstNodeIdx + "-" + lastNodeIdx + ">";
-                }
-            };
-            
-            return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
-        }
-        
-        return null;
+    @Override
+    protected HeapViewerNode createObjectArrayItemNode(JavaScriptObject object, String type, ArrayItemValue item) {
+        return new JavaScriptNodes.JavaScriptObjectArrayItemNode(object, type, item);
     }
     
 }
