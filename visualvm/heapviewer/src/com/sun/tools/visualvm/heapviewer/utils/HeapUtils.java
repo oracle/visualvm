@@ -26,10 +26,15 @@
 package com.sun.tools.visualvm.heapviewer.utils;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
+import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.NbBundle;
 
@@ -58,6 +63,48 @@ public final class HeapUtils {
         }
         
         return subclasses;
+    }
+    
+//    public static Map<String, Object> getValuesOfFields(Instance instance, String... fields) {
+//        Map<String, Object> values = new HashMap();
+//        for (String field : fields) values.put(field, null);
+//        
+//        List<FieldValue> fieldValues = instance.getFieldValues();
+//        for (FieldValue fieldValue : fieldValues) {
+//            String fieldName = fieldValue.getField().getName();
+//            if (values.containsKey(fieldName)) {
+//                Object value = fieldValue instanceof ObjectFieldValue ? ((ObjectFieldValue)fieldValue).getInstance() : fieldValue.getValue();
+//                values.put(fieldName, value);
+//            }
+////            Object value = fieldValue instanceof ObjectFieldValue ? ((ObjectFieldValue)fieldValue).getInstance() : fieldValue.getValue();
+////            values.replace(fieldValue.getField().getName(), value);
+//        }
+//    
+//        return values;
+//    }
+    
+    
+    public static Object[] getValuesOfFields(Instance instance, String... fields) {
+        Object[] values = new Object[fields.length];
+        
+        Map<String, Integer> fieldsM = new HashMap();
+        for (int i = 0; i < fields.length; i++) fieldsM.put(fields[i], i);
+        
+        List<FieldValue> fieldValues = instance.getFieldValues();
+        for (int i = fieldValues.size() - 1; i >= 0; i--) {
+            FieldValue fieldValue = fieldValues.get(i);
+            String fieldName = fieldValue.getField().getName();
+            Integer valueIdx = fieldsM.remove(fieldName);
+            if (valueIdx != null) {
+                Object value = fieldValue instanceof ObjectFieldValue ? ((ObjectFieldValue)fieldValue).getInstance() : fieldValue.getValue();
+                values[valueIdx] = value;
+                if (fieldsM.isEmpty()) break;
+            }
+//            Object value = fieldValue instanceof ObjectFieldValue ? ((ObjectFieldValue)fieldValue).getInstance() : fieldValue.getValue();
+//            values.replace(fieldValue.getField().getName(), value);
+        }
+        
+        return values;
     }
     
     

@@ -561,7 +561,7 @@ public class ProfilerInterface implements CommonConstants {
         HeapDump.initialize(jdk15);
         ThreadDump.initialize(jdk15);
         ClassLoaderManager.initialize(profilerServer);
-        ClassLoaderManager.addLoader(ClassLoader.getSystemClassLoader());
+        ClassLoaderManager.addSystemClassLoader();
         reflectMethods = new WeakHashMap();
 
         evBufManager = new EventBufferManager(profilerServer);

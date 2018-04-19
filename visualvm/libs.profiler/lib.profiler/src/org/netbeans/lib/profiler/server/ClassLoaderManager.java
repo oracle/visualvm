@@ -260,6 +260,18 @@ class ClassLoaderManager implements CommonConstants {
         manVec.add(ldrMan); // will be placed at the correct index: newId
     }
 
+    static void addSystemClassLoader() {
+        ClassLoader systemCl = ClassLoader.getSystemClassLoader();
+        ClassLoader extensionCl = systemCl.getParent();
+
+        if (extensionCl != null) {
+            addLoader(extensionCl);
+            registerLoader(systemCl);
+        } else {
+            addLoader(systemCl);
+        }
+    }
+
     /**
      * This method SHOULD be called frequently enough to allow unloaded classes go away.
      * On the other hand, since currently it's called from monitoring code, which itself has to execute at regular
