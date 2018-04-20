@@ -1,6 +1,6 @@
  profilerinterface
 
- Timestamp is 57bebfa9 (Thu Aug 25 11:51:37 2016)
+ Timestamp is 5ad9adb4 (Fri Apr 20 11:07:00 2018)
 
  Preferred load address is 10000000
 
@@ -20,8 +20,8 @@
  0002:000001e0 00000088H .idata$4                DATA
  0002:00000268 0000021eH .idata$6                DATA
  0002:00000490 00000ec7H .edata                  DATA
- 0003:00000000 00001d40H .data                   DATA
- 0003:00001d40 000004c8H .bss                    DATA
+ 0003:00000000 00001d50H .data                   DATA
+ 0003:00001d50 000004c8H .bss                    DATA
  0004:00000000 00000058H .rsrc$01                DATA
  0004:00000060 00000398H .rsrc$02                DATA
 
@@ -164,19 +164,19 @@
  0002:000001a4       __IMPORT_DESCRIPTOR_msvcrt 100051a4     MSVCRT:msvcrt.dll
  0002:000001b8       __IMPORT_DESCRIPTOR_KERNEL32 100051b8     kernel32:KERNEL32.dll
  0002:000001cc       __NULL_IMPORT_DESCRIPTOR   100051cc     MSVCRT:msvcrt.dll
- 0003:00001d30       ___native_dllmain_reason   10008d30     MSVCRT:natstart.obj
- 0003:00001d34       ___native_vcclrit_reason   10008d34     MSVCRT:natstart.obj
- 0003:00001d38       ___security_cookie         10008d38     MSVCRT:gs_cookie.obj
- 0003:00001d3c       ___security_cookie_complement 10008d3c     MSVCRT:gs_cookie.obj
- 0003:000021e4       __jvmti                    100091e4     <common>
- 0003:000021e8       __jvmti_callbacks          100091e8     <common>
- 0003:000021ec       _JVM_DumpHeap15            100091ec     <common>
- 0003:000021f0       ___native_startup_state    100091f0     <common>
- 0003:000021f4       ___native_startup_lock     100091f4     <common>
- 0003:000021f8       ___onexitend               100091f8     <common>
- 0003:000021fc       ___onexitbegin             100091fc     <common>
- 0003:00002200       __pRawDllMain              10009200     <common>
- 0003:00002204       ___dyn_tls_init_callback   10009204     <common>
+ 0003:00001d40       ___native_dllmain_reason   10008d40     MSVCRT:natstart.obj
+ 0003:00001d44       ___native_vcclrit_reason   10008d44     MSVCRT:natstart.obj
+ 0003:00001d48       ___security_cookie         10008d48     MSVCRT:gs_cookie.obj
+ 0003:00001d4c       ___security_cookie_complement 10008d4c     MSVCRT:gs_cookie.obj
+ 0003:000021f4       __jvmti                    100091f4     <common>
+ 0003:000021f8       __jvmti_callbacks          100091f8     <common>
+ 0003:000021fc       _JVM_DumpHeap15            100091fc     <common>
+ 0003:00002200       ___native_startup_state    10009200     <common>
+ 0003:00002204       ___native_startup_lock     10009204     <common>
+ 0003:00002208       ___onexitend               10009208     <common>
+ 0003:0000220c       ___onexitbegin             1000920c     <common>
+ 0003:00002210       __pRawDllMain              10009210     <common>
+ 0003:00002214       ___dyn_tls_init_callback   10009214     <common>
 
  entry point at        0001:00003ad9
 

@@ -77,7 +77,7 @@
 #define NO_OF_BASE_BITS 2
 #define NO_OF_MASK_BITS (32-NO_OF_BASE_BITS)
 #define NO_OF_BASE_ADDRESS (1<<NO_OF_BASE_BITS)
-#define OFFSET_MASK ((1L<<NO_OF_MASK_BITS)-1)
+#define OFFSET_MASK ((1LL<<NO_OF_MASK_BITS)-1)
 #define BASE_ADDRESS_MASK (~OFFSET_MASK)
 
 #define MAX_FRAMES 16384
@@ -88,22 +88,20 @@ static jvmtiFrameInfo *_stack_frames_buffer = NULL;
 static jint *_stack_id_buffer = NULL;
 static jclass threadType = NULL;
 static jclass intArrType = NULL;
-static long base_addresses[NO_OF_BASE_ADDRESS]={-1L,-1L,-1L,-1L};
+static long long base_addresses[NO_OF_BASE_ADDRESS]={-1LL,-1LL,-1LL,-1LL};
 
 static jint convert_jmethodID_to_jint(jmethodID jmethod) {
     if (NEEDS_CONVERSION) {
-        long base_address=(long)jmethod&BASE_ADDRESS_MASK;
+        long long base_address=(long long)jmethod&BASE_ADDRESS_MASK;
         unsigned int i;
 
         for (i=0;i<NO_OF_BASE_ADDRESS;i++) {
-            long ba = base_addresses[i];
-
-            if (ba == -1L) {
+            if (base_addresses[i] == -1LL) {
                 base_addresses[i] = base_address;
-                //fprintf(stderr,"Profiler Agent: Registering new base %lx\n",base_address);
+                //fprintf(stderr,"Profiler Agent: Registering new base %llx\n",base_address);
             }
             if (base_addresses[i]==base_address) {
-                jint offset = (long)jmethod&OFFSET_MASK;
+                jint offset = (long long)jmethod&OFFSET_MASK;
                 offset |= i<<NO_OF_MASK_BITS;
                 //fprintf(stderr,"M %p -> %x\n",jmethod,offset);
                 return offset;
