@@ -1599,8 +1599,11 @@ public class ProfilerClient implements CommonConstants {
             && settings.getTargetJDKVersionString() != CommonConstants.JDK_100_STRING) {
             settings.setWorkingDir(resp.getWorkingDir());
             settings.setVMClassPaths(resp.getJavaClassPath(), resp.getJavaExtDirs(), resp.getBootClassPath());
-            ClassRepository.initClassPaths(settings.getWorkingDir(), settings.getVMClassPaths());
+        } else {
+            settings.setWorkingDir("");
+            settings.setVMClassPaths("", null, null);
         }
+        ClassRepository.initClassPaths(settings.getWorkingDir(), settings.getVMClassPaths());
 
         return true;
     }
