@@ -45,6 +45,7 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
+import java.util.Objects;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -72,9 +73,10 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
         
         objectsView = new TreeTableView("java_objects_hierarchy", context, actions, TreeTableViewColumn.classesPlain(heap)) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-                if (selected != null) {
-                    JavaClass javaClass = selected;
-                    
+                JavaClass javaClass;
+                synchronized (objectsView) { javaClass = selected; }
+                
+                if (javaClass != null) {
                     if (javaClass.isArray()) {
                         String className = javaClass.getName().replace("[]", ""); // NOI18N
                         JavaClass plainClass = heap.getJavaClassByName(className);
@@ -117,7 +119,11 @@ public class ClassHierarchyPlugin extends HeapViewPlugin {
     
     
     protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
-        selected = node == null ? null : HeapViewerNode.getValue(node, DataType.CLASS, heap);
+        JavaClass sel = node == null ? null : HeapViewerNode.getValue(node, DataType.CLASS, heap);
+        synchronized (objectsView) {
+            if (Objects.equals(selected, sel)) return;
+            else selected = sel;
+        }
         
         objectsView.reloadView();
     }
