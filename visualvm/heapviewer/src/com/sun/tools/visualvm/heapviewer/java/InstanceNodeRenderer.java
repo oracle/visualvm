@@ -28,7 +28,6 @@ package com.sun.tools.visualvm.heapviewer.java;
 import java.awt.Image;
 import javax.swing.ImageIcon;
 import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.ui.swing.renderer.JavaNameRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.modules.profiler.api.icons.Icons;
@@ -38,6 +37,7 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import org.openide.util.ImageUtilities;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.netbeans.lib.profiler.heap.Instance;
 import org.openide.util.NbBundle;
 
 /**
@@ -82,9 +82,9 @@ public class InstanceNodeRenderer extends JavaNameRenderer implements HeapViewer
         String log = node.getLogicalValue(heap);
         if (log != null && !log.isEmpty()) setGrayValue(" : " + log); // NOI18N
         
-        JavaClass jclass = HeapViewerNode.getValue(node, DataType.CLASS, heap);
-        ImageIcon icon = jclass != null && jclass.isArray() ? ICON_ARRAY : ICON_INSTANCE;
-        setIcon(isLoop ? new ImageIcon(ImageUtilities.mergeImages(icon.getImage(), IMAGE_LOOP, 0, 0)) : icon);     
+        ImageIcon icon = getIcon(node.getInstance(), node.isGCRoot());
+        if (isLoop) icon = new ImageIcon(ImageUtilities.mergeImages(icon.getImage(), IMAGE_LOOP, 0, 0));
+        setIcon(icon);     
         
         setIconTextGap(isLoop ? 4 : 1);
         ((LabelRenderer)valueRenderers()[0]).setMargin(3, isLoop ? 3 : 0, 3, 0);
@@ -92,6 +92,11 @@ public class InstanceNodeRenderer extends JavaNameRenderer implements HeapViewer
     
     public String getShortName() {
         return getBoldValue();
+    }
+    
+    
+    protected ImageIcon getIcon(Instance instance, boolean isGCRoot) {
+        return instance == null || !instance.getJavaClass().isArray() ? ICON_INSTANCE : ICON_ARRAY;
     }
     
 }
