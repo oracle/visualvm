@@ -50,6 +50,7 @@ import org.netbeans.lib.profiler.ui.components.JExtendedSplitPane;
 import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import java.awt.Container;
 import org.openide.util.Lookup;
 
 /**
@@ -127,14 +128,18 @@ public class PluggableTreeTableView extends TreeTableView {
         int pcount = plugins.size();
         for (int i = 0; i < pcount; i++) {
             HeapViewPlugin plugin = plugins.get(i);
-            PluginPresenter presenter = new PluginPresenter(plugin);
+            final PluginContainer[] container = new PluginContainer[1];
+            PluginPresenter presenter = new PluginPresenter(plugin) {
+                @Override
+                Container getPluginContainer() { return container[0]; }
+            };
             presenter.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
             if (i == 0) presenter.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
             else if (i == pcount - 1) presenter.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
             else presenter.putClientProperty("JButton.segmentPosition", "middle"); // NOI18N
-            PluginContainer container = new PluginContainer(plugin, presenter);
+            container[0] = new PluginContainer(plugin, presenter);
             toolbar.add(presenter);
-            pluginsComponent.add(container);
+            pluginsComponent.add(container[0]);
         }
         
         checkVisibility(pluginsComponent);
@@ -159,21 +164,19 @@ public class PluggableTreeTableView extends TreeTableView {
     }
     
     
-    private static class PluginPresenter extends JToggleButton {
-        
-        private final JComponent component;
+    private static abstract class PluginPresenter extends JToggleButton {
         
         PluginPresenter(HeapViewPlugin plugin) {
             super(plugin.getName(), plugin.getIcon());
-            
             setToolTipText(plugin.getDescription());
-            
-            this.component = plugin.getComponent();
         }
         
+        abstract Container getPluginContainer();
+        
         protected void fireItemStateChanged(ItemEvent e) {
-            component.getParent().setVisible(e.getStateChange() == ItemEvent.SELECTED);
-            checkVisibility((JComponent)component.getParent().getParent());
+            Container container = getPluginContainer();
+            container.setVisible(e.getStateChange() == ItemEvent.SELECTED);
+            checkVisibility((JComponent)container.getParent());
         }
         
     }
@@ -181,8 +184,12 @@ public class PluggableTreeTableView extends TreeTableView {
     
     private static class PluginContainer extends JPanel {
         
+        private final HeapViewPlugin plugin;
+        
         PluginContainer(HeapViewPlugin plugin, final PluginPresenter pluginPresenter) {
             super(new BorderLayout());
+            
+            this.plugin = plugin;
             
             JPanel detailHeader = new JPanel(null);
             detailHeader.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, SEPARATOR_COLOR));
@@ -197,8 +204,13 @@ public class PluggableTreeTableView extends TreeTableView {
             }));
             
             add(detailHeader, BorderLayout.NORTH);
-            add(plugin.getComponent(), BorderLayout.CENTER);
             setVisible(pluginPresenter.isSelected());
+        }
+        
+        public void setVisible(boolean visible) {
+            if (visible && getComponentCount() < 2)
+                add(plugin.getComponent(), BorderLayout.CENTER);
+            super.setVisible(visible);
         }
         
     }
