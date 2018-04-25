@@ -96,6 +96,7 @@ public class JavaNodesRendererProvider extends HeapViewerRenderer.Provider {
         
         // GC types
         renderers.put(GCTypeNode.class, new GCTypeNode.Renderer());
+        renderers.put(PathToGCRootPlugin.GCRootNode.class, new PathToGCRootPlugin.GCRootNode.Renderer(heap));
     }
     
 }
