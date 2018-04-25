@@ -812,7 +812,21 @@ public abstract class NetBeansProfiler extends Profiler {
     private static void loadAgentIntoTargetJVM(final String jar, final String options, final String pid)
                                             throws AttachNotSupportedException, IOException, AgentLoadException, AgentInitializationException  {
         VirtualMachine virtualMachine = VirtualMachine.attach(pid);
-        virtualMachine.loadAgent(jar,options);
+        try {
+            virtualMachine.loadAgent(jar,options);
+        } catch (AgentLoadException ex) {
+            if ("0".equals(ex.getMessage())) {
+                // JDK 10 -> JDK 9 mismatch
+                return;
+            }
+            throw ex;
+        } catch (IOException ex) {
+           if ("readInt".equals(ex.getStackTrace()[0].getMethodName())) {
+                // JDK 9 -> JDK 10 mismatch
+                return;
+            }
+            throw ex;
+        }
     }
 
     // -- NetBeansProfiler-only public methods -----------------------------------------------------------------------------

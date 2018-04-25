@@ -47,8 +47,9 @@ BuildForJDK()
         JAVA_HOME=$1
         JDK_ID=$2
         echo $JAVA_HOME $JDK_ID
+        # Use Solaris Studio 12
 	CC_FLAGS="-I$JAVA_HOME/include -I$JAVA_HOME/include/solaris -DSOLARIS -G -lrt \
-	-xO2 -v -mt -KPIC -xCC -Xa -xstrconst"
+	-xO2 -v -mt -xc99=none -Kpic -xCC -Xa -xstrconst"
 
 	cc $CC_FLAGS $PROC_FLAGS \
 	-o ../../release/lib/deployed/$JDK_ID/solaris-$PROC/libprofilerinterface.so \

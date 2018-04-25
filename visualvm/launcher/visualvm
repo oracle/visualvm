@@ -38,8 +38,8 @@ while [ -h "$PRG" ]; do
     fi
 done
 
-if [ -f `dirname "$PRG"`/../Resources/visualvm/etc/visualvm.conf ] ; then
-    PRG=`dirname "$PRG"`/../Resources/visualvm/bin/visualvm
+if [ -f "`dirname "$PRG"`/../Resources/visualvm/etc/visualvm.conf" ] ; then
+    PRG="`dirname "$PRG"`/../Resources/visualvm/bin/visualvm"
 fi
 
 progdir=`dirname "$PRG"`

@@ -47,8 +47,9 @@ BuildForJDK()
         JAVA_HOME=$1
         JDK_ID=$2
         echo $JAVA_HOME $JDK_ID
+        # Use Solaris Studio 12
 	CC_FLAGS="-I$JAVA_HOME/include -I$JAVA_HOME/include/solaris -DSOLARIS -G -lrt \
-	-xO2 -v -mt -Kpic -xCC -Xa -xstrconst -errwarn=%all"
+	-xO2 -v -mt -m64 -Kpic -xc99=none -xCC -Xa -xstrconst -errwarn=%all"
 
 	cc $CC_FLAGS $PROC_FLAGS \
 	-o ../../release/lib/deployed/$JDK_ID/solaris-$PROC/libprofilerinterface.so \
@@ -72,7 +73,7 @@ if [ $PROC = "i386" ]; then
   export PROC_FLAGS="-xregs=no%frameptr"
   PROC="amd64"
 elif [ $PROC = "sparc" ]; then
-  export PROC_FLAGS="-xregs=no%appl -xarch=v9"
+  export PROC_FLAGS="-xregs=no%appl"
   PROC="sparcv9"
 else 
   echo "Invalid architecture " $PROC
