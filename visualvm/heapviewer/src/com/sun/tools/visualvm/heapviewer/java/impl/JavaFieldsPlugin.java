@@ -76,14 +76,17 @@ class JavaFieldsPlugin extends HeapViewPlugin {
         
         objectsView = new TreeTableView("java_objects_fields", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-                if (selected != null) {
+                Object _selected;
+                synchronized (objectsView) { _selected = selected; }
+                
+                if (_selected != null) {
                     List<FieldValue> fields = null;
 
-                    if (selected instanceof Instance) {
-                        fields = new ArrayList(((Instance)selected).getFieldValues());
-                        fields.addAll(((Instance)selected).getStaticFieldValues());
-                    } else if (selected instanceof JavaClass) {
-                        fields = ((JavaClass)selected).getStaticFieldValues();
+                    if (_selected instanceof Instance) {
+                        fields = new ArrayList(((Instance)_selected).getFieldValues());
+                        fields.addAll(((Instance)_selected).getStaticFieldValues());
+                    } else if (_selected instanceof JavaClass) {
+                        fields = ((JavaClass)_selected).getStaticFieldValues();
                     }
 
                     HeapViewerNode[] nodes = JavaFieldsProvider.getNodes(fields, root, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
@@ -102,13 +105,16 @@ class JavaFieldsPlugin extends HeapViewPlugin {
     
     protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
         Instance selectedInstance = node == null ? null : HeapViewerNode.getValue(node, DataType.INSTANCE, heap);
-        if (selectedInstance != null) {
-            if (Objects.equals(selected, selectedInstance)) return;
-            selected = selectedInstance;
-        } else {
-            JavaClass selectedClass = node == null ? null : HeapViewerNode.getValue(node, DataType.CLASS, heap);
-            if (Objects.equals(selected, selectedClass)) return;
-            selected = selectedClass;
+        
+        synchronized (objectsView) {
+            if (selectedInstance != null) {
+                if (Objects.equals(selected, selectedInstance)) return;
+                selected = selectedInstance;
+            } else {
+                JavaClass selectedClass = node == null ? null : HeapViewerNode.getValue(node, DataType.CLASS, heap);
+                if (Objects.equals(selected, selectedClass)) return;
+                selected = selectedClass;
+            }
         }
         
         objectsView.reloadView();
