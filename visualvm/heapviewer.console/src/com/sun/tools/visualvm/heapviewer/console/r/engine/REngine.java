@@ -51,7 +51,7 @@ public class REngine {
     public static synchronized boolean isSupported() {
         if (supported == null) {
             try {
-                Context c = Context.create("R");
+                Context c = Context.newBuilder("R").allowAllAccess(true).build();
                 c.eval("R", "invisible(42)");
                 supported = Boolean.TRUE;
             } catch (Exception e) {
@@ -71,7 +71,7 @@ public class REngine {
     private void initRContext() {
         cancelled = new AtomicBoolean(false);
         outStream = new ROut();
-        rContext = Context.newBuilder("R").out(outStream).build();
+        rContext = Context.newBuilder("R").allowAllAccess(true).out(outStream).build();
         String javaToDfSrc =
                 "function(c1, c2, c3, c4) { " +
                 "   data.frame(ClassName=as.vector(c1, 'character')," +
