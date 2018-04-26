@@ -25,11 +25,8 @@
 
 package com.sun.tools.visualvm.heapviewer.java.impl;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import javax.swing.JComponent;
 import javax.swing.SortOrder;
 import org.netbeans.lib.profiler.heap.Heap;
@@ -42,13 +39,13 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.model.ProgressNode;
 import com.sun.tools.visualvm.heapviewer.model.RootNode;
 import com.sun.tools.visualvm.heapviewer.model.TextNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -69,31 +66,20 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     
     private final TreeTableView objectsView;
     
-    private final Set<Instance> computingInstances = Collections.synchronizedSet(new HashSet());
-    
 
-    public JavaReferencesPlugin(HeapContext context, HeapViewerActions actions) {
+    public JavaReferencesPlugin(HeapContext context, HeapViewerActions actions, final JavaReferencesProvider provider) {
         super(Bundle.JavaReferencesPlugin_Name(), Bundle.JavaReferencesPlugin_Description(), Icons.getIcon(ProfilerIcons.NODE_REVERSE));
         
         heap = context.getFragment().getHeap();
         
         objectsView = new TreeTableView("java_objects_references", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-                Instance _selected = null;
-                synchronized (this) { _selected = selected; }
+                Instance _selected;
+                synchronized (objectsView) { _selected = selected; }
                 
                 if (_selected != null) {
-                    if (computingInstances.contains(_selected)) {
-                        return new HeapViewerNode[] { new ProgressNode() };
-                    } else {
-                        computingInstances.add(_selected);
-                        try {
-                            HeapViewerNode[] nodes = JavaReferencesProvider.getNodes(_selected, root, heap, viewID, null, dataTypes, sortOrders, progress);
-                            return nodes == null || nodes.length == 0 ? new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_NoReferences()) } : nodes;
-                        } finally {
-                            computingInstances.remove(_selected);
-                        }
-                    }
+                    HeapViewerNode[] nodes = provider.getNodes(_selected, root, heap, viewID, null, dataTypes, sortOrders, progress);
+                    return nodes == null || nodes.length == 0 ? new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_NoReferences()) } : nodes;
                 }
                 
                 return new HeapViewerNode[] { new TextNode(Bundle.JavaReferencesPlugin_NoSelection()) };
@@ -108,9 +94,12 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     
     protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
         Instance newSelected = node == null ? null : HeapViewerNode.getValue(node, DataType.INSTANCE, heap);
-        if (Objects.equals(selected, newSelected)) return;
         
-        synchronized (this) { selected = newSelected; }
+        synchronized (objectsView) {
+            if (Objects.equals(selected, newSelected)) return;
+            selected = newSelected;
+        }
+        
         objectsView.reloadView();
     }
     
@@ -119,7 +108,10 @@ class JavaReferencesPlugin extends HeapViewPlugin {
     public static class Provider extends HeapViewPlugin.Provider {
 
         public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
-            if (!viewID.startsWith("diff") && JavaHeapFragment.isJavaHeap(context)) return new JavaReferencesPlugin(context, actions); // NOI18N
+            if (!viewID.startsWith("diff") && JavaHeapFragment.isJavaHeap(context)) { // NOI18N
+                JavaReferencesProvider provider = Lookup.getDefault().lookup(JavaReferencesProvider.class);
+                return new JavaReferencesPlugin(context, actions, provider);
+            }
             return null;
         }
         

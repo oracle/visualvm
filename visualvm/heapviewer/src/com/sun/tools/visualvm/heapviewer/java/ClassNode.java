@@ -29,6 +29,8 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
+import java.util.Iterator;
+import org.netbeans.lib.profiler.heap.Instance;
 
 /**
  *
@@ -48,6 +50,10 @@ public class ClassNode extends HeapViewerNode {
     
     public JavaClass getJavaClass() {
         return jclass;
+    }
+    
+    public Iterator<Instance> getInstancesIterator() {
+        return jclass.getInstancesIterator();
     }
     
     public String getName() {

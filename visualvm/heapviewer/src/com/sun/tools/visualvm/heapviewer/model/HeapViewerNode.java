@@ -155,8 +155,12 @@ public abstract class HeapViewerNode extends CCTNode {
             protected void done() {
                 if (children != null) try {
                     // TODO: children not valid in case the sorting changed during computation!
-                    setChildren(get());
-                    root.updateChildren(HeapViewerNode.this);
+                    HeapViewerNode[] newChildren = get();
+                    // newChildren may be null, for example if the worker thread has been interrupted
+                    if (newChildren != null) {
+                        setChildren(newChildren);
+                        root.updateChildren(HeapViewerNode.this);
+                    }
                 } catch (Exception ex) {
                     Exceptions.printStackTrace(ex);
                 }

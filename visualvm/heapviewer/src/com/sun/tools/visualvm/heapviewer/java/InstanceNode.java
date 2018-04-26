@@ -55,6 +55,9 @@ public class InstanceNode extends HeapViewerNode {
     private String name;
     private String logicalValue;
     
+    // Internal-only flag initialized during computeName()
+    private boolean isGCRoot;
+    
     
     public InstanceNode(Instance instance) {
         this.instance = instance;
@@ -81,8 +84,13 @@ public class InstanceNode extends HeapViewerNode {
     
     public String getName(Heap heap) {
         if (name == null) {
-            if (heap == null) return computeName(instance, null);
-            else name = computeName(instance, heap);
+            if (heap == null) {
+                return computeName(instance, (GCRoot)null);
+            } else {
+                GCRoot gcRoot = heap.getGCRoot(instance);
+                isGCRoot = gcRoot != null;
+                name = computeName(instance, gcRoot);
+            }
         }
         return name;
     }
@@ -113,9 +121,18 @@ public class InstanceNode extends HeapViewerNode {
     }
     
     
+    boolean isGCRoot() {
+        return isGCRoot;
+    }
+    
+    
     static String computeName(Instance instance, Heap heap) {
-        String name = instance.getJavaClass().getName() + "#" + instance.getInstanceNumber(); // NOI18N
         GCRoot gcroot = heap == null ? null : heap.getGCRoot(instance);
+        return computeName(instance, gcroot);
+    }
+    
+    private static String computeName(Instance instance, GCRoot gcroot) {
+        String name = instance.getJavaClass().getName() + "#" + instance.getInstanceNumber(); // NOI18N
         if (gcroot != null) name = Bundle.InstanceNode_GCRootFlag(name, gcroot.getKind());
         return name;
     }

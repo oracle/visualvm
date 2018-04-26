@@ -31,6 +31,7 @@ import org.netbeans.lib.profiler.heap.JavaClass;
 import com.sun.tools.visualvm.heapviewer.model.ContainerNode;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
+import java.util.Iterator;
 import org.openide.util.NbBundle;
 
 /**
@@ -55,6 +56,14 @@ public final class InstancesContainer {
         public Objects(String name, JavaClass javaClass, int maxItems) {
             super(name, maxItems);
             this.javaClass = javaClass;
+        }
+        
+        public JavaClass getJavaClass() {
+            return javaClass;
+        }
+        
+        public Iterator<Instance> getInstancesIterator() {
+            return getItems().iterator();
         }
 
         protected int getCount(Instance item, Heap heap) {
@@ -87,7 +96,7 @@ public final class InstancesContainer {
         }
         
         protected Object getValue(DataType type, Heap heap) {
-            if (type == DataType.CLASS) return javaClass;
+            if (type == DataType.CLASS) return getJavaClass();
 
             return super.getValue(type, heap);
         }

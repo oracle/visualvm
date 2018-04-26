@@ -46,6 +46,7 @@ import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+import org.openide.util.lookup.ServiceProviders;
 
 /**
  *
@@ -58,8 +59,14 @@ import org.openide.util.lookup.ServiceProvider;
     "JavaReferencesProvider_SamplesContainer=<sample {0} references>",
     "JavaReferencesProvider_NodesContainer=<references {0}-{1}>"
 })
-@ServiceProvider(service=HeapViewerNode.Provider.class, position = 400)
+@ServiceProviders(value={
+    @ServiceProvider(service=HeapViewerNode.Provider.class, position = 400),
+    @ServiceProvider(service=JavaReferencesProvider.class, position = 400)}
+)
 public class JavaReferencesProvider extends HeapViewerNode.Provider {
+    
+    private boolean referencesInitialized;
+    
     
     public String getName() {
         return Bundle.JavaReferencesProvider_Name();
@@ -77,12 +84,22 @@ public class JavaReferencesProvider extends HeapViewerNode.Provider {
         return getNodes(((InstanceNode)parent).getInstance(), parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
     }
     
-    static HeapViewerNode[] getNodes(Instance instance, final HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
+    HeapViewerNode[] getNodes(Instance instance, final HeapViewerNode parent, final Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
         if (instance == null) return null;
         
-        final List<Value> references = getReferences(instance);
+        List<Value> references = null;
         
-        NodesComputer<Value> computer = new NodesComputer<Value>(references.size(), UIThresholds.MAX_INSTANCE_REFERENCES) {
+        synchronized (this) {
+            if (!referencesInitialized) {
+                references = initializeReferences(instance);
+                referencesInitialized = true;
+            }
+        }
+        
+        if (references == null) references = instance.getReferences();
+        final List<Value> referencesF = references;
+        
+        NodesComputer<Value> computer = new NodesComputer<Value>(referencesF.size(), UIThresholds.MAX_INSTANCE_REFERENCES) {
             protected boolean sorts(DataType dataType) {
                 return !DataType.COUNT.equals(dataType);
             }
@@ -90,7 +107,7 @@ public class JavaReferencesProvider extends HeapViewerNode.Provider {
                 return InstanceReferenceNode.incoming(reference);
             }
             protected ProgressIterator<Value> objectsIterator(int index, Progress progress) {
-                Iterator<Value> iterator = references.listIterator(index);
+                Iterator<Value> iterator = referencesF.listIterator(index);
                 return new ProgressIterator(iterator, index, false, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
@@ -107,7 +124,7 @@ public class JavaReferencesProvider extends HeapViewerNode.Provider {
         return computer.computeNodes(parent, heap, viewID, null, dataTypes, sortOrders, progress);
     }
     
-    private static List<Value> getReferences(Instance instance) {
+    private static List<Value> initializeReferences(Instance instance) {
         assert !SwingUtilities.isEventDispatchThread();
 
         ProgressHandle pHandle = null;

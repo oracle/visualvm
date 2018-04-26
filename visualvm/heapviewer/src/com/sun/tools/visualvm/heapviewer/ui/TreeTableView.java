@@ -282,7 +282,6 @@ public class TreeTableView {
 //    protected void willBeSorted(List<RowSorter.SortKey> sortKeys) {}
     
     protected void nodeSelected(HeapViewerNode node, boolean adjusting) {
-        // TODO: a lot of noise here, requires cleanup!
         hasSelection = node != null;
         if (navigator != null) {
             String _viewName = viewName;
@@ -290,6 +289,14 @@ public class TreeTableView {
             navigator.setNode(node, currentRoot == root ? null : currentRoot, getRoot(), _viewName);
         }
     }
+    
+    protected void nodeExpanding(HeapViewerNode node) {}
+    
+    protected void nodeExpanded(HeapViewerNode node) {}
+
+    protected void nodeCollapsing(HeapViewerNode node) {}
+
+    protected void nodeCollapsed(HeapViewerNode node) {}
     
     protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
         return HeapViewerNode.NO_NODES;
@@ -454,13 +461,13 @@ public class TreeTableView {
                 
 //                TreeTableView.this.willBeSorted(sortKeys);
             }
-//            protected void nodeExpanding(TreeNode node)  { System.err.println(">>> Expanding " + node); }
-//    
-//            protected void nodeExpanded(TreeNode node)  { System.err.println(">>> Expanded " + node); }
-//
-//            protected void nodeCollapsing(TreeNode node)  { System.err.println(">>> Collapsing " + node); }
-//
-//            protected void nodeCollapsed(TreeNode node)  { System.err.println(">>> Collapsed " + node); }
+            protected void nodeExpanding(TreeNode node) { if (node instanceof HeapViewerNode) TreeTableView.this.nodeExpanding((HeapViewerNode)node); }
+    
+            protected void nodeExpanded(TreeNode node) { if (node instanceof HeapViewerNode) TreeTableView.this.nodeExpanded((HeapViewerNode)node); }
+
+            protected void nodeCollapsing(TreeNode node) { if (node instanceof HeapViewerNode) TreeTableView.this.nodeCollapsing((HeapViewerNode)node); }
+
+            protected void nodeCollapsed(TreeNode node) { if (node instanceof HeapViewerNode) TreeTableView.this.nodeCollapsed((HeapViewerNode)node); }
         };
         
         if (initialSortKey != null) {
