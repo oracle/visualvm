@@ -24,13 +24,9 @@
  */
 package com.sun.tools.visualvm.heapviewer.truffle.lang.ruby;
 
-import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleInstancePropertyProvider;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPropertyPlugin;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPropertyProvider;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -38,9 +34,6 @@ import org.netbeans.lib.profiler.heap.ArrayItemValue;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 
@@ -163,19 +156,6 @@ final class RubyObjectProperties {
         @Override
         protected Collection<FieldValue> getPropertyItems(RubyObject object, Heap heap) {
             return object.getReferences();
-        }
-
-
-        @ServiceProvider(service=HeapViewPlugin.Provider.class, position = 300)
-        public static class PluginProvider extends HeapViewPlugin.Provider {
-
-            public HeapViewPlugin createPlugin(HeapContext context, HeapViewerActions actions, String viewID) {
-                if (!RubyHeapFragment.isRubyHeap(context)) return null;
-
-                ReferencesProvider fieldsProvider = Lookup.getDefault().lookup(ReferencesProvider.class);
-                return new TruffleObjectPropertyPlugin("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE), "ruby_objects_references", context, actions, fieldsProvider);
-            }
-
         }
 
     }
