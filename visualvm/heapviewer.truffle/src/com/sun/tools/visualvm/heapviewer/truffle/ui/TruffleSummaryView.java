@@ -495,7 +495,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
         private void init() {
             Heap heap = context.getFragment().getHeap();
             
-            Icon typeIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.CLASS));
+            Icon typeIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.PACKAGE));
             final ProfilerRenderer typeRenderer = new TruffleTypeNode.Renderer(typeIcon);
             
             Icon instanceIcon = language.createLanguageIcon(Icons.getIcon(LanguageIcons.INSTANCE));
