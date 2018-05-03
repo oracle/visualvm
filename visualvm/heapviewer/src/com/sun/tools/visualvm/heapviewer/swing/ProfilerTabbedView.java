@@ -238,7 +238,7 @@ public abstract class ProfilerTabbedView {
         }
         
         private static String tabName(String name, boolean closable) {
-            return name + (closable ? " " : "");
+            return name + (closable ? " " : ""); // NOI18N
         }
         
         public boolean containsView(JComponent view) {

@@ -30,15 +30,11 @@ import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.MultiRenderer;
 import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
-import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@NbBundle.Messages({
-    "StackFrameNodeRenderer_AtMark=at"
-})
 public class StackFrameNodeRenderer extends MultiRenderer implements HeapViewerRenderer {
     
     private final LabelRenderer atRenderer;
@@ -48,7 +44,7 @@ public class StackFrameNodeRenderer extends MultiRenderer implements HeapViewerR
     
     public StackFrameNodeRenderer() {
         atRenderer = new LabelRenderer();
-        atRenderer.setText(Bundle.StackFrameNodeRenderer_AtMark());
+        atRenderer.setText("at"); // NOI18N
         atRenderer.setMargin(3, 3, 3, 0);
         methodRenderer = new JavaNameRenderer();
         renderers = new ProfilerRenderer[] { atRenderer, methodRenderer };

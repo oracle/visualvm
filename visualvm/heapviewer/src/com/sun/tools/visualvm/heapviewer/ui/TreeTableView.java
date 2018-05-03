@@ -705,7 +705,7 @@ public class TreeTableView {
         public String getColumnName(int column) {
             String columnName = columns.get(column).getHeaderValue().toString();
             return dataTypeListeners[column] == null ? columnName :
-                   "<html><nobr>" + columnName + " <small style='color: gray;'>(" + Bundle.TreeTableView_SortToGet() + ")</small></nobr></html>";
+                   "<html><nobr>" + columnName + " <small style='color: gray;'>(" + Bundle.TreeTableView_SortToGet() + ")</small></nobr></html>"; // NOI18N
         }
         
         public Object getValueAt(TreeNode node, int column) {

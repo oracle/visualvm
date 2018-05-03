@@ -55,6 +55,8 @@ import org.openide.util.NbBundle;
  */
 @NbBundle.Messages({
     "JavaThreadsProvider_LocalVariable=local variable",
+    "JavaThreadsProvider_UnknownLocalVariable=unknown local variable",
+    "JavaThreadsProvider_UnknownThread=unknown thread",
     "JavaThreadsProvider_CannotResolveClassMsg=Cannot resolve class",
     "JavaThreadsProvider_CannotResolveInstanceMsg=Cannot resolve instance"
 })
@@ -234,9 +236,9 @@ class JavaThreadsProvider {
                                         Instance localInstance = localVar.getInstance();
 
                                         if (localInstance != null) {
-                                            sb.append("       <span style=\"color: #666666\">local variable:</span> ").append(HeapUtils.instanceToHtml(localInstance, false, heap, javaClassClass)).append("<br>"); // NOI18N
+                                            sb.append("       <span style=\"color: #666666\">" + Bundle.JavaThreadsProvider_LocalVariable() + ":</span> ").append(HeapUtils.instanceToHtml(localInstance, false, heap, javaClassClass)).append("<br>"); // NOI18N
                                         } else {
-                                            sb.append("      <span style=\"color: #666666\"> unknown local variable</span><br>"); // NOI18N                                                
+                                            sb.append("       <span style=\"color: #666666\">" + Bundle.JavaThreadsProvider_UnknownLocalVariable() + "</span><br>"); // NOI18N                                                
                                         }
                                     }
                                 }
@@ -244,7 +246,7 @@ class JavaThreadsProvider {
                         }
                     }
                 } else {
-                    sb.append("Unknown thread<br>"); // NOI18N
+                    sb.append(Bundle.JavaThreadsProvider_UnknownThread() + "<br>"); // NOI18N
                 }
                 sb.append("<br>");  // NOI18N
             }

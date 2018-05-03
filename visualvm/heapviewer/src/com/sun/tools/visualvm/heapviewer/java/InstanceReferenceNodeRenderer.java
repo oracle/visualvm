@@ -37,15 +37,11 @@ import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
-import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
-@NbBundle.Messages({
-    "InstanceReferenceNodeRenderer_NodeNameRefence=in"
-})
 public class InstanceReferenceNodeRenderer extends MultiRenderer implements HeapViewerRenderer {
     
     protected static final Icon ICON_PRIMITIVE = Icons.getIcon(LanguageIcons.PRIMITIVE);
@@ -81,7 +77,7 @@ public class InstanceReferenceNodeRenderer extends MultiRenderer implements Heap
             public void setValue(Object value, int row) {
                 InstanceReferenceNode node = (InstanceReferenceNode) value;
                 if (InstanceNode.Mode.INCOMING_REFERENCE.equals(node.getMode())) {
-                    setText(Bundle.InstanceReferenceNodeRenderer_NodeNameRefence());
+                    setText("in"); // NOI18N
                     equalsRenderer.setMargin(3, 2, 3, 0);
                 } else {
                     setText("="); // NOI18N
