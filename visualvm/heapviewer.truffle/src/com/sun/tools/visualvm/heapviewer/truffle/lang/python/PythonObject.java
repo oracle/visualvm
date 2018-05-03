@@ -48,7 +48,7 @@ import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
  *
  * @author Tomas Hurka
  */
-public class PythonObject extends TruffleObject.InstanceBased {
+class PythonObject extends TruffleObject.InstanceBased {
 
 //    public static final DataType<PythonObject> DATA_TYPE = new DataType<PythonObject>(PythonObject.class, null, null);
 

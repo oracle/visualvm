@@ -52,7 +52,7 @@ import org.netbeans.lib.profiler.heap.Heap;
  *
  * @author Tomas Hurka
  */
-public class RObject extends TruffleObject.InstanceBased {
+class RObject extends TruffleObject.InstanceBased {
     
 //    public static final DataType<RObject> DATA_TYPE = new DataType<RObject>(RObject.class, null, null);
     
