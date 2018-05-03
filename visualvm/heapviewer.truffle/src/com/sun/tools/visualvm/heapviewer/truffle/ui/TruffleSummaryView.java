@@ -317,6 +317,8 @@ public class TruffleSummaryView extends HeapViewerFeature {
             table.setColumnRenderer(0, renderer, fillerColumn != 0);
             table.setColumnRenderer(1, renderer, fillerColumn != 1);
             
+            table.setFocusable(false);
+            
             add(table, BorderLayout.CENTER);
         }
         
