@@ -72,6 +72,12 @@ public class PythonLanguage extends TruffleLanguage<PythonObject, PythonType, Py
         return new PythonHeapFragment(this, langID, heap);
     }
     
+    
+    @Override
+    public Class<PythonObject> getLanguageObjectClass() {
+        return PythonObject.class;
+    }
+    
 
     @Override
     public boolean isLanguageObject(Instance instance) {

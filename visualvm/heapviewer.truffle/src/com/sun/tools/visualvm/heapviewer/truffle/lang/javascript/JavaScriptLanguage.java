@@ -72,6 +72,12 @@ public class JavaScriptLanguage extends TruffleLanguage<JavaScriptObject, JavaSc
         return new JavaScriptHeapFragment(this, langID, heap);
     }
     
+    
+    @Override
+    public Class<JavaScriptObject> getLanguageObjectClass() {
+        return JavaScriptObject.class;
+    }
+    
 
     @Override
     public boolean isLanguageObject(Instance instance) {

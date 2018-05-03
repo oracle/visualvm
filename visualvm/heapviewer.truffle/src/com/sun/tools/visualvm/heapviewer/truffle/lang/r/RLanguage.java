@@ -70,6 +70,12 @@ public class RLanguage extends TruffleLanguage<RObject, RType, RHeapFragment> {
         return new RHeapFragment(this, langID, heap);
     }
     
+    
+    @Override
+    public Class<RObject> getLanguageObjectClass() {
+        return RObject.class;
+    }
+    
 
     @Override
     public boolean isLanguageObject(Instance instance) {

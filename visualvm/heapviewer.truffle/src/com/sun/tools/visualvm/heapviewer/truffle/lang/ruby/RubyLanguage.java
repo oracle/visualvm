@@ -70,6 +70,12 @@ public class RubyLanguage extends TruffleLanguage<RubyObject, RubyType, RubyHeap
         return new RubyHeapFragment(this, langID, heap);
     }
     
+    
+    @Override
+    public Class<RubyObject> getLanguageObjectClass() {
+        return RubyObject.class;
+    }
+    
 
     @Override
     public boolean isLanguageObject(Instance instance) {

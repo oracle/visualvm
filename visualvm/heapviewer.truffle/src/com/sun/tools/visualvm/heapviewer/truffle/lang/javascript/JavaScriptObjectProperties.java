@@ -60,7 +60,7 @@ final class JavaScriptObjectProperties {
     public static class FieldsProvider extends TruffleObjectPropertyProvider.Fields<JavaScriptObject, JavaScriptType, JavaScriptHeapFragment, JavaScriptLanguage> {
 
         public FieldsProvider() {
-            super(Bundle.JavaScriptObjectProperties_Properties(), JavaScriptObject.class, JavaScriptLanguage.instance(), true);
+            super(Bundle.JavaScriptObjectProperties_Properties(), JavaScriptLanguage.instance(), true);
         }
 
 
@@ -141,7 +141,7 @@ final class JavaScriptObjectProperties {
     public static class ReferencesProvider extends TruffleObjectPropertyProvider.References<JavaScriptObject, JavaScriptType, JavaScriptHeapFragment, JavaScriptLanguage> {
 
         public ReferencesProvider() {
-            super(Bundle.JavaScriptObjectProperties_References(), JavaScriptObject.class, JavaScriptLanguage.instance(), false);
+            super(Bundle.JavaScriptObjectProperties_References(), JavaScriptLanguage.instance(), false);
         }
 
 

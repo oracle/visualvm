@@ -60,7 +60,7 @@ final class RubyObjectProperties {
     public static class FieldsProvider extends TruffleObjectPropertyProvider.Fields<RubyObject, RubyType, RubyHeapFragment, RubyLanguage> {
 
         public FieldsProvider() {
-            super(Bundle.RubyObjectProperties_Properties(), RubyObject.class, RubyLanguage.instance(), true);
+            super(Bundle.RubyObjectProperties_Properties(), RubyLanguage.instance(), true);
         }
 
 
@@ -140,7 +140,7 @@ final class RubyObjectProperties {
     public static class ReferencesProvider extends TruffleObjectPropertyProvider.References<RubyObject, RubyType, RubyHeapFragment, RubyLanguage> {
 
         public ReferencesProvider() {
-            super(Bundle.RubyObjectProperties_References(), RubyObject.class, RubyLanguage.instance(), false);
+            super(Bundle.RubyObjectProperties_References(), RubyLanguage.instance(), false);
         }
 
 

@@ -74,9 +74,9 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
     private final boolean filtersProperties;
     
     
-    protected TruffleObjectPropertyProvider(String propertyName, Class<O> objectClass, L language, boolean displaysProgress, boolean filtersProperties, int maxPropertyItems) {
+    protected TruffleObjectPropertyProvider(String propertyName, L language, boolean displaysProgress, boolean filtersProperties, int maxPropertyItems) {
         this.language = language;
-        this.objectClass = objectClass;
+        this.objectClass = language.getLanguageObjectClass();
         this.propertyName = propertyName;
         this.maxPropertyItems = maxPropertyItems;
         this.displaysProgress = displaysProgress;
@@ -176,8 +176,8 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
     
     public static abstract class Fields<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>> extends TruffleObjectPropertyProvider<O, T, F, L, FieldValue> {
         
-        protected Fields(String propertyName, Class<O> objectClass, L language, boolean filtersProperties) {
-            super(propertyName, objectClass, language, false, filtersProperties, UIThresholds.MAX_INSTANCE_FIELDS);
+        protected Fields(String propertyName, L language, boolean filtersProperties) {
+            super(propertyName, language, false, filtersProperties, UIThresholds.MAX_INSTANCE_FIELDS);
         }
         
         
@@ -242,8 +242,8 @@ public abstract class TruffleObjectPropertyProvider<O extends TruffleObject, T e
     
     public static abstract class References<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>> extends TruffleObjectPropertyProvider<O, T, F, L, FieldValue> {
         
-        protected References(String propertyName, Class<O> objectClass, L language, boolean filtersProperties) {
-            super(propertyName, objectClass, language, true, filtersProperties, UIThresholds.MAX_INSTANCE_REFERENCES);
+        protected References(String propertyName, L language, boolean filtersProperties) {
+            super(propertyName, language, true, filtersProperties, UIThresholds.MAX_INSTANCE_REFERENCES);
         }
         
         

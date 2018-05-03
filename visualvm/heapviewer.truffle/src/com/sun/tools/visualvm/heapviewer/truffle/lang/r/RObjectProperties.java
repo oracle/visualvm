@@ -62,7 +62,7 @@ final class RObjectProperties {
     public static class AttributesProvider extends TruffleObjectPropertyProvider.Fields<RObject, RType, RHeapFragment, RLanguage> {
 
         public AttributesProvider() {
-            super(Bundle.RObjectProperties_Properties(), RObject.class, RLanguage.instance(), true);
+            super(Bundle.RObjectProperties_Properties(), RLanguage.instance(), true);
         }
 
 
@@ -123,7 +123,7 @@ final class RObjectProperties {
     public static class ItemsProvider extends TruffleObjectPropertyProvider.Fields<RObject, RType, RHeapFragment, RLanguage> {
 
         public ItemsProvider() {
-            super(Bundle.RObjectProperties_Items(), RObject.class, RLanguage.instance(), true);
+            super(Bundle.RObjectProperties_Items(), RLanguage.instance(), true);
         }
 
 
@@ -189,7 +189,7 @@ final class RObjectProperties {
     public static class ReferencesProvider extends TruffleObjectPropertyProvider.References<RObject, RType, RHeapFragment, RLanguage> {
 
         public ReferencesProvider() {
-            super(Bundle.RObjectProperties_References(), RObject.class, RLanguage.instance(), false);
+            super(Bundle.RObjectProperties_References(), RLanguage.instance(), false);
         }
 
 

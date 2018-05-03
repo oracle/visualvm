@@ -59,7 +59,7 @@ final class PythonObjectProperties {
     public static class AttributesProvider extends TruffleObjectPropertyProvider.Fields<PythonObject, PythonType, PythonHeapFragment, PythonLanguage> {
 
         public AttributesProvider() {
-            super(Bundle.PythonObjectProperties_Properties(), PythonObject.class, PythonLanguage.instance(), true);
+            super(Bundle.PythonObjectProperties_Properties(), PythonLanguage.instance(), true);
         }
 
 
@@ -113,7 +113,7 @@ final class PythonObjectProperties {
     public static class ItemsProvider extends TruffleObjectPropertyProvider.Fields<PythonObject, PythonType, PythonHeapFragment, PythonLanguage> {
 
         public ItemsProvider() {
-            super(Bundle.PythonObjectProperties_Items(), PythonObject.class, PythonLanguage.instance(), true);
+            super(Bundle.PythonObjectProperties_Items(), PythonLanguage.instance(), true);
         }
 
 
@@ -167,7 +167,7 @@ final class PythonObjectProperties {
     public static class ReferencesProvider extends TruffleObjectPropertyProvider.References<PythonObject, PythonType, PythonHeapFragment, PythonLanguage> {
 
         public ReferencesProvider() {
-            super(Bundle.PythonObjectProperties_References(), PythonObject.class, PythonLanguage.instance(), false);
+            super(Bundle.PythonObjectProperties_References(), PythonLanguage.instance(), false);
         }
 
 

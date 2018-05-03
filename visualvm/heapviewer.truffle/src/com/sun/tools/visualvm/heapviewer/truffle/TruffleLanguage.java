@@ -90,6 +90,9 @@ public abstract class TruffleLanguage<O extends TruffleObject, T extends Truffle
     }
     
     
+    public abstract Class<O> getLanguageObjectClass();
+    
+    
     public abstract boolean isLanguageObject(Instance instance);
     
     public abstract O createObject(Instance instance);
