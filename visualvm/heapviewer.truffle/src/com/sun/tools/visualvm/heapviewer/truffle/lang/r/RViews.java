@@ -41,12 +41,18 @@ import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.JavaClass;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "RViews_Version=Version:",
+    "RViews_Platform=Platform:",
+    "RViews_Unknown=<unknown>"
+})
 final class RViews {
     
     // -------------------------------------------------------------------------
@@ -88,8 +94,8 @@ final class RViews {
         protected void computeEnvironmentData(Object[][] environmentData) {
             super.computeEnvironmentData(environmentData);
             
-            environmentData[1][0] = "Version:";
-            environmentData[2][0] = "Platform:";
+            environmentData[1][0] = Bundle.RViews_Version();
+            environmentData[2][0] = Bundle.RViews_Platform();
             
             RHeapFragment fragment = (RHeapFragment)getContext().getFragment();
             Heap heap = fragment.getHeap();
@@ -104,12 +110,12 @@ final class RViews {
                         List<FieldValue> fields = envFrame.getLocalFieldValues();
                         for (FieldValue field : fields) {
                             String fieldName = field.getField().getName();
-                            if (("R.version".equals(fieldName) || "version".equals(fieldName)) && field instanceof ObjectFieldValue) {
+                            if (("R.version".equals(fieldName) || "version".equals(fieldName)) && field instanceof ObjectFieldValue) { // NOI18N
                                 Instance envI = ((ObjectFieldValue)field).getInstance();
                                 if (RObject.isRObject(envI)) {
                                     RObject env = new RObject(envI);
-                                    environmentData[1][1] = itemValue(env, "version.string", heap);
-                                    environmentData[2][1] = itemValue(env, "system", heap);
+                                    environmentData[1][1] = itemValue(env, "version.string", heap); // NOI18N
+                                    environmentData[2][1] = itemValue(env, "system", heap); // NOI18N
                                 }
                                                                 
                                 break;
@@ -119,12 +125,12 @@ final class RViews {
                 }
             }
             
-            if (environmentData[1][1] == null) environmentData[1][1] = "<unknown>";
-            if (environmentData[2][1] == null) environmentData[2][1] = "<unknown>";
+            if (environmentData[1][1] == null) environmentData[1][1] = Bundle.RViews_Unknown();
+            if (environmentData[2][1] == null) environmentData[2][1] = Bundle.RViews_Unknown();
         }
         
         private static String itemValue(RObject object, String item, Heap heap) {
-            item = "(" + item + ")";
+            item = "(" + item + ")"; // NOI18N
             List<FieldValue> items = object.getFieldValues();
             for (FieldValue itemv : items) {
                 String itemn = itemv.getField().getName();

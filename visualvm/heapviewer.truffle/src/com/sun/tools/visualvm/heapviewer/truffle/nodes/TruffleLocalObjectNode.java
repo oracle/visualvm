@@ -67,7 +67,7 @@ public interface TruffleLocalObjectNode<O extends TruffleObject> extends Truffle
         
         public Renderer(Heap heap, Icon icon) {
             lvRenderer = new LabelRenderer();
-            lvRenderer.setText("local object");
+            lvRenderer.setText("local object"); // NOI18N
             lvRenderer.setMargin(3, 3, 3, 1);
             
             dobjectRenderer = new TruffleObjectNode.Renderer(heap, icon);
@@ -87,7 +87,7 @@ public interface TruffleLocalObjectNode<O extends TruffleObject> extends Truffle
 
         public String getShortName() {
             String name = dobjectRenderer.getShortName();
-            int nameIdx = name.lastIndexOf('[');
+            int nameIdx = name.lastIndexOf('['); // NOI18N
             if (nameIdx != -1) name = name.substring(0, nameIdx).trim();
             return /*lvRenderer + " " +*/ name;
         }

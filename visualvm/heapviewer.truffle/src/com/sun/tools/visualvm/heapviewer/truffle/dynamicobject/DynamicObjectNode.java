@@ -49,7 +49,7 @@ public class DynamicObjectNode<O extends DynamicObject> extends TruffleObjectNod
     
     
     protected static String defaultLogicalValue(DynamicObject object, String type, Heap heap) {
-        return "shape #" + object.getShape().getInstanceNumber();
+        return "shape #" + object.getShape().getInstanceNumber(); // NOI18N
     }
     
 }

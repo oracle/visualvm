@@ -42,21 +42,28 @@ import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TruffleReferencesProvider_Name=truffle references",
+    "TruffleReferencesProvider_MoreNodes=<another {0} truffle references left>",
+    "TruffleReferencesProvider_SamplesContainer=<sample {0} truffle references>",
+    "TTruffleReferencesProvider_NodesContainer=<truffle references {0}-{1}>"
+})
 @ServiceProvider(service=HeapViewerNode.Provider.class, position = 200)
 public class TruffleReferencesProvider extends HeapViewerNode.Provider {
     
     public String getName() {
-        return "truffle references";
+        return Bundle.TruffleReferencesProvider_Name();
     }
     
     public boolean supportsView(Heap heap, String viewID) {
-        return viewID.equals("truffle_objects_javaext");
+        return viewID.equals("truffle_objects_javaext"); // NOI18N
     }
     
     public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
@@ -90,13 +97,13 @@ public class TruffleReferencesProvider extends HeapViewerNode.Provider {
                 return new ProgressIterator(iterator, index, false, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
-                return "<another " + moreNodesCount + " references left>";
+                return Bundle.TruffleReferencesProvider_MoreNodes(moreNodesCount);
             }
             protected String getSamplesContainerString(String objectsCount)  {
-                return "<sample " + objectsCount + " references>";
+                return Bundle.TruffleReferencesProvider_SamplesContainer(objectsCount);
             }
             protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                return "<references " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                return Bundle.TTruffleReferencesProvider_NodesContainer(firstNodeIdx, lastNodeIdx);
             }
         };
 

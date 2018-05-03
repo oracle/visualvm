@@ -40,12 +40,18 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "PythonViews_Version=Version:",
+    "PythonViews_Platform=Platform:",
+    "PythonViews_Unknown=<unknown>"
+})
 final class PythonViews {
     
     // -------------------------------------------------------------------------
@@ -87,11 +93,11 @@ final class PythonViews {
         protected void computeEnvironmentData(Object[][] environmentData) {
             super.computeEnvironmentData(environmentData);
             
-            environmentData[1][0] = "Version:";
-            environmentData[2][0] = "Platform:";
+            environmentData[1][0] = Bundle.PythonViews_Version();
+            environmentData[2][0] = Bundle.PythonViews_Platform();
             
             PythonHeapFragment fragment = (PythonHeapFragment)getContext().getFragment();
-            PythonType moduleType = fragment.getType("module", null);
+            PythonType moduleType = fragment.getType("module", null); // NOI18N
             
             if (moduleType != null) {
                 Heap heap = fragment.getHeap();
@@ -100,31 +106,31 @@ final class PythonViews {
                 Iterator<PythonObject> objects = moduleType.getObjectsIterator();
                 while (objects.hasNext()) {
                     PythonObject object = objects.next();
-                    if ("sys".equals(DetailsSupport.getDetailsString(object.getInstance(), heap))) {
+                    if ("sys".equals(DetailsSupport.getDetailsString(object.getInstance(), heap))) { // NOI18N
                         sysModule = object;
                         break;
                     }
                 }
                 if (sysModule != null) {
-                    String version = attributeValue(sysModule, "version", heap);
-                    int graalInfoIdx = version.indexOf('[');
+                    String version = attributeValue(sysModule, "version", heap); // NOI18N
+                    int graalInfoIdx = version.indexOf('['); // NOI18N
                     if (graalInfoIdx != -1) version = version.substring(0, graalInfoIdx);
                     environmentData[1][1] = version;
-                    environmentData[2][1] = attributeValue(sysModule, "platform", heap);
+                    environmentData[2][1] = attributeValue(sysModule, "platform", heap); // NOI18N
                     
-                    PythonObject implementation = attributeObject(sysModule, "implementation");                    
+                    PythonObject implementation = attributeObject(sysModule, "implementation");      // NOI18N               
                     if (implementation != null) {
-                        PythonObject _ns_ = attributeObject(implementation, "__ns__");
+                        PythonObject _ns_ = attributeObject(implementation, "__ns__"); // NOI18N
                         if (_ns_ != null) {
-                            environmentData[1][1] = attributeValue(_ns_, "name", heap) + " " + version;
-                            environmentData[2][1] = attributeValue(_ns_, "_multiarch", heap);
+                            environmentData[1][1] = attributeValue(_ns_, "name", heap) + " " + version; // NOI18N
+                            environmentData[2][1] = attributeValue(_ns_, "_multiarch", heap); // NOI18N
                         }
                     }
                 }
             }
             
-            if (environmentData[1][1] == null) environmentData[1][1] = "<unknown>";
-            if (environmentData[2][1] == null) environmentData[2][1] = "<unknown>";
+            if (environmentData[1][1] == null) environmentData[1][1] = Bundle.PythonViews_Unknown();
+            if (environmentData[2][1] == null) environmentData[2][1] = Bundle.PythonViews_Unknown();
         }
         
         private static PythonObject attributeObject(PythonObject object, String attribute) {

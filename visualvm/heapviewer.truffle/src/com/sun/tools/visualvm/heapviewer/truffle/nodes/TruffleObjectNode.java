@@ -91,7 +91,7 @@ public interface TruffleObjectNode<O extends TruffleObject> {
         public String getLogicalValue(Heap heap) {
             if (logicalValue == null) {
                 logicalValue = computeLogicalValue(object, typeName, heap);
-                if (logicalValue == null) logicalValue = "";
+                if (logicalValue == null) logicalValue = ""; // NOI18N
             }
             return logicalValue.isEmpty() ? null : logicalValue;
         }
@@ -153,17 +153,17 @@ public interface TruffleObjectNode<O extends TruffleObject> {
             boolean isLoop = loop != null;
             TruffleObjectNode node = isLoop ? (TruffleObjectNode)loop : (TruffleObjectNode)value;
             
-            String name = node == null ? "" : node.getName(heap);
-            if (name != null && !"null".equals(name)) {
-                super.setNormalValue(isLoop ? "loop to " : "");
+            String name = node == null ? "" : node.getName(heap); // NOI18N
+            if (name != null && !"null".equals(name)) { // NOI18N
+                super.setNormalValue(isLoop ? "loop to " : ""); // NOI18N
                 super.setBoldValue(name);
             } else {
-                super.setNormalValue("null");
+                super.setNormalValue("null"); // NOI18N
                 super.setBoldValue(null);
             }
             
             String logValue = node.getLogicalValue(heap);
-            setGrayValue(logValue == null ? "" : " : " + logValue);
+            setGrayValue(logValue == null ? "" : " : " + logValue); // NOI18N
             
             setIcon(isLoop ? loopIcon() : icon);   
             

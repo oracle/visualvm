@@ -31,12 +31,21 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "RViewPlugins_PropertiesName=Attributes",
+    "RViewPlugins_PropertiesDescription=Attributes",
+    "RViewPlugins_ItemsName=Items",
+    "RViewPlugins_ItemsDescription=Items",
+    "RViewPlugins_ReferencesName=References",
+    "RViewPlugins_ReferencesDescription=References"
+})
 final class RViewPlugins {
     
     // -------------------------------------------------------------------------
@@ -50,7 +59,7 @@ final class RViewPlugins {
             if (!RHeapFragment.isRHeap(context)) return null;
             
             RObjectProperties.AttributesProvider fieldsProvider = Lookup.getDefault().lookup(RObjectProperties.AttributesProvider.class);
-            return new TruffleObjectPropertyPlugin("Attributes", "Attributes", Icons.getIcon(ProfilerIcons.NODE_FORWARD), "r_objects_attributes", context, actions, fieldsProvider);
+            return new TruffleObjectPropertyPlugin(Bundle.RViewPlugins_PropertiesName(), Bundle.RViewPlugins_PropertiesDescription(), Icons.getIcon(ProfilerIcons.NODE_FORWARD), "r_objects_attributes", context, actions, fieldsProvider); // NOI18N
         }
         
     }
@@ -67,7 +76,7 @@ final class RViewPlugins {
             if (!RHeapFragment.isRHeap(context)) return null;
             
             RObjectProperties.ItemsProvider fieldsProvider = Lookup.getDefault().lookup(RObjectProperties.ItemsProvider.class);
-            return new TruffleObjectPropertyPlugin("Items", "Items", Icons.getIcon(ProfilerIcons.NODE_FORWARD), "r_objects_items", context, actions, fieldsProvider);
+            return new TruffleObjectPropertyPlugin(Bundle.RViewPlugins_ItemsName(), Bundle.RViewPlugins_ItemsDescription(), Icons.getIcon(ProfilerIcons.NODE_FORWARD), "r_objects_items", context, actions, fieldsProvider); // NOI18N
         }
         
     }
@@ -84,7 +93,7 @@ final class RViewPlugins {
             if (!RHeapFragment.isRHeap(context)) return null;
             
             RObjectProperties.ReferencesProvider fieldsProvider = Lookup.getDefault().lookup(RObjectProperties.ReferencesProvider.class);
-            return new TruffleObjectPropertyPlugin("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE), "r_objects_references", context, actions, fieldsProvider);
+            return new TruffleObjectPropertyPlugin(Bundle.RViewPlugins_ReferencesName(), Bundle.RViewPlugins_ReferencesDescription(), Icons.getIcon(ProfilerIcons.NODE_REVERSE), "r_objects_references", context, actions, fieldsProvider); // NOI18N
         }
         
     }

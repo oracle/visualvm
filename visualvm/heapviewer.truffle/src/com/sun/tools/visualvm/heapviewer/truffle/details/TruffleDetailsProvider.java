@@ -68,13 +68,13 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
             String rootNode = DetailsUtils.getInstanceFieldString(instance, "rootNode", heap); // NOI18N
 
             if (rootNode != null) {
-                Object entryPoint = instance.getValueOfField("entryPoint");
+                Object entryPoint = instance.getValueOfField("entryPoint"); // NOI18N
 
                 if (entryPoint instanceof Long && ((Long) entryPoint).longValue() != 0) {
-                    rootNode += " <opt>";
+                    rootNode += " <opt>"; // NOI18N
                 }
-                if (instance.getValueOfField("sourceCallTarget") != null) {
-                    rootNode += " <split-" + Long.toHexString(instance.getInstanceId()) + ">";
+                if (instance.getValueOfField("sourceCallTarget") != null) { // NOI18N
+                    rootNode += " <split-" + Long.toHexString(instance.getInstanceId()) + ">"; // NOI18N
                 }
                 return rootNode;
             } else {
@@ -86,19 +86,19 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
             String version = DetailsUtils.getInstanceFieldString(instance, "version", heap); // NOI18N
 
             if (name != null && version != null) {
-                return name + " (version " + version + ")";
+                return name + " (version " + version + ")"; // NOI18N
             }
             return name;
         }
         if (POLYGLOT_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "info", heap);
+            return DetailsUtils.getInstanceFieldString(instance, "info", heap); // NOI18N
         }
         if (INSTRUMENT_INFO_MASK.equals(className)) {
             String name = DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
             String version = DetailsUtils.getInstanceFieldString(instance, "version", heap); // NOI18N
 
             if (name != null && !name.isEmpty() && version != null && !version.isEmpty()) {
-                return name + " (version " + version + ")";
+                return name + " (version " + version + ")"; // NOI18N
             }
             if (name == null || name.isEmpty()) {
                 return DetailsUtils.getInstanceFieldString(instance, "id", heap); // NOI18N
@@ -106,7 +106,7 @@ public class TruffleDetailsProvider extends DetailsProvider.Basic {
             return name;
         }
         if (NATIVE_ROOT_MASK.equals(className)) {
-            return "native call";
+            return "native call"; // NOI18N
         }
         return null;
     }

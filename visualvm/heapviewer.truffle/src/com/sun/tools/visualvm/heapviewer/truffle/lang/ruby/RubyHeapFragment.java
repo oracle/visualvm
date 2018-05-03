@@ -29,20 +29,24 @@ import org.netbeans.lib.profiler.heap.Instance;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObjectLanguageHeapFragment;
 import java.util.Iterator;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "RubyHeapFragment_Name=Ruby Heap"
+})
 class RubyHeapFragment extends DynamicObjectLanguageHeapFragment<RubyObject, RubyType> {
     
     static final String RUBY_LANG_ID = "org.truffleruby.language.RubyObjectType"; // NOI18N
     
-    private static final String RUBY_HEAP_ID = "ruby_heap";
+    private static final String RUBY_HEAP_ID = "ruby_heap"; // NOI18N
     
     
     RubyHeapFragment(RubyLanguage language, Instance langID, Heap heap) {
-        super(RUBY_HEAP_ID, "Ruby Heap", fragmentDescription(langID, heap), language, heap);
+        super(RUBY_HEAP_ID, Bundle.RubyHeapFragment_Name(), fragmentDescription(langID, heap), language, heap);
     }
     
     
@@ -63,7 +67,7 @@ class RubyHeapFragment extends DynamicObjectLanguageHeapFragment<RubyObject, Rub
 
     
     static boolean isRubyHeap(HeapContext context) {
-        return RUBY_HEAP_ID.equals(context.getFragment().getID()); // NOI18N
+        return RUBY_HEAP_ID.equals(context.getFragment().getID());
     }
     
 //    public static HeapContext getRubyContext(HeapContext context) {

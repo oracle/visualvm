@@ -83,13 +83,13 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
         if (SOURCE_SECTION_MASK.equals(className)) {
             Integer charIndex = (Integer) instance.getValueOfField("charIndex");    // NOI18N
             Integer charLength = (Integer) instance.getValueOfField("charLength");  // NOI18N
-            return DetailsUtils.getInstanceFieldString(instance, "source", heap)+ " ["+charIndex+","+(charIndex+charLength)+"]";
+            return DetailsUtils.getInstanceFieldString(instance, "source", heap)+ " ["+charIndex+","+(charIndex+charLength)+"]"; // NOI18N
         }
         if (FRAMESLOT_MASK.equals(className)) {
             Integer index = (Integer) instance.getValueOfField("index");    // NOI18N
             String identifier = DetailsUtils.getInstanceFieldString(instance, "identifier", heap);    // NOI18N
             String kind = DetailsUtils.getInstanceFieldString(instance, "kind", heap);    // NOI18N
-            return "[" + index + "," + identifier + "," + kind + "]";
+            return "[" + index + "," + identifier + "," + kind + "]"; // NOI18N
         }
         if (BP_ENABLED_MASK.equals(className)) {
             Object val = instance.getValueOfField("visited");   // NOI18N
@@ -105,7 +105,7 @@ public class SourceDetailsProvider extends DetailsProvider.Basic {
             if (val instanceof Boolean && val1 instanceof Boolean) {
                 boolean wasTrue = ((Boolean)val).booleanValue();
                 boolean wasFalse = ((Boolean)val1).booleanValue();
-                return "wasTrue="+wasTrue+", wasFalse="+wasFalse;
+                return "wasTrue="+wasTrue+", wasFalse="+wasFalse; // NOI18N
             }
 
         }

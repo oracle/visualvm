@@ -31,12 +31,21 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "PythonViewPlugins_PropertiesName=Attributes",
+    "PythonViewPlugins_PropertiesDescription=Attributes",
+    "PythonViewPlugins_ItemsName=Items",
+    "PythonViewPlugins_ItemsDescription=Items",
+    "PythonViewPlugins_ReferencesName=References",
+    "PythonViewPlugins_ReferencesDescription=References"
+})
 final class PythonViewPlugins {
     
     // -------------------------------------------------------------------------
@@ -50,7 +59,7 @@ final class PythonViewPlugins {
             if (!PythonHeapFragment.isPythonHeap(context)) return null;
             
             PythonObjectProperties.AttributesProvider fieldsProvider = Lookup.getDefault().lookup(PythonObjectProperties.AttributesProvider.class);
-            return new TruffleObjectPropertyPlugin("Attributes", "Attributes", Icons.getIcon(ProfilerIcons.NODE_FORWARD), "python_objects_attributes", context, actions, fieldsProvider);
+            return new TruffleObjectPropertyPlugin(Bundle.PythonViewPlugins_PropertiesName(), Bundle.PythonViewPlugins_PropertiesDescription(), Icons.getIcon(ProfilerIcons.NODE_FORWARD), "python_objects_attributes", context, actions, fieldsProvider); // NOI18N
         }
         
     }
@@ -67,7 +76,7 @@ final class PythonViewPlugins {
             if (!PythonHeapFragment.isPythonHeap(context)) return null;
             
             PythonObjectProperties.ItemsProvider fieldsProvider = Lookup.getDefault().lookup(PythonObjectProperties.ItemsProvider.class);
-            return new TruffleObjectPropertyPlugin("Items", "Items", Icons.getIcon(ProfilerIcons.NODE_FORWARD), "python_objects_items", context, actions, fieldsProvider);
+            return new TruffleObjectPropertyPlugin(Bundle.PythonViewPlugins_ItemsName(), Bundle.PythonViewPlugins_ItemsDescription(), Icons.getIcon(ProfilerIcons.NODE_FORWARD), "python_objects_items", context, actions, fieldsProvider); // NOI18N
         }
         
     }
@@ -84,7 +93,7 @@ final class PythonViewPlugins {
             if (!PythonHeapFragment.isPythonHeap(context)) return null;
             
             PythonObjectProperties.ReferencesProvider fieldsProvider = Lookup.getDefault().lookup(PythonObjectProperties.ReferencesProvider.class);
-            return new TruffleObjectPropertyPlugin("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE), "python_objects_references", context, actions, fieldsProvider);
+            return new TruffleObjectPropertyPlugin(Bundle.PythonViewPlugins_ReferencesName(), Bundle.PythonViewPlugins_ReferencesDescription(), Icons.getIcon(ProfilerIcons.NODE_REVERSE), "python_objects_references", context, actions, fieldsProvider); // NOI18N
         }
         
     }

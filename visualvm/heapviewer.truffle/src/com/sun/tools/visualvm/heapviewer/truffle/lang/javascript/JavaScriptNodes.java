@@ -83,20 +83,20 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
     static String getLogicalValue(JavaScriptObject object, String type, Heap heap) {
         String logicalValue = null;
         
-        if ("Function".equals(type) || "JSFunction".equals(type)) {
-            FieldValue dataField = object.getFieldValue("functionData (hidden)");
+        if ("Function".equals(type) || "JSFunction".equals(type)) { // NOI18N
+            FieldValue dataField = object.getFieldValue("functionData (hidden)"); // NOI18N
             Instance data = dataField instanceof ObjectFieldValue ? ((ObjectFieldValue)dataField).getInstance() : null;
 //                Instance data = (Instance)getInstance().getValueOfField("object2");
             logicalValue = data == null ? null : DetailsSupport.getDetailsString(data, heap);
             if (logicalValue != null) logicalValue += "()";
-        } else if ("JavaPackage".equals(type)) {
-            FieldValue nameField = object.getFieldValue("packageName (hidden)");
+        } else if ("JavaPackage".equals(type)) { // NOI18N
+            FieldValue nameField = object.getFieldValue("packageName (hidden)"); // NOI18N
             Instance name = nameField instanceof ObjectFieldValue ? ((ObjectFieldValue)nameField).getInstance() : null;
 //                Instance name = (Instance)getInstance().getValueOfField("object2");
             logicalValue = name == null ? null : DetailsSupport.getDetailsString(name, heap);
-        } else if ("Object".equals(type) || "JSObject".equals(type)) {
-            String head = "properties [";
-            String sep = ", ";
+        } else if ("Object".equals(type) || "JSObject".equals(type)) { // NOI18N
+            String head = "properties ["; // NOI18N
+            String sep = ", "; // NOI18N
             
             StringBuilder sb = new StringBuilder();
             sb.append(head);
@@ -104,33 +104,33 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
             List<FieldValue> fields = object.getFieldValues();
             for (FieldValue field : fields) {
                 String name = field.getField().getName();
-                if (!name.contains("(hidden)")) sb.append(name).append(sep);
+                if (!name.contains("(hidden)")) sb.append(name).append(sep); // NOI18N
             }
             
             int length = sb.length();
             if (length > head.length()) sb.delete(length - sep.length(), length);
-            sb.append("]");
+            sb.append("]"); // NOI18N
             
             logicalValue = sb.toString();
-        } else if ("Array".equals(type) || "JSArray".equals(type)) {
-            FieldValue lengthField = object.getFieldValue("length (hidden)");
+        } else if ("Array".equals(type) || "JSArray".equals(type)) { // NOI18N
+            FieldValue lengthField = object.getFieldValue("length (hidden)"); // NOI18N
             if (lengthField == null) {
-                lengthField = object.getFieldValue("usedLength (hidden)");
+                lengthField = object.getFieldValue("usedLength (hidden)"); // NOI18N
             }
             if (lengthField != null) {
                 Integer length = Integer.parseInt(lengthField.getValue());
-                logicalValue = Formatters.numberFormat().format(length) + (length == 1 ? " item" : " items");
+                logicalValue = Formatters.numberFormat().format(length) + (length == 1 ? " item" : " items"); // NOI18N
             }
-        } else if ("Null$NullClass".equals(type)) {
+        } else if ("Null$NullClass".equals(type)) { // NOI18N
             logicalValue = DetailsSupport.getDetailsString(object.getInstance(), heap);
-        } else if ("Date".equals(type) || "JSDate".equals(type)) {
-            FieldValue timeField = object.getFieldValue("timeMillis (hidden)");
+        } else if ("Date".equals(type) || "JSDate".equals(type)) { // NOI18N
+            FieldValue timeField = object.getFieldValue("timeMillis (hidden)"); // NOI18N
             if (timeField != null) {
                 double time = Double.parseDouble(timeField.getValue());
                 logicalValue = new Date((long)time).toString();
             }
-        } else if ("JSBoolean".equals(type) || "JSNumber".equals(type)) {
-            FieldValue valueField = object.getFieldValue("value (hidden)");
+        } else if ("JSBoolean".equals(type) || "JSNumber".equals(type)) { // NOI18N
+            FieldValue valueField = object.getFieldValue("value (hidden)"); // NOI18N
 
             if (valueField != null) {
                 if (valueField instanceof ObjectFieldValue) {
@@ -200,7 +200,7 @@ public class JavaScriptNodes extends TruffleOpenNodeActionProvider<JavaScriptObj
         @Override
         public HeapViewerNode createNode(JavaScriptObject object, Heap heap) {
             String type = getType().getName();
-            return !type.startsWith("<") ? new JavaScriptObjectNode(object, type) :
+            return !type.startsWith("<") ? new JavaScriptObjectNode(object, type) : // NOI18N
                     new JavaScriptObjectNode(object, object.getType(heap));
         }
 

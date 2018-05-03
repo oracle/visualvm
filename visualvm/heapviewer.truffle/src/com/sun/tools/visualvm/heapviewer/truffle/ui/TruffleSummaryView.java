@@ -174,14 +174,14 @@ public class TruffleSummaryView extends HeapViewerFeature {
     // -------------------------------------------------------------------------
     
     @NbBundle.Messages({
-        "TruffleOverviewSummary_Name=Overview",
-        "TruffleOverviewSummary_Description=Overview",
-        "TruffleOverviewSummary_HeapSection=Heap",
-        "TruffleOverviewSummary_EnvironmentSection=Environment",
-        "TruffleOverviewSummary_SizeItem=Size:",
-        "TruffleOverviewSummary_TypesItem=Types:",
-        "TruffleOverviewSummary_ObjectsItem=Objects:",
-        "TruffleOverviewSummary_LanguageItem=Language:"
+        "TruffleOverviewSection_Name=Overview",
+        "TruffleOverviewSection_Description=Overview",
+        "TruffleOverviewSection_HeapSection=Heap",
+        "TruffleOverviewSection_EnvironmentSection=Environment",
+        "TruffleOverviewSection_SizeItem=Size:",
+        "TruffleOverviewSection_TypesItem=Types:",
+        "TruffleOverviewSection_ObjectsItem=Objects:",
+        "TruffleOverviewSection_LanguageItem=Language:"
     })
     public static abstract class OverviewSection extends TruffleSummarySection {
         
@@ -201,7 +201,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
         }
         
         public OverviewSection(HeapContext context, int heapItemsCount, int languageItemsCount) {
-            super(Bundle.TruffleOverviewSummary_Name(), Bundle.TruffleOverviewSummary_Description());
+            super(Bundle.TruffleOverviewSection_Name(), Bundle.TruffleOverviewSection_Description());
             
             this.context = context;
             
@@ -244,25 +244,25 @@ public class TruffleSummaryView extends HeapViewerFeature {
             
             NumberFormat numberFormat = NumberFormat.getInstance();
             
-            heapData[0][0] = Bundle.TruffleOverviewSummary_SizeItem();
-            heapData[0][1] = numberFormat.format(fragment.getHeapSize(null)) + " B";
+            heapData[0][0] = Bundle.TruffleOverviewSection_SizeItem();
+            heapData[0][1] = numberFormat.format(fragment.getHeapSize(null)) + " B"; // NOI18N
             
-            heapData[1][0] = Bundle.TruffleOverviewSummary_TypesItem();
+            heapData[1][0] = Bundle.TruffleOverviewSection_TypesItem();
             heapData[1][1] = numberFormat.format(fragment.getTypes(null).size());
             
-            heapData[2][0] = Bundle.TruffleOverviewSummary_ObjectsItem();
+            heapData[2][0] = Bundle.TruffleOverviewSection_ObjectsItem();
             heapData[2][1] = numberFormat.format(fragment.getObjectsCount(null));
         }
         
         protected void computeEnvironmentData(Object[][] environmentData) {
-            environmentData[0][0] = Bundle.TruffleOverviewSummary_LanguageItem();
+            environmentData[0][0] = Bundle.TruffleOverviewSection_LanguageItem();
             environmentData[0][1] = getContext().getFragment().getDescription();
         }
         
         
         private void init() {
-            heapSnippet = new TruffleOverviewSnippet(Bundle.TruffleOverviewSummary_HeapSection(), heapItemsCount, 0);
-            environmentSnippet = new TruffleOverviewSnippet(Bundle.TruffleOverviewSummary_EnvironmentSection(), environmentItemsCount, 1);
+            heapSnippet = new TruffleOverviewSnippet(Bundle.TruffleOverviewSection_HeapSection(), heapItemsCount, 0);
+            environmentSnippet = new TruffleOverviewSnippet(Bundle.TruffleOverviewSection_EnvironmentSection(), environmentItemsCount, 1);
             Splitter overviewRow = new Splitter(Splitter.HORIZONTAL_SPLIT, heapSnippet, environmentSnippet);
 
             component = new JPanel(new VerticalLayout(false)) {
@@ -360,20 +360,21 @@ public class TruffleSummaryView extends HeapViewerFeature {
     // -------------------------------------------------------------------------
     
     @NbBundle.Messages({
-        "JavaObjectsSummary_Name=Statistics",
-        "JavaObjectsSummary_Description=Statistics",
-        "JavaObjectsSummary_HeapSection=Heap",
-        "JavaObjectsSummary_ClassesInstancesCount=Types by Objects Count",
-        "JavaObjectsSummary_ClassesInstancesSize=Types by Objects Size",
-        "JavaObjectsSummary_InstancesSize=Objects by Size",
-        "JavaObjectsSummary_DominatorsRetainedSize=Dominators by Retained Size",
-        "JavaObjectsSummary_ComputeRetainedSizesLbl=Retained sizes must be computed first:",
-        "JavaObjectsSummary_ComputeRetainedSizesBtn=Compute Retained Sizes",
-        "JavaObjectsSummary_ComputingRetainedSizes=computing retained sizes...",
-        "JavaObjectsSummary_ComputingProgress=computing...",
-        "JavaObjectsSummary_ViewAll=view all",
-        "JavaObjectsSummary_NameColumn=Name",
-        "JavaObjectsSummary_ValueColumn=Value"
+        "TruffleObjectsSection_Name=Statistics",
+        "TruffleObjectsSection_Description=Statistics",
+        "TruffleObjectsSection_HeapSection=Heap",
+        "TruffleObjectsSection_ClassesInstancesCount=Types by Objects Count",
+        "TruffleObjectsSection_ClassesInstancesSize=Types by Objects Size",
+        "TruffleObjectsSection_InstancesSize=Objects by Size",
+        "TruffleObjectsSection_DominatorsRetainedSize=Dominators by Retained Size",
+        "TruffleObjectsSection_ComputeRetainedSizesLbl=Retained sizes must be computed first:",
+        "TruffleObjectsSection_ComputeRetainedSizesBtn=Compute Retained Sizes",
+        "TruffleObjectsSection_ComputingRetainedSizes=computing retained sizes...",
+        "TruffleObjectsSection_ComputingProgress=computing...",
+        "TruffleObjectsSection_ViewAll=view all",
+        "TruffleObjectsSection_NameColumn=Name",
+        "TruffleObjectsSection_ValueColumn=Value",
+        "TruffleObjectsSection_NoDominators=<no dominators found>"
     })
     public static class ObjectsSection<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>> extends TruffleSummarySection {
 
@@ -396,7 +397,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
 
 
         public ObjectsSection(L language, HeapContext context, HeapViewerActions actions, Collection<HeapViewerNodeAction.Provider> actionProviders) {
-            super(Bundle.JavaObjectsSummary_Name(), Bundle.JavaObjectsSummary_Description());
+            super(Bundle.TruffleObjectsSection_Name(), Bundle.TruffleObjectsSection_Description());
             
             this.language = language;
             
@@ -516,7 +517,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
                     }
                 }
             };
-            typesByCount = new ResultsSnippet(Bundle.JavaObjectsSummary_ClassesInstancesCount(), typesByCountDisplayer) {
+            typesByCount = new ResultsSnippet(Bundle.TruffleObjectsSection_ClassesInstancesCount(), typesByCountDisplayer) {
                 protected void setupTable(ProfilerTable table) {
                     table.setColumnRenderer(0, typeRenderer);
                     table.setColumnRenderer(1, classesByCountRenderer);
@@ -533,7 +534,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
                     }
                 }
             };
-            typesBySize = new ResultsSnippet(Bundle.JavaObjectsSummary_ClassesInstancesSize(), typesBySizeDisplayer) {
+            typesBySize = new ResultsSnippet(Bundle.TruffleObjectsSection_ClassesInstancesSize(), typesBySizeDisplayer) {
                 protected void setupTable(ProfilerTable table) {
                     table.setColumnRenderer(0, typeRenderer);
                     table.setColumnRenderer(1, sizeRenderer);
@@ -552,7 +553,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
                     }
                 }
             };
-            objectsBySize = new ResultsSnippet(Bundle.JavaObjectsSummary_InstancesSize(), objectsBySizeDisplayer) {
+            objectsBySize = new ResultsSnippet(Bundle.TruffleObjectsSection_InstancesSize(), objectsBySizeDisplayer) {
                 protected void setupTable(ProfilerTable table) {
                     table.setColumnRenderer(0, objectRenderer);
                     table.setColumnRenderer(1, sizeRenderer);
@@ -570,7 +571,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
                     }
                 }
             };
-            dominatorsByRetainedSize = new ResultsSnippet(Bundle.JavaObjectsSummary_DominatorsRetainedSize(), dominatorsByRetainedSizeDisplayer) {
+            dominatorsByRetainedSize = new ResultsSnippet(Bundle.TruffleObjectsSection_DominatorsRetainedSize(), dominatorsByRetainedSizeDisplayer) {
                 private Runnable retainedSizesUpdater;
                 protected JComponent createComponent() {
                     if (retainedAvailable) {
@@ -579,7 +580,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
                         final JPanel p = new JPanel(new GridBagLayout());
                         p.setOpaque(false);
 
-                        final JLabel l = new JLabel(Bundle.JavaObjectsSummary_ComputeRetainedSizesLbl(), JLabel.LEADING);
+                        final JLabel l = new JLabel(Bundle.TruffleObjectsSection_ComputeRetainedSizesLbl(), JLabel.LEADING);
                         GridBagConstraints c = new GridBagConstraints();
                         c.gridx = 0;
                         c.gridy = 0;
@@ -604,11 +605,11 @@ public class TruffleSummaryView extends HeapViewerFeature {
                         c.anchor = GridBagConstraints.NORTHWEST;
                         c.insets = new Insets(2, 2, 2, 2);
 
-                        JButton lb = new JButton(Bundle.JavaObjectsSummary_ComputeRetainedSizesBtn()) {
+                        JButton lb = new JButton(Bundle.TruffleObjectsSection_ComputeRetainedSizesBtn()) {
                             protected void fireActionPerformed(ActionEvent e) {
                                 if (DataType.RETAINED_SIZE.computeValues(heap, null)) {
                                     p.remove(this);
-                                    l.setText(Bundle.JavaObjectsSummary_ComputingRetainedSizes());
+                                    l.setText(Bundle.TruffleObjectsSection_ComputingRetainedSizes());
                                     l.setIcon(Icons.getIcon(HeapWalkerIcons.PROGRESS));
                                     p.invalidate();
                                     p.revalidate();
@@ -667,7 +668,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
                     if (model.getRowCount() == 0) {
                         DefaultTableModel dmodel = (DefaultTableModel)table.getModel();
                         table.setDefaultRenderer(Object.class, new LabelRenderer());
-                        dmodel.setValueAt("<no dominators found>", 0, 0);
+                        dmodel.setValueAt(Bundle.TruffleObjectsSection_NoDominators(), 0, 0);
                         dmodel.fireTableDataChanged();
                     } else {
                         super.setRealModel(model);
@@ -741,8 +742,8 @@ public class TruffleSummaryView extends HeapViewerFeature {
 
         private void configureSnippet(final ResultsSnippet snippet, final Object[][] data) {
             final TableModel model = new DefaultTableModel(data, new Object[] {
-                                                Bundle.JavaObjectsSummary_NameColumn(),
-                                                Bundle.JavaObjectsSummary_ValueColumn() }) {
+                                                Bundle.TruffleObjectsSection_NameColumn(),
+                                                Bundle.TruffleObjectsSection_ValueColumn() }) {
                 public boolean isCellEditable(int row, int column) { return false; }
             };
 
@@ -782,7 +783,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
                 c.insets = new Insets(0, 5, 0, 0);
                 sectionSeparator.add(new JLabel("["), c); // NOI18N
 
-                link = new LinkButton(Bundle.JavaObjectsSummary_ViewAll()) {
+                link = new LinkButton(Bundle.TruffleObjectsSection_ViewAll()) {
                     @Override
                     protected void clicked() {
                         SwingUtilities.invokeLater(allDisplayer);
@@ -831,7 +832,7 @@ public class TruffleSummaryView extends HeapViewerFeature {
 
             protected JComponent createComponent() {
                 TableModel model = new DefaultTableModel(PREVIEW_ITEMS, 1) {
-                    { setValueAt(Bundle.JavaObjectsSummary_ComputingProgress(), 0, 0); }
+                    { setValueAt(Bundle.TruffleObjectsSection_ComputingProgress(), 0, 0); }
                     public boolean isCellEditable(int row, int column) { return false; }
                 };
 

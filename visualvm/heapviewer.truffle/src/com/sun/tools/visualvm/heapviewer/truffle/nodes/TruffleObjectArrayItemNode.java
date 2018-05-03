@@ -62,7 +62,7 @@ public interface TruffleObjectArrayItemNode<O extends TruffleObject> {
         
         
         public String getItemName() {
-            return "[" + item.getIndex() + "]";
+            return "[" + item.getIndex() + "]"; // NOI18N
         }
 
         public ArrayItemValue getItem() {
@@ -103,7 +103,7 @@ public interface TruffleObjectArrayItemNode<O extends TruffleObject> {
         private final Heap heap;
         
         public Renderer(Heap heap, Icon icon) {
-            this(heap, icon, "=");
+            this(heap, icon, "="); // NOI18N
         }
         
         public Renderer(Heap heap, Icon icon, String divider) {
@@ -113,11 +113,11 @@ public interface TruffleObjectArrayItemNode<O extends TruffleObject> {
                 public void setValue(Object value, int row) {
                     TruffleObjectArrayItemNode node = (TruffleObjectArrayItemNode)value;
                     String name = node.getItemName();
-                    if (name.startsWith("static ")) {
-                        setNormalValue("static ");
-                        setBoldValue(name.substring("static ".length()));
+                    if (name.startsWith("static ")) { // NOI18N
+                        setNormalValue("static "); // NOI18N
+                        setBoldValue(name.substring("static ".length())); // NOI18N
                     } else {
-                        setNormalValue("");
+                        setNormalValue(""); // NOI18N
                         setBoldValue(name);
                     }
                     setIcon(Icons.getIcon(ProfilerIcons.NODE_FORWARD));

@@ -38,12 +38,17 @@ import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "RubyViews_Platform=Platform:",
+    "RubyViews_Unknown=<unknown>"
+})
 final class RubyViews {
     
     // -------------------------------------------------------------------------
@@ -85,29 +90,29 @@ final class RubyViews {
         protected void computeEnvironmentData(Object[][] environmentData) {
             super.computeEnvironmentData(environmentData);
             
-            environmentData[1][0] = "Platform:";
+            environmentData[1][0] = Bundle.RubyViews_Platform();
             
             RubyHeapFragment fragment = (RubyHeapFragment)getContext().getFragment();
-            RubyType gemPlatform = fragment.getType("Gem::Platform", null);
+            RubyType gemPlatform = fragment.getType("Gem::Platform", null); // NOI18N
             RubyObject platformO = gemPlatform == null || gemPlatform.getObjectsCount() == 0 ?
                                          null : gemPlatform.getObjectsIterator().next();
             
             if (platformO != null) {
                 Heap heap = fragment.getHeap();
                 
-                String osFV = variableValue(platformO, "@os", heap);
-                String cpuFV = variableValue(platformO, "@cpu", heap);
+                String osFV = variableValue(platformO, "@os", heap); // NOI18N
+                String cpuFV = variableValue(platformO, "@cpu", heap); // NOI18N
                 if (osFV != null || cpuFV != null) {
                     String platform = osFV;
                     if (cpuFV != null) {
-                        if (platform != null) platform += " "; else platform = "";
+                        if (platform != null) platform += " "; else platform = ""; // NOI18N
                         platform += cpuFV;
                     }
                     environmentData[1][1] = platform;
                 }
             }
             
-            if (environmentData[1][1] == null) environmentData[1][1] = "<unknown>";
+            if (environmentData[1][1] == null) environmentData[1][1] = Bundle.RubyViews_Unknown();
         }
         
         private static String variableValue(RubyObject object, String field, Heap heap) {

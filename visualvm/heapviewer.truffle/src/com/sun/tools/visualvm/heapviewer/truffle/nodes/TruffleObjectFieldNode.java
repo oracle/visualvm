@@ -73,7 +73,7 @@ public interface TruffleObjectFieldNode<O extends TruffleObject> {
         }
         
         protected String computeFieldName(FieldValue field) {
-            return (field.getField().isStatic() ? "static " : "") + field.getField().getName();
+            return (field.getField().isStatic() ? "static " : "") + field.getField().getName(); // NOI18N
         }
 
 
@@ -111,7 +111,7 @@ public interface TruffleObjectFieldNode<O extends TruffleObject> {
         private final Heap heap;
         
         public Renderer(Heap heap, Icon icon) {
-            this(heap, icon, "=");
+            this(heap, icon, "="); // NOI18N
         }
         
         public Renderer(Heap heap, Icon icon, String divider) {
@@ -121,11 +121,11 @@ public interface TruffleObjectFieldNode<O extends TruffleObject> {
                 public void setValue(Object value, int row) {
                     TruffleObjectFieldNode node = (TruffleObjectFieldNode)value;
                     String name = node.getFieldName();
-                    if (name.startsWith("static ")) {
-                        setNormalValue("static ");
-                        setBoldValue(name.substring("static ".length()));
+                    if (name.startsWith("static ")) { // NOI18N
+                        setNormalValue("static "); // NOI18N
+                        setBoldValue(name.substring("static ".length())); // NOI18N
                     } else {
-                        setNormalValue("");
+                        setNormalValue(""); // NOI18N
                         setBoldValue(name);
                     }
                     setIcon(Icons.getIcon(ProfilerIcons.NODE_FORWARD));

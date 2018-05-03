@@ -64,32 +64,32 @@ public class RObject extends TruffleObject.InstanceBased {
     private static final String RPAIR_LIST_FQN = "com.oracle.truffle.r.runtime.data.RPairList";   // NOI18N
     private static final String RNULL_FQN = "com.oracle.truffle.r.runtime.data.RNull"; // NOI18N
     private static final String[] typeMaping = new String[] {
-        "RRawVector", "raw",
-        "RRaw", "raw",
-        "RLogicalVector", "logical",
-        "RLogical", "logical",
-        "RIntVector", "integer",
-        "RInteger", "integer",
-        "RForeignIntWrapper", "integer",
-        "RDoubleVector", "double",
-        "RDouble", "double",
-        "RForeignDoubleWrapper", "double",
-        "RComplexVector", "complex",
-        "RComplex", "complex",
-        "RStringVector", "character",
-        "RString", "character",
-        "RForeignStringWrapper", "character",
-        "RList", "list",
-        "RScalarList", "list",
-        "RExpression", "expression",
-        "RFunction", "function",
-        "RSymbol", "symbol",
-        "REnvironment", "environment",
-        "RPairList", "pairlist",
-        "RLanguage", "language",
-        "RPromise", "promise",
-        "RExternalPtr", "externalptr",
-        "RS4Object", "S4"};
+        "RRawVector", "raw", // NOI18N
+        "RRaw", "raw", // NOI18N
+        "RLogicalVector", "logical", // NOI18N
+        "RLogical", "logical", // NOI18N
+        "RIntVector", "integer", // NOI18N
+        "RInteger", "integer", // NOI18N
+        "RForeignIntWrapper", "integer", // NOI18N
+        "RDoubleVector", "double", // NOI18N
+        "RDouble", "double", // NOI18N
+        "RForeignDoubleWrapper", "double", // NOI18N
+        "RComplexVector", "complex", // NOI18N
+        "RComplex", "complex", // NOI18N
+        "RStringVector", "character", // NOI18N
+        "RString", "character", // NOI18N
+        "RForeignStringWrapper", "character", // NOI18N
+        "RList", "list", // NOI18N
+        "RScalarList", "list", // NOI18N
+        "RExpression", "expression", // NOI18N
+        "RFunction", "function", // NOI18N
+        "RSymbol", "symbol", // NOI18N
+        "REnvironment", "environment", // NOI18N
+        "RPairList", "pairlist", // NOI18N
+        "RLanguage", "language", // NOI18N
+        "RPromise", "promise", // NOI18N
+        "RExternalPtr", "externalptr", // NOI18N
+        "RS4Object", "S4"}; // NOI18N
 
     private static Map<String,String> typeMap;
 
@@ -127,21 +127,21 @@ public class RObject extends TruffleObject.InstanceBased {
         this.instance = instance;
         this.type = type;
         
-        Object[] values = HeapUtils.getValuesOfFields(instance, "data", "complete", "refCount", "attributes", "frameAccess", "frame");
+        Object[] values = HeapUtils.getValuesOfFields(instance, "data", "complete", "refCount", "attributes", "frameAccess", "frame"); // NOI18N
         
-        data = (Instance) values[0]; // NOI18N
+        data = (Instance) values[0];
         
-        Object completeO = values[1];  // NOI18N
+        Object completeO = values[1];
         complete = completeO == null ? null : Boolean.parseBoolean(completeO.toString());
         
-        Object refCountO = values[2];  // NOI18N
+        Object refCountO = values[2];
         refCount = refCountO == null ? null : Integer.parseInt(refCountO.toString());
         
-        attributesInstance = (Instance) values[3]; // NOI18N
+        attributesInstance = (Instance) values[3];
         className = instance.getJavaClass().getName();
         dataType = data == null ? null : data.getJavaClass().getName().replace("[]", ""); // NOI18N
         fieldValues = new LazyFieldValues();
-        Instance frameAccess = (Instance) values[4]; // NOI18N
+        Instance frameAccess = (Instance) values[4];
         if (frameAccess != null) {
             frameInstance = (Instance) values[5];
         } else {
@@ -452,7 +452,7 @@ public class RObject extends TruffleObject.InstanceBased {
                ObjectFieldValue fval = (ObjectFieldValue) val;
                Instance parent = fval.getDefiningInstance();
 
-               if (parent.getJavaClass().getName().equals(RPAIR_LIST_FQN) && fval.getField().getName().equals("cdr")) {
+               if (parent.getJavaClass().getName().equals(RPAIR_LIST_FQN) && fval.getField().getName().equals("cdr")) { // NOI18N
                    return parent;
                }
            }
@@ -461,13 +461,13 @@ public class RObject extends TruffleObject.InstanceBased {
     }
 
     static Instance getDataFromWrapper(Instance instance) {
-        Instance delegate = (Instance) instance.getValueOfField("delegate");
+        Instance delegate = (Instance) instance.getValueOfField("delegate"); // NOI18N
 
         if (delegate != null) {
-            Instance proxy = (Instance) delegate.getValueOfField("proxy");
+            Instance proxy = (Instance) delegate.getValueOfField("proxy"); // NOI18N
 
             if (proxy != null) {
-                return (Instance) proxy.getValueOfField("val$values");
+                return (Instance) proxy.getValueOfField("val$values"); // NOI18N
             }
         }
         return null;
@@ -495,10 +495,10 @@ public class RObject extends TruffleObject.InstanceBased {
                 List<String> nameList = new ArrayList();
                 for (Instance cdr = pairListInstance;
                    cdr != null && cdr.getJavaClass().equals(pairListClass);
-                   cdr = (Instance) cdr.getValueOfField("cdr")) {
-                    String name = getName((Instance)cdr.getValueOfField("tag"));
+                   cdr = (Instance) cdr.getValueOfField("cdr")) { // NOI18N
+                    String name = getName((Instance)cdr.getValueOfField("tag")); // NOI18N
                     length++;
-                    values.add(cdr.getValueOfField("car"));
+                    values.add(cdr.getValueOfField("car")); // NOI18N
                     if (name != null) {
                         hasNames = true;
                     }
@@ -526,12 +526,12 @@ public class RObject extends TruffleObject.InstanceBased {
 
         @Override
         public List getItems() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
         }
 
         @Override
         public List getFieldValues() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
         }
 
         @Override
@@ -556,22 +556,22 @@ public class RObject extends TruffleObject.InstanceBased {
 
         @Override
         public Instance getNearestGCRootPointer() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
         }
 
         @Override
         public long getReachableSize() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
         }
 
         @Override
         public List getReferences() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
         }
 
         @Override
         public long getRetainedSize() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
         }
 
         @Override
@@ -582,12 +582,12 @@ public class RObject extends TruffleObject.InstanceBased {
 
         @Override
         public List getStaticFieldValues() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
         }
 
         @Override
         public Object getValueOfField(String string) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            throw new UnsupportedOperationException("Not supported yet.");  // NOI18N
         }
 
         @Override
@@ -684,7 +684,7 @@ public class RObject extends TruffleObject.InstanceBased {
 
         @Override
         public Field getField() {
-            return new RNamedField("logical", index);
+            return new RNamedField("logical", index); // NOI18N
         }
 
         @Override
@@ -693,9 +693,9 @@ public class RObject extends TruffleObject.InstanceBased {
             int val = Integer.valueOf(valString);
 
             if (val == 0) {
-                valString = "FALSE";
+                valString = "FALSE"; // NOI18N
             } else if (val == 1) {
-                valString = "TRUE";
+                valString = "TRUE"; // NOI18N
             }
             return valString;
         }
@@ -709,13 +709,13 @@ public class RObject extends TruffleObject.InstanceBased {
 
         @Override
         public Field getField() {
-            return new RNamedField("complex", index);
+            return new RNamedField("complex", index); // NOI18N
         }
 
         @Override
         public String getValue() {
             List vals = getValues();
-            return vals.get(2*index)+"+"+vals.get(2*index+1)+"i";
+            return vals.get(2*index)+"+"+vals.get(2*index+1)+"i"; // NOI18N
         }
     }
     
@@ -787,14 +787,14 @@ public class RObject extends TruffleObject.InstanceBased {
                 for (Integer dim : dims) {
                     int offset = rindex % dim;
                     rindex /= dim;
-                    name.append(offset+1).append(',');
+                    name.append(offset+1).append(','); // NOI18N
                 }
-                return '['+name.substring(0, name.length()-1)+']';
+                return '['+name.substring(0, name.length()-1)+']'; // NOI18N
             }
             List<String> names = names();
-            String name = "["+(index+1)+"]";
+            String name = "["+(index+1)+"]"; // NOI18N
             if (names != null) {
-                return name+" ("+names.get(index)+")";
+                return name+" ("+names.get(index)+")"; // NOI18N
             }
             return name;
         }

@@ -49,12 +49,18 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TruffleViewPlugin_Name=Truffle Object",
+    "TruffleViewPlugin_Description=Truffle Object",
+    "TruffleViewPlugin_NoSelection=<no DynamicObject or TruffleFrame selected>"
+})
 class TruffleViewPlugin extends HeapViewPlugin {
     
     private final Heap heap;
@@ -64,11 +70,11 @@ class TruffleViewPlugin extends HeapViewPlugin {
     
 
     public TruffleViewPlugin(HeapContext context, HeapViewerActions actions) {
-        super("Truffle Object", "Truffle Object", graalIcon());
+        super(Bundle.TruffleViewPlugin_Name(), Bundle.TruffleViewPlugin_Description(), graalIcon());
         
         heap = context.getFragment().getHeap();
         
-        objectsView = new TreeTableView("truffle_objects_javaext", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
+        objectsView = new TreeTableView("truffle_objects_javaext", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 if (DynamicObject.isDynamicObject(selected)) {
                     DynamicObject dobject = new DynamicObject(selected);
@@ -76,7 +82,7 @@ class TruffleViewPlugin extends HeapViewPlugin {
                 } else if (TruffleFrame.isTruffleFrame(selected)) {
                     return new HeapViewerNode[] { new InstanceNode(selected) };
                 } else {
-                    return new HeapViewerNode[] { new TextNode("<no DynamicObject or TruffleFrame selected>") };
+                    return new HeapViewerNode[] { new TextNode(Bundle.TruffleViewPlugin_NoSelection()) };
                 }
             }
             protected void childrenChanged() {
@@ -107,7 +113,7 @@ class TruffleViewPlugin extends HeapViewPlugin {
     
     
     private static Icon graalIcon() {
-        String path = TruffleViewPlugin.class.getPackage().getName().replace('.', '/') + "/GraalVM.png";
+        String path = TruffleViewPlugin.class.getPackage().getName().replace('.', '/') + "/GraalVM.png"; // NOI18N
         return new ImageIcon(ImageUtilities.loadImage(path, true));
     }
     

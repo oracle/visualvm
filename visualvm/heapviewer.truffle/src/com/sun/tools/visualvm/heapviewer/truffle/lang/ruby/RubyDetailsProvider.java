@@ -67,16 +67,16 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
     public String getDetailsString(String className, Instance instance, Heap heap) {
         if (RUBY_OBJECT_TYPE_MASK.equals(className)) {
             String name = instance.getJavaClass().getName();
-            int index = name.lastIndexOf('$');
+            int index = name.lastIndexOf('$'); // NOI18N
 
             if (index == -1) {
-                index = name.lastIndexOf('.');
+                index = name.lastIndexOf('.'); // NOI18N
             }
             return name.substring(index+1);
         }
         if (ASCII_ROPE_MASK.equals(className)) {
-            Integer len = (Integer) instance.getValueOfField("byteLength");
-            return getByteArrayFieldString(instance, "bytes", 0, len.intValue(), "...");
+            Integer len = (Integer) instance.getValueOfField("byteLength"); // NOI18N
+            return getByteArrayFieldString(instance, "bytes", 0, len.intValue(), "..."); // NOI18N
         }
         if (CONCAT_ROPE_MASK.equals(className)) {
             Object vall = instance.getValueOfField("left");   // NOI18N
@@ -93,7 +93,7 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
             String value = left + DetailsUtils.getInstanceString((Instance)valr, heap);
 
             if (value.length() > DetailsUtils.MAX_ARRAY_LENGTH) {
-                return value.substring(0, DetailsUtils.MAX_ARRAY_LENGTH) + "...";
+                return value.substring(0, DetailsUtils.MAX_ARRAY_LENGTH) + "..."; // NOI18N
             }
             return value;
         }
@@ -113,37 +113,37 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
             }
         }
         if (ENCODING_MASK.equals(className)) {
-            return getByteArrayFieldString(instance, "name", 0, -1, "...");
+            return getByteArrayFieldString(instance, "name", 0, -1, "..."); // NOI18N
         }
         if (ROPE_TABLE_KEY_MASK.equals(className)) {
-            byte[] bytes = getByteArrayFieldString(instance, "bytes", 0, -1);
-            String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding", heap);
+            byte[] bytes = getByteArrayFieldString(instance, "bytes", 0, -1); // NOI18N
+            String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding", heap); // NOI18N
 
-            return getString(bytes, encodingString, "...");
+            return getString(bytes, encodingString, "..."); // NOI18N
         }
         if (INVALID_ROPE_MASK.equals(className)) {
-            byte[] bytes = getByteArrayFieldString(instance, "bytes", 0, -1);
-            String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding", heap);
+            byte[] bytes = getByteArrayFieldString(instance, "bytes", 0, -1); // NOI18N
+            String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding", heap); // NOI18N
 
-            return getString(bytes, encodingString, "...");
+            return getString(bytes, encodingString, "..."); // NOI18N
         }
         if (VALID_ROPE_MASK.equals(className)) {
-            byte[] bytes = getByteArrayFieldString(instance, "bytes", 0, -1);
-            String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding", heap);
+            byte[] bytes = getByteArrayFieldString(instance, "bytes", 0, -1); // NOI18N
+            String encodingString = DetailsUtils.getInstanceFieldString(instance, "encoding", heap); // NOI18N
 
-            return getString(bytes, encodingString, "...");
+            return getString(bytes, encodingString, "..."); // NOI18N
         }
         if (INT_ROPE_MASK.equals(className)) {
-            return Integer.toString(DetailsUtils.getIntFieldValue(instance, "value", 0));
+            return Integer.toString(DetailsUtils.getIntFieldValue(instance, "value", 0)); // NOI18N
         }
         if (MODULE_FIELDS_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name", heap);
+            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
         }
         if (BASIC_LAYOUT_MASK.equals(className)) {
-            Instance logicalClassInst = (Instance) instance.getValueOfField("logicalClass");
+            Instance logicalClassInst = (Instance) instance.getValueOfField("logicalClass"); // NOI18N
             if (DynamicObject.isDynamicObject(logicalClassInst)) {
                 DynamicObject logicalClass = new DynamicObject(logicalClassInst);
-                ObjectFieldValue fields = (ObjectFieldValue) logicalClass.getFieldValue("fields (hidden)");
+                ObjectFieldValue fields = (ObjectFieldValue) logicalClass.getFieldValue("fields (hidden)"); // NOI18N
 
                 return DetailsUtils.getInstanceString(fields.getInstance(), heap);
             }
@@ -157,7 +157,7 @@ public class RubyDetailsProvider extends DetailsProvider.Basic {
             return DetailsUtils.getInstanceString(name, heap);
         }
         if (RUBY_ROOT_NODE_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "sharedMethodInfo", heap);
+            return DetailsUtils.getInstanceFieldString(instance, "sharedMethodInfo", heap); // NOI18N
         }
         return null;
     }

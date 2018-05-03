@@ -45,12 +45,18 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TruffleJavaViewPlugin_Name=Java Object",
+    "TruffleJavaViewPlugin_Description=Java Object",
+    "TruffleJavaViewPlugin_NoSelection=<no object selected>"
+})
 public class TruffleJavaViewPlugin extends HeapViewPlugin {
     
     private final Heap heap;
@@ -60,14 +66,14 @@ public class TruffleJavaViewPlugin extends HeapViewPlugin {
     
     
     public TruffleJavaViewPlugin(HeapContext context, HeapViewerActions actions) {
-        super("Java Object", "Java Object", Icons.getIcon(GeneralIcons.JAVA_PROCESS));
+        super(Bundle.TruffleJavaViewPlugin_Name(), Bundle.TruffleJavaViewPlugin_Description(), Icons.getIcon(GeneralIcons.JAVA_PROCESS));
         
         heap = context.getFragment().getHeap();
         
-        objectsView = new TreeTableView("java_objects_truffleext", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
+        objectsView = new TreeTableView("java_objects_truffleext", context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) { // NOI18N
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
                 InstanceNode instanceNode = selected == null ? null : new InstanceNode(selected);
-                HeapViewerNode result = instanceNode == null ? new TextNode("<no object selected>") : instanceNode;
+                HeapViewerNode result = instanceNode == null ? new TextNode(Bundle.TruffleJavaViewPlugin_NoSelection()) : instanceNode;
                 return new HeapViewerNode[] { result };
             }
             protected void childrenChanged() {

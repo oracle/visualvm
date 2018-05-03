@@ -53,19 +53,34 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.PluggableTreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
 import org.netbeans.modules.profiler.api.icons.Icons;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TruffleObjectsView_Name=Objects",
+    "TruffleObjectsView_Description=Objects",
+    "TruffleObjectsView_Compare=Compare with another heap dump...",
+    "TruffleObjectsView_AllObjects=All Objects",
+    "TruffleObjectsView_Dominators=Dominators",
+    "TruffleObjectsView_GcRoots=GC Roots",
+    "TruffleObjectsView_Types=Types",
+    "TruffleObjectsView_Objects=Objects",
+    "TruffleObjectsView_FilterSubclasses=Filter Subclasses",
+    "TruffleObjectsView_Preset=Preset:",
+    "TruffleObjectsView_Aggregation=Aggregation:",
+    "TruffleObjectsView_Details=Details:"
+})
 public class TruffleObjectsView extends HeapViewerFeature {
     
     private static final String FEATURE_ID = "objects"; // NOI18N
     
     protected static enum Preset {
-        ALL_OBJECTS ("All Objects"),
-        DOMINATORS ("Dominators"),
-        GC_ROOTS ("GC Roots");
+        ALL_OBJECTS (Bundle.TruffleObjectsView_AllObjects()),
+        DOMINATORS (Bundle.TruffleObjectsView_Dominators()),
+        GC_ROOTS (Bundle.TruffleObjectsView_GcRoots());
         
         private final String presetName;
         private Preset(String presetName) { this.presetName = presetName; }
@@ -73,8 +88,8 @@ public class TruffleObjectsView extends HeapViewerFeature {
     }
     
     protected static enum Aggregation {
-        TYPES ("Types", Icons.getIcon(LanguageIcons.PACKAGE)),
-        OBJECTS ("Objects", Icons.getIcon(LanguageIcons.INSTANCE));
+        TYPES (Bundle.TruffleObjectsView_Types(), Icons.getIcon(LanguageIcons.PACKAGE)),
+        OBJECTS (Bundle.TruffleObjectsView_Objects(), Icons.getIcon(LanguageIcons.INSTANCE));
         
         private final String aggregationName;
         private final Icon aggregationIcon;
@@ -101,7 +116,7 @@ public class TruffleObjectsView extends HeapViewerFeature {
     
     
     public TruffleObjectsView(TruffleLanguage language, HeapContext context, HeapViewerActions actions) {
-        super(idFromLanguage(language), "Objects", "Objects", iconFromLanguage(language), 200);
+        super(idFromLanguage(language), Bundle.TruffleObjectsView_Name(), Bundle.TruffleObjectsView_Description(), iconFromLanguage(language), 200);
         
         this.language = language;
         this.context = context;
@@ -322,7 +337,7 @@ public class TruffleObjectsView extends HeapViewerFeature {
         toolbar.addSeparator();
         toolbar.addSpace(5);
         
-        toolbar.add(new GrayLabel("Presets:"));
+        toolbar.add(new GrayLabel(Bundle.TruffleObjectsView_Preset()));
         toolbar.addSpace(2);
         
         class PresetAction extends AbstractAction {
@@ -344,7 +359,7 @@ public class TruffleObjectsView extends HeapViewerFeature {
         
         toolbar.addSpace(8);
         
-        toolbar.add(new GrayLabel("Aggregation:"));
+        toolbar.add(new GrayLabel(Bundle.TruffleObjectsView_Aggregation()));
         toolbar.addSpace(2);
         
         final ButtonGroup aggregationBG = new ButtonGroup();
@@ -378,7 +393,7 @@ public class TruffleObjectsView extends HeapViewerFeature {
         if (objectsView.hasPlugins()) {
             toolbar.addSpace(8);
 
-            toolbar.add(new GrayLabel("Details:"));
+            toolbar.add(new GrayLabel(Bundle.TruffleObjectsView_Details()));
             toolbar.addSpace(2);
             
             toolbar.add(objectsView.getToolbar());

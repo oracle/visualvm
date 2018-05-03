@@ -72,9 +72,9 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
     
     
     private static String computeName(TruffleObjectNode.InstanceBased<RObject> node, Heap heap) {
-        if ("com.oracle.truffle.r.runtime.data.RLogical".equals(node.getInstance().getJavaClass().getName())) {
+        if ("com.oracle.truffle.r.runtime.data.RLogical".equals(node.getInstance().getJavaClass().getName())) { // NOI18N
             String valueString = node.getLogicalValue(heap);
-            return "logical#" + valueString.substring(1, valueString.length() - 1);
+            return "logical#" + valueString.substring(1, valueString.length() - 1); // NOI18N
         } else {
             String typeString = node.getTypeName();
             return typeString.substring(typeString.lastIndexOf('.') + 1) + "#" + node.getInstance().getInstanceNumber(); // NOI18N
@@ -265,7 +265,7 @@ public class RNodes extends TruffleOpenNodeActionProvider<RObject, RType, RHeapF
 
             renderers.put(RNodes.RObjectReferenceNode.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon));
 
-            renderers.put(RNodes.RObjectAttributeReferenceNode.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon, "attribute in"));
+            renderers.put(RNodes.RObjectAttributeReferenceNode.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon, "attribute in")); // NOI18N
         }
 
     }

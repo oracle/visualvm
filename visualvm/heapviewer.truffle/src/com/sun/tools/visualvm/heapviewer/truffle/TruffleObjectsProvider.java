@@ -42,11 +42,30 @@ import javax.swing.SortOrder;
 import org.netbeans.lib.profiler.heap.GCRoot;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TruffleObjectsProvider_MoreNodesObjects=<another {0} objects left>",
+    "TruffleObjectsProvider_SamplesContainerObjects=<sample {0} objects>",
+    "TruffleObjectsProvider_NodesContainerObjects=<objects {0}-{1}>",
+    "TruffleObjectsProvider_NoObjects=<No objects found>",
+    "TruffleObjectsProvider_MoreNodesTypes=<another {0} types left>",
+    "TruffleObjectsProvider_SamplesContainerTypes=<sample {0} types>",
+    "TruffleObjectsProvider_NodesContainerTypes=<types {0}-{1}>",
+    "TruffleObjectsProvider_NoRetainedSizes=<Retained sizes not computed yet>",
+    "TruffleObjectsProvider_MoreNodesDominators=<another {0} dominators left>",
+    "TruffleObjectsProvider_SamplesContainerDominators=<sample {0} dominators>",
+    "TruffleObjectsProvider_NodesContainerDominators=<dominators {0}-{1}>",
+    "TruffleObjectsProvider_NoDominators=<No dominators found>",
+    "TruffleObjectsProvider_MoreNodesGcRoots=<another {0} GC roots left>",
+    "TruffleObjectsProvider_SamplesContainerGcRoots=<sample {0} GC roots>",
+    "TruffleObjectsProvider_NodesContainerGcRoots=<GC roots {0}-{1}>",
+    "TruffleObjectsProvider_NoGcRoots=<No GC roots found>"
+})
 public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>> {
     
     private final L language;
@@ -75,13 +94,13 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
                     return new ProgressIterator(objects, index, true, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
-                    return "<another " + moreNodesCount + " objects left>";
+                    return Bundle.TruffleObjectsProvider_MoreNodesObjects(moreNodesCount);
                 }
                 protected String getSamplesContainerString(String objectsCount)  {
-                    return "<sample " + objectsCount + " objects>";
+                    return Bundle.TruffleObjectsProvider_SamplesContainerObjects(objectsCount);
                 }
                 protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                    return "<objects " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                    return Bundle.TruffleObjectsProvider_NodesContainerObjects(firstNodeIdx, lastNodeIdx);
                 }
             };
             
@@ -100,27 +119,27 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
                     return new ProgressIterator(typesI, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
-                    return "<another " + moreNodesCount + " types left>";
+                    return Bundle.TruffleObjectsProvider_MoreNodesTypes(moreNodesCount);
                 }
                 protected String getSamplesContainerString(String objectsCount)  {
-                    return "<sample " + objectsCount + " types>";
+                    return Bundle.TruffleObjectsProvider_SamplesContainerTypes(objectsCount);
                 }
                 protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                    return "<types " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                    return Bundle.TruffleObjectsProvider_NodesContainerTypes(firstNodeIdx, lastNodeIdx);
                 }
             };
 
             nodes = computer.computeNodes(parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
         }
         
-        return nodes.length > 0 ? nodes : new HeapViewerNode[] { new TextNode("<No objects found>") };
+        return nodes.length > 0 ? nodes : new HeapViewerNode[] { new TextNode(Bundle.TruffleObjectsProvider_NoObjects()) };
     }
     
     public HeapViewerNode[] getDominators(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
         final Heap heap = context.getFragment().getHeap();
         
         if (!DataType.RETAINED_SIZE.valuesAvailable(heap))
-            return new HeapViewerNode[] { new TextNode("<Retained sizes not computed yet>") };
+            return new HeapViewerNode[] { new TextNode(Bundle.TruffleObjectsProvider_NoRetainedSizes()) };
         
         int maxSearchInstances = 10000;
         
@@ -153,13 +172,13 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
                     return new ProgressIterator(dominatorsIt, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
-                    return "<another " + moreNodesCount + " dominators left>";
+                    return Bundle.TruffleObjectsProvider_MoreNodesDominators(moreNodesCount);
                 }
                 protected String getSamplesContainerString(String objectsCount)  {
-                    return "<sample " + objectsCount + " dominators>";
+                    return Bundle.TruffleObjectsProvider_SamplesContainerDominators(objectsCount);
                 }
                 protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                    return "<dominators " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                    return Bundle.TruffleObjectsProvider_NodesContainerDominators(firstNodeIdx, lastNodeIdx);
                 }
             };
             
@@ -190,20 +209,20 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
                     return new ProgressIterator(typesIt, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
-                    return "<another " + moreNodesCount + " dominators left>";
+                    return Bundle.TruffleObjectsProvider_MoreNodesDominators(moreNodesCount);
                 }
                 protected String getSamplesContainerString(String objectsCount)  {
-                    return "<sample " + objectsCount + " dominators>";
+                    return Bundle.TruffleObjectsProvider_SamplesContainerDominators(objectsCount);
                 }
                 protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                    return "<dominators " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                    return Bundle.TruffleObjectsProvider_NodesContainerDominators(firstNodeIdx, lastNodeIdx);
                 }
             };
             
             nodes = computer.computeNodes(parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
         }
         
-        return nodes.length > 0 ? nodes : new HeapViewerNode[] { new TextNode("<No dominators found>") };
+        return nodes.length > 0 ? nodes : new HeapViewerNode[] { new TextNode(Bundle.TruffleObjectsProvider_NoDominators()) };
     }
     
     public HeapViewerNode[] getGCRoots(HeapViewerNode parent, HeapContext context, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress, int aggregation) {
@@ -236,13 +255,13 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
                     return new ProgressIterator(gcRootsIt, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
-                    return "<another " + moreNodesCount + " GC roots left>";
+                    return Bundle.TruffleObjectsProvider_MoreNodesGcRoots(moreNodesCount);
                 }
                 protected String getSamplesContainerString(String objectsCount)  {
-                    return "<sample " + objectsCount + " GC roots>";
+                    return Bundle.TruffleObjectsProvider_SamplesContainerGcRoots(objectsCount);
                 }
                 protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                    return "<GC roots " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                    return Bundle.TruffleObjectsProvider_NodesContainerGcRoots(firstNodeIdx, lastNodeIdx);
                 }
             };
 
@@ -272,20 +291,20 @@ public class TruffleObjectsProvider<O extends TruffleObject, T extends TruffleTy
                     return new ProgressIterator(typesIt, index, false, progress);
                 }
                 protected String getMoreNodesString(String moreNodesCount)  {
-                    return "<another " + moreNodesCount + " GC roots left>";
+                    return Bundle.TruffleObjectsProvider_MoreNodesGcRoots(moreNodesCount);
                 }
                 protected String getSamplesContainerString(String objectsCount)  {
-                    return "<sample " + objectsCount + " GC roots>";
+                    return Bundle.TruffleObjectsProvider_SamplesContainerGcRoots(objectsCount);
                 }
                 protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                    return "<GC roots " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                    return Bundle.TruffleObjectsProvider_NodesContainerGcRoots(firstNodeIdx, lastNodeIdx);
                 }
             };
             
             nodes = computer.computeNodes(parent, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
         }
         
-        return nodes.length > 0 ? nodes : new HeapViewerNode[] { new TextNode("<No GC roots found>") };
+        return nodes.length > 0 ? nodes : new HeapViewerNode[] { new TextNode(Bundle.TruffleObjectsProvider_NoGcRoots()) };
     }
     
     

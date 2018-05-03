@@ -39,12 +39,18 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "JavaScriptViews_Platform=Platform:",
+    "JavaScriptViews_NotPresent=<not present>",
+    "JavaScriptViews_Unknown=<unknown>"
+})
 final class JavaScriptViews {
     
     // -------------------------------------------------------------------------
@@ -86,40 +92,40 @@ final class JavaScriptViews {
         protected void computeEnvironmentData(Object[][] environmentData) {
             super.computeEnvironmentData(environmentData);
             
-            environmentData[1][0] = "Node.js:";
-            environmentData[2][0] = "Platform:";
+            environmentData[1][0] = "Node.js:"; // NOI18N
+            environmentData[2][0] = Bundle.JavaScriptViews_Platform();
             
             JavaScriptHeapFragment fragment = (JavaScriptHeapFragment)getContext().getFragment();
-            JavaScriptType processType = fragment.getType("process", null);
+            JavaScriptType processType = fragment.getType("process", null); // NOI18N
             JavaScriptObject process = processType == null || processType.getObjectsCount() == 0 ?
                                               null : processType.getObjectsIterator().next();
             
             if (process == null) {
-                environmentData[1][1] = "<not present>";
-                environmentData[2][1] = "<unknown>";
+                environmentData[1][1] = Bundle.JavaScriptViews_NotPresent();
+                environmentData[2][1] = Bundle.JavaScriptViews_Unknown();
             } else {
                 Heap heap = fragment.getHeap();
                 
-                FieldValue releaseFV = process.getFieldValue("release");
+                FieldValue releaseFV = process.getFieldValue("release"); // NOI18N
                 if (releaseFV instanceof ObjectFieldValue) {
                     Instance releaseI = ((ObjectFieldValue)releaseFV).getInstance();
                     if (JavaScriptObject.isJavaScriptObject(releaseI)) {
                         JavaScriptObject releaseO = new JavaScriptObject(releaseI);
-                        if ("node".equals(fieldValue(releaseO, "name", heap))) {
-                            String versionFV = fieldValue(process, "version", heap);
-                            String node = versionFV != null ? "node " + versionFV : "<unknown>";
-                            String ltsFV = fieldValue(releaseO, "lts", heap);
-                            if (ltsFV != null) node += " (" + ltsFV + ")";
+                        if ("node".equals(fieldValue(releaseO, "name", heap))) { // NOI18N
+                            String versionFV = fieldValue(process, "version", heap); // NOI18N
+                            String node = versionFV != null ? "node " + versionFV : Bundle.JavaScriptViews_Unknown(); // NOI18N
+                            String ltsFV = fieldValue(releaseO, "lts", heap); // NOI18N
+                            if (ltsFV != null) node += " (" + ltsFV + ")"; // NOI18N
                             environmentData[1][1] = node;
                             
-                            String platformFV = fieldValue(process, "platform", heap);
-                            String archFV = fieldValue(process, "arch", heap);
+                            String platformFV = fieldValue(process, "platform", heap); // NOI18N
+                            String archFV = fieldValue(process, "arch", heap); // NOI18N
                             if (platformFV == null && archFV == null) {
-                                environmentData[2][1] = "<unknown>";
+                                environmentData[2][1] = Bundle.JavaScriptViews_Unknown();
                             } else {
                                 String platform = platformFV;
                                 if (archFV != null) {
-                                    if (platform != null) platform += " "; else platform = "";
+                                    if (platform != null) platform += " "; else platform = ""; // NOI18N
                                     platform += archFV;
                                 }
                                 environmentData[2][1] = platform;
@@ -129,14 +135,14 @@ final class JavaScriptViews {
                         }                        
                     }
                     
-                    environmentData[1][1] = "<unknown>";
-                    environmentData[2][1] = "<unknown>";
+                    environmentData[1][1] = Bundle.JavaScriptViews_Unknown();
+                    environmentData[2][1] = Bundle.JavaScriptViews_Unknown();
                     
                     return;
                 }
                 
-                environmentData[1][1] = "<not present>";
-                environmentData[2][1] = "<unknown>";
+                environmentData[1][1] = Bundle.JavaScriptViews_NotPresent();
+                environmentData[2][1] = Bundle.JavaScriptViews_Unknown();
             }
         }
         

@@ -62,6 +62,11 @@ import org.openide.util.NbBundle;
  * @author Jiri Sedlacek
  */
 @NbBundle.Messages({
+    "TruffleThreadsProvider_Unknown=<unknown>",
+    "TruffleThreadsProvider_ThreadNotAvailable=Thread not available",
+    "TruffleThreadsProvider_ThreadNamePrefix=Thread \"{0}\"",
+    "TruffleThreadsProvider_StackFramePrefix=at",
+    "TruffleThreadsProvider_LocalObjectPrefix=local object:",
     "TruffleThreadsProvider_CannotResolveClassMsg=Cannot resolve class",
     "TruffleThreadsProvider_CannotResolveInstanceMsg=Cannot resolve instance"
 })
@@ -78,15 +83,13 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
     public HeapViewerNode[] getThreadsObjects(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
         List<HeapViewerNode> threadNodes = new ArrayList();
         
-//        JavaClass javaClassClass = heap.getJavaClassByName(Class.class.getName());
-        
         TruffleStackTraces tst = new TruffleStackTraces(heap);
         Collection<TruffleStackTraces.StackTrace> threads = tst.getStackTraces();
         
         if (threads != null) {
             for (TruffleStackTraces.StackTrace st : threads) {
                 Instance threadInstance = st.getThread();
-                String threadName = DetailsSupport.getDetailsString(threadInstance, heap);
+                String threadName = Bundle.TruffleThreadsProvider_ThreadNamePrefix(DetailsSupport.getDetailsString(threadInstance, heap));
                 if (threadName == null /*|| !threadName.startsWith(RUBY_THREAD_NAME_PREFIX)*/) continue;
                 
                 final List<HeapViewerNode> stackFrameNodes = new ArrayList();
@@ -99,14 +102,7 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
 
                 for (TruffleStackTraces.Frame f : st.getFrames()) {
                     Set<HeapViewerNode> localObjects = new HashSet();
-                    for (FieldValue fv :  f.getFieldValues()) {
-    //                    String val;
-    //                    if (fv instanceof ObjectFieldValue) {
-    //                        Instance i = ((ObjectFieldValue)fv).getInstance();
-    //                        val = i.getJavaClass().getName()+"#"+i.getInstanceNumber();
-    //                    } else {
-    //                        val = fv.getValue();
-    //                    }
+                    for (FieldValue fv : f.getFieldValues()) {
                         if (!(fv instanceof ObjectFieldValue)) continue;
 
                         Instance instance = ((ObjectFieldValue)fv).getInstance();
@@ -122,21 +118,14 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
                             localObjects.add(new LocalObjectNode(instance));
                         }
                     }
-    //                List<FieldValue> fields = f.getFieldValues();
+                    
                     String stackFrameName = f.getName();
-                    if (stackFrameName == null) stackFrameName = "<unknown>";
+                    if (stackFrameName == null) stackFrameName = Bundle.TruffleThreadsProvider_Unknown();
                     stackFrameNodes.add(new TruffleStackFrameNode(stackFrameName, localObjects.toArray(HeapViewerNode.NO_NODES)));
-    //                sb.append("    at "+f.getName()+"()");
-    //                sb.append("<br>");  // NOI18N
-    //
-    ////                if (!fields.isEmpty()) sb.append("        Locals:");
-    ////                sb.append("<br>");  // NOI18N
-    //
-
                 }
             }
         } else {
-            threadNodes.add(new TextNode("Thread not available"));
+            threadNodes.add(new TextNode(Bundle.TruffleThreadsProvider_ThreadNotAvailable()));
         }
         
         return threadNodes.toArray(HeapViewerNode.NO_NODES);
@@ -170,8 +159,6 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
     }
     
     public String getThreadsHTML(HeapContext context) {
-//        long start = System.currentTimeMillis();
-        
         StringBuilder sb = new StringBuilder();
         
         Heap heap = context.getFragment().getHeap();
@@ -184,44 +171,32 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
 
         if (threads != null) {
             for (TruffleStackTraces.StackTrace st : threads) {
-                sb.append("<b>&nbsp;&nbsp;Thread " + DetailsSupport.getDetailsString(st.getThread(), heap) + "</b>");        
+                sb.append("<b>&nbsp;&nbsp;" + Bundle.TruffleThreadsProvider_ThreadNamePrefix(DetailsSupport.getDetailsString(st.getThread(), heap)) + "</b>"); // NOI18N        
                 sb.append("<br>");  // NOI18N
 
                 List<TruffleStackTraces.Frame> frames = st.getFrames();
                 for (TruffleStackTraces.Frame f : frames) {
                     List<FieldValue> fields = f.getFieldValues();
                     String fname = f.getName();
-                    if (fname == null) fname = "<unknown>";
-                    sb.append("    at "+HeapUtils.htmlize(fname));
+                    if (fname == null) fname = Bundle.TruffleThreadsProvider_Unknown();
+                    sb.append("    " + Bundle.TruffleThreadsProvider_StackFramePrefix() + " " + HeapUtils.htmlize(fname)); // NOI18N
                     sb.append("<br>");  // NOI18N
 
-    //                if (!fields.isEmpty()) sb.append("        Locals:");
-    //                sb.append("<br>");  // NOI18N
-
                     for (FieldValue fv : fields) {
-    //                    String val;
-    //                    if (fv instanceof ObjectFieldValue) {
-    //                        Instance i = ((ObjectFieldValue)fv).getInstance();
-    //                        val = i.getJavaClass().getName()+"#"+i.getInstanceNumber();
-    //                    } else {
-    //                        val = fv.getValue();
-    //                    }
                         if (!(fv instanceof ObjectFieldValue)) continue;
                         Instance instance = ((ObjectFieldValue)fv).getInstance();
                         if (instance == null) continue;
-                        sb.append("       <span style=\"color: #666666\">local object:</span> " + printInstance(instance, heap, javaClassClass));
+                        sb.append("       <span style=\"color: #666666\">" + Bundle.TruffleThreadsProvider_LocalObjectPrefix() + "</span> " + printInstance(instance, heap, javaClassClass)); // NOI18N
                         sb.append("<br>");  // NOI18N
                     }
                 }
             }
         } else {
-            sb.append("<b>&nbsp;&nbsp;Thread not available");
+            sb.append("<b>&nbsp;&nbsp;" + Bundle.TruffleThreadsProvider_ThreadNotAvailable()); // NOI18N
         }
         
         sb.append("<br>");  // NOI18N
         sb.append("</pre>"); // NOI18N
-        
-//        System.err.println(">>> JAVASCRIPT Threads computed in " + (System.currentTimeMillis() - start));
         
         return sb.toString();
     }
@@ -232,18 +207,18 @@ public class TruffleThreadsProvider<O extends TruffleObject, T extends TruffleTy
             TruffleObjectNode<O> node = language.createObjectNode(object, object.getType(heap));
             String instanceString = HeapUtils.instanceToHtml(instance, false, heap, javaClassClass);
             String type = node.getTypeName();
-            instanceString = instanceString.replace(">" + instance.getJavaClass().getName() + "#", ">" + HeapUtils.htmlize(type) + "#");
+            instanceString = instanceString.replace(">" + instance.getJavaClass().getName() + "#", ">" + HeapUtils.htmlize(type) + "#"); // NOI18N
             String logValue = node.getLogicalValue(heap);
-            if (logValue != null) instanceString += " <span style=\"color: #666666\">: " + HeapUtils.htmlize(logValue) + "</span>";
+            if (logValue != null) instanceString += " <span style=\"color: #666666\">: " + HeapUtils.htmlize(logValue) + "</span>"; // NOI18N
             return instanceString;
         } else if (DynamicObject.isDynamicObject(instance)) {
             DynamicObject dobj = new DynamicObject(instance);
             TruffleObjectNode<O> node = new DynamicObjectNode(dobj, dobj.getType(heap));
             String instanceString = HeapUtils.instanceToHtml(instance, false, heap, javaClassClass);
             String type = node.getTypeName();
-            instanceString = instanceString.replace(">" + instance.getJavaClass().getName() + "#", ">" + HeapUtils.htmlize(type) + "#");
+            instanceString = instanceString.replace(">" + instance.getJavaClass().getName() + "#", ">" + HeapUtils.htmlize(type) + "#"); // NOI18N
             String logValue = node.getLogicalValue(heap);
-            if (logValue != null) instanceString += " <span style=\"color: #666666\">: " + HeapUtils.htmlize(logValue) + "</span>";
+            if (logValue != null) instanceString += " <span style=\"color: #666666\">: " + HeapUtils.htmlize(logValue) + "</span>"; // NOI18N
             return instanceString;
         } else {
             return HeapUtils.instanceToHtml(instance, true, heap, javaClassClass);

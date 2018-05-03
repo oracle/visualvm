@@ -109,21 +109,21 @@ public class TruffleStackTraces {
         }
 
         private static String getFrameName(Instance callTarget, Heap heap) {
-            Instance rootNode = (Instance) callTarget.getValueOfField("rootNode");
+            Instance rootNode = (Instance) callTarget.getValueOfField("rootNode"); // NOI18N
 
             if (rootNode != null) {
                 String name = DetailsUtils.getInstanceString(rootNode, heap);
                 Instance sourceSection = getSourceSection(rootNode);
                 if (sourceSection != null) {
-                    Instance source = (Instance) sourceSection.getValueOfField("source");
+                    Instance source = (Instance) sourceSection.getValueOfField("source"); // NOI18N
                     if (source != null) {
-                        String fileName = DetailsUtils.getInstanceFieldString(source, "name", heap);
-                        int slash = fileName.lastIndexOf('/');
+                        String fileName = DetailsUtils.getInstanceFieldString(source, "name", heap); // NOI18N
+                        int slash = fileName.lastIndexOf('/'); // NOI18N
 
                         if (slash != -1) {
                             fileName = fileName.substring(slash+1);
                         }
-                        return name+" ("+fileName+":"+getLineNumber(sourceSection, source)+")";
+                        return name+" ("+fileName+":"+getLineNumber(sourceSection, source)+")"; // NOI18N
                     }
                 }
                 return name;
@@ -137,7 +137,7 @@ public class TruffleStackTraces {
         for (Object fv : rootNode.getFieldValues()) {
             FieldValue fieldVal  = (FieldValue) fv;
 
-            if ("sourceSection".equals(fieldVal.getField().getName())) {
+            if ("sourceSection".equals(fieldVal.getField().getName())) { // NOI18N
                 Instance sc = ((ObjectFieldValue)fieldVal).getInstance();
 
                 if (sc != null) {
@@ -149,10 +149,10 @@ public class TruffleStackTraces {
     }
 
     private static String getLineNumber(Instance sourceSection, Instance source) {
-        Integer charIndex = (Integer) sourceSection.getValueOfField("charIndex");
-        Instance textmap = (Instance) source.getValueOfField("textMap");
+        Integer charIndex = (Integer) sourceSection.getValueOfField("charIndex"); // NOI18N
+        Instance textmap = (Instance) source.getValueOfField("textMap"); // NOI18N
         if (textmap != null) {
-            PrimitiveArrayInstance nlOffsets = (PrimitiveArrayInstance) textmap.getValueOfField("nlOffsets");
+            PrimitiveArrayInstance nlOffsets = (PrimitiveArrayInstance) textmap.getValueOfField("nlOffsets"); // NOI18N
             List vals = nlOffsets.getValues();
 
             for (int i=0; i<vals.size(); i++) {
@@ -164,7 +164,7 @@ public class TruffleStackTraces {
             }
             return String.valueOf(vals.size());
         }
-        return "0";
+        return "0"; // NOI18N
     }
 
     private static Instance getSingleton(String javaClass, Heap heap) {
@@ -183,8 +183,8 @@ public class TruffleStackTraces {
     // implementation for DefaultTruffleRuntime
     private static class DefaultTruffleRuntime {
 
-        private static final String TRUFFLE_RUNTIME_FQN = "com.oracle.truffle.api.impl.DefaultTruffleRuntime";
-        private static final String THREAD_FQN = "java.lang.Thread";
+        private static final String TRUFFLE_RUNTIME_FQN = "com.oracle.truffle.api.impl.DefaultTruffleRuntime"; // NOI18N
+        private static final String THREAD_FQN = "java.lang.Thread"; // NOI18N
 
         private Collection<StackTrace> truffleStackTraces;
 
@@ -192,7 +192,7 @@ public class TruffleStackTraces {
             Instance runtime = getSingleton(TRUFFLE_RUNTIME_FQN, heap);
 
             if (runtime != null) {
-                Instance stackTraces = (Instance) runtime.getValueOfField("stackTraces");
+                Instance stackTraces = (Instance) runtime.getValueOfField("stackTraces"); // NOI18N
 
                 truffleStackTraces = getStackTraces(heap, stackTraces);
             }
@@ -228,10 +228,10 @@ public class TruffleStackTraces {
         }
 
         private Instance getTruffleFrameInstance(Instance thread, Instance stackTraces) {
-            Instance threadLocals = (Instance) thread.getValueOfField("threadLocals");
+            Instance threadLocals = (Instance) thread.getValueOfField("threadLocals"); // NOI18N
 
             if (threadLocals != null) {
-                List<Instance> mapTable = getObjectArray(threadLocals, "table");
+                List<Instance> mapTable = getObjectArray(threadLocals, "table"); // NOI18N
 
                 return searchTable(mapTable, stackTraces);
             }
@@ -241,10 +241,10 @@ public class TruffleStackTraces {
         private Instance searchTable(List<Instance> entries, Instance item) {
             for (Instance entry : entries) {
                 for (; entry != null; entry = (Instance) entry.getValueOfField("next")) { // NOI18N
-                    Instance key = (Instance) entry.getValueOfField("referent");
+                    Instance key = (Instance) entry.getValueOfField("referent"); // NOI18N
 
                     if (item.equals(key)) {
-                        return (Instance) entry.getValueOfField("value");
+                        return (Instance) entry.getValueOfField("value"); // NOI18N
                     }
                 }
             }
@@ -278,7 +278,7 @@ public class TruffleStackTraces {
 
                 do {
                     frames.add(new DefaultFrame(heap, frame));
-                    frame = (Instance) frame.getValueOfField("callerFrame");
+                    frame = (Instance) frame.getValueOfField("callerFrame"); // NOI18N
                 } while (frame != null);
             }
             return frames;
@@ -289,8 +289,8 @@ public class TruffleStackTraces {
 
         private DefaultFrame(Heap heap, Instance frame) {
             super(heap,
-                    (Instance) frame.getValueOfField("target"),
-                    (Instance) frame.getValueOfField("frame")
+                    (Instance) frame.getValueOfField("target"), // NOI18N
+                    (Instance) frame.getValueOfField("frame") // NOI18N
             );
         }
     }

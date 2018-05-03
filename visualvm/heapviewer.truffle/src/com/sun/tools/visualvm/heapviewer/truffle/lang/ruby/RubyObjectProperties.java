@@ -34,6 +34,7 @@ import org.netbeans.lib.profiler.heap.ArrayItemValue;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 
@@ -41,6 +42,11 @@ import org.openide.util.lookup.ServiceProviders;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "RubyObjectProperties_Properties=variables",
+    "RubyObjectProperties_Items=items",
+    "RubyObjectProperties_References=references"
+})
 final class RubyObjectProperties {
     
     // -------------------------------------------------------------------------
@@ -54,13 +60,13 @@ final class RubyObjectProperties {
     public static class FieldsProvider extends TruffleObjectPropertyProvider.Fields<RubyObject, RubyType, RubyHeapFragment, RubyLanguage> {
 
         public FieldsProvider() {
-            super("variables", RubyObject.class, RubyLanguage.instance(), true);
+            super(Bundle.RubyObjectProperties_Properties(), RubyObject.class, RubyLanguage.instance(), true);
         }
 
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("ruby_");
+            return viewID.startsWith("ruby_"); // NOI18N
         }
 
         @Override
@@ -87,8 +93,8 @@ final class RubyObjectProperties {
         protected boolean includeInstance(Instance instance) {
             String className = instance.getJavaClass().getName();
 
-            if (className.startsWith("java.lang.") ||
-                className.startsWith("org.truffleruby.core.rope."))
+            if (className.startsWith("java.lang.") || // NOI18N
+                className.startsWith("org.truffleruby.core.rope.")) // NOI18N
                 return true;
 
             return false;
@@ -105,13 +111,13 @@ final class RubyObjectProperties {
     public static class ArrayItemsProvider extends TruffleInstancePropertyProvider.ArrayItems<RubyObject, RubyType, RubyHeapFragment, RubyLanguage> {
 
         public ArrayItemsProvider() {
-            super("items", RubyLanguage.instance(), false);
+            super(Bundle.RubyObjectProperties_Items(), RubyLanguage.instance(), false);
         }
 
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("ruby_");
+            return viewID.startsWith("ruby_"); // NOI18N
         }
 
 
@@ -134,13 +140,13 @@ final class RubyObjectProperties {
     public static class ReferencesProvider extends TruffleObjectPropertyProvider.References<RubyObject, RubyType, RubyHeapFragment, RubyLanguage> {
 
         public ReferencesProvider() {
-            super("references", RubyObject.class, RubyLanguage.instance(), false);
+            super(Bundle.RubyObjectProperties_References(), RubyObject.class, RubyLanguage.instance(), false);
         }
 
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("ruby_");
+            return viewID.startsWith("ruby_"); // NOI18N
         }
 
         @Override

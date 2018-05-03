@@ -76,20 +76,20 @@ public class PythonObject extends TruffleObject.InstanceBased {
     }
 
     public PythonObject(String type, Instance instance) {
-        if (instance == null) throw new IllegalArgumentException("Instance cannot be null");
+        if (instance == null) throw new IllegalArgumentException("Instance cannot be null"); // NOI18N
         
         this.instance = instance;
         this.type = type;
         
-        Object[] values = HeapUtils.getValuesOfFields(instance, "storage", "pythonClass", "store", "array", "map", "set", "dictStorage");
+        Object[] values = HeapUtils.getValuesOfFields(instance, "storage", "pythonClass", "store", "array", "map", "set", "dictStorage"); // NOI18N
         
-        storage = (Instance) values[0]; // NOI18N
-        pythonClass = (Instance) values[1]; // NOI18N
-        store = (Instance) values[2]; // NOI18N
-        array = (ObjectArrayInstance) values[3]; // NOI18N
-        map = (Instance) values[4]; // NOI18N
-        set = (Instance) values[5]; // NOI18N
-        dictStorage = (Instance) values[6]; // NOI18N
+        storage = (Instance) values[0];
+        pythonClass = (Instance) values[1];
+        store = (Instance) values[2];
+        array = (ObjectArrayInstance) values[3];
+        map = (Instance) values[4];
+        set = (Instance) values[5];
+        dictStorage = (Instance) values[6];
         
 //        Map values = HeapUtils.getValuesOfFields(instance, "storage", "pythonClass", "store", "array", "map", "set", "dictStorage");
 //        
@@ -146,7 +146,7 @@ public class PythonObject extends TruffleObject.InstanceBased {
     }
     
     static String getPythonType(Instance instance) {
-        return DetailsUtils.getInstanceString((Instance) instance.getValueOfField("pythonClass"), null);
+        return DetailsUtils.getInstanceString((Instance) instance.getValueOfField("pythonClass"), null); // NOI18N
     }
 
     @Override
@@ -185,7 +185,7 @@ public class PythonObject extends TruffleObject.InstanceBased {
                         if (PythonObject.isPythonObject(pInstance)) {
                             addItem(pInstance, ref, robjRefs);
                         } else {
-                            Instance store = getReference(pInstance, PYTHON_OBJECT_FQN, "store");
+                            Instance store = getReference(pInstance, PYTHON_OBJECT_FQN, "store"); // NOI18N
                             if (PythonObject.isPythonObject(store)) {
                                 addItem(store, ref, robjRefs);
                             }
@@ -225,8 +225,8 @@ public class PythonObject extends TruffleObject.InstanceBased {
             mapEntry = parent;
         }
         // top TreeMap$Entry
-        Instance treeMap = getReference(mapEntry, TREEMAP_FQN, "root");
-        Instance pythonObject = getReference(treeMap, PYTHON_OBJECT_FQN, "map");
+        Instance treeMap = getReference(mapEntry, TREEMAP_FQN, "root"); // NOI18N
+        Instance pythonObject = getReference(treeMap, PYTHON_OBJECT_FQN, "map"); // NOI18N
 
         if (isPythonObject(pythonObject)) {
             for (FieldValue fv : new PythonObject(pythonObject).getAttributes()) {
@@ -242,7 +242,7 @@ public class PythonObject extends TruffleObject.InstanceBased {
     }
 
     private Instance getParentTreeEntry(Instance treeEntry) {
-        return (Instance) treeEntry.getValueOfField("parent");
+        return (Instance) treeEntry.getValueOfField("parent"); // NOI18N
     }
 
     private Instance getReference(Instance instance, String definingClass, String fieldName) {
@@ -291,13 +291,13 @@ public class PythonObject extends TruffleObject.InstanceBased {
         Instance vals = null;
 
         if (store != null) {
-            vals = (Instance)store.getValueOfField("values");
+            vals = (Instance)store.getValueOfField("values"); // NOI18N
         }
         if (array != null) {
             vals = array;
         }
         if (vals != null) {
-            listType = vals.getJavaClass().getName().replace("[]", "");
+            listType = vals.getJavaClass().getName().replace("[]", ""); // NOI18N
             if (vals instanceof ObjectArrayInstance) {
                 return ((ObjectArrayInstance)vals).getValues();
             }
@@ -311,7 +311,7 @@ public class PythonObject extends TruffleObject.InstanceBased {
 
     private int getLength() {
         if (store != null) {
-            Integer len = (Integer) store.getValueOfField("length");
+            Integer len = (Integer) store.getValueOfField("length"); // NOI18N
 
             if (len != null) {
                 return len.intValue();
@@ -346,12 +346,12 @@ public class PythonObject extends TruffleObject.InstanceBased {
     }
 
     private List<FieldValue> getDictFields() {
-        Instance fastStore = (Instance) dictStorage.getValueOfField("store");
+        Instance fastStore = (Instance) dictStorage.getValueOfField("store"); // NOI18N
 
         if (DynamicObject.isDynamicObject(fastStore)) {
             return new DynamicObject(fastStore).getFieldValues();
         }
-        Instance keywords = (Instance) dictStorage.getValueOfField("keywords");
+        Instance keywords = (Instance) dictStorage.getValueOfField("keywords"); // NOI18N
         if (keywords instanceof ObjectArrayInstance) {
             return getEntriesFromKeywords((ObjectArrayInstance) keywords);
         }
@@ -359,7 +359,7 @@ public class PythonObject extends TruffleObject.InstanceBased {
     }
 
     private List<FieldValue> getSetFields() {
-        Instance m = (Instance) set.getValueOfField("m");
+        Instance m = (Instance) set.getValueOfField("m"); // NOI18N
         if (m != null) {    // TreeMap
             return getEntriesFromTreeMap(true, m);
         }
@@ -380,7 +380,7 @@ public class PythonObject extends TruffleObject.InstanceBased {
 
     private List<FieldValue> getEntriesFromEconomicMapStorage(boolean isSet, Instance economicMapStorage) {
         List fields = new ArrayList();
-        Instance entries = (Instance) economicMapStorage.getValueOfField("entries");
+        Instance entries = (Instance) economicMapStorage.getValueOfField("entries"); // NOI18N
 
         if (entries instanceof ObjectArrayInstance) {
             ObjectArrayInstance entriesArr = (ObjectArrayInstance) entries;
@@ -398,7 +398,7 @@ public class PythonObject extends TruffleObject.InstanceBased {
                         if (value != null) {
                             if (value instanceof Instance) {
                                 Instance ival = ((Instance)value);
-                                Instance linkValue = (Instance) ival.getValueOfField("value");
+                                Instance linkValue = (Instance) ival.getValueOfField("value"); // NOI18N
 
                                 if (linkValue != null && ival.getJavaClass().getName().startsWith(mapClassName)) {
                                     value = linkValue;
@@ -415,7 +415,7 @@ public class PythonObject extends TruffleObject.InstanceBased {
 
     private List<FieldValue> getEntriesFromTreeMap(boolean isSet, Instance treeMap) {
         List fields = new ArrayList();
-        Instance rootEntry = (Instance) treeMap.getValueOfField("root");
+        Instance rootEntry = (Instance) treeMap.getValueOfField("root"); // NOI18N
 
         getEntries(isSet, rootEntry, fields);
         return fields;
@@ -423,9 +423,9 @@ public class PythonObject extends TruffleObject.InstanceBased {
 
     private void getEntries(boolean isSet, Instance entry, List fields) {
         if (entry != null) {
-            getEntries(isSet, (Instance) entry.getValueOfField("left"), fields);
+            getEntries(isSet, (Instance) entry.getValueOfField("left"), fields); // NOI18N
             fields.add(new PythonMapEntryFieldValue(isSet, entry));
-            getEntries(isSet, (Instance) entry.getValueOfField("right"), fields);
+            getEntries(isSet, (Instance) entry.getValueOfField("right"), fields); // NOI18N
         }
     }
 
@@ -515,7 +515,7 @@ public class PythonObject extends TruffleObject.InstanceBased {
         @Override
         public Field getField() {
             if (isSet) {
-                return new PythonMapEntryField("item");
+                return new PythonMapEntryField("item"); // NOI18N
             }
             Instance key = getEntryKey();
             String name = DetailsUtils.getInstanceString(key, null);
@@ -607,7 +607,7 @@ public class PythonObject extends TruffleObject.InstanceBased {
 
         @Override
         public String getName() {
-            return  "["+index+"]";
+            return  "["+index+"]"; // NOI18N
         }
 
         @Override

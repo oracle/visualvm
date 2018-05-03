@@ -41,11 +41,16 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
 import javax.swing.Icon;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TruffleObjectPropertyPlugin_NoSelection=<no object selected>",
+    "TruffleObjectPropertyPlugin_NoItems=<no {0}>" // <no items>
+})
 public class TruffleObjectPropertyPlugin<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>> extends HeapViewPlugin {
     
     private final TruffleObjectPropertyProvider<O, T, F, L, ? extends Object> provider;
@@ -66,10 +71,10 @@ public class TruffleObjectPropertyPlugin<O extends TruffleObject, T extends Truf
         
         objectsView = new TreeTableView(viewID, context, actions, TreeTableViewColumn.instancesMinimal(heap, false)) {
             protected HeapViewerNode[] computeData(RootNode root, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
-                if (selected == null) return new HeapViewerNode[] { new TextNode("<no object selected>") };
+                if (selected == null) return new HeapViewerNode[] { new TextNode(Bundle.TruffleObjectPropertyPlugin_NoSelection()) };
                     
                 HeapViewerNode[] nodes = provider.getNodes(selected, root, heap, viewID, viewFilter, dataTypes, sortOrders, progress);
-                return nodes == null || nodes.length == 0 ? new HeapViewerNode[] { new TextNode("<no " + provider.getName() + ">") } : nodes;
+                return nodes == null || nodes.length == 0 ? new HeapViewerNode[] { new TextNode(Bundle.TruffleObjectPropertyPlugin_NoItems(provider.getName())) } : nodes;
             }
         };
     }

@@ -72,7 +72,7 @@ public class TruffleFrame {
         localValues = Collections.EMPTY_LIST;
         if (isTruffleFrameSubClass(truffleFrame)) {
             List<Instance> locals = getObjectArray(truffleFrame, "locals");         // NOI18N
-            List<String> primitiveLocals = getPrimitiveArray(truffleFrame, "primitiveLocals");  // NOI18N       // NOI18N
+            List<String> primitiveLocals = getPrimitiveArray(truffleFrame, "primitiveLocals");  // NOI18N
             List<Instance> arguments = getObjectArray(truffleFrame, "arguments");   // NOI18N
             Instance slotArr = getValueofFields(truffleFrame, "descriptor", "slots");   // NOI18N
             List<Instance> slots = getObjectArray(slotArr, "elementData");  // NOI18N
@@ -209,8 +209,8 @@ public class TruffleFrame {
     }
 
     private Type getVauleType(Instance frameSlot) {
-        Instance kind = (Instance) frameSlot.getValueOfField("kind");
-        byte tag = ((Byte) kind.getValueOfField("tag")).byteValue();
+        Instance kind = (Instance) frameSlot.getValueOfField("kind"); // NOI18N
+        byte tag = ((Byte) kind.getValueOfField("tag")).byteValue(); // NOI18N
 
         switch (tag) {
             case OBJECT_TAG:
@@ -230,7 +230,7 @@ public class TruffleFrame {
             case BYTE_TAG:
                 return PType.BYTE;
             default:
-                throw new IllegalArgumentException("Unknown type:" + tag);
+                throw new IllegalArgumentException("Unknown type:" + tag); // NOI18N
         }
     }
 

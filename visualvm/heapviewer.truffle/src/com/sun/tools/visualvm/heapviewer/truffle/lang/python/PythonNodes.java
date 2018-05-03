@@ -73,7 +73,7 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
     
     private static String computeName(TruffleObjectNode.InstanceBased<PythonObject> node, Heap heap) {
         String typeString = node.getTypeName();
-        return typeString.substring(typeString.lastIndexOf('.') + 1) + "#" + node.getInstance().getInstanceNumber();
+        return typeString.substring(typeString.lastIndexOf('.') + 1) + "#" + node.getInstance().getInstanceNumber(); // NOI18N
     }
     
     private static PythonObjectNode createCopy(TruffleObjectNode.InstanceBased<PythonObject> node) {
@@ -259,7 +259,7 @@ public class PythonNodes extends TruffleOpenNodeActionProvider<PythonObject, Pyt
 
             renderers.put(PythonNodes.PythonObjectReferenceNode.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon));
 
-            renderers.put(PythonNodes.PythonObjectAttributeReferenceNode.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon, "attribute in"));
+            renderers.put(PythonNodes.PythonObjectAttributeReferenceNode.class, new TruffleObjectReferenceNode.Renderer(heap, instanceIcon, "attribute in")); // NOI18N
         }
 
     }

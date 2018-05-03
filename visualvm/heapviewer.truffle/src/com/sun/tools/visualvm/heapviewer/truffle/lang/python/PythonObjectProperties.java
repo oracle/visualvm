@@ -33,6 +33,7 @@ import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.Value;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 
@@ -40,6 +41,11 @@ import org.openide.util.lookup.ServiceProviders;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "PythonObjectProperties_Properties=attributes",
+    "PythonObjectProperties_Items=items",
+    "PythonObjectProperties_References=references"
+})
 final class PythonObjectProperties {
     
     // -------------------------------------------------------------------------
@@ -53,13 +59,13 @@ final class PythonObjectProperties {
     public static class AttributesProvider extends TruffleObjectPropertyProvider.Fields<PythonObject, PythonType, PythonHeapFragment, PythonLanguage> {
 
         public AttributesProvider() {
-            super("attributes", PythonObject.class, PythonLanguage.instance(), true);
+            super(Bundle.PythonObjectProperties_Properties(), PythonObject.class, PythonLanguage.instance(), true);
         }
 
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("python_");
+            return viewID.startsWith("python_"); // NOI18N
         }
 
         @Override
@@ -86,8 +92,8 @@ final class PythonObjectProperties {
         protected boolean includeInstance(Instance instance) {
             String className = instance.getJavaClass().getName();
 
-            if (className.startsWith("java.lang.") ||
-                className.startsWith("com.oracle.graal.python.runtime.datatype."))
+            if (className.startsWith("java.lang.") || // NOI18N
+                className.startsWith("com.oracle.graal.python.runtime.datatype.")) // NOI18N
                 return true;
 
             return false;
@@ -107,13 +113,13 @@ final class PythonObjectProperties {
     public static class ItemsProvider extends TruffleObjectPropertyProvider.Fields<PythonObject, PythonType, PythonHeapFragment, PythonLanguage> {
 
         public ItemsProvider() {
-            super("items", PythonObject.class, PythonLanguage.instance(), true);
+            super(Bundle.PythonObjectProperties_Items(), PythonObject.class, PythonLanguage.instance(), true);
         }
 
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("python_");
+            return viewID.startsWith("python_"); // NOI18N
         }
 
         @Override
@@ -140,8 +146,8 @@ final class PythonObjectProperties {
         protected boolean includeInstance(Instance instance) {
             String className = instance.getJavaClass().getName();
 
-            if (className.startsWith("java.lang.") ||
-                className.startsWith("com.oracle.graal.python.runtime.datatype."))
+            if (className.startsWith("java.lang.") || // NOI18N
+                className.startsWith("com.oracle.graal.python.runtime.datatype.")) // NOI18N
                 return true;
 
             return false;
@@ -161,13 +167,13 @@ final class PythonObjectProperties {
     public static class ReferencesProvider extends TruffleObjectPropertyProvider.References<PythonObject, PythonType, PythonHeapFragment, PythonLanguage> {
 
         public ReferencesProvider() {
-            super("references", PythonObject.class, PythonLanguage.instance(), false);
+            super(Bundle.PythonObjectProperties_References(), PythonObject.class, PythonLanguage.instance(), false);
         }
 
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("python_");
+            return viewID.startsWith("python_"); // NOI18N
         }
 
         @Override

@@ -52,17 +52,15 @@ import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
  * @author Jiri Sedlacek
  */
 public class DynamicObject extends TruffleObject.InstanceBased {
-    
-//    public static final DataType<DynamicObject> DATA_TYPE = new DataType<DynamicObject>(DynamicObject.class, null, null);
 
-    static final String DYNAMIC_OBJECT_FQN = "com.oracle.truffle.api.object.DynamicObject";
-    private static final String LOCATION_FQN = "com.oracle.truffle.api.object.Location";
-    private static final String ENTERPRISE_PACKAGE = "com.oracle.truffle.object.enterprise";
-    private static final String ENTERPRISE_LOCATION_TOP_CLASS = ENTERPRISE_PACKAGE+".EnterpriseLocations";
-    private static final String PROPERTY_MAP_FQN = "com.oracle.truffle.object.ConsListPropertyMap";
-    private static final String TRIE_PROPERTY_MAP_FQN = "com.oracle.truffle.object.TriePropertyMap";
-    private static final String PROPERTY_FQN = "com.oracle.truffle.object.PropertyImpl";
-    private static final String OBJECT_TYPE_FQN = "com.oracle.truffle.api.object.ObjectType";
+    static final String DYNAMIC_OBJECT_FQN = "com.oracle.truffle.api.object.DynamicObject"; // NOI18N
+    private static final String LOCATION_FQN = "com.oracle.truffle.api.object.Location"; // NOI18N
+    private static final String ENTERPRISE_PACKAGE = "com.oracle.truffle.object.enterprise"; // NOI18N
+    private static final String ENTERPRISE_LOCATION_TOP_CLASS = ENTERPRISE_PACKAGE+".EnterpriseLocations"; // NOI18N
+    private static final String PROPERTY_MAP_FQN = "com.oracle.truffle.object.ConsListPropertyMap"; // NOI18N
+    private static final String TRIE_PROPERTY_MAP_FQN = "com.oracle.truffle.object.TriePropertyMap"; // NOI18N
+    private static final String PROPERTY_FQN = "com.oracle.truffle.object.PropertyImpl"; // NOI18N
+    private static final String OBJECT_TYPE_FQN = "com.oracle.truffle.api.object.ObjectType"; // NOI18N
 
     private final Instance instance;
     
@@ -80,7 +78,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
     }
     
     public DynamicObject(String type, Instance instance) {
-        if (instance == null) throw new IllegalArgumentException("Instance cannot be null");
+        if (instance == null) throw new IllegalArgumentException("Instance cannot be null"); // NOI18N
         
         this.instance = instance;
         this.type = type;
@@ -253,7 +251,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
 
     static JavaClass getLanguageIdFromShape(Instance sh) {
         if (sh != null) {
-            Instance objectType = (Instance) sh.getValueOfField("objectType");
+            Instance objectType = (Instance) sh.getValueOfField("objectType"); // NOI18N
             if (objectType != null) {
                 JavaClass objTypeCls = objectType.getJavaClass();
 
@@ -370,7 +368,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             return "null";  // NOI18N
         }
         String name = instance.getJavaClass().getName();
-        int last = name.lastIndexOf('.');
+        int last = name.lastIndexOf('.'); // NOI18N
 
         if (last != -1) {
             name = name.substring(last + 1);
@@ -468,7 +466,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                 if (className.contains("LongArrayLocation")) {  // NOI18N
                     Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
                     // Instance actualLoc = (Instance) loc.getValueOfField("arrayLocation");
-                    PrimitiveArrayInstance arr = (PrimitiveArrayInstance) dynamicObject.getValueOfField("primext");
+                    PrimitiveArrayInstance arr = (PrimitiveArrayInstance) dynamicObject.getValueOfField("primext"); // NOI18N
 
                     return getFieldValue(dynamicObject, (String) arr.getValues().get(index));
                 }
@@ -627,9 +625,9 @@ public class DynamicObject extends TruffleObject.InstanceBased {
             }
             if (className.contains("ObjectFieldLocation")) {    // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
-                return getInstanceFieldValue(dynamicObject, "object" + (index + 2));
+                return getInstanceFieldValue(dynamicObject, "object" + (index + 2)); // NOI18N
             }
-            if (className.contains("IntFieldLocation")) {
+            if (className.contains("IntFieldLocation")) { // NOI18N
                 Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
                 return getInstanceFieldValue(dynamicObject, "primitive" + (index + 1)); // NOI18N
             }
@@ -719,7 +717,7 @@ public class DynamicObject extends TruffleObject.InstanceBased {
                 }
             }
             if (loc.getValueOfField("index") != null && loc.getValueOfField("offset") != null) {    // NOI18N
-                if (loc.getValueOfField("type") != null) {   // TypedObjectFieldLocation
+                if (loc.getValueOfField("type") != null) {   // NOI18N // TypedObjectFieldLocation
                     Integer index = (Integer) loc.getValueOfField("index"); // NOI18N
                     if (index.intValue() == 0) { // test for type Object[]
                         long typeClassId = ((Instance) loc.getValueOfField("type")).getInstanceId();  // NOI18N

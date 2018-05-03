@@ -59,22 +59,22 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
         if (PCLASS_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "className", heap);
+            return DetailsUtils.getInstanceFieldString(instance, "className", heap); // NOI18N
         }
         if (PFUNCTION_MASK.equals(className) || PBUILDIN_FUNCTION_MASK.equals(className)) {
-            return DetailsUtils.getInstanceFieldString(instance, "name", heap);
+            return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
         }
         if (PNONE_MASK.equals(className)) {
-            return "None";
+            return "None"; // NOI18N
         }
         if (PLIST_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "store", heap);    // NOI18N
         }
         if (BASIC_STORAGE_MASK.equals(className)) {
-            return DetailsUtils.getIntFieldValue(instance, "length", 0) + " items";
+            return DetailsUtils.getIntFieldValue(instance, "length", 0) + " items"; // NOI18N
         }
         if (EMPTY_STORAGE_MASK.equals(className)) {
-            return "0 items";
+            return "0 items"; // NOI18N
         }
         if (PTUPLE_MASK.equals(className)) {
             return DetailsUtils.getInstanceFieldString(instance, "array", heap);    // NOI18N
@@ -83,7 +83,7 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
             return DetailsUtils.getInstanceFieldString(instance, "name", heap); // NOI18N
         }
         if (PBYTES_MASK.equals(className)) {
-            String bytes = DetailsUtils.getPrimitiveArrayFieldString(instance, "bytes", 0, -1, ",", "...");
+            String bytes = DetailsUtils.getPrimitiveArrayFieldString(instance, "bytes", 0, -1, ",", "..."); // NOI18N
 
             if (bytes == null) {
                 return DetailsUtils.getInstanceFieldString(instance, "store", heap); // NOI18N
@@ -101,19 +101,19 @@ public class PythonDetailsProvider extends DetailsProvider.Basic {
              return DetailsUtils.getInstanceFieldString(instance, "message", heap); // NOI18N
         }
         if (BYTE_STORAGE_MASK.equals(className)) {
-            return DetailsUtils.getPrimitiveArrayFieldString(instance, "values", 0, -1, ",", "...");
+            return DetailsUtils.getPrimitiveArrayFieldString(instance, "values", 0, -1, ",", "..."); // NOI18N
         }
         return null;
     }
 
     private static String complexToString(double real, double imag) {
         if (real == 0.) {
-            return toString(imag) + "j";
+            return toString(imag) + "j"; // NOI18N
         } else {
             if (imag >= 0) {
-                return String.format("(%s+%sj)", toString(real), toString(imag));
+                return String.format("(%s+%sj)", toString(real), toString(imag)); // NOI18N
             } else {
-                return String.format("(%s-%sj)", toString(real), toString(-imag));
+                return String.format("(%s-%sj)", toString(real), toString(-imag)); // NOI18N
             }
         }
     }

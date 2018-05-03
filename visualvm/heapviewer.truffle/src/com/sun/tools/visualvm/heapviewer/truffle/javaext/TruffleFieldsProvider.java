@@ -46,12 +46,19 @@ import com.sun.tools.visualvm.heapviewer.model.Progress;
 import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
 import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
 import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TruffleFieldsProvider_Name=truffle fields",
+    "TruffleFieldsProvider_MoreNodes=<another {0} truffle fields left>",
+    "TruffleFieldsProvider_SamplesContainer=<sample {0} truffle fields>",
+    "TruffleFieldsProvider_NodesContainer=<truffle fields {0}-{1}>"
+})
 abstract class TruffleFieldsProvider extends HeapViewerNode.Provider {
     
     public HeapViewerNode[] getNodes(HeapViewerNode parent, Heap heap, String viewID, HeapViewerNodeFilter viewFilter, List<DataType> dataTypes, List<SortOrder> sortOrders, Progress progress) {
@@ -74,13 +81,13 @@ abstract class TruffleFieldsProvider extends HeapViewerNode.Provider {
                 return new ProgressIterator(iterator, index, false, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
-                return "<another " + moreNodesCount + " truffle fields left>";
+                return Bundle.TruffleFieldsProvider_MoreNodes(moreNodesCount);
             }
             protected String getSamplesContainerString(String objectsCount)  {
-                return "<sample " + objectsCount + " truffle fields>";
+                return Bundle.TruffleFieldsProvider_SamplesContainer(objectsCount);
             }
             protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                return "<truffle fields " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                return Bundle.TruffleFieldsProvider_NodesContainer(firstNodeIdx, lastNodeIdx);
             }
         };
 
@@ -114,11 +121,11 @@ abstract class TruffleFieldsProvider extends HeapViewerNode.Provider {
         private boolean includeInstanceFields = true;
         
         public String getName() {
-            return "truffle fields";
+            return Bundle.TruffleFieldsProvider_Name();
         }
 
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.equals("truffle_objects_javaext");
+            return viewID.equals("truffle_objects_javaext"); // NOI18N
         }
 
         public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {

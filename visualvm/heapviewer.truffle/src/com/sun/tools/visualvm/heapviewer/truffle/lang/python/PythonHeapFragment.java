@@ -29,18 +29,22 @@ import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
 import java.util.Iterator;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Tomas Hurka
  */
+@NbBundle.Messages({
+    "PythonHeapFragment_Name=Python Heap"
+})
 public class PythonHeapFragment extends TruffleLanguageHeapFragment<PythonObject, PythonType> {
 
-    private static final String PYTHON_HEAP_ID = "python_heap";
+    private static final String PYTHON_HEAP_ID = "python_heap"; // NOI18N
 
 
     PythonHeapFragment(PythonLanguage language, Instance langID, Heap heap) {
-        super(PYTHON_HEAP_ID, "Python Heap", fragmentDescription(langID, heap), language, heap);
+        super(PYTHON_HEAP_ID, Bundle.PythonHeapFragment_Name(), fragmentDescription(langID, heap), language, heap);
     }
     
     
@@ -49,7 +53,7 @@ public class PythonHeapFragment extends TruffleLanguageHeapFragment<PythonObject
     }
     
     static boolean isPythonHeap(HeapContext context) {
-        return PYTHON_HEAP_ID.equals(context.getFragment().getID()); // NOI18N
+        return PYTHON_HEAP_ID.equals(context.getFragment().getID());
     }
     
     

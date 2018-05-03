@@ -39,22 +39,29 @@ import javax.swing.SortOrder;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TrufflePrimitiveArrayItemsProvider_Name=items",
+    "TrufflePrimitiveArrayItemsProvider_MoreNodes=<another {0} items left>",
+    "TrufflePrimitiveArrayItemsProvider_SamplesContainer=<sample {0} items>",
+    "TrufflePrimitiveArrayItemsProvider_NodesContainer=<items {0}-{1}>"
+})
 @ServiceProvider(service=HeapViewerNode.Provider.class, position = 300)
 public class TrufflePrimitiveArrayItemsProvider extends HeapViewerNode.Provider {
     
     public String getName() {
-        return "items";
+        return Bundle.TrufflePrimitiveArrayItemsProvider_Name();
     }
     
     public boolean supportsView(Heap heap, String viewID) {
         // TODO: fix to cover just the Truffle heaps!
-        return !viewID.startsWith("java_");
+        return !viewID.startsWith("java_"); // NOI18N
     }
     
     public boolean supportsNode(HeapViewerNode parent, Heap heap, String viewID) {
@@ -70,7 +77,7 @@ public class TrufflePrimitiveArrayItemsProvider extends HeapViewerNode.Provider 
         final Instance instance = HeapViewerNode.getValue(parent, DataType.INSTANCE, heap);
 //        if (!(instance instanceof PrimitiveArrayInstance)) return null;
         
-        final String type = instance.getJavaClass().getName().replace("[]", "");
+        final String type = instance.getJavaClass().getName().replace("[]", ""); // NOI18N
         final List<String> items = ((PrimitiveArrayInstance)instance).getValues();
 
         NodesComputer<Integer> computer = new NodesComputer<Integer>(items.size(), UIThresholds.MAX_ARRAY_ITEMS) {
@@ -86,13 +93,13 @@ public class TrufflePrimitiveArrayItemsProvider extends HeapViewerNode.Provider 
                 return new ProgressIterator(iterator, index, false, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
-                return "<another " + moreNodesCount + " items left>";
+                return Bundle.TrufflePrimitiveArrayItemsProvider_MoreNodes(moreNodesCount);
             }
             protected String getSamplesContainerString(String objectsCount)  {
-                return "<sample " + objectsCount + " items>";
+                return Bundle.TrufflePrimitiveArrayItemsProvider_SamplesContainer(objectsCount);
             }
             protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                return "<items " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                return Bundle.TrufflePrimitiveArrayItemsProvider_NodesContainer(firstNodeIdx, lastNodeIdx);
             }
         };
 

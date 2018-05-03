@@ -37,16 +37,24 @@ import java.util.Map;
 import java.util.Objects;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.ObjectFieldValue;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "JavaScriptHeapFragment_Name=JavaScript Heap",
+    "JavaScriptHeapFragment_UnknownType=<unknown type>",
+    "JavaScriptHeapFragment_NoPrototype=<no prototype>",
+    "JavaScriptHeapFragment_AnonymousPrototype=<anonymous prototype>",
+    "JavaScriptHeapFragment_UnknownPrototype=<unknown prototype>"
+})
 class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScriptObject, JavaScriptType> {
     
-    static final String JS_LANG_ID = "com.oracle.truffle.js.runtime.builtins.JSClass";
+    static final String JS_LANG_ID = "com.oracle.truffle.js.runtime.builtins.JSClass"; // NOI18N
     
-    private static final String JS_HEAP_ID = "javascript_heap";
+    private static final String JS_HEAP_ID = "javascript_heap"; // NOI18N
     
     // Copied from DynamicObjectDetailsProvider, unify!
     private static final String JS_NULL_CLASS_FQN = "com.oracle.truffle.js.runtime.objects.Null";     // NOI18N
@@ -60,7 +68,7 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
     
     
     JavaScriptHeapFragment(JavaScriptLanguage language, Instance langID, Heap heap) {
-        super(JS_HEAP_ID, "JavaScript Heap", fragmentDescription(langID, heap), language, heap);
+        super(JS_HEAP_ID, Bundle.JavaScriptHeapFragment_Name(), fragmentDescription(langID, heap), language, heap);
         
         JavaClass nullClass = heap.getJavaClassByName(JS_NULL_CLASS_FQN);
         nullInstance = (Instance)nullClass.getValueOfStaticField("instance"); // NOI18N
@@ -77,7 +85,7 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
     }
     
     static boolean isJavaScriptHeap(HeapContext context) {
-        return JS_HEAP_ID.equals(context.getFragment().getID()); // NOI18N
+        return JS_HEAP_ID.equals(context.getFragment().getID());
     }
     
     
@@ -144,9 +152,9 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
     }
     
     private static String getJSType(Instance prototype, JavaScriptHeapFragment fragment) {
-        if (prototype == null) return "<unknown type>";
+        if (prototype == null) return Bundle.JavaScriptHeapFragment_UnknownType();
         
-        if (Objects.equals(fragment.nullInstance, prototype)) return "<no prototype>";
+        if (Objects.equals(fragment.nullInstance, prototype)) return Bundle.JavaScriptHeapFragment_NoPrototype();
         
         Heap heap = fragment.getHeap();
         
@@ -157,10 +165,10 @@ class JavaScriptHeapFragment extends DynamicObjectLanguageHeapFragment<JavaScrip
             JavaScriptObject dconstructor = new JavaScriptObject(constructor);
             String dconstructorT = DynamicObject.getType(constructor, heap);
             String type = JavaScriptNodes.getLogicalValue(dconstructor, dconstructorT, heap);
-            if (type == null) return "<anonymous prototype>";
+            if (type == null) return Bundle.JavaScriptHeapFragment_AnonymousPrototype();
             return type.endsWith("()") ? type.substring(0, type.length() - 2) : type; // NOI18N
         } else {
-            return "<unknown prototype>";
+            return Bundle.JavaScriptHeapFragment_UnknownPrototype();
         }
     }
     

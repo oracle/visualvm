@@ -179,7 +179,7 @@ public final class SourceSectionView extends DetailsProvider.View implements Scr
     private void showAll() {
         all.setEnabled(false);
         view.setEnabled(false);
-        new RequestProcessor("SourceSection Details").post(new Runnable() { // TODO: use a HeapWalker processor once the API is available
+        new RequestProcessor("SourceSection Details").post(new Runnable() { // NOI18N // TODO: use a HeapWalker processor once the API is available
             public void run() {
                 String _preview = null;
                 try {

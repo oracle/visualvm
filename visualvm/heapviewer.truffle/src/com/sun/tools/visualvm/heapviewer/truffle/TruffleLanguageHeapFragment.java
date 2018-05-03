@@ -38,6 +38,7 @@ import com.sun.tools.visualvm.heapviewer.utils.HeapUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.api.progress.ProgressHandle;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -45,6 +46,10 @@ import org.netbeans.api.progress.ProgressHandle;
  */
 // O: type of base language objects (JavaScriptDynamicObject, RubyDynamicObject, PythonObject, RObject)
 // T: TruffleType or its subclass aggregating O objects
+@NbBundle.Messages({
+    "TruffleLanguageHeapFragment_Language=Language",
+    "TruffleLanguageHeapFragment_InitializingLanguageModel=Initializing {0} Model..."
+})
 public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T extends TruffleType<O>> extends HeapFragment {
     
     private final TruffleLanguage<O, T, ? extends TruffleLanguageHeapFragment<O, T>> language;
@@ -141,9 +146,9 @@ public abstract class TruffleLanguageHeapFragment<O extends TruffleObject, T ext
             }
         }
         
-        int verIdx = getDescription().indexOf(" (");
-        String langName = verIdx != -1 ? getDescription().substring(0, verIdx) : "Language";
-        ProgressHandle pHandle = ProgressHandle.createHandle("Initializing " + langName + " Model...");
+        int verIdx = getDescription().indexOf(" ("); // NOI18N
+        String langName = verIdx != -1 ? getDescription().substring(0, verIdx) : Bundle.TruffleLanguageHeapFragment_Language();
+        ProgressHandle pHandle = ProgressHandle.createHandle(Bundle.TruffleLanguageHeapFragment_InitializingLanguageModel(langName));
         pHandle.setInitialDelay(1000);
         pHandle.start();
         

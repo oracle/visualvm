@@ -48,11 +48,18 @@ import org.netbeans.lib.profiler.heap.HeapProgress;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
 import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TruffleInstancePropertyProvider_ComputingNodes=<Computing {0}...>", // <Computing items...>
+    "TruffleInstancePropertyProvider_MoreNodes=<another {0} {1} left>", // <another 1234 items left>
+    "TruffleInstancePropertyProvider_SamplesContainer=<sample {0} {1}>", // <sample 1234 items>
+    "TruffleInstancePropertyProvider_NodesContainer=<{2} {0}-{1}>" // <items 1001 - 2000>
+})
 public abstract class TruffleInstancePropertyProvider<O extends TruffleObject, T extends TruffleType<O>, F extends TruffleLanguageHeapFragment<O, T>, L extends TruffleLanguage<O, T, F>, I> extends HeapViewerNode.Provider {
     
     private final L language;
@@ -110,7 +117,7 @@ public abstract class TruffleInstancePropertyProvider<O extends TruffleObject, T
         if (!displaysProgress) {
             itemsC = getPropertyItems(instance, heap);
         } else {
-            ProgressHandle pHandle = ProgressHandle.createHandle("Computing " + propertyName + "...");
+            ProgressHandle pHandle = ProgressHandle.createHandle(Bundle.TruffleInstancePropertyProvider_ComputingNodes(propertyName));
             pHandle.setInitialDelay(1000);
             pHandle.start(HeapProgress.PROGRESS_MAX);
             HeapFragment.setProgress(pHandle, 0);
@@ -140,13 +147,13 @@ public abstract class TruffleInstancePropertyProvider<O extends TruffleObject, T
                 return new ProgressIterator(iterator, index, false, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
-                return "<another " + moreNodesCount + " " + propertyName + " left>";
+                return Bundle.TruffleInstancePropertyProvider_MoreNodes(moreNodesCount, propertyName);
             }
             protected String getSamplesContainerString(String objectsCount)  {
-                return "<sample " + objectsCount + " " + propertyName + ">";
+                return Bundle.TruffleInstancePropertyProvider_SamplesContainer(objectsCount, propertyName);
             }
             protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                return "<" + propertyName + " " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                return Bundle.TruffleInstancePropertyProvider_NodesContainer(firstNodeIdx, lastNodeIdx, propertyName);
             }
         };
 

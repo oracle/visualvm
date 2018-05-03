@@ -31,11 +31,15 @@ import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
 import com.sun.tools.visualvm.heapviewer.java.StackFrameNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TruffleStackFrameNode_Unknown=<unknown>"
+})
 public class TruffleStackFrameNode extends StackFrameNode {
     
     public TruffleStackFrameNode(String name, HeapViewerNode[] children) {
@@ -57,14 +61,14 @@ public class TruffleStackFrameNode extends StackFrameNode {
 
         public Renderer() {
             atRenderer = new LabelRenderer();
-            atRenderer.setText("at");
+            atRenderer.setText("at"); // NOI18N
             atRenderer.setMargin(3, 3, 3, 0);
             frameRenderer = new NormalBoldGrayRenderer() {
                 public void setValue(Object value, int row) {
                     if (value == null) {
-                        setNormalValue("");
-                        setBoldValue("");
-                        setGrayValue("");
+                        setNormalValue(""); // NOI18N
+                        setBoldValue(""); // NOI18N
+                        setGrayValue(""); // NOI18N
                     } else {
                         setNormalValue(((Object[])value)[0].toString());
                         setBoldValue(((Object[])value)[1].toString());
@@ -84,40 +88,40 @@ public class TruffleStackFrameNode extends StackFrameNode {
         public void setValue(Object value, int row) {
             if (value == null) {
                 // no value - fallback to <unknown>
-                name1 = "";
-                name2 = "<unknown>";
-                detail = "";
+                name1 = ""; // NOI18N
+                name2 = Bundle.TruffleStackFrameNode_Unknown();
+                detail = ""; // NOI18N
             } else {
                 String val = value.toString();
                 
-                int idx = val.lastIndexOf(' ');
+                int idx = val.lastIndexOf(' '); // NOI18N
                 if (idx != -1) { // multiple strings
                     detail = val.substring(idx);
-                    if (detail.startsWith(" (")) {
+                    if (detail.startsWith(" (")) { // NOI18N
                         val = val.substring(0, idx); // detail contains source:line
                     } else {
-                        detail = ""; // no detail available
+                        detail = ""; // no detail available // NOI18N
                     }
                     
-                    idx = val.startsWith("<") ? -1 : val.lastIndexOf(' ');
+                    idx = val.startsWith("<") ? -1 : val.lastIndexOf(' '); // NOI18N
                     if (idx != -1) { // multiple strings - last bold
                         name2 = val.substring(idx + 1);
                         name1 = val.substring(0, idx + 1);
                     } else { // single string or meta value - all bold
-                        name1 = "";
+                        name1 = ""; // NOI18N
                         name2 = val;
                     }
                     
-                    idx = name2.lastIndexOf('.');
+                    idx = name2.lastIndexOf('.'); // NOI18N
                     if (idx != -1) { // class.method detected in last string - only method bold
-                        if (!name1.isEmpty()) name1 += " ";
+                        if (!name1.isEmpty()) name1 += " "; // NOI18N
                         name1 = name1 + name2.substring(0, idx + 1);
                         name2 = name2.substring(idx + 1);
                     }
                 } else { // single string - all bold
-                    name1 = "";
+                    name1 = ""; // NOI18N
                     name2 = val;
-                    detail = "";
+                    detail = ""; // NOI18N
                 }
             }
             
@@ -125,7 +129,7 @@ public class TruffleStackFrameNode extends StackFrameNode {
         }
 
         public String getShortName() {
-            return "at " + name2 + " " + detail;
+            return "at " + name2 + " " + detail; // NOI18N
         }
 
     }

@@ -34,6 +34,7 @@ import org.netbeans.lib.profiler.heap.ArrayItemValue;
 import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 
@@ -41,6 +42,11 @@ import org.openide.util.lookup.ServiceProviders;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "JavaScriptObjectProperties_Properties=properties",
+    "JavaScriptObjectProperties_Items=items",
+    "JavaScriptObjectProperties_References=references"
+})
 final class JavaScriptObjectProperties {
     
     // -------------------------------------------------------------------------
@@ -54,13 +60,13 @@ final class JavaScriptObjectProperties {
     public static class FieldsProvider extends TruffleObjectPropertyProvider.Fields<JavaScriptObject, JavaScriptType, JavaScriptHeapFragment, JavaScriptLanguage> {
 
         public FieldsProvider() {
-            super("properties", JavaScriptObject.class, JavaScriptLanguage.instance(), true);
+            super(Bundle.JavaScriptObjectProperties_Properties(), JavaScriptObject.class, JavaScriptLanguage.instance(), true);
         }
 
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("javascript_");
+            return viewID.startsWith("javascript_"); // NOI18N
         }
 
         @Override
@@ -87,9 +93,9 @@ final class JavaScriptObjectProperties {
         protected boolean includeInstance(Instance instance) {
             String className = instance.getJavaClass().getName();
 
-            if (className.startsWith("java.lang.") ||
-                className.startsWith("com.oracle.truffle.js.runtime.objects.") ||
-                className.startsWith("com.oracle.truffle.api.object.DynamicObject[]"))
+            if (className.startsWith("java.lang.") || // NOI18N
+                className.startsWith("com.oracle.truffle.js.runtime.objects.") || // NOI18N
+                className.startsWith("com.oracle.truffle.api.object.DynamicObject[]")) // NOI18N
                 return true;
 
             return false;
@@ -106,13 +112,13 @@ final class JavaScriptObjectProperties {
     public static class ArrayItemsProvider extends TruffleInstancePropertyProvider.ArrayItems<JavaScriptObject, JavaScriptType, JavaScriptHeapFragment, JavaScriptLanguage> {
 
         public ArrayItemsProvider() {
-            super("items", JavaScriptLanguage.instance(), false);
+            super(Bundle.JavaScriptObjectProperties_Items(), JavaScriptLanguage.instance(), false);
         }
 
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("javascript_");
+            return viewID.startsWith("javascript_"); // NOI18N
         }
 
 
@@ -135,13 +141,13 @@ final class JavaScriptObjectProperties {
     public static class ReferencesProvider extends TruffleObjectPropertyProvider.References<JavaScriptObject, JavaScriptType, JavaScriptHeapFragment, JavaScriptLanguage> {
 
         public ReferencesProvider() {
-            super("references", JavaScriptObject.class, JavaScriptLanguage.instance(), false);
+            super(Bundle.JavaScriptObjectProperties_References(), JavaScriptObject.class, JavaScriptLanguage.instance(), false);
         }
 
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("javascript_");
+            return viewID.startsWith("javascript_"); // NOI18N
         }
 
         @Override

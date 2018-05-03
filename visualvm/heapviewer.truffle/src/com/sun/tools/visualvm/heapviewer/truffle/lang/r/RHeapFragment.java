@@ -29,18 +29,22 @@ import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "RHeapFragment_Name=R Heap"
+})
 class RHeapFragment extends TruffleLanguageHeapFragment<RObject, RType> {
     
-    private static final String R_HEAP_ID = "r_heap";
+    private static final String R_HEAP_ID = "r_heap"; // NOI18N
     
     
     RHeapFragment(RLanguage language, Instance langID, Heap heap) {
-        super(R_HEAP_ID, "R Heap", fragmentDescription(langID, heap), language, heap);
+        super(R_HEAP_ID, Bundle.RHeapFragment_Name(), fragmentDescription(langID, heap), language, heap);
     }
     
     
@@ -62,7 +66,7 @@ class RHeapFragment extends TruffleLanguageHeapFragment<RObject, RType> {
     
     
     static boolean isRHeap(HeapContext context) {
-        return R_HEAP_ID.equals(context.getFragment().getID()); // NOI18N
+        return R_HEAP_ID.equals(context.getFragment().getID());
     }
     
     public static HeapContext getRContext(HeapContext context) {

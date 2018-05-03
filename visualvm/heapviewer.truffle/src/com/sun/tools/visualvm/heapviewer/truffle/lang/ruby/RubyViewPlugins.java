@@ -36,12 +36,19 @@ import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "RubyViewPlugins_PropertiesName=Variables",
+    "RubyViewPlugins_PropertiesDescription=Variables",
+    "RubyViewPlugins_ReferencesName=References",
+    "RubyViewPlugins_ReferencesDescription=References"
+})
 final class RubyViewPlugins {
     
     // -------------------------------------------------------------------------
@@ -63,13 +70,13 @@ final class RubyViewPlugins {
         @Override
         protected Instance getPreviewInstance(HeapViewerNode node) {
             RubyNodes.RubyObjectNode dnode = (RubyNodes.RubyObjectNode)node;
-            if ("Proc".equals(dnode.getTypeName())) {
+            if ("Proc".equals(dnode.getTypeName())) { // NOI18N
                 RubyObject rbobj = dnode.getTruffleObject();
-                FieldValue dataField = rbobj.getFieldValue("sharedMethodInfo (hidden)");
+                FieldValue dataField = rbobj.getFieldValue("sharedMethodInfo (hidden)"); // NOI18N
                 Instance data = dataField instanceof ObjectFieldValue ? ((ObjectFieldValue)dataField).getInstance() : null;
                 if (data == null) return null;
 
-                Object sourceSection = ((Instance)data).getValueOfField("sourceSection");
+                Object sourceSection = ((Instance)data).getValueOfField("sourceSection"); // NOI18N
                 if (!(sourceSection instanceof Instance)) return null;
 
                 return (Instance)sourceSection;
@@ -104,7 +111,7 @@ final class RubyViewPlugins {
             if (!RubyHeapFragment.isRubyHeap(context)) return null;
             
             RubyObjectProperties.FieldsProvider fieldsProvider = Lookup.getDefault().lookup(RubyObjectProperties.FieldsProvider.class);
-            return new TruffleObjectPropertyPlugin("Variables", "Variables", Icons.getIcon(ProfilerIcons.NODE_FORWARD), "ruby_objects_fields", context, actions, fieldsProvider);
+            return new TruffleObjectPropertyPlugin(Bundle.RubyViewPlugins_PropertiesName(), Bundle.RubyViewPlugins_PropertiesDescription(), Icons.getIcon(ProfilerIcons.NODE_FORWARD), "ruby_objects_fields", context, actions, fieldsProvider); // NOI18N
         }
         
     }
@@ -121,7 +128,7 @@ final class RubyViewPlugins {
             if (!RubyHeapFragment.isRubyHeap(context)) return null;
             
             RubyObjectProperties.ReferencesProvider fieldsProvider = Lookup.getDefault().lookup(RubyObjectProperties.ReferencesProvider.class);
-            return new TruffleObjectPropertyPlugin("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE), "ruby_objects_references", context, actions, fieldsProvider);
+            return new TruffleObjectPropertyPlugin(Bundle.RubyViewPlugins_ReferencesName(), Bundle.RubyViewPlugins_ReferencesDescription(), Icons.getIcon(ProfilerIcons.NODE_REVERSE), "ruby_objects_references", context, actions, fieldsProvider); // NOI18N
         }
         
     }

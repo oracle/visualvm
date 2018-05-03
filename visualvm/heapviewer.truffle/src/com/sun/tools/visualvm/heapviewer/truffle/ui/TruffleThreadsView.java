@@ -56,11 +56,21 @@ import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
 import com.sun.tools.visualvm.heapviewer.ui.PluggableTreeTableView;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
 import javax.swing.Icon;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TruffleThreadsView_Name=Threads",
+    "TruffleThreadsView_Description=Threads",
+    "TruffleThreadsView_ComputingThreads=computing threads...",
+    "TruffleThreadsView_Results=Results:",
+    "TruffleThreadsView_ViewObjects=Objects",
+    "TruffleThreadsView_ViewHtml=HTML",
+    "TruffleThreadsView_Details=Details:"
+})
 public class TruffleThreadsView extends HeapViewerFeature {
     
     private static final String FEATURE_ID = "threads"; // NOI18N
@@ -77,7 +87,7 @@ public class TruffleThreadsView extends HeapViewerFeature {
     
     
     public TruffleThreadsView(TruffleLanguage language, HeapContext context, HeapViewerActions actions) {
-        super(idFromLanguage(language), "Threads", "Threads", iconFromLanguage(language), 300);
+        super(idFromLanguage(language), Bundle.TruffleThreadsView_Name(), Bundle.TruffleThreadsView_Description(), iconFromLanguage(language), 300);
         
         Heap heap = context.getFragment().getHeap();
         
@@ -93,9 +103,9 @@ public class TruffleThreadsView extends HeapViewerFeature {
                 for (CCTNode child : children) expandNode((HeapViewerNode)child);
             }
         };
-        objectsView.setViewName("Threads");
+        objectsView.setViewName(getName());
         
-        htmlView = new HTMLView(getID() + HTML_ID, context, actions, "<br>&nbsp;&nbsp;computing threads...") {
+        htmlView = new HTMLView(getID() + HTML_ID, context, actions, "<br>&nbsp;&nbsp;" + Bundle.TruffleThreadsView_ComputingThreads()) { // NOI18N
             protected String computeData(HeapContext context, String viewID) {
                 return threadsProvider.getThreadsHTML(context);
             }
@@ -133,7 +143,7 @@ public class TruffleThreadsView extends HeapViewerFeature {
         toolbar.addSeparator();
         toolbar.addSpace(5);
         
-        toolbar.add(new GrayLabel("Results:"));
+        toolbar.add(new GrayLabel(Bundle.TruffleThreadsView_Results()));
         toolbar.addSpace(3);
         
         ButtonGroup resultsBG = new ButtonGroup();
@@ -148,7 +158,7 @@ public class TruffleThreadsView extends HeapViewerFeature {
         };
         rObjects.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
         rObjects.putClientProperty("JButton.segmentPosition", "first"); // NOI18N
-        rObjects.setToolTipText("Objects");
+        rObjects.setToolTipText(Bundle.TruffleThreadsView_ViewObjects());
         resultsBG.add(rObjects);
         toolbar.add(rObjects);
         
@@ -162,7 +172,7 @@ public class TruffleThreadsView extends HeapViewerFeature {
         };
         rHTML.putClientProperty("JButton.buttonType", "segmented"); // NOI18N
         rHTML.putClientProperty("JButton.segmentPosition", "last"); // NOI18N
-        rHTML.setToolTipText("HTML");
+        rHTML.setToolTipText(Bundle.TruffleThreadsView_ViewHtml());
         resultsBG.add(rHTML);
         toolbar.add(rHTML);
 
@@ -172,7 +182,7 @@ public class TruffleThreadsView extends HeapViewerFeature {
 //            detailsToolbar.addSeparator();
             pluginsToolbar.addSpace(8);
 
-            pluginsToolbar.add(new GrayLabel("Details:"));
+            pluginsToolbar.add(new GrayLabel(Bundle.TruffleThreadsView_Details()));
             pluginsToolbar.addSpace(2);
             
             pluginsToolbar.add(objectsView.getToolbar());

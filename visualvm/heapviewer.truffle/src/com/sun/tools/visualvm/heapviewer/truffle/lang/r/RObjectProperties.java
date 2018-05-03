@@ -36,6 +36,7 @@ import org.netbeans.lib.profiler.heap.FieldValue;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.heap.Instance;
 import org.netbeans.lib.profiler.heap.Value;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 
@@ -43,6 +44,11 @@ import org.openide.util.lookup.ServiceProviders;
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "RObjectProperties_Properties=attributes",
+    "RObjectProperties_Items=items",
+    "RObjectProperties_References=references"
+})
 final class RObjectProperties {
     
     // -------------------------------------------------------------------------
@@ -56,13 +62,13 @@ final class RObjectProperties {
     public static class AttributesProvider extends TruffleObjectPropertyProvider.Fields<RObject, RType, RHeapFragment, RLanguage> {
 
         public AttributesProvider() {
-            super("attributes", RObject.class, RLanguage.instance(), true);
+            super(Bundle.RObjectProperties_Properties(), RObject.class, RLanguage.instance(), true);
         }
 
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("r_");
+            return viewID.startsWith("r_"); // NOI18N
         }
 
         @Override
@@ -97,7 +103,7 @@ final class RObjectProperties {
         protected boolean includeInstance(Instance instance) {
             String className = instance.getJavaClass().getName();
 
-            if (className.startsWith("java.lang."))
+            if (className.startsWith("java.lang.")) // NOI18N
                 return true;
 
             return false;
@@ -117,13 +123,13 @@ final class RObjectProperties {
     public static class ItemsProvider extends TruffleObjectPropertyProvider.Fields<RObject, RType, RHeapFragment, RLanguage> {
 
         public ItemsProvider() {
-            super("items", RObject.class, RLanguage.instance(), true);
+            super(Bundle.RObjectProperties_Items(), RObject.class, RLanguage.instance(), true);
         }
 
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("r_");
+            return viewID.startsWith("r_"); // NOI18N
         }
 
         @Override
@@ -162,8 +168,8 @@ final class RObjectProperties {
         protected boolean includeInstance(Instance instance) {
             String className = instance.getJavaClass().getName();
 
-            if (className.startsWith("java.lang.") ||
-                className.startsWith("com.oracle.truffle.r.runtime.data."))
+            if (className.startsWith("java.lang.") || // NOI18N
+                className.startsWith("com.oracle.truffle.r.runtime.data.")) // NOI18N
                 return true;
 
             return false;
@@ -183,13 +189,13 @@ final class RObjectProperties {
     public static class ReferencesProvider extends TruffleObjectPropertyProvider.References<RObject, RType, RHeapFragment, RLanguage> {
 
         public ReferencesProvider() {
-            super("references", RObject.class, RLanguage.instance(), false);
+            super(Bundle.RObjectProperties_References(), RObject.class, RLanguage.instance(), false);
         }
 
 
         @Override
         public boolean supportsView(Heap heap, String viewID) {
-            return viewID.startsWith("r_");
+            return viewID.startsWith("r_"); // NOI18N
         }
 
         @Override

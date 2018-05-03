@@ -82,48 +82,48 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
     static String getLogicalValue(RubyObject object, String type, Heap heap) {
         String logicalValue = null;
 
-        if ("Proc".equals(type)) {
-            FieldValue infoField = object.getFieldValue("sharedMethodInfo (hidden)");
+        if ("Proc".equals(type)) { // NOI18N
+            FieldValue infoField = object.getFieldValue("sharedMethodInfo (hidden)"); // NOI18N
             Instance info = infoField instanceof ObjectFieldValue ? ((ObjectFieldValue)infoField).getInstance() : null;
             if (info != null) {
-                String name = DetailsUtils.getInstanceFieldString(info, "name", heap);
-                String notes = DetailsUtils.getInstanceFieldString(info, "notes", heap);
+                String name = DetailsUtils.getInstanceFieldString(info, "name", heap); // NOI18N
+                String notes = DetailsUtils.getInstanceFieldString(info, "notes", heap); // NOI18N
                 
-                if (name != null && notes != null) logicalValue = name + " (" + notes + ")";
+                if (name != null && notes != null) logicalValue = name + " (" + notes + ")"; // NOI18N
                 else if (name != null) logicalValue = name;
                 else if (notes != null) logicalValue = notes;
             }
-        } else if ("Method".equals(type) || "UnboundMethod".equals(type)) {
-            FieldValue methodField = object.getFieldValue("method (hidden)");
+        } else if ("Method".equals(type) || "UnboundMethod".equals(type)) { // NOI18N
+            FieldValue methodField = object.getFieldValue("method (hidden)"); // NOI18N
             Instance method = methodField instanceof ObjectFieldValue ? ((ObjectFieldValue)methodField).getInstance() : null;
             
-            Object infoField = method == null ? null : method.getValueOfField("sharedMethodInfo");
+            Object infoField = method == null ? null : method.getValueOfField("sharedMethodInfo"); // NOI18N
             Instance info = infoField instanceof Instance ? (Instance)infoField : null;
             
             if (info != null) {
-                String name = DetailsUtils.getInstanceFieldString(info, "name", heap);
-                String notes = DetailsUtils.getInstanceFieldString(info, "notes", heap);
+                String name = DetailsUtils.getInstanceFieldString(info, "name", heap); // NOI18N
+                String notes = DetailsUtils.getInstanceFieldString(info, "notes", heap); // NOI18N
                 
-                if (name != null && notes != null) logicalValue = name + " (" + notes + ")";
+                if (name != null && notes != null) logicalValue = name + " (" + notes + ")"; // NOI18N
                 else if (name != null) logicalValue = name;
                 else if (notes != null) logicalValue = notes;
             }
-        } else if ("Symbol".equals(type)) {
-            FieldValue symbolField = object.getFieldValue("string (hidden)");
+        } else if ("Symbol".equals(type)) { // NOI18N
+            FieldValue symbolField = object.getFieldValue("string (hidden)"); // NOI18N
             Instance symbol = symbolField instanceof ObjectFieldValue ? ((ObjectFieldValue)symbolField).getInstance() : null;
             
             if (symbol != null) logicalValue = DetailsUtils.getInstanceString(symbol, heap);
-        } else if ("Class".equals(type) || "Module".equals(type)) {
-            FieldValue fieldsField = object.getFieldValue("fields (hidden)");
+        } else if ("Class".equals(type) || "Module".equals(type)) { // NOI18N
+            FieldValue fieldsField = object.getFieldValue("fields (hidden)"); // NOI18N
             Instance fields = fieldsField instanceof ObjectFieldValue ? ((ObjectFieldValue)fieldsField).getInstance() : null;
             
-            Object nameField = fields == null ? null : fields.getValueOfField("name");
+            Object nameField = fields == null ? null : fields.getValueOfField("name"); // NOI18N
             Instance name = nameField instanceof Instance ? (Instance)nameField : null;
             
             if (name != null) logicalValue = DetailsUtils.getInstanceString(name, heap);
-        } else if ("BasicObject".equals(type)) {
-            String head = "fields [";
-            String sep = ", ";
+        } else if ("BasicObject".equals(type)) { // NOI18N
+            String head = "fields ["; // NOI18N
+            String sep = ", "; // NOI18N
             
             StringBuilder sb = new StringBuilder();
             sb.append(head);
@@ -131,30 +131,30 @@ public class RubyNodes extends TruffleOpenNodeActionProvider<RubyObject, RubyTyp
             List<FieldValue> fields = object.getFieldValues();
             for (FieldValue field : fields) {
                 String name = field.getField().getName();
-                if (!name.contains("(hidden)")) sb.append(name).append(sep);
+                if (!name.contains("(hidden)")) sb.append(name).append(sep); // NOI18N
             }
             
             int length = sb.length();
             if (length > head.length()) sb.delete(length - sep.length(), length);
-            sb.append("]");
+            sb.append("]"); // NOI18N
             
             logicalValue = sb.toString();
-        } else if ("Array".equals(type)) {
-            FieldValue sizeField = object.getFieldValue("size (hidden)");
+        } else if ("Array".equals(type)) { // NOI18N
+            FieldValue sizeField = object.getFieldValue("size (hidden)"); // NOI18N
             if (sizeField != null) {
                 Integer size = Integer.parseInt(sizeField.getValue());
-                logicalValue = Formatters.numberFormat().format(size) + (size == 1 ? " item" : " items");
+                logicalValue = Formatters.numberFormat().format(size) + (size == 1 ? " item" : " items"); // NOI18N
             }
-        } else if ("String".equals(type)) {
-            FieldValue ropeField = object.getFieldValue("rope (hidden)");
+        } else if ("String".equals(type)) { // NOI18N
+            FieldValue ropeField = object.getFieldValue("rope (hidden)"); // NOI18N
             Instance rope = ropeField instanceof ObjectFieldValue ? ((ObjectFieldValue)ropeField).getInstance() : null;
             if (rope != null) logicalValue = DetailsUtils.getInstanceString(rope, heap);
-        } else if ("Regexp".equals(type)) {
-            FieldValue sourceField = object.getFieldValue("source (hidden)");
+        } else if ("Regexp".equals(type)) { // NOI18N
+            FieldValue sourceField = object.getFieldValue("source (hidden)"); // NOI18N
             Instance source = sourceField instanceof ObjectFieldValue ? ((ObjectFieldValue)sourceField).getInstance() : null;
             if (source != null) logicalValue = DetailsUtils.getInstanceString(source, heap);
-        } else if ("Encoding".equals(type)) {
-            FieldValue encodingField = object.getFieldValue("encoding (hidden)");
+        } else if ("Encoding".equals(type)) { // NOI18N
+            FieldValue encodingField = object.getFieldValue("encoding (hidden)"); // NOI18N
             Instance encoding = encodingField instanceof ObjectFieldValue ? ((ObjectFieldValue)encodingField).getInstance() : null;
             if (encoding != null) logicalValue = DetailsUtils.getInstanceString(encoding, heap);
         }

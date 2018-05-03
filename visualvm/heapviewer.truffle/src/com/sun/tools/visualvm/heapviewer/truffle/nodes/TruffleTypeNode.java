@@ -42,11 +42,17 @@ import javax.swing.Icon;
 import javax.swing.SortOrder;
 import org.netbeans.lib.profiler.heap.Heap;
 import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TruffleTypeNode_MoreNodes=<another {0} objects left>", // <another 1234 objects left>
+    "TruffleTypeNode_SamplesContainer=<sample {0} objects>", // <sample 1234 objects>
+    "TruffleTypeNode_NodesContainer=<objects {0}-{1}>" // <objects 1001 - 2000>
+})
 public abstract class TruffleTypeNode<O extends TruffleObject, T extends TruffleType<O>> extends HeapViewerNode {
     
     private final T type;
@@ -123,13 +129,13 @@ public abstract class TruffleTypeNode<O extends TruffleObject, T extends Truffle
                 return new ProgressIterator(iterator, index, true, progress);
             }
             protected String getMoreNodesString(String moreNodesCount)  {
-                return "<another " + moreNodesCount + " objects left>";
+                return Bundle.TruffleTypeNode_MoreNodes(moreNodesCount);
             }
             protected String getSamplesContainerString(String objectsCount)  {
-                return "<sample " + objectsCount + " objects>";
+                return Bundle.TruffleTypeNode_SamplesContainer(objectsCount);
             }
             protected String getNodesContainerString(String firstNodeIdx, String lastNodeIdx)  {
-                return "<objects " + firstNodeIdx + "-" + lastNodeIdx + ">";
+                return Bundle.TruffleTypeNode_NodesContainer(firstNodeIdx, lastNodeIdx);
             }
         };
         return computer.computeNodes(this, heap, viewID, null, dataTypes, sortOrders, progress);

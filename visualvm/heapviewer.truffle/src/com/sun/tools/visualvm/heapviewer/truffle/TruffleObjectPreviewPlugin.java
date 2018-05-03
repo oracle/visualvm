@@ -41,11 +41,17 @@ import org.netbeans.lib.profiler.ui.UIUtils;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
 import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "TruffleObjectPreviewPlugin_Name=Preview",
+    "TruffleObjectPreviewPlugin_Description=Preview",
+    "TruffleObjectPreviewPlugin_NoDetails=<no details>"
+})
 public abstract class TruffleObjectPreviewPlugin extends HeapViewPlugin {
     
     private final Heap heap;
@@ -54,7 +60,7 @@ public abstract class TruffleObjectPreviewPlugin extends HeapViewPlugin {
     
     
     public TruffleObjectPreviewPlugin(HeapContext context) {
-        super("Preview", "Preview", Icons.getIcon(HeapWalkerIcons.PROPERTIES));
+        super(Bundle.TruffleObjectPreviewPlugin_Name(), Bundle.TruffleObjectPreviewPlugin_Description(), Icons.getIcon(HeapWalkerIcons.PROPERTIES));
         heap = context.getFragment().getHeap();
     }
     
@@ -114,7 +120,7 @@ public abstract class TruffleObjectPreviewPlugin extends HeapViewPlugin {
             JComponent instanceView = selectedInstance == null ? null :
                        DetailsSupport.getDetailsView(selectedInstance, heap);
             if (instanceView == null) {
-                JLabel noDetails = new JLabel("<no details>", JLabel.CENTER);
+                JLabel noDetails = new JLabel(Bundle.TruffleObjectPreviewPlugin_NoDetails(), JLabel.CENTER);
                 noDetails.setEnabled(false);
                 
                 instanceView = new JPanel(new BorderLayout());

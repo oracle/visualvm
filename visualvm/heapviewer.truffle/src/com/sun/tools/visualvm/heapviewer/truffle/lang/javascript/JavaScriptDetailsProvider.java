@@ -141,7 +141,7 @@ public class JavaScriptDetailsProvider extends DetailsProvider.Basic {
         }
         if (JS_REGEX_NODE_MASK.equals(className)) {
             String regexClass = instance.getJavaClass().getName();
-            String regexSimpleName = regexClass.substring(regexClass.lastIndexOf('.') + 1, regexClass.length());
+            String regexSimpleName = regexClass.substring(regexClass.lastIndexOf('.') + 1, regexClass.length()); // NOI18N
             String engineLabel = regexSimpleName.substring(0, regexSimpleName.indexOf("RegexNode"));    // NOI18N
             if (engineLabel != null) {
                 String pattern = DetailsUtils.getInstanceFieldString(instance, "pattern", heap);    // NOI18N

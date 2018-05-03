@@ -65,8 +65,8 @@ public class DynamicObjectDetailsProvider extends DetailsProvider.Basic {
             } else {
                 Instance shape = (Instance) instance.getValueOfField("shape");  // NOI18N
                 Instance objectType = (Instance) shape.getValueOfField("objectType");   // NOI18N
-                buf.append('(').append(getSimpleClassName(objectType)).append(')');
-                buf.append(' ').append(getShortInstanceId(shape));
+                buf.append('(').append(getSimpleClassName(objectType)).append(')'); // NOI18N
+                buf.append(' ').append(getShortInstanceId(shape)); // NOI18N
             }
             return buf.toString();
         }
@@ -83,13 +83,13 @@ public class DynamicObjectDetailsProvider extends DetailsProvider.Basic {
     }
 
     private static String getShortInstanceId(Instance instance) {
-        if (instance == null) return "null";
-        return getSimpleClassName(instance) + "#" + instance.getInstanceNumber();
+        if (instance == null) return "null"; // NOI18N
+        return getSimpleClassName(instance) + "#" + instance.getInstanceNumber(); // NOI18N
     }
 
     private static String getSimpleClassName(Instance instance) {
         String name = instance.getJavaClass().getName();
-        int last = name.lastIndexOf('.');
+        int last = name.lastIndexOf('.'); // NOI18N
         if (last != -1) {
             name = name.substring(last + 1);
         }

@@ -65,7 +65,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
 
     public String getDetailsString(String className, Instance instance, Heap heap) {
         if (RVECTOR_MASK.equals(className)) {
-            Object rawData = instance.getValueOfField("data");
+            Object rawData = instance.getValueOfField("data"); // NOI18N
 
             if (rawData != null) {
                 int size;
@@ -87,36 +87,36 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                         size /= 2;
                         if (size == 1) {
                             List vals = data.getValues();
-                            return "["+vals.get(0)+"+"+vals.get(1)+"i]";
+                            return "["+vals.get(0)+"+"+vals.get(1)+"i]"; // NOI18N
                         }
                     }
                 } else {
                     return null;
                 }
-                Boolean complete = (Boolean) instance.getValueOfField("complete");
-                Integer refCount = (Integer) instance.getValueOfField("refCount");
+                Boolean complete = (Boolean) instance.getValueOfField("complete"); // NOI18N
+                Integer refCount = (Integer) instance.getValueOfField("refCount"); // NOI18N
                 String rClassName = getRClassName(instance, heap);
                 String refString;
 
                 switch (refCount.intValue()) {
                     case 0:
-                       refString = ", temporary";
+                       refString = ", temporary"; // NOI18N
                        break;
                     case 1:
-                        refString = "";
+                        refString = ""; // NOI18N
                         break;
                     case Integer.MAX_VALUE:
-                        refString = ", shared permanent";
+                        refString = ", shared permanent"; // NOI18N
                         break;
                     default:
-                        refString = ", shared";
+                        refString = ", shared"; // NOI18N
                 }
                 if (rClassName == null) {
-                    rClassName = "";
+                    rClassName = ""; // NOI18N
                 } else {
-                    rClassName = rClassName+" ";
+                    rClassName = rClassName+" "; // NOI18N
                 }
-                return "Size: " + size + (complete ? "" : ", has NAs") +  refString;
+                return "Size: " + size + (complete ? "" : ", has NAs") +  refString; // NOI18N
             }
         }
         if (RSYMBOL_MASK.equals(className)) {
@@ -131,7 +131,7 @@ public class RDetailsProvider extends DetailsProvider.Basic {
             return value == null || value.isEmpty() ? null : value;
         }
         if (RSCALAR_VECTOR_MASK.equals(className)) {
-            Object rawData = instance.getValueOfField("value");
+            Object rawData = instance.getValueOfField("value"); // NOI18N
 
             if (rawData != null) {
                 boolean isLogical = RLOGICAL_FQN.equals(instance.getJavaClass().getName());
@@ -141,31 +141,31 @@ public class RDetailsProvider extends DetailsProvider.Basic {
             Double imaginaryPart = (Double) instance.getValueOfField("imaginaryPart"); // NOI18N
 
             if (realPart != null && imaginaryPart != null) {
-                return "["+realPart+"+"+imaginaryPart+"i]";
+                return "["+realPart+"+"+imaginaryPart+"i]"; // NOI18N
             }
         }
         if (RS4OBJECT_MASK.equals(className)) {
             return getRClassName(instance, heap);
         }
         if (RNULL_MASK.equals(className)) {
-            return "NULL";
+            return "NULL"; // NOI18N
         }
         if (RWRAPPER_MASK.equals(className)) {
-            Instance delegate = (Instance) instance.getValueOfField("delegate");
+            Instance delegate = (Instance) instance.getValueOfField("delegate"); // NOI18N
 
             if (delegate != null) {
-                Instance proxy = (Instance) delegate.getValueOfField("proxy");
+                Instance proxy = (Instance) delegate.getValueOfField("proxy"); // NOI18N
 
                 if (proxy != null) {
-                    Object rawData = proxy.getValueOfField("val$values");
+                    Object rawData = proxy.getValueOfField("val$values"); // NOI18N
 
                     if (rawData instanceof ObjectArrayInstance) {
                         ObjectArrayInstance data = (ObjectArrayInstance) rawData;
                         int size = data.getLength();
                         if (size == 1) {
-                            return getValue(data.getValues().get(0), false, heap)+", foreign";
+                            return getValue(data.getValues().get(0), false, heap)+", foreign"; // NOI18N
                         }
-                        return "Size: " + size+", foreign";
+                        return "Size: " + size+", foreign"; // NOI18N
                     }
                 }
             }
@@ -177,16 +177,16 @@ public class RDetailsProvider extends DetailsProvider.Basic {
         Instance attributesInst = (Instance) instance.getValueOfField("attributes");   // NOI18N
         if (attributesInst != null) {
             DynamicObject  attributes = new DynamicObject(attributesInst);
-            FieldValue classAttr = attributes.getFieldValue("class");
+            FieldValue classAttr = attributes.getFieldValue("class"); // NOI18N
             if (classAttr instanceof ObjectFieldValue) {
                 Instance classAttrName = ((ObjectFieldValue)classAttr).getInstance();
-                return "Class: " + DetailsSupport.getDetailsString(classAttrName, heap);
+                return "Class: " + DetailsSupport.getDetailsString(classAttrName, heap); // NOI18N
             } else {
-                classAttr = attributes.getFieldValue(".S3Class");
+                classAttr = attributes.getFieldValue(".S3Class"); // NOI18N
                 if (classAttr instanceof ObjectFieldValue) {
                     Instance classAttrName = ((ObjectFieldValue)classAttr).getInstance();
                     if (RObject.isRObject(classAttrName)) {
-                        StringBuilder classes = new StringBuilder("S3Class: [");
+                        StringBuilder classes = new StringBuilder("S3Class: ["); // NOI18N
                         RObject vector = new RObject(classAttrName);
                         List values = vector.getValues();
 
@@ -194,12 +194,12 @@ public class RDetailsProvider extends DetailsProvider.Basic {
                             Instance str = (Instance) values.get(i);
                             classes.append(DetailsSupport.getDetailsString((Instance) str, heap));
                             if (i<values.size()-1) {
-                                classes.append(", ");
+                                classes.append(", "); // NOI18N
                             }
                         }
-                        return classes.append(']').toString();
+                        return classes.append(']').toString(); // NOI18N
                     }
-                    return "S3Class: " + DetailsSupport.getDetailsString(classAttrName, heap);
+                    return "S3Class: " + DetailsSupport.getDetailsString(classAttrName, heap); // NOI18N
                 }
             }
         }
@@ -218,13 +218,13 @@ public class RDetailsProvider extends DetailsProvider.Basic {
             int val = Integer.valueOf(valString);
 
             if (val == LOGICAL_FALSE) {
-                valString = "FALSE";
+                valString = "FALSE"; // NOI18N
             } else if (val == LOGICAL_TRUE) {
-                valString = "TRUE";
+                valString = "TRUE"; // NOI18N
             } else if (val == LOGICAL_NA) {
-                valString = "NA";
+                valString = "NA"; // NOI18N
             }
         }
-        return "["+valString+"]";
+        return "["+valString+"]"; // NOI18N
     }
 }

@@ -37,12 +37,19 @@ import org.netbeans.lib.profiler.heap.ObjectFieldValue;
 import org.netbeans.modules.profiler.api.icons.Icons;
 import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "JavaScriptViewPlugins_PropertiesName=Properties",
+    "JavaScriptViewPlugins_PropertiesDescription=Properties",
+    "JavaScriptViewPlugins_ReferencesName=References",
+    "JavaScriptViewPlugins_ReferencesDescription=References"
+})
 final class JavaScriptViewPlugins {
     
     // -------------------------------------------------------------------------
@@ -64,25 +71,25 @@ final class JavaScriptViewPlugins {
         @Override
         protected Instance getPreviewInstance(HeapViewerNode node) {
             JavaScriptNodes.JavaScriptObjectNode jsnode = (JavaScriptNodes.JavaScriptObjectNode)node;
-            if ("Function".equals(jsnode.getTypeName()) || "JSFunction".equals(jsnode.getTypeName())) {
+            if ("Function".equals(jsnode.getTypeName()) || "JSFunction".equals(jsnode.getTypeName())) { // NOI18N
                 JavaScriptObject jsobj = jsnode.getTruffleObject();
-                FieldValue dataField = jsobj.getFieldValue("functionData (hidden)");
+                FieldValue dataField = jsobj.getFieldValue("functionData (hidden)"); // NOI18N
                 Instance data = dataField instanceof ObjectFieldValue ? ((ObjectFieldValue)dataField).getInstance() : null;
                 if (data == null) return null;
 
-                Object rootNode = ((Instance)data).getValueOfField("lazyInit");
+                Object rootNode = ((Instance)data).getValueOfField("lazyInit"); // NOI18N
                 if (!(rootNode instanceof Instance)) {
-                    Object callTarget = data.getValueOfField("callTarget");
+                    Object callTarget = data.getValueOfField("callTarget"); // NOI18N
                     if (!(callTarget instanceof Instance)) return null;
 
-                    rootNode = ((Instance)callTarget).getValueOfField("rootNode");
+                    rootNode = ((Instance)callTarget).getValueOfField("rootNode"); // NOI18N
                     if (!(rootNode instanceof Instance)) return null;
                 }
 
                 Instance sourceSection = null;
                 List<FieldValue> rootNodeFields = ((Instance)rootNode).getFieldValues();
                 for (FieldValue field : rootNodeFields) {
-                    if ("sourceSection".equals(field.getField().getName()) && field instanceof ObjectFieldValue) {
+                    if ("sourceSection".equals(field.getField().getName()) && field instanceof ObjectFieldValue) { // NOI18N
                         Instance instance = ((ObjectFieldValue)field).getInstance();
                         if (instance != null) {
                             sourceSection = instance;
@@ -92,10 +99,10 @@ final class JavaScriptViewPlugins {
                 }
 
                 if (!(sourceSection instanceof Instance)) {
-                    Object nnode = ((Instance)rootNode).getValueOfField("node");
+                    Object nnode = ((Instance)rootNode).getValueOfField("node"); // NOI18N
                     if (!(nnode instanceof Instance)) return null;
 
-                    Object ssourceSection = ((Instance)nnode).getValueOfField("source");
+                    Object ssourceSection = ((Instance)nnode).getValueOfField("source"); // NOI18N
                     if (!(ssourceSection instanceof Instance)) return null;
 
                     sourceSection = (Instance)ssourceSection;
@@ -133,7 +140,7 @@ final class JavaScriptViewPlugins {
             if (!JavaScriptHeapFragment.isJavaScriptHeap(context)) return null;
             
             JavaScriptObjectProperties.FieldsProvider fieldsProvider = Lookup.getDefault().lookup(JavaScriptObjectProperties.FieldsProvider.class);
-            return new TruffleObjectPropertyPlugin("Properties", "Properties", Icons.getIcon(ProfilerIcons.NODE_FORWARD), "javascript_objects_fields", context, actions, fieldsProvider);
+            return new TruffleObjectPropertyPlugin(Bundle.JavaScriptViewPlugins_PropertiesName(), Bundle.JavaScriptViewPlugins_PropertiesDescription(), Icons.getIcon(ProfilerIcons.NODE_FORWARD), "javascript_objects_fields", context, actions, fieldsProvider); // NOI18N
         }
         
     }
@@ -150,7 +157,7 @@ final class JavaScriptViewPlugins {
             if (!JavaScriptHeapFragment.isJavaScriptHeap(context)) return null;
             
             JavaScriptObjectProperties.ReferencesProvider fieldsProvider = Lookup.getDefault().lookup(JavaScriptObjectProperties.ReferencesProvider.class);
-            return new TruffleObjectPropertyPlugin("References", "References", Icons.getIcon(ProfilerIcons.NODE_REVERSE), "javascript_objects_references", context, actions, fieldsProvider);
+            return new TruffleObjectPropertyPlugin(Bundle.JavaScriptViewPlugins_ReferencesName(), Bundle.JavaScriptViewPlugins_ReferencesDescription(), Icons.getIcon(ProfilerIcons.NODE_REVERSE), "javascript_objects_references", context, actions, fieldsProvider); // NOI18N
         }
         
     }
