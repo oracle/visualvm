@@ -380,6 +380,7 @@ final class FilterUtils {
             }
         };
         JButton closeButton = CloseButton.create(hider);
+        closeButton.setFocusable(true);
         String escAccelerator = ActionsSupport.keyAcceleratorString(escKey);
         closeButton.setToolTipText(Bundle.TruffleFilterUtils_Close(escAccelerator));
         panel.add(closeButton, BorderLayout.EAST);
