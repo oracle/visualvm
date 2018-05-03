@@ -389,6 +389,7 @@ final class FilterUtils {
             }
         };
         JButton closeButton = CloseButton.create(hider);
+        closeButton.setFocusable(true);
         String escAccelerator = ActionsSupport.keyAcceleratorString(escKey);
         closeButton.setToolTipText(MessageFormat.format(BTN_CLOSE_TOOLTIP, escAccelerator));
         panel.add(closeButton, BorderLayout.EAST);

@@ -51,6 +51,7 @@ import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
 import com.sun.tools.visualvm.heapviewer.HeapContext;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import java.awt.Container;
+import javax.swing.JButton;
 import org.openide.util.Lookup;
 
 /**
@@ -191,6 +192,11 @@ public class PluggableTreeTableView extends TreeTableView {
             
             this.plugin = plugin;
             
+            JButton closeButton = CloseButton.create(new Runnable() {
+                public void run() { pluginPresenter.setSelected(false); }
+            });
+            closeButton.setFocusable(true);
+            
             JPanel detailHeader = new JPanel(null);
             detailHeader.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, SEPARATOR_COLOR));
             detailHeader.setLayout(new BoxLayout(detailHeader, BoxLayout.LINE_AXIS));
@@ -199,9 +205,7 @@ public class PluggableTreeTableView extends TreeTableView {
             captionL.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
             detailHeader.add(captionL);            
             detailHeader.add(Box.createGlue());
-            detailHeader.add(CloseButton.create(new Runnable() {
-                public void run() { pluginPresenter.setSelected(false); }
-            }));
+            detailHeader.add(closeButton);
             
             add(detailHeader, BorderLayout.NORTH);
             setVisible(pluginPresenter.isSelected());
