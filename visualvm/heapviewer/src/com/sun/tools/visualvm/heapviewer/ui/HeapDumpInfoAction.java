@@ -121,7 +121,7 @@ class HeapDumpInfoAction extends AbstractAction {
         } catch (ExecutionException ex) {
             Exceptions.printStackTrace(ex);
         } catch (TimeoutException ex) {
-            text.setText(SUMMARY_SECTION_PREFIX + "<div style='margin-left: 10px;'>" + Bundle.HeapDumpInfoAction_ComputingInfo() + "</div>");
+            text.setText(SUMMARY_SECTION_PREFIX + "<div style='margin-left: 10px;'>" + Bundle.HeapDumpInfoAction_ComputingInfo() + "</div>"); // NOI18N
             text.setCaretPosition(0);
         }
     }

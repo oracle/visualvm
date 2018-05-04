@@ -29,8 +29,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.text.MessageFormat;
-import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -69,32 +67,28 @@ import com.sun.tools.visualvm.heapviewer.model.DataType;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
 import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
 import com.sun.tools.visualvm.heapviewer.ui.TreeTableView;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Jiri Sedlacek
  */
+@NbBundle.Messages({
+    "JavaFilterUtils_ActionFilter=Filter",
+    "JavaFilterUtils_SidebarCaption=Class Filter:",
+    "JavaFilterUtils_FilterResults=Filter results ({0})",
+    "JavaFilterUtils_MatchCase=Match case",
+    "JavaFilterUtils_Close=Close Filter sidebar ({0})",
+    "JavaFilterUtils_InvalidRegexp=Entered regular expression is invalid:\n{0}",
+    "JavaFilterUtils_FilterContains=Contains",
+    "JavaFilterUtils_FilterNotContains=Does Not Contain",
+    "JavaFilterUtils_FilterSubclass=Subclass Of",
+    "JavaFilterUtils_FilterType=Filter type: {0}",
+    "JavaFilterUtils_InsertFilter=Insert Defined Filter"
+})
 final class FilterUtils {
     
-    // -----
-    // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.lib.profiler.ui.swing.Bundle"); // NOI18N
-    public static final String ACTION_FILTER = messages.getString("FilterUtils_ActionFilter"); // NOI18N
-    private static final String SIDEBAR_CAPTION = "Class Filter:"; // NOI18N
-//    private static final String SIDEBAR_CAPTION = messages.getString("FilterUtils_SidebarCaption"); // NOI18N
-    private static final String BTN_FILTER_TOOLTIP = messages.getString("FilterUtils_BtnFilterTooltip"); // NOI18N
-    private static final String BTN_MATCH_CASE_TOOLTIP = messages.getString("FilterUtils_BtnMatchCaseTooltip"); // NOI18N
-    private static final String BTN_CLOSE_TOOLTIP = messages.getString("FilterUtils_BtnCloseTooltip"); // NOI18N
-    private static final String MSG_INVALID_REGEXP = messages.getString("FilterUtils_MsgInvalidRegexp"); // NOI18N
-    private static final String FILTER_CONTAINS = messages.getString("FilterUtils_FilterContains"); // NOI18N
-    private static final String FILTER_NOT_CONTAINS = messages.getString("FilterUtils_FilterNotContains"); // NOI18N
-    private static final String FILTER_REGEXP = "Subclass Of"; // NOI18N
-//    private static final String FILTER_REGEXP = messages.getString("FilterUtils_FilterRegexp"); // NOI18N
-    private static final String FILTER_TYPE = messages.getString("FilterUtils_FilterType"); // NOI18N
-    private static final String INSERT_FILTER = messages.getString("FilterUtils_InsertFilter"); // NOI18N
-    // -----
-    
-    public static final String FILTER_ACTION_KEY = "filter-action-key"; // NOI18N
+    private static final String FILTER_ACTION_KEY = "filter-action-key"; // NOI18N
     
     private static final String FILTER_CHANGED = "filter-changed"; // NOI18N
     
@@ -164,7 +158,7 @@ final class FilterUtils {
 
         Object filterType = filterPanel.getClientProperty("FILTER_TYPE"); // NOI18N
         if (filterType instanceof FilterType) {
-            ((FilterType)filterType).filterImpl(TextFilter.TYPE_REGEXP, Icons.getIcon(LanguageIcons.CLASS), FILTER_REGEXP);
+            ((FilterType)filterType).filterImpl(TextFilter.TYPE_REGEXP, Icons.getIcon(LanguageIcons.CLASS), Bundle.JavaFilterUtils_FilterSubclass());
         } else {
             return;
         }
@@ -193,7 +187,7 @@ final class FilterUtils {
             toolbar.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
         
         toolbar.add(Box.createHorizontalStrut(6));
-        toolbar.add(new JLabel(SIDEBAR_CAPTION));
+        toolbar.add(new JLabel(Bundle.JavaFilterUtils_SidebarCaption()));
         toolbar.add(Box.createHorizontalStrut(3));
         
         final EditableHistoryCombo combo = new EditableHistoryCombo();        
@@ -210,7 +204,7 @@ final class FilterUtils {
         if (PackageColorer.hasRegisteredColors()) {
             toolbar.add(new PopupButton() {
                 {
-                    setToolTipText(INSERT_FILTER);
+                    setToolTipText(Bundle.JavaFilterUtils_InsertFilter());
                 }
 //                protected void displayPopup() {
 //                    JPopupMenu menu = new JPopupMenu();
@@ -248,12 +242,12 @@ final class FilterUtils {
         
         final TextFilter activeFilter = new TextFilter() {
             protected void handleInvalidFilter(String invalidValue, RuntimeException e) {
-                ProfilerDialogs.displayError(MessageFormat.format(MSG_INVALID_REGEXP, invalidValue));
+                ProfilerDialogs.displayError(Bundle.JavaFilterUtils_InvalidRegexp(invalidValue));
             }
         };
         final TextFilter currentFilter = new TextFilter();
         
-        final JButton filter = new JButton(ACTION_FILTER, Icons.getIcon(GeneralIcons.FILTER)) {
+        final JButton filter = new JButton(Bundle.JavaFilterUtils_ActionFilter(), Icons.getIcon(GeneralIcons.FILTER)) {
             protected void fireActionPerformed(ActionEvent e) {
                 super.fireActionPerformed(e);
                 final JButton _this = this;
@@ -269,7 +263,7 @@ final class FilterUtils {
             }
         };
         String filterAccelerator = ActionsSupport.keyAcceleratorString(filterKey);
-        filter.setToolTipText(MessageFormat.format(BTN_FILTER_TOOLTIP, filterAccelerator));
+        filter.setToolTipText(Bundle.JavaFilterUtils_FilterResults(filterAccelerator));
         
         Action filterAction = new AbstractAction() {
             public void actionPerformed(final ActionEvent e) {
@@ -305,24 +299,24 @@ final class FilterUtils {
                 });
             }
         };
-        matchCase.setToolTipText(BTN_MATCH_CASE_TOOLTIP);
+        matchCase.setToolTipText(Bundle.JavaFilterUtils_MatchCase());
         installAction(matchCase, filterAction, filterKey, FILTER_ACTION_KEY);
         
         FilterType filterType = new FilterType(Icons.getIcon(GeneralIcons.FILTER_CONTAINS)) {
             protected void populatePopup(JPopupMenu popup) {
-                popup.add(new JMenuItem(FILTER_CONTAINS, Icons.getIcon(GeneralIcons.FILTER_CONTAINS)) {
+                popup.add(new JMenuItem(Bundle.JavaFilterUtils_FilterContains(), Icons.getIcon(GeneralIcons.FILTER_CONTAINS)) {
                     protected void fireActionPerformed(ActionEvent e) {
                         super.fireActionPerformed(e);
                         filterImpl(TextFilter.TYPE_INCLUSIVE, getIcon(), getText());
                     }
                 });
-                popup.add(new JMenuItem(FILTER_NOT_CONTAINS, Icons.getIcon(GeneralIcons.FILTER_NOT_CONTAINS)) {
+                popup.add(new JMenuItem(Bundle.JavaFilterUtils_FilterNotContains(), Icons.getIcon(GeneralIcons.FILTER_NOT_CONTAINS)) {
                     protected void fireActionPerformed(ActionEvent e) {
                         super.fireActionPerformed(e);
                         filterImpl(TextFilter.TYPE_EXCLUSIVE, getIcon(), getText());
                     }
                 });
-                popup.add(new JMenuItem(FILTER_REGEXP, Icons.getIcon(LanguageIcons.CLASS)) {
+                popup.add(new JMenuItem(Bundle.JavaFilterUtils_FilterSubclass(), Icons.getIcon(LanguageIcons.CLASS)) {
                     protected void fireActionPerformed(ActionEvent e) {
                         super.fireActionPerformed(e);
                         filterImpl(TextFilter.TYPE_REGEXP, getIcon(), getText());
@@ -342,14 +336,14 @@ final class FilterUtils {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         setIcon(icon);
-                        setToolTipText(MessageFormat.format(FILTER_TYPE, name));
+                        setToolTipText(Bundle.JavaFilterUtils_FilterType(name));
                         currentFilter.setType(type);
                         updateFilterButton(filter, currentFilter, activeFilter);
                     }
                 });
             }
         };
-        filterType.setToolTipText(MessageFormat.format(FILTER_TYPE, FILTER_CONTAINS));
+        filterType.setToolTipText(Bundle.JavaFilterUtils_FilterType(Bundle.JavaFilterUtils_FilterContains()));
         installAction(filterType, filterAction, filterKey, FILTER_ACTION_KEY);
         toolbar.add(filterType);
         
@@ -389,8 +383,9 @@ final class FilterUtils {
             }
         };
         JButton closeButton = CloseButton.create(hider);
+        closeButton.setFocusable(true);
         String escAccelerator = ActionsSupport.keyAcceleratorString(escKey);
-        closeButton.setToolTipText(MessageFormat.format(BTN_CLOSE_TOOLTIP, escAccelerator));
+        closeButton.setToolTipText(Bundle.JavaFilterUtils_Close(escAccelerator));
         panel.add(closeButton, BorderLayout.EAST);
         
         String HIDE = "hide-action"; // NOI18N

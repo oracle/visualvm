@@ -62,7 +62,7 @@ public class PrimitiveNodeRenderer extends MultiRenderer implements HeapViewerRe
         };
         
         equalsRenderer = new LabelRenderer();
-        equalsRenderer.setText("=");
+        equalsRenderer.setText("="); // NOI18N
         equalsRenderer.setMargin(3, 0, 3, 0);
         
         valueRenderer = new NormalBoldGrayRenderer() {

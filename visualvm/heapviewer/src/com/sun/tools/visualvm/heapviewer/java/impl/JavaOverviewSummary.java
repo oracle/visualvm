@@ -342,6 +342,7 @@ class JavaOverviewSummary extends HeapView {
                 public boolean isCellEditable(int row, int column) { return false; }
             };
             SummaryView.SimpleTable table = new SummaryView.SimpleTable(model, fillerColumn);
+            table.setFocusable(false);
             LabelRenderer r1 = new LabelRenderer();
             r1.setFont(r1.getFont().deriveFont(Font.BOLD));
             table.setColumnRenderer(0, r1, fillerColumn != 0);
@@ -393,6 +394,7 @@ class JavaOverviewSummary extends HeapView {
                     public boolean isCellEditable(int row, int column) { return false; }
                 };
                 final SummaryView.SimpleTable properties = new SummaryView.SimpleTable(model, 1);
+                properties.setFocusable(false);
                 LabelRenderer r1 = new LabelRenderer();
                 r1.setFont(r1.getFont().deriveFont(Font.BOLD));
                 properties.setColumnRenderer(0, r1, true);
