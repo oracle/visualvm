@@ -22,11 +22,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.dynamicobject;
+package org.graalvm.visualvm.heapviewer.truffle.dynamicobject;
 
-import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleObjectReferenceNode;
-import org.netbeans.lib.profiler.heap.FieldValue;
-import org.netbeans.lib.profiler.heap.Heap;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectReferenceNode;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 
 /**
  *

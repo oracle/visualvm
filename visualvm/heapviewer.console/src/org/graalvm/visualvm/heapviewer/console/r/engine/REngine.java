@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.console.r.engine;
+package org.graalvm.visualvm.heapviewer.console.r.engine;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.lib.profiler.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 

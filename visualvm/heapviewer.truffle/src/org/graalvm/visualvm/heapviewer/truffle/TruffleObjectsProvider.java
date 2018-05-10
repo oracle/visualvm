@@ -22,26 +22,26 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle;
+package org.graalvm.visualvm.heapviewer.truffle;
 
-import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.model.TextNode;
-import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
-import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
-import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
+import org.graalvm.visualvm.heapviewer.model.Progress;
+import org.graalvm.visualvm.heapviewer.model.TextNode;
+import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
+import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
+import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.swing.SortOrder;
-import org.netbeans.lib.profiler.heap.GCRoot;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.GCRoot;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.openide.util.NbBundle;
 
 /**

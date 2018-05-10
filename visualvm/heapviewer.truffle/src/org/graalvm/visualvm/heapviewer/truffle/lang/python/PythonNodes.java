@@ -22,25 +22,25 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.lang.python;
+package org.graalvm.visualvm.heapviewer.truffle.lang.python;
 
-import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleLocalObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleObjectFieldNode;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
-import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleObjectReferenceNode;
-import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleOpenNodeActionProvider;
-import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleTypeNode;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleLocalObjectNode;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectFieldNode;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectNode;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectReferenceNode;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleOpenNodeActionProvider;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleTypeNode;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerNodeAction;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import java.util.Map;
 import javax.swing.Icon;
-import org.netbeans.lib.profiler.heap.FieldValue;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.LanguageIcons;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.LanguageIcons;
 import org.openide.util.lookup.ServiceProvider;
 
 /**

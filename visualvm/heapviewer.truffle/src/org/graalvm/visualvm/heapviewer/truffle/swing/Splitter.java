@@ -23,9 +23,9 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.truffle.swing;
+package org.graalvm.visualvm.heapviewer.truffle.swing;
 
-import com.sun.tools.visualvm.uisupport.UISupport;
+import org.graalvm.visualvm.uisupport.UISupport;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;

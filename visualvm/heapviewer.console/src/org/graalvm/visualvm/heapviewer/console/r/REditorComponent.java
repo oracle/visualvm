@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.console.r;
+package org.graalvm.visualvm.heapviewer.console.r;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -56,8 +56,8 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainView;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.lib.profiler.ui.components.NoCaret;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.components.NoCaret;
 
 /**
  *

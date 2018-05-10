@@ -22,19 +22,19 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle;
+package org.graalvm.visualvm.heapviewer.truffle;
 
-import com.sun.tools.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.HeapContext;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
-import com.sun.tools.visualvm.heapviewer.HeapFragment;
-import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.utils.HeapUtils;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
+import org.graalvm.visualvm.heapviewer.HeapFragment;
+import org.graalvm.visualvm.heapviewer.model.Progress;
+import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.api.progress.ProgressHandle;

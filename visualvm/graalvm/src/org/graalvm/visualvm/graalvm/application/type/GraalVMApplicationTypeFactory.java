@@ -22,12 +22,12 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.graalvm.application.type;
+package org.graalvm.visualvm.graalvm.application.type;
 
-import com.sun.tools.visualvm.application.Application;
-import com.sun.tools.visualvm.application.jvm.Jvm;
-import com.sun.tools.visualvm.application.type.ApplicationType;
-import com.sun.tools.visualvm.application.type.MainClassApplicationTypeFactory;
+import org.graalvm.visualvm.application.Application;
+import org.graalvm.visualvm.application.jvm.Jvm;
+import org.graalvm.visualvm.application.type.ApplicationType;
+import org.graalvm.visualvm.application.type.MainClassApplicationTypeFactory;
 import org.openide.util.NbBundle;
 
 /**

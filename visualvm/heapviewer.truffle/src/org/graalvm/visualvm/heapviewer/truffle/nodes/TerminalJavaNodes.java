@@ -22,13 +22,13 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.nodes;
+package org.graalvm.visualvm.heapviewer.truffle.nodes;
 
-import org.netbeans.lib.profiler.heap.ArrayItemValue;
-import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.lib.profiler.heap.Value;
-import com.sun.tools.visualvm.heapviewer.java.InstanceNode;
-import com.sun.tools.visualvm.heapviewer.java.InstanceReferenceNode;
+import org.graalvm.visualvm.lib.jfluid.heap.ArrayItemValue;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.Value;
+import org.graalvm.visualvm.heapviewer.java.InstanceNode;
+import org.graalvm.visualvm.heapviewer.java.InstanceReferenceNode;
 
 /**
  *
@@ -38,7 +38,7 @@ public final class TerminalJavaNodes {
     
     public static class Instance extends InstanceNode {
         
-        public Instance(org.netbeans.lib.profiler.heap.Instance instance) {
+        public Instance(org.graalvm.visualvm.lib.jfluid.heap.Instance instance) {
             super(instance);
             setChildren(NO_NODES);
         }
@@ -56,7 +56,7 @@ public final class TerminalJavaNodes {
         public Field(ObjectFieldValue value, boolean incoming) {
             super(value, incoming);
             
-            org.netbeans.lib.profiler.heap.Instance instance = getInstance();
+            org.graalvm.visualvm.lib.jfluid.heap.Instance instance = getInstance();
             isArray = instance != null && instance.getJavaClass().isArray();
             
             if (!isArray) setChildren(NO_NODES);

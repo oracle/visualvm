@@ -22,25 +22,25 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.lang.r;
+package org.graalvm.visualvm.heapviewer.truffle.lang.r;
 
-import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleFrame;
-import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleObjectsView;
-import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleSummaryView;
-import com.sun.tools.visualvm.heapviewer.ui.HeapView;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
-import com.sun.tools.visualvm.heapviewer.ui.SummaryView;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleFrame;
+import org.graalvm.visualvm.heapviewer.truffle.ui.TruffleObjectsView;
+import org.graalvm.visualvm.heapviewer.truffle.ui.TruffleSummaryView;
+import org.graalvm.visualvm.heapviewer.ui.HeapView;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerFeature;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerNodeAction;
+import org.graalvm.visualvm.heapviewer.ui.SummaryView;
 import java.util.Collection;
 import java.util.List;
-import org.netbeans.lib.profiler.heap.FieldValue;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 

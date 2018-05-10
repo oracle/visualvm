@@ -22,20 +22,20 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.lang.r;
+package org.graalvm.visualvm.heapviewer.truffle.lang.r;
 
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleFrame;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObjectPropertyProvider;
-import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleFrame;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleObjectPropertyProvider;
+import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.netbeans.lib.profiler.heap.FieldValue;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.Value;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.Value;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;

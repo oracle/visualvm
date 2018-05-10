@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle;
+package org.graalvm.visualvm.heapviewer.truffle;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,17 +30,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.netbeans.lib.profiler.heap.FieldValue;
-import org.netbeans.lib.profiler.heap.GCRoot;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.lib.profiler.heap.JavaFrameGCRoot;
-import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
-import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
-import org.netbeans.lib.profiler.heap.ThreadObjectGCRoot;
-import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.GCRoot;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaFrameGCRoot;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
+import org.graalvm.visualvm.lib.jfluid.heap.ThreadObjectGCRoot;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 
 /**
  *

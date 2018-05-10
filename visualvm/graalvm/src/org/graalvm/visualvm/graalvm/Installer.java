@@ -22,10 +22,10 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.graalvm;
+package org.graalvm.visualvm.graalvm;
 
-import com.sun.tools.visualvm.application.type.ApplicationTypeFactory;
-import com.sun.tools.visualvm.graalvm.application.type.GraalVMApplicationTypeFactory;
+import org.graalvm.visualvm.application.type.ApplicationTypeFactory;
+import org.graalvm.visualvm.graalvm.application.type.GraalVMApplicationTypeFactory;
 import org.openide.modules.ModuleInstall;
 
 public class Installer extends ModuleInstall {

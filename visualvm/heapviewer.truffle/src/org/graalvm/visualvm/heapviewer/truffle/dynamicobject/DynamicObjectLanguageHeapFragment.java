@@ -22,19 +22,19 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.dynamicobject;
+package org.graalvm.visualvm.heapviewer.truffle.dynamicobject;
 
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguage;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
-import com.sun.tools.visualvm.heapviewer.utils.HeapUtils;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleLanguage;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleType;
+import org.graalvm.visualvm.heapviewer.utils.HeapUtils;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 
 /**
  *

@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.ui;
+package org.graalvm.visualvm.heapviewer.truffle.ui;
 
 import java.awt.CardLayout;
 import java.awt.event.ItemEvent;
@@ -35,26 +35,26 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.SortOrder;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.results.CCTNode;
-import org.netbeans.lib.profiler.ui.components.ProfilerToolbar;
-import org.netbeans.lib.profiler.ui.swing.GrayLabel;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.api.icons.ProfilerIcons;
-import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
-import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.model.RootNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguage;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleThreadsProvider;
-import com.sun.tools.visualvm.heapviewer.ui.HTMLView;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerFeature;
-import com.sun.tools.visualvm.heapviewer.ui.PluggableTreeTableView;
-import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.results.CCTNode;
+import org.graalvm.visualvm.lib.ui.components.ProfilerToolbar;
+import org.graalvm.visualvm.lib.ui.swing.GrayLabel;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.api.icons.ProfilerIcons;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
+import org.graalvm.visualvm.heapviewer.model.Progress;
+import org.graalvm.visualvm.heapviewer.model.RootNode;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleLanguage;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleThreadsProvider;
+import org.graalvm.visualvm.heapviewer.ui.HTMLView;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerFeature;
+import org.graalvm.visualvm.heapviewer.ui.PluggableTreeTableView;
+import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import javax.swing.Icon;
 import org.openide.util.NbBundle;
 

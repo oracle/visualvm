@@ -22,13 +22,13 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle;
+package org.graalvm.visualvm.heapviewer.truffle;
 
-import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleTypeNode;
-import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleObjectNode;
-import com.sun.tools.visualvm.heapviewer.truffle.nodes.TruffleLocalObjectNode;
-import com.sun.tools.visualvm.heapviewer.HeapFragment;
-import com.sun.tools.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleTypeNode;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleObjectNode;
+import org.graalvm.visualvm.heapviewer.truffle.nodes.TruffleLocalObjectNode;
+import org.graalvm.visualvm.heapviewer.HeapFragment;
+import org.graalvm.visualvm.heapviewer.truffle.dynamicobject.DynamicObject;
 import java.awt.Image;
 import java.io.File;
 import java.lang.ref.Reference;
@@ -38,11 +38,11 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import org.netbeans.lib.profiler.heap.Field;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
+import org.graalvm.visualvm.lib.jfluid.heap.Field;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 

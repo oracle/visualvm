@@ -22,22 +22,22 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.nodes;
+package org.graalvm.visualvm.heapviewer.truffle.nodes;
 
 import java.awt.Image;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.NormalBoldGrayRenderer;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
-import com.sun.tools.visualvm.heapviewer.java.InstanceNode;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.NormalBoldGrayRenderer;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
+import org.graalvm.visualvm.heapviewer.java.InstanceNode;
+import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleType;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.openide.util.ImageUtilities;
 
 /**

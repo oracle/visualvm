@@ -22,23 +22,23 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.nodes;
+package org.graalvm.visualvm.heapviewer.truffle.nodes;
 
-import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguage;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
-import com.sun.tools.visualvm.heapviewer.truffle.ui.TruffleObjectView;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerNodeAction;
-import com.sun.tools.visualvm.heapviewer.ui.NodeObjectsView;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleLanguage;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleType;
+import org.graalvm.visualvm.heapviewer.truffle.ui.TruffleObjectView;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerNodeAction;
+import org.graalvm.visualvm.heapviewer.ui.NodeObjectsView;
 import java.util.ArrayList;
 import java.util.List;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 import org.openide.util.NbBundle;
 
 /**

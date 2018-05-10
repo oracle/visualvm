@@ -22,29 +22,29 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.javaext;
+package org.graalvm.visualvm.heapviewer.truffle.javaext;
 
 import java.util.List;
 import java.util.Objects;
 import javax.swing.JComponent;
 import javax.swing.SortOrder;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-import com.sun.tools.visualvm.heapviewer.HeapContext;
-import com.sun.tools.visualvm.heapviewer.java.InstanceNode;
-import com.sun.tools.visualvm.heapviewer.model.DataType;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.model.RootNode;
-import com.sun.tools.visualvm.heapviewer.model.TextNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewPlugin;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerActions;
-import com.sun.tools.visualvm.heapviewer.ui.TreeTableView;
-import com.sun.tools.visualvm.heapviewer.ui.TreeTableViewColumn;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+import org.graalvm.visualvm.heapviewer.HeapContext;
+import org.graalvm.visualvm.heapviewer.java.InstanceNode;
+import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
+import org.graalvm.visualvm.heapviewer.model.Progress;
+import org.graalvm.visualvm.heapviewer.model.RootNode;
+import org.graalvm.visualvm.heapviewer.model.TextNode;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleLanguageHeapFragment;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewPlugin;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerActions;
+import org.graalvm.visualvm.heapviewer.ui.TreeTableView;
+import org.graalvm.visualvm.heapviewer.ui.TreeTableViewColumn;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 

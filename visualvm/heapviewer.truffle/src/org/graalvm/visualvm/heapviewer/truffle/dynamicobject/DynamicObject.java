@@ -22,29 +22,29 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.dynamicobject;
+package org.graalvm.visualvm.heapviewer.truffle.dynamicobject;
 
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.netbeans.lib.profiler.heap.ArrayItemValue;
-import org.netbeans.lib.profiler.heap.Field;
-import org.netbeans.lib.profiler.heap.FieldValue;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.lib.profiler.heap.ObjectArrayInstance;
-import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.lib.profiler.heap.PrimitiveArrayInstance;
-import org.netbeans.lib.profiler.heap.PrimitiveType;
-import org.netbeans.lib.profiler.heap.Type;
-import org.netbeans.lib.profiler.heap.Value;
-import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
-import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
+import org.graalvm.visualvm.lib.jfluid.heap.ArrayItemValue;
+import org.graalvm.visualvm.lib.jfluid.heap.Field;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectArrayInstance;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveArrayInstance;
+import org.graalvm.visualvm.lib.jfluid.heap.PrimitiveType;
+import org.graalvm.visualvm.lib.jfluid.heap.Type;
+import org.graalvm.visualvm.lib.jfluid.heap.Value;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 
 /**
  *

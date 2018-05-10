@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.console.r;
+package org.graalvm.visualvm.heapviewer.console.r;
 
 import java.awt.AWTException;
 import java.awt.Graphics;
@@ -32,7 +32,7 @@ import java.awt.ImageCapabilities;
 import java.awt.RenderingHints;
 import java.util.Objects;
 import javax.swing.JPanel;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  *

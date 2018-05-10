@@ -22,26 +22,26 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.nodes;
+package org.graalvm.visualvm.heapviewer.truffle.nodes;
 
-import com.sun.tools.visualvm.heapviewer.model.DataType;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNodeFilter;
-import com.sun.tools.visualvm.heapviewer.model.Progress;
-import com.sun.tools.visualvm.heapviewer.model.RootNode;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleObject;
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
-import com.sun.tools.visualvm.heapviewer.ui.UIThresholds;
-import com.sun.tools.visualvm.heapviewer.utils.NodesComputer;
-import com.sun.tools.visualvm.heapviewer.utils.ProgressIterator;
+import org.graalvm.visualvm.heapviewer.model.DataType;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNodeFilter;
+import org.graalvm.visualvm.heapviewer.model.Progress;
+import org.graalvm.visualvm.heapviewer.model.RootNode;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleObject;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleType;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.graalvm.visualvm.heapviewer.ui.UIThresholds;
+import org.graalvm.visualvm.heapviewer.utils.NodesComputer;
+import org.graalvm.visualvm.heapviewer.utils.ProgressIterator;
 import java.awt.Font;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.Icon;
 import javax.swing.SortOrder;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
 import org.openide.util.NbBundle;
 
 /**

@@ -22,15 +22,15 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.nodes;
+package org.graalvm.visualvm.heapviewer.truffle.nodes;
 
-import org.netbeans.lib.profiler.ui.swing.renderer.LabelRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.MultiRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.NormalBoldGrayRenderer;
-import org.netbeans.lib.profiler.ui.swing.renderer.ProfilerRenderer;
-import com.sun.tools.visualvm.heapviewer.java.StackFrameNode;
-import com.sun.tools.visualvm.heapviewer.model.HeapViewerNode;
-import com.sun.tools.visualvm.heapviewer.ui.HeapViewerRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.LabelRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.MultiRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.NormalBoldGrayRenderer;
+import org.graalvm.visualvm.lib.ui.swing.renderer.ProfilerRenderer;
+import org.graalvm.visualvm.heapviewer.java.StackFrameNode;
+import org.graalvm.visualvm.heapviewer.model.HeapViewerNode;
+import org.graalvm.visualvm.heapviewer.ui.HeapViewerRenderer;
 import org.openide.util.NbBundle;
 
 /**

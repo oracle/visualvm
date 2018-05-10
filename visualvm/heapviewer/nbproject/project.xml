@@ -145,7 +145,7 @@
             </module-dependencies>
             <friend-packages>
                 <friend>org.graalvm.visualvm.heapdump</friend>
-                <friend>com.sun.tools.visualvm.heapviewer.console</friend>
+                <friend>org.graalvm.visualvm.heapviewer.console</friend>
                 <friend>org.graalvm.visualvm.heapviewer.truffle</friend>
                 <package>org.graalvm.visualvm.heapviewer</package>
                 <package>org.graalvm.visualvm.heapviewer.java</package>

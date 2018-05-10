@@ -22,10 +22,10 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.lang.r;
+package org.graalvm.visualvm.heapviewer.truffle.lang.r;
 
-import com.sun.tools.visualvm.heapviewer.truffle.TruffleType;
-import org.netbeans.lib.profiler.heap.Instance;
+import org.graalvm.visualvm.heapviewer.truffle.TruffleType;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
 
 /**
  *

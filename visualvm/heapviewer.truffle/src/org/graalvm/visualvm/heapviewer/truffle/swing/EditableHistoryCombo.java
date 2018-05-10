@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.truffle.swing;
+package org.graalvm.visualvm.heapviewer.truffle.swing;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -33,7 +33,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
-import org.netbeans.lib.profiler.ui.UIUtils;
+import org.graalvm.visualvm.lib.ui.UIUtils;
 
 /**
  *
@@ -49,7 +49,7 @@ public class EditableHistoryCombo extends JComboBox {
         setEditable(true);
 //        putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE); // NOI18N
         
-        setPrototypeDisplayValue("org.netbeans.lib.profiler.ui.swing.XXXXXXXXXXXXXXXXXXXX"); // NOI18N
+        setPrototypeDisplayValue("org.graalvm.visualvm.lib.ui.swing.XXXXXXXXXXXXXXXXXXXX"); // NOI18N
         Dimension dim = getPreferredSize();
         dim.height = !UIUtils.isNimbusLookAndFeel() ? getMinimumSize().height :
                      new JTextField("X").getPreferredSize().height; // NOI18N

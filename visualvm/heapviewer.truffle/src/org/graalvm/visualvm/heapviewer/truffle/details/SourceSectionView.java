@@ -22,7 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.details;
+package org.graalvm.visualvm.heapviewer.truffle.details;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -49,15 +49,15 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.results.ExportDataDumper;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.heapwalk.details.api.ExportAction;
-import org.netbeans.modules.profiler.heapwalk.details.api.StringDecoder;
-import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
-import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.results.ExportDataDumper;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.ExportAction;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.StringDecoder;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 

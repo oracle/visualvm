@@ -22,10 +22,10 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.console.r.engine;
+package org.graalvm.visualvm.heapviewer.console.r.engine;
 
 import java.util.List;
-import org.netbeans.lib.profiler.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
 
 /**
  *

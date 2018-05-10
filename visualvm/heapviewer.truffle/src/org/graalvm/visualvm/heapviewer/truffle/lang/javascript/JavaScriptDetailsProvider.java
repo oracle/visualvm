@@ -22,21 +22,21 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.sun.tools.visualvm.heapviewer.truffle.lang.javascript;
+package org.graalvm.visualvm.heapviewer.truffle.lang.javascript;
 
-import com.sun.tools.visualvm.heapviewer.truffle.details.SourceDetailsProvider;
-import com.sun.tools.visualvm.heapviewer.truffle.details.SourceSectionView;
+import org.graalvm.visualvm.heapviewer.truffle.details.SourceDetailsProvider;
+import org.graalvm.visualvm.heapviewer.truffle.details.SourceSectionView;
 import java.util.Iterator;
 import java.util.Locale;
-import org.netbeans.lib.profiler.heap.Field;
-import org.netbeans.lib.profiler.heap.FieldValue;
-import org.netbeans.lib.profiler.heap.Heap;
-import org.netbeans.lib.profiler.heap.Instance;
-import org.netbeans.lib.profiler.heap.JavaClass;
-import org.netbeans.lib.profiler.heap.ObjectFieldValue;
-import org.netbeans.modules.profiler.heapwalk.details.api.DetailsSupport;
-import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsProvider;
-import org.netbeans.modules.profiler.heapwalk.details.spi.DetailsUtils;
+import org.graalvm.visualvm.lib.jfluid.heap.Field;
+import org.graalvm.visualvm.lib.jfluid.heap.FieldValue;
+import org.graalvm.visualvm.lib.jfluid.heap.Heap;
+import org.graalvm.visualvm.lib.jfluid.heap.Instance;
+import org.graalvm.visualvm.lib.jfluid.heap.JavaClass;
+import org.graalvm.visualvm.lib.jfluid.heap.ObjectFieldValue;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.api.DetailsSupport;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsProvider;
+import org.graalvm.visualvm.lib.profiler.heapwalk.details.spi.DetailsUtils;
 import org.openide.util.lookup.ServiceProvider;
 
 /**

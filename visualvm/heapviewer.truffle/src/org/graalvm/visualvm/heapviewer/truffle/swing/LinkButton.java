@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.truffle.swing;
+package org.graalvm.visualvm.heapviewer.truffle.swing;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -41,7 +41,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 /**
- * Copied from com.sun.tools.visualvm.heapviewer.swing.LinkButton
+ * Copied from org.graalvm.visualvm.heapviewer.swing.LinkButton
  *
  * @author Jiri Sedlacek
  */

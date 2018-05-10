@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.console.r;
+package org.graalvm.visualvm.heapviewer.console.r;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -41,7 +41,7 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 /**
- * Copy of com.sun.tools.visualvm.heapviewer.swing.MultiSplitContainer
+ * Copy of org.graalvm.visualvm.heapviewer.swing.MultiSplitContainer
  * TODO: make this a public class and share it to prevent duplication.
  *
  * @author Jiri Sedlacek

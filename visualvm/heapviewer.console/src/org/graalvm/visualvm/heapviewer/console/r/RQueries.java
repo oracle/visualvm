@@ -23,7 +23,7 @@
  * questions.
  */
 
-package com.sun.tools.visualvm.heapviewer.console.r;
+package org.graalvm.visualvm.heapviewer.console.r;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -48,15 +48,15 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
-import org.netbeans.lib.profiler.ui.UIUtils;
-import org.netbeans.modules.profiler.api.ProfilerDialogs;
-import org.netbeans.modules.profiler.api.icons.GeneralIcons;
-import org.netbeans.modules.profiler.api.icons.Icons;
-//import org.netbeans.modules.profiler.heapwalk.OQLSupport;
-//import org.netbeans.modules.profiler.heapwalk.ui.icons.HeapWalkerIcons;
-//import org.netbeans.modules.profiler.oql.repository.api.OQLQueryCategory;
-//import org.netbeans.modules.profiler.oql.repository.api.OQLQueryDefinition;
-//import org.netbeans.modules.profiler.oql.repository.api.OQLQueryRepository;
+import org.graalvm.visualvm.lib.ui.UIUtils;
+import org.graalvm.visualvm.lib.profiler.api.ProfilerDialogs;
+import org.graalvm.visualvm.lib.profiler.api.icons.GeneralIcons;
+import org.graalvm.visualvm.lib.profiler.api.icons.Icons;
+//import org.graalvm.visualvm.lib.profiler.heapwalk.OQLSupport;
+//import org.graalvm.visualvm.lib.profiler.heapwalk.ui.icons.HeapWalkerIcons;
+//import org.graalvm.visualvm.lib.profiler.oql.repository.api.OQLQueryCategory;
+//import org.graalvm.visualvm.lib.profiler.oql.repository.api.OQLQueryDefinition;
+//import org.graalvm.visualvm.lib.profiler.oql.repository.api.OQLQueryRepository;
 import org.openide.awt.StatusDisplayer;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
