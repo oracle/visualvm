@@ -261,6 +261,7 @@ final class FilterUtils {
         };
         String filterAccelerator = ActionsSupport.keyAcceleratorString(filterKey);
         filter.setToolTipText(Bundle.TruffleFilterUtils_FilterResults(filterAccelerator));
+        filter.putClientProperty("JComponent.sizeVariant", "regular"); // NOI18N
         
         Action filterAction = new AbstractAction() {
             public void actionPerformed(final ActionEvent e) {

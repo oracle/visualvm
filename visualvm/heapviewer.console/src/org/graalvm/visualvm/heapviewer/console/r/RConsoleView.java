@@ -460,6 +460,7 @@ class RConsoleView extends HeapViewerFeature {
                     return getPreferredSize();
                 }
             };
+            runButton.putClientProperty("JComponent.sizeVariant", "regular"); // NOI18N
             
             cancelAction = new AbstractAction(Bundle.RConsoleView_CancelAction(), Icons.getIcon(GeneralIcons.STOP)) {
                 {
